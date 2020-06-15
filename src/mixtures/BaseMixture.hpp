@@ -1,7 +1,6 @@
 #ifndef BASEMIXTURE_HPP
 #define BASEMIXTURE_HPP
 
-
 //! Abstract base class for a generic mixture model
 
 //! This class represents a mixture model object to be used in a BNP iterative
@@ -16,30 +15,27 @@
 //! distributions on them.
 
 class BaseMixture {
-public:
-    // DESTRUCTOR AND CONSTRUCTORS
-    virtual ~BaseMixture() = default;
-    BaseMixture() = default;
+ public:
+  // DESTRUCTOR AND CONSTRUCTORS
+  virtual ~BaseMixture() = default;
+  BaseMixture() = default;
 
+  // PROBABILITIES FUNCTIONS
+  //! Mass probability for choosing an already existing cluster
 
-    // PROBABILITIES FUNCTIONS
-    //! Mass probability for choosing an already existing cluster
+  //! \param card Cardinality of the cluster
+  //! \param n    Total number of data points
+  //! \return     Probability value
+  virtual double mass_existing_cluster(const unsigned int card,
+                                       const unsigned int n) const = 0;
 
-    //! \param card Cardinality of the cluster
-    //! \param n    Total number of data points
-    //! \return     Probability value
-    virtual double mass_existing_cluster(const unsigned int card,
-        const unsigned int n) const = 0;
+  //! Mass probability for choosing a newly created cluster
 
-
-    //! Mass probability for choosing a newly created cluster
-
-    //! \param n_clust Number of clusters
-    //! \param n       Total number of data points
-    //! \return        Probability value
-    virtual double mass_new_cluster(const unsigned int n_clust,
-        const unsigned int n) const = 0;
+  //! \param n_clust Number of clusters
+  //! \param n       Total number of data points
+  //! \return        Probability value
+  virtual double mass_new_cluster(const unsigned int n_clust,
+                                  const unsigned int n) const = 0;
 };
 
-
-#endif // BASEMIXTURE_HPP
+#endif  // BASEMIXTURE_HPP

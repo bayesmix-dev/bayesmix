@@ -6,7 +6,6 @@
 #include <memory>
 #include <vector>
 
-
 //! Generic object factory for an abstract product.
 
 //! An object factory allows to choose one of several derived objects from a
@@ -23,83 +22,75 @@
 //! \param AbstractProduct Class name for the abstract base object
 //! \param Args...         Collection of parameters for the objects constructors
 
-template<class AbstractProduct, typename... Args>
-class Factory{
-private:
-    using Identifier = std::string;
-    using Builder = std::function< std::unique_ptr<AbstractProduct>(
-        Args...)>;
+template <class AbstractProduct, typename... Args>
+class Factory {
+ private:
+  using Identifier = std::string;
+  using Builder = std::function<std::unique_ptr<AbstractProduct>(Args...)>;
 
-    //! Storage for algorithm builders
-    std::map<Identifier, Builder> storage;
+  //! Storage for algorithm builders
+  std::map<Identifier, Builder> storage;
 
-    // CONSTRUCTORS AND COPY OOPERATORS
-    Factory() = default;
-    Factory(const Factory &f) = delete;
-    Factory& operator=(const Factory &f) = delete;
+  // CONSTRUCTORS AND COPY OOPERATORS
+  Factory() = default;
+  Factory(const Factory &f) = delete;
+  Factory &operator=(const Factory &f) = delete;
 
-public:
-    //! Public destructor
-    ~Factory() = default;
+ public:
+  //! Public destructor
+  ~Factory() = default;
 
+  //! Creates the factory via Meyer's trick
 
-    //! Creates the factory via Meyer's trick
+  //! \return A reference to the factory object
+  static Factory &Instance() {
+    static Factory factory;
+    return factory;
+  }
 
-    //! \return A reference to the factory object
-    static Factory& Instance(){
-        static Factory factory;
-        return factory;
+  //! Creates a specific object based on an identifier
+
+  //! \param name Identifier for the object
+  //! \param args Collection of any number of parameters
+  //! \return     An unique pointer to the created object
+  std::unique_ptr<AbstractProduct> create_object(const Identifier &name,
+                                                 Args... args) const {
+    auto f = storage.find(name);
+    if (f == storage.end()) {
+      throw std::invalid_argument("Error: factory identifier not found");
+    } else {
+      return f->second(std::forward<Args>(args)...);
     }
+  }
 
+  //! Adds a builder function to the storage
 
-    //! Creates a specific object based on an identifier
-
-    //! \param name Identifier for the object
-    //! \param args Collection of any number of parameters
-    //! \return     An unique pointer to the created object
-    std::unique_ptr<AbstractProduct> create_object(const Identifier &name,
-        Args... args) const {
-        auto f = storage.find(name);
-        if(f == storage.end()){
-            throw std::invalid_argument("Error: factory identifier not found");
-        }
-        else {
-            return f->second(std::forward<Args>(args)...);
-        }
+  //! \param name    Identifier to associate the builder with
+  //! \param bulider Builder function for a specific object type
+  void add_builder(const Identifier &name, const Builder &builder) {
+    auto f = storage.insert(std::make_pair(name, builder));
+    if (f.second == false) {
+      std::cout << "Warning: new duplicate builder was not added to factory"
+                << std::endl;
     }
+  }
 
-
-    //! Adds a builder function to the storage
-
-    //! \param name    Identifier to associate the builder with
-    //! \param bulider Builder function for a specific object type
-    void add_builder(const Identifier &name, const Builder &builder){
-        auto f = storage.insert(std::make_pair(name, builder));
-        if(f.second == false){
-            std::cout <<
-                "Warning: new duplicate builder was not added to factory" <<
-                std::endl;
-        }
+  //! Returns a list of identifiers of all builders in the storage
+  std::vector<Identifier> list_of_known_builders() const {
+    std::vector<Identifier> tmp;
+    tmp.reserve(storage.size());
+    for (auto i = storage.begin(); i != storage.end(); i++) {
+      tmp.push_back(i->first);
     }
+    return tmp;
+  }
 
+  //! Checks whether the given algorithm is already in the storage
 
-    //! Returns a list of identifiers of all builders in the storage
-    std::vector<Identifier> list_of_known_builders() const {
-        std::vector<Identifier> tmp;
-        tmp.reserve(storage.size());
-        for(auto i = storage.begin(); i != storage.end(); i++){
-            tmp.push_back(i->first);
-        }
-        return tmp;
-    }
-
-
-    //! Checks whether the given algorithm is already in the storage
-
-    //! \param algo Id for the algorithm to check
-    bool check_existence(const Identifier &algo) const {
-        return !( storage.find(algo) == storage.end() );
-    }
+  //! \param algo Id for the algorithm to check
+  bool check_existence(const Identifier &algo) const {
+    return !(storage.find(algo) == storage.end());
+  }
 };
 
-#endif // FACTORY_HPP
+#endif  // FACTORY_HPP

@@ -11,6 +11,8 @@ add_subdirectory(hierarchies)
 add_subdirectory(hyperparameters)
 add_subdirectory(mixtures)
 add_subdirectory(runtime)
+add_subdirectory(utils)
+
 
 
 

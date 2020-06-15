@@ -1,8 +1,9 @@
 #ifndef HIERARCHYNNIG_HPP
 #define HIERARCHYNNIG_HPP
 
-#include "HierarchyBase.hpp"
+#include <src/utils/rng.hpp>
 
+#include "HierarchyBase.hpp"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.
 
@@ -22,48 +23,48 @@
 
 //! \param Hypers Name of the hyperparameters class
 
-template<class Hypers>
+template <class Hypers>
 class HierarchyNNIG : public HierarchyBase<Hypers> {
-protected:
-    using HierarchyBase<Hypers>::state;
-    using HierarchyBase<Hypers>::hypers;
+ protected:
+  using HierarchyBase<Hypers>::state;
+  using HierarchyBase<Hypers>::hypers;
 
-    // AUXILIARY TOOLS
-    //! Raises error if the state values are not valid w.r.t. their own domain
-    void check_state_validity() override;
+  // AUXILIARY TOOLS
+  //! Raises error if the state values are not valid w.r.t. their own domain
+  void check_state_validity() override;
 
-    //! Returns updated values of the prior hyperparameters via their posterior
-    std::vector<double> normal_gamma_update(const Eigen::VectorXd &data,
-        const double mu0, const double alpha0, const double beta0,
-        const double lambda);
+  //! Returns updated values of the prior hyperparameters via their posterior
+  std::vector<double> normal_gamma_update(const Eigen::VectorXd &data,
+                                          const double mu0, const double alpha0,
+                                          const double beta0,
+                                          const double lambda);
 
-public:
-    //! Returns true if the hierarchy models multivariate data (here, false)
-    bool is_multivariate() const override {return false;}
+ public:
+  //! Returns true if the hierarchy models multivariate data (here, false)
+  bool is_multivariate() const override { return false; }
 
-    // DESTRUCTOR AND CONSTRUCTORS
-    ~HierarchyNNIG() = default;
-    HierarchyNNIG(std::shared_ptr<Hypers> hypers_) {
-        hypers = hypers_;
-        state = std::vector<Eigen::MatrixXd>(2,Eigen::MatrixXd(1,1));
-        state[0](0,0) = hypers->get_mu0();
-        state[1](0,0) = sqrt(hypers->get_beta0()/(hypers->get_alpha0()-1));
-    }
+  // DESTRUCTOR AND CONSTRUCTORS
+  ~HierarchyNNIG() = default;
+  HierarchyNNIG(std::shared_ptr<Hypers> hypers_) {
+    hypers = hypers_;
+    state = std::vector<Eigen::MatrixXd>(2, Eigen::MatrixXd(1, 1));
+    state[0](0, 0) = hypers->get_mu0();
+    state[1](0, 0) = sqrt(hypers->get_beta0() / (hypers->get_alpha0() - 1));
+  }
 
-    // EVALUATION FUNCTIONS
-    //! Evaluates the likelihood of data in the given points
-    Eigen::VectorXd like(const Eigen::MatrixXd &data) override;
-    //! Evaluates the marginal distribution of data in the given points
-    Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) override;
+  // EVALUATION FUNCTIONS
+  //! Evaluates the likelihood of data in the given points
+  Eigen::VectorXd like(const Eigen::MatrixXd &data) override;
+  //! Evaluates the marginal distribution of data in the given points
+  Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) override;
 
-    // SAMPLING FUNCTIONS
-    //! Generates new values for state from the centering prior distribution
-    void draw() override;
-    //! Generates new values for state from the centering posterior distribution
-    void sample_given_data(const Eigen::MatrixXd &data) override;
+  // SAMPLING FUNCTIONS
+  //! Generates new values for state from the centering prior distribution
+  void draw() override;
+  //! Generates new values for state from the centering posterior distribution
+  void sample_given_data(const Eigen::MatrixXd &data) override;
 };
-
 
 #include "HierarchyNNIG.imp.hpp"
 
-#endif // HIERARCHYNNIG_HPP
+#endif  // HIERARCHYNNIG_HPP

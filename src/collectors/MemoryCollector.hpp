@@ -3,7 +3,6 @@
 
 #include "BaseCollector.hpp"
 
-
 //! Class for a "virtual" collector which contains all objects of the chain
 
 //! This is a type of collector which includes a deque containing all states of
@@ -14,34 +13,32 @@
 //! is not needed, for instance in a main program that both runes and algorithm
 //! and computes the estimates.
 
-class MemoryCollector: public BaseCollector {
-protected:
-    //! Deque that contains all states in Protobuf-object form
-    std::deque<State> chain;
+class MemoryCollector : public BaseCollector {
+ protected:
+  //! Deque that contains all states in Protobuf-object form
+  std::deque<State> chain;
 
-    //! Reads the next state, based on the curr_iter curson
-    State next_state() override;
+  //! Reads the next state, based on the curr_iter curson
+  State next_state() override;
 
-public:
-    // DESTRUCTOR AND CONSTRUCTORS
-    ~MemoryCollector() = default;
-    MemoryCollector() = default;
+ public:
+  // DESTRUCTOR AND CONSTRUCTORS
+  ~MemoryCollector() = default;
+  MemoryCollector() = default;
 
-    //! Initializes collector (here, it does nothing)
-    void start() override {return;}
-    //! Closes collector (here, it does nothing)
-    void finish() override {return;}
+  //! Initializes collector (here, it does nothing)
+  void start() override { return; }
+  //! Closes collector (here, it does nothing)
+  void finish() override { return; }
 
-    //! Writes the given state to the collector
-    void collect(State iter_state) override;
+  //! Writes the given state to the collector
+  void collect(State iter_state) override;
 
-    // GETTERS AND SETTERS
-    //! Returns i-th state in the collector
-    State get_state(unsigned int i) override {return chain[i];}
-    //! Returns the whole chain in form of a deque of States
-    std::deque<State> get_chain() override {return chain;}
-
+  // GETTERS AND SETTERS
+  //! Returns i-th state in the collector
+  State get_state(unsigned int i) override { return chain[i]; }
+  //! Returns the whole chain in form of a deque of States
+  std::deque<State> get_chain() override { return chain; }
 };
 
-
-#endif // MEMORYCOLLECTOR_HPP
+#endif  // MEMORYCOLLECTOR_HPP

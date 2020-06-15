@@ -1,19 +1,19 @@
 #ifndef BASECOLLECTOR_HPP
 #define BASECOLLECTOR_HPP
 
+#include <fcntl.h>
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/text_format.h>
+#include <google/protobuf/util/delimited_message_util.h>
+#include <stdio.h>
+#include <unistd.h>
+
 #include <deque>
 #include <fstream>
 #include <string>
 #include <vector>
-#include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
 
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/util/delimited_message_util.h>
 #include "chain_state.pb.h"
-
 
 //! Abstract base class for a collector that contains a chain in Protobuf form
 
@@ -27,47 +27,46 @@
 //! whole Markov chain by the end of the running of the algorithm.
 
 class BaseCollector {
-protected:
-    //! Current size of the chain
-    unsigned int size = 0;
-    //! Read cursor that indicates the current iteration
-    unsigned int curr_iter = -1;
+ protected:
+  //! Current size of the chain
+  unsigned int size = 0;
+  //! Read cursor that indicates the current iteration
+  unsigned int curr_iter = -1;
 
-    //! Reads the next state, based on the curr_iter curson
-    //! \return The requested state in protobuf-object form
-    virtual State next_state() = 0;
+  //! Reads the next state, based on the curr_iter curson
+  //! \return The requested state in protobuf-object form
+  virtual State next_state() = 0;
 
-public:
-    // DESTRUCTOR AND CONSTRUCTORS
-    virtual ~BaseCollector() = default;
-    BaseCollector() = default;
+ public:
+  // DESTRUCTOR AND CONSTRUCTORS
+  virtual ~BaseCollector() = default;
+  BaseCollector() = default;
 
-    //! Initializes collector
-    virtual void start() = 0;
-    //! Closes collector
-    virtual void finish() = 0;
+  //! Initializes collector
+  virtual void start() = 0;
+  //! Closes collector
+  virtual void finish() = 0;
 
-    //! Reads the next state and advances the cursor by 1
-    //! \return The requested state in protobuf-object form
-    State get_next_state(){
-        curr_iter++;
-        if(curr_iter >= size){
-            throw std::out_of_range("Error: curr_iter > size in collector");
-        }
-        return next_state();
+  //! Reads the next state and advances the cursor by 1
+  //! \return The requested state in protobuf-object form
+  State get_next_state() {
+    curr_iter++;
+    if (curr_iter >= size) {
+      throw std::out_of_range("Error: curr_iter > size in collector");
     }
+    return next_state();
+  }
 
-    //! Writes the given state to the collector
-    virtual void collect(State iter_state) = 0;
+  //! Writes the given state to the collector
+  virtual void collect(State iter_state) = 0;
 
-    // GETTERS AND SETTERS
-    //! Returns i-th state in the collector
-    virtual State get_state(unsigned int i) = 0;
-    //! Returns the whole chain in form of a deque of States
-    virtual std::deque<State> get_chain() = 0;
+  // GETTERS AND SETTERS
+  //! Returns i-th state in the collector
+  virtual State get_state(unsigned int i) = 0;
+  //! Returns the whole chain in form of a deque of States
+  virtual std::deque<State> get_chain() = 0;
 
-    unsigned int get_size() const {return size;}
+  unsigned int get_size() const { return size; }
 };
 
-
-#endif // BASECOLLECTOR_HPP
+#endif  // BASECOLLECTOR_HPP
