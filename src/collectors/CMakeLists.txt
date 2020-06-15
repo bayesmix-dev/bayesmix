@@ -1,0 +1,10 @@
+target_sources(bayesmix
+  PUBLIC
+    BaseCollector.hpp
+    FileCollector.hpp
+    FileCollector.cpp
+    MemoryCollector.hpp
+    MemoryCollector.cpp
+    chain_state.pb.h
+    chain_state.pb.cc
+)

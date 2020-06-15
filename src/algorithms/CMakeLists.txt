@@ -1,0 +1,9 @@
+target_sources(bayesmix
+  PUBLIC
+    Algorithm.hpp
+    Algorithm.imp.hpp
+    Neal2.hpp
+    Neal2.imp.hpp
+    Neal8.hpp
+    Neal8.imp.hpp
+)
