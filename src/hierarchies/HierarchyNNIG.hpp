@@ -55,8 +55,12 @@ class HierarchyNNIG : public HierarchyBase<Hypers> {
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points
   Eigen::VectorXd like(const Eigen::MatrixXd &data) override;
+  //! Evaluates the log-likelihood of data in the given points
+  Eigen::VectorXd lpdf(const Eigen::MatrixXd &data) override;
   //! Evaluates the marginal distribution of data in the given points
   Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) override;
+  //! Evaluates the log-marginal distributionof data in the given points
+  Eigen::VectorXd marg_lpdf(const Eigen::MatrixXd &data) override;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution

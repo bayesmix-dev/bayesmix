@@ -46,7 +46,7 @@ class HierarchyNNW : public HierarchyBase<Hypers> {
   //! Returns updated values of the prior hyperparameters via their posterior
   std::vector<Eigen::MatrixXd> normal_wishart_update(
       const Eigen::MatrixXd &data, const EigenRowVec &mu0, const double lambda,
-      const Eigen::MatrixXd &tau0, const double nu);
+      const Eigen::MatrixXd &tau0_inv, const double nu);
 
  public:
   //! Returns true if the hierarchy models multivariate data (here, true)
@@ -65,8 +65,15 @@ class HierarchyNNW : public HierarchyBase<Hypers> {
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points
   Eigen::VectorXd like(const Eigen::MatrixXd &data) override;
+  
+  //! Evaluates the log-likelihood of data in the given points
+  Eigen::VectorXd lpdf(const Eigen::MatrixXd &data) override;
+  
   //! Evaluates the marginal distribution of data in the given points
   Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) override;
+  
+  //! Evaluates the log-marginal distributionof data in the given points
+  Eigen::VectorXd marg_lpdf(const Eigen::MatrixXd &data) override;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution

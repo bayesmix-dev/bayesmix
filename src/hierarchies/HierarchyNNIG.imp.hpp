@@ -39,11 +39,19 @@ std::vector<double> HierarchyNNIG<Hypers>::normal_gamma_update(
 //! \return     Likehood vector evaluated in data
 template <class Hypers>
 Eigen::VectorXd HierarchyNNIG<Hypers>::like(const Eigen::MatrixXd &data) {
+  Eigen::VectorXd result = lpdf(data);
+  return result.array().exp();
+}
+
+//! \param data Column vector of data points
+//! \return     Log-Likehood vector evaluated in data
+template <class Hypers>
+Eigen::VectorXd HierarchyNNIG<Hypers>::lpdf(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
-    result(i) = exp(
-        stan::math::normal_lpdf(data(i, 0), state[0](0, 0), state[1](0, 0)));
+    result(i) =
+        stan::math::normal_lpdf(data(i, 0), state[0](0, 0), state[1](0, 0));
   }
   return result;
 }
@@ -52,6 +60,14 @@ Eigen::VectorXd HierarchyNNIG<Hypers>::like(const Eigen::MatrixXd &data) {
 //! \return     Marginal distribution vector evaluated in data
 template <class Hypers>
 Eigen::VectorXd HierarchyNNIG<Hypers>::eval_marg(const Eigen::MatrixXd &data) {
+  Eigen::VectorXd result = marg_lpdf(data);
+  return result.array().exp();
+}
+
+//! \param data Column vector of data points
+//! \return     Marginal distribution vector evaluated in data (log)
+template <class Hypers>
+Eigen::VectorXd HierarchyNNIG<Hypers>::marg_lpdf(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
   double mu0 = hypers->get_mu0();
   double lambda = hypers->get_lambda();
@@ -64,8 +80,7 @@ Eigen::VectorXd HierarchyNNIG<Hypers>::eval_marg(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute marginal for each data point
-    result(i) =
-        exp(stan::math::student_t_lpdf(data(i, 0), 2 * alpha0, mu0, sig_n));
+    result(i) = stan::math::student_t_lpdf(data(i, 0), 2 * alpha0, mu0, sig_n);
   }
   return result;
 }

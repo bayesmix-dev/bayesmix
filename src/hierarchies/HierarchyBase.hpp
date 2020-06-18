@@ -49,8 +49,12 @@ class HierarchyBase {
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points
   virtual Eigen::VectorXd like(const Eigen::MatrixXd &data) = 0;
+  //! Evaluates the log-likelihood of data in the given points
+  virtual Eigen::VectorXd lpdf(const Eigen::MatrixXd &data) = 0;
   //! Evaluates the marginal distribution of data in the given points
   virtual Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) = 0;
+  //! Evaluates the log-marginal distributionof data in the given points
+  virtual Eigen::VectorXd marg_lpdf(const Eigen::MatrixXd &data) = 0;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
@@ -70,7 +74,6 @@ class HierarchyBase {
       check_state_validity();
     }
   }
-  void set_rng_seed(const unsigned int seed) { rng.seed(seed); }
 };
 
 #endif  // HIERARCHYBASE_HPP

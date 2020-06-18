@@ -25,7 +25,7 @@ void HierarchyNNW<Hypers>::set_tau_and_utilities(const Eigen::MatrixXd &tau) {
 
   // Update tau utilities
   tau_chol_factor = Eigen::LLT<Eigen::MatrixXd>(tau);
-  tau_chol_factor_eval = tau_chol_factor.matrixL();
+  tau_chol_factor_eval = tau_chol_factor.matrixL().transpose();
   Eigen::VectorXd diag = tau_chol_factor_eval.diagonal();
   tau_log_det = 2 * log(diag.array()).sum();
 }
@@ -36,7 +36,7 @@ void HierarchyNNW<Hypers>::set_tau_and_utilities(const Eigen::MatrixXd &tau) {
 template <class Hypers>
 std::vector<Eigen::MatrixXd> HierarchyNNW<Hypers>::normal_wishart_update(
     const Eigen::MatrixXd &data, const EigenRowVec &mu0, const double lambda,
-    const Eigen::MatrixXd &tau0, const double nu) {
+    const Eigen::MatrixXd &tau0_inv, const double nu) {
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::MatrixXd lambda_post(1, 1), nu_post(1, 1);
@@ -54,9 +54,8 @@ std::vector<Eigen::MatrixXd> HierarchyNNW<Hypers>::normal_wishart_update(
   }
   tau_temp +=
       (n * lambda / (n + lambda)) * (mubar - mu0).transpose() * (mubar - mu0);
-  tau_temp = 0.5 * tau_temp + tau0.inverse();
-  Eigen::MatrixXd tau_post = tau_temp.inverse();
-
+  tau_temp = 0.5 * tau_temp + tau0_inv;
+  Eigen::MatrixXd tau_post = stan::math::inverse_spd(tau_temp);
   return std::vector<Eigen::MatrixXd>{mu_post, lambda_post, tau_post, nu_post};
 }
 
@@ -64,22 +63,29 @@ std::vector<Eigen::MatrixXd> HierarchyNNW<Hypers>::normal_wishart_update(
 //! \return     Likehood vector evaluated in data
 template <class Hypers>
 Eigen::VectorXd HierarchyNNW<Hypers>::like(const Eigen::MatrixXd &data) {
+  Eigen::VectorXd result = lpdf(data);
+  return result.array().exp();
+}
+
+//! \param data Matrix of row-vectorial data points
+//! \return     Log-Likehood vector evaluated in data
+template <class Hypers>
+Eigen::VectorXd HierarchyNNW<Hypers>::lpdf(const Eigen::MatrixXd &data) {
+  using stan::math::NEG_LOG_SQRT_TWO_PI;
+
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);
   EigenRowVec mu(state[0]);
+  double base = 0.5 * tau_log_det + NEG_LOG_SQRT_TWO_PI * data.cols();
 
   for (size_t i = 0; i < n; i++) {
     // Compute likelihood for each data point
     EigenRowVec datum = data.row(i);
-    result(i) =
-        std::pow(2.0 * M_PI, -data.cols() / 2.0) *
-        std::exp(0.5 * (tau_log_det - ((tau_chol_factor_eval.transpose() *
-                                        (datum - mu).transpose())
-                                           .squaredNorm())));
-    // Unoptimized likelihood by Stan:
-    // result(i) = std::exp(stan::math::multi_normal_prec_lpdf(
-    //     datum, mu, state[1]));
+    double exp =
+        0.5 * (tau_chol_factor_eval * (datum - mu).transpose()).squaredNorm();
+
+    result(i) = base - exp;
   }
   return result;
 }
@@ -88,6 +94,14 @@ Eigen::VectorXd HierarchyNNW<Hypers>::like(const Eigen::MatrixXd &data) {
 //! \return     Marginal distribution vector evaluated in data
 template <class Hypers>
 Eigen::VectorXd HierarchyNNW<Hypers>::eval_marg(const Eigen::MatrixXd &data) {
+  Eigen::VectorXd result = marg_lpdf(data);
+  return result.array().exp();
+}
+
+//! \param data Matrix of row-vectorial data points
+//! \return     Marginal distribution vector evaluated in data
+template <class Hypers>
+Eigen::VectorXd HierarchyNNW<Hypers>::marg_lpdf(const Eigen::MatrixXd &data) {
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);
@@ -96,19 +110,18 @@ Eigen::VectorXd HierarchyNNW<Hypers>::eval_marg(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
   EigenRowVec mu0 = hypers->get_mu0();
   double lambda = hypers->get_lambda();
-  Eigen::MatrixXd tau0 = hypers->get_tau0();
+  Eigen::MatrixXd tau0_inv = hypers->get_tau0_inv();
   double nu = hypers->get_nu();
 
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * nu - dim + 1;
   Eigen::MatrixXd sigma_n =
-      tau0.inverse() * (nu - 0.5 * (dim - 1)) * lambda / (lambda + 1);
+      tau0_inv * (nu - 0.5 * (dim - 1)) * lambda / (lambda + 1);
 
   for (size_t i = 0; i < n; i++) {
     // Compute marginal for each data point
     EigenRowVec datum = data.row(i);
-    result(i) =
-        exp(stan::math::multi_student_t_lpdf(datum, nu_n, mu0, sigma_n));
+    result(i) = stan::math::multi_student_t_lpdf(datum, nu_n, mu0, sigma_n);
   }
   return result;
 }
@@ -124,9 +137,8 @@ void HierarchyNNW<Hypers>::draw() {
   // Generate new state values from their prior centering distribution
   Eigen::MatrixXd tau_new =
       stan::math::wishart_rng(nu, tau0, Rng::Instance().get());
-  Eigen::MatrixXd sigma = tau_new.inverse();
-  EigenRowVec mu_new = stan::math::multi_normal_rng(mu0, sigma * (1 / lambda),
-                                                    Rng::Instance().get());
+  EigenRowVec mu_new = stan::math::multi_normal_prec_rng(mu0, tau_new * lambda,
+                                                         Rng::Instance().get());
 
   // Update state
   state[0] = mu_new;
@@ -139,12 +151,12 @@ void HierarchyNNW<Hypers>::sample_given_data(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
   EigenRowVec mu0 = hypers->get_mu0();
   double lambda = hypers->get_lambda();
-  Eigen::MatrixXd tau0 = hypers->get_tau0();
+  Eigen::MatrixXd tau0_inv = hypers->get_tau0_inv();
   double nu = hypers->get_nu();
 
   // Update values
   std::vector<Eigen::MatrixXd> temp =
-      normal_wishart_update(data, mu0, lambda, tau0, nu);
+      normal_wishart_update(data, mu0, lambda, tau0_inv, nu);
   EigenRowVec mu_post = temp[0];
   double lambda_post = temp[1](0, 0);
   Eigen::MatrixXd tau_post = temp[2];
@@ -153,9 +165,8 @@ void HierarchyNNW<Hypers>::sample_given_data(const Eigen::MatrixXd &data) {
   // Generate new state values from their prior centering distribution
   Eigen::MatrixXd tau_new =
       stan::math::wishart_rng(nu_post, tau_post, Rng::Instance().get());
-  Eigen::MatrixXd sigma = tau_new.inverse();
-  EigenRowVec mu_new = stan::math::multi_normal_rng(
-      mu_post, sigma * (1 / lambda_post), Rng::Instance().get());
+  EigenRowVec mu_new = stan::math::multi_normal_prec_rng(
+      mu_post, tau_new * lambda_post, Rng::Instance().get());
 
   // Update state
   state[0] = mu_new;
