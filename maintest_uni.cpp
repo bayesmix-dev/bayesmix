@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
   BaseCollector *coll;
   std::string colltype = argv[3];
   if (colltype == "file") {
-    std::string filename = "collector_uni.recordio";
+    std::string filename = "resources/collector_uni.recordio";
     if (argc > 4) {
       filename = argv[4];
     } else {
