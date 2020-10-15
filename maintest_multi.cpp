@@ -49,15 +49,15 @@ int main(int argc, char *argv[]) {
   // =========================================================================
   // SET MODEL PARAMETERS
   // =========================================================================
-  Eigen::Matrix<double, 1, 2> mu0;  mu0 << 5.5, 5.5;
+  Eigen::Matrix<double, 1, 2> mu0;
+  mu0 << 5.5, 5.5;
   double lambda = 0.2;
   double nu = 5.0;
-  Eigen::MatrixXd tau0 = (1/nu) * Eigen::Matrix<double, 2, 2>::Identity();
+  Eigen::MatrixXd tau0 = (1 / nu) * Eigen::Matrix<double, 2, 2>::Identity();
   HypersType hy(mu0, lambda, tau0, nu);
 
   double totalmass = 1.0;
   MixtureType mix(totalmass);
-
 
   // =========================================================================
   // LOAD ALGORITHM FACTORY
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
         hy, mix, data, init);
   };
   Builder neal8builder = [](HypersType hy, MixtureType mix,
-                            Eigen::MatrixXd data, unsigned int init){
+                            Eigen::MatrixXd data, unsigned int init) {
     return std::make_unique<Neal8<HierarchyType, HypersType, MixtureType>>(
         hy, mix, data, init);
   };
