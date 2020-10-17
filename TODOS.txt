@@ -1,0 +1,11 @@
+PRIORITY LIST
+* Mixture -> mixing
+* (3) Full run-time implementation
+* (3) Gamma prior on total mass
+* (3) Regression: linear DDP
+* (2) Regression: weight dependent model (logit s.b.)
+* (1) Extension to normalized rand. meas. / normal generalized gamma
+* (1) Extension to generic likelihoods and centering measures
+* (0) Building of Python package
+* (0) Comparison with other packages (DP-package, bnpmix)
+* (0) Docs/README/etc
