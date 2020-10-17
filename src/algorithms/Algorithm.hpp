@@ -23,13 +23,13 @@
 //! An algorithm that inherits from this abstract class will have multiple
 //! iterations of the same step. Steps are further split into substeps, each of
 //! which updates specific values of the state of the Markov chain, which is
-//! composed of the allocations vector and the unique values vector (see below).
+//! composed of an allocations vector and a unique values vector (see below).
 //! This is known as a Gibbs sampling structure, where a set of values is
 //! updated according to a conditional distribution given all other values.
 //! The underlying model for the data is assumed to be a so-called hierarchical
 //! model, where each datum is independently drawn from a common likelihood
 //! function, whose parameters are specific to each unit and are iid generated
-//! from a random probability measure, called the mixture. Different data points
+//! from a random probability measure, called mixture. Different data points
 //! may have the same parameters as each other, and thus a clustering structure
 //! on data emerges, with each cluster being identified by its own parameters,
 //! called unique values. These will often be generated from the centering

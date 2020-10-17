@@ -12,4 +12,4 @@
 #include "runtime/Factory.hpp"
 #include "utils.hpp"
 
-#endif // INCLUDES_HPP
+#endif  // INCLUDES_HPP

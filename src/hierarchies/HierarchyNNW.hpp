@@ -6,8 +6,8 @@
 //! Normal Normal-Wishart hierarchy for multivariate data.
 
 //! This class represents a hierarchy, i.e. a cluster, whose multivariate data
-//! are distributed according to a multinomial normal likelihood, the parameters
-//! of which have a Normal-Wishart centering distribution. That is:
+//! are distributed according to a multinomial normal likelihood, the
+//! parameters of which have a Normal-Wishart centering distribution. That is:
 //!           phi = (mu,tau)   (state);
 //! f(x_i|mu,tau) = N(mu,tau)  (data likelihood);
 //!      (mu,tau) ~ G          (unique values distribution);
@@ -65,13 +65,13 @@ class HierarchyNNW : public HierarchyBase<Hypers> {
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points
   Eigen::VectorXd like(const Eigen::MatrixXd &data) override;
-  
+
   //! Evaluates the log-likelihood of data in the given points
   Eigen::VectorXd lpdf(const Eigen::MatrixXd &data) override;
-  
+
   //! Evaluates the marginal distribution of data in the given points
   Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) override;
-  
+
   //! Evaluates the log-marginal distributionof data in the given points
   Eigen::VectorXd marg_lpdf(const Eigen::MatrixXd &data) override;
 

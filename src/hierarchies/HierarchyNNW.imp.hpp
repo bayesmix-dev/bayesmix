@@ -137,8 +137,8 @@ void HierarchyNNW<Hypers>::draw() {
   // Generate new state values from their prior centering distribution
   Eigen::MatrixXd tau_new =
       stan::math::wishart_rng(nu, tau0, Rng::Instance().get());
-  EigenRowVec mu_new = stan::math::multi_normal_prec_rng(mu0, tau_new * lambda,
-                                                         Rng::Instance().get());
+  EigenRowVec mu_new = stan::math::multi_normal_prec_rng(
+      mu0, tau_new * lambda, Rng::Instance().get());
 
   // Update state
   state[0] = mu_new;

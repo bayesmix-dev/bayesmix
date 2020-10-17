@@ -20,7 +20,8 @@
 //! objects.
 
 //! \param AbstractProduct Class name for the abstract base object
-//! \param Args...         Collection of parameters for the objects constructors
+//! \param Args...         Collection of parameters for the objects
+//! constructors
 
 template <class AbstractProduct, typename... Args>
 class Factory {

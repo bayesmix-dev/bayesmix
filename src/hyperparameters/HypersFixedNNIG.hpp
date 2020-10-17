@@ -26,8 +26,8 @@ class HypersFixedNNIG {
   // DESTRUCTOR AND CONSTRUCTORS
   ~HypersFixedNNIG() = default;
   HypersFixedNNIG() = default;
-  HypersFixedNNIG(const double mu0_, const double lambda_, const double alpha0_,
-                  const double beta0_)
+  HypersFixedNNIG(const double mu0_, const double lambda_,
+                  const double alpha0_, const double beta0_)
       : mu0(mu0_), lambda(lambda_), alpha0(alpha0_), beta0(beta0_) {
     check_hypers_validity();
   }
