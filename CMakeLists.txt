@@ -18,16 +18,16 @@ target_include_directories(bayesmix PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/stan/math
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/stan/math/lib/boost_1.72.0
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/stan/math/lib/eigen_3.3.7
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/stan/math/lib/tbb_2019_U8/include)
-
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/stan/math/lib/tbb_2019_U8/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf-3.12.3/src/.libs)
 
 target_link_directories(bayesmix PRIVATE
     /home/mario/dev/stan/math/lib/tbb
-)
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf-3.12.3/src/.libs)
 
 target_link_libraries(bayesmix 
     tbb 
     pthread
-    ${PROTO_LIBRARIES})
+	protobuf)
 
 target_compile_options(bayesmix PUBLIC -D_REENTRANT -fPIC)

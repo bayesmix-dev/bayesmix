@@ -41,6 +41,7 @@ static void InitDefaultsscc_info_Par_Col_chain_5fstate_2eproto() {
     new (ptr) ::Par_Col();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
+  ::Par_Col::InitAsDefaultInstance();
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Par_Col_chain_5fstate_2eproto =
@@ -54,6 +55,7 @@ static void InitDefaultsscc_info_Param_chain_5fstate_2eproto() {
     new (ptr) ::Param();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
+  ::Param::InitAsDefaultInstance();
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_Param_chain_5fstate_2eproto =
@@ -68,6 +70,7 @@ static void InitDefaultsscc_info_State_chain_5fstate_2eproto() {
     new (ptr) ::State();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
+  ::State::InitAsDefaultInstance();
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_State_chain_5fstate_2eproto =
@@ -82,6 +85,7 @@ static void InitDefaultsscc_info_UniqueValues_chain_5fstate_2eproto() {
     new (ptr) ::UniqueValues();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
+  ::UniqueValues::InitAsDefaultInstance();
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_UniqueValues_chain_5fstate_2eproto =
@@ -161,6 +165,8 @@ static bool dynamic_init_dummy_chain_5fstate_2eproto = (static_cast<void>(::PROT
 
 // ===================================================================
 
+void Par_Col::InitAsDefaultInstance() {
+}
 class Par_Col::_Internal {
  public:
 };
@@ -219,6 +225,7 @@ void Par_Col::Clear() {
 
 const char* Par_Col::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -363,6 +370,8 @@ void Par_Col::InternalSwap(Par_Col* other) {
 
 // ===================================================================
 
+void Param::InitAsDefaultInstance() {
+}
 class Param::_Internal {
  public:
 };
@@ -422,6 +431,7 @@ void Param::Clear() {
 
 const char* Param::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -563,6 +573,8 @@ void Param::InternalSwap(Param* other) {
 
 // ===================================================================
 
+void UniqueValues::InitAsDefaultInstance() {
+}
 class UniqueValues::_Internal {
  public:
 };
@@ -622,6 +634,7 @@ void UniqueValues::Clear() {
 
 const char* UniqueValues::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -763,6 +776,8 @@ void UniqueValues::InternalSwap(UniqueValues* other) {
 
 // ===================================================================
 
+void State::InitAsDefaultInstance() {
+}
 class State::_Internal {
  public:
 };
@@ -825,6 +840,7 @@ void State::Clear() {
 
 const char* State::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
