@@ -27,6 +27,6 @@ target_link_directories(bayesmix PRIVATE
 target_link_libraries(bayesmix 
     tbb 
     pthread
-	protobuf)
+    protobuf)
 
 target_compile_options(bayesmix PUBLIC -D_REENTRANT -fPIC)
