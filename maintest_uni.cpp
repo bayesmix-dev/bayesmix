@@ -12,7 +12,7 @@
 //! You can change the classes used for the model through the aliases below.
 
 using HypersType = HypersFixedNNIG;
-using MixtureType = DirichletMixture;
+using MixingType = DirichletMixing;
 template <class HypersType>
 using HierarchyType = HierarchyNNIG<HypersType>;
 
@@ -60,29 +60,29 @@ int main(int argc, char *argv[]) {
   double totalmass = 1.0;
   // std::cout << "Insert total mass value:" << std::endl;
   // std::cin >> totalmass;
-  MixtureType mix(totalmass);
+  MixingType mix(totalmass);
 
   // =========================================================================
   // LOAD ALGORITHM FACTORY
   // =========================================================================
   using Builder = std::function<
-      std::unique_ptr<Algorithm<HierarchyType, HypersType, MixtureType>>(
-          HypersType, MixtureType, Eigen::VectorXd, unsigned int)>;
+      std::unique_ptr<Algorithm<HierarchyType, HypersType, MixingType>>(
+          HypersType, MixingType, Eigen::VectorXd, unsigned int)>;
 
-  Builder neal2builder = [](HypersType hy, MixtureType mix,
+  Builder neal2builder = [](HypersType hy, MixingType mix,
                             Eigen::VectorXd data, unsigned int init) {
-    return std::make_unique<Neal2<HierarchyType, HypersType, MixtureType>>(
+    return std::make_unique<Neal2<HierarchyType, HypersType, MixingType>>(
         hy, mix, data, init);
   };
-  Builder neal8builder = [](HypersType hy, MixtureType mix,
+  Builder neal8builder = [](HypersType hy, MixingType mix,
                             Eigen::VectorXd data, unsigned int init) {
-    return std::make_unique<Neal8<HierarchyType, HypersType, MixtureType>>(
+    return std::make_unique<Neal8<HierarchyType, HypersType, MixingType>>(
         hy, mix, data, init);
   };
 
   auto &algofactory =
-      Factory<Algorithm<HierarchyType, HypersType, MixtureType>, HypersType,
-              MixtureType, Eigen::VectorXd, unsigned int>::Instance();
+      Factory<Algorithm<HierarchyType, HypersType, MixingType>, HypersType,
+              MixingType, Eigen::VectorXd, unsigned int>::Instance();
 
   algofactory.add_builder("neal2", neal2builder);
   algofactory.add_builder("neal8", neal8builder);

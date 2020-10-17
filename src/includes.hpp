@@ -7,8 +7,8 @@
 #include "hierarchies/HierarchyNNW.hpp"
 #include "hyperparameters/HypersFixedNNIG.hpp"
 #include "hyperparameters/HypersFixedNNW.hpp"
-#include "mixtures/DirichletMixture.hpp"
-#include "mixtures/PitYorMixture.hpp"
+#include "mixings/DirichletMixing.hpp"
+#include "mixings/PitYorMixing.hpp"
 #include "runtime/Factory.hpp"
 #include "utils.hpp"
 

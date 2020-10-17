@@ -5,20 +5,20 @@
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-Eigen::VectorXd Neal2<Hierarchy, Hypers, Mixture>::density_marginal_component(
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+Eigen::VectorXd Neal2<Hierarchy, Hypers, Mixing>::density_marginal_component(
     Hierarchy<Hypers> &temp_hier) {
   // Exploit conjugacy of hierarchy
   return temp_hier.eval_marg(this->density.first);
 }
 
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-void Neal2<Hierarchy, Hypers, Mixture>::print_startup_message() const {
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+void Neal2<Hierarchy, Hypers, Mixing>::print_startup_message() const {
   std::cout << "Running Neal2 algorithm..." << std::endl;
 }
 
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-void Neal2<Hierarchy, Hypers, Mixture>::initialize() {
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+void Neal2<Hierarchy, Hypers, Mixing>::initialize() {
   // Initialize objects
   cardinalities.reserve(data.rows());
   std::default_random_engine generator;
@@ -39,8 +39,8 @@ void Neal2<Hierarchy, Hypers, Mixture>::initialize() {
   }
 }
 
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-void Neal2<Hierarchy, Hypers, Mixture>::sample_allocations() {
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+void Neal2<Hierarchy, Hypers, Mixing>::sample_allocations() {
   // Initialize relevant values
   unsigned int n = data.rows();
 
@@ -65,18 +65,18 @@ void Neal2<Hierarchy, Hypers, Mixture>::sample_allocations() {
     // Loop over clusters
     for (size_t k = 0; k < n_clust; k++) {
       // Probability of being assigned to an already existing cluster
-      probas(k) = this->mixture.mass_existing_cluster(cardinalities[k], n - 1) *
+      probas(k) = this->mixing.mass_existing_cluster(cardinalities[k], n - 1) *
                   unique_values[k].like(datum)(0);
       if (singleton == 1 && k == allocations[i]) {
         // Probability of being assigned to a newly generated cluster
-        probas(k) = this->mixture.mass_new_cluster(n_clust, n - 1) *
+        probas(k) = this->mixing.mass_new_cluster(n_clust, n - 1) *
                     unique_values[0].eval_marg(datum)(0);
       }
       tot += probas(k);
     }
     if (singleton == 0) {
       // Further update with marginal component
-      probas(n_clust) = this->mixture.mass_new_cluster(n_clust, n - 1) *
+      probas(n_clust) = this->mixing.mass_new_cluster(n_clust, n - 1) *
                         unique_values[0].eval_marg(datum)(0);
       tot += probas(n_clust);
     }
@@ -130,8 +130,8 @@ void Neal2<Hierarchy, Hypers, Mixture>::sample_allocations() {
   }
 }
 
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-void Neal2<Hierarchy, Hypers, Mixture>::sample_unique_values() {
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+void Neal2<Hierarchy, Hypers, Mixing>::sample_unique_values() {
   // Initialize relevant values
   unsigned int n_clust = unique_values.size();
   unsigned int n = allocations.size();

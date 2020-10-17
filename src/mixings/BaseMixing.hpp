@@ -1,5 +1,5 @@
-#ifndef BASEMIXTURE_HPP
-#define BASEMIXTURE_HPP
+#ifndef BASEMIXING_HPP
+#define BASEMIXING_HPP
 
 //! Abstract base class for a generic mixture model
 
@@ -14,11 +14,11 @@
 //! The class will then have its own parameters, and maybe even prior
 //! distributions on them.
 
-class BaseMixture {
+class BaseMixing {
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~BaseMixture() = default;
-  BaseMixture() = default;
+  virtual ~BaseMixing() = default;
+  BaseMixing() = default;
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
@@ -38,4 +38,4 @@ class BaseMixture {
                                   const unsigned int n) const = 0;
 };
 
-#endif  // BASEMIXTURE_HPP
+#endif  // BASEMIXING_HPP

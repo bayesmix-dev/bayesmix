@@ -1,7 +1,7 @@
-#ifndef PITYORMIXTURE_HPP
-#define PITYORMIXTURE_HPP
+#ifndef PITYORMIXING_HPP
+#define PITYORMIXING_HPP
 
-#include "BaseMixture.hpp"
+#include "BaseMixing.hpp"
 
 //! Class that represents the Pitman-Yor process mixture model.
 
@@ -14,16 +14,16 @@
 //! factor, while the weight for a newly created cluster is the remaining
 //! one counting the total amount as the sample size increased by the strength.
 
-class PitYorMixture : BaseMixture {
+class PitYorMixing : BaseMixing {
  protected:
   //! Strength and discount parameters
   double strength, discount;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~PitYorMixture() = default;
-  PitYorMixture() = default;
-  PitYorMixture(const double strength_, const double discount_)
+  ~PitYorMixing() = default;
+  PitYorMixing() = default;
+  PitYorMixing(const double strength_, const double discount_)
       : strength(strength_), discount(discount_) {
     assert(strength > -discount);
     assert(0 <= discount && discount < 1);
@@ -61,4 +61,4 @@ class PitYorMixture : BaseMixture {
   void set_discount(const double discount_) { discount = discount_; }
 };
 
-#endif  // PITYORMIXTURE_HPP
+#endif  // PITYORMIXING_HPP

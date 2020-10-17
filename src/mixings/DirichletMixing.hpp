@@ -1,7 +1,7 @@
-#ifndef DIRICHLETMIXTURE_HPP
-#define DIRICHLETMIXTURE_HPP
+#ifndef DIRICHLETMIXING_HPP
+#define DIRICHLETMIXING_HPP
 
-#include "BaseMixture.hpp"
+#include "BaseMixing.hpp"
 
 //! Class that represents the Dirichlet process mixture model.
 
@@ -13,16 +13,16 @@
 //! creation of a new cluster, and weights of already existing clusters are
 //! proportional to their cardinalities.
 
-class DirichletMixture : public BaseMixture {
+class DirichletMixing : public BaseMixing {
  protected:
   //! Total mass parameters
   double totalmass;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~DirichletMixture() = default;
-  DirichletMixture() = default;
-  DirichletMixture(const double totalmass_) : totalmass(totalmass_) {
+  ~DirichletMixing() = default;
+  DirichletMixing() = default;
+  DirichletMixing(const double totalmass_) : totalmass(totalmass_) {
     assert(totalmass >= 0);
   }
 
@@ -52,4 +52,4 @@ class DirichletMixture : public BaseMixture {
   void set_totalmass(const double totalmass_) { totalmass = totalmass_; }
 };
 
-#endif  // DIRICHLETMIXTURE_HPP
+#endif  // DIRICHLETMIXING_HPP

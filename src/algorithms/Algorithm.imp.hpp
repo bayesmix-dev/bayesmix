@@ -5,8 +5,8 @@
 
 //! \param iter Number of the current iteration
 //! \return     Protobuf-object version of the current state
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-State Algorithm<Hierarchy, Hypers, Mixture>::get_state_as_proto(
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+State Algorithm<Hierarchy, Hypers, Mixing>::get_state_as_proto(
     unsigned int iter) {
   // Transcribe allocations vector
   State iter_out;
@@ -37,8 +37,8 @@ State Algorithm<Hierarchy, Hypers, Mixture>::get_state_as_proto(
 
 //! \param un_val Unique value in Protobuf-object form
 //! \return       Matrix version of un_val
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-Eigen::MatrixXd Algorithm<Hierarchy, Hypers, Mixture>::proto_param_to_matrix(
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+Eigen::MatrixXd Algorithm<Hierarchy, Hypers, Mixing>::proto_param_to_matrix(
     const Param &un_val) const {
   Eigen::MatrixXd par_matrix = Eigen::MatrixXd::Zero(
       un_val.par_cols(0).elems_size(), un_val.par_cols_size());
@@ -52,15 +52,15 @@ Eigen::MatrixXd Algorithm<Hierarchy, Hypers, Mixture>::proto_param_to_matrix(
   return par_matrix;
 }
 
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-void Algorithm<Hierarchy, Hypers, Mixture>::print_ending_message() const {
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+void Algorithm<Hierarchy, Hypers, Mixing>::print_ending_message() const {
   std::cout << "Done" << std::endl;
 }
 
 //! \param grid Grid of points in matrix form to evaluate the density on
 //! \param coll Collector containing the algorithm chain
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-void Algorithm<Hierarchy, Hypers, Mixture>::eval_density(
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+void Algorithm<Hierarchy, Hypers, Mixing>::eval_density(
     const Eigen::MatrixXd &grid, BaseCollector *coll) {
   // Initialize objects
   density.first = grid;
@@ -95,10 +95,10 @@ void Algorithm<Hierarchy, Hypers, Mixture>::eval_density(
       temp_hier.set_state(params, false);
 
       // Update density estimate (cluster component)
-      dens += mixture.mass_existing_cluster(card[h], n) * temp_hier.like(grid);
+      dens += mixing.mass_existing_cluster(card[h], n) * temp_hier.like(grid);
     }
     // Update density estimate (marginal component)
-    dens += mixture.mass_new_cluster(n_clust, n) *
+    dens += mixing.mass_new_cluster(n_clust, n) *
             density_marginal_component(temp_hier);
   }
 
@@ -110,8 +110,8 @@ void Algorithm<Hierarchy, Hypers, Mixture>::eval_density(
 
 //! \param coll Collector containing the algorithm chain
 //! \return     Index of the iteration containing the best estimate
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-unsigned int Algorithm<Hierarchy, Hypers, Mixture>::cluster_estimate(
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+unsigned int Algorithm<Hierarchy, Hypers, Mixing>::cluster_estimate(
     BaseCollector *coll) {
   // Read chain from collector
   std::deque<State> chain = coll->get_chain();
@@ -164,8 +164,8 @@ unsigned int Algorithm<Hierarchy, Hypers, Mixture>::cluster_estimate(
 }
 
 //! \param filename Name of file to write to
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-void Algorithm<Hierarchy, Hypers, Mixture>::write_clustering_to_file(
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+void Algorithm<Hierarchy, Hypers, Mixing>::write_clustering_to_file(
     const std::string &filename) const {
   if (!clustering_was_computed) {
     std::cerr << "Error: cannot write clustering to file; "
@@ -205,8 +205,8 @@ void Algorithm<Hierarchy, Hypers, Mixture>::write_clustering_to_file(
 }
 
 //! \param filename Name of file to write to
-template <template <class> class Hierarchy, class Hypers, class Mixture>
-void Algorithm<Hierarchy, Hypers, Mixture>::write_density_to_file(
+template <template <class> class Hierarchy, class Hypers, class Mixing>
+void Algorithm<Hierarchy, Hypers, Mixing>::write_density_to_file(
     const std::string &filename) const {
   if (!density_was_computed) {
     std::cerr << "Error: cannot write density to file; eval_density() "

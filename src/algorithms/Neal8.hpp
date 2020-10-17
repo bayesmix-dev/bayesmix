@@ -21,15 +21,15 @@
 
 //! \param Hierarchy Name of the hierarchy template class
 //! \param Hypers    Name of the hyperparameters class
-//! \param Mixture   Name of the mixture class
+//! \param Mixing    Name of the mixing mode class
 
-template<template <class> class Hierarchy, class Hypers, class Mixture>
-class Neal8 : public Neal2<Hierarchy, Hypers, Mixture>{
+template<template <class> class Hierarchy, class Hypers, class Mixing>
+class Neal8 : public Neal2<Hierarchy, Hypers, Mixing>{
 protected:
-    using Algorithm<Hierarchy, Hypers, Mixture>::data;
-    using Algorithm<Hierarchy, Hypers, Mixture>::cardinalities;
-    using Algorithm<Hierarchy, Hypers, Mixture>::allocations;
-    using Algorithm<Hierarchy, Hypers, Mixture>::unique_values;
+    using Algorithm<Hierarchy, Hypers, Mixing>::data;
+    using Algorithm<Hierarchy, Hypers, Mixing>::cardinalities;
+    using Algorithm<Hierarchy, Hypers, Mixing>::allocations;
+    using Algorithm<Hierarchy, Hypers, Mixing>::unique_values;
 
     //! Number of auxiliary blocks
     unsigned int n_aux = 3;
@@ -50,12 +50,12 @@ public:
     // DESTRUCTOR AND CONSTRUCTORS
     ~Neal8() = default;
     //! \param hypers_  Hyperparameters object for the model
-    //! \param mixture_ Mixture object for the model
+    //! \param mixing_ Mixing object for the model
     //! \param data_    Matrix of row-vectorial data points
     //! \param init     Prescribed n. of clusters for the algorithm initializ.
-    Neal8(const Hypers &hypers_, const Mixture &mixture_,
+    Neal8(const Hypers &hypers_, const Mixing &mixing_,
         const Eigen::MatrixXd &data_, const unsigned int init = 0) :
-        Neal2<Hierarchy, Hypers, Mixture>::Neal2(hypers_, mixture_, data_,
+        Neal2<Hierarchy, Hypers, Mixing>::Neal2(hypers_, mixing_, data_,
         init) {
         // Initialize auxiliary blocks
         for(size_t i = 0; i < n_aux; i++){

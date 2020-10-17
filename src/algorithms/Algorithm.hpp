@@ -46,13 +46,13 @@
 //! where c_i is the allocation of the i-th datum.
 //!
 //! This class is templatized over the types of the elements of this model: the
-//! hierarchies of cluster, their hyperparameters, and the mixture.
+//! hierarchies of cluster, their hyperparameters, and the mixing mode.
 
 //! \param Hierarchy Name of the hierarchy template class
 //! \param Hypers    Name of the hyperparameters class
-//! \param Mixture   Name of the mixture class
+//! \param Mixing    Name of the mixing mode class
 
-template <template <class> class Hierarchy, class Hypers, class Mixture>
+template <template <class> class Hierarchy, class Hypers, class Mixing>
 class Algorithm {
  protected:
   // METHOD PARAMETERS
@@ -74,8 +74,8 @@ class Algorithm {
   std::vector<Hierarchy<Hypers> > unique_values;
   //! Grid of points and evaluation of density on it
   std::pair<Eigen::MatrixXd, Eigen::VectorXd> density;
-  //! Mixture object
-  Mixture mixture;
+  //! Mixing object
+  Mixing mixing;
   //! Protobuf object that contains the best clustering
   State best_clust;
   //! Random engine
@@ -151,12 +151,12 @@ class Algorithm {
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~Algorithm() = default;
   //! \param hypers_  Hyperparameters object for the model
-  //! \param mixture_ Mixture object for the model
+  //! \param mixing_  Mixing object for the model
   //! \param data_    Matrix of row-vectorial data points
   //! \param init     Prescribed n. of clusters for the algorithm initializ.
-  Algorithm(const Hypers &hypers_, const Mixture &mixture_,
+  Algorithm(const Hypers &hypers_, const Mixing &mixing_,
             const Eigen::MatrixXd &data_, const unsigned int init = 0)
-      : mixture(mixture_), data(data_), init_num_clusters(init) {
+      : mixing(mixing_), data(data_), init_num_clusters(init) {
     Hierarchy<Hypers> hierarchy(std::make_shared<Hypers>(hypers_));
 
     if (hierarchy.is_multivariate() == false && data.cols() > 1) {
