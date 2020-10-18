@@ -72,7 +72,7 @@ class HierarchyNNW : public HierarchyBase<Hypers> {
   //! Evaluates the marginal distribution of data in the given points
   Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) override;
 
-  //! Evaluates the log-marginal distributionof data in the given points
+  //! Evaluates the log-marginal distribution of data in the given points
   Eigen::VectorXd marg_lpdf(const Eigen::MatrixXd &data) override;
 
   // SAMPLING FUNCTIONS

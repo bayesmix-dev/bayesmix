@@ -53,7 +53,7 @@ class HierarchyBase {
   virtual Eigen::VectorXd lpdf(const Eigen::MatrixXd &data) = 0;
   //! Evaluates the marginal distribution of data in the given points
   virtual Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) = 0;
-  //! Evaluates the log-marginal distributionof data in the given points
+  //! Evaluates the log-marginal distribution of data in the given points
   virtual Eigen::VectorXd marg_lpdf(const Eigen::MatrixXd &data) = 0;
 
   // SAMPLING FUNCTIONS
