@@ -1,7 +1,7 @@
 #ifndef NEAL2_HPP
 #define NEAL2_HPP
 
-#include "Algorithm.hpp"
+#include "MarginalAlgorithm.hpp"
 
 //! Template class for Neal's algorithm 2 for conjugate hierarchies
 
@@ -27,7 +27,7 @@
 //! \param Mixing    Name of the mixing mode class
 
 template <template <class> class Hierarchy, class Hypers, class Mixing>
-class Neal2 : public Algorithm<Hierarchy, Hypers, Mixing> {
+class Neal2 : public MarginalAlgorithm<Hierarchy, Hypers, Mixing> {
  protected:
   using Algorithm<Hierarchy, Hypers, Mixing>::data;
   using Algorithm<Hierarchy, Hypers, Mixing>::cardinalities;
@@ -58,8 +58,8 @@ class Neal2 : public Algorithm<Hierarchy, Hypers, Mixing> {
   //! \param init     Prescribed n. of clusters for the algorithm initializ.
   Neal2(const Hypers &hypers_, const Mixing &mixing_,
         const Eigen::MatrixXd &data_, const unsigned int init = 0)
-      : Algorithm<Hierarchy, Hypers, Mixing>::Algorithm(hypers_, mixing_,
-                                                        data_, init) {}
+      : MarginalAlgorithm<Hierarchy, Hypers, Mixing>::MarginalAlgorithm(
+            hypers_, mixing_, data_, init) {}
 };
 
 #include "Neal2.imp.hpp"

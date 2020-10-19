@@ -2,6 +2,10 @@ target_sources(bayesmix
   PUBLIC
     Algorithm.hpp
     Algorithm.imp.hpp
+    ConditionalAlgorithm.hpp
+    ConditionalAlgorithm.imp.hpp
+    MarginalAlgorithm.hpp
+    MarginalAlgorithm.imp.hpp
     Neal2.hpp
     Neal2.imp.hpp
     Neal8.hpp

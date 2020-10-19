@@ -138,7 +138,7 @@ class Algorithm {
   // ESTIMATE FUNCTIONS
   //! Evaluates the overall data pdf on a gived grid of points
   virtual void eval_density(const Eigen::MatrixXd &grid,
-                            BaseCollector *const collector);
+                            BaseCollector *const collector) = 0;
   //! Estimates the clustering structure of the data via LS minimization
   virtual unsigned int cluster_estimate(BaseCollector *collector);
   //! Writes unique values of each datum in csv form

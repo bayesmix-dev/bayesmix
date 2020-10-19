@@ -28,7 +28,7 @@ class Neal8 : public Neal2<Hierarchy, Hypers, Mixing> {
   using Algorithm<Hierarchy, Hypers, Mixing>::data;
   using Algorithm<Hierarchy, Hypers, Mixing>::cardinalities;
   using Algorithm<Hierarchy, Hypers, Mixing>::allocations;
-  using Algorithm<Hierarchy, Hypers, Mixing>::unique_values;
+  using Algorithm<Hierarchy, Hypers, Mixing>::unique_values; //TODO remove all?
 
   //! Number of auxiliary blocks
   unsigned int n_aux = 3;

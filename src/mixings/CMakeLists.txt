@@ -4,4 +4,3 @@ target_sources(bayesmix
     DirichletMixing.hpp
     PitYorMixing.hpp
 )
-
