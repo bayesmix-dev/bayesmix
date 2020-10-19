@@ -1,5 +1,6 @@
 PRIORITY LIST
 * (3) Full run-time implementation
+  * add constructor args and template products?
 * (3) Gamma prior on total mass
 * (3) Regression: linear DDP
 * (2) Regression: weight dependent model (logit s.b.)
