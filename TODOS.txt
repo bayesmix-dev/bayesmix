@@ -9,3 +9,6 @@ PRIORITY LIST
 * (0) Building of Python package
 * (0) Comparison with other packages (DP-package, bnpmix)
 * (0) Docs/README/etc
+
+OTHER
+* Memory collector stuff?
