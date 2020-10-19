@@ -20,14 +20,12 @@
 //! objects.
 
 //! \param AbstractProduct Class name for the abstract base object
-//! \param Args...         Collection of parameters for the objects
-//! constructors
 
-template <class AbstractProduct, typename... Args>
+template <class AbstractProduct>
 class Factory {
  private:
   using Identifier = std::string;
-  using Builder = std::function<std::unique_ptr<AbstractProduct>(Args...)>;
+  using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
   //! Storage for algorithm builders
   std::map<Identifier, Builder> storage;
@@ -52,15 +50,16 @@ class Factory {
   //! Creates a specific object based on an identifier
 
   //! \param name Identifier for the object
-  //! \param args Collection of any number of parameters
-  //! \return     An unique pointer to the created object
-  std::unique_ptr<AbstractProduct> create_object(const Identifier &name,
-                                                 Args... args) const {
+  //! \return     An shared pointer to the created object
+  std::shared_ptr<AbstractProduct> create_object(
+      const Identifier &name) const {
     auto f = storage.find(name);
     if (f == storage.end()) {
-      throw std::invalid_argument("Error: factory identifier not found");
+      std::string err = "Error: factory identifier \"" + name + "\" not found";
+      throw std::invalid_argument(err);
     } else {
-      return f->second(std::forward<Args>(args)...);
+      return f->second();
+      // return f->second(std::forward<Args>(args)...);
     }
   }
 
@@ -71,8 +70,8 @@ class Factory {
   void add_builder(const Identifier &name, const Builder &builder) {
     auto f = storage.insert(std::make_pair(name, builder));
     if (f.second == false) {
-      std::cout << "Warning: new duplicate builder was not added to factory"
-                << std::endl;
+      std::cout << "Warning: new duplicate builder \"" << name
+                << "\" was not added to factory" << std::endl;
     }
   }
 

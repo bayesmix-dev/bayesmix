@@ -1,6 +1,8 @@
 #ifndef BASEMIXING_HPP
 #define BASEMIXING_HPP
 
+#include <cassert>
+
 //! Abstract base class for a generic mixture model
 
 //! This class represents a mixture model object to be used in a BNP iterative
@@ -36,6 +38,8 @@ class BaseMixing {
   //! \return        Probability value
   virtual double mass_new_cluster(const unsigned int n_clust,
                                   const unsigned int n) const = 0;
+
+  virtual void print_id() const = 0;
 };
 
 #endif  // BASEMIXING_HPP
