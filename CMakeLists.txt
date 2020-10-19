@@ -11,7 +11,8 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 SET(BASEPATH "${CMAKE_SOURCE_DIR}")
 INCLUDE_DIRECTORIES("${BASEPATH}")
 
-add_executable(bayesmix maintest_uni.cpp)
+add_executable(bayesmix run.cpp)
+# add_executable(bayesmix maintest_uni.cpp)
 add_subdirectory(src)
 
 target_include_directories(bayesmix PUBLIC
