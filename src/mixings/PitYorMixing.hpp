@@ -14,7 +14,7 @@
 //! factor, while the weight for a newly created cluster is the remaining
 //! one counting the total amount as the sample size increased by the strength.
 
-class PitYorMixing : BaseMixing {
+class PitYorMixing : public BaseMixing {
  protected:
   //! Strength and discount parameters
   double strength, discount;
