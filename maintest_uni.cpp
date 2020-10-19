@@ -92,9 +92,9 @@ int main(int argc, char *argv[]) {
   // =========================================================================
   std::string algo = argv[2];
   auto sampler = algofactory.create_object(algo, hy, mix, data, init);
-  (*sampler).set_rng_seed(20200229);
-  (*sampler).set_maxiter(1000);
-  (*sampler).set_burnin(100);
+  sampler->set_rng_seed(20200229);
+  sampler->set_maxiter(1000);
+  sampler->set_burnin(100);
 
   // =========================================================================
   // CHOOSE COLLECTOR
@@ -121,15 +121,15 @@ int main(int argc, char *argv[]) {
   // =========================================================================
   // RUN SAMPLER
   // =========================================================================
-  (*sampler).run(coll);
+  sampler->run(coll);
 
   // =========================================================================
   // DENSITY AND CLUSTER ESTIMATES
   // =========================================================================
-  (*sampler).eval_density(grid, coll);
-  (*sampler).write_density_to_file("resources/dens_uni.csv");
-  unsigned int i_cap = (*sampler).cluster_estimate(coll);
-  (*sampler).write_clustering_to_file("resources/clust_uni.csv");
+  sampler->eval_density(grid, coll);
+  sampler->write_density_to_file("resources/dens_uni.csv");
+  unsigned int i_cap = sampler->cluster_estimate(coll);
+  sampler->write_clustering_to_file("resources/clust_uni.csv");
 
   std::cout << "End of maintest_uni.cpp" << std::endl;
   return 0;

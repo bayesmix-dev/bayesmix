@@ -144,12 +144,12 @@ int main(int argc, char const *argv[]){
   auto hier = factory_Hier.create_object(type_Hier);
   auto hyp = factory_Hyp.create_object(type_Hyp);
   auto mix = factory_Mix.create_object(type_Mix);
-  (*algo).set_Hier(hier);
-  (*algo).set_Hyp(hyp);
-  (*algo).set_Mix(mix);
-  (*algo).print_id();
-  (*algo).call_Hier_id();
-  (*algo).call_Hyp_id();
-  (*algo).call_Mix_id();
+  algo->set_Hier(hier);
+  algo->set_Hyp(hyp);
+  algo->set_Mix(mix);
+  algo->print_id();
+  algo->call_Hier_id();
+  algo->call_Hyp_id();
+  algo->call_Mix_id();
   return 0;
 }
