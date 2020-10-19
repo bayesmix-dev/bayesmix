@@ -1,12 +1,12 @@
-#ifndef FACTORY_LOAD_HPP
-#define FACTORY_LOAD_HPP
+#ifndef LOAD_MIXINGS_HPP
+#define LOAD_MIXINGS_HPP
 
 #include "../runtime/Factory.hpp"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
-__attribute__((constructor)) static void load_Mixing() {
+__attribute__((constructor)) static void load_mixings() {
   Builder<BaseMixing> DPbuilder = []() {
     return std::make_shared<DirichletMixing>();
   };
@@ -18,4 +18,4 @@ __attribute__((constructor)) static void load_Mixing() {
   factory.add_builder("PY", PYbuilder);
 }
 
-#endif  // FACTORY_LOAD_HPP
+#endif  // LOAD_MIXINGS_HPP

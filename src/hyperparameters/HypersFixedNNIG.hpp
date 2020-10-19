@@ -1,7 +1,7 @@
 #ifndef HYPERSFIXEDNNIG_HPP
 #define HYPERSFIXEDNNIG_HPP
 
-#include <cassert>
+#include "HypersBase.hpp"
 
 //! Class that represents fixed hyperparameters for an NNIG hierarchy.
 
@@ -10,13 +10,13 @@
 //! HierarchyNNIG. All constructors and setters have validity checks for the
 //! inserted values.
 
-class HypersFixedNNIG {
+class HypersFixedNNIG : public HypersBase {
  protected:
   // HYPERPARAMETERS
   double mu0, lambda, alpha0, beta0;
 
   //! Raises error if the hypers values are not valid w.r.t. their own domain
-  void check_hypers_validity() {
+  void check_hypers_validity() override {
     assert(lambda > 0);
     assert(alpha0 > 0);
     assert(beta0 > 0);
@@ -24,7 +24,6 @@ class HypersFixedNNIG {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~HypersFixedNNIG() = default;
   HypersFixedNNIG() = default;
   HypersFixedNNIG(const double mu0_, const double lambda_,
                   const double alpha0_, const double beta0_)
@@ -50,6 +49,10 @@ class HypersFixedNNIG {
     assert(lambda_ > 0);
     lambda = lambda_;
   }
+
+  void print_id() const override {  // TODO
+    std::cout << "NNIGFix" << std::endl;
+  };
 };
 
 #endif  // HYPERSFIXEDNNIG_HPP

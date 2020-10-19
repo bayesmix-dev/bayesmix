@@ -17,6 +17,7 @@ add_subdirectory(src)
 
 target_include_directories(bayesmix PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/stan/math
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/stan/math/stan/math
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/stan/math/lib/boost_1.72.0
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/stan/math/lib/eigen_3.3.7
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/stan/math/lib/tbb_2019_U8/include

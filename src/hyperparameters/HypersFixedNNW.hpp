@@ -1,8 +1,9 @@
 #ifndef HYPERSFIXEDNNW_HPP
 #define HYPERSFIXEDNNW_HPP
 
+#include "HypersBase.hpp"
 #include <Eigen/Dense>
-#include <cassert>
+#include <stan/math/prim.hpp>
 
 //! Class that represents fixed hyperparameters for an NNW hierarchy.
 
@@ -11,7 +12,7 @@
 //! HierarchyNNW. All constructors and setters have validity checks for the
 //! inserted values.
 
-class HypersFixedNNW {
+class HypersFixedNNW : public HypersBase {
  protected:
   using EigenRowVec = Eigen::Matrix<double, 1, Eigen::Dynamic>;
 
@@ -22,7 +23,7 @@ class HypersFixedNNW {
   double nu;
 
   //! Raises error if the hypers values are not valid w.r.t. their own domain
-  void check_hypers_validity() {
+  void check_hypers_validity() override {
     unsigned int dim = mu0.size();
     assert(lambda > 0);
     assert(dim == tau0.rows());
@@ -37,7 +38,6 @@ class HypersFixedNNW {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~HypersFixedNNW() = default;
   HypersFixedNNW() = default;
   HypersFixedNNW(const EigenRowVec &mu0_, const double lambda_,
                  const Eigen::MatrixXd &tau0_, const double nu_)
@@ -82,6 +82,10 @@ class HypersFixedNNW {
     assert(nu_ > mu0.size() - 1);
     nu = nu_;
   }
+
+  void print_id() const override {  // TODO
+    std::cout << "NNWFix" << std::endl;
+  };
 };
 
 #endif  // HYPERSFIXEDNNW_HPP

@@ -24,9 +24,6 @@
 //! distributions, and of evaluating the distribution of the data, either its
 //! likelihood (whose parameters are the state) or its marginal distribution.
 
-//! \param Hypers Name of the hyperparameters class
-
-template <class Hypers>
 class HierarchyBase {
  protected:
   //! Current unique values state of this cluster
