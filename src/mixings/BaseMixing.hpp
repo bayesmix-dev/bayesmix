@@ -39,7 +39,7 @@ class BaseMixing {
   virtual double mass_new_cluster(const unsigned int n_clust,
                                   const unsigned int n) const = 0;
 
-  virtual void print_id() const = 0;
+  virtual void print_id() const = 0;  // TODO
 };
 
 #endif  // BASEMIXING_HPP

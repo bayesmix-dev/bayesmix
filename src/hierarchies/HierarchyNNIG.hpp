@@ -21,13 +21,10 @@
 //! thus the marginal and the posterior distribution are available in closed
 //! form and Neal's algorithm 2 may be used with it.
 
-//! \param Hypers Name of the hyperparameters class
-
-template <class Hypers>
-class HierarchyNNIG : public HierarchyBase<Hypers> {
+class HierarchyNNIG : public HierarchyBase {
  protected:
-  using HierarchyBase<Hypers>::state;
-  using HierarchyBase<Hypers>::hypers;
+  using HierarchyBase::state;
+  using HierarchyBase::hypers;
 
   // AUXILIARY TOOLS
   //! Raises error if the state values are not valid w.r.t. their own domain
@@ -46,7 +43,7 @@ class HierarchyNNIG : public HierarchyBase<Hypers> {
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~HierarchyNNIG() = default;
-  HierarchyNNIG(std::shared_ptr<Hypers> hypers_) {
+  HierarchyNNIG(std::shared_ptr<HypersBase> hypers_) {
     hypers = hypers_;
     state = std::vector<Eigen::MatrixXd>(2, Eigen::MatrixXd(1, 1));
     state[0](0, 0) = hypers->get_mu0();
@@ -68,6 +65,8 @@ class HierarchyNNIG : public HierarchyBase<Hypers> {
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data(const Eigen::MatrixXd &data) override;
+
+  void print_id() const override {std::cout << "NNIG" << std::endl;} // TODO
 };
 
 #include "HierarchyNNIG.imp.hpp"

@@ -4,6 +4,7 @@ PRIORITY LIST
   * Hierarchy-Hypers relation
   * Fix arguments issue
   * (add constructor args and template products?)
+* Class names
 * (3) Gamma prior on total mass
 * (3) Regression: linear DDP
 * (2) Regression: weight dependent model (logit s.b.)

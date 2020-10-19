@@ -12,7 +12,7 @@ class HypersBase {
   ~HypersBase() = default;
   HypersBase() = default;
 
-  virtual void print_id() const = 0;
+  virtual void print_id() const = 0;  // TODO
 };
 
 #endif  // HYPERSBASE_HPP

@@ -3,8 +3,7 @@
 
 #include "HierarchyNNW.hpp"
 
-template <class Hypers>
-void HierarchyNNW<Hypers>::check_state_validity() {
+void HierarchyNNW::check_state_validity() {
   // Check if tau is a square matrix
   unsigned int dim = state[0].size();
   assert(dim == state[1].rows());
@@ -15,8 +14,7 @@ void HierarchyNNW<Hypers>::check_state_validity() {
 }
 
 //! \param tau Value to set to state[1]
-template <class Hypers>
-void HierarchyNNW<Hypers>::set_tau_and_utilities(const Eigen::MatrixXd &tau) {
+void HierarchyNNW::set_tau_and_utilities(const Eigen::MatrixXd &tau) {
   if (state.size() == 1) {  // e.g. if the hierarchy is being initialized
     state.push_back(tau);
   } else {
@@ -33,8 +31,7 @@ void HierarchyNNW<Hypers>::set_tau_and_utilities(const Eigen::MatrixXd &tau) {
 //! \param data                  Matrix of row-vectorial data points
 //! \param mu0, lambda, tau0, nu Original values for hyperparameters
 //! \return                      Vector of updated values for hyperparameters
-template <class Hypers>
-std::vector<Eigen::MatrixXd> HierarchyNNW<Hypers>::normal_wishart_update(
+std::vector<Eigen::MatrixXd> HierarchyNNW::normal_wishart_update(
     const Eigen::MatrixXd &data, const EigenRowVec &mu0, const double lambda,
     const Eigen::MatrixXd &tau0_inv, const double nu) {
   // Initialize relevant objects
@@ -61,16 +58,14 @@ std::vector<Eigen::MatrixXd> HierarchyNNW<Hypers>::normal_wishart_update(
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Likehood vector evaluated in data
-template <class Hypers>
-Eigen::VectorXd HierarchyNNW<Hypers>::like(const Eigen::MatrixXd &data) {
+Eigen::VectorXd HierarchyNNW::like(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result = lpdf(data);
   return result.array().exp();
 }
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Log-Likehood vector evaluated in data
-template <class Hypers>
-Eigen::VectorXd HierarchyNNW<Hypers>::lpdf(const Eigen::MatrixXd &data) {
+Eigen::VectorXd HierarchyNNW::lpdf(const Eigen::MatrixXd &data) {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
 
   // Initialize relevant objects
@@ -92,16 +87,14 @@ Eigen::VectorXd HierarchyNNW<Hypers>::lpdf(const Eigen::MatrixXd &data) {
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Marginal distribution vector evaluated in data
-template <class Hypers>
-Eigen::VectorXd HierarchyNNW<Hypers>::eval_marg(const Eigen::MatrixXd &data) {
+Eigen::VectorXd HierarchyNNW::eval_marg(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result = marg_lpdf(data);
   return result.array().exp();
 }
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Marginal distribution vector evaluated in data
-template <class Hypers>
-Eigen::VectorXd HierarchyNNW<Hypers>::marg_lpdf(const Eigen::MatrixXd &data) {
+Eigen::VectorXd HierarchyNNW::marg_lpdf(const Eigen::MatrixXd &data) {
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);
@@ -126,8 +119,7 @@ Eigen::VectorXd HierarchyNNW<Hypers>::marg_lpdf(const Eigen::MatrixXd &data) {
   return result;
 }
 
-template <class Hypers>
-void HierarchyNNW<Hypers>::draw() {
+void HierarchyNNW::draw() {
   // Get values of hyperparameters
   EigenRowVec mu0 = hypers->get_mu0();
   double lambda = hypers->get_lambda();
@@ -146,8 +138,7 @@ void HierarchyNNW<Hypers>::draw() {
 }
 
 //! \param data Matrix of row-vectorial data points
-template <class Hypers>
-void HierarchyNNW<Hypers>::sample_given_data(const Eigen::MatrixXd &data) {
+void HierarchyNNW::sample_given_data(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
   EigenRowVec mu0 = hypers->get_mu0();
   double lambda = hypers->get_lambda();

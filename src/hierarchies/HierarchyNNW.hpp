@@ -20,13 +20,10 @@
 //! posterior distribution are available in closed form and Neal's algorithm 2
 //! may be used with it.
 
-//! \param Hypers Name of the hyperparameters class
-
-template <class Hypers>
-class HierarchyNNW : public HierarchyBase<Hypers> {
+class HierarchyNNW : public HierarchyBase {
  protected:
-  using HierarchyBase<Hypers>::state;
-  using HierarchyBase<Hypers>::hypers;
+  using HierarchyBase::state;
+  using HierarchyBase::hypers;
   using EigenRowVec = Eigen::Matrix<double, 1, Eigen::Dynamic>;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
@@ -54,7 +51,7 @@ class HierarchyNNW : public HierarchyBase<Hypers> {
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~HierarchyNNW() = default;
-  HierarchyNNW(std::shared_ptr<Hypers> hypers_) {
+  HierarchyNNW(std::shared_ptr<HypersBase> hypers_) {
     hypers = hypers_;
     unsigned int dim = hypers->get_mu0().size();
     state.push_back(hypers->get_mu0());
@@ -92,6 +89,8 @@ class HierarchyNNW : public HierarchyBase<Hypers> {
       check_state_validity();
     }
   }
+
+  void print_id() const override {std::cout << "NNW" << std::endl;} // TODO
 };
 
 #include "HierarchyNNW.imp.hpp"

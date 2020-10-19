@@ -3,16 +3,14 @@
 
 #include "HierarchyNNIG.hpp"
 
-template <class Hypers>
-void HierarchyNNIG<Hypers>::check_state_validity() {
+void HierarchyNNIG::check_state_validity() {
   assert(state[1](0, 0) > 0);
 }
 
 //! \param data                       Column vector of data points
 //! \param mu0, alpha0, beta0, lambda Original values for hyperparameters
 //! \return                           Vector of updated values for hyperpar.s
-template <class Hypers>
-std::vector<double> HierarchyNNIG<Hypers>::normal_gamma_update(
+std::vector<double> HierarchyNNIG::normal_gamma_update(
     const Eigen::VectorXd &data, const double mu0, const double alpha0,
     const double beta0, const double lambda) {
   // Initialize relevant variables
@@ -37,16 +35,14 @@ std::vector<double> HierarchyNNIG<Hypers>::normal_gamma_update(
 
 //! \param data Column vector of data points
 //! \return     Likehood vector evaluated in data
-template <class Hypers>
-Eigen::VectorXd HierarchyNNIG<Hypers>::like(const Eigen::MatrixXd &data) {
+Eigen::VectorXd HierarchyNNIG::like(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result = lpdf(data);
   return result.array().exp();
 }
 
 //! \param data Column vector of data points
 //! \return     Log-Likehood vector evaluated in data
-template <class Hypers>
-Eigen::VectorXd HierarchyNNIG<Hypers>::lpdf(const Eigen::MatrixXd &data) {
+Eigen::VectorXd HierarchyNNIG::lpdf(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
@@ -58,16 +54,14 @@ Eigen::VectorXd HierarchyNNIG<Hypers>::lpdf(const Eigen::MatrixXd &data) {
 
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data
-template <class Hypers>
-Eigen::VectorXd HierarchyNNIG<Hypers>::eval_marg(const Eigen::MatrixXd &data) {
+Eigen::VectorXd HierarchyNNIG::eval_marg(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result = marg_lpdf(data);
   return result.array().exp();
 }
 
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data (log)
-template <class Hypers>
-Eigen::VectorXd HierarchyNNIG<Hypers>::marg_lpdf(const Eigen::MatrixXd &data) {
+Eigen::VectorXd HierarchyNNIG::marg_lpdf(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
   double mu0 = hypers->get_mu0();
   double lambda = hypers->get_lambda();
@@ -85,8 +79,7 @@ Eigen::VectorXd HierarchyNNIG<Hypers>::marg_lpdf(const Eigen::MatrixXd &data) {
   return result;
 }
 
-template <class Hypers>
-void HierarchyNNIG<Hypers>::draw() {
+void HierarchyNNIG::draw() {
   // Get values of hyperparameters
   double mu0 = hypers->get_mu0();
   double lambda = hypers->get_lambda();
@@ -105,8 +98,7 @@ void HierarchyNNIG<Hypers>::draw() {
 }
 
 //! \param data Column vector of data points
-template <class Hypers>
-void HierarchyNNIG<Hypers>::sample_given_data(const Eigen::MatrixXd &data) {
+void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
   double mu0 = hypers->get_mu0();
   double lambda = hypers->get_lambda();
