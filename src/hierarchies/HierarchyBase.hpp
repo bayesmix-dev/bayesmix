@@ -8,6 +8,8 @@
 #include <stan/math/prim/prob.hpp>
 #include <vector>
 
+#include "../utils/rng.hpp"
+
 //! Abstract base template class for a hierarchy object.
 
 //! This template class represents a hierarchy object in a generic iterative

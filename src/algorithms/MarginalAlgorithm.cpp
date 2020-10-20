@@ -1,6 +1,3 @@
-#ifndef MARGINALALGORITHM_IMP_HPP
-#define MARGINALALGORITHM_IMP_HPP
-
 #include "MarginalAlgorithm.hpp"
 
 //! \param grid Grid of points in matrix form to evaluate the density on
@@ -53,5 +50,3 @@ void MarginalAlgorithm::eval_density(
   // Update flag
   density_was_computed = true;
 }
-
-#endif  // MARGINALALGORITHM_IMP_HPP

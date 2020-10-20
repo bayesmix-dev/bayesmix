@@ -51,6 +51,4 @@ class Neal2 : public MarginalAlgorithm {
       : MarginalAlgorithm::MarginalAlgorithm(mixing_, data_, init) {}
 };
 
-#include "Neal2.imp.hpp"
-
 #endif  // NEAL2_HPP

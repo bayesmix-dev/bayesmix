@@ -137,6 +137,4 @@ class HierarchyNNW : public HierarchyBase {
   void print_id() const override {std::cout << "NNW" << std::endl;} // TODO
 };
 
-#include "HierarchyNNW.imp.hpp"
-
 #endif  // HIERARCHYNNW_HPP

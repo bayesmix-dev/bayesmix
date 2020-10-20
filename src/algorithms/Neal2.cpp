@@ -1,6 +1,3 @@
-#ifndef NEAL2_IMP_HPP
-#define NEAL2_IMP_HPP
-
 #include "Neal2.hpp"
 
 //! \param temp_hier Temporary hierarchy object
@@ -149,5 +146,3 @@ void Neal2::sample_unique_values() {
     unique_values[i].sample_given_data(curr_data);
   }
 }
-
-#endif  // NEAL2_IMP_HPP

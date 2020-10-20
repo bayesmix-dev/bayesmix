@@ -1,6 +1,3 @@
-#ifndef NEAL8_IMP_HPP
-#define NEAL8_IMP_HPP
-
 #include "Neal8.hpp"
 
 //! \param temp_hier Temporary hierarchy object
@@ -112,5 +109,3 @@ void Neal8::sample_allocations() {
     }
   }
 }
-
-#endif  // NEAL8_IMP_HPP

@@ -63,6 +63,4 @@ class Neal8 : public Neal2 {
   }
 };
 
-#include "Neal8.imp.hpp"
-
 #endif  // NEAL8_HPP

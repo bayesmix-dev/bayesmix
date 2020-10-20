@@ -1,6 +1,3 @@
-#ifndef HIERARCHYNNW_IMP_HPP
-#define HIERARCHYNNW_IMP_HPP
-
 #include "HierarchyNNW.hpp"
 
 void HierarchyNNW::check_hypers_validity() {
@@ -176,5 +173,3 @@ void HierarchyNNW::sample_given_data(const Eigen::MatrixXd &data) {
   state[0] = mu_new;
   set_tau_and_utilities(tau_new);
 }
-
-#endif  // HIERARCHYNNW_IMP_HPP

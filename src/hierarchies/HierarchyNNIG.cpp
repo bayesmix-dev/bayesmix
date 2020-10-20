@@ -1,6 +1,3 @@
-#ifndef HIERARCHYNNIG_IMP_HPP
-#define HIERARCHYNNIG_IMP_HPP
-
 #include "HierarchyNNIG.hpp"
 
 void HierarchyNNIG::check_state_validity() {
@@ -123,5 +120,3 @@ void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
   state[0](0, 0) = mu_new;
   state[1](0, 0) = sig_new;
 }
-
-#endif  // HIERARCHYNNIG_IMP_HPP

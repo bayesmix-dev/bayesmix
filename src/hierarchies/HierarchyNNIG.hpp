@@ -96,6 +96,4 @@ class HierarchyNNIG : public HierarchyBase {
   void print_id() const override {std::cout << "NNIG" << std::endl;} // TODO
 };
 
-#include "HierarchyNNIG.imp.hpp"
-
 #endif  // HIERARCHYNNIG_HPP

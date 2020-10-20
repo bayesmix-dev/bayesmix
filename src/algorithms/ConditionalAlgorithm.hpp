@@ -12,6 +12,4 @@ public:
                             BaseCollector *const collector) override;
 };
 
-#include "ConditionalAlgorithm.imp.hpp"
-
 #endif  // CONDITIONALALGORITHM_HPP

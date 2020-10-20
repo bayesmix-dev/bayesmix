@@ -1,13 +1,13 @@
 target_sources(bayesmix
   PUBLIC
     Algorithm.hpp
-    Algorithm.imp.hpp
+    Algorithm.cpp
     ConditionalAlgorithm.hpp
-    ConditionalAlgorithm.imp.hpp
+    ConditionalAlgorithm.cpp
     MarginalAlgorithm.hpp
-    MarginalAlgorithm.imp.hpp
+    MarginalAlgorithm.cpp
     Neal2.hpp
-    Neal2.imp.hpp
+    Neal2.cpp
     Neal8.hpp
-    Neal8.imp.hpp
+    Neal8.cpp
 )

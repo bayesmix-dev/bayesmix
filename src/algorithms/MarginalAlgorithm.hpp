@@ -12,6 +12,4 @@ class MarginalAlgorithm : public Algorithm {
                             BaseCollector *const collector) override;
 };
 
-#include "MarginalAlgorithm.imp.hpp"
-
 #endif  // MARGINALALGORITHM_HPP

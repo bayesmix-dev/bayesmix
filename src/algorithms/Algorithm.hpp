@@ -199,6 +199,4 @@ class Algorithm {
   virtual void set_n_aux(const unsigned int n_aux_) { return; }
 };
 
-#include "Algorithm.imp.hpp"
-
 #endif  // ALGORITHM_HPP

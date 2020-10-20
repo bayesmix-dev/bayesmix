@@ -1,6 +1,3 @@
-#ifndef ALGORITHM_IMP_HPP
-#define ALGORITHM_IMP_HPP
-
 #include "Algorithm.hpp"
 
 //! \param iter Number of the current iteration
@@ -175,5 +172,3 @@ void Algorithm::write_density_to_file(
   file.close();
   std::cout << "Successfully wrote density to " << filename << std::endl;
 }
-
-#endif  // ALGORITHM_IMP_HPP
