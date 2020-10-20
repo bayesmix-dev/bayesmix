@@ -2,6 +2,8 @@
 #define HIERARCHYNNW_HPP
 
 #include "HierarchyBase.hpp"
+#include <Eigen/Dense>
+//#include <stan/math/prim.hpp>  // TODO
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 
@@ -23,8 +25,13 @@
 class HierarchyNNW : public HierarchyBase {
  protected:
   using HierarchyBase::state;
-  using HierarchyBase::hypers;
   using EigenRowVec = Eigen::Matrix<double, 1, Eigen::Dynamic>;
+
+  // HYPERPARAMETERS
+  EigenRowVec mu0;
+  double lambda;
+  Eigen::MatrixXd tau0, tau0_inv;
+  double nu;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
   //! Lower factor object of the Cholesky decomposition of tau
@@ -35,6 +42,8 @@ class HierarchyNNW : public HierarchyBase {
   double tau_log_det;
 
   // AUXILIARY TOOLS
+  //! Raises error if the hypers values are not valid w.r.t. their own domain
+  void check_hypers_validity() override;
   //! Raises error if the state values are not valid w.r.t. their own domain
   void check_state_validity() override;
   //! Special setter tau and its utilities
@@ -51,11 +60,10 @@ class HierarchyNNW : public HierarchyBase {
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~HierarchyNNW() = default;
-  HierarchyNNW(std::shared_ptr<HypersBase> hypers_) {
-    hypers = hypers_;
-    unsigned int dim = hypers->get_mu0().size();
-    state.push_back(hypers->get_mu0());
-    set_tau_and_utilities(hypers->get_lambda() *
+  HierarchyNNW() {
+    unsigned int dim = get_mu0().size();
+    state.push_back(get_mu0());
+    set_tau_and_utilities(get_lambda() *
                           Eigen::MatrixXd::Identity(dim, dim));
   }
 
@@ -88,6 +96,42 @@ class HierarchyNNW : public HierarchyBase {
     if (check) {
       check_state_validity();
     }
+  }
+
+  EigenRowVec get_mu0() const { return mu0; }
+
+  double get_lambda() const { return lambda; }
+
+  Eigen::MatrixXd get_tau0() const { return tau0; }
+
+  Eigen::MatrixXd get_tau0_inv() const { return tau0_inv; }
+
+  double get_nu() const { return nu; }
+
+  void set_mu0(const EigenRowVec &mu0_) {
+    assert(mu0_.size() == mu0.size());
+    mu0 = mu0_;
+  }
+
+  void set_lambda(const double lambda_) {
+    assert(lambda_ > 0);
+    lambda = lambda_;
+  }
+
+  void set_tau0(const Eigen::MatrixXd &tau0_) {
+    // Check if tau0 is a square symmetric positive semidefinite matrix
+    assert(tau0_.rows() == tau0_.cols());
+    assert(mu0.size() == tau0_.rows());
+    assert(tau0.isApprox(tau0.transpose()));
+    Eigen::LLT<Eigen::MatrixXd> llt(tau0);
+    assert(llt.info() != Eigen::NumericalIssue);
+    tau0 = tau0_;
+    tau0_inv = stan::math::inverse_spd(tau0);
+  }
+
+  void set_nu(const double nu_) {
+    assert(nu_ > mu0.size() - 1);
+    nu = nu_;
   }
 
   void print_id() const override {std::cout << "NNW" << std::endl;} // TODO

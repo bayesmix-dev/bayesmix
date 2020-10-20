@@ -8,8 +8,6 @@
 #include <stan/math/prim/prob.hpp>
 #include <vector>
 
-#include "../hyperparameters/HypersBase.hpp"
-
 //! Abstract base template class for a hierarchy object.
 
 //! This template class represents a hierarchy object in a generic iterative
@@ -30,10 +28,10 @@ class HierarchyBase {
  protected:
   //! Current unique values state of this cluster
   std::vector<Eigen::MatrixXd> state;
-  //! Pointer to the hyperparameters object of the state
-  std::shared_ptr<HypersBase> hypers;
 
   // AUXILIARY TOOLS
+  //! Raises error if the hypers values are not valid w.r.t. their own domain
+  virtual void check_hypers_validity() = 0;
   //! Raises error if the state values are not valid w.r.t. their own domain
   virtual void check_state_validity() = 0;
 
@@ -63,7 +61,6 @@ class HierarchyBase {
 
   // GETTERS AND SETTERS
   std::vector<Eigen::MatrixXd> get_state() const { return state; }
-  std::shared_ptr<HypersBase> get_hypers() const { return hypers; }
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
   virtual void set_state(const std::vector<Eigen::MatrixXd> &state_,

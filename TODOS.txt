@@ -1,10 +1,12 @@
+RUNTIME-FULL 
+* Hyperpriors = objects with pointer (nupptr if none)?
+* .cpp files (since no templates anymore)
+* Fix arguments issue (protobuf)
+* Class names
+
+
 PRIORITY LIST
 * (3) Full run-time implementation
-  * Factory stuff
-  * Hierarchy-Hypers relation
-  * Fix arguments issue
-  * (add constructor args and template products?)
-* Class names
 * (3) Gamma prior on total mass
 * (3) Regression: linear DDP
 * (2) Regression: weight dependent model (logit s.b.)
@@ -15,4 +17,5 @@ PRIORITY LIST
 * (0) Docs/README/etc
 
 OTHER
+* Add hyperpriors
 * Memory collector stuff?

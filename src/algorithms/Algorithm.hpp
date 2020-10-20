@@ -14,6 +14,8 @@
 #include "../collectors/FileCollector.hpp"
 #include "../collectors/MemoryCollector.hpp"
 #include "../collectors/chain_state.pb.h"
+#include "../hierarchies/HierarchyBase.hpp"
+#include "../mixings/BaseMixing.hpp"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -48,11 +50,6 @@
 //! This class is templatized over the types of the elements of this model: the
 //! hierarchies of cluster, their hyperparameters, and the mixing mode.
 
-//! \param Hierarchy Name of the hierarchy template class
-//! \param Hypers    Name of the hyperparameters class
-//! \param Mixing    Name of the mixing mode class
-
-template <template <class> class Hierarchy, class Hypers, class Mixing>
 class Algorithm {
  protected:
   // METHOD PARAMETERS
@@ -71,11 +68,11 @@ class Algorithm {
   //! Allocation for each datum, i.e. label of the cluster it belongs to
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
-  std::vector<Hierarchy<Hypers> > unique_values;
+  std::vector<std::shared_ptr<HierarchyBase>> unique_values;
   //! Grid of points and evaluation of density on it
   std::pair<Eigen::MatrixXd, Eigen::VectorXd> density;
   //! Mixing object
-  Mixing mixing;
+  std::shared_ptr<BaseMixing> mixing;
   //! Protobuf object that contains the best clustering
   State best_clust;
   //! Random engine
@@ -94,7 +91,7 @@ class Algorithm {
   Eigen::MatrixXd proto_param_to_matrix(const Param &par) const;
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd density_marginal_component(
-      Hierarchy<Hypers> &temp_hier) = 0;
+      HierarchyBase &temp_hier) = 0;
 
   // ALGORITHM FUNCTIONS
   virtual void print_startup_message() const = 0;
@@ -150,14 +147,13 @@ class Algorithm {
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~Algorithm() = default;
-  //! \param hypers_  Hyperparameters object for the model
   //! \param mixing_  Mixing object for the model
   //! \param data_    Matrix of row-vectorial data points
   //! \param init     Prescribed n. of clusters for the algorithm initializ.
-  Algorithm(const Hypers &hypers_, const Mixing &mixing_,
+  Algorithm(const BaseMixing &mixing_,
             const Eigen::MatrixXd &data_, const unsigned int init = 0)
       : mixing(mixing_), data(data_), init_num_clusters(init) {
-    Hierarchy<Hypers> hierarchy(std::make_shared<Hypers>(hypers_));
+    HierarchyBase hierarchy;
 
     if (hierarchy.is_multivariate() == false && data.cols() > 1) {
       std::cout << "Warning: multivariate data supplied to "

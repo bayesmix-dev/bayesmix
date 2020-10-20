@@ -24,9 +24,18 @@
 class HierarchyNNIG : public HierarchyBase {
  protected:
   using HierarchyBase::state;
-  using HierarchyBase::hypers;
+
+  // HYPERPARAMETERS
+  double mu0, lambda, alpha0, beta0;
 
   // AUXILIARY TOOLS
+  //! Raises error if the hypers values are not valid w.r.t. their own domain
+  void check_hypers_validity() override {
+    assert(lambda > 0);
+    assert(alpha0 > 0);
+    assert(beta0 > 0);
+  }
+
   //! Raises error if the state values are not valid w.r.t. their own domain
   void check_state_validity() override;
 
@@ -43,11 +52,10 @@ class HierarchyNNIG : public HierarchyBase {
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~HierarchyNNIG() = default;
-  HierarchyNNIG(std::shared_ptr<HypersBase> hypers_) {
-    hypers = hypers_;
+  HierarchyNNIG() {
     state = std::vector<Eigen::MatrixXd>(2, Eigen::MatrixXd(1, 1));
-    state[0](0, 0) = hypers->get_mu0();
-    state[1](0, 0) = sqrt(hypers->get_beta0() / (hypers->get_alpha0() - 1));
+    state[0](0, 0) = get_mu0();
+    state[1](0, 0) = sqrt(get_beta0() / (get_alpha0() - 1));
   }
 
   // EVALUATION FUNCTIONS
@@ -65,6 +73,25 @@ class HierarchyNNIG : public HierarchyBase {
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data(const Eigen::MatrixXd &data) override;
+
+  // GETTERS AND SETTERS
+  double get_mu0() const { return mu0; }
+  double get_alpha0() const { return alpha0; }
+  double get_beta0() const { return beta0; }
+  double get_lambda() const { return lambda; }
+  void set_mu0(const double mu0_) { mu0 = mu0_; }
+  void set_alpha0(const double alpha0_) {
+    assert(alpha0_ > 0);
+    alpha0 = alpha0_;
+  }
+  void set_beta0(const double beta0_) {
+    assert(beta0_ > 0);
+    beta0 = beta0_;
+  }
+  void set_lambda(const double lambda_) {
+    assert(lambda_ > 0);
+    lambda = lambda_;
+  }
 
   void print_id() const override {std::cout << "NNIG" << std::endl;} // TODO
 };

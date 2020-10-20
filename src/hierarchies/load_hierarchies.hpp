@@ -1,16 +1,16 @@
-#ifndef FACTORY_LOAD_HPP
-#define FACTORY_LOAD_HPP
+#ifndef LOAD_HIERARCHIES_HPP
+#define LOAD_HIERARCHIES_HPP
 
 #include "../runtime/Factory.hpp"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
-__attribute__((constructor)) static void load_Hierarchies() {
+__attribute__((constructor)) static void load_hierarchies() {
+  Factory<HierarchyBase> &factory = Factory<HierarchyBase>::Instance();
   Builder<HierarchyBase> NNIGbuilder = []() {
     return std::make_shared<HierarchyNNIG>();
   };
-  Factory<HierarchyBase> &factory = Factory<HierarchyBase>::Instance();
   Builder<HierarchyBase> NNWbuilder = []() {
     return std::make_shared<HierarchyNNW>();
   };
@@ -18,4 +18,4 @@ __attribute__((constructor)) static void load_Hierarchies() {
   factory.add_builder("NNW", NNWbuilder);
 }
 
-#endif  // FACTORY_LOAD_HPP
+#endif  // LOAD_HIERARCHIES_HPP

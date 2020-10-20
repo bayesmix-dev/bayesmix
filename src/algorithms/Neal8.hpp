@@ -18,28 +18,18 @@
 //! and some minor adjustments in the allocation sampling phase to circumvent
 //! non-conjugacy, it is the same as Neal's algorithm 2.
 
-//! \param Hierarchy Name of the hierarchy template class
-//! \param Hypers    Name of the hyperparameters class
-//! \param Mixing    Name of the mixing mode class
-
-template <template <class> class Hierarchy, class Hypers, class Mixing>
-class Neal8 : public Neal2<Hierarchy, Hypers, Mixing> {
+class Neal8 : public Neal2 {
  protected:
-  using Algorithm<Hierarchy, Hypers, Mixing>::data;
-  using Algorithm<Hierarchy, Hypers, Mixing>::cardinalities;
-  using Algorithm<Hierarchy, Hypers, Mixing>::allocations;
-  using Algorithm<Hierarchy, Hypers, Mixing>::unique_values;
-
   //! Number of auxiliary blocks
   unsigned int n_aux = 3;
 
   //! Vector of auxiliary blocks
-  std::vector<Hierarchy<Hypers>> aux_unique_values;
+  std::vector<HierarchyBase> aux_unique_values;
 
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd density_marginal_component(
-      Hierarchy<Hypers> &temp_hier) override;
+      HierarchyBase &temp_hier) override;
 
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;
@@ -52,13 +42,12 @@ class Neal8 : public Neal2<Hierarchy, Hypers, Mixing> {
   //! \param mixing_ Mixing object for the model
   //! \param data_    Matrix of row-vectorial data points
   //! \param init     Prescribed n. of clusters for the algorithm initializ.
-  Neal8(const Hypers &hypers_, const Mixing &mixing_,
+  Neal8(const BaseMixing &mixing_,
         const Eigen::MatrixXd &data_, const unsigned int init = 0)
-      : Neal2<Hierarchy, Hypers, Mixing>::Neal2(hypers_, mixing_, data_,
-                                                init) {
+      : Neal2::Neal2(mixing_, data_, init) {
     // Initialize auxiliary blocks
     for (size_t i = 0; i < n_aux; i++) {
-      aux_unique_values.push_back(this->unique_values[0]);
+      aux_unique_values.push_back(unique_values[0]);
     }
   }
 
@@ -69,7 +58,7 @@ class Neal8 : public Neal2<Hierarchy, Hypers, Mixing> {
     // Rebuild the correct amount of auxiliary blocks
     aux_unique_values.clear();
     for (size_t i = 0; i < n_aux; i++) {
-      aux_unique_values.push_back(this->unique_values[0]);
+      aux_unique_values.push_back(unique_values[0]);
     }
   }
 };

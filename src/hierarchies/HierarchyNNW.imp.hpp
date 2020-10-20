@@ -3,6 +3,19 @@
 
 #include "HierarchyNNW.hpp"
 
+void HierarchyNNW::check_hypers_validity() {
+  unsigned int dim = mu0.size();
+  assert(lambda > 0);
+  assert(dim == tau0.rows());
+  assert(nu > dim - 1);
+
+  // Check if tau0 is a square symmetric positive semidefinite matrix
+  assert(tau0.rows() == tau0.cols());
+  assert(tau0.isApprox(tau0.transpose()));
+  Eigen::LLT<Eigen::MatrixXd> llt(tau0);
+  assert(llt.info() != Eigen::NumericalIssue);
+}
+
 void HierarchyNNW::check_state_validity() {
   // Check if tau is a square matrix
   unsigned int dim = state[0].size();
@@ -101,10 +114,10 @@ Eigen::VectorXd HierarchyNNW::marg_lpdf(const Eigen::MatrixXd &data) {
   unsigned int dim = data.cols();
 
   // Get values of hyperparameters
-  EigenRowVec mu0 = hypers->get_mu0();
-  double lambda = hypers->get_lambda();
-  Eigen::MatrixXd tau0_inv = hypers->get_tau0_inv();
-  double nu = hypers->get_nu();
+  EigenRowVec mu0 = get_mu0();
+  double lambda = get_lambda();
+  Eigen::MatrixXd tau0_inv = get_tau0_inv();
+  double nu = get_nu();
 
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * nu - dim + 1;
@@ -121,10 +134,10 @@ Eigen::VectorXd HierarchyNNW::marg_lpdf(const Eigen::MatrixXd &data) {
 
 void HierarchyNNW::draw() {
   // Get values of hyperparameters
-  EigenRowVec mu0 = hypers->get_mu0();
-  double lambda = hypers->get_lambda();
-  Eigen::MatrixXd tau0 = hypers->get_tau0();
-  double nu = hypers->get_nu();
+  EigenRowVec mu0 = get_mu0();
+  double lambda = get_lambda();
+  Eigen::MatrixXd tau0 = get_tau0();
+  double nu = get_nu();
 
   // Generate new state values from their prior centering distribution
   Eigen::MatrixXd tau_new =
@@ -140,10 +153,10 @@ void HierarchyNNW::draw() {
 //! \param data Matrix of row-vectorial data points
 void HierarchyNNW::sample_given_data(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
-  EigenRowVec mu0 = hypers->get_mu0();
-  double lambda = hypers->get_lambda();
-  Eigen::MatrixXd tau0_inv = hypers->get_tau0_inv();
-  double nu = hypers->get_nu();
+  EigenRowVec mu0 = get_mu0();
+  double lambda = get_lambda();
+  Eigen::MatrixXd tau0_inv = get_tau0_inv();
+  double nu = get_nu();
 
   // Update values
   std::vector<Eigen::MatrixXd> temp =

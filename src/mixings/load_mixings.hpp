@@ -7,10 +7,10 @@ template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
 __attribute__((constructor)) static void load_mixings() {
+  Factory<BaseMixing> &factory = Factory<BaseMixing>::Instance();
   Builder<BaseMixing> DPbuilder = []() {
     return std::make_shared<DirichletMixing>();
   };
-  Factory<BaseMixing> &factory = Factory<BaseMixing>::Instance();
   Builder<BaseMixing> PYbuilder = []() {
     return std::make_shared<PitYorMixing>();
   };

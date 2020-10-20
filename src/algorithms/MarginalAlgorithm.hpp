@@ -3,13 +3,11 @@
 
 #include "Algorithm.hpp"
 
-template <template <class> class Hierarchy, class Hypers, class Mixing>
-class MarginalAlgorithm : public Algorithm<Hierarchy, Hypers, Mixing> {
+class MarginalAlgorithm : public Algorithm {
  public:
-  MarginalAlgorithm(const Hypers &hypers_, const Mixing &mixing_,
+  MarginalAlgorithm(const BaseMixing &mixing_,
                     const Eigen::MatrixXd &data_, const unsigned int init = 0)
-      : Algorithm<Hierarchy, Hypers, Mixing>::Algorithm(hypers_, mixing_,
-                                                        data_, init) {}
+      : Algorithm::Algorithm(mixing_, data_, init) {}
   virtual void eval_density(const Eigen::MatrixXd &grid,
                             BaseCollector *const collector) override;
 };

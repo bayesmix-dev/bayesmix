@@ -9,18 +9,14 @@ int main(int argc, char *argv[]) {
   std::cout << "Running run.cpp" << std::endl;
 
   std::string type_mixing = argv[1];
-  std::string type_hier  = argv[2];
-  std::string type_hypers = argv[3];
+  std::string type_hier   = argv[2];
 
   Factory<BaseMixing> &factory_mixing = Factory<BaseMixing>::Instance();
-  Factory<HierarchyBase> &factory_hypers = Factory<HierarchyBase>::Instance();
-  Factory<HypersBase> &factory_hypers = Factory<HypersBase>::Instance();
+  Factory<HierarchyBase> &factory_hier = Factory<HierarchyBase>::Instance();
   auto mixing = factory_mixing.create_object(type_mixing);
-  auto hier   = factory_hier.create_object(type_hier)
-  auto hypers = factory_hypers.create_object(type_hypers);
+  auto hier = factory_hier.create_object(type_hier);
   mixing->print_id();
   hier->print_id();
-  hypers->print_id();
 
   std::cout << "End of run.cpp" << std::endl;
   return 0;

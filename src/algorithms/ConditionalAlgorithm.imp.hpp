@@ -5,8 +5,7 @@
 
 //! \param grid Grid of points in matrix form to evaluate the density on
 //! \param coll Collector containing the algorithm chain
-template <template <class> class Hierarchy, class Hypers, class Mixing>
-void ConditionalAlgorithm<Hierarchy, Hypers, Mixing>::eval_density(
+void ConditionalAlgorithm::eval_density(
     const Eigen::MatrixXd &grid, BaseCollector *coll) {
   std::cout << "TODO" << std::endl;  // TODO
 }

@@ -63,10 +63,10 @@ Eigen::VectorXd HierarchyNNIG::eval_marg(const Eigen::MatrixXd &data) {
 //! \return     Marginal distribution vector evaluated in data (log)
 Eigen::VectorXd HierarchyNNIG::marg_lpdf(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
-  double mu0 = hypers->get_mu0();
-  double lambda = hypers->get_lambda();
-  double alpha0 = hypers->get_alpha0();
-  double beta0 = hypers->get_beta0();
+  double mu0 = get_mu0();
+  double lambda = get_lambda();
+  double alpha0 = get_alpha0();
+  double beta0 = get_beta0();
 
   // Compute standard deviation of marginal distribution
   double sig_n = sqrt(beta0 * (lambda + 1) / (alpha0 * lambda));
@@ -81,10 +81,10 @@ Eigen::VectorXd HierarchyNNIG::marg_lpdf(const Eigen::MatrixXd &data) {
 
 void HierarchyNNIG::draw() {
   // Get values of hyperparameters
-  double mu0 = hypers->get_mu0();
-  double lambda = hypers->get_lambda();
-  double alpha0 = hypers->get_alpha0();
-  double beta0 = hypers->get_beta0();
+  double mu0 = get_mu0();
+  double lambda = get_lambda();
+  double alpha0 = get_alpha0();
+  double beta0 = get_beta0();
 
   // Generate new state values from their prior centering distribution
   double sig_new =
@@ -100,10 +100,10 @@ void HierarchyNNIG::draw() {
 //! \param data Column vector of data points
 void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
-  double mu0 = hypers->get_mu0();
-  double lambda = hypers->get_lambda();
-  double alpha0 = hypers->get_alpha0();
-  double beta0 = hypers->get_beta0();
+  double mu0 = get_mu0();
+  double lambda = get_lambda();
+  double alpha0 = get_alpha0();
+  double beta0 = get_beta0();
 
   // Update values
   std::vector<double> temp =

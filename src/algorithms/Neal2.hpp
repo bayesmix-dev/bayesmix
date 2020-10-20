@@ -22,22 +22,12 @@
 //! cluster are instead updated via the posterior distribution, which again has
 //! a closed-form expression thanks to conjugacy.
 
-//! \param Hierarchy Name of the hierarchy template class
-//! \param Hypers    Name of the hyperparameters class
-//! \param Mixing    Name of the mixing mode class
-
-template <template <class> class Hierarchy, class Hypers, class Mixing>
-class Neal2 : public MarginalAlgorithm<Hierarchy, Hypers, Mixing> {
+class Neal2 : public MarginalAlgorithm {
  protected:
-  using Algorithm<Hierarchy, Hypers, Mixing>::data;
-  using Algorithm<Hierarchy, Hypers, Mixing>::cardinalities;
-  using Algorithm<Hierarchy, Hypers, Mixing>::allocations;
-  using Algorithm<Hierarchy, Hypers, Mixing>::unique_values;
-
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd density_marginal_component(
-      Hierarchy<Hypers> &temp_hier) override;
+      HierarchyBase &temp_hier) override;
 
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;
@@ -56,10 +46,9 @@ class Neal2 : public MarginalAlgorithm<Hierarchy, Hypers, Mixing> {
   //! \param mixing_  Mixing object for the model
   //! \param data_    Matrix of row-vectorial data points
   //! \param init     Prescribed n. of clusters for the algorithm initializ.
-  Neal2(const Hypers &hypers_, const Mixing &mixing_,
+  Neal2(const BaseMixing &mixing_,
         const Eigen::MatrixXd &data_, const unsigned int init = 0)
-      : MarginalAlgorithm<Hierarchy, Hypers, Mixing>::MarginalAlgorithm(
-            hypers_, mixing_, data_, init) {}
+      : MarginalAlgorithm::MarginalAlgorithm(mixing_, data_, init) {}
 };
 
 #include "Neal2.imp.hpp"
