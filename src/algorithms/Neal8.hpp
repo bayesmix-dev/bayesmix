@@ -24,12 +24,12 @@ class Neal8 : public Neal2 {
   unsigned int n_aux = 3;
 
   //! Vector of auxiliary blocks
-  std::vector<HierarchyBase> aux_unique_values;
+  std::vector<std::shared_ptr<HierarchyBase>> aux_unique_values;
 
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd density_marginal_component(
-      HierarchyBase &temp_hier) override;
+      std::shared_ptr<HierarchyBase> temp_hier) override;
 
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;
@@ -38,18 +38,7 @@ class Neal8 : public Neal2 {
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   ~Neal8() = default;
-  //! \param hypers_  Hyperparameters object for the model
-  //! \param mixing_ Mixing object for the model
-  //! \param data_    Matrix of row-vectorial data points
-  //! \param init     Prescribed n. of clusters for the algorithm initializ.
-  Neal8(const BaseMixing &mixing_,
-        const Eigen::MatrixXd &data_, const unsigned int init = 0)
-      : Neal2::Neal2(mixing_, data_, init) {
-    // Initialize auxiliary blocks
-    for (size_t i = 0; i < n_aux; i++) {
-      aux_unique_values.push_back(unique_values[0]);
-    }
-  }
+  Neal8() = default;
 
   // GETTERS AND SETTERS
   unsigned int get_n_aux() const { return n_aux; }
@@ -61,6 +50,14 @@ class Neal8 : public Neal2 {
       aux_unique_values.push_back(unique_values[0]);
     }
   }
+
+  // void initalize() { // TODO
+  //   // ...
+  //   // Initialize auxiliary blocks
+  //   for (size_t i = 0; i < n_aux; i++) {
+  //     aux_unique_values.push_back(unique_values[0]);
+  //   }
+  // }
 };
 
 #endif  // NEAL8_HPP

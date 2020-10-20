@@ -2,8 +2,8 @@
 
 //! \param grid Grid of points in matrix form to evaluate the density on
 //! \param coll Collector containing the algorithm chain
-void MarginalAlgorithm::eval_density(
-    const Eigen::MatrixXd &grid, BaseCollector *coll) {
+void MarginalAlgorithm::eval_density(const Eigen::MatrixXd &grid,
+                                     BaseCollector *coll) {
   // Initialize objects
   density.first = grid;
   Eigen::VectorXd dens(Eigen::MatrixXd::Zero(grid.rows(), 1));
@@ -25,7 +25,8 @@ void MarginalAlgorithm::eval_density(
       card[chain[iter].allocations(j)] += 1;
     }
     // Initialize temporary hierarchy
-    HierarchyBase temp_hier(unique_values[0].get_hypers());
+    std::shared_ptr<HierarchyBase> temp_hier =
+        std::make_shared<HierarchyBase>();
 
     // Loop over current iteration's unique values
     for (size_t h = 0; h < n_clust; h++) {
@@ -34,14 +35,14 @@ void MarginalAlgorithm::eval_density(
         params[k] =
             proto_param_to_matrix(chain[iter].uniquevalues(h).params(k));
       }
-      temp_hier.set_state(params, false);
+      temp_hier->set_state(params, false);
 
       // Update density estimate (cluster component)
-      dens += mixing.mass_existing_cluster(card[h], n) *
-              temp_hier.like(grid);
+      dens +=
+          mixing->mass_existing_cluster(card[h], n) * temp_hier->like(grid);
     }
     // Update density estimate (marginal component)
-    dens += mixing.mass_new_cluster(n_clust, n) *
+    dens += mixing->mass_new_cluster(n_clust, n) *
             density_marginal_component(temp_hier);
   }
 

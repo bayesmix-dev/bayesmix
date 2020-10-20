@@ -33,8 +33,8 @@ void Neal8::sample_allocations() {
     int singleton = 0;
     if (cardinalities[allocations[i]] == 1) {
       // Save unique value in the first auxiliary block
-      aux_unique_values[0].set_state(unique_values[allocations[i]].get_state(),
-                                     false);
+      aux_unique_values[0]->set_state(
+        unique_values[allocations[i]]->get_state(), false);
       singleton = 1;
     }
 
@@ -43,7 +43,7 @@ void Neal8::sample_allocations() {
 
     // Draw the unique values in the auxiliary blocks from their prior
     for (size_t j = singleton; j < n_aux; j++) {
-      aux_unique_values[j].draw();
+      aux_unique_values[j]->draw();
     }
 
     // Compute probabilities of clusters
@@ -53,7 +53,7 @@ void Neal8::sample_allocations() {
     for (size_t k = 0; k < n_clust; k++) {
       // Probability of being assigned to an already existing cluster
       probas(k) = mixing.mass_existing_cluster(cardinalities[k], n - 1) *
-                  unique_values[k].like(datum)(0);
+                  unique_values[k]->like(datum)(0);
       tot += probas(k);
       // Note: if datum is a singleton, then, when k = allocations[i],
       // one has card[k] = 0: cluster k will never be chosen
@@ -62,7 +62,7 @@ void Neal8::sample_allocations() {
     for (size_t k = 0; k < n_aux; k++) {
       // Probability of being assigned to a newly generated cluster
       probas(n_clust + k) = mixing.mass_new_cluster(n_clust, n - 1) *
-                            aux_unique_values[k].like(datum)(0) / n_aux;
+                            aux_unique_values[k]->like(datum)(0) / n_aux;
       tot += probas(n_clust + k);
     }
     // Normalize
@@ -77,7 +77,7 @@ void Neal8::sample_allocations() {
       if (c_new >= n_clust) {
         // Case 1: datum moves from a singleton to a new cluster
         // Take unique values from an auxiliary block
-        unique_values[allocations[i]].set_state(
+        unique_values[allocations[i]]->set_state(
             aux_unique_values[c_new - n_clust].get_state(), false);
         cardinalities[allocations[i]] += 1;
       } else {  // Case 2: datum moves from a singleton to an old cluster

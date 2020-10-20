@@ -5,9 +5,8 @@
 
 class ConditionalAlgorithm : public Algorithm {
 public:
-  MarginalAlgorithm(const BaseMixing &mixing_,
-                    const Eigen::MatrixXd &data_, const unsigned int init = 0)
-      : Algorithm::Algorithm(mixing_, data_, init) {}
+  ~ConditionalAlgorithm() = default;
+  ConditionalAlgorithm() = default;
   virtual void eval_density(const Eigen::MatrixXd &grid,
                             BaseCollector *const collector) override;
 };

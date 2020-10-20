@@ -11,8 +11,8 @@ State Algorithm::get_state_as_proto(
   // Transcribe unique values vector
   for (size_t i = 0; i < unique_values.size(); i++) {
     UniqueValues uniquevalues_temp;
-    for (size_t k = 0; k < unique_values[i].get_state().size(); k++) {
-      Eigen::MatrixXd par_temp = unique_values[i].get_state()[k];
+    for (size_t k = 0; k < unique_values[i]->get_state().size(); k++) {
+      Eigen::MatrixXd par_temp = unique_values[i]->get_state()[k];
       Param par_temp_proto;
       for (size_t j = 0; j < par_temp.cols(); j++) {
         Par_Col col_temp;

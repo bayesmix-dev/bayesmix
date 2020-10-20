@@ -91,7 +91,7 @@ class Algorithm {
   Eigen::MatrixXd proto_param_to_matrix(const Param &par) const;
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd density_marginal_component(
-      HierarchyBase &temp_hier) = 0;
+      std::shared_ptr<HierarchyBase> temp_hier) = 0;
 
   // ALGORITHM FUNCTIONS
   virtual void print_startup_message() const = 0;
@@ -147,36 +147,35 @@ class Algorithm {
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~Algorithm() = default;
-  //! \param mixing_  Mixing object for the model
-  //! \param data_    Matrix of row-vectorial data points
-  //! \param init     Prescribed n. of clusters for the algorithm initializ.
-  Algorithm(const BaseMixing &mixing_,
-            const Eigen::MatrixXd &data_, const unsigned int init = 0)
-      : mixing(mixing_), data(data_), init_num_clusters(init) {
-    HierarchyBase hierarchy;
+  Algorithm() = default;
 
-    if (hierarchy.is_multivariate() == false && data.cols() > 1) {
-      std::cout << "Warning: multivariate data supplied to "
-                << "univariate hierarchy. The algorithm will run "
-                << "correctly, but all data rows other than the first"
-                << "one will be ignored" << std::endl;
-    }
-    if (data.rows() == 0) {
-      init_num_clusters = 1;
-    }
-    if (init_num_clusters == 0) {
-      // If not provided, standard initializ.: one datum per cluster
-      std::cout << "Warning: initial number of clusters will be "
-                << "set equal to the data size (" << data.rows() << ")"
-                << std::endl;
-      init_num_clusters = data.rows();
-    }
-
-    // Initialize hierarchies for starting clusters
-    for (size_t i = 0; i < init_num_clusters; i++) {
-      unique_values.push_back(hierarchy);
-    }
-  }
+//  void initialize() { // TODO
+//    // ...
+//
+//    HierarchyBase hierarchy;
+//
+//    if (hierarchy.is_multivariate() == false && data.cols() > 1) {
+//      std::cout << "Warning: multivariate data supplied to "
+//                << "univariate hierarchy. The algorithm will run "
+//                << "correctly, but all data rows other than the first"
+//                << "one will be ignored" << std::endl;
+//    }
+//    if (data.rows() == 0) {
+//      init_num_clusters = 1;
+//    }
+//    if (init_num_clusters == 0) {
+//      // If not provided, standard initializ.: one datum per cluster
+//      std::cout << "Warning: initial number of clusters will be "
+//                << "set equal to the data size (" << data.rows() << ")"
+//                << std::endl;
+//      init_num_clusters = data.rows();
+//    }
+//
+//    // Initialize hierarchies for starting clusters
+//    for (size_t i = 0; i < init_num_clusters; i++) {
+//      unique_values.push_back(hierarchy);
+//    }
+//  }
 
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }

@@ -5,9 +5,8 @@
 
 class MarginalAlgorithm : public Algorithm {
  public:
-  MarginalAlgorithm(const BaseMixing &mixing_,
-                    const Eigen::MatrixXd &data_, const unsigned int init = 0)
-      : Algorithm::Algorithm(mixing_, data_, init) {}
+  ~MarginalAlgorithm() = default;
+  MarginalAlgorithm() = default;
   virtual void eval_density(const Eigen::MatrixXd &grid,
                             BaseCollector *const collector) override;
 };

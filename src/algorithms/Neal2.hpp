@@ -27,7 +27,7 @@ class Neal2 : public MarginalAlgorithm {
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd density_marginal_component(
-      HierarchyBase &temp_hier) override;
+      std::shared_ptr<HierarchyBase> temp_hier) override;
 
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;
@@ -42,13 +42,7 @@ class Neal2 : public MarginalAlgorithm {
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   ~Neal2() = default;
-  //! \param hypers_  Hyperparameters object for the model
-  //! \param mixing_  Mixing object for the model
-  //! \param data_    Matrix of row-vectorial data points
-  //! \param init     Prescribed n. of clusters for the algorithm initializ.
-  Neal2(const BaseMixing &mixing_,
-        const Eigen::MatrixXd &data_, const unsigned int init = 0)
-      : MarginalAlgorithm::MarginalAlgorithm(mixing_, data_, init) {}
+  Neal2() = default;
 };
 
 #endif  // NEAL2_HPP
