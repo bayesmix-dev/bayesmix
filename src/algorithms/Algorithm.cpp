@@ -167,3 +167,7 @@ void Algorithm::write_density_to_file(const std::string &filename) const {
   file.close();
   std::cout << "Successfully wrote density to " << filename << std::endl;
 }
+
+void Algorithm::set_data(const std::string &filename){
+  data = read_eigen_matrix(filename);
+}
