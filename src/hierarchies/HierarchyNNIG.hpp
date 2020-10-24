@@ -93,6 +93,15 @@ class HierarchyNNIG : public HierarchyBase {
     lambda = lambda_;
   }
 
+  //! \param state_ State value to set
+  //! \param check  If true, a state validity check occurs after assignment
+  void set_state(const std::vector<Eigen::MatrixXd> &state_,
+                 bool check = true) override {
+    state = state_;
+    if (check) {
+      check_state_validity();
+    }
+  }
   void print_id() const override {std::cout << "NNIG" << std::endl;} // TODO
 };
 

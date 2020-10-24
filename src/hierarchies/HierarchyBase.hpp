@@ -66,12 +66,7 @@ class HierarchyBase {
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
   virtual void set_state(const std::vector<Eigen::MatrixXd> &state_,
-                         bool check = true) {
-    state = state_;
-    if (check) {
-      check_state_validity();
-    }
-  }
+                         bool check) = 0;
 
   virtual void print_id() const = 0; // TODO
 };
