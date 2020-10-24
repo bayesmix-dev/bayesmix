@@ -5,7 +5,7 @@
 Eigen::VectorXd Neal2::density_marginal_component(
       std::shared_ptr<HierarchyBase> temp_hier) {
   // Exploit conjugacy of hierarchy
-  return temp_hier.eval_marg(density.first);
+  return temp_hier->eval_marg(density.first);
 }
 
 void Neal2::print_startup_message() const {
@@ -58,18 +58,18 @@ void Neal2::sample_allocations() {
     // Loop over clusters
     for (size_t k = 0; k < n_clust; k++) {
       // Probability of being assigned to an already existing cluster
-      probas(k) = mixing.mass_existing_cluster(cardinalities[k], n - 1) *
+      probas(k) = mixing->mass_existing_cluster(cardinalities[k], n - 1) *
                   unique_values[k]->like(datum)(0);
       if (singleton == 1 && k == allocations[i]) {
         // Probability of being assigned to a newly generated cluster
-        probas(k) = mixing.mass_new_cluster(n_clust, n - 1) *
+        probas(k) = mixing->mass_new_cluster(n_clust, n - 1) *
                     unique_values[0]->eval_marg(datum)(0);
       }
       tot += probas(k);
     }
     if (singleton == 0) {
       // Further update with marginal component
-      probas(n_clust) = mixing.mass_new_cluster(n_clust, n - 1) *
+      probas(n_clust) = mixing->mass_new_cluster(n_clust, n - 1) *
                         unique_values[0]->eval_marg(datum)(0);
       tot += probas(n_clust);
     }
@@ -107,9 +107,10 @@ void Neal2::sample_allocations() {
     else {  // if singleton == 0
       if (c_new == n_clust) {
         // Case 3: datum moves from a non-singleton to a new cluster
-        HierarchyBase new_unique(unique_values[0]->get_hypers());
+        std::shared_ptr<HierarchyBase> new_unique =
+          unique_values[0];  // TODO init hypers
         // Generate new unique values with posterior sampling
-        new_unique.sample_given_data(datum);
+        new_unique->sample_given_data(datum);
         unique_values.push_back(new_unique);
         allocations[i] = n_clust;
         cardinalities.push_back(1);

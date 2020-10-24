@@ -196,6 +196,8 @@ class Algorithm {
   void set_rng_seed(const unsigned int seed) { rng.seed(seed); }
   //! Does nothing except for Neal8
   virtual void set_n_aux(const unsigned int n_aux_) { return; }
+
+  virtual void print_id() const = 0;  // TODO
 };
 
 #endif  // ALGORITHM_HPP

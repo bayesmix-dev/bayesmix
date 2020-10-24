@@ -58,6 +58,8 @@ class Neal8 : public Neal2 {
   //     aux_unique_values.push_back(unique_values[0]);
   //   }
   // }
+
+  void print_id() const override {std::cout << "N8" << std::endl; }  // TODO
 };
 
 #endif  // NEAL8_HPP
