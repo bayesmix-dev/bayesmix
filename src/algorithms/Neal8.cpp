@@ -34,7 +34,7 @@ void Neal8::sample_allocations() {
     if (cardinalities[allocations[i]] == 1) {
       // Save unique value in the first auxiliary block
       aux_unique_values[0]->set_state(
-        unique_values[allocations[i]]->get_state(), false);
+          unique_values[allocations[i]]->get_state(), false);
       singleton = 1;
     }
 

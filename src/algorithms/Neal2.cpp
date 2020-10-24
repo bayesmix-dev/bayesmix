@@ -3,7 +3,7 @@
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2::density_marginal_component(
-      std::shared_ptr<HierarchyBase> temp_hier) {
+    std::shared_ptr<HierarchyBase> temp_hier) {
   // Exploit conjugacy of hierarchy
   return temp_hier->eval_marg(density.first);
 }
@@ -108,7 +108,7 @@ void Neal2::sample_allocations() {
       if (c_new == n_clust) {
         // Case 3: datum moves from a non-singleton to a new cluster
         std::shared_ptr<HierarchyBase> new_unique =
-          unique_values[0];  // TODO init hypers
+            unique_values[0];  // TODO init hypers
         // Generate new unique values with posterior sampling
         new_unique->sample_given_data(datum);
         unique_values.push_back(new_unique);

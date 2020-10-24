@@ -8,12 +8,8 @@ using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
 __attribute__((constructor)) static void load_Hierarchies() {
   Factory<Algorithm> &factory = Factory<Algorithm>::Instance();
-  Builder<Algorithm> Neal2builder = []() {
-    return std::make_shared<Neal2>();
-  };
-  Builder<Algorithm> NNWbuilder = []() {
-    return std::make_shared<Neal8>();
-  };
+  Builder<Algorithm> Neal2builder = []() { return std::make_shared<Neal2>(); };
+  Builder<Algorithm> NNWbuilder = []() { return std::make_shared<Neal8>(); };
   factory.add_builder("N2", Neal2builder);
   factory.add_builder("N8", NNWbuilder);
 }

@@ -1,8 +1,6 @@
 #include "HierarchyNNIG.hpp"
 
-void HierarchyNNIG::check_state_validity() {
-  assert(state[1](0, 0) > 0);
-}
+void HierarchyNNIG::check_state_validity() { assert(state[1](0, 0) > 0); }
 
 //! \param data                       Column vector of data points
 //! \param mu0, alpha0, beta0, lambda Original values for hyperparameters

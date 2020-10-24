@@ -102,7 +102,7 @@ class HierarchyNNIG : public HierarchyBase {
       check_state_validity();
     }
   }
-  void print_id() const override {std::cout << "NNIG" << std::endl;} // TODO
+  void print_id() const override { std::cout << "NNIG" << std::endl; }  // TODO
 };
 
 #endif  // HIERARCHYNNIG_HPP

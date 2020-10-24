@@ -1,8 +1,9 @@
 #ifndef HIERARCHYNNW_HPP
 #define HIERARCHYNNW_HPP
 
-#include "HierarchyBase.hpp"
 #include <Eigen/Dense>
+
+#include "HierarchyBase.hpp"
 //#include <stan/math/prim.hpp>  // TODO
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
@@ -63,8 +64,7 @@ class HierarchyNNW : public HierarchyBase {
   HierarchyNNW() {
     unsigned int dim = get_mu0().size();
     state.push_back(get_mu0());
-    set_tau_and_utilities(get_lambda() *
-                          Eigen::MatrixXd::Identity(dim, dim));
+    set_tau_and_utilities(get_lambda() * Eigen::MatrixXd::Identity(dim, dim));
   }
 
   // EVALUATION FUNCTIONS
@@ -134,7 +134,7 @@ class HierarchyNNW : public HierarchyBase {
     nu = nu_;
   }
 
-  void print_id() const override {std::cout << "NNW" << std::endl;} // TODO
+  void print_id() const override { std::cout << "NNW" << std::endl; }  // TODO
 };
 
 #endif  // HIERARCHYNNW_HPP

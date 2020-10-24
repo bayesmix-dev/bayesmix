@@ -2,8 +2,7 @@
 
 //! \param iter Number of the current iteration
 //! \return     Protobuf-object version of the current state
-State Algorithm::get_state_as_proto(
-    unsigned int iter) {
+State Algorithm::get_state_as_proto(unsigned int iter) {
   // Transcribe allocations vector
   State iter_out;
   *iter_out.mutable_allocations() = {allocations.begin(), allocations.end()};
@@ -33,8 +32,7 @@ State Algorithm::get_state_as_proto(
 
 //! \param un_val Unique value in Protobuf-object form
 //! \return       Matrix version of un_val
-Eigen::MatrixXd Algorithm::proto_param_to_matrix(
-    const Param &un_val) const {
+Eigen::MatrixXd Algorithm::proto_param_to_matrix(const Param &un_val) const {
   Eigen::MatrixXd par_matrix = Eigen::MatrixXd::Zero(
       un_val.par_cols(0).elems_size(), un_val.par_cols_size());
 
@@ -53,8 +51,7 @@ void Algorithm::print_ending_message() const {
 
 //! \param coll Collector containing the algorithm chain
 //! \return     Index of the iteration containing the best estimate
-unsigned int Algorithm::cluster_estimate(
-    BaseCollector *coll) {
+unsigned int Algorithm::cluster_estimate(BaseCollector *coll) {
   // Read chain from collector
   std::deque<State> chain = coll->get_chain();
 
@@ -106,8 +103,7 @@ unsigned int Algorithm::cluster_estimate(
 }
 
 //! \param filename Name of file to write to
-void Algorithm::write_clustering_to_file(
-    const std::string &filename) const {
+void Algorithm::write_clustering_to_file(const std::string &filename) const {
   if (!clustering_was_computed) {
     std::cerr << "Error: cannot write clustering to file; "
               << "cluster_estimate() must be called first" << std::endl;
@@ -146,8 +142,7 @@ void Algorithm::write_clustering_to_file(
 }
 
 //! \param filename Name of file to write to
-void Algorithm::write_density_to_file(
-    const std::string &filename) const {
+void Algorithm::write_density_to_file(const std::string &filename) const {
   if (!density_was_computed) {
     std::cerr << "Error: cannot write density to file; eval_density() "
               << "must be called first" << std::endl;

@@ -4,7 +4,7 @@
 #include "Algorithm.hpp"
 
 class ConditionalAlgorithm : public Algorithm {
-public:
+ public:
   ~ConditionalAlgorithm() = default;
   ConditionalAlgorithm() = default;
   virtual void eval_density(const Eigen::MatrixXd &grid,

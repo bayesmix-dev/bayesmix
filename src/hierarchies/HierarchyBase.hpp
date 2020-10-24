@@ -68,7 +68,7 @@ class HierarchyBase {
   virtual void set_state(const std::vector<Eigen::MatrixXd> &state_,
                          bool check) = 0;
 
-  virtual void print_id() const = 0; // TODO
+  virtual void print_id() const = 0;  // TODO
 };
 
 #endif  // HIERARCHYBASE_HPP
