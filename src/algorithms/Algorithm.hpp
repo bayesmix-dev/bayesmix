@@ -187,6 +187,7 @@ class Algorithm {
     }
     return density;
   }
+  std::shared_ptr<BaseMixing> get_mixing() const { return mixing; }
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
@@ -196,8 +197,10 @@ class Algorithm {
   void set_rng_seed(const unsigned int seed) { rng.seed(seed); }
   //! Does nothing except for Neal8
   virtual void set_n_aux(const unsigned int n_aux_) { return; }
+  void set_mixing(std::shared_ptr<BaseMixing> mixing_) { mixing = mixing_; }
 
   virtual void print_id() const = 0;  // TODO
+  virtual void get_mixing_id() const { mixing->print_id(); }  // TODO
 };
 
 #endif  // ALGORITHM_HPP

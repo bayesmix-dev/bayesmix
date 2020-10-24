@@ -20,9 +20,9 @@ int main(int argc, char *argv[]) {
   auto hier = factory_hier.create_object(type_hier);
   auto algo = factory_algo.create_object(type_algo);
 
-  mixing->print_id();
-  hier->print_id();
+  algo->set_mixing(mixing);
   algo->print_id();
+  algo->get_mixing_id();
 
   std::cout << "End of run.cpp" << std::endl;
   return 0;
