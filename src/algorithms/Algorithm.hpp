@@ -149,34 +149,6 @@ class Algorithm {
   virtual ~Algorithm() = default;
   Algorithm() = default;
 
-  //  void initialize() { // TODO
-  //    // ...
-  //
-  //    HierarchyBase hierarchy;
-  //
-  //    if (hierarchy.is_multivariate() == false && data.cols() > 1) {
-  //      std::cout << "Warning: multivariate data supplied to "
-  //                << "univariate hierarchy. The algorithm will run "
-  //                << "correctly, but all data rows other than the first"
-  //                << "one will be ignored" << std::endl;
-  //    }
-  //    if (data.rows() == 0) {
-  //      init_num_clusters = 1;
-  //    }
-  //    if (init_num_clusters == 0) {
-  //      // If not provided, standard initializ.: one datum per cluster
-  //      std::cout << "Warning: initial number of clusters will be "
-  //                << "set equal to the data size (" << data.rows() << ")"
-  //                << std::endl;
-  //      init_num_clusters = data.rows();
-  //    }
-  //
-  //    // Initialize hierarchies for starting clusters
-  //    for (size_t i = 0; i < init_num_clusters; i++) {
-  //      unique_values.push_back(hierarchy);
-  //    }
-  //  }
-
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }
   unsigned int get_burnin() const { return burnin; }
@@ -191,17 +163,34 @@ class Algorithm {
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
-  void set_init_num_clusters(const unsigned int init) {
-    init_num_clusters = init;
-  }
   void set_rng_seed(const unsigned int seed) { rng.seed(seed); }
   //! Does nothing except for Neal8
   virtual void set_n_aux(const unsigned int n_aux_) { return; }
   void set_mixing(std::shared_ptr<BaseMixing> mixing_) { mixing = mixing_; }
-  void set_data(const Eigen::MatrixXd &data_) { data = data_; }
+  void set_data_and_initial_clusters(const Eigen::MatrixXd &data_,
+                                     std::shared_ptr<HierarchyBase> hier_,
+                                     const unsigned int init = 0) {
+  if(data.rows() == 0) {
+    std::invalid_argument("Error: empty data matrix");  // TODO error type
+  }
+  if (hier_->is_multivariate() == false && data.cols() > 1) {
+    std::cout << "Warning: multivariate data supplied to univariate hierarchy."
+              << " The algorithm will run correctly, but all data rows other"
+              << " than the first one will be ignored" << std::endl;
+  }
+    data = data_;
+    init_num_clusters = (init == 0) ? data.rows() : init;
+    // "Warning: initial number of clusters will be set equal to the data
+    // size (" << data.rows() << ")"
+    // Initialize hierarchies for starting clusters
+    for (size_t i = 0; i < init_num_clusters; i++) {
+      unique_values.push_back(hier_);
+    }
+  }
 
   virtual void print_id() const = 0;  // TODO
-  virtual void get_mixing_id() const { mixing->print_id(); }  // TODO
+  void get_mixing_id() const { mixing->print_id(); }  // TODO
+  void get_hier_id() const { unique_values[0]->print_id(); }  // TODO
 };
 
 #endif  // ALGORITHM_HPP

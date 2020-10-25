@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   std::string type_algo   = "N2";
   std::string datafile    = "resources/data_multi.csv";
   std::string gridfile    = "resources/grid_multi.csv";
-  unsigned int init = 2;
+  unsigned int init = 0;
 
   // Create factories and objects
   Factory<BaseMixing>  &factory_mixing = Factory<BaseMixing>::Instance();
@@ -32,12 +32,12 @@ int main(int argc, char *argv[]) {
   // STUFF:
   // Object allocation
   algo->set_mixing(mixing);
-  algo->set_data(data);
-  algo->set_init_num_clusters(init);
+  algo->set_data_and_initial_clusters(data, hier, init);
 
   // Execution
   algo->print_id();
   algo->get_mixing_id();
+  algo->get_hier_id();
 
   std::cout << "End of run.cpp" << std::endl;
   return 0;
