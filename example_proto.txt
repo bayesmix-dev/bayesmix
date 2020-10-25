@@ -15,69 +15,68 @@ void StraussPP::get_state_as_proto(google::protobuf::Message *out) {
 
 syntax="proto3";
   
-  message WishartParams {
+message WishartParams {
   double nu = 1;
   bool identity = 2;
   oneof sigma_ { double sigma = 3; }
   int32 dim = 4;
-  }
-  
-  message FixedMultiPrecParams {
+}
+
+
+message FixedMultiPrecParams {
   double sigma = 1;
   int32 dim = 2;
-  }
-  
-  message FixedUnivPrecParams {
+}
+
+
+message FixedUnivPrecParams {
   double sigma = 1;
-  }
-  
-  message GammaParams {
+}
+
+
+message GammaParams {
   double alpha = 1;
   double beta = 2;
-  }
-  
-  
-  message StraussParams {
+}
+
+
+message StraussParams {
   message Priors {
-  double beta_l = 1;
-  double beta_u = 2;
-  double gamma_l = 3;
-  double gamma_u = 4;
-  double r_l = 5;
-  double r_u = 6;
+    double beta_l = 1;
+    double beta_u = 2;
+    double gamma_l = 3;
+    double gamma_u = 4;
+    double r_l = 5;
+    double r_u = 6;
   }
-  
   message Inits {
-  double beta = 1;
-  double gamma = 2;
-  double R = 3;
+    double beta = 1;
+    double gamma = 2;
+    double R = 3;
   }
-  
   Priors prior = 1;
   Inits init = 2;
   bool fixed_params = 3;
-  }
-  
-  
-  message NrepParams {
+}
+
+
+message NrepParams {
   double u = 1;
   double p = 2;
-  }
-  
-  message Params {
+}
+
+
+message Params {
   oneof pp_params {
-  StraussParams strauss = 1;
-  NrepParams nrep = 2;
+    StraussParams strauss = 1;
+    NrepParams nrep = 2;
   }
-  
   oneof prec_params {
-  FixedMultiPrecParams fixed_multi_prec = 3;
-  WishartParams wishart = 4;
-  FixedUnivPrecParams fixed_univ_prec = 5;
-  GammaParams gamma_prec = 6;
+    FixedMultiPrecParams fixed_multi_prec = 3;
+    WishartParams wishart = 4;
+    FixedUnivPrecParams fixed_univ_prec = 5;
+    GammaParams gamma_prec = 6;
   }
-  
   GammaParams gamma_jump = 7;
-  
   double mala_stepsize = 8;
-  }
+}
