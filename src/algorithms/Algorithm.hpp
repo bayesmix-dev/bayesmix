@@ -16,7 +16,6 @@
 #include "../collectors/chain_state.pb.h"
 #include "../hierarchies/HierarchyBase.hpp"
 #include "../mixings/BaseMixing.hpp"
-#include "../utils.hpp"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -199,8 +198,7 @@ class Algorithm {
   //! Does nothing except for Neal8
   virtual void set_n_aux(const unsigned int n_aux_) { return; }
   void set_mixing(std::shared_ptr<BaseMixing> mixing_) { mixing = mixing_; }
-  void set_data(const Eigen::MatrixXd &data_) {data = data_; };
-  void set_data(const std::string &filename);
+  void set_data(const Eigen::MatrixXd &data_) { data = data_; }
 
   virtual void print_id() const = 0;  // TODO
   virtual void get_mixing_id() const { mixing->print_id(); }  // TODO

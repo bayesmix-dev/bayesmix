@@ -1,6 +1,5 @@
 RUNTIME-FULL 
-* Hyperpriors = objects with pointer (nupptr if none)?
-* .cpp files (since no templates anymore)
+* Hyperpriors = objects with pointer (nullptr if none)?
 * Fix arguments issue (protobuf)
 * Class names
 
@@ -15,6 +14,7 @@ PRIORITY LIST
 * (0) Building of Python package
 * (0) Comparison with other packages (DP-package, bnpmix)
 * (0) Docs/README/etc
+
 
 OTHER
 * Add hyperpriors

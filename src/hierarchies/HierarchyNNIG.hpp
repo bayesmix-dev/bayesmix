@@ -1,7 +1,7 @@
 #ifndef HIERARCHYNNIG_HPP
 #define HIERARCHYNNIG_HPP
 
-#include <src/utils/rng.hpp>
+#include "../utils/rng.hpp"
 
 #include "HierarchyBase.hpp"
 

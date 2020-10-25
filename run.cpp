@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 
   // Do the stuff
   algo->set_mixing(mixing);
-  algo->set_data(datafile);
+  algo->set_data(read_eigen_matrix(datafile));  // TODO fix
   algo->print_id();
   algo->get_mixing_id();
 
