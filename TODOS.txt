@@ -1,6 +1,7 @@
 RUNTIME-FULL 
 * Hyperpriors = objects with pointer (nullptr if none)?
 * Fix arguments issue (protobuf)
+* initialize stuff in classes
 * Class names
 
 

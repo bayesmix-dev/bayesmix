@@ -13,6 +13,8 @@ int main(int argc, char *argv[]) {
   std::string type_hier   = "NNW";
   std::string type_algo   = "N2";
   std::string datafile    = "resources/data_multi.csv";
+  std::string gridfile    = "resources/grid_multi.csv";
+  unsigned int init = 2;
 
   // Create factories and objects
   Factory<BaseMixing>  &factory_mixing = Factory<BaseMixing>::Instance();
@@ -22,9 +24,18 @@ int main(int argc, char *argv[]) {
   auto hier = factory_hier.create_object(type_hier);
   auto algo = factory_algo.create_object(type_algo);
 
-  // Do the stuff
+  // Other objects
+  Eigen::MatrixXd data = read_eigen_matrix(datafile);
+  Eigen::MatrixXd grid = read_eigen_matrix(gridfile);
+
+
+  // STUFF:
+  // Object allocation
   algo->set_mixing(mixing);
-  algo->set_data(read_eigen_matrix(datafile));  // TODO fix
+  algo->set_data(data);
+  algo->set_init_num_clusters(init);
+
+  // Execution
   algo->print_id();
   algo->get_mixing_id();
 
