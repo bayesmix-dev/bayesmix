@@ -1,7 +1,16 @@
-RUNTIME-FULL 
-* Hyperpriors = objects with pointer (nullptr if none)?
-* Fix arguments issue (protobuf)
-* initialize stuff in classes
+PR #2: RUNTIME PARAMS
+* Proto messages: 'UnivariateLSState', 'MultivariateLSState', etc
+* Rng to singleton;  change all rng to auto rng = Rng::Instance().get();
+* log-probabilities
+* Eigen::MatrixXd Algorithm::proto_param_to_matrix()  ->  Eigen::MatrixXd to_eigen() to a new proto_utils.hpp
+* Same for Algorithm::write_clustering_to_file() etc
+* stan::math::categorical_rng(probas, rng) - 1;  ->  int categorical_rng(VectorXd probas, std::mtxyz rng, int start=0) to a new distributions.hpp
+
+
+PR #3: RUNTIME PRIORS
+* ...
+
+OTHER
 * Class names
 
 

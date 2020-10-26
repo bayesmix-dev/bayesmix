@@ -159,7 +159,6 @@ class Algorithm {
     }
     return density;
   }
-  std::shared_ptr<BaseMixing> get_mixing() const { return mixing; }
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }

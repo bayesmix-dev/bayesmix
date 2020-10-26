@@ -25,8 +25,7 @@ void MarginalAlgorithm::eval_density(const Eigen::MatrixXd &grid,
       card[chain[iter].allocations(j)] += 1;
     }
     // Initialize temporary hierarchy
-    std::shared_ptr<HierarchyBase> temp_hier =
-        unique_values[0];  // TODO init hypers
+    std::shared_ptr<HierarchyBase> temp_hier = unique_values[0]; // TODO hypers
 
     // Loop over current iteration's unique values
     for (size_t h = 0; h < n_clust; h++) {

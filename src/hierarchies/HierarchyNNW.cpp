@@ -173,3 +173,14 @@ void HierarchyNNW::sample_given_data(const Eigen::MatrixXd &data) {
   state[0] = mu_new;
   set_tau_and_utilities(tau_new);
 }
+
+void HierarchyNNW::set_tau0(const Eigen::MatrixXd &tau0_) {
+  // Check if tau0 is a square symmetric positive semidefinite matrix
+  assert(tau0_.rows() == tau0_.cols());
+  assert(mu0.size() == tau0_.rows());
+  assert(tau0.isApprox(tau0.transpose()));
+  Eigen::LLT<Eigen::MatrixXd> llt(tau0);
+  assert(llt.info() != Eigen::NumericalIssue);
+  tau0 = tau0_;
+  tau0_inv = stan::math::inverse_spd(tau0);
+}

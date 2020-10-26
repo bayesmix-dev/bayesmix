@@ -118,16 +118,7 @@ class HierarchyNNW : public HierarchyBase {
     lambda = lambda_;
   }
 
-  void set_tau0(const Eigen::MatrixXd &tau0_) {
-    // Check if tau0 is a square symmetric positive semidefinite matrix
-    assert(tau0_.rows() == tau0_.cols());
-    assert(mu0.size() == tau0_.rows());
-    assert(tau0.isApprox(tau0.transpose()));
-    Eigen::LLT<Eigen::MatrixXd> llt(tau0);
-    assert(llt.info() != Eigen::NumericalIssue);
-    tau0 = tau0_;
-    tau0_inv = stan::math::inverse_spd(tau0);
-  }
+  void set_tau0(const Eigen::MatrixXd &tau0_);
 
   void set_nu(const double nu_) {
     assert(nu_ > mu0.size() - 1);
