@@ -23,6 +23,6 @@ namespace bayesmix {
   
     std::mt19937_64 mt;
   };
-}
+}  // namespace bayesmix
 
 #endif  // RNG_HPP

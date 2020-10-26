@@ -1,4 +1,0 @@
-#ifndef PROTO_UTILS_HPP
-#define PROTO_UTILS_HPP
-
-#endif  // PROTO_UTILS_HPP
