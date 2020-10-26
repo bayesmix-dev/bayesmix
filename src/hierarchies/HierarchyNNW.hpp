@@ -3,8 +3,8 @@
 
 #include <Eigen/Dense>
 
+#include "../utils/distributions.hpp"
 #include "HierarchyBase.hpp"
-//#include <stan/math/prim.hpp>  // TODO
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 

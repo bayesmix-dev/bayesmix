@@ -168,7 +168,7 @@ class Algorithm {
                                      std::shared_ptr<HierarchyBase> hier_,
                                      const unsigned int init = 0) {
   if(data.rows() == 0) {
-    std::invalid_argument("Error: empty data matrix");  // TODO error type
+    std::invalid_argument("Error: empty data matrix");
   }
   if (hier_->is_multivariate() == false && data.cols() > 1) {
     std::cout << "Warning: multivariate data supplied to univariate hierarchy."
