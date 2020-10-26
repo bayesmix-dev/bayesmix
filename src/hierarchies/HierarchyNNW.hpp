@@ -40,7 +40,7 @@ class HierarchyNNW : public HierarchyBase {
   //! Matrix-form evaluation of tau_chol_factor
   Eigen::MatrixXd tau_chol_factor_eval;
   //! Determinant of tau in logarithmic scale
-  double tau_log_det;
+  double tau_logdet;
 
   // AUXILIARY TOOLS
   //! Raises error if the hypers values are not valid w.r.t. their own domain

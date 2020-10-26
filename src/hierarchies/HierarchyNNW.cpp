@@ -35,7 +35,7 @@ void HierarchyNNW::set_tau_and_utilities(const Eigen::MatrixXd &tau) {
   tau_chol_factor = Eigen::LLT<Eigen::MatrixXd>(tau);
   tau_chol_factor_eval = tau_chol_factor.matrixL().transpose();
   Eigen::VectorXd diag = tau_chol_factor_eval.diagonal();
-  tau_log_det = 2 * log(diag.array()).sum();
+  tau_logdet = 2 * log(diag.array()).sum();
 }
 
 //! \param data                  Matrix of row-vectorial data points
@@ -76,21 +76,15 @@ Eigen::VectorXd HierarchyNNW::like(const Eigen::MatrixXd &data) {
 //! \param data Matrix of row-vectorial data points
 //! \return     Log-Likehood vector evaluated in data
 Eigen::VectorXd HierarchyNNW::lpdf(const Eigen::MatrixXd &data) {
-  using stan::math::NEG_LOG_SQRT_TWO_PI;
-
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);
   EigenRowVec mu(state[0]);
-  double base = 0.5 * tau_log_det + NEG_LOG_SQRT_TWO_PI * data.cols();
-
+  // Compute likelihood for each data point
   for (size_t i = 0; i < n; i++) {
-    // Compute likelihood for each data point
-    EigenRowVec datum = data.row(i);
-    double exp =
-        0.5 * (tau_chol_factor_eval * (datum - mu).transpose()).squaredNorm();
-
-    result(i) = base - exp;
+    result(i) = bayesmix::multi_normal_prec_lpdf(data.row(i), mu,
+                                                 tau_chol_factor_eval,
+                                                 tau_logdet);
   }
   return result;
 }
