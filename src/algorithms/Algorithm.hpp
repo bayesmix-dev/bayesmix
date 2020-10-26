@@ -16,6 +16,7 @@
 #include "../collectors/chain_state.pb.h"
 #include "../hierarchies/HierarchyBase.hpp"
 #include "../mixings/BaseMixing.hpp"
+#include "../utils/distributions.hpp"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -75,8 +76,6 @@ class Algorithm {
   std::shared_ptr<BaseMixing> mixing;
   //! Protobuf object that contains the best clustering
   State best_clust;
-  //! Random engine
-  std::mt19937 rng;
 
   // FLAGS
   //! Flag to check validity of density write function
@@ -162,7 +161,6 @@ class Algorithm {
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
-  void set_rng_seed(const unsigned int seed) { rng.seed(seed); }
   //! Does nothing except for Neal8
   virtual void set_n_aux(const unsigned int n_aux_) { return; }
   void set_mixing(std::shared_ptr<BaseMixing> mixing_) { mixing = mixing_; }

@@ -42,9 +42,10 @@ int main(int argc, char *argv[]) {
   // READ DATA AND GRID FROM FILE
   // =========================================================================
   std::string datafile = argv[1];
-  Eigen::MatrixXd data = read_eigen_matrix(datafile);
+  Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
   unsigned int init = 2;  // initial number of clusters
-  Eigen::MatrixXd grid = read_eigen_matrix("resources/grid_multi.csv");
+  Eigen::MatrixXd grid = bayesmix::read_eigen_matrix(
+    "resources/grid_multi.csv");
 
   // =========================================================================
   // SET MODEL PARAMETERS

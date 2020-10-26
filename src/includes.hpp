@@ -1,7 +1,6 @@
 #ifndef INCLUDES_HPP
 #define INCLUDES_HPP
 
-#include "utils.hpp"
 #include "algorithms/Neal2.hpp"
 #include "algorithms/Neal8.hpp"
 #include "algorithms/load_algorithms.hpp"
@@ -12,5 +11,9 @@
 #include "mixings/PitYorMixing.hpp"
 #include "mixings/load_mixings.hpp"
 #include "runtime/Factory.hpp"
+#include "src/utils/distributions.hpp"
+#include "src/utils/io_utils.hpp"
+#include "src/utils/proto_utils.hpp"
+//#include "src/utils/rng.hpp"
 
 #endif  // INCLUDES_HPP

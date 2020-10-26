@@ -1,7 +1,6 @@
 target_sources(bayesmix
   PUBLIC
     includes.hpp
-    utils.hpp
 )
 
 add_subdirectory(algorithms)

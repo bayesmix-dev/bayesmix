@@ -137,10 +137,11 @@ void HierarchyNNW::draw() {
   double nu = get_nu();
 
   // Generate new state values from their prior centering distribution
+  auto rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new =
-      stan::math::wishart_rng(nu, tau0, Rng::Instance().get());
+      stan::math::wishart_rng(nu, tau0, rng);
   EigenRowVec mu_new = stan::math::multi_normal_prec_rng(
-      mu0, tau_new * lambda, Rng::Instance().get());
+      mu0, tau_new * lambda, rng);
 
   // Update state
   state[0] = mu_new;
@@ -164,10 +165,11 @@ void HierarchyNNW::sample_given_data(const Eigen::MatrixXd &data) {
   double nu_post = temp[3](0, 0);
 
   // Generate new state values from their prior centering distribution
+  auto rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new =
-      stan::math::wishart_rng(nu_post, tau_post, Rng::Instance().get());
+      stan::math::wishart_rng(nu_post, tau_post, rng);
   EigenRowVec mu_new = stan::math::multi_normal_prec_rng(
-      mu_post, tau_new * lambda_post, Rng::Instance().get());
+      mu_post, tau_new * lambda_post, rng);
 
   // Update state
   state[0] = mu_new;

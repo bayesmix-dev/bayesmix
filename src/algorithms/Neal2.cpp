@@ -77,6 +77,7 @@ void Neal2::sample_allocations() {
     probas = probas / tot;
 
     // Draw a NEW value for datum allocation
+    auto rng = bayesmix::Rng::Instance().get();
     unsigned int c_new = stan::math::categorical_rng(probas, rng) - 1;
 
     // Assign datum to its new cluster and update cardinalities:

@@ -25,8 +25,8 @@ int main(int argc, char *argv[]) {
   auto algo = factory_algo.create_object(type_algo);
 
   // Other objects
-  Eigen::MatrixXd data = read_eigen_matrix(datafile);
-  Eigen::MatrixXd grid = read_eigen_matrix(gridfile);
+  Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
+  Eigen::MatrixXd grid = bayesmix::read_eigen_matrix(gridfile);
 
 
   // STUFF:
