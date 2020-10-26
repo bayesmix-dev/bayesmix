@@ -62,7 +62,7 @@ void FileCollector::collect(State iter_state) {
 // \return  Chain state in Protobuf-object form
 State FileCollector::get_state(unsigned int i) {
   State state;
-  for (size_t k = 0; k < i + 1; k++) {
+  for (size_t j = 0; j < i + 1; j++) {
     state = get_next_state();
   }
   if (i < size - 1) {

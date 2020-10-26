@@ -17,28 +17,28 @@ void MarginalAlgorithm::eval_density(const Eigen::MatrixXd &grid,
   std::vector<Eigen::MatrixXd> params(n_params);
 
   // Loop over non-burn-in algorithm iterations
-  for (size_t iter = 0; iter < n_iter; iter++) {
+  for (size_t i = 0; i < n_iter; i++) {
     // Compute clusters cardinalities
-    unsigned int n_clust = chain[iter].uniquevalues_size();
+    unsigned int n_clust = chain[i].uniquevalues_size();
     std::vector<unsigned int> card(n_clust, 0);
     for (size_t j = 0; j < n; j++) {
-      card[chain[iter].allocations(j)] += 1;
+      card[chain[i].allocations(j)] += 1;
     }
     // Initialize temporary hierarchy
     std::shared_ptr<HierarchyBase> temp_hier = unique_values[0]; // TODO hypers
 
     // Loop over current iteration's unique values
-    for (size_t h = 0; h < n_clust; h++) {
+    for (size_t j = 0; j < n_clust; j++) {
       // Extract and copy unique values in temp_hier
       for (size_t k = 0; k < n_params; k++) {
         params[k] =
-            proto_param_to_matrix(chain[iter].uniquevalues(h).params(k));
+            proto_param_to_matrix(chain[i].uniquevalues(j).params(k));
       }
       temp_hier->set_state(params, false);
 
       // Update density estimate (cluster component)
       dens +=
-          mixing->mass_existing_cluster(card[h], n) * temp_hier->like(grid);
+          mixing->mass_existing_cluster(card[j], n) * temp_hier->like(grid);
     }
     // Update density estimate (marginal component)
     dens += mixing->mass_new_cluster(n_clust, n) *

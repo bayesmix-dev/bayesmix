@@ -10,19 +10,19 @@ State Algorithm::get_state_as_proto(unsigned int iter) {
   // Transcribe unique values vector
   for (size_t i = 0; i < unique_values.size(); i++) {
     UniqueValues uniquevalues_temp;
-    for (size_t k = 0; k < unique_values[i]->get_state().size(); k++) {
-      Eigen::MatrixXd par_temp = unique_values[i]->get_state()[k];
+    for (size_t j = 0; j < unique_values[i]->get_state().size(); j++) {
+      Eigen::MatrixXd par_temp = unique_values[i]->get_state()[j];
       Param par_temp_proto;
-      for (size_t j = 0; j < par_temp.cols(); j++) {
+      for (size_t k = 0; k < par_temp.cols(); k++) {
         Par_Col col_temp;
         for (size_t h = 0; h < par_temp.rows(); h++) {
-          col_temp.add_elems(par_temp(h, j));
+          col_temp.add_elems(par_temp(h, k));
         }
         par_temp_proto.add_par_cols();
         *par_temp_proto.mutable_par_cols(j) = col_temp;
       }
       uniquevalues_temp.add_params();
-      *uniquevalues_temp.mutable_params(k) = par_temp_proto;
+      *uniquevalues_temp.mutable_params(j) = par_temp_proto;
     }
     iter_out.add_uniquevalues();
     *iter_out.mutable_uniquevalues(i) = uniquevalues_temp;
@@ -37,9 +37,9 @@ Eigen::MatrixXd Algorithm::proto_param_to_matrix(const Param &un_val) const {
       un_val.par_cols(0).elems_size(), un_val.par_cols_size());
 
   // Loop over unique values to copy them one at a time
-  for (size_t h = 0; h < un_val.par_cols_size(); h++) {
-    for (size_t j = 0; j < un_val.par_cols(h).elems_size(); j++) {
-      par_matrix(j, h) = un_val.par_cols(h).elems(j);
+  for (size_t i = 0; i < un_val.par_cols_size(); i++) {
+    for (size_t j = 0; j < un_val.par_cols(i).elems_size(); j++) {
+      par_matrix(j, i) = un_val.par_cols(i).elems(j);
     }
   }
   return par_matrix;
@@ -59,19 +59,19 @@ unsigned int Algorithm::cluster_estimate(BaseCollector *coll) {
   unsigned n_iter = chain.size();
   unsigned int n = chain[0].allocations_size();
   Eigen::VectorXd errors(n_iter);
-  Eigen::MatrixXd tot_diss = Eigen::MatrixXd::Zero(n, n);
+  Eigen::MatrixXd mean_diss = Eigen::MatrixXd::Zero(n, n);
   std::vector<Eigen::SparseMatrix<double> > all_diss;
   State temp;
 
   // Loop over iterations
-  for (size_t h = 0; h < n_iter; h++) {
+  for (size_t i = 0; i < n_iter; i++) {
     // Find and all nonzero entries of the dissimilarity matrix
     std::vector<Eigen::Triplet<double> > triplets_list;
     triplets_list.reserve(n * n / 4);
-    for (size_t i = 0; i < n; i++) {
-      for (size_t j = 0; j < i; j++) {
-        if (chain[h].allocations(i) == chain[h].allocations(j)) {
-          triplets_list.push_back(Eigen::Triplet<double>(i, j, 1.0));
+    for (size_t j = 0; j < n; i++) {
+      for (size_t k = 0; k < j; k++) {
+        if (chain[i].allocations(j) == chain[i].allocations(k)) {
+          triplets_list.push_back(Eigen::Triplet<double>(j, k, 1.0));
         }
       }
     }
@@ -80,26 +80,26 @@ unsigned int Algorithm::cluster_estimate(BaseCollector *coll) {
     dissim.setZero();
     dissim.setFromTriplets(triplets_list.begin(), triplets_list.end());
     all_diss.push_back(dissim);
-    tot_diss += dissim;
+    mean_diss += dissim;
   }
   // Average over iterations
-  tot_diss = tot_diss / n_iter;
+  mean_diss = mean_diss / n_iter;
 
   // Compute Frobenius norm error of all iterations
-  for (size_t h = 0; h < n_iter; h++) {
-    errors(h) = (tot_diss - all_diss[h]).norm();
+  for (size_t i = 0; i < n_iter; i++) {
+    errors(i) = (mean_diss - all_diss[i]).norm();
   }
 
   // Find iteration with the least error
-  std::ptrdiff_t i;
-  unsigned int min_err = errors.minCoeff(&i);
-  best_clust = chain[i];
-  std::cout << "Optimal clustering: at iteration " << i << " with "
+  std::ptrdiff_t ibest;
+  unsigned int min_err = errors.minCoeff(&ibest);
+  best_clust = chain[ibest];
+  std::cout << "Optimal clustering: at iteration " << ibest << " with "
             << best_clust.uniquevalues_size() << " clusters" << std::endl;
   // Update flag
   clustering_was_computed = true;
 
-  return i;
+  return ibest;
 }
 
 //! \param filename Name of file to write to
@@ -124,13 +124,13 @@ void Algorithm::write_clustering_to_file(const std::string &filename) const {
       Eigen::MatrixXd temp_param(
           proto_param_to_matrix(best_clust.uniquevalues(ci).params(j)));
       for (size_t k = 0; k < temp_param.rows(); k++) {
-        for (size_t z = 0; z < temp_param.cols(); z++) {
+        for (size_t h = 0; h < temp_param.cols(); h++) {
           // Write unique value to file
-          if (z == temp_param.cols() - 1 && k == temp_param.rows() - 1 &&
+          if (h == temp_param.cols() - 1 && k == temp_param.rows() - 1 &&
               j == best_clust.uniquevalues(ci).params_size() - 1) {
-            file << temp_param(k, z);
+            file << temp_param(k, h);
           } else {
-            file << temp_param(k, z) << ",";
+            file << temp_param(k, h) << ",";
           }
         }
       }

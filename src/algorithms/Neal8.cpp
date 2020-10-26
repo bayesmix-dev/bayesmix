@@ -6,7 +6,7 @@ Eigen::VectorXd Neal8::density_marginal_component(
     std::shared_ptr<HierarchyBase> temp_hier) {
   Eigen::VectorXd dens_addendum(density.first.rows());
   // Loop over unique values for a "sample mean" of the marginal
-  for (size_t h = 0; h < n_aux; h++) {
+  for (size_t i = 0; i < n_aux; i++) {
     // Generate unique values from their prior centering distribution
     temp_hier->draw();
     dens_addendum += temp_hier->like(density.first) / n_aux;
@@ -50,20 +50,20 @@ void Neal8::sample_allocations() {
     Eigen::VectorXd probas(n_clust + n_aux);
     double tot = 0.0;
     // Loop over clusters
-    for (size_t k = 0; k < n_clust; k++) {
+    for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
-      probas(k) = mixing->mass_existing_cluster(cardinalities[k], n - 1) *
-                  unique_values[k]->like(datum)(0);
-      tot += probas(k);
-      // Note: if datum is a singleton, then, when k = allocations[i],
-      // one has card[k] = 0: cluster k will never be chosen
+      probas(j) = mixing->mass_existing_cluster(cardinalities[j], n - 1) *
+                  unique_values[j]->like(datum)(0);
+      tot += probas(j);
+      // Note: if datum is a singleton, then, when j = allocations[i],
+      // one has card[j] = 0: cluster j will never be chosen
     }
     // Loop over auxiliary blocks
-    for (size_t k = 0; k < n_aux; k++) {
+    for (size_t j = 0; j < n_aux; j++) {
       // Probability of being assigned to a newly generated cluster
-      probas(n_clust + k) = mixing->mass_new_cluster(n_clust, n - 1) *
-                            aux_unique_values[k]->like(datum)(0) / n_aux;
-      tot += probas(n_clust + k);
+      probas(n_clust + j) = mixing->mass_new_cluster(n_clust, n - 1) *
+                            aux_unique_values[j]->like(datum)(0) / n_aux;
+      tot += probas(n_clust + j);
     }
     // Normalize
     probas = probas / tot;

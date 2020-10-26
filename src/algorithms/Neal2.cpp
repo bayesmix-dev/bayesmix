@@ -20,8 +20,8 @@ void Neal2::initialize() {
   std::uniform_int_distribution<int> distro(0, init_num_clusters - 1);
 
   // Allocate one datum per cluster first, and update cardinalities
-  for (size_t h = 0; h < init_num_clusters; h++) {
-    allocations.push_back(h);
+  for (size_t i = 0; i < init_num_clusters; i++) {
+    allocations.push_back(i);
     cardinalities.push_back(1);
   }
 
@@ -56,16 +56,16 @@ void Neal2::sample_allocations() {
     Eigen::VectorXd probas(n_clust + (1 - singleton));
     double tot = 0.0;
     // Loop over clusters
-    for (size_t k = 0; k < n_clust; k++) {
+    for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
-      probas(k) = mixing->mass_existing_cluster(cardinalities[k], n - 1) *
-                  unique_values[k]->like(datum)(0);
-      if (singleton == 1 && k == allocations[i]) {
+      probas(j) = mixing->mass_existing_cluster(cardinalities[j], n - 1) *
+                  unique_values[j]->like(datum)(0);
+      if (singleton == 1 && j == allocations[i]) {
         // Probability of being assigned to a newly generated cluster
-        probas(k) = mixing->mass_new_cluster(n_clust, n - 1) *
+        probas(j) = mixing->mass_new_cluster(n_clust, n - 1) *
                     unique_values[0]->eval_marg(datum)(0);
       }
-      tot += probas(k);
+      tot += probas(j);
     }
     if (singleton == 0) {
       // Further update with marginal component
