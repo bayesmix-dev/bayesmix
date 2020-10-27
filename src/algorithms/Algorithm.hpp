@@ -70,8 +70,8 @@ class Algorithm {
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
   std::vector<std::shared_ptr<HierarchyBase>> unique_values;
-  //! Grid of points and evaluation of density on it
-  std::pair<Eigen::MatrixXd, Eigen::VectorXd> density;
+  //! Grid of points and evaluation of log-density on it
+  std::pair<Eigen::MatrixXd, Eigen::VectorXd> lpdf;
   //! Mixing object
   std::shared_ptr<BaseMixing> mixing;
   //! Protobuf object that contains the best clustering
@@ -79,7 +79,7 @@ class Algorithm {
 
   // FLAGS
   //! Flag to check validity of density write function
-  bool density_was_computed = false;
+  bool lpdf_was_computed = false;
   //! Flag to check validity of clustering write function
   bool clustering_was_computed = false;
 
@@ -89,7 +89,7 @@ class Algorithm {
   //! Turns a single unique value from Protobuf object form into a matrix
   Eigen::MatrixXd proto_param_to_matrix(const Param &par) const;
   //! Computes marginal contribution of a given iteration & cluster
-  virtual Eigen::VectorXd density_marginal_component(
+  virtual Eigen::VectorXd lpdf_marginal_component(
       std::shared_ptr<HierarchyBase> temp_hier) = 0;
 
   // ALGORITHM FUNCTIONS
@@ -132,8 +132,8 @@ class Algorithm {
   }
 
   // ESTIMATE FUNCTIONS
-  //! Evaluates the overall data pdf on a gived grid of points
-  virtual void eval_density(const Eigen::MatrixXd &grid,
+  //! Evaluates the overall data log-pdf on a given grid of points
+  virtual void eval_lpdf(const Eigen::MatrixXd &grid,
                             BaseCollector *const collector) = 0;
   //! Estimates the clustering structure of the data via LS minimization
   virtual unsigned int cluster_estimate(BaseCollector *collector);
@@ -141,8 +141,8 @@ class Algorithm {
   void write_clustering_to_file(
       const std::string &filename = "csv/clust_best.csv") const;
   //! Writes grid and density evaluation on it in csv form
-  void write_density_to_file(
-      const std::string &filename = "csv/density.csv") const;
+  void write_lpdf_to_file(
+      const std::string &filename = "csv/lpdf.csv") const;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~Algorithm() = default;
@@ -152,11 +152,11 @@ class Algorithm {
   unsigned int get_maxiter() const { return maxiter; }
   unsigned int get_burnin() const { return burnin; }
   unsigned int get_init_num_clusters() const { return init_num_clusters; }
-  std::pair<Eigen::MatrixXd, Eigen::VectorXd> get_density() const {
-    if (!density_was_computed) {
-      std::domain_error("Error calling get_density(): not computed yet");
+  std::pair<Eigen::MatrixXd, Eigen::VectorXd> get_lpdf() const {
+    if (!lpdf_was_computed) {
+      std::domain_error("Error calling get_lpdf(): not computed yet");
     }
-    return density;
+    return lpdf;
   }
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }

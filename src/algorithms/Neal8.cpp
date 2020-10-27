@@ -2,16 +2,21 @@
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
-Eigen::VectorXd Neal8::density_marginal_component(
+Eigen::VectorXd Neal8::lpdf_marginal_component(
     std::shared_ptr<HierarchyBase> temp_hier) {
-  Eigen::VectorXd dens_addendum(density.first.rows());
+  unsigned int n_grid = lpdf.first.rows();
+  Eigen::VectorXd lpdf_(n_grid);
+  Eigen::MatrixXd lpdf_temp(n_grid, n_aux);
   // Loop over unique values for a "sample mean" of the marginal
   for (size_t i = 0; i < n_aux; i++) {
     // Generate unique values from their prior centering distribution
     temp_hier->draw();
-    dens_addendum += temp_hier->like(density.first) / n_aux;
+    lpdf_temp.col(i) = temp_hier->lpdf(lpdf.first);
   }
-  return dens_addendum;
+  for(size_t i = 0; i < n_grid; i++){
+    lpdf_(i) = stan::math::log_sum_exp(lpdf_temp.row(i));
+  }
+  return lpdf_.array() - log(n_aux);
 }
 
 void Neal8::print_startup_message() const {

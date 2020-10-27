@@ -142,9 +142,9 @@ void Algorithm::write_clustering_to_file(const std::string &filename) const {
 }
 
 //! \param filename Name of file to write to
-void Algorithm::write_density_to_file(const std::string &filename) const {
-  if (!density_was_computed) {
-    std::cerr << "Error: cannot write density to file; eval_density() "
+void Algorithm::write_lpdf_to_file(const std::string &filename) const {
+  if (!lpdf_was_computed) {
+    std::cerr << "Error: cannot write lpdf to file; eval_lpdf() "
               << "must be called first" << std::endl;
     return;
   }
@@ -154,16 +154,16 @@ void Algorithm::write_density_to_file(const std::string &filename) const {
   file.open(filename);
 
   // Loop over grid points
-  for (size_t i = 0; i < density.first.rows(); i++) {
-    Eigen::VectorXd point = density.first.row(i);
+  for (size_t i = 0; i < lpdf.first.rows(); i++) {
+    Eigen::VectorXd point = lpdf.first.row(i);
     // Write point coordinates
     for (size_t j = 0; j < point.size(); j++) {
       file << point(j) << ",";
     }
     // Write density value
-    file << density.second(i) << std::endl;
+    file << lpdf.second(i) << std::endl;
   }
 
   file.close();
-  std::cout << "Successfully wrote density to " << filename << std::endl;
+  std::cout << "Successfully wrote lpdf to " << filename << std::endl;
 }

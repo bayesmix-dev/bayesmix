@@ -2,10 +2,10 @@
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
-Eigen::VectorXd Neal2::density_marginal_component(
+Eigen::VectorXd Neal2::lpdf_marginal_component(
     std::shared_ptr<HierarchyBase> temp_hier) {
   // Exploit conjugacy of hierarchy
-  return temp_hier->eval_marg(density.first);
+  return temp_hier->marg_lpdf(lpdf.first);
 }
 
 void Neal2::print_startup_message() const {

@@ -28,7 +28,7 @@ class Neal8 : public Neal2 {
 
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
-  Eigen::VectorXd density_marginal_component(
+  Eigen::VectorXd lpdf_marginal_component(
       std::shared_ptr<HierarchyBase> temp_hier) override;
 
   // ALGORITHM FUNCTIONS

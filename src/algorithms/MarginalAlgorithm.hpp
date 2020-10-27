@@ -7,7 +7,7 @@ class MarginalAlgorithm : public Algorithm {
  public:
   ~MarginalAlgorithm() = default;
   MarginalAlgorithm() = default;
-  virtual void eval_density(const Eigen::MatrixXd &grid,
+  virtual void eval_lpdf(const Eigen::MatrixXd &grid,
                             BaseCollector *const collector) override;
 };
 
