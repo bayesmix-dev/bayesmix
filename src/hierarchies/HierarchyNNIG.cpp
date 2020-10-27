@@ -109,10 +109,9 @@ void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
 
   // Generate new state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  double sig_new = sqrt(
-      stan::math::inv_gamma_rng(alpha_post, beta_post, rng));
-  double mu_new = stan::math::normal_rng(mu_post, sig_new / sqrt(lambda_post),
-                                         rng);
+  double sig_new = sqrt(stan::math::inv_gamma_rng(alpha_post, beta_post, rng));
+  double mu_new =
+      stan::math::normal_rng(mu_post, sig_new / sqrt(lambda_post), rng);
 
   // Update state
   state[0](0, 0) = mu_new;

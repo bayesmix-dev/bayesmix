@@ -13,7 +13,7 @@ Eigen::VectorXd Neal8::lpdf_marginal_component(
     temp_hier->draw();
     lpdf_temp.col(i) = temp_hier->lpdf(lpdf.first);
   }
-  for(size_t i = 0; i < n_grid; i++){
+  for (size_t i = 0; i < n_grid; i++) {
     lpdf_(i) = stan::math::log_sum_exp(lpdf_temp.row(i));
   }
   return lpdf_.array() - log(n_aux);

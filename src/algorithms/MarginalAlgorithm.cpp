@@ -45,7 +45,7 @@ void MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
     lpdf_local.col(n_clust) = log(mixing->mass_new_cluster(n_clust, n)) +
                               lpdf_marginal_component(temp_hier).array();
     // Update overall density estimate
-    for(size_t j = 0; j < grid.rows(); j++){
+    for (size_t j = 0; j < grid.rows(); j++) {
       lpdf_(j) = stan::math::log_sum_exp(lpdf_local.row(j));
     }
   }

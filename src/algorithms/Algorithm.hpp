@@ -134,15 +134,14 @@ class Algorithm {
   // ESTIMATE FUNCTIONS
   //! Evaluates the overall data log-pdf on a given grid of points
   virtual void eval_lpdf(const Eigen::MatrixXd &grid,
-                            BaseCollector *const collector) = 0;
+                         BaseCollector *const collector) = 0;
   //! Estimates the clustering structure of the data via LS minimization
   virtual unsigned int cluster_estimate(BaseCollector *collector);
   //! Writes unique values of each datum in csv form
   void write_clustering_to_file(
       const std::string &filename = "csv/clust_best.csv") const;
   //! Writes grid and density evaluation on it in csv form
-  void write_lpdf_to_file(
-      const std::string &filename = "csv/lpdf.csv") const;
+  void write_lpdf_to_file(const std::string &filename = "csv/lpdf.csv") const;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~Algorithm() = default;
@@ -167,14 +166,15 @@ class Algorithm {
   void set_data_and_initial_clusters(const Eigen::MatrixXd &data_,
                                      std::shared_ptr<HierarchyBase> hier_,
                                      const unsigned int init = 0) {
-  if(data.rows() == 0) {
-    std::invalid_argument("Error: empty data matrix");
-  }
-  if (hier_->is_multivariate() == false && data.cols() > 1) {
-    std::cout << "Warning: multivariate data supplied to univariate hierarchy."
-              << " The algorithm will run correctly, but all data rows other"
-              << " than the first one will be ignored" << std::endl;
-  }
+    if (data.rows() == 0) {
+      std::invalid_argument("Error: empty data matrix");
+    }
+    if (hier_->is_multivariate() == false && data.cols() > 1) {
+      std::cout
+          << "Warning: multivariate data supplied to univariate hierarchy."
+          << " The algorithm will run correctly, but all data rows other"
+          << " than the first one will be ignored" << std::endl;
+    }
     data = data_;
     init_num_clusters = (init == 0) ? data.rows() : init;
     // "Warning: initial number of clusters will be set equal to the data
@@ -185,8 +185,8 @@ class Algorithm {
     }
   }
 
-  virtual void print_id() const = 0;  // TODO
-  void get_mixing_id() const { mixing->print_id(); }  // TODO
+  virtual void print_id() const = 0;                          // TODO
+  void get_mixing_id() const { mixing->print_id(); }          // TODO
   void get_hier_id() const { unique_values[0]->print_id(); }  // TODO
 };
 

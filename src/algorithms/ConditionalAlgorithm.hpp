@@ -8,7 +8,7 @@ class ConditionalAlgorithm : public Algorithm {
   ~ConditionalAlgorithm() = default;
   ConditionalAlgorithm() = default;
   virtual void eval_lpdf(const Eigen::MatrixXd &grid,
-                            BaseCollector *const collector) override;
+                         BaseCollector *const collector) override;
 };
 
 #endif  // CONDITIONALALGORITHM_HPP
