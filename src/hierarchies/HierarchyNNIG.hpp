@@ -2,7 +2,6 @@
 #define HIERARCHYNNIG_HPP
 
 #include "../utils/rng.hpp"
-
 #include "HierarchyBase.hpp"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.

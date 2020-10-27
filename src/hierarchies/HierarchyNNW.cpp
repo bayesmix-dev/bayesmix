@@ -82,9 +82,8 @@ Eigen::VectorXd HierarchyNNW::lpdf(const Eigen::MatrixXd &data) {
   EigenRowVec mu(state[0]);
   // Compute likelihood for each data point
   for (size_t i = 0; i < n; i++) {
-    result(i) = bayesmix::multi_normal_prec_lpdf(data.row(i), mu,
-                                                 tau_chol_factor_eval,
-                                                 tau_logdet);
+    result(i) = bayesmix::multi_normal_prec_lpdf(
+        data.row(i), mu, tau_chol_factor_eval, tau_logdet);
   }
   return result;
 }
@@ -132,10 +131,9 @@ void HierarchyNNW::draw() {
 
   // Generate new state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  Eigen::MatrixXd tau_new =
-      stan::math::wishart_rng(nu, tau0, rng);
-  EigenRowVec mu_new = stan::math::multi_normal_prec_rng(
-      mu0, tau_new * lambda, rng);
+  Eigen::MatrixXd tau_new = stan::math::wishart_rng(nu, tau0, rng);
+  EigenRowVec mu_new =
+      stan::math::multi_normal_prec_rng(mu0, tau_new * lambda, rng);
 
   // Update state
   state[0] = mu_new;
@@ -160,10 +158,9 @@ void HierarchyNNW::sample_given_data(const Eigen::MatrixXd &data) {
 
   // Generate new state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  Eigen::MatrixXd tau_new =
-      stan::math::wishart_rng(nu_post, tau_post, rng);
-  EigenRowVec mu_new = stan::math::multi_normal_prec_rng(
-      mu_post, tau_new * lambda_post, rng);
+  Eigen::MatrixXd tau_new = stan::math::wishart_rng(nu_post, tau_post, rng);
+  EigenRowVec mu_new =
+      stan::math::multi_normal_prec_rng(mu_post, tau_new * lambda_post, rng);
 
   // Update state
   state[0] = mu_new;

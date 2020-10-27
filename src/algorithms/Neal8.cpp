@@ -2,16 +2,21 @@
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
-Eigen::VectorXd Neal8::density_marginal_component(
-    std::shared_ptr<HierarchyBase> temp_hier) {
-  Eigen::VectorXd dens_addendum(density.first.rows());
+Eigen::VectorXd Neal8::lpdf_marginal_component(
+    std::shared_ptr<HierarchyBase> temp_hier, const Eigen::MatrixXd &grid) {
+  unsigned int n_grid = grid.rows();
+  Eigen::VectorXd lpdf_(n_grid);
+  Eigen::MatrixXd lpdf_temp(n_grid, n_aux);
   // Loop over unique values for a "sample mean" of the marginal
   for (size_t i = 0; i < n_aux; i++) {
     // Generate unique values from their prior centering distribution
     temp_hier->draw();
-    dens_addendum += temp_hier->like(density.first) / n_aux;
+    lpdf_temp.col(i) = temp_hier->lpdf(grid);
   }
-  return dens_addendum;
+  for (size_t i = 0; i < n_grid; i++) {
+    lpdf_(i) = stan::math::log_sum_exp(lpdf_temp.row(i));
+  }
+  return lpdf_.array() - log(n_aux);
 }
 
 void Neal8::print_startup_message() const {
@@ -46,31 +51,28 @@ void Neal8::sample_allocations() {
       aux_unique_values[j]->draw();
     }
 
-    // Compute probabilities of clusters
-    Eigen::VectorXd probas(n_clust + n_aux);
-    double tot = 0.0;
+    // Compute probabilities of clusters in log-space
+    Eigen::VectorXd logprobas(n_clust + n_aux);
     // Loop over clusters
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
-      probas(j) = mixing->mass_existing_cluster(cardinalities[j], n - 1) *
-                  unique_values[j]->like(datum)(0);
-      tot += probas(j);
+      logprobas(j) =
+          log(mixing->mass_existing_cluster(cardinalities[j], n - 1)) +
+          unique_values[j]->lpdf(datum)(0);
       // Note: if datum is a singleton, then, when j = allocations[i],
       // one has card[j] = 0: cluster j will never be chosen
     }
     // Loop over auxiliary blocks
     for (size_t j = 0; j < n_aux; j++) {
       // Probability of being assigned to a newly generated cluster
-      probas(n_clust + j) = mixing->mass_new_cluster(n_clust, n - 1) *
-                            aux_unique_values[j]->like(datum)(0) / n_aux;
-      tot += probas(n_clust + j);
+      logprobas(n_clust + j) = log(mixing->mass_new_cluster(n_clust, n - 1)) +
+                               aux_unique_values[j]->lpdf(datum)(0) -
+                               log(n_aux);
     }
-    // Normalize
-    probas = probas / tot;
-
     // Draw a NEW value for datum allocation
     auto rng = bayesmix::Rng::Instance().get();
-    unsigned int c_new = bayesmix::categorical_rng(probas, rng, 0);
+    unsigned int c_new =
+        bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
 
     // Assign datum to its new cluster and update cardinalities:
     // 4 cases are handled separately

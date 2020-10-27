@@ -7,8 +7,8 @@ class ConditionalAlgorithm : public Algorithm {
  public:
   ~ConditionalAlgorithm() = default;
   ConditionalAlgorithm() = default;
-  virtual void eval_density(const Eigen::MatrixXd &grid,
-                            BaseCollector *const collector) override;
+  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
+                                    BaseCollector *const collector) override;
 };
 
 #endif  // CONDITIONALALGORITHM_HPP

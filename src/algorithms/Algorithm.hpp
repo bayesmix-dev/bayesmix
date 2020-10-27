@@ -4,19 +4,18 @@
 #include <math.h>
 
 #include <Eigen/Dense>
-#include <Eigen/SparseCore>
 #include <fstream>
 #include <random>
 #include <stan/math/prim/fun.hpp>
 #include <stan/math/prim/prob.hpp>
 #include <vector>
 
-#include "../collectors/FileCollector.hpp"
-#include "../collectors/MemoryCollector.hpp"
+#include "../collectors/BaseCollector.hpp"
 #include "../collectors/chain_state.pb.h"
 #include "../hierarchies/HierarchyBase.hpp"
 #include "../mixings/BaseMixing.hpp"
 #include "../utils/distributions.hpp"
+#include "../utils/proto_utils.hpp"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -70,27 +69,16 @@ class Algorithm {
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
   std::vector<std::shared_ptr<HierarchyBase>> unique_values;
-  //! Grid of points and evaluation of density on it
-  std::pair<Eigen::MatrixXd, Eigen::VectorXd> density;
   //! Mixing object
   std::shared_ptr<BaseMixing> mixing;
-  //! Protobuf object that contains the best clustering
-  State best_clust;
-
-  // FLAGS
-  //! Flag to check validity of density write function
-  bool density_was_computed = false;
-  //! Flag to check validity of clustering write function
-  bool clustering_was_computed = false;
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object
   State get_state_as_proto(unsigned int iter);
-  //! Turns a single unique value from Protobuf object form into a matrix
-  Eigen::MatrixXd proto_param_to_matrix(const Param &par) const;
   //! Computes marginal contribution of a given iteration & cluster
-  virtual Eigen::VectorXd density_marginal_component(
-      std::shared_ptr<HierarchyBase> temp_hier) = 0;
+  virtual Eigen::VectorXd lpdf_marginal_component(
+      std::shared_ptr<HierarchyBase> temp_hier,
+      const Eigen::MatrixXd &grid) = 0;
 
   // ALGORITHM FUNCTIONS
   virtual void print_startup_message() const = 0;
@@ -99,7 +87,9 @@ class Algorithm {
   virtual void sample_unique_values() = 0;
   virtual void sample_weights() = 0;
   virtual void update_hypers() = 0;
-  virtual void print_ending_message() const;
+  virtual void print_ending_message() const {
+  	std::cout << "Done" << std::endl;
+  };
   //! Saves the current iteration's state in Protobuf form to a collector
   void save_state(BaseCollector *collector, unsigned int iter) {
     collector->collect(get_state_as_proto(iter));
@@ -131,18 +121,10 @@ class Algorithm {
     print_ending_message();
   }
 
-  // ESTIMATE FUNCTIONS
-  //! Evaluates the overall data pdf on a gived grid of points
-  virtual void eval_density(const Eigen::MatrixXd &grid,
-                            BaseCollector *const collector) = 0;
-  //! Estimates the clustering structure of the data via LS minimization
-  virtual unsigned int cluster_estimate(BaseCollector *collector);
-  //! Writes unique values of each datum in csv form
-  void write_clustering_to_file(
-      const std::string &filename = "csv/clust_best.csv") const;
-  //! Writes grid and density evaluation on it in csv form
-  void write_density_to_file(
-      const std::string &filename = "csv/density.csv") const;
+  // ESTIMATE FUNCTION
+  //! Evaluates the logpdf for each single iteration on a given grid of points
+  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
+                                    BaseCollector *const collector) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~Algorithm() = default;
@@ -152,12 +134,6 @@ class Algorithm {
   unsigned int get_maxiter() const { return maxiter; }
   unsigned int get_burnin() const { return burnin; }
   unsigned int get_init_num_clusters() const { return init_num_clusters; }
-  std::pair<Eigen::MatrixXd, Eigen::VectorXd> get_density() const {
-    if (!density_was_computed) {
-      std::domain_error("Error calling get_density(): not computed yet");
-    }
-    return density;
-  }
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
@@ -167,14 +143,15 @@ class Algorithm {
   void set_data_and_initial_clusters(const Eigen::MatrixXd &data_,
                                      std::shared_ptr<HierarchyBase> hier_,
                                      const unsigned int init = 0) {
-  if(data.rows() == 0) {
-    std::invalid_argument("Error: empty data matrix");
-  }
-  if (hier_->is_multivariate() == false && data.cols() > 1) {
-    std::cout << "Warning: multivariate data supplied to univariate hierarchy."
-              << " The algorithm will run correctly, but all data rows other"
-              << " than the first one will be ignored" << std::endl;
-  }
+    if (data.rows() == 0) {
+      std::invalid_argument("Error: empty data matrix");
+    }
+    if (hier_->is_multivariate() == false && data.cols() > 1) {
+      std::cout
+          << "Warning: multivariate data supplied to univariate hierarchy."
+          << " The algorithm will run correctly, but all data rows other"
+          << " than the first one will be ignored" << std::endl;
+    }
     data = data_;
     init_num_clusters = (init == 0) ? data.rows() : init;
     // "Warning: initial number of clusters will be set equal to the data
@@ -185,8 +162,8 @@ class Algorithm {
     }
   }
 
-  virtual void print_id() const = 0;  // TODO
-  void get_mixing_id() const { mixing->print_id(); }  // TODO
+  virtual void print_id() const = 0;                          // TODO
+  void get_mixing_id() const { mixing->print_id(); }          // TODO
   void get_hier_id() const { unique_values[0]->print_id(); }  // TODO
 };
 
