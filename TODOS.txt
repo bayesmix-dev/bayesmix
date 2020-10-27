@@ -1,3 +1,9 @@
+PR #2: LOGPROBAS
+* I/O stuff
+* move cluster estimate from Algorithm to a new cluster_utils.hpp
+* Remove std::pair<...> lpdf in Algorithm
+* eval_density() must return density in single iterations, not the mean
+
 PR #3: RUNTIME PARAMS
 * Proto messages: 'UnivariateLSState', 'MultivariateLSState', etc
 
