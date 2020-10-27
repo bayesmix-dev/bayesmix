@@ -3,7 +3,9 @@ PR #2: LOGPROBAS
 * move cluster estimate from Algorithm to a new cluster_utils.hpp
 
 PR #3: RUNTIME PARAMS
+* smart pointers for collectors
 * Proto messages: 'UnivariateLSState', 'MultivariateLSState', etc
+* Add iteration number to State proto
 
 PR #4: RUNTIME PRIORS
 * ...

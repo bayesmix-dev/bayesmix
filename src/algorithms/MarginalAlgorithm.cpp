@@ -32,7 +32,8 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
     for (size_t j = 0; j < n_clust; j++) {
       // Extract and copy unique values in temp_hier
       for (size_t k = 0; k < n_params; k++) {
-        params[k] = proto_param_to_matrix(chain[i].uniquevalues(j).params(k));
+        params[k] = bayesmix::proto_param_to_matrix(
+          chain[i].uniquevalues(j).params(k));
       }
       temp_hier->set_state(params, false);
 

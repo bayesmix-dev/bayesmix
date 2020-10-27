@@ -9,12 +9,12 @@ Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename) {
     std::string err = "Error: file " + filename + " does not exist";
     throw std::invalid_argument(err);
   }
-  
+
   // Loop over file lines
   while (!istr.eof()) {
     std::string line;
     getline(istr, line);
-  
+
     unsigned int temp = 0;
     std::stringstream stream(line);
     while (!stream.eof()) {
@@ -29,10 +29,10 @@ Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename) {
     }
     rows++;
   }
-  
+
   istr.close();
   rows--;
-  
+
   // Fill an Eigen Matrix with values from the buffer array
   Eigen::MatrixXd mat(rows, cols);
   for (size_t i = 0; i < rows; i++) {
