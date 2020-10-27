@@ -10,7 +10,7 @@ double bayesmix::multi_normal_prec_lpdf(Eigen::VectorXd datum,
                                         Eigen::MatrixXd prec_chol,
                                         double prec_logdet) {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
-  double base = 0.5 * prec_logdet + NEG_LOG_SQRT_TWO_PI * datum.size();
-  double exp = 0.5 * (prec_chol * (datum - mean)).squaredNorm();
-  return base - exp;
+  double base = prec_logdet + NEG_LOG_SQRT_TWO_PI * datum.size();
+  double exp = (prec_chol * (datum - mean)).squaredNorm();
+  return 0.5 * (base - exp);
 }
