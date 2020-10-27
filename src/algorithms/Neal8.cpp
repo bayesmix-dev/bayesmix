@@ -1,31 +1,25 @@
-#ifndef NEAL8_IMP_HPP
-#define NEAL8_IMP_HPP
-
 #include "Neal8.hpp"
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
-template <template <class> class Hierarchy, class Hypers, class Mixing>
-Eigen::VectorXd Neal8<Hierarchy, Hypers, Mixing>::density_marginal_component(
-    Hierarchy<Hypers> &temp_hier) {
-  Eigen::VectorXd dens_addendum(this->density.first.rows());
+Eigen::VectorXd Neal8::density_marginal_component(
+    std::shared_ptr<HierarchyBase> temp_hier) {
+  Eigen::VectorXd dens_addendum(density.first.rows());
   // Loop over unique values for a "sample mean" of the marginal
-  for (size_t h = 0; h < n_aux; h++) {
+  for (size_t i = 0; i < n_aux; i++) {
     // Generate unique values from their prior centering distribution
-    temp_hier.draw();
-    dens_addendum += temp_hier.like(this->density.first) / n_aux;
+    temp_hier->draw();
+    dens_addendum += temp_hier->like(density.first) / n_aux;
   }
   return dens_addendum;
 }
 
-template <template <class> class Hierarchy, class Hypers, class Mixing>
-void Neal8<Hierarchy, Hypers, Mixing>::print_startup_message() const {
+void Neal8::print_startup_message() const {
   std::cout << "Running Neal8 algorithm (with m=" << n_aux
             << " auxiliary blocks)..." << std::endl;
 }
 
-template <template <class> class Hierarchy, class Hypers, class Mixing>
-void Neal8<Hierarchy, Hypers, Mixing>::sample_allocations() {
+void Neal8::sample_allocations() {
   // Initialize relevant values
   unsigned int n = data.rows();
 
@@ -39,8 +33,8 @@ void Neal8<Hierarchy, Hypers, Mixing>::sample_allocations() {
     int singleton = 0;
     if (cardinalities[allocations[i]] == 1) {
       // Save unique value in the first auxiliary block
-      aux_unique_values[0].set_state(unique_values[allocations[i]].get_state(),
-                                     false);
+      aux_unique_values[0]->set_state(
+          unique_values[allocations[i]]->get_state(), false);
       singleton = 1;
     }
 
@@ -49,33 +43,34 @@ void Neal8<Hierarchy, Hypers, Mixing>::sample_allocations() {
 
     // Draw the unique values in the auxiliary blocks from their prior
     for (size_t j = singleton; j < n_aux; j++) {
-      aux_unique_values[j].draw();
+      aux_unique_values[j]->draw();
     }
 
     // Compute probabilities of clusters
     Eigen::VectorXd probas(n_clust + n_aux);
     double tot = 0.0;
     // Loop over clusters
-    for (size_t k = 0; k < n_clust; k++) {
+    for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
-      probas(k) = this->mixing.mass_existing_cluster(cardinalities[k], n - 1) *
-                  unique_values[k].like(datum)(0);
-      tot += probas(k);
-      // Note: if datum is a singleton, then, when k = allocations[i],
-      // one has card[k] = 0: cluster k will never be chosen
+      probas(j) = mixing->mass_existing_cluster(cardinalities[j], n - 1) *
+                  unique_values[j]->like(datum)(0);
+      tot += probas(j);
+      // Note: if datum is a singleton, then, when j = allocations[i],
+      // one has card[j] = 0: cluster j will never be chosen
     }
     // Loop over auxiliary blocks
-    for (size_t k = 0; k < n_aux; k++) {
+    for (size_t j = 0; j < n_aux; j++) {
       // Probability of being assigned to a newly generated cluster
-      probas(n_clust + k) = this->mixing.mass_new_cluster(n_clust, n - 1) *
-                            aux_unique_values[k].like(datum)(0) / n_aux;
-      tot += probas(n_clust + k);
+      probas(n_clust + j) = mixing->mass_new_cluster(n_clust, n - 1) *
+                            aux_unique_values[j]->like(datum)(0) / n_aux;
+      tot += probas(n_clust + j);
     }
     // Normalize
     probas = probas / tot;
 
     // Draw a NEW value for datum allocation
-    unsigned int c_new = stan::math::categorical_rng(probas, this->rng) - 1;
+    auto rng = bayesmix::Rng::Instance().get();
+    unsigned int c_new = bayesmix::categorical_rng(probas, rng, 0);
 
     // Assign datum to its new cluster and update cardinalities:
     // 4 cases are handled separately
@@ -83,8 +78,8 @@ void Neal8<Hierarchy, Hypers, Mixing>::sample_allocations() {
       if (c_new >= n_clust) {
         // Case 1: datum moves from a singleton to a new cluster
         // Take unique values from an auxiliary block
-        unique_values[allocations[i]].set_state(
-            aux_unique_values[c_new - n_clust].get_state(), false);
+        unique_values[allocations[i]]->set_state(
+            aux_unique_values[c_new - n_clust]->get_state(), false);
         cardinalities[allocations[i]] += 1;
       } else {  // Case 2: datum moves from a singleton to an old cluster
         unique_values.erase(unique_values.begin() + allocations[i]);
@@ -115,5 +110,3 @@ void Neal8<Hierarchy, Hypers, Mixing>::sample_allocations() {
     }
   }
 }
-
-#endif  // NEAL8_IMP_HPP

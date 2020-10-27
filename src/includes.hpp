@@ -3,13 +3,15 @@
 
 #include "algorithms/Neal2.hpp"
 #include "algorithms/Neal8.hpp"
+#include "algorithms/load_algorithms.hpp"
 #include "hierarchies/HierarchyNNIG.hpp"
 #include "hierarchies/HierarchyNNW.hpp"
-#include "hyperparameters/HypersFixedNNIG.hpp"
-#include "hyperparameters/HypersFixedNNW.hpp"
+#include "hierarchies/load_hierarchies.hpp"
 #include "mixings/DirichletMixing.hpp"
 #include "mixings/PitYorMixing.hpp"
+#include "mixings/load_mixings.hpp"
 #include "runtime/Factory.hpp"
-#include "utils.hpp"
+//#include "src/utils/distributions.hpp"
+#include "src/utils/io_utils.hpp"
 
 #endif  // INCLUDES_HPP

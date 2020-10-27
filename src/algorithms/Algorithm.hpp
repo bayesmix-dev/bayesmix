@@ -14,6 +14,9 @@
 #include "../collectors/FileCollector.hpp"
 #include "../collectors/MemoryCollector.hpp"
 #include "../collectors/chain_state.pb.h"
+#include "../hierarchies/HierarchyBase.hpp"
+#include "../mixings/BaseMixing.hpp"
+#include "../utils/distributions.hpp"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -48,11 +51,6 @@
 //! This class is templatized over the types of the elements of this model: the
 //! hierarchies of cluster, their hyperparameters, and the mixing mode.
 
-//! \param Hierarchy Name of the hierarchy template class
-//! \param Hypers    Name of the hyperparameters class
-//! \param Mixing    Name of the mixing mode class
-
-template <template <class> class Hierarchy, class Hypers, class Mixing>
 class Algorithm {
  protected:
   // METHOD PARAMETERS
@@ -71,15 +69,13 @@ class Algorithm {
   //! Allocation for each datum, i.e. label of the cluster it belongs to
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
-  std::vector<Hierarchy<Hypers> > unique_values;
+  std::vector<std::shared_ptr<HierarchyBase>> unique_values;
   //! Grid of points and evaluation of density on it
   std::pair<Eigen::MatrixXd, Eigen::VectorXd> density;
   //! Mixing object
-  Mixing mixing;
+  std::shared_ptr<BaseMixing> mixing;
   //! Protobuf object that contains the best clustering
   State best_clust;
-  //! Random engine
-  std::mt19937 rng;
 
   // FLAGS
   //! Flag to check validity of density write function
@@ -94,7 +90,7 @@ class Algorithm {
   Eigen::MatrixXd proto_param_to_matrix(const Param &par) const;
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd density_marginal_component(
-      Hierarchy<Hypers> &temp_hier) = 0;
+      std::shared_ptr<HierarchyBase> temp_hier) = 0;
 
   // ALGORITHM FUNCTIONS
   virtual void print_startup_message() const = 0;
@@ -150,37 +146,7 @@ class Algorithm {
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~Algorithm() = default;
-  //! \param hypers_  Hyperparameters object for the model
-  //! \param mixing_  Mixing object for the model
-  //! \param data_    Matrix of row-vectorial data points
-  //! \param init     Prescribed n. of clusters for the algorithm initializ.
-  Algorithm(const Hypers &hypers_, const Mixing &mixing_,
-            const Eigen::MatrixXd &data_, const unsigned int init = 0)
-      : mixing(mixing_), data(data_), init_num_clusters(init) {
-    Hierarchy<Hypers> hierarchy(std::make_shared<Hypers>(hypers_));
-
-    if (hierarchy.is_multivariate() == false && data.cols() > 1) {
-      std::cout << "Warning: multivariate data supplied to "
-                << "univariate hierarchy. The algorithm will run "
-                << "correctly, but all data rows other than the first"
-                << "one will be ignored" << std::endl;
-    }
-    if (data.rows() == 0) {
-      init_num_clusters = 1;
-    }
-    if (init_num_clusters == 0) {
-      // If not provided, standard initializ.: one datum per cluster
-      std::cout << "Warning: initial number of clusters will be "
-                << "set equal to the data size (" << data.rows() << ")"
-                << std::endl;
-      init_num_clusters = data.rows();
-    }
-
-    // Initialize hierarchies for starting clusters
-    for (size_t i = 0; i < init_num_clusters; i++) {
-      unique_values.push_back(hierarchy);
-    }
-  }
+  Algorithm() = default;
 
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }
@@ -195,14 +161,33 @@ class Algorithm {
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
-  void set_init_num_clusters(const unsigned int init) {
-    init_num_clusters = init;
-  }
-  void set_rng_seed(const unsigned int seed) { rng.seed(seed); }
   //! Does nothing except for Neal8
   virtual void set_n_aux(const unsigned int n_aux_) { return; }
-};
+  void set_mixing(std::shared_ptr<BaseMixing> mixing_) { mixing = mixing_; }
+  void set_data_and_initial_clusters(const Eigen::MatrixXd &data_,
+                                     std::shared_ptr<HierarchyBase> hier_,
+                                     const unsigned int init = 0) {
+  if(data.rows() == 0) {
+    std::invalid_argument("Error: empty data matrix");
+  }
+  if (hier_->is_multivariate() == false && data.cols() > 1) {
+    std::cout << "Warning: multivariate data supplied to univariate hierarchy."
+              << " The algorithm will run correctly, but all data rows other"
+              << " than the first one will be ignored" << std::endl;
+  }
+    data = data_;
+    init_num_clusters = (init == 0) ? data.rows() : init;
+    // "Warning: initial number of clusters will be set equal to the data
+    // size (" << data.rows() << ")"
+    // Initialize hierarchies for starting clusters
+    for (size_t i = 0; i < init_num_clusters; i++) {
+      unique_values.push_back(hier_);
+    }
+  }
 
-#include "Algorithm.imp.hpp"
+  virtual void print_id() const = 0;  // TODO
+  void get_mixing_id() const { mixing->print_id(); }  // TODO
+  void get_hier_id() const { unique_values[0]->print_id(); }  // TODO
+};
 
 #endif  // ALGORITHM_HPP

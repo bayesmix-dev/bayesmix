@@ -8,6 +8,8 @@
 #include <stan/math/prim/prob.hpp>
 #include <vector>
 
+#include "../utils/rng.hpp"
+
 //! Abstract base template class for a hierarchy object.
 
 //! This template class represents a hierarchy object in a generic iterative
@@ -24,17 +26,14 @@
 //! distributions, and of evaluating the distribution of the data, either its
 //! likelihood (whose parameters are the state) or its marginal distribution.
 
-//! \param Hypers Name of the hyperparameters class
-
-template <class Hypers>
 class HierarchyBase {
  protected:
   //! Current unique values state of this cluster
   std::vector<Eigen::MatrixXd> state;
-  //! Pointer to the hyperparameters object of the state
-  std::shared_ptr<Hypers> hypers;
 
   // AUXILIARY TOOLS
+  //! Raises error if the hypers values are not valid w.r.t. their own domain
+  virtual void check_hypers_validity() = 0;
   //! Raises error if the state values are not valid w.r.t. their own domain
   virtual void check_state_validity() = 0;
 
@@ -64,16 +63,12 @@ class HierarchyBase {
 
   // GETTERS AND SETTERS
   std::vector<Eigen::MatrixXd> get_state() const { return state; }
-  std::shared_ptr<Hypers> get_hypers() const { return hypers; }
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
   virtual void set_state(const std::vector<Eigen::MatrixXd> &state_,
-                         bool check = true) {
-    state = state_;
-    if (check) {
-      check_state_validity();
-    }
-  }
+                         bool check) = 0;
+
+  virtual void print_id() const = 0;  // TODO
 };
 
 #endif  // HIERARCHYBASE_HPP

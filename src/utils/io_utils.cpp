@@ -1,15 +1,6 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#include "io_utils.hpp"
 
-#include <Eigen/Dense>
-#include <fstream>
-
-#define MAXBUFSIZE ((int)1e6)
-
-//! \file
-
-//! Returns an Eigen Matrix after reading it from a file.
-Eigen::MatrixXd read_eigen_matrix(const std::string &filename) {
+Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename) {
   // Initialize objects
   unsigned int cols = 0, rows = 0;
   double buffer[MAXBUFSIZE];
@@ -18,12 +9,12 @@ Eigen::MatrixXd read_eigen_matrix(const std::string &filename) {
     std::string err = "Error: file " + filename + " does not exist";
     throw std::invalid_argument(err);
   }
-
+  
   // Loop over file lines
   while (!istr.eof()) {
     std::string line;
     getline(istr, line);
-
+  
     unsigned int temp = 0;
     std::stringstream stream(line);
     while (!stream.eof()) {
@@ -38,10 +29,10 @@ Eigen::MatrixXd read_eigen_matrix(const std::string &filename) {
     }
     rows++;
   }
-
+  
   istr.close();
   rows--;
-
+  
   // Fill an Eigen Matrix with values from the buffer array
   Eigen::MatrixXd mat(rows, cols);
   for (size_t i = 0; i < rows; i++) {
@@ -51,5 +42,3 @@ Eigen::MatrixXd read_eigen_matrix(const std::string &filename) {
   }
   return mat;
 };
-
-#endif  // UTILS_HPP

@@ -1,7 +1,20 @@
+PR #1: RUNTIME FULL
+* log-probabilities
+* Same for some functions on the multivariate normal lpdf
+
+PR #2: RUNTIME PARAMS
+* Proto messages: 'UnivariateLSState', 'MultivariateLSState', etc
+
+PR #3: RUNTIME PRIORS
+* ...
+
+OTHER
+* Class names
+* Make CondAlgo and MargAlgo virtual?
+
+
 PRIORITY LIST
 * (3) Full run-time implementation
-  * Factory stuff
-  * (add constructor args and template products?)
 * (3) Gamma prior on total mass
 * (3) Regression: linear DDP
 * (2) Regression: weight dependent model (logit s.b.)
@@ -11,5 +24,7 @@ PRIORITY LIST
 * (0) Comparison with other packages (DP-package, bnpmix)
 * (0) Docs/README/etc
 
+
 OTHER
+* Add hyperpriors
 * Memory collector stuff?

@@ -50,6 +50,8 @@ class DirichletMixing : public BaseMixing {
   // GETTERS AND SETTERS
   double get_totalmass() const { return totalmass; }
   void set_totalmass(const double totalmass_) { totalmass = totalmass_; }
+
+  void print_id() const override { std::cout << "DP" << std::endl; }  // TODO
 };
 
 #endif  // DIRICHLETMIXING_HPP
