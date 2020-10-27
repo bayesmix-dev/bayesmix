@@ -7,8 +7,8 @@ class MarginalAlgorithm : public Algorithm {
  public:
   ~MarginalAlgorithm() = default;
   MarginalAlgorithm() = default;
-  virtual void eval_lpdf(const Eigen::MatrixXd &grid,
-                         BaseCollector *const collector) override;
+  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
+                                    BaseCollector *const collector) override;
 };
 
 #endif  // MARGINALALGORITHM_HPP

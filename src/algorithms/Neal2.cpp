@@ -3,9 +3,9 @@
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2::lpdf_marginal_component(
-    std::shared_ptr<HierarchyBase> temp_hier) {
+    std::shared_ptr<HierarchyBase> temp_hier, const Eigen::MatrixXd &grid) {
   // Exploit conjugacy of hierarchy
-  return temp_hier->marg_lpdf(lpdf.first);
+  return temp_hier->marg_lpdf(grid);
 }
 
 void Neal2::print_startup_message() const {

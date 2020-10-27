@@ -70,16 +70,11 @@ class Algorithm {
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
   std::vector<std::shared_ptr<HierarchyBase>> unique_values;
-  //! Grid of points and evaluation of log-density on it
-  std::pair<Eigen::MatrixXd, Eigen::VectorXd> lpdf;
   //! Mixing object
   std::shared_ptr<BaseMixing> mixing;
   //! Protobuf object that contains the best clustering
   State best_clust;
 
-  // FLAGS
-  //! Flag to check validity of density write function
-  bool lpdf_was_computed = false;
   //! Flag to check validity of clustering write function
   bool clustering_was_computed = false;
 
@@ -90,7 +85,8 @@ class Algorithm {
   Eigen::MatrixXd proto_param_to_matrix(const Param &par) const;
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<HierarchyBase> temp_hier) = 0;
+      std::shared_ptr<HierarchyBase> temp_hier,
+      const Eigen::MatrixXd &grid) = 0;
 
   // ALGORITHM FUNCTIONS
   virtual void print_startup_message() const = 0;
@@ -132,16 +128,14 @@ class Algorithm {
   }
 
   // ESTIMATE FUNCTIONS
-  //! Evaluates the overall data log-pdf on a given grid of points
-  virtual void eval_lpdf(const Eigen::MatrixXd &grid,
-                         BaseCollector *const collector) = 0;
+  //! Evaluates the logpdf for each single iteration on a given grid of points
+  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
+                                    BaseCollector *const collector) = 0;
   //! Estimates the clustering structure of the data via LS minimization
   virtual unsigned int cluster_estimate(BaseCollector *collector);
   //! Writes unique values of each datum in csv form
   void write_clustering_to_file(
       const std::string &filename = "csv/clust_best.csv") const;
-  //! Writes grid and density evaluation on it in csv form
-  void write_lpdf_to_file(const std::string &filename = "csv/lpdf.csv") const;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~Algorithm() = default;
@@ -151,12 +145,6 @@ class Algorithm {
   unsigned int get_maxiter() const { return maxiter; }
   unsigned int get_burnin() const { return burnin; }
   unsigned int get_init_num_clusters() const { return init_num_clusters; }
-  std::pair<Eigen::MatrixXd, Eigen::VectorXd> get_lpdf() const {
-    if (!lpdf_was_computed) {
-      std::domain_error("Error calling get_lpdf(): not computed yet");
-    }
-    return lpdf;
-  }
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
