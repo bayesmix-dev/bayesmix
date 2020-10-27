@@ -46,31 +46,28 @@ void Neal8::sample_allocations() {
       aux_unique_values[j]->draw();
     }
 
-    // Compute probabilities of clusters
-    Eigen::VectorXd probas(n_clust + n_aux);
-    double tot = 0.0;
+    // Compute probabilities of clusters in log-space
+    Eigen::VectorXd logprobas(n_clust + n_aux);
     // Loop over clusters
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
-      probas(j) = mixing->mass_existing_cluster(cardinalities[j], n - 1) *
-                  unique_values[j]->like(datum)(0);
-      tot += probas(j);
+      logprobas(j) =
+          log(mixing->mass_existing_cluster(cardinalities[j], n - 1)) +
+          unique_values[j]->lpdf(datum)(0);
       // Note: if datum is a singleton, then, when j = allocations[i],
       // one has card[j] = 0: cluster j will never be chosen
     }
     // Loop over auxiliary blocks
     for (size_t j = 0; j < n_aux; j++) {
       // Probability of being assigned to a newly generated cluster
-      probas(n_clust + j) = mixing->mass_new_cluster(n_clust, n - 1) *
-                            aux_unique_values[j]->like(datum)(0) / n_aux;
-      tot += probas(n_clust + j);
+      logprobas(n_clust + j) = log(mixing->mass_new_cluster(n_clust, n - 1)) +
+                               aux_unique_values[j]->lpdf(datum)(0) -
+                               log(n_aux);
     }
-    // Normalize
-    probas = probas / tot;
-
     // Draw a NEW value for datum allocation
     auto rng = bayesmix::Rng::Instance().get();
-    unsigned int c_new = bayesmix::categorical_rng(probas, rng, 0);
+    unsigned int c_new =
+        bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
 
     // Assign datum to its new cluster and update cardinalities:
     // 4 cases are handled separately

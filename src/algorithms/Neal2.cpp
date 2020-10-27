@@ -52,33 +52,29 @@ void Neal2::sample_allocations() {
     // Remove datum from cluster
     cardinalities[allocations[i]] -= 1;
 
-    // Compute probabilities of clusters
-    Eigen::VectorXd probas(n_clust + (1 - singleton));
-    double tot = 0.0;
+    // Compute probabilities of clusters in log-space
+    Eigen::VectorXd logprobas(n_clust + (1 - singleton));
     // Loop over clusters
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
-      probas(j) = mixing->mass_existing_cluster(cardinalities[j], n - 1) *
-                  unique_values[j]->like(datum)(0);
+      logprobas(j) =
+          log(mixing->mass_existing_cluster(cardinalities[j], n - 1)) +
+          unique_values[j]->lpdf(datum)(0);
       if (singleton == 1 && j == allocations[i]) {
         // Probability of being assigned to a newly generated cluster
-        probas(j) = mixing->mass_new_cluster(n_clust, n - 1) *
-                    unique_values[0]->eval_marg(datum)(0);
+        logprobas(j) = log(mixing->mass_new_cluster(n_clust, n - 1)) +
+                       unique_values[0]->marg_lpdf(datum)(0);
       }
-      tot += probas(j);
     }
     if (singleton == 0) {
       // Further update with marginal component
-      probas(n_clust) = mixing->mass_new_cluster(n_clust, n - 1) *
-                        unique_values[0]->eval_marg(datum)(0);
-      tot += probas(n_clust);
+      logprobas(n_clust) = log(mixing->mass_new_cluster(n_clust, n - 1)) +
+                           unique_values[0]->marg_lpdf(datum)(0);
     }
-    // Normalize
-    probas = probas / tot;
-
     // Draw a NEW value for datum allocation
     auto rng = bayesmix::Rng::Instance().get();
-    unsigned int c_new = stan::math::categorical_rng(probas, rng) - 1;
+    unsigned int c_new =
+        bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
 
     // Assign datum to its new cluster and update cardinalities:
     // 4 cases are handled separately

@@ -1,11 +1,7 @@
-PR #1: RUNTIME FULL
-* log-probabilities
-* Same for some functions on the multivariate normal lpdf
-
-PR #2: RUNTIME PARAMS
+PR #3: RUNTIME PARAMS
 * Proto messages: 'UnivariateLSState', 'MultivariateLSState', etc
 
-PR #3: RUNTIME PRIORS
+PR #4: RUNTIME PRIORS
 * ...
 
 OTHER
