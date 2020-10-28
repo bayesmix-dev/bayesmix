@@ -1,7 +1,11 @@
 syntax = "proto3";
 
+import "mixings.proto";
+
 import "ls_state.proto";
-import "mixings.proto"
+
+package bayesmix;
+
 
 message ConditionalState {
     message ClusterVal {
@@ -16,7 +20,7 @@ message ConditionalState {
     repeated int32 cluster_allocs = 2 [packed = true];
 
     oneof mixing_state {
-        DPstate dp_state = 3;
-        PYstate py_state = 4;
+        DPState dp_state = 3;
+        PYState py_state = 4;
     }
 }
