@@ -5,8 +5,8 @@ sudo apt install autoconf automake libtool curl g++ unzip -y
 
 # Get libraries
 cd lib
-git clone https://github.com/protocolbuffers/protobuf.git
-git clone https://github.com/stan-dev/math.git
+git clone https://github.com/protocolbuffers/protobuf.git --depth 1
+git clone https://github.com/stan-dev/math.git --depth 1
 
 # Compile protobuf library
 cd protobuf-3.12.3
