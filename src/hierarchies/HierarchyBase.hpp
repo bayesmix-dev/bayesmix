@@ -1,6 +1,8 @@
 #ifndef HIERARCHYBASE_HPP
 #define HIERARCHYBASE_HPP
 
+#include <google/protobuf/message.h>
+
 #include <array>
 #include <memory>
 #include <random>
@@ -28,9 +30,6 @@
 
 class HierarchyBase {
  protected:
-  //! Current unique values state of this cluster
-  std::vector<Eigen::MatrixXd> state;
-
   // AUXILIARY TOOLS
   //! Raises error if the hypers values are not valid w.r.t. their own domain
   virtual void check_hypers_validity() = 0;
@@ -48,10 +47,13 @@ class HierarchyBase {
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points
   virtual Eigen::VectorXd like(const Eigen::MatrixXd &data) = 0;
+
   //! Evaluates the log-likelihood of data in the given points
   virtual Eigen::VectorXd lpdf(const Eigen::MatrixXd &data) = 0;
+
   //! Evaluates the marginal distribution of data in the given points
   virtual Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) = 0;
+
   //! Evaluates the log-marginal distribution of data in the given points
   virtual Eigen::VectorXd marg_lpdf(const Eigen::MatrixXd &data) = 0;
 
@@ -62,11 +64,11 @@ class HierarchyBase {
   virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;
 
   // GETTERS AND SETTERS
-  std::vector<Eigen::MatrixXd> get_state() const { return state; }
+  virtual void get_state_as_proto(google::protobuf::Message *out) = 0;
+
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  virtual void set_state(const std::vector<Eigen::MatrixXd> &state_,
-                         bool check) = 0;
+  virtual void set_state(google::protobuf::Message *curr, bool check) = 0;
 
   virtual void print_id() const = 0;  // TODO
 };

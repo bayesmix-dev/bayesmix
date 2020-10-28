@@ -1,6 +1,6 @@
 #include "HierarchyNNIG.hpp"
 
-void HierarchyNNIG::check_state_validity() { assert(state[1](0, 0) > 0); }
+void HierarchyNNIG::check_state_validity() { assert(std > 0); }
 
 //! \param data                       Column vector of data points
 //! \param mu0, alpha0, beta0, lambda Original values for hyperparameters
@@ -116,4 +116,21 @@ void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
   // Update state
   state[0](0, 0) = mu_new;
   state[1](0, 0) = sig_new;
+}
+
+void HierarchyNNIG::set_state(google::protobuf::Message *curr, bool check) {
+  using namespace google::protobuf::internal;
+
+  mean = down_cast<UnivLSState *>(curr)->mean();
+  std = down_cast<UnivLSState *>(curr)->std();
+
+  if (check) {
+    check_state_validity();
+  }
+}
+
+void HierarchyNNIG::get_state_as_proto(google::protobuf::Message *out) {
+  using namespace google::protobuf::internal;
+  down_cast<UnivLSState *>(out)->set_mean(mean);
+  down_cast<UnivLSState *>(out)->set_std(std);
 }

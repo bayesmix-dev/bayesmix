@@ -177,3 +177,19 @@ void HierarchyNNW::set_tau0(const Eigen::MatrixXd &tau0_) {
   tau0 = tau0_;
   tau0_inv = stan::math::inverse_spd(tau0);
 }
+
+void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
+  using namespace google::protobuf::internal;
+  mean = to_eigen(down_cast<MultiLSState*>(curr))->mean();
+  precision = to_eigen(down_cast<MultiLSState *>(curr))->precision();
+}
+
+void HierarchyNNW::get_state_as_proto(google::protobuf::Message *out) {
+  using namespace google::protobuf::internal;
+  Vector* proto_mean;
+  Matrix* proto_prec;
+  to_proto(mean, proto_mean);
+  to_proto(precision, proto_prec);
+
+  
+}
