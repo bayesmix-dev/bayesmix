@@ -16,6 +16,7 @@
 #include "../mixings/BaseMixing.hpp"
 #include "../utils/distributions.hpp"
 #include "../utils/proto_utils.hpp"
+#include "../../proto/cpp/marginal_state.pb.h"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 

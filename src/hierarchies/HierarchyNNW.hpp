@@ -7,7 +7,6 @@
 
 #include "../../proto/cpp/ls_state.pb.h"
 #include "../../proto/cpp/matrix.pb.h"
-
 #include "../utils/distributions.hpp"
 #include "HierarchyBase.hpp"
 
@@ -30,7 +29,7 @@
 
 class HierarchyNNW : public HierarchyBase {
  protected:
-  Eigen::VectorXd mean;  
+  Eigen::VectorXd mean;
   Eigen::MatrixXd precision;
 
   using EigenRowVec = Eigen::Matrix<double, 1, Eigen::Dynamic>;
