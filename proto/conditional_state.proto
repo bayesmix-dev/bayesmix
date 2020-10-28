@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "ls_state.proto";
+import "mixings.proto"
+
+message ConditionalState {
+    message ClusterVal {
+        oneof val {
+            UnivLSState univ_ls_state = 1;
+            MultiLSState multi_ls_state = 2;
+        }
+    }
+
+    repeated ClusterVal cluster_vals = 1;
+
+    repeated int32 cluster_allocs = 2 [packed = true];
+
+    oneof mixing_state {
+        DPstate dp_state = 3;
+        PYstate py_state = 4;
+    }
+}

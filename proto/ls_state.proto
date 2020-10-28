@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "matrix.proto";
+
+package bayesmix;
+
+message UnivLSState {
+    double mean = 1;
+    double std = 1;
+}
+
+message MultiLSState {
+    Vector mean = 1;
+    Matrix precision = 2;
+}
+

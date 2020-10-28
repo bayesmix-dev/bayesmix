@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package bayesmix;
+
+message DPState {
+    double totalmass = 1;
+}
+
+message PYState {
+    double totalmass = 1;
+    double discount = 2;
+}
