@@ -9,6 +9,7 @@
 #include "../../proto/cpp/matrix.pb.h"
 #include "../utils/distributions.hpp"
 #include "HierarchyBase.hpp"
+#include "../utils/proto_utils.hpp"
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 
@@ -30,7 +31,7 @@
 class HierarchyNNW : public HierarchyBase {
  protected:
   Eigen::VectorXd mean;
-  Eigen::MatrixXd precision;
+  Eigen::MatrixXd tau;
 
   using EigenRowVec = Eigen::Matrix<double, 1, Eigen::Dynamic>;
 
@@ -54,7 +55,7 @@ class HierarchyNNW : public HierarchyBase {
   //! Raises error if the state values are not valid w.r.t. their own domain
   void check_state_validity() override;
   //! Special setter tau and its utilities
-  void set_tau_and_utilities(const Eigen::MatrixXd &tau);
+  void set_tau_and_utilities(const Eigen::MatrixXd &tau_);
 
   //! Returns updated values of the prior hyperparameters via their posterior
   std::vector<Eigen::MatrixXd> normal_wishart_update(
@@ -69,7 +70,7 @@ class HierarchyNNW : public HierarchyBase {
   ~HierarchyNNW() = default;
   HierarchyNNW() {
     unsigned int dim = get_mu0().size();
-    state.push_back(get_mu0());
+    mean = get_mu0();
     set_tau_and_utilities(get_lambda() * Eigen::MatrixXd::Identity(dim, dim));
   }
 

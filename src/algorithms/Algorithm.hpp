@@ -75,7 +75,7 @@ class Algorithm {
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object
-  State get_state_as_proto(unsigned int iter);
+  bayesmix::MarginalState get_state_as_proto(unsigned int iter);
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd lpdf_marginal_component(
       std::shared_ptr<HierarchyBase> temp_hier,

@@ -15,21 +15,17 @@ void HierarchyNNW::check_hypers_validity() {
 
 void HierarchyNNW::check_state_validity() {
   // Check if tau is a square matrix
-  unsigned int dim = state[0].size();
-  assert(dim == state[1].rows());
-  assert(dim == state[1].cols());
+  unsigned int dim = mean.size();
+  assert(dim == tau.rows());
+  assert(dim == tau.cols());
   // Check if tau is symmetric positive semi definite
-  assert(state[1].isApprox(state[1].transpose()));
+  assert(tau.isApprox(tau.transpose()));
   assert(tau_chol_factor.info() != Eigen::NumericalIssue);
 }
 
 //! \param tau Value to set to state[1]
-void HierarchyNNW::set_tau_and_utilities(const Eigen::MatrixXd &tau) {
-  if (state.size() == 1) {  // e.g. if the hierarchy is being initialized
-    state.push_back(tau);
-  } else {
-    state[1] = tau;
-  }
+void HierarchyNNW::set_tau_and_utilities(const Eigen::MatrixXd &tau_) {
+  tau = tau_;
 
   // Update tau utilities
   tau_chol_factor = Eigen::LLT<Eigen::MatrixXd>(tau);
@@ -79,11 +75,10 @@ Eigen::VectorXd HierarchyNNW::lpdf(const Eigen::MatrixXd &data) {
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);
-  EigenRowVec mu(state[0]);
   // Compute likelihood for each data point
   for (size_t i = 0; i < n; i++) {
     result(i) = bayesmix::multi_normal_prec_lpdf(
-        data.row(i), mu, tau_chol_factor_eval, tau_logdet);
+        data.row(i), mean, tau_chol_factor_eval, tau_logdet);
   }
   return result;
 }
@@ -132,11 +127,10 @@ void HierarchyNNW::draw() {
   // Generate new state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new = stan::math::wishart_rng(nu, tau0, rng);
-  EigenRowVec mu_new =
+  EigenRowVec mean =
       stan::math::multi_normal_prec_rng(mu0, tau_new * lambda, rng);
 
   // Update state
-  state[0] = mu_new;
   set_tau_and_utilities(tau_new);
 }
 
@@ -159,11 +153,10 @@ void HierarchyNNW::sample_given_data(const Eigen::MatrixXd &data) {
   // Generate new state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new = stan::math::wishart_rng(nu_post, tau_post, rng);
-  EigenRowVec mu_new =
+  EigenRowVec mean =
       stan::math::multi_normal_prec_rng(mu_post, tau_new * lambda_post, rng);
 
   // Update state
-  state[0] = mu_new;
   set_tau_and_utilities(tau_new);
 }
 
@@ -180,16 +173,21 @@ void HierarchyNNW::set_tau0(const Eigen::MatrixXd &tau0_) {
 
 void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
   using namespace google::protobuf::internal;
-  mean = to_eigen(down_cast<MultiLSState *>(curr)->mean());
-  precision = to_eigen(down_cast<MultiLSState *>(curr)->precision());
+  using namespace bayesmix;
 
-  // TODO Set taus and utilities;
+  mean = to_eigen(down_cast<MultiLSState *>(curr)->mean());
+  tau = to_eigen(down_cast<MultiLSState *>(curr)->precision());
+
+  std::cout << "successful dowcast, mean: " << mean.transpose() << std::endl;
+
+  set_tau_and_utilities(tau);
 }
 
 void HierarchyNNW::get_state_as_proto(google::protobuf::Message *out) {
   using namespace google::protobuf::internal;
+  using namespace bayesmix;
   Vector *proto_mean = down_cast<MultiLSState *>(out)->mutable_mean();
   Matrix *proto_prec = down_cast<MultiLSState *>(out)->mutable_precision();
-  bayesmix::to_proto(mean, proto_mean);
-  bayesmix::to_proto(precision, proto_prec);
+  to_proto(mean, proto_mean);
+  to_proto(tau, proto_prec);
 }

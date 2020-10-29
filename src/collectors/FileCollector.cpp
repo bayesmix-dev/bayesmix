@@ -16,12 +16,12 @@ void FileCollector::close_reading() {
 }
 
 // \return Chain state in Protobuf-object form
-State FileCollector::next_state() {
+bayesmix::MarginalState FileCollector::next_state() {
   if (!is_open_read) {
     open_for_reading();
   }
 
-  State out;
+  bayesmix::MarginalState out;
   bool keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(
       &out, fin, nullptr);
   if (!keep) {
@@ -49,7 +49,7 @@ void FileCollector::finish() {
 }
 
 // \param iter_state State in Protobuf-object form to write to the collector
-void FileCollector::collect(State iter_state) {
+void FileCollector::collect(bayesmix::MarginalState iter_state) {
   bool success = google::protobuf::util::SerializeDelimitedToZeroCopyStream(
       iter_state, fout);
   size++;
@@ -60,8 +60,8 @@ void FileCollector::collect(State iter_state) {
 
 // \param i Position of the requested state in the chain
 // \return  Chain state in Protobuf-object form
-State FileCollector::get_state(unsigned int i) {
-  State state;
+bayesmix::MarginalState FileCollector::get_state(unsigned int i) {
+  bayesmix::MarginalState state;
   for (size_t j = 0; j < i + 1; j++) {
     state = get_next_state();
   }
@@ -73,12 +73,12 @@ State FileCollector::get_state(unsigned int i) {
 }
 
 // \return Chain in deque form
-std::deque<State> FileCollector::get_chain() {
+std::deque<bayesmix::MarginalState> FileCollector::get_chain() {
   open_for_reading();
   bool keep = true;
-  std::deque<State> out;
+  std::deque<bayesmix::MarginalState> out;
   while (keep) {
-    State msg;
+    bayesmix::MarginalState msg;
     keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(&msg, fin,
                                                                     nullptr);
     if (keep) {

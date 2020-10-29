@@ -31,7 +31,7 @@ Eigen::VectorXd bayesmix::to_eigen(const Vector &vec) {
   Eigen::VectorXd out;
   if (size > 0) {
     const double *p = &(vec.data())[0];
-    out = Map<const VectorXd>(p, size);
+    out = Eigen::Map<const Eigen::VectorXd>(p, size);
   }
   return out;
 }
@@ -42,7 +42,7 @@ Eigen::MatrixXd bayesmix::to_eigen(const Matrix &mat) {
   Eigen::MatrixXd out;
   if (nrow > 0 & ncol > 0) {
     const double *p = &(mat.data())[0];
-    out = Eigen::Map<const MatrixXd>(p, nrow, ncol);
+    out = Eigen::Map<const Eigen::MatrixXd>(p, nrow, ncol);
   }
   return out;
 }
