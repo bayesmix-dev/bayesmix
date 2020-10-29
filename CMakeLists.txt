@@ -4,7 +4,6 @@ project(bayesmix)
 find_package(PkgConfig REQUIRED)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
-set(CMAKE_INSTALL_RPATH "${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf/src/.libs/")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # SET(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath,/home/mario/dev/stan/math/lib/tbb")
 
@@ -15,7 +14,6 @@ add_executable(bayesmix run.cpp)
 # add_executable(bayesmix maintest_uni.cpp)
 add_subdirectory(src)
 add_subdirectory(proto)
-
 
 message("source dir: " "${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -30,11 +28,11 @@ target_include_directories(bayesmix PUBLIC
 
 target_link_directories(bayesmix PRIVATE
     /home/mario/dev/stan/math/lib/tbb
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf/src/.libs
+    # ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf/src/.libs
 )
 
-target_link_libraries(bayesmix 
-    tbb 
+target_link_libraries(bayesmix
+    tbb
     pthread
     protobuf
 )
