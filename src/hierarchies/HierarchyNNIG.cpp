@@ -41,8 +41,7 @@ Eigen::VectorXd HierarchyNNIG::lpdf(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
-    result(i) =
-        stan::math::normal_lpdf(data(i, 0), mean, std);
+    result(i) = stan::math::normal_lpdf(data(i, 0), mean, std);
   }
   return result;
 }
@@ -106,8 +105,7 @@ void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
   // Generate new state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
   double std = sqrt(stan::math::inv_gamma_rng(alpha_post, beta_post, rng));
-  double mean =
-      stan::math::normal_rng(mu_post, std / sqrt(lambda_post), rng);
+  double mean = stan::math::normal_rng(mu_post, std / sqrt(lambda_post), rng);
 }
 
 void HierarchyNNIG::set_state(google::protobuf::Message *curr, bool check) {
@@ -115,8 +113,6 @@ void HierarchyNNIG::set_state(google::protobuf::Message *curr, bool check) {
   using namespace bayesmix;
   mean = down_cast<UnivLSState *>(curr)->mean();
   std = down_cast<UnivLSState *>(curr)->std();
-  std::cout << "successful dowcast, mean: " << mean << std::endl; 
-
   if (check) {
     check_state_validity();
   }
@@ -125,6 +121,12 @@ void HierarchyNNIG::set_state(google::protobuf::Message *curr, bool check) {
 void HierarchyNNIG::get_state_as_proto(google::protobuf::Message *out) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
-  down_cast<UnivLSState *>(out)->set_mean(mean);
-  down_cast<UnivLSState *>(out)->set_std(std);
+
+  UnivLSState state;
+  state.set_mean(mean);
+  state.set_std(std);
+
+  down_cast<MarginalState::ClusterVal *>(out)
+      ->mutable_univ_ls_state()
+      ->CopyFrom(state);
 }

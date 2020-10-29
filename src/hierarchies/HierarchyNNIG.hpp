@@ -4,6 +4,7 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include "../../proto/cpp/ls_state.pb.h"
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
 #include "HierarchyBase.hpp"
 
@@ -82,6 +83,7 @@ class HierarchyNNIG : public HierarchyBase {
   double get_alpha0() const { return alpha0; }
   double get_beta0() const { return beta0; }
   double get_lambda() const { return lambda; }
+  double get_mean() const { return mean; }
   void set_mu0(const double mu0_) { mu0 = mu0_; }
   void set_alpha0(const double alpha0_) {
     assert(alpha0_ > 0);
