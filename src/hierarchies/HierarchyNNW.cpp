@@ -180,7 +180,7 @@ void HierarchyNNW::set_tau0(const Eigen::MatrixXd &tau0_) {
 
 void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
   using namespace google::protobuf::internal;
-  mean = to_eigen(down_cast<MultiLSState*>(curr)->mean());
+  mean = to_eigen(down_cast<MultiLSState *>(curr)->mean());
   precision = to_eigen(down_cast<MultiLSState *>(curr)->precision());
 
   // TODO Set taus and utilities;
@@ -188,8 +188,7 @@ void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
 
 void HierarchyNNW::get_state_as_proto(google::protobuf::Message *out) {
   using namespace google::protobuf::internal;
-  Vector *proto_mean =
-      down_cast<MultiLSState *>(out)->mutable_mean();
+  Vector *proto_mean = down_cast<MultiLSState *>(out)->mutable_mean();
   Matrix *proto_prec = down_cast<MultiLSState *>(out)->mutable_precision();
   bayesmix::to_proto(mean, proto_mean);
   bayesmix::to_proto(precision, proto_prec);

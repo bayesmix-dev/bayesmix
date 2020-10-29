@@ -3,8 +3,8 @@
 
 #include <Eigen/Dense>
 
-#include "../collectors/chain_state.pb.h"
 #include "../../proto/cpp/matrix.pb.h"
+#include "../collectors/chain_state.pb.h"
 
 namespace bayesmix {
 //! Turns a single unique value from Protobuf object form into a matrix

@@ -10,13 +10,13 @@
 #include <stan/math/prim/prob.hpp>
 #include <vector>
 
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/BaseCollector.hpp"
 #include "../collectors/chain_state.pb.h"
 #include "../hierarchies/HierarchyBase.hpp"
 #include "../mixings/BaseMixing.hpp"
 #include "../utils/distributions.hpp"
 #include "../utils/proto_utils.hpp"
-#include "../../proto/cpp/marginal_state.pb.h"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -89,7 +89,7 @@ class Algorithm {
   virtual void sample_weights() = 0;
   virtual void update_hypers() = 0;
   virtual void print_ending_message() const {
-  	std::cout << "Done" << std::endl;
+    std::cout << "Done" << std::endl;
   };
   //! Saves the current iteration's state in Protobuf form to a collector
   void save_state(BaseCollector *collector, unsigned int iter) {
