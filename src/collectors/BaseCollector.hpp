@@ -13,8 +13,8 @@
 #include <string>
 #include <vector>
 
-#include "chain_state.pb.h"
-#include <proto/cpp/marginal_state.pb.h>
+//#include "chain_state.pb.h"
+#include "../../proto/cpp/marginal_state.pb.h"
 
 //! Abstract base class for a collector that contains a chain in Protobuf form
 

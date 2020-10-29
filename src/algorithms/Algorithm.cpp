@@ -13,8 +13,7 @@ bayesmix::MarginalState Algorithm::get_state_as_proto(unsigned int iter) {
     bayesmix::MarginalState::ClusterVal* clusval = iter_out.add_cluster_vals();
     unique_values[i]->get_state_as_proto(clusval);
 
-    //   UniqueValues uniquevalues_temp;
-
+    //   UniqueValues uniquevalues_temp;  // TODO remove?
     //   for (size_t j = 0; j < unique_values[i]->get_state().size(); j++) {
     //     Eigen::MatrixXd par_temp = unique_values[i]->get_state()[j];
     //     Param par_temp_proto;

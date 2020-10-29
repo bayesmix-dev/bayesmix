@@ -5,6 +5,6 @@ target_sources(bayesmix
     FileCollector.cpp
     MemoryCollector.hpp
     MemoryCollector.cpp
-    chain_state.pb.h
-    chain_state.pb.cc
+    #chain_state.pb.h  # TODO
+    #chain_state.pb.cc
 )
