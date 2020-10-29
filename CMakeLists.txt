@@ -4,7 +4,7 @@ project(bayesmix)
 find_package(PkgConfig REQUIRED)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
-set(CMAKE_INSTALL_RPATH "${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf-3.12.3/src/.libs/")
+set(CMAKE_INSTALL_RPATH "${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf/src/.libs/")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # SET(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath,/home/mario/dev/stan/math/lib/tbb")
 
@@ -25,12 +25,12 @@ target_include_directories(bayesmix PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/boost_1.72.0
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/eigen_3.3.7
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/tbb_2019_U8/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf-3.12.3/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf/src
 )
 
 target_link_directories(bayesmix PRIVATE
     /home/mario/dev/stan/math/lib/tbb
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf-3.12.3/src/.libs
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf/src/.libs
 )
 
 target_link_libraries(bayesmix 
