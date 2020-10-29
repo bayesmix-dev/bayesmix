@@ -1,23 +1,10 @@
 #include "proto_utils.hpp"
 
-//! \param un_val Unique value in Protobuf-object form
-//! \return       Matrix version of un_val
-Eigen::MatrixXd bayesmix::proto_param_to_matrix(const Param &un_val) {
-  Eigen::MatrixXd par_matrix = Eigen::MatrixXd::Zero(
-      un_val.par_cols(0).elems_size(), un_val.par_cols_size());
-
-  // Loop over unique values to copy them one at a time
-  for (size_t i = 0; i < un_val.par_cols_size(); i++) {
-    for (size_t j = 0; j < un_val.par_cols(i).elems_size(); j++) {
-      par_matrix(j, i) = un_val.par_cols(i).elems(j);
-    }
-  }
-  return par_matrix;
-}
-
 void bayesmix::to_proto(const Eigen::MatrixXd &mat, Matrix *out) {
   out->set_rows(mat.rows());
   out->set_cols(mat.cols());
+  out->set_rowmajor(false);
+
   *out->mutable_data() = {mat.data(), mat.data() + mat.size()};
 }
 
@@ -37,12 +24,19 @@ Eigen::VectorXd bayesmix::to_eigen(const Vector &vec) {
 }
 
 Eigen::MatrixXd bayesmix::to_eigen(const Matrix &mat) {
+  using namespace Eigen;
   int nrow = mat.rows();
   int ncol = mat.cols();
   Eigen::MatrixXd out;
   if (nrow > 0 & ncol > 0) {
     const double *p = &(mat.data())[0];
-    out = Eigen::Map<const Eigen::MatrixXd>(p, nrow, ncol);
+    if (mat.rowmajor()) {
+      out = Map<const Eigen::Matrix<double, Dynamic, Dynamic, RowMajor> >(
+          p, nrow, ncol);
+    }
+    else {
+      out = Map<const MatrixXd>(p, nrow, ncol);
+    }
   }
   return out;
 }

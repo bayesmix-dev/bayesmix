@@ -4,7 +4,6 @@
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
-#include "../collectors/BaseCollector.hpp"
 #include "../utils/proto_utils.hpp"
 
 namespace bayesmix {
