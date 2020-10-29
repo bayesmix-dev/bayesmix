@@ -8,7 +8,7 @@
 
 namespace bayesmix {
 //! Turns a single unique value from Protobuf object form into a matrix
-Eigen::MatrixXd proto_param_to_matrix(const Param &par);
+Eigen::MatrixXd proto_param_to_matrix(const Param &par);  // TODO delete?
 
 void to_proto(const Eigen::MatrixXd &mat, Matrix *out);
 
