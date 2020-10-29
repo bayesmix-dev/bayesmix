@@ -5,18 +5,17 @@
 Eigen::VectorXi bayesmix::cluster_estimate(Eigen::MatrixXi allocation_chain) {
   // Initialize objects
   unsigned n_iter = allocation_chain.rows();
-  unsigned int n = allocation_chain.cols();
+  unsigned int n_data = allocation_chain.cols();
   Eigen::VectorXd errors(n_iter);
-  Eigen::MatrixXd mean_diss = Eigen::MatrixXd::Zero(n, n);
+  Eigen::MatrixXd mean_diss(n_data, n_data);
   std::vector<Eigen::SparseMatrix<double> > all_diss;
-  State temp;
 
   // Loop over iterations
   for (size_t i = 0; i < n_iter; i++) {
     // Find and all nonzero entries of the dissimilarity matrix
     std::vector<Eigen::Triplet<double> > triplets_list;
-    triplets_list.reserve(n * n / 4);
-    for (size_t j = 0; j < n; i++) {
+    triplets_list.reserve(n_data * n_data / 4);
+    for (size_t j = 0; j < n_data; i++) {
       for (size_t k = 0; k < j; k++) {
         if (allocation_chain(i, j) == allocation_chain(i, k)) {
           triplets_list.push_back(Eigen::Triplet<double>(j, k, 1.0));
@@ -24,7 +23,7 @@ Eigen::VectorXi bayesmix::cluster_estimate(Eigen::MatrixXi allocation_chain) {
       }
     }
     // Build dissimilarity matrix and update total dissimilarity
-    Eigen::SparseMatrix<double> dissim(n, n);
+    Eigen::SparseMatrix<double> dissim(n_data, n_data);
     dissim.setZero();
     dissim.setFromTriplets(triplets_list.begin(), triplets_list.end());
     all_diss.push_back(dissim);
