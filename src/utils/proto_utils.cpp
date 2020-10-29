@@ -30,11 +30,13 @@ Eigen::MatrixXd bayesmix::to_eigen(const Matrix &mat) {
   Eigen::MatrixXd out;
   if (nrow > 0 & ncol > 0) {
     const double *p = &(mat.data())[0];
-    if (mat.rowmajor)
+    if (mat.rowmajor()) {
       out = Map<const Eigen::Matrix<double, Dynamic, Dynamic, RowMajor> >(
           p, nrow, ncol);
-    else
+    }
+    else {
       out = Map<const MatrixXd>(p, nrow, ncol);
+    }
   }
   return out;
 }
