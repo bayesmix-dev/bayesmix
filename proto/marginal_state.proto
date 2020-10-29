@@ -23,4 +23,6 @@ message MarginalState {
         DPState dp_state = 3;
         PYState py_state = 4;
     }
+
+    int32 iteration_num = 5;
 }
