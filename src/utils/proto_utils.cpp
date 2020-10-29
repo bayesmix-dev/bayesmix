@@ -18,6 +18,8 @@ Eigen::MatrixXd bayesmix::proto_param_to_matrix(const Param &un_val) {
 void bayesmix::to_proto(const Eigen::MatrixXd &mat, Matrix *out) {
   out->set_rows(mat.rows());
   out->set_cols(mat.cols());
+  out->set_rowmajor(false);
+
   *out->mutable_data() = {mat.data(), mat.data() + mat.size()};
 }
 
@@ -37,12 +39,17 @@ Eigen::VectorXd bayesmix::to_eigen(const Vector &vec) {
 }
 
 Eigen::MatrixXd bayesmix::to_eigen(const Matrix &mat) {
+  using namespace Eigen;
   int nrow = mat.rows();
   int ncol = mat.cols();
   Eigen::MatrixXd out;
   if (nrow > 0 & ncol > 0) {
     const double *p = &(mat.data())[0];
-    out = Eigen::Map<const Eigen::MatrixXd>(p, nrow, ncol);
+    if (mat.rowmajor)
+      out = Map<const Eigen::Matrix<double, Dynamic, Dynamic, RowMajor> >(
+          p, nrow, ncol);
+    else
+      out = Map<const MatrixXd>(p, nrow, ncol);
   }
   return out;
 }
