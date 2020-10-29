@@ -35,7 +35,7 @@ class FileCollector : public BaseCollector {
   //! Terminates reading mode for the collector
   void close_reading();
   //! Reads the next state, based on the curr_iter curson
-  State next_state() override;
+  bayesmix::MarginalState next_state() override;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -56,11 +56,11 @@ class FileCollector : public BaseCollector {
   void finish() override;
 
   //! Writes the given state to the collector
-  void collect(State iter_state) override;
+  void collect(bayesmix::MarginalState iter_state) override;
   //! Returns i-th state in the collector
-  State get_state(unsigned int i) override;
+  bayesmix::MarginalState get_state(unsigned int i) override;
   //! Returns the whole chain in form of a deque of States
-  std::deque<State> get_chain() override;
+  std::deque<bayesmix::MarginalState> get_chain() override;
 };
 
 #endif  // FILECOLLECTOR_HPP

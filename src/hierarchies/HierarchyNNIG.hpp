@@ -1,6 +1,9 @@
 #ifndef HIERARCHYNNIG_HPP
 #define HIERARCHYNNIG_HPP
 
+#include <google/protobuf/stubs/casts.h>
+
+#include "../../proto/cpp/ls_state.pb.h"
 #include "../utils/rng.hpp"
 #include "HierarchyBase.hpp"
 
@@ -22,7 +25,9 @@
 
 class HierarchyNNIG : public HierarchyBase {
  protected:
-  using HierarchyBase::state;
+  // state
+  double mean;
+  double std;
 
   // HYPERPARAMETERS
   double mu0, lambda, alpha0, beta0;
@@ -52,9 +57,8 @@ class HierarchyNNIG : public HierarchyBase {
   // DESTRUCTOR AND CONSTRUCTORS
   ~HierarchyNNIG() = default;
   HierarchyNNIG() {
-    state = std::vector<Eigen::MatrixXd>(2, Eigen::MatrixXd(1, 1));
-    state[0](0, 0) = get_mu0();
-    state[1](0, 0) = sqrt(get_beta0() / (get_alpha0() - 1));
+    mean = get_mu0();
+    std = sqrt(get_beta0() / (get_alpha0() - 1));
   }
 
   // EVALUATION FUNCTIONS
@@ -94,13 +98,10 @@ class HierarchyNNIG : public HierarchyBase {
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  void set_state(const std::vector<Eigen::MatrixXd> &state_,
-                 bool check = true) override {
-    state = state_;
-    if (check) {
-      check_state_validity();
-    }
-  }
+  void set_state(google::protobuf::Message *curr, bool check = true) override;
+
+  void get_state_as_proto(google::protobuf::Message *out);
+
   void print_id() const override { std::cout << "NNIG" << std::endl; }  // TODO
 };
 

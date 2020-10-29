@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "chain_state.pb.h"
+#include "../../proto/cpp/marginal_state.pb.h"
 
 //! Abstract base class for a collector that contains a chain in Protobuf form
 
@@ -35,7 +35,7 @@ class BaseCollector {
 
   //! Reads the next state, based on the curr_iter curson
   //! \return The requested state in protobuf-object form
-  virtual State next_state() = 0;
+  virtual bayesmix::MarginalState next_state() = 0;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -49,7 +49,7 @@ class BaseCollector {
 
   //! Reads the next state and advances the cursor by 1
   //! \return The requested state in protobuf-object form
-  State get_next_state() {
+  bayesmix::MarginalState get_next_state() {
     curr_iter++;
     if (curr_iter >= size) {
       throw std::out_of_range("Error: curr_iter > size in collector");
@@ -58,13 +58,13 @@ class BaseCollector {
   }
 
   //! Writes the given state to the collector
-  virtual void collect(State iter_state) = 0;
+  virtual void collect(bayesmix::MarginalState iter_state) = 0;
 
   // GETTERS AND SETTERS
   //! Returns i-th state in the collector
-  virtual State get_state(unsigned int i) = 0;
+  virtual bayesmix::MarginalState get_state(unsigned int i) = 0;
   //! Returns the whole chain in form of a deque of States
-  virtual std::deque<State> get_chain() = 0;
+  virtual std::deque<bayesmix::MarginalState> get_chain() = 0;
 
   unsigned int get_size() const { return size; }
 };

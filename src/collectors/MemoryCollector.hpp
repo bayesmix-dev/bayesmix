@@ -16,10 +16,10 @@
 class MemoryCollector : public BaseCollector {
  protected:
   //! Deque that contains all states in Protobuf-object form
-  std::deque<State> chain;
+  std::deque<bayesmix::MarginalState> chain;
 
   //! Reads the next state, based on the curr_iter curson
-  State next_state() override;
+  bayesmix::MarginalState next_state() override;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -32,13 +32,15 @@ class MemoryCollector : public BaseCollector {
   void finish() override { return; }
 
   //! Writes the given state to the collector
-  void collect(State iter_state) override;
+  void collect(bayesmix::MarginalState iter_state) override;
 
   // GETTERS AND SETTERS
   //! Returns i-th state in the collector
-  State get_state(unsigned int i) override { return chain[i]; }
+  bayesmix::MarginalState get_state(unsigned int i) override {
+    return chain[i];
+  }
   //! Returns the whole chain in form of a deque of States
-  std::deque<State> get_chain() override { return chain; }
+  std::deque<bayesmix::MarginalState> get_chain() override { return chain; }
 };
 
 #endif  // MEMORYCOLLECTOR_HPP

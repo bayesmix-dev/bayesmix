@@ -1,6 +1,6 @@
 #include "HierarchyNNIG.hpp"
 
-void HierarchyNNIG::check_state_validity() { assert(state[1](0, 0) > 0); }
+void HierarchyNNIG::check_state_validity() { assert(std > 0); }
 
 //! \param data                       Column vector of data points
 //! \param mu0, alpha0, beta0, lambda Original values for hyperparameters
@@ -42,7 +42,7 @@ Eigen::VectorXd HierarchyNNIG::lpdf(const Eigen::MatrixXd &data) {
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
     result(i) =
-        stan::math::normal_lpdf(data(i, 0), state[0](0, 0), state[1](0, 0));
+        stan::math::normal_lpdf(data(i, 0), mean, std);
   }
   return result;
 }
@@ -83,12 +83,8 @@ void HierarchyNNIG::draw() {
 
   // Generate new state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  double sig_new = sqrt(stan::math::inv_gamma_rng(alpha0, beta0, rng));
-  double mu_new = stan::math::normal_rng(mu0, sig_new / sqrt(lambda), rng);
-
-  // Update state
-  state[0](0, 0) = mu_new;
-  state[1](0, 0) = sig_new;
+  double std = sqrt(stan::math::inv_gamma_rng(alpha0, beta0, rng));
+  double mean = stan::math::normal_rng(mu0, std / sqrt(lambda), rng);
 }
 
 //! \param data Column vector of data points
@@ -109,11 +105,26 @@ void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
 
   // Generate new state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  double sig_new = sqrt(stan::math::inv_gamma_rng(alpha_post, beta_post, rng));
-  double mu_new =
-      stan::math::normal_rng(mu_post, sig_new / sqrt(lambda_post), rng);
+  double std = sqrt(stan::math::inv_gamma_rng(alpha_post, beta_post, rng));
+  double mean =
+      stan::math::normal_rng(mu_post, std / sqrt(lambda_post), rng);
+}
 
-  // Update state
-  state[0](0, 0) = mu_new;
-  state[1](0, 0) = sig_new;
+void HierarchyNNIG::set_state(google::protobuf::Message *curr, bool check) {
+  using namespace google::protobuf::internal;
+  using namespace bayesmix;
+  mean = down_cast<UnivLSState *>(curr)->mean();
+  std = down_cast<UnivLSState *>(curr)->std();
+  std::cout << "successful dowcast, mean: " << mean << std::endl; 
+
+  if (check) {
+    check_state_validity();
+  }
+}
+
+void HierarchyNNIG::get_state_as_proto(google::protobuf::Message *out) {
+  using namespace google::protobuf::internal;
+  using namespace bayesmix;
+  down_cast<UnivLSState *>(out)->set_mean(mean);
+  down_cast<UnivLSState *>(out)->set_std(std);
 }

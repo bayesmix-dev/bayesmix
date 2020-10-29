@@ -10,8 +10,8 @@
 #include <stan/math/prim/prob.hpp>
 #include <vector>
 
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/BaseCollector.hpp"
-#include "../collectors/chain_state.pb.h"
 #include "../hierarchies/HierarchyBase.hpp"
 #include "../mixings/BaseMixing.hpp"
 #include "../utils/distributions.hpp"
@@ -74,7 +74,7 @@ class Algorithm {
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object
-  State get_state_as_proto(unsigned int iter);
+  bayesmix::MarginalState get_state_as_proto(unsigned int iter);
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd lpdf_marginal_component(
       std::shared_ptr<HierarchyBase> temp_hier,
@@ -88,7 +88,7 @@ class Algorithm {
   virtual void sample_weights() = 0;
   virtual void update_hypers() = 0;
   virtual void print_ending_message() const {
-  	std::cout << "Done" << std::endl;
+    std::cout << "Done" << std::endl;
   };
   //! Saves the current iteration's state in Protobuf form to a collector
   void save_state(BaseCollector *collector, unsigned int iter) {

@@ -1,10 +1,15 @@
 #ifndef HIERARCHYNNW_HPP
 #define HIERARCHYNNW_HPP
 
+#include <google/protobuf/stubs/casts.h>
+
 #include <Eigen/Dense>
 
+#include "../../proto/cpp/ls_state.pb.h"
+#include "../../proto/cpp/matrix.pb.h"
 #include "../utils/distributions.hpp"
 #include "HierarchyBase.hpp"
+#include "../utils/proto_utils.hpp"
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 
@@ -25,7 +30,9 @@
 
 class HierarchyNNW : public HierarchyBase {
  protected:
-  using HierarchyBase::state;
+  Eigen::VectorXd mean;
+  Eigen::MatrixXd tau;
+
   using EigenRowVec = Eigen::Matrix<double, 1, Eigen::Dynamic>;
 
   // HYPERPARAMETERS
@@ -48,7 +55,7 @@ class HierarchyNNW : public HierarchyBase {
   //! Raises error if the state values are not valid w.r.t. their own domain
   void check_state_validity() override;
   //! Special setter tau and its utilities
-  void set_tau_and_utilities(const Eigen::MatrixXd &tau);
+  void set_tau_and_utilities(const Eigen::MatrixXd &tau_);
 
   //! Returns updated values of the prior hyperparameters via their posterior
   std::vector<Eigen::MatrixXd> normal_wishart_update(
@@ -63,7 +70,7 @@ class HierarchyNNW : public HierarchyBase {
   ~HierarchyNNW() = default;
   HierarchyNNW() {
     unsigned int dim = get_mu0().size();
-    state.push_back(get_mu0());
+    mean = get_mu0();
     set_tau_and_utilities(get_lambda() * Eigen::MatrixXd::Identity(dim, dim));
   }
 
@@ -89,14 +96,7 @@ class HierarchyNNW : public HierarchyBase {
   // GETTERS AND SETTERS
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  void set_state(const std::vector<Eigen::MatrixXd> &state_,
-                 bool check = true) override {
-    state[0] = state_[0];
-    set_tau_and_utilities(state_[1]);
-    if (check) {
-      check_state_validity();
-    }
-  }
+  void set_state(google::protobuf::Message *curr, bool check = true) override;
 
   EigenRowVec get_mu0() const { return mu0; }
 
@@ -124,6 +124,8 @@ class HierarchyNNW : public HierarchyBase {
     assert(nu_ > mu0.size() - 1);
     nu = nu_;
   }
+
+  void get_state_as_proto(google::protobuf::Message *out) override;
 
   void print_id() const override { std::cout << "NNW" << std::endl; }  // TODO
 };
