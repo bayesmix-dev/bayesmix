@@ -13,4 +13,3 @@ message MultiLSState {
     Vector mean = 1;
     Matrix precision = 2;
 }
-

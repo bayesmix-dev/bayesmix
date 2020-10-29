@@ -7,6 +7,6 @@ message DPState {
 }
 
 message PYState {
-    double totalmass = 1;
+    double strength = 1;
     double discount = 2;
 }
