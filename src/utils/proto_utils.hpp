@@ -4,12 +4,8 @@
 #include <Eigen/Dense>
 
 #include "../../proto/cpp/matrix.pb.h"
-//#include "../collectors/chain_state.pb.h"
 
 namespace bayesmix {
-//! Turns a single unique value from Protobuf object form into a matrix
-// Eigen::MatrixXd proto_param_to_matrix(const Param &par);  // TODO delete?
-
 void to_proto(const Eigen::MatrixXd &mat, Matrix *out);
 
 void to_proto(const Eigen::VectorXd &vec, Vector *out);

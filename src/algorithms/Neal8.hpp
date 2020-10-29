@@ -45,20 +45,12 @@ class Neal8 : public Neal2 {
   unsigned int get_n_aux() const { return n_aux; }
   void set_n_aux(const unsigned int n_aux_) override {
     n_aux = n_aux_;
-    // Rebuild the correct amount of auxiliary blocks
+    // Initialize correct amount of auxiliary blocks
     aux_unique_values.clear();
     for (size_t i = 0; i < n_aux; i++) {
       aux_unique_values.push_back(unique_values[0]);
     }
   }
-
-  // void initalize() { // TODO
-  //   // ...
-  //   // Initialize auxiliary blocks
-  //   for (size_t i = 0; i < n_aux; i++) {
-  //     aux_unique_values.push_back(unique_values[0]);
-  //   }
-  // }
 
   void print_id() const override { std::cout << "N8" << std::endl; }  // TODO
 };

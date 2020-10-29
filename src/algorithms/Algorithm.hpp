@@ -12,7 +12,6 @@
 
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/BaseCollector.hpp"
-//#include "../collectors/chain_state.pb.h"
 #include "../hierarchies/HierarchyBase.hpp"
 #include "../mixings/BaseMixing.hpp"
 #include "../utils/distributions.hpp"
