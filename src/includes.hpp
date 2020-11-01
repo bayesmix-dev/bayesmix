@@ -4,6 +4,8 @@
 #include "algorithms/Neal2.hpp"
 #include "algorithms/Neal8.hpp"
 #include "algorithms/load_algorithms.hpp"
+#include "collectors/FileCollector.hpp"
+#include "collectors/MemoryCollector.hpp"
 #include "hierarchies/HierarchyNNIG.hpp"
 #include "hierarchies/HierarchyNNW.hpp"
 #include "hierarchies/load_hierarchies.hpp"

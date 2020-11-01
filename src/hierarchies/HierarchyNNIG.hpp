@@ -28,7 +28,7 @@ class HierarchyNNIG : public HierarchyBase {
  protected:
   // state
   double mean;
-  double std;
+  double std = 1.0;
 
   // HYPERPARAMETERS
   double mu0, lambda, alpha0, beta0;
@@ -57,10 +57,7 @@ class HierarchyNNIG : public HierarchyBase {
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~HierarchyNNIG() = default;
-  HierarchyNNIG() {
-    mean = get_mu0();
-    std = sqrt(get_beta0() / (get_alpha0() - 1));
-  }
+  HierarchyNNIG() = default;
 
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points
@@ -84,7 +81,7 @@ class HierarchyNNIG : public HierarchyBase {
   double get_beta0() const { return beta0; }
   double get_lambda() const { return lambda; }
   double get_mean() const { return mean; }
-  void set_mu0(const double mu0_) { mu0 = mu0_; }
+  void set_mu0(const double mu0_) { mu0 = mu0_; mean = mu0; }
   void set_alpha0(const double alpha0_) {
     assert(alpha0_ > 0);
     alpha0 = alpha0_;
