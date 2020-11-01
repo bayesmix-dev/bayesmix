@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
   std::string type_algo = "N2";
   std::string datafile = "resources/data_uni.csv";
   std::string gridfile = "resources/grid_uni.csv";
+  std::string densfile = "resources/dens_uni.csv";
   unsigned int init = 0;
 
   // Create factories and objects
@@ -51,6 +52,8 @@ int main(int argc, char *argv[]) {
   algo->set_burnin(100);
 
   algo->run(coll);
+  Eigen::MatrixXd dens = algo->eval_lpdf(grid, coll);
+  bayesmix::write_matrix_to_file(dens, densfile);
 
   std::cout << "End of run.cpp" << std::endl;
   return 0;

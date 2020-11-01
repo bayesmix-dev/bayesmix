@@ -42,3 +42,12 @@ Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename) {
   }
   return mat;
 };
+
+void bayesmix::write_matrix_to_file(
+    const Eigen::MatrixXd &mat,
+    std::string filename /*= "resources/mat.csv"*/) {
+  using namespace Eigen;
+  const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ",", "\n");
+  std::ofstream file(filename.c_str());
+  file << mat.format(CSVFormat);
+}
