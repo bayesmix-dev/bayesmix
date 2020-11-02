@@ -1,10 +1,10 @@
 #include "proto_utils.hpp"
+#include <iostream>
 
 void bayesmix::to_proto(const Eigen::MatrixXd &mat, Matrix *out) {
   out->set_rows(mat.rows());
   out->set_cols(mat.cols());
   out->set_rowmajor(false);
-
   *out->mutable_data() = {mat.data(), mat.data() + mat.size()};
 }
 

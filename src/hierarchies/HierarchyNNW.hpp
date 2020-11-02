@@ -100,6 +100,10 @@ class HierarchyNNW : public HierarchyBase {
 
   EigenRowVec get_mu0() const { return mu0; }
 
+  Eigen::VectorXd get_mean() const { return mean; }
+
+  Eigen::MatrixXd get_tau() const { return tau; }
+
   double get_lambda() const { return lambda; }
 
   Eigen::MatrixXd get_tau0() const { return tau0; }
