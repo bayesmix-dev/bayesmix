@@ -1,5 +1,4 @@
 #include "proto_utils.hpp"
-#include <iostream>
 
 void bayesmix::to_proto(const Eigen::MatrixXd &mat, Matrix *out) {
   out->set_rows(mat.rows());
