@@ -10,7 +10,8 @@ SET(CMAKE_CXX_FLAGS -pthread)
 
 include_directories(${GTEST_INCLUDE_DIR})
 
-add_executable(test_bayesmix get_state_as_proto_test.cpp)
+add_executable(test_bayesmix get_state_as_proto_test.cpp proto_utils.cpp)
+
 
 target_link_libraries(test_bayesmix ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} bayesmix)
 add_test(NAME runtest COMMAND test_bayesmix)
