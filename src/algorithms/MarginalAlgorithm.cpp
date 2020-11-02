@@ -26,7 +26,7 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
     // Initialize local matrix of log-densities
     Eigen::MatrixXd lpdf_local(grid.rows(), n_clust + 1);
     // Initialize local temporary hierarchy
-    std::shared_ptr<HierarchyBase> temp_hier = unique_values[0];  // TODO hyp
+    std::shared_ptr<HierarchyBase> temp_hier = unique_values[0];
 
     // Loop over local unique values i.e. clusters
     for (size_t j = 0; j < n_clust; j++) {
