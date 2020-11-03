@@ -35,19 +35,16 @@ void Neal2::initialize() {
 
 void Neal2::sample_allocations() {
   // Initialize relevant values
-  unsigned int n = data.rows();
+  unsigned int n_data = data.rows();
 
   // Loop over data points
-  for (size_t i = 0; i < n; i++) {
+  for (size_t i = 0; i < n_data; i++) {
     // Current i-th datum as row vector
     Eigen::Matrix<double, 1, Eigen::Dynamic> datum = data.row(i);
     // Initialize current number of clusters
     unsigned int n_clust = unique_values.size();
     // Initialize pseudo-flag
-    int singleton = 0;
-    if (cardinalities[allocations[i]] == 1) {
-      singleton = 1;
-    }
+    int singleton = (cardinalities[allocations[i]] == 1) ? 1 : 0;
 
     // Remove datum from cluster
     cardinalities[allocations[i]] -= 1;
@@ -58,17 +55,17 @@ void Neal2::sample_allocations() {
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
       logprobas(j) =
-          log(mixing->mass_existing_cluster(cardinalities[j], n - 1)) +
+          log(mixing->mass_existing_cluster(cardinalities[j], n_data - 1)) +
           unique_values[j]->lpdf(datum)(0);
       if (singleton == 1 && j == allocations[i]) {
         // Probability of being assigned to a newly generated cluster
-        logprobas(j) = log(mixing->mass_new_cluster(n_clust, n - 1)) +
+        logprobas(j) = log(mixing->mass_new_cluster(n_clust, n_data - 1)) +
                        unique_values[0]->marg_lpdf(datum)(0);
       }
     }
     if (singleton == 0) {
       // Further update with marginal component
-      logprobas(n_clust) = log(mixing->mass_new_cluster(n_clust, n - 1)) +
+      logprobas(n_clust) = log(mixing->mass_new_cluster(n_clust, n_data - 1)) +
                            unique_values[0]->marg_lpdf(datum)(0);
     }
     // Draw a NEW value for datum allocation
@@ -123,11 +120,11 @@ void Neal2::sample_allocations() {
 void Neal2::sample_unique_values() {
   // Initialize relevant values
   unsigned int n_clust = unique_values.size();
-  unsigned int n = allocations.size();
+  unsigned int n_data = allocations.size();
 
   // Vector that represents all clusters by the indexes of their data points
   std::vector<std::vector<unsigned int>> clust_idxs(n_clust);
-  for (size_t i = 0; i < n; i++) {
+  for (size_t i = 0; i < n_data; i++) {
     clust_idxs[allocations[i]].push_back(i);
   }
 

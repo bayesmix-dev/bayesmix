@@ -80,20 +80,14 @@ void HierarchyNNIG::draw() {
   double alpha0 = get_alpha0();
   double beta0 = get_beta0();
 
-  // Generate new state values from their prior centering distribution
+  // Update state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  double std = sqrt(stan::math::inv_gamma_rng(alpha0, beta0, rng));
-  double mean = stan::math::normal_rng(mu0, std / sqrt(lambda), rng);
+  std = sqrt(stan::math::inv_gamma_rng(alpha0, beta0, rng));
+  mean = stan::math::normal_rng(mu0, std / sqrt(lambda), rng);
 }
 
 //! \param data Column vector of data points
 void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
-  // Get values of hyperparameters
-  double mu0 = get_mu0();
-  double lambda = get_lambda();
-  double alpha0 = get_alpha0();
-  double beta0 = get_beta0();
-
   // Update values
   std::vector<double> temp =
       normal_gamma_update(data.col(0), mu0, alpha0, beta0, lambda);
@@ -102,10 +96,10 @@ void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
   double beta_post = temp[2];
   double lambda_post = temp[3];
 
-  // Generate new state values from their prior centering distribution
+  // Update state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  double std = sqrt(stan::math::inv_gamma_rng(alpha_post, beta_post, rng));
-  double mean = stan::math::normal_rng(mu_post, std / sqrt(lambda_post), rng);
+  std = sqrt(stan::math::inv_gamma_rng(alpha_post, beta_post, rng));
+  mean = stan::math::normal_rng(mu_post, std / sqrt(lambda_post), rng);
 }
 
 void HierarchyNNIG::set_state(google::protobuf::Message *curr, bool check) {
