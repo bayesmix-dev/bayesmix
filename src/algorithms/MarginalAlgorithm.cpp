@@ -9,11 +9,9 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
   std::deque<bayesmix::MarginalState> chain = coll->get_chain();
   unsigned int n_data = chain[0].cluster_allocs_size();
   unsigned int n_iter = chain.size();
-  // unsigned int n_params = chain[0].uniquevalues(0).params_size();
 
   // Initialize objects
   Eigen::MatrixXd lpdf(grid.rows(), n_iter);
-  // std::vector<Eigen::MatrixXd> params(n_params);
 
   // Loop over non-burn-in algorithm iterations
   for (size_t i = 0; i < n_iter; i++) {
@@ -31,10 +29,6 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
     // Loop over local unique values i.e. clusters
     for (size_t j = 0; j < n_clust; j++) {
       // Extract and copy unique values in temp_hier
-      // for (size_t k = 0; k < n_params; k++) {
-      //   params[k] = bayesmix::proto_param_to_matrix(
-      //       chain[i].uniquevalues(j).params(k));
-      // }
       bayesmix::MarginalState::ClusterVal curr_val = chain[i].cluster_vals(j);
       temp_hier->set_state(&curr_val, false);
 

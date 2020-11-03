@@ -15,7 +15,7 @@ class Rng {
   void seed(int seed_val) { mt.seed(seed_val); }
 
  private:
-  Rng(int seed_val = 123414) { mt.seed(seed_val); }
+  Rng(int seed_val = 20201103) { mt.seed(seed_val); }
   ~Rng() {}
 
   Rng(Rng const &) = delete;
