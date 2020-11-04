@@ -111,6 +111,7 @@ class Algorithm {
     unsigned int iter = 0;
     collector->start();
     while (iter < maxiter) {
+      std::cout << "Iteration n. " << iter << std::endl;  // TODO
       step();
       if (iter >= burnin) {
         save_state(collector, iter);
@@ -155,8 +156,9 @@ class Algorithm {
     data = data_;
     init_num_clusters = (init == 0) ? data.rows() : init;
     // "Warning: initial number of clusters will be set equal to the data
-    // size (" << data.rows() << ")"
+    // size (" << data.rows() << ")"  // TODO
     // Initialize hierarchies for starting clusters
+    unique_values.clear();
     for (size_t i = 0; i < init_num_clusters; i++) {
       unique_values.push_back(hier_);
     }

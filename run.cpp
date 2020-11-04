@@ -27,6 +27,15 @@ int main(int argc, char *argv[]) {
   auto hier = std::make_shared<HierarchyNNIG>();  // TODO temp
   auto algo = factory_algo.create_object(type_algo);
 
+  // TODO temp: running test
+  mixing->set_totalmass(1.0);
+  hier->set_mu0(5.0);
+  hier->set_lambda(0.1);
+  hier->set_alpha0(2.0);
+  hier->set_beta0(2.0);
+  algo->set_maxiter(1000);
+  algo->set_burnin(100);
+
   // Other objects
   Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
   Eigen::MatrixXd grid = bayesmix::read_eigen_matrix(gridfile);
@@ -41,15 +50,6 @@ int main(int argc, char *argv[]) {
   algo->print_id();
   algo->get_mixing_id();
   algo->get_hier_id();
-
-  // TODO temp: running test
-  mixing->set_totalmass(1.0);
-  hier->set_mu0(5.0);
-  hier->set_lambda(0.1);
-  hier->set_alpha0(2.0);
-  hier->set_beta0(2.0);
-  algo->set_maxiter(1000);
-  algo->set_burnin(100);
 
   algo->run(coll);
   Eigen::MatrixXd dens = algo->eval_lpdf(grid, coll);
