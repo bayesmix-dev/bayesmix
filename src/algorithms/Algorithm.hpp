@@ -77,8 +77,8 @@ class Algorithm {
   bayesmix::MarginalState get_state_as_proto(unsigned int iter);
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<HierarchyBase> temp_hier,
-      const Eigen::MatrixXd &grid) = 0;
+    std::shared_ptr<HierarchyBase> temp_hier,
+    const Eigen::MatrixXd &grid) = 0;
 
   // ALGORITHM FUNCTIONS
   virtual void print_startup_message() const = 0;

@@ -26,7 +26,7 @@ void Neal2::initialize() {
   }
 
   // Randomly allocate all remaining data, and update cardinalities
-  for (size_t j = init_num_clusters; j < data.rows(); j++) {
+  for (size_t i = init_num_clusters; i < data.rows(); i++) {
     unsigned int clust = distro(generator);
     allocations.push_back(clust);
     cardinalities[clust] += 1;
