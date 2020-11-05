@@ -101,7 +101,7 @@ void Neal2::sample_allocations() {
     else {  // if singleton == 0
       if (c_new == n_clust) {
         // Case 3: datum moves from a non-singleton to a new cluster
-        std::shared_ptr<HierarchyBase> new_unique = unique_values[0];
+        std::shared_ptr<HierarchyBase> new_unique = unique_values[0]->clone();
         // Generate new unique values with posterior sampling
         new_unique->sample_given_data(datum);
         unique_values.push_back(new_unique);

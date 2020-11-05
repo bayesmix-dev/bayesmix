@@ -73,6 +73,9 @@ class HierarchyNNW : public HierarchyBase {
     mean = get_mu0();
     set_tau_and_utilities(get_lambda() * Eigen::MatrixXd::Identity(dim, dim));
   }
+  std::shared_ptr<HierarchyBase> clone() const override {
+    return std::make_shared<HierarchyNNW>(*this);
+  }
 
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points

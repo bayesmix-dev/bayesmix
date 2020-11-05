@@ -104,7 +104,9 @@ void Neal8::sample_allocations() {
       if (c_new >= n_clust) {
         // Case 3: datum moves from a non-singleton to a new cluster
         // Copy one of the auxiliary block as the new cluster
-        unique_values.push_back(aux_unique_values[c_new - n_clust]);
+        std::shared_ptr<HierarchyBase> hier_new =
+            aux_unique_values[c_new - n_clust]->clone();
+        unique_values.push_back(hier_new);
         cardinalities.push_back(1);
         allocations[i] = n_clust;
       } else {  // Case 4: datum moves from a non-singleton to an old cluster

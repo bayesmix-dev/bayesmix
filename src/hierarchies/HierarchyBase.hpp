@@ -43,6 +43,7 @@ class HierarchyBase {
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~HierarchyBase() = default;
   HierarchyBase() = default;
+  virtual std::shared_ptr<HierarchyBase> clone() const = 0;
 
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points

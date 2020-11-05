@@ -58,6 +58,9 @@ class HierarchyNNIG : public HierarchyBase {
   // DESTRUCTOR AND CONSTRUCTORS
   ~HierarchyNNIG() = default;
   HierarchyNNIG() = default;
+  std::shared_ptr<HierarchyBase> clone() const override {
+    return std::make_shared<HierarchyNNIG>(*this);
+  }
 
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points

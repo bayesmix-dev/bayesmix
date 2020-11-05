@@ -48,7 +48,7 @@ class Neal8 : public Neal2 {
     // Initialize correct amount of auxiliary blocks
     aux_unique_values.clear();
     for (size_t i = 0; i < n_aux; i++) {
-      aux_unique_values.push_back(unique_values[0]);
+      aux_unique_values.push_back(unique_values[0]->clone());
     }
   }
 

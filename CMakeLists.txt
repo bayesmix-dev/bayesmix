@@ -17,7 +17,7 @@ add_library(bayesmix)
 
 add_subdirectory(src)
 add_subdirectory(proto)
-add_subdirectory(test)
+#add_subdirectory(test)
 
 message("source dir: " "${CMAKE_CURRENT_SOURCE_DIR}")
 
