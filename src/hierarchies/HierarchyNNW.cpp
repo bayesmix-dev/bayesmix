@@ -34,6 +34,13 @@ void HierarchyNNW::set_tau_and_utilities(const Eigen::MatrixXd &tau_) {
   tau_logdet = 2 * log(diag.array()).sum();
 }
 
+void HierarchyNNW::check_and_initialize() {
+  check_hypers_validity();
+  unsigned int dim = get_mu0().size();
+  mean = get_mu0();
+  set_tau_and_utilities(get_lambda() * Eigen::MatrixXd::Identity(dim, dim));
+}
+
 //! \param data                  Matrix of row-vectorial data points
 //! \param mu0, lambda, tau0, nu Original values for hyperparameters
 //! \return                      Vector of updated values for hyperparameters

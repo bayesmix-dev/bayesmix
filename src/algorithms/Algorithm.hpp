@@ -107,6 +107,9 @@ class Algorithm {
   //! Runs the algorithm and saves the whole chain to a collector
   void run(BaseCollector *collector) {
     print_startup_message();
+    for (auto &un : unique_values) {
+      un->check_and_initialize();
+    }
     initialize();
     unsigned int iter = 0;
     collector->start();
