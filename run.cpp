@@ -33,8 +33,8 @@ int main(int argc, char *argv[]) {
   hier->set_lambda(0.1);
   hier->set_alpha0(2.0);
   hier->set_beta0(2.0);
-  algo->set_maxiter(5);
-  algo->set_burnin(1);
+  algo->set_maxiter(1000);
+  algo->set_burnin(100);
 
   // Other objects
   Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);

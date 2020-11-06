@@ -179,11 +179,7 @@ void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
       down_cast<MarginalState::ClusterVal *>(curr);
 
   mean = to_eigen(currcast->multi_ls_state().mean());
-  tau = to_eigen(currcast->multi_ls_state().precision());
-
-  std::cout << "successful dowcast, mean: " << mean.transpose() << std::endl;
-
-  set_tau_and_utilities(tau);
+  set_tau_and_utilities(to_eigen(currcast->multi_ls_state().precision()));
 }
 
 void HierarchyNNW::get_state_as_proto(google::protobuf::Message *out) {
