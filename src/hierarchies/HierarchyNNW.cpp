@@ -175,8 +175,11 @@ void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
 
-  mean = to_eigen(down_cast<MultiLSState *>(curr)->mean());
-  tau = to_eigen(down_cast<MultiLSState *>(curr)->precision());
+  MarginalState::ClusterVal *currcast =
+      down_cast<MarginalState::ClusterVal *>(curr);
+
+  mean = to_eigen(currcast->multi_ls_state().mean());
+  tau = to_eigen(currcast->multi_ls_state().precision());
 
   std::cout << "successful dowcast, mean: " << mean.transpose() << std::endl;
 
@@ -186,8 +189,12 @@ void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
 void HierarchyNNW::get_state_as_proto(google::protobuf::Message *out) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
-  Vector *proto_mean = down_cast<MultiLSState *>(out)->mutable_mean();
-  Matrix *proto_prec = down_cast<MultiLSState *>(out)->mutable_precision();
-  to_proto(mean, proto_mean);
-  to_proto(tau, proto_prec);
+
+  MultiLSState state;
+  to_proto(mean, state.mutable_mean());
+  to_proto(mean, state.mutable_precision());
+
+  down_cast<MarginalState::ClusterVal *>(out)
+      ->mutable_multi_ls_state()
+      ->CopyFrom(state);
 }

@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 
 #include "../../proto/cpp/ls_state.pb.h"
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "../../proto/cpp/matrix.pb.h"
 #include "../utils/distributions.hpp"
 #include "../utils/proto_utils.hpp"

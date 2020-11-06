@@ -5,14 +5,18 @@
 bayesmix::MarginalState Algorithm::get_state_as_proto(unsigned int iter) {
   bayesmix::MarginalState iter_out;
   // Transcribe iteration number and allocations vector
+  std::cout << "Iteration: " << iter << std::endl;
   iter_out.set_iteration_num(iter);
   *iter_out.mutable_cluster_allocs() = {allocations.begin(),
                                         allocations.end()};
 
   // Transcribe unique values vector
   for (size_t i = 0; i < unique_values.size(); i++) {
-    bayesmix::MarginalState::ClusterVal* clusval = iter_out.add_cluster_vals();
-    unique_values[i]->get_state_as_proto(clusval);
+    bayesmix::MarginalState::ClusterVal clusval; 
+    unique_values[i]->get_state_as_proto(&clusval);
+    iter_out.add_cluster_vals()->CopyFrom(clusval);
+
+    std::cout << "Here \n" << clusval.DebugString() << std::endl;
   }
   return iter_out;
 }

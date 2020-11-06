@@ -105,8 +105,15 @@ void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
 void HierarchyNNIG::set_state(google::protobuf::Message *curr, bool check) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
-  mean = down_cast<UnivLSState *>(curr)->mean();
-  std = down_cast<UnivLSState *>(curr)->std();
+
+  MarginalState::ClusterVal *currcast =
+      down_cast<MarginalState::ClusterVal *>(curr);
+
+  
+  std::cout << "Setting values: " << currcast->DebugString() << std::endl;
+  mean = currcast->univ_ls_state().mean();
+  std = currcast->univ_ls_state().std();
+  std::cout << "mean: " << mean << ", std: " << std << std::endl;
   if (check) {
     check_state_validity();
   }
@@ -123,4 +130,6 @@ void HierarchyNNIG::get_state_as_proto(google::protobuf::Message *out) {
   down_cast<MarginalState::ClusterVal *>(out)
       ->mutable_univ_ls_state()
       ->CopyFrom(state);
+
+  std::cout << "Getting values: \n" << out->DebugString() << std::endl;
 }
