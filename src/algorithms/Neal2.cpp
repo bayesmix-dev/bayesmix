@@ -72,11 +72,14 @@ void Neal2::sample_allocations() {
     auto rng = bayesmix::Rng::Instance().get();
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
+    std::cout << stan::math::softmax(logprobas) << std::endl;  // TODO DEBUG
+    std::cout << "c_new=" << c_new << std::endl;  // TODO DEBUG
 
     // Assign datum to its new cluster and update cardinalities:
     // 4 cases are handled separately
     if (singleton == 1) {
       if (c_new == allocations[i]) {
+        std::cout << "case 1" << std::endl;  // TODO DEBUG
         // Case 1: datum moves from a singleton to a new cluster
         // Replace former with new cluster by updating unique values
         unique_values[allocations[i]]->sample_given_data(datum);
@@ -84,6 +87,7 @@ void Neal2::sample_allocations() {
       }
 
       else {  // Case 2: datum moves from a singleton to an old cluster
+        std::cout << "case 2" << std::endl;  // TODO DEBUG
         unique_values.erase(unique_values.begin() + allocations[i]);
         unsigned int c_old = allocations[i];
         allocations[i] = c_new;
@@ -100,6 +104,7 @@ void Neal2::sample_allocations() {
 
     else {  // if singleton == 0
       if (c_new == n_clust) {
+        std::cout << "case 3" << std::endl;  // TODO DEBUG
         // Case 3: datum moves from a non-singleton to a new cluster
         std::shared_ptr<HierarchyBase> new_unique = unique_values[0]->clone();
         // Generate new unique values with posterior sampling
@@ -110,6 +115,7 @@ void Neal2::sample_allocations() {
       }
 
       else {  // Case 4: datum moves from a non-singleton to an old cluster
+        std::cout << "case 4" << std::endl;  // TODO DEBUG
         allocations[i] = c_new;
         cardinalities[c_new] += 1;
       }

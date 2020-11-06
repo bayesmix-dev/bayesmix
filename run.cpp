@@ -45,9 +45,8 @@ int main(int argc, char *argv[]) {
   hier->set_tau0(tau0);
   
   mixing->set_totalmass(1.0);
-  algo->set_maxiter(1000);
-  algo->set_burnin(100);
-  // algo->set_n_aux(3);  // for Neal8
+  algo->set_maxiter(10);
+  algo->set_burnin(0);
 
   // Other objects
   Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
@@ -57,6 +56,7 @@ int main(int argc, char *argv[]) {
   // Object allocation
   algo->set_mixing(mixing);
   algo->set_data_and_initial_clusters(data, hier, init);
+  if(type_algo == "N8") algo->set_n_aux(3);
   BaseCollector *coll = new MemoryCollector();
 
   // Execution
