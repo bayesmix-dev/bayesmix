@@ -113,20 +113,16 @@ class HierarchyNNW : public HierarchyBase {
 
   double get_nu() const { return nu; }
 
-  void set_mu0(const EigenRowVec &mu0_) {
-    mu0 = mu0_;
+  void set_mu0(const EigenRowVec &mu0_) { mu0 = mu0_; }
+
+  void set_lambda(const double lambda_) { lambda = lambda_; }
+
+  void set_tau0(const Eigen::MatrixXd &tau0_) {
+    tau0 = tau0_;
+    tau0_inv = stan::math::inverse_spd(tau0);
   }
 
-  void set_lambda(const double lambda_) {
-    assert(lambda_ > 0);
-    lambda = lambda_;
-  }
-
-  void set_tau0(const Eigen::MatrixXd &tau0_);
-
-  void set_nu(const double nu_) {
-    nu = nu_;
-  }
+  void set_nu(const double nu_) { nu = nu_; }
 
   void get_state_as_proto(google::protobuf::Message *out) override;
 

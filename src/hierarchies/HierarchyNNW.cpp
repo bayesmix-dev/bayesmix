@@ -167,17 +167,6 @@ void HierarchyNNW::sample_given_data(const Eigen::MatrixXd &data) {
   set_tau_and_utilities(tau_new);
 }
 
-void HierarchyNNW::set_tau0(const Eigen::MatrixXd &tau0_) {
-  // Check if tau0 is a square symmetric positive semidefinite matrix
-  assert(tau0_.rows() == tau0_.cols());
-  assert(mu0.size() == tau0_.rows());
-  assert(tau0.isApprox(tau0.transpose()));
-  Eigen::LLT<Eigen::MatrixXd> llt(tau0);
-  assert(llt.info() != Eigen::NumericalIssue);
-  tau0 = tau0_;
-  tau0_inv = stan::math::inverse_spd(tau0);
-}
-
 void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
@@ -187,6 +176,10 @@ void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
 
   mean = to_eigen(currcast->multi_ls_state().mean());
   set_tau_and_utilities(to_eigen(currcast->multi_ls_state().precision()));
+
+  if (check) {
+    check_state_validity();
+  }
 }
 
 void HierarchyNNW::get_state_as_proto(google::protobuf::Message *out) {
@@ -195,7 +188,7 @@ void HierarchyNNW::get_state_as_proto(google::protobuf::Message *out) {
 
   MultiLSState state;
   to_proto(mean, state.mutable_mean());
-  to_proto(mean, state.mutable_precision());
+  to_proto(tau, state.mutable_precision());
 
   down_cast<MarginalState::ClusterVal *>(out)
       ->mutable_multi_ls_state()

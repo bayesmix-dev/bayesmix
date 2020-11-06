@@ -21,7 +21,7 @@
 class Neal8 : public Neal2 {
  protected:
   //! Number of auxiliary blocks
-  unsigned int n_aux = 3;
+  unsigned int n_aux;
 
   //! Vector of auxiliary blocks
   std::vector<std::shared_ptr<HierarchyBase>> aux_unique_values;

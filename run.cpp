@@ -12,9 +12,9 @@ int main(int argc, char *argv[]) {
   //std::string type_mixing = "PY";
   //std::string type_hier = "NNW";
   std::string type_algo = "N2";
-  std::string datafile = "resources/data_uni.csv";
-  std::string gridfile = "resources/grid_uni.csv";
-  std::string densfile = "resources/dens_uni.csv";
+  std::string datafile = "resources/data_multi.csv";
+  std::string gridfile = "resources/grid_multi.csv";
+  std::string densfile = "resources/dens_multi.csv";
   unsigned int init = 0;
 
   // Create factories and objects
@@ -24,25 +24,25 @@ int main(int argc, char *argv[]) {
   //auto mixing = factory_mixing.create_object(type_mixing);
   auto mixing = std::make_shared<DirichletMixing>();
   //auto hier = factory_hier.create_object(type_hier);
-  auto hier = std::make_shared<HierarchyNNIG>();
+  auto hier = std::make_shared<HierarchyNNW>();
   auto algo = factory_algo.create_object(type_algo);
 
   // Set parameters
 
-  // NNIG
-  hier->set_mu0(5.0);
-  hier->set_lambda(0.1);
-  hier->set_alpha0(2.0);
-  hier->set_beta0(2.0);
+  // // NNIG
+  // hier->set_mu0(5.0);
+  // hier->set_lambda(0.1);
+  // hier->set_alpha0(2.0);
+  // hier->set_beta0(2.0);
 
-  // // NNW
-  // Eigen::Matrix<double, 1, 2> mu0; mu0 << 5.5, 5.5;
-  // hier->set_mu0(mu0);
-  // hier->set_lambda(0.2);
-  // double nu = 5.0;
-  // hier->set_nu(nu);
-  // Eigen::MatrixXd tau0 = (1 / nu) * Eigen::Matrix<double, 2, 2>::Identity();
-  // hier->set_tau0(tau0);
+  // NNW
+  Eigen::Matrix<double, 1, 2> mu0; mu0 << 5.5, 5.5;
+  hier->set_mu0(mu0);
+  hier->set_lambda(0.2);
+  double nu = 5.0;
+  hier->set_nu(nu);
+  Eigen::MatrixXd tau0 = (1 / nu) * Eigen::Matrix<double, 2, 2>::Identity();
+  hier->set_tau0(tau0);
   
   mixing->set_totalmass(1.0);
   algo->set_maxiter(1000);
