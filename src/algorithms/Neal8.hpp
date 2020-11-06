@@ -34,6 +34,7 @@ class Neal8 : public Neal2 {
 
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;
+  void initialize() override;
   void sample_allocations() override;
 
  public:
@@ -44,12 +45,8 @@ class Neal8 : public Neal2 {
   // GETTERS AND SETTERS
   unsigned int get_n_aux() const { return n_aux; }
   void set_n_aux(const unsigned int n_aux_) override {
+    assert(n_aux_ > 0);
     n_aux = n_aux_;
-    // Initialize correct amount of auxiliary blocks
-    aux_unique_values.clear();
-    for (size_t i = 0; i < n_aux; i++) {
-      aux_unique_values.push_back(unique_values[0]->clone());
-    }
   }
 
   void print_id() const override { std::cout << "N8" << std::endl; }  // TODO
