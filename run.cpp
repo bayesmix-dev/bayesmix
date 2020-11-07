@@ -16,6 +16,8 @@ int main(int argc, char *argv[]) {
   std::string gridfile = "resources/grid_multi.csv";
   std::string densfile = "resources/dens_multi.csv";
   unsigned int init = 0;
+  unsigned int maxiter = 1000;
+  unsigned int burnin = 100;
 
   // Create factories and objects
   //Factory<BaseMixing> &factory_mixing = Factory<BaseMixing>::Instance();
@@ -26,6 +28,8 @@ int main(int argc, char *argv[]) {
   //auto hier = factory_hier.create_object(type_hier);
   auto hier = std::make_shared<HierarchyNNW>();
   auto algo = factory_algo.create_object(type_algo);
+  // Initialize RNG object
+  auto rng = bayesmix::Rng::Instance().get();
 
   // Set parameters
 
@@ -45,8 +49,8 @@ int main(int argc, char *argv[]) {
   hier->set_tau0(tau0);
   
   mixing->set_totalmass(1.0);
-  algo->set_maxiter(10);
-  algo->set_burnin(0);
+  algo->set_maxiter(maxiter);
+  algo->set_burnin(burnin);
 
   // Other objects
   Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
@@ -56,7 +60,9 @@ int main(int argc, char *argv[]) {
   // Object allocation
   algo->set_mixing(mixing);
   algo->set_data_and_initial_clusters(data, hier, init);
-  if(type_algo == "N8") algo->set_n_aux(3);
+  if(type_algo == "N8") {
+  	algo->set_n_aux(3);
+  }
   BaseCollector *coll = new MemoryCollector();
 
   // Execution
