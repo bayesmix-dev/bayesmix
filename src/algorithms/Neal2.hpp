@@ -45,7 +45,7 @@ class Neal2 : public MarginalAlgorithm {
   ~Neal2() = default;
   Neal2() = default;
 
-  void print_id() const override { std::cout << "N2" << std::endl; }  // TODO
+  std::string get_id() const override { return "Neal2"; }
 };
 
 #endif  // NEAL2_HPP

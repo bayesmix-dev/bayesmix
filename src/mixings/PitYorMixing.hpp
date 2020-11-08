@@ -60,7 +60,7 @@ class PitYorMixing : public BaseMixing {
   void set_strength(const double strength_) { strength = strength_; }
   void set_discount(const double discount_) { discount = discount_; }
 
-  void print_id() const override { std::cout << "PY" << std::endl; }  // TODO
+  std::string get_id() const override { return "Pitman-Yor"; }
 };
 
 #endif  // PITYORMIXING_HPP

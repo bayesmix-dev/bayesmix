@@ -167,9 +167,7 @@ class Algorithm {
     }
   }
 
-  virtual void print_id() const = 0;                          // TODO
-  void get_mixing_id() const { mixing->print_id(); }          // TODO
-  void get_hier_id() const { unique_values[0]->print_id(); }  // TODO
+  virtual std::string get_id() const = 0;
 };
 
 #endif  // ALGORITHM_HPP

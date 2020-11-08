@@ -49,7 +49,7 @@ class Neal8 : public Neal2 {
     n_aux = n_aux_;
   }
 
-  void print_id() const override { std::cout << "N8" << std::endl; }  // TODO
+  std::string get_id() const override { return "Neal8"; }
 };
 
 #endif  // NEAL8_HPP

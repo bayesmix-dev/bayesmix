@@ -65,11 +65,6 @@ int main(int argc, char *argv[]) {
   }
   BaseCollector *coll = new MemoryCollector();
 
-  // Execution
-  algo->print_id();
-  algo->get_mixing_id();
-  algo->get_hier_id();
-
   algo->run(coll);
   Eigen::MatrixXd dens = algo->eval_lpdf(grid, coll);
   bayesmix::write_matrix_to_file(dens, densfile);

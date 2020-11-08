@@ -51,7 +51,7 @@ class DirichletMixing : public BaseMixing {
   double get_totalmass() const { return totalmass; }
   void set_totalmass(const double totalmass_) { totalmass = totalmass_; }
 
-  void print_id() const override { std::cout << "DP" << std::endl; }  // TODO
+  std::string get_id() const override { return "Dirichlet"; }
 };
 
 #endif  // DIRICHLETMIXING_HPP

@@ -72,7 +72,7 @@ class HierarchyBase {
   //! \param check  If true, a state validity check occurs after assignment
   virtual void set_state(google::protobuf::Message *curr, bool check) = 0;
 
-  virtual void print_id() const = 0;  // TODO
+  virtual std::string get_id() const = 0;
 };
 
 #endif  // HIERARCHYBASE_HPP

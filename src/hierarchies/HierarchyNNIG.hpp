@@ -96,7 +96,7 @@ class HierarchyNNIG : public HierarchyBase {
 
   void get_state_as_proto(google::protobuf::Message *out);
 
-  void print_id() const override { std::cout << "NNIG" << std::endl; }  // TODO
+  std::string get_id() const override { return "NNIG"; }
 };
 
 #endif  // HIERARCHYNNIG_HPP
