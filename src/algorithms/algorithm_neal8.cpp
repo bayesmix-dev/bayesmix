@@ -1,8 +1,8 @@
-#include "Neal8.hpp"
+#include "Algorithm_neal8.hpp"
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
-Eigen::VectorXd Neal8::lpdf_marginal_component(
+Eigen::VectorXd AlgorithmNeal8::lpdf_marginal_component(
     std::shared_ptr<HierarchyBase> temp_hier, const Eigen::MatrixXd &grid) {
   unsigned int n_grid = grid.rows();
   Eigen::VectorXd lpdf_(n_grid);
@@ -19,15 +19,15 @@ Eigen::VectorXd Neal8::lpdf_marginal_component(
   return lpdf_.array() - log(n_aux);
 }
 
-void Neal8::print_startup_message() const {
+void AlgorithmNeal8::print_startup_message() const {
   std::string msg = "Running Neal8 algorithm (m=" + std::to_string(n_aux) +
                     " aux. blocks)\nwith " + unique_values[0]->get_id() +
                     " hierarchies, " + mixing->get_id() + " mixing...";
   std::cout << msg << std::endl;
 }
 
-void Neal8::initialize() {
-  Neal2::initialize();
+void AlgorithmNeal8::initialize() {
+  AlgorithmNeal2::initialize();
   // Create correct amount of auxiliary blocks
   aux_unique_values.clear();
   for (size_t i = 0; i < n_aux; i++) {
@@ -35,7 +35,7 @@ void Neal8::initialize() {
   }
 }
 
-void Neal8::sample_allocations() {
+void AlgorithmNeal8::sample_allocations() {
   // Initialize relevant values
   unsigned int n = data.rows();
   auto rng = bayesmix::Rng::Instance().get();

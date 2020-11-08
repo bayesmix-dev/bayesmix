@@ -1,15 +1,15 @@
 #ifndef MARGINALALGORITHM_HPP
 #define MARGINALALGORITHM_HPP
 
-#include "Algorithm.hpp"
+#include "algorithm_base.hpp"
 
-class MarginalAlgorithm : public Algorithm {
+class AlgorithmMarginal : public AlgorithmBase {
  protected:
   virtual void print_startup_message() const override = 0;
 
  public:
-  ~MarginalAlgorithm() = default;
-  MarginalAlgorithm() = default;
+  ~AlgorithmMarginal() = default;
+  AlgorithmMarginal() = default;
   virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
                                     BaseCollector *const collector) override;
 };

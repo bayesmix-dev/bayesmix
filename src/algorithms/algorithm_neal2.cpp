@@ -1,21 +1,21 @@
-#include "Neal2.hpp"
+#include "algorithm_neal2.hpp"
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
-Eigen::VectorXd Neal2::lpdf_marginal_component(
+Eigen::VectorXd AlgorithmNeal2::lpdf_marginal_component(
     std::shared_ptr<HierarchyBase> temp_hier, const Eigen::MatrixXd &grid) {
   // Exploit conjugacy of hierarchy
   return temp_hier->marg_lpdf(grid);
 }
 
-void Neal2::print_startup_message() const {
+void AlgorithmNeal2::print_startup_message() const {
   std::string msg = "Running Neal2 algorithm\nwith " +
                     unique_values[0]->get_id() + " hierarchies, " +
                     mixing->get_id() + " mixing...";
   std::cout << msg << std::endl;
 }
 
-void Neal2::initialize() {
+void AlgorithmNeal2::initialize() {
   // Initialize objects
   cardinalities.reserve(data.rows());
   std::default_random_engine generator;
@@ -36,7 +36,7 @@ void Neal2::initialize() {
   }
 }
 
-void Neal2::sample_allocations() {
+void AlgorithmNeal2::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
   auto rng = bayesmix::Rng::Instance().get();
@@ -119,7 +119,7 @@ void Neal2::sample_allocations() {
   }
 }
 
-void Neal2::sample_unique_values() {
+void AlgorithmNeal2::sample_unique_values() {
   // Initialize relevant values
   unsigned int n_clust = unique_values.size();
   unsigned int n_data = allocations.size();

@@ -1,7 +1,7 @@
 #ifndef NEAL8_HPP
 #define NEAL8_HPP
 
-#include "Neal2.hpp"
+#include "algorithm_neal2.hpp"
 
 //! Template class for Neal's algorithm 8 for conjugate hierarchies
 
@@ -18,7 +18,7 @@
 //! and some minor adjustments in the allocation sampling phase to circumvent
 //! non-conjugacy, it is the same as Neal's algorithm 2.
 
-class Neal8 : public Neal2 {
+class AlgorithmNeal8 : public AlgorithmNeal2 {
  protected:
   //! Number of auxiliary blocks
   unsigned int n_aux;
@@ -39,8 +39,8 @@ class Neal8 : public Neal2 {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~Neal8() = default;
-  Neal8() = default;
+  ~AlgorithmNeal8() = default;
+  AlgorithmNeal8() = default;
 
   // GETTERS AND SETTERS
   unsigned int get_n_aux() const { return n_aux; }

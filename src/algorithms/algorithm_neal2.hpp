@@ -1,7 +1,7 @@
 #ifndef NEAL2_HPP
 #define NEAL2_HPP
 
-#include "MarginalAlgorithm.hpp"
+#include "algorithm_marginal.hpp"
 
 //! Template class for Neal's algorithm 2 for conjugate hierarchies
 
@@ -22,7 +22,7 @@
 //! cluster are instead updated via the posterior distribution, which again has
 //! a closed-form expression thanks to conjugacy.
 
-class Neal2 : public MarginalAlgorithm {
+class AlgorithmNeal2 : public AlgorithmMarginal {
  protected:
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
@@ -42,8 +42,8 @@ class Neal2 : public MarginalAlgorithm {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~Neal2() = default;
-  Neal2() = default;
+  ~AlgorithmNeal2() = default;
+  AlgorithmNeal2() = default;
 
   std::string get_id() const override { return "Neal2"; }
 };

@@ -50,7 +50,7 @@
 //! This class is templatized over the types of the elements of this model: the
 //! hierarchies of cluster, their hyperparameters, and the mixing mode.
 
-class Algorithm {
+class AlgorithmBase {
  protected:
   // METHOD PARAMETERS
   //! Iterations of the algorithm
@@ -131,8 +131,8 @@ class Algorithm {
                                     BaseCollector *const collector) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~Algorithm() = default;
-  Algorithm() = default;
+  virtual ~AlgorithmBase() = default;
+  AlgorithmBase() = default;
 
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }
