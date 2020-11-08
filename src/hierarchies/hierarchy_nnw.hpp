@@ -2,15 +2,9 @@
 #define BAYESMIX_HIERARCHIES_HIERARCHY_NNW_HPP_
 
 #include <google/protobuf/stubs/casts.h>
-
 #include <Eigen/Dense>
-
-#include "../../proto/cpp/ls_state.pb.h"
-#include "../../proto/cpp/marginal_state.pb.h"
-#include "../../proto/cpp/matrix.pb.h"
-#include "../utils/distributions.hpp"
-#include "../utils/proto_utils.hpp"
 #include "hierarchy_base.hpp"
+#include <stan/math/prim/fun.hpp>
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 

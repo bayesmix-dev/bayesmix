@@ -1,6 +1,7 @@
 #ifndef BAYESMIX_MIXINGS_MIXING_PITYOR_HPP_
 #define BAYESMIX_MIXINGS_MIXING_PITYOR_HPP_
 
+#include <cassert>
 #include "mixing_base.hpp"
 
 //! Class that represents the Pitman-Yor process mixture model.
@@ -37,11 +38,7 @@ class MixingPitYor : public MixingBase {
   //! \return     Probability value
   double mass_existing_cluster(const unsigned int card,
                                const unsigned int n) const override {
-    if (card == 0) {
-      return 0;
-    } else {
-      return (card - discount) / (n + strength);
-    }
+    return (card == 0) ? 0 : (card - discount) / (n + strength);
   }
 
   //! Mass probability for choosing a newly created cluster

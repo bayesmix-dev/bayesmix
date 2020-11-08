@@ -1,4 +1,8 @@
 #include "algorithm_base.hpp"
+#include <Eigen/Dense>
+// #include <stan/math/prim/fun.hpp>  // TODO
+// #include <stan/math/prim/prob.hpp>  // TODO
+#include "../../proto/cpp/marginal_state.pb.h"
 
 //! \param iter Number of the current iteration
 //! \return     Protobuf-object version of the current state

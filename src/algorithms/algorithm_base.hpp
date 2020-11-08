@@ -1,21 +1,13 @@
 #ifndef BAYESMIX_ALGORITHMS_ALGORITHM_BASE_HPP_
 #define BAYESMIX_ALGORITHMS_ALGORITHM_BASE_HPP_
 
-#include <math.h>
-
 #include <Eigen/Dense>
-#include <fstream>
-#include <random>
-#include <stan/math/prim/fun.hpp>
-#include <stan/math/prim/prob.hpp>
+#include <memory>
 #include <vector>
-
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/collector_base.hpp"
 #include "../hierarchies/hierarchy_base.hpp"
 #include "../mixings/mixing_base.hpp"
-#include "../utils/distributions.hpp"
-#include "../utils/proto_utils.hpp"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 

@@ -2,7 +2,6 @@
 #define BAYESMIX_UTILS_PROTO_UTILS_HPP_
 
 #include <Eigen/Dense>
-
 #include "../../proto/cpp/matrix.pb.h"
 
 namespace bayesmix {

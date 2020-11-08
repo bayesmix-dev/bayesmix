@@ -2,6 +2,11 @@
 #define BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_HPP_
 
 #include "../runtime/factory.hpp"
+#include "hierarchy_base.hpp"
+#include <functional>
+#include <memory>
+#include "hierarchy_nnig.hpp"
+#include "hierarchy_nnw.hpp"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;

@@ -1,5 +1,6 @@
 #ifndef BAYESMIX_RUNTIME_FACTORY_HPP_
 #define BAYESMIX_RUNTIME_FACTORY_HPP_
+
 #include <functional>
 #include <iostream>
 #include <map>

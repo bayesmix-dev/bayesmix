@@ -2,6 +2,8 @@
 #define BAYESMIX_ALGORITHMS_ALGORITHM_MARGINAL_HPP_
 
 #include "algorithm_base.hpp"
+#include <Eigen/Dense>
+#include "../collectors/collector_base.hpp"
 
 class AlgorithmMarginal : public AlgorithmBase {
  protected:

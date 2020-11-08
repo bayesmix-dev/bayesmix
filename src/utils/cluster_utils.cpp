@@ -1,4 +1,7 @@
 #include "cluster_utils.hpp"
+#include <Eigen/Dense>
+#include <Eigen/SparseCore>
+#include "../utils/proto_utils.hpp"
 
 //! \param coll Collector containing the algorithm chain
 //! \return     Index of the iteration containing the best estimate

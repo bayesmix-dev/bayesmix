@@ -2,6 +2,10 @@
 #define BAYESMIX_ALGORITHMS_ALGORITHM_NEAL8_HPP_
 
 #include "algorithm_neal2.hpp"
+#include <Eigen/Dense>
+#include <memory>
+#include <vector>
+#include <cassert>
 
 //! Template class for Neal's algorithm 8 for conjugate hierarchies
 

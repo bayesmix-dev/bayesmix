@@ -2,6 +2,11 @@
 #define BAYESMIX_ALGORITHMS_LOAD_ALGORITHMS_HPP_
 
 #include "../runtime/factory.hpp"
+#include "algorithm_base.hpp"
+#include "algorithm_neal2.hpp"
+#include "algorithm_neal8.hpp"
+#include <functional>
+#include <memory>
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;

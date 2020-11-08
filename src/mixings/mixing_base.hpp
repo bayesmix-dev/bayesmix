@@ -1,8 +1,6 @@
 #ifndef BAYESMIX_MIXINGS_MIXING_BASE_HPP_
 #define BAYESMIX_MIXINGS_MIXING_BASE_HPP_
 
-#include <cassert>
-
 //! Abstract base class for a generic mixture model
 
 //! This class represents a mixture model object to be used in a BNP iterative

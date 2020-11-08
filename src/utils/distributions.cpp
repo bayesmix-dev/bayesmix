@@ -1,4 +1,7 @@
 #include "distributions.hpp"
+#include <Eigen/Dense>
+#include <random>
+#include <stan/math/prim/prob.hpp>
 
 int bayesmix::categorical_rng(const Eigen::VectorXd &probas,
                               std::mt19937_64 &rng, int start /*= 0*/) {

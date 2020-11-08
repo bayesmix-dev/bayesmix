@@ -3,7 +3,6 @@
 
 #include <Eigen/Dense>
 #include <random>
-#include <stan/math/prim/prob.hpp>
 
 namespace bayesmix {
 int categorical_rng(const Eigen::VectorXd &probas, std::mt19937_64 &rng,
