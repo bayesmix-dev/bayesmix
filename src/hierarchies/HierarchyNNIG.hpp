@@ -28,7 +28,7 @@ class HierarchyNNIG : public HierarchyBase {
  protected:
   // state
   double mean;
-  double std = 1.0;
+  double std;
 
   // HYPERPARAMETERS
   double mu0, lambda, alpha0, beta0;
@@ -42,7 +42,7 @@ class HierarchyNNIG : public HierarchyBase {
   }
 
   //! Raises error if the state values are not valid w.r.t. their own domain
-  void check_state_validity() override;
+  void check_state_validity() override { assert(std > 0); }
 
   //! Returns updated values of the prior hyperparameters via their posterior
   std::vector<double> normal_gamma_update(const Eigen::VectorXd &data,
@@ -52,6 +52,7 @@ class HierarchyNNIG : public HierarchyBase {
                                           const double lambda);
 
  public:
+  void check_and_initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, false)
   bool is_multivariate() const override { return false; }
 
@@ -85,18 +86,9 @@ class HierarchyNNIG : public HierarchyBase {
   double get_lambda() const { return lambda; }
   double get_mean() const { return mean; }
   void set_mu0(const double mu0_) { mu0 = mu0_; mean = mu0; }
-  void set_alpha0(const double alpha0_) {
-    assert(alpha0_ > 0);
-    alpha0 = alpha0_;
-  }
-  void set_beta0(const double beta0_) {
-    assert(beta0_ > 0);
-    beta0 = beta0_;
-  }
-  void set_lambda(const double lambda_) {
-    assert(lambda_ > 0);
-    lambda = lambda_;
-  }
+  void set_alpha0(const double alpha0_) { alpha0 = alpha0_; }
+  void set_beta0(const double beta0_) { beta0 = beta0_; }
+  void set_lambda(const double lambda_) { lambda = lambda_; }
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment

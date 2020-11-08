@@ -37,6 +37,7 @@ class HierarchyBase {
   virtual void check_state_validity() = 0;
 
  public:
+  virtual void check_and_initialize() = 0;
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
 

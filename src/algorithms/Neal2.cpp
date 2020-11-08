@@ -36,6 +36,7 @@ void Neal2::initialize() {
 void Neal2::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
+  auto rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
   for (size_t i = 0; i < n_data; i++) {
@@ -69,10 +70,8 @@ void Neal2::sample_allocations() {
                            unique_values[0]->marg_lpdf(datum)(0);
     }
     // Draw a NEW value for datum allocation
-    auto rng = bayesmix::Rng::Instance().get();
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
-
     // Assign datum to its new cluster and update cardinalities:
     // 4 cases are handled separately
     if (singleton == 1) {

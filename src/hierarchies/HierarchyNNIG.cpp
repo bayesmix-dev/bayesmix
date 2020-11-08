@@ -1,6 +1,10 @@
 #include "HierarchyNNIG.hpp"
 
-void HierarchyNNIG::check_state_validity() { assert(std > 0); }
+void HierarchyNNIG::check_and_initialize() {
+  check_hypers_validity();
+  mean = get_mu0();
+  std = sqrt(get_beta0()/(get_alpha0()-1));
+}
 
 //! \param data                       Column vector of data points
 //! \param mu0, alpha0, beta0, lambda Original values for hyperparameters
@@ -90,7 +94,8 @@ void HierarchyNNIG::draw() {
 void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
   // Update values
   std::vector<double> temp =
-      normal_gamma_update(data.col(0), mu0, alpha0, beta0, lambda);
+      normal_gamma_update(data.col(0), get_mu0(), get_alpha0(), get_beta0(),
+      get_lambda());
   double mu_post = temp[0];
   double alpha_post = temp[1];
   double beta_post = temp[2];
@@ -105,8 +110,13 @@ void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
 void HierarchyNNIG::set_state(google::protobuf::Message *curr, bool check) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
-  mean = down_cast<UnivLSState *>(curr)->mean();
-  std = down_cast<UnivLSState *>(curr)->std();
+
+  MarginalState::ClusterVal *currcast =
+      down_cast<MarginalState::ClusterVal *>(curr);
+
+  mean = currcast->univ_ls_state().mean();
+  std = currcast->univ_ls_state().std();
+
   if (check) {
     check_state_validity();
   }

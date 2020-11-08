@@ -17,8 +17,10 @@ TEST(set_state, univ_ls) {
 
   ASSERT_EQ(curr.mean(), mean);
 
+  MarginalState::ClusterVal clusval;
+  clusval.mutable_univ_ls_state()->CopyFrom(curr);
   HierarchyNNIG cluster;
-  cluster.set_state(&curr);
+  cluster.set_state(&clusval);
 
   ASSERT_EQ(curr.mean(), cluster.get_mean());
 }
@@ -33,8 +35,10 @@ TEST(get_state_as_proto_test, univ_ls) {
   curr.set_mean(mean);
   curr.set_std(std);
 
+  MarginalState::ClusterVal clusval_in;
+  clusval_in.mutable_univ_ls_state()->CopyFrom(curr);
   HierarchyNNIG cluster;
-  cluster.set_state(&curr);
+  cluster.set_state(&clusval_in);
 
   MarginalState out;
   MarginalState::ClusterVal* clusval = out.add_cluster_vals();
@@ -61,8 +65,10 @@ TEST(set_state, multi_ls) {
   ASSERT_EQ(curr.precision().data(0), 1.0);
   ASSERT_EQ(curr.precision().data(6), 10.0);
 
+  MarginalState::ClusterVal clusval_in;
+  clusval_in.mutable_multi_ls_state()->CopyFrom(curr);
   HierarchyNNW cluster;
-  cluster.set_state(&curr);
+  cluster.set_state(&clusval_in);
 
   ASSERT_EQ(curr.mean().data(0), cluster.get_mean()(0));
   ASSERT_EQ(curr.precision().data(0), cluster.get_tau()(0, 0));

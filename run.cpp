@@ -12,29 +12,45 @@ int main(int argc, char *argv[]) {
   //std::string type_mixing = "PY";
   //std::string type_hier = "NNW";
   std::string type_algo = "N2";
-  std::string datafile = "resources/data_uni.csv";
-  std::string gridfile = "resources/grid_uni.csv";
-  std::string densfile = "resources/dens_uni.csv";
+  std::string datafile = "resources/data_uni.csv";  //TEST
+  std::string gridfile = "resources/grid_uni.csv";  //TEST
+  std::string densfile = "resources/dens_uni.csv";  //TEST
   unsigned int init = 0;
+  unsigned int maxiter = 1000;
+  unsigned int burnin = 1;
 
   // Create factories and objects
   //Factory<BaseMixing> &factory_mixing = Factory<BaseMixing>::Instance();
   //Factory<HierarchyBase> &factory_hier = Factory<HierarchyBase>::Instance();
   Factory<Algorithm> &factory_algo = Factory<Algorithm>::Instance();
   //auto mixing = factory_mixing.create_object(type_mixing);
-  auto mixing = std::make_shared<DirichletMixing>();  // TODO temp
+  auto mixing = std::make_shared<DirichletMixing>();
   //auto hier = factory_hier.create_object(type_hier);
-  auto hier = std::make_shared<HierarchyNNIG>();  // TODO temp
+  auto hier = std::make_shared<HierarchyNNIG>();  //TEST
   auto algo = factory_algo.create_object(type_algo);
+  // Initialize RNG object
+  auto rng = bayesmix::Rng::Instance().get();
 
-  // TODO temp: running test
-  mixing->set_totalmass(1.0);
+  // Set parameters
+
+  // NNIG  //TEST
   hier->set_mu0(5.0);
   hier->set_lambda(0.1);
   hier->set_alpha0(2.0);
   hier->set_beta0(2.0);
-  algo->set_maxiter(1000);
-  algo->set_burnin(100);
+
+  // // NNW  //TEST
+  // Eigen::Matrix<double, 1, 2> mu0; mu0 << 5.5, 5.5;
+  // hier->set_mu0(mu0);
+  // hier->set_lambda(0.2);
+  // double nu = 5.0;
+  // hier->set_nu(nu);
+  // Eigen::MatrixXd tau0 = (1 / nu) * Eigen::Matrix<double, 2, 2>::Identity();
+  // hier->set_tau0(tau0);
+  
+  mixing->set_totalmass(2.0);
+  algo->set_maxiter(maxiter);
+  algo->set_burnin(burnin);
 
   // Other objects
   Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
@@ -44,6 +60,9 @@ int main(int argc, char *argv[]) {
   // Object allocation
   algo->set_mixing(mixing);
   algo->set_data_and_initial_clusters(data, hier, init);
+  if(type_algo == "N8") {
+  	algo->set_n_aux(3);
+  }
   BaseCollector *coll = new MemoryCollector();
 
   // Execution

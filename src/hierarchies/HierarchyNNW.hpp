@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 
 #include "../../proto/cpp/ls_state.pb.h"
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "../../proto/cpp/matrix.pb.h"
 #include "../utils/distributions.hpp"
 #include "../utils/proto_utils.hpp"
@@ -54,7 +55,7 @@ class HierarchyNNW : public HierarchyBase {
   void check_hypers_validity() override;
   //! Raises error if the state values are not valid w.r.t. their own domain
   void check_state_validity() override;
-  //! Special setter tau and its utilities
+  //! Special setter for tau and its utilities
   void set_tau_and_utilities(const Eigen::MatrixXd &tau_);
 
   //! Returns updated values of the prior hyperparameters via their posterior
@@ -63,16 +64,13 @@ class HierarchyNNW : public HierarchyBase {
       const Eigen::MatrixXd &tau0_inv, const double nu);
 
  public:
+  void check_and_initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, true)
   bool is_multivariate() const override { return true; }
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~HierarchyNNW() = default;
-  HierarchyNNW() {
-    unsigned int dim = get_mu0().size();
-    mean = get_mu0();
-    set_tau_and_utilities(get_lambda() * Eigen::MatrixXd::Identity(dim, dim));
-  }
+  HierarchyNNW() = default;
   std::shared_ptr<HierarchyBase> clone() const override {
     return std::make_shared<HierarchyNNW>(*this);
   }
@@ -115,22 +113,16 @@ class HierarchyNNW : public HierarchyBase {
 
   double get_nu() const { return nu; }
 
-  void set_mu0(const EigenRowVec &mu0_) {
-    assert(mu0_.size() == mu0.size());
-    mu0 = mu0_;
+  void set_mu0(const EigenRowVec &mu0_) { mu0 = mu0_; }
+
+  void set_lambda(const double lambda_) { lambda = lambda_; }
+
+  void set_tau0(const Eigen::MatrixXd &tau0_) {
+    tau0 = tau0_;
+    tau0_inv = stan::math::inverse_spd(tau0);
   }
 
-  void set_lambda(const double lambda_) {
-    assert(lambda_ > 0);
-    lambda = lambda_;
-  }
-
-  void set_tau0(const Eigen::MatrixXd &tau0_);
-
-  void set_nu(const double nu_) {
-    assert(nu_ > mu0.size() - 1);
-    nu = nu_;
-  }
+  void set_nu(const double nu_) { nu = nu_; }
 
   void get_state_as_proto(google::protobuf::Message *out) override;
 

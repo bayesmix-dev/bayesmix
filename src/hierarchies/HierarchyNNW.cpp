@@ -34,6 +34,13 @@ void HierarchyNNW::set_tau_and_utilities(const Eigen::MatrixXd &tau_) {
   tau_logdet = 2 * log(diag.array()).sum();
 }
 
+void HierarchyNNW::check_and_initialize() {
+  check_hypers_validity();
+  unsigned int dim = get_mu0().size();
+  mean = get_mu0();
+  set_tau_and_utilities(get_lambda() * Eigen::MatrixXd::Identity(dim, dim));
+}
+
 //! \param data                  Matrix of row-vectorial data points
 //! \param mu0, lambda, tau0, nu Original values for hyperparameters
 //! \return                      Vector of updated values for hyperparameters
@@ -160,34 +167,30 @@ void HierarchyNNW::sample_given_data(const Eigen::MatrixXd &data) {
   set_tau_and_utilities(tau_new);
 }
 
-void HierarchyNNW::set_tau0(const Eigen::MatrixXd &tau0_) {
-  // Check if tau0 is a square symmetric positive semidefinite matrix
-  assert(tau0_.rows() == tau0_.cols());
-  assert(mu0.size() == tau0_.rows());
-  assert(tau0.isApprox(tau0.transpose()));
-  Eigen::LLT<Eigen::MatrixXd> llt(tau0);
-  assert(llt.info() != Eigen::NumericalIssue);
-  tau0 = tau0_;
-  tau0_inv = stan::math::inverse_spd(tau0);
-}
-
 void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
 
-  mean = to_eigen(down_cast<MultiLSState *>(curr)->mean());
-  tau = to_eigen(down_cast<MultiLSState *>(curr)->precision());
+  MarginalState::ClusterVal *currcast =
+      down_cast<MarginalState::ClusterVal *>(curr);
 
-  std::cout << "successful dowcast, mean: " << mean.transpose() << std::endl;
+  mean = to_eigen(currcast->multi_ls_state().mean());
+  set_tau_and_utilities(to_eigen(currcast->multi_ls_state().precision()));
 
-  set_tau_and_utilities(tau);
+  if (check) {
+    check_state_validity();
+  }
 }
 
 void HierarchyNNW::get_state_as_proto(google::protobuf::Message *out) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
-  Vector *proto_mean = down_cast<MultiLSState *>(out)->mutable_mean();
-  Matrix *proto_prec = down_cast<MultiLSState *>(out)->mutable_precision();
-  to_proto(mean, proto_mean);
-  to_proto(tau, proto_prec);
+
+  MultiLSState state;
+  to_proto(mean, state.mutable_mean());
+  to_proto(tau, state.mutable_precision());
+
+  down_cast<MarginalState::ClusterVal *>(out)
+      ->mutable_multi_ls_state()
+      ->CopyFrom(state);
 }
