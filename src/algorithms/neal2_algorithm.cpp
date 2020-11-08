@@ -20,7 +20,7 @@ Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
 }
 
 void Neal2Algorithm::print_startup_message() const {
-  std::string msg = "Running Neal2 algorithm\nwith " +
+  std::string msg = "Running Neal2 algorithm with " +
                     unique_values[0]->get_id() + " hierarchies, " +
                     mixing->get_id() + " mixing...";
   std::cout << msg << std::endl;

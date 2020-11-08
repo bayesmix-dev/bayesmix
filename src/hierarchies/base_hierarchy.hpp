@@ -63,7 +63,7 @@ class BaseHierarchy {
   virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;
 
   // GETTERS AND SETTERS
-  virtual void get_state_as_proto(google::protobuf::Message *out) = 0;
+  virtual void write_state_to_proto(google::protobuf::Message *out) = 0;
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment

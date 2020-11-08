@@ -194,7 +194,7 @@ void NNWHierarchy::set_state(google::protobuf::Message *curr, bool check) {
   }
 }
 
-void NNWHierarchy::get_state_as_proto(google::protobuf::Message *out) {
+void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
 

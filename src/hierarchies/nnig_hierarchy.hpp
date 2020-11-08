@@ -98,7 +98,7 @@ class NNIGHierarchy : public BaseHierarchy {
   //! \param check  If true, a state validity check occurs after assignment
   void set_state(google::protobuf::Message *curr, bool check = true) override;
 
-  void get_state_as_proto(google::protobuf::Message *out);
+  void write_state_to_proto(google::protobuf::Message *out);
 
   std::string get_id() const override { return "NNIG"; }
 };

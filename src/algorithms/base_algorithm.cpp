@@ -16,7 +16,7 @@ bayesmix::MarginalState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
   // Transcribe unique values vector
   for (size_t i = 0; i < unique_values.size(); i++) {
     bayesmix::MarginalState::ClusterVal clusval;
-    unique_values[i]->get_state_as_proto(&clusval);
+    unique_values[i]->write_state_to_proto(&clusval);
     iter_out.add_cluster_vals()->CopyFrom(clusval);
   }
   return iter_out;

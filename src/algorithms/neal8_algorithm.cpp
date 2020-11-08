@@ -31,7 +31,7 @@ Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
 
 void Neal8Algorithm::print_startup_message() const {
   std::string msg = "Running Neal8 algorithm (m=" + std::to_string(n_aux) +
-                    " aux. blocks)\nwith " + unique_values[0]->get_id() +
+                    " aux. blocks) with " + unique_values[0]->get_id() +
                     " hierarchies, " + mixing->get_id() + " mixing...";
   std::cout << msg << std::endl;
 }
@@ -61,7 +61,7 @@ void Neal8Algorithm::sample_allocations() {
     if (cardinalities[allocations[i]] == 1) {
       // Save unique value in the first auxiliary block
       bayesmix::MarginalState::ClusterVal curr_val;
-      unique_values[allocations[i]]->get_state_as_proto(&curr_val);
+      unique_values[allocations[i]]->write_state_to_proto(&curr_val);
       aux_unique_values[0]->set_state(&curr_val, false);
       singleton = 1;
     }
@@ -103,7 +103,7 @@ void Neal8Algorithm::sample_allocations() {
         // Case 1: datum moves from a singleton to a new cluster
         // Take unique values from an auxiliary block
         bayesmix::MarginalState::ClusterVal curr_val;
-        aux_unique_values[c_new - n_clust]->get_state_as_proto(&curr_val);
+        aux_unique_values[c_new - n_clust]->write_state_to_proto(&curr_val);
         unique_values[allocations[i]]->set_state(&curr_val, false);
         cardinalities[allocations[i]] += 1;
       } else {  // Case 2: datum moves from a singleton to an old cluster

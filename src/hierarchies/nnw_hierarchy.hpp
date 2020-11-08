@@ -120,7 +120,7 @@ class NNWHierarchy : public BaseHierarchy {
 
   void set_nu(const double nu_) { nu = nu_; }
 
-  void get_state_as_proto(google::protobuf::Message *out) override;
+  void write_state_to_proto(google::protobuf::Message *out) override;
 
   std::string get_id() const override { return "NNW"; }
 };
