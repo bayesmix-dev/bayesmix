@@ -1,7 +1,10 @@
-#include <gtest/gtest.h>
-#include <Eigen/Dense>
-#include "../proto/cpp/matrix.pb.h"
 #include "../src/utils/proto_utils.hpp"
+
+#include <gtest/gtest.h>
+
+#include <Eigen/Dense>
+
+#include "../proto/cpp/matrix.pb.h"
 
 TEST(to_proto, vector) {
   Eigen::VectorXd vec = Eigen::VectorXd::Ones(5);

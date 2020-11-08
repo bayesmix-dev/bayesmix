@@ -5,7 +5,6 @@
 #include "../src/hierarchies/HierarchyNNIG.hpp"
 #include "../src/hierarchies/HierarchyNNW.hpp"
 
-
 TEST(set_state, univ_ls) {
   using namespace bayesmix;
   double mean = 5;
@@ -24,7 +23,6 @@ TEST(set_state, univ_ls) {
 
   ASSERT_EQ(curr.mean(), cluster.get_mean());
 }
-
 
 TEST(get_state_as_proto_test, univ_ls) {
   using namespace bayesmix;

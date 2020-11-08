@@ -20,9 +20,9 @@ Eigen::VectorXd Neal8::lpdf_marginal_component(
 }
 
 void Neal8::print_startup_message() const {
-  std::string msg = "Running Neal8 algorithm (m=" + std::to_string(n_aux)
-    + " aux. blocks)\nwith " + unique_values[0]->get_id() + " hierarchies, "
-    + mixing->get_id() + " mixing...";
+  std::string msg = "Running Neal8 algorithm (m=" + std::to_string(n_aux) +
+                    " aux. blocks)\nwith " + unique_values[0]->get_id() +
+                    " hierarchies, " + mixing->get_id() + " mixing...";
   std::cout << msg << std::endl;
 }
 

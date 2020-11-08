@@ -85,7 +85,10 @@ class HierarchyNNIG : public HierarchyBase {
   double get_beta0() const { return beta0; }
   double get_lambda() const { return lambda; }
   double get_mean() const { return mean; }
-  void set_mu0(const double mu0_) { mu0 = mu0_; mean = mu0; }
+  void set_mu0(const double mu0_) {
+    mu0 = mu0_;
+    mean = mu0;
+  }
   void set_alpha0(const double alpha0_) { alpha0 = alpha0_; }
   void set_beta0(const double beta0_) { beta0 = beta0_; }
   void set_lambda(const double lambda_) { lambda = lambda_; }
