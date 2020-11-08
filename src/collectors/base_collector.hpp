@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_COLLECTORS_COLLECTOR_BASE_HPP_
-#define BAYESMIX_COLLECTORS_COLLECTOR_BASE_HPP_
+#ifndef BAYESMIX_COLLECTORS_BASE_COLLECTOR_HPP_
+#define BAYESMIX_COLLECTORS_BASE_COLLECTOR_HPP_
 
 #include <fcntl.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -26,7 +26,7 @@
 //! collector. This means that the collector will contain the states of the
 //! whole Markov chain by the end of the running of the algorithm.
 
-class CollectorBase {
+class BaseCollector {
  protected:
   //! Current size of the chain
   unsigned int size = 0;
@@ -39,8 +39,8 @@ class CollectorBase {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~CollectorBase() = default;
-  CollectorBase() = default;
+  virtual ~BaseCollector() = default;
+  BaseCollector() = default;
 
   //! Initializes collector
   virtual void start() = 0;
@@ -69,4 +69,4 @@ class CollectorBase {
   unsigned int get_size() const { return size; }
 };
 
-#endif  // BAYESMIX_COLLECTORS_COLLECTOR_BASE_HPP_
+#endif  // BAYESMIX_COLLECTORS_BASE_COLLECTOR_HPP_

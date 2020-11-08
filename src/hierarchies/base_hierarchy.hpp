@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_HIERARCHIES_HIERARCHY_BASE_HPP_
-#define BAYESMIX_HIERARCHIES_HIERARCHY_BASE_HPP_
+#ifndef BAYESMIX_HIERARCHIES_BASE_HIERARCHY_HPP_
+#define BAYESMIX_HIERARCHIES_BASE_HIERARCHY_HPP_
 
 #include <google/protobuf/message.h>
 
@@ -25,7 +25,7 @@
 //! distributions, and of evaluating the distribution of the data, either its
 //! likelihood (whose parameters are the state) or its marginal distribution.
 
-class HierarchyBase {
+class BaseHierarchy {
  protected:
   // AUXILIARY TOOLS
   //! Raises error if the hypers values are not valid w.r.t. their own domain
@@ -39,9 +39,9 @@ class HierarchyBase {
   virtual bool is_multivariate() const = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~HierarchyBase() = default;
-  HierarchyBase() = default;
-  virtual std::shared_ptr<HierarchyBase> clone() const = 0;
+  virtual ~BaseHierarchy() = default;
+  BaseHierarchy() = default;
+  virtual std::shared_ptr<BaseHierarchy> clone() const = 0;
 
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points
@@ -72,4 +72,4 @@ class HierarchyBase {
   virtual std::string get_id() const = 0;
 };
 
-#endif  // BAYESMIX_HIERARCHIES_HIERARCHY_BASE_HPP_
+#endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_HPP_

@@ -5,20 +5,20 @@
 #include <memory>
 
 #include "../runtime/factory.hpp"
-#include "hierarchy_base.hpp"
-#include "hierarchy_nnig.hpp"
-#include "hierarchy_nnw.hpp"
+#include "base_hierarchy.hpp"
+#include "nnig_hierarchy.hpp"
+#include "nnw_hierarchy.hpp"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
 __attribute__((constructor)) static void load_hierarchies() {
-  Factory<HierarchyBase> &factory = Factory<HierarchyBase>::Instance();
-  Builder<HierarchyBase> NNIGbuilder = []() {
-    return std::make_shared<HierarchyNNIG>();
+  Factory<BaseHierarchy> &factory = Factory<BaseHierarchy>::Instance();
+  Builder<BaseHierarchy> NNIGbuilder = []() {
+    return std::make_shared<NNIGHierarchy>();
   };
-  Builder<HierarchyBase> NNWbuilder = []() {
-    return std::make_shared<HierarchyNNW>();
+  Builder<BaseHierarchy> NNWbuilder = []() {
+    return std::make_shared<NNWHierarchy>();
   };
   factory.add_builder("NNIG", NNIGbuilder);
   factory.add_builder("NNW", NNWbuilder);

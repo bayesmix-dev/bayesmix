@@ -1,9 +1,9 @@
-#ifndef BAYESMIX_MIXINGS_MIXING_PITYOR_HPP_
-#define BAYESMIX_MIXINGS_MIXING_PITYOR_HPP_
+#ifndef BAYESMIX_MIXINGS_PITYOR_MIXING_HPP_
+#define BAYESMIX_MIXINGS_PITYOR_MIXING_HPP_
 
 #include <cassert>
 
-#include "mixing_base.hpp"
+#include "base_mixing.hpp"
 
 //! Class that represents the Pitman-Yor process mixture model.
 
@@ -16,16 +16,16 @@
 //! factor, while the weight for a newly created cluster is the remaining
 //! one counting the total amount as the sample size increased by the strength.
 
-class MixingPitYor : public MixingBase {
+class PitYorMixing : public BaseMixing {
  protected:
   //! Strength and discount parameters
   double strength, discount;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~MixingPitYor() = default;
-  MixingPitYor() = default;
-  MixingPitYor(const double strength_, const double discount_)
+  ~PitYorMixing() = default;
+  PitYorMixing() = default;
+  PitYorMixing(const double strength_, const double discount_)
       : strength(strength_), discount(discount_) {
     assert(strength > -discount);
     assert(0 <= discount && discount < 1);
@@ -61,4 +61,4 @@ class MixingPitYor : public MixingBase {
   std::string get_id() const override { return "Pitman-Yor"; }
 };
 
-#endif  // BAYESMIX_MIXINGS_MIXING_PITYOR_HPP_
+#endif  // BAYESMIX_MIXINGS_PITYOR_MIXING_HPP_

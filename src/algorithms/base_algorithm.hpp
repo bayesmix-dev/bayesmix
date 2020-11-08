@@ -1,14 +1,14 @@
-#ifndef BAYESMIX_ALGORITHMS_ALGORITHM_BASE_HPP_
-#define BAYESMIX_ALGORITHMS_ALGORITHM_BASE_HPP_
+#ifndef BAYESMIX_ALGORITHMS_BASE_ALGORITHM_HPP_
+#define BAYESMIX_ALGORITHMS_BASE_ALGORITHM_HPP_
 
 #include <Eigen/Dense>
 #include <memory>
 #include <vector>
 
 #include "../../proto/cpp/marginal_state.pb.h"
-#include "../collectors/collector_base.hpp"
-#include "../hierarchies/hierarchy_base.hpp"
-#include "../mixings/mixing_base.hpp"
+#include "../collectors/base_collector.hpp"
+#include "../hierarchies/base_hierarchy.hpp"
+#include "../mixings/base_mixing.hpp"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -43,7 +43,7 @@
 //! This class is templatized over the types of the elements of this model: the
 //! hierarchies of cluster, their hyperparameters, and the mixing mode.
 
-class AlgorithmBase {
+class BaseAlgorithm {
  protected:
   // METHOD PARAMETERS
   //! Iterations of the algorithm
@@ -61,16 +61,16 @@ class AlgorithmBase {
   //! Allocation for each datum, i.e. label of the cluster it belongs to
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
-  std::vector<std::shared_ptr<HierarchyBase>> unique_values;
+  std::vector<std::shared_ptr<BaseHierarchy>> unique_values;
   //! Mixing object
-  std::shared_ptr<MixingBase> mixing;
+  std::shared_ptr<BaseMixing> mixing;
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object
   bayesmix::MarginalState get_state_as_proto(unsigned int iter);
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<HierarchyBase> temp_hier,
+      std::shared_ptr<BaseHierarchy> temp_hier,
       const Eigen::MatrixXd &grid) = 0;
 
   // ALGORITHM FUNCTIONS
@@ -84,7 +84,7 @@ class AlgorithmBase {
     std::cout << "Done" << std::endl;
   };
   //! Saves the current iteration's state in Protobuf form to a collector
-  void save_state(CollectorBase *collector, unsigned int iter) {
+  void save_state(BaseCollector *collector, unsigned int iter) {
     collector->collect(get_state_as_proto(iter));
   }
 
@@ -98,7 +98,7 @@ class AlgorithmBase {
 
  public:
   //! Runs the algorithm and saves the whole chain to a collector
-  void run(CollectorBase *collector) {
+  void run(BaseCollector *collector) {
     print_startup_message();
     for (auto &un : unique_values) {
       un->check_and_initialize();
@@ -121,11 +121,11 @@ class AlgorithmBase {
   // ESTIMATE FUNCTION
   //! Evaluates the logpdf for each single iteration on a given grid of points
   virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                                    CollectorBase *const collector) = 0;
+                                    BaseCollector *const collector) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~AlgorithmBase() = default;
-  AlgorithmBase() = default;
+  virtual ~BaseAlgorithm() = default;
+  BaseAlgorithm() = default;
 
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }
@@ -136,9 +136,9 @@ class AlgorithmBase {
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
   //! Does nothing except for Neal8
   virtual void set_n_aux(const unsigned int n_aux_) { return; }
-  void set_mixing(std::shared_ptr<MixingBase> mixing_) { mixing = mixing_; }
+  void set_mixing(std::shared_ptr<BaseMixing> mixing_) { mixing = mixing_; }
   void set_data_and_initial_clusters(const Eigen::MatrixXd &data_,
-                                     std::shared_ptr<HierarchyBase> hier_,
+                                     std::shared_ptr<BaseHierarchy> hier_,
                                      const unsigned int init = 0) {
     if (data.rows() == 0) {
       std::invalid_argument("Error: empty data matrix");
@@ -161,4 +161,4 @@ class AlgorithmBase {
   virtual std::string get_id() const = 0;
 };
 
-#endif  // BAYESMIX_ALGORITHMS_ALGORITHM_BASE_HPP_
+#endif  // BAYESMIX_ALGORITHMS_BASE_ALGORITHM_HPP_

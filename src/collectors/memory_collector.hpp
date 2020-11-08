@@ -1,7 +1,7 @@
-#ifndef BAYESMIX_COLLECTORS_COLLECTOR_MEMORY_HPP_
-#define BAYESMIX_COLLECTORS_COLLECTOR_MEMORY_HPP_
+#ifndef BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
+#define BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
 
-#include "collector_base.hpp"
+#include "base_collector.hpp"
 
 //! Class for a "virtual" collector which contains all objects of the chain
 
@@ -13,7 +13,7 @@
 //! is not needed, for instance in a main program that both runes and algorithm
 //! and computes the estimates.
 
-class CollectorMemory : public CollectorBase {
+class MemoryCollector : public BaseCollector {
  protected:
   //! Deque that contains all states in Protobuf-object form
   std::deque<bayesmix::MarginalState> chain;
@@ -23,8 +23,8 @@ class CollectorMemory : public CollectorBase {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~CollectorMemory() = default;
-  CollectorMemory() = default;
+  ~MemoryCollector() = default;
+  MemoryCollector() = default;
 
   //! Initializes collector (here, it does nothing)
   void start() override { return; }
@@ -43,4 +43,4 @@ class CollectorMemory : public CollectorBase {
   std::deque<bayesmix::MarginalState> get_chain() override { return chain; }
 };
 
-#endif  // BAYESMIX_COLLECTORS_COLLECTOR_MEMORY_HPP_
+#endif  // BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_

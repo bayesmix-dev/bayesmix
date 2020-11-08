@@ -1,6 +1,6 @@
-#include "collector_file.hpp"
+#include "file_collector.hpp"
 
-void CollectorFile::open_for_reading() {
+void FileCollector::open_for_reading() {
   infd = open(filename.c_str(), O_RDONLY);
   if (infd == -1) {
     std::cout << "Errno: " << strerror(errno) << std::endl;
@@ -9,14 +9,14 @@ void CollectorFile::open_for_reading() {
   is_open_read = true;
 }
 
-void CollectorFile::close_reading() {
+void FileCollector::close_reading() {
   fin->Close();
   close(infd);
   is_open_read = false;
 }
 
 // \return Chain state in Protobuf-object form
-bayesmix::MarginalState CollectorFile::next_state() {
+bayesmix::MarginalState FileCollector::next_state() {
   if (!is_open_read) {
     open_for_reading();
   }
@@ -25,7 +25,7 @@ bayesmix::MarginalState CollectorFile::next_state() {
   bool keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(
       &out, fin, nullptr);
   if (!keep) {
-    std::out_of_range("Error: surpassed EOF in CollectorFile");
+    std::out_of_range("Error: surpassed EOF in FileCollector");
   }
   if (curr_iter == size - 1) {
     curr_iter = -1;
@@ -34,13 +34,13 @@ bayesmix::MarginalState CollectorFile::next_state() {
   return out;
 }
 
-void CollectorFile::start() {
+void FileCollector::start() {
   int outfd = open(filename.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
   fout = new google::protobuf::io::FileOutputStream(outfd);
   is_open_write = true;
 }
 
-void CollectorFile::finish() {
+void FileCollector::finish() {
   if (is_open_write) {
     fout->Close();
     close(outfd);
@@ -49,18 +49,18 @@ void CollectorFile::finish() {
 }
 
 // \param iter_state State in Protobuf-object form to write to the collector
-void CollectorFile::collect(bayesmix::MarginalState iter_state) {
+void FileCollector::collect(bayesmix::MarginalState iter_state) {
   bool success = google::protobuf::util::SerializeDelimitedToZeroCopyStream(
       iter_state, fout);
   size++;
   if (!success) {
-    std::cout << "Writing in CollectorFile failed" << std::endl;
+    std::cout << "Writing in FileCollector failed" << std::endl;
   }
 }
 
 // \param i Position of the requested state in the chain
 // \return  Chain state in Protobuf-object form
-bayesmix::MarginalState CollectorFile::get_state(unsigned int i) {
+bayesmix::MarginalState FileCollector::get_state(unsigned int i) {
   bayesmix::MarginalState state;
   for (size_t j = 0; j < i + 1; j++) {
     state = get_next_state();
@@ -73,7 +73,7 @@ bayesmix::MarginalState CollectorFile::get_state(unsigned int i) {
 }
 
 // \return Chain in deque form
-std::deque<bayesmix::MarginalState> CollectorFile::get_chain() {
+std::deque<bayesmix::MarginalState> FileCollector::get_chain() {
   open_for_reading();
   bool keep = true;
   std::deque<bayesmix::MarginalState> out;

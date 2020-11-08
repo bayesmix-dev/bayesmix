@@ -1,9 +1,9 @@
-#ifndef BAYESMIX_MIXINGS_MIXING_DIRICHLET_HPP_
-#define BAYESMIX_MIXINGS_MIXING_DIRICHLET_HPP_
+#ifndef BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
+#define BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
 
 #include <cassert>
 
-#include "mixing_base.hpp"
+#include "base_mixing.hpp"
 
 //! Class that represents the Dirichlet process mixture model.
 
@@ -15,16 +15,16 @@
 //! creation of a new cluster, and weights of already existing clusters are
 //! proportional to their cardinalities.
 
-class MixingDirichlet : public MixingBase {
+class DirichletMixing : public BaseMixing {
  protected:
   //! Total mass parameters
   double totalmass;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~MixingDirichlet() = default;
-  MixingDirichlet() = default;
-  MixingDirichlet(const double totalmass_) : totalmass(totalmass_) {
+  ~DirichletMixing() = default;
+  DirichletMixing() = default;
+  DirichletMixing(const double totalmass_) : totalmass(totalmass_) {
     assert(totalmass >= 0);
   }
 
@@ -56,4 +56,4 @@ class MixingDirichlet : public MixingBase {
   std::string get_id() const override { return "Dirichlet"; }
 };
 
-#endif  // BAYESMIX_MIXINGS_MIXING_DIRICHLET_HPP_
+#endif  // BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_

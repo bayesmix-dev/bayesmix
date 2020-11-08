@@ -1,4 +1,4 @@
-#include "algorithm_neal2.hpp"
+#include "neal2_algorithm.hpp"
 
 #include <Eigen/Dense>
 #include <memory>
@@ -6,27 +6,27 @@
 #include <vector>
 
 #include "../../proto/cpp/marginal_state.pb.h"
-#include "../hierarchies/hierarchy_base.hpp"
-#include "../mixings/mixing_base.hpp"
+#include "../hierarchies/base_hierarchy.hpp"
+#include "../mixings/base_mixing.hpp"
 #include "../utils/distributions.hpp"
 #include "../utils/rng.hpp"
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
-Eigen::VectorXd AlgorithmNeal2::lpdf_marginal_component(
-    std::shared_ptr<HierarchyBase> temp_hier, const Eigen::MatrixXd &grid) {
+Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
+    std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid) {
   // Exploit conjugacy of hierarchy
   return temp_hier->marg_lpdf(grid);
 }
 
-void AlgorithmNeal2::print_startup_message() const {
+void Neal2Algorithm::print_startup_message() const {
   std::string msg = "Running Neal2 algorithm\nwith " +
                     unique_values[0]->get_id() + " hierarchies, " +
                     mixing->get_id() + " mixing...";
   std::cout << msg << std::endl;
 }
 
-void AlgorithmNeal2::initialize() {
+void Neal2Algorithm::initialize() {
   // Initialize objects
   cardinalities.reserve(data.rows());
   std::default_random_engine generator;
@@ -47,7 +47,7 @@ void AlgorithmNeal2::initialize() {
   }
 }
 
-void AlgorithmNeal2::sample_allocations() {
+void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
   auto rng = bayesmix::Rng::Instance().get();
@@ -114,7 +114,7 @@ void AlgorithmNeal2::sample_allocations() {
     else {  // if singleton == 0
       if (c_new == n_clust) {
         // Case 3: datum moves from a non-singleton to a new cluster
-        std::shared_ptr<HierarchyBase> new_unique = unique_values[0]->clone();
+        std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
         // Generate new unique values with posterior sampling
         new_unique->sample_given_data(datum);
         unique_values.push_back(new_unique);
@@ -130,7 +130,7 @@ void AlgorithmNeal2::sample_allocations() {
   }
 }
 
-void AlgorithmNeal2::sample_unique_values() {
+void Neal2Algorithm::sample_unique_values() {
   // Initialize relevant values
   unsigned int n_clust = unique_values.size();
   unsigned int n_data = allocations.size();

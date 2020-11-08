@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_MIXINGS_MIXING_BASE_HPP_
-#define BAYESMIX_MIXINGS_MIXING_BASE_HPP_
+#ifndef BAYESMIX_MIXINGS_BASE_MIXING_HPP_
+#define BAYESMIX_MIXINGS_BASE_MIXING_HPP_
 
 //! Abstract base class for a generic mixture model
 
@@ -14,11 +14,11 @@
 //! aforementioned events. The class will then have its own parameters, and
 //! maybe even prior distributions on them.
 
-class MixingBase {
+class BaseMixing {
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~MixingBase() = default;
-  MixingBase() = default;
+  virtual ~BaseMixing() = default;
+  BaseMixing() = default;
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
@@ -40,4 +40,4 @@ class MixingBase {
   virtual std::string get_id() const = 0;
 };
 
-#endif  // BAYESMIX_MIXINGS_MIXING_BASE_HPP_
+#endif  // BAYESMIX_MIXINGS_BASE_MIXING_HPP_

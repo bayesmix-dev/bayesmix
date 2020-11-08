@@ -1,4 +1,4 @@
-#include "hierarchy_nnig.hpp"
+#include "nnig_hierarchy.hpp"
 
 #include <google/protobuf/stubs/casts.h>
 
@@ -9,7 +9,7 @@
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
 
-void HierarchyNNIG::check_and_initialize() {
+void NNIGHierarchy::check_and_initialize() {
   check_hypers_validity();
   mean = get_mu0();
   std = sqrt(get_beta0() / (get_alpha0() - 1));
@@ -18,7 +18,7 @@ void HierarchyNNIG::check_and_initialize() {
 //! \param data                       Column vector of data points
 //! \param mu0, alpha0, beta0, lambda Original values for hyperparameters
 //! \return                           Vector of updated values for hyperpar.s
-std::vector<double> HierarchyNNIG::normal_gamma_update(
+std::vector<double> NNIGHierarchy::normal_gamma_update(
     const Eigen::VectorXd &data, const double mu0, const double alpha0,
     const double beta0, const double lambda) {
   // Initialize relevant variables
@@ -43,14 +43,14 @@ std::vector<double> HierarchyNNIG::normal_gamma_update(
 
 //! \param data Column vector of data points
 //! \return     Likehood vector evaluated in data
-Eigen::VectorXd HierarchyNNIG::like(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNIGHierarchy::like(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result = lpdf(data);
   return result.array().exp();
 }
 
 //! \param data Column vector of data points
 //! \return     Log-Likehood vector evaluated in data
-Eigen::VectorXd HierarchyNNIG::lpdf(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNIGHierarchy::lpdf(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
@@ -61,14 +61,14 @@ Eigen::VectorXd HierarchyNNIG::lpdf(const Eigen::MatrixXd &data) {
 
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data
-Eigen::VectorXd HierarchyNNIG::eval_marg(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNIGHierarchy::eval_marg(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result = marg_lpdf(data);
   return result.array().exp();
 }
 
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data (log)
-Eigen::VectorXd HierarchyNNIG::marg_lpdf(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNIGHierarchy::marg_lpdf(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
   double mu0 = get_mu0();
   double lambda = get_lambda();
@@ -86,7 +86,7 @@ Eigen::VectorXd HierarchyNNIG::marg_lpdf(const Eigen::MatrixXd &data) {
   return result;
 }
 
-void HierarchyNNIG::draw() {
+void NNIGHierarchy::draw() {
   // Get values of hyperparameters
   double mu0 = get_mu0();
   double lambda = get_lambda();
@@ -100,7 +100,7 @@ void HierarchyNNIG::draw() {
 }
 
 //! \param data Column vector of data points
-void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
+void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   // Update values
   std::vector<double> temp = normal_gamma_update(
       data.col(0), get_mu0(), get_alpha0(), get_beta0(), get_lambda());
@@ -115,7 +115,7 @@ void HierarchyNNIG::sample_given_data(const Eigen::MatrixXd &data) {
   mean = stan::math::normal_rng(mu_post, std / sqrt(lambda_post), rng);
 }
 
-void HierarchyNNIG::set_state(google::protobuf::Message *curr, bool check) {
+void NNIGHierarchy::set_state(google::protobuf::Message *curr, bool check) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
 
@@ -130,7 +130,7 @@ void HierarchyNNIG::set_state(google::protobuf::Message *curr, bool check) {
   }
 }
 
-void HierarchyNNIG::get_state_as_proto(google::protobuf::Message *out) {
+void NNIGHierarchy::get_state_as_proto(google::protobuf::Message *out) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
 

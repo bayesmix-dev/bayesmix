@@ -1,12 +1,12 @@
-#ifndef BAYESMIX_HIERARCHIES_HIERARCHY_NNW_HPP_
-#define BAYESMIX_HIERARCHIES_HIERARCHY_NNW_HPP_
+#ifndef BAYESMIX_HIERARCHIES_NNW_HIERARCHY_HPP_
+#define BAYESMIX_HIERARCHIES_NNW_HIERARCHY_HPP_
 
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
 #include <stan/math/prim/fun.hpp>
 
-#include "hierarchy_base.hpp"
+#include "base_hierarchy.hpp"
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 
@@ -25,7 +25,7 @@
 //! posterior distribution are available in closed form and Neal's algorithm 2
 //! may be used with it.
 
-class HierarchyNNW : public HierarchyBase {
+class NNWHierarchy : public BaseHierarchy {
  protected:
   Eigen::VectorXd mean;
   Eigen::MatrixXd tau;
@@ -65,10 +65,10 @@ class HierarchyNNW : public HierarchyBase {
   bool is_multivariate() const override { return true; }
 
   // DESTRUCTOR AND CONSTRUCTORS
-  ~HierarchyNNW() = default;
-  HierarchyNNW() = default;
-  std::shared_ptr<HierarchyBase> clone() const override {
-    return std::make_shared<HierarchyNNW>(*this);
+  ~NNWHierarchy() = default;
+  NNWHierarchy() = default;
+  std::shared_ptr<BaseHierarchy> clone() const override {
+    return std::make_shared<NNWHierarchy>(*this);
   }
 
   // EVALUATION FUNCTIONS
@@ -125,4 +125,4 @@ class HierarchyNNW : public HierarchyBase {
   std::string get_id() const override { return "NNW"; }
 };
 
-#endif  // BAYESMIX_HIERARCHIES_HIERARCHY_NNW_HPP_
+#endif  // BAYESMIX_HIERARCHIES_NNW_HIERARCHY_HPP_

@@ -1,6 +1,6 @@
 target_sources(bayesmix
   PUBLIC
-    mixing_base.hpp
-    mixing_dirichlet.hpp
-    mixing_pityor.hpp
+    base_mixing.hpp
+    dirichlet_mixing.hpp
+    pityor_mixing.hpp
 )

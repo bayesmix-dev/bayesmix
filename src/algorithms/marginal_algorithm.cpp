@@ -1,16 +1,16 @@
-#include "algorithm_marginal.hpp"
+#include "marginal_algorithm.hpp"
 
 #include <Eigen/Dense>
 #include <stan/math/prim/fun.hpp>
 
 #include "../../proto/cpp/marginal_state.pb.h"
-#include "../collectors/collector_base.hpp"
+#include "../collectors/base_collector.hpp"
 
 //! \param grid Grid of points in matrix form to evaluate the density on
 //! \param coll Collector containing the algorithm chain
 //! \return     Matrix whose i-th column is the lpdf at i-th iteration
-Eigen::MatrixXd AlgorithmMarginal::eval_lpdf(const Eigen::MatrixXd &grid,
-                                             CollectorBase *coll) {
+Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
+                                             BaseCollector *coll) {
   // Read chain from collector
   std::deque<bayesmix::MarginalState> chain = coll->get_chain();
   unsigned int n_data = chain[0].cluster_allocs_size();
@@ -30,7 +30,7 @@ Eigen::MatrixXd AlgorithmMarginal::eval_lpdf(const Eigen::MatrixXd &grid,
     // Initialize local matrix of log-densities
     Eigen::MatrixXd lpdf_local(grid.rows(), n_clust + 1);
     // Initialize local temporary hierarchy
-    std::shared_ptr<HierarchyBase> temp_hier = unique_values[0]->clone();
+    std::shared_ptr<BaseHierarchy> temp_hier = unique_values[0]->clone();
 
     // Loop over local unique values i.e. clusters
     for (size_t j = 0; j < n_clust; j++) {

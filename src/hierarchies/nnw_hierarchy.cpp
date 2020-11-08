@@ -1,4 +1,4 @@
-#include "hierarchy_nnw.hpp"
+#include "nnw_hierarchy.hpp"
 
 #include <google/protobuf/stubs/casts.h>
 
@@ -12,7 +12,7 @@
 #include "../utils/proto_utils.hpp"
 #include "../utils/rng.hpp"
 
-void HierarchyNNW::check_hypers_validity() {
+void NNWHierarchy::check_hypers_validity() {
   unsigned int dim = mu0.size();
   assert(lambda > 0);
   assert(dim == tau0.rows());
@@ -25,7 +25,7 @@ void HierarchyNNW::check_hypers_validity() {
   assert(llt.info() != Eigen::NumericalIssue);
 }
 
-void HierarchyNNW::check_state_validity() {
+void NNWHierarchy::check_state_validity() {
   // Check if tau is a square matrix
   unsigned int dim = mean.size();
   assert(dim == tau.rows());
@@ -36,7 +36,7 @@ void HierarchyNNW::check_state_validity() {
 }
 
 //! \param tau Value to set to state[1]
-void HierarchyNNW::set_tau_and_utilities(const Eigen::MatrixXd &tau_) {
+void NNWHierarchy::set_tau_and_utilities(const Eigen::MatrixXd &tau_) {
   tau = tau_;
 
   // Update tau utilities
@@ -46,7 +46,7 @@ void HierarchyNNW::set_tau_and_utilities(const Eigen::MatrixXd &tau_) {
   tau_logdet = 2 * log(diag.array()).sum();
 }
 
-void HierarchyNNW::check_and_initialize() {
+void NNWHierarchy::check_and_initialize() {
   check_hypers_validity();
   unsigned int dim = get_mu0().size();
   mean = get_mu0();
@@ -56,7 +56,7 @@ void HierarchyNNW::check_and_initialize() {
 //! \param data                  Matrix of row-vectorial data points
 //! \param mu0, lambda, tau0, nu Original values for hyperparameters
 //! \return                      Vector of updated values for hyperparameters
-std::vector<Eigen::MatrixXd> HierarchyNNW::normal_wishart_update(
+std::vector<Eigen::MatrixXd> NNWHierarchy::normal_wishart_update(
     const Eigen::MatrixXd &data, const EigenRowVec &mu0, const double lambda,
     const Eigen::MatrixXd &tau0_inv, const double nu) {
   // Initialize relevant objects
@@ -83,14 +83,14 @@ std::vector<Eigen::MatrixXd> HierarchyNNW::normal_wishart_update(
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Likehood vector evaluated in data
-Eigen::VectorXd HierarchyNNW::like(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNWHierarchy::like(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result = lpdf(data);
   return result.array().exp();
 }
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Log-Likehood vector evaluated in data
-Eigen::VectorXd HierarchyNNW::lpdf(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNWHierarchy::lpdf(const Eigen::MatrixXd &data) {
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);
@@ -104,14 +104,14 @@ Eigen::VectorXd HierarchyNNW::lpdf(const Eigen::MatrixXd &data) {
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Marginal distribution vector evaluated in data
-Eigen::VectorXd HierarchyNNW::eval_marg(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNWHierarchy::eval_marg(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result = marg_lpdf(data);
   return result.array().exp();
 }
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Marginal distribution vector evaluated in data
-Eigen::VectorXd HierarchyNNW::marg_lpdf(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNWHierarchy::marg_lpdf(const Eigen::MatrixXd &data) {
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);
@@ -136,7 +136,7 @@ Eigen::VectorXd HierarchyNNW::marg_lpdf(const Eigen::MatrixXd &data) {
   return result;
 }
 
-void HierarchyNNW::draw() {
+void NNWHierarchy::draw() {
   // Get values of hyperparameters
   EigenRowVec mu0 = get_mu0();
   double lambda = get_lambda();
@@ -154,7 +154,7 @@ void HierarchyNNW::draw() {
 }
 
 //! \param data Matrix of row-vectorial data points
-void HierarchyNNW::sample_given_data(const Eigen::MatrixXd &data) {
+void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
   EigenRowVec mu0 = get_mu0();
   double lambda = get_lambda();
@@ -179,7 +179,7 @@ void HierarchyNNW::sample_given_data(const Eigen::MatrixXd &data) {
   set_tau_and_utilities(tau_new);
 }
 
-void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
+void NNWHierarchy::set_state(google::protobuf::Message *curr, bool check) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
 
@@ -194,7 +194,7 @@ void HierarchyNNW::set_state(google::protobuf::Message *curr, bool check) {
   }
 }
 
-void HierarchyNNW::get_state_as_proto(google::protobuf::Message *out) {
+void NNWHierarchy::get_state_as_proto(google::protobuf::Message *out) {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
 

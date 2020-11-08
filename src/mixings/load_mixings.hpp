@@ -5,20 +5,20 @@
 #include <memory>
 
 #include "../runtime/factory.hpp"
-#include "mixing_base.hpp"
-#include "mixing_dirichlet.hpp"
-#include "mixing_pityor.hpp"
+#include "base_mixing.hpp"
+#include "dirichlet_mixing.hpp"
+#include "pityor_mixing.hpp"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
 __attribute__((constructor)) static void load_mixings() {
-  Factory<MixingBase> &factory = Factory<MixingBase>::Instance();
-  Builder<MixingBase> DPbuilder = []() {
-    return std::make_shared<MixingDirichlet>();
+  Factory<BaseMixing> &factory = Factory<BaseMixing>::Instance();
+  Builder<BaseMixing> DPbuilder = []() {
+    return std::make_shared<DirichletMixing>();
   };
-  Builder<MixingBase> PYbuilder = []() {
-    return std::make_shared<MixingPitYor>();
+  Builder<BaseMixing> PYbuilder = []() {
+    return std::make_shared<PitYorMixing>();
   };
   factory.add_builder("DP", DPbuilder);
   factory.add_builder("PY", PYbuilder);

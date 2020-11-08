@@ -5,20 +5,20 @@
 #include <memory>
 
 #include "../runtime/factory.hpp"
-#include "algorithm_base.hpp"
-#include "algorithm_neal2.hpp"
-#include "algorithm_neal8.hpp"
+#include "base_algorithm.hpp"
+#include "neal2_algorithm.hpp"
+#include "neal8_algorithm.hpp"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
 __attribute__((constructor)) static void load_algorithms() {
-  Factory<AlgorithmBase> &factory = Factory<AlgorithmBase>::Instance();
-  Builder<AlgorithmBase> Neal2builder = []() {
-    return std::make_shared<AlgorithmNeal2>();
+  Factory<BaseAlgorithm> &factory = Factory<BaseAlgorithm>::Instance();
+  Builder<BaseAlgorithm> Neal2builder = []() {
+    return std::make_shared<Neal2Algorithm>();
   };
-  Builder<AlgorithmBase> Neal8builder = []() {
-    return std::make_shared<AlgorithmNeal8>();
+  Builder<BaseAlgorithm> Neal8builder = []() {
+    return std::make_shared<Neal8Algorithm>();
   };
   factory.add_builder("N2", Neal2builder);
   factory.add_builder("N8", Neal8builder);

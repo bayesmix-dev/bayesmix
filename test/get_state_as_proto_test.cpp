@@ -2,8 +2,8 @@
 
 #include "../proto/cpp/ls_state.pb.h"
 #include "../proto/cpp/marginal_state.pb.h"
-#include "../src/hierarchies/HierarchyNNIG.hpp"
-#include "../src/hierarchies/HierarchyNNW.hpp"
+#include "../src/hierarchies/NNIGHierarchy.hpp"
+#include "../src/hierarchies/NNWHierarchy.hpp"
 
 TEST(set_state, univ_ls) {
   using namespace bayesmix;
@@ -18,7 +18,7 @@ TEST(set_state, univ_ls) {
 
   MarginalState::ClusterVal clusval;
   clusval.mutable_univ_ls_state()->CopyFrom(curr);
-  HierarchyNNIG cluster;
+  NNIGHierarchy cluster;
   cluster.set_state(&clusval);
 
   ASSERT_EQ(curr.mean(), cluster.get_mean());
@@ -35,7 +35,7 @@ TEST(get_state_as_proto_test, univ_ls) {
 
   MarginalState::ClusterVal clusval_in;
   clusval_in.mutable_univ_ls_state()->CopyFrom(curr);
-  HierarchyNNIG cluster;
+  NNIGHierarchy cluster;
   cluster.set_state(&clusval_in);
 
   MarginalState out;
@@ -65,7 +65,7 @@ TEST(set_state, multi_ls) {
 
   MarginalState::ClusterVal clusval_in;
   clusval_in.mutable_multi_ls_state()->CopyFrom(curr);
-  HierarchyNNW cluster;
+  NNWHierarchy cluster;
   cluster.set_state(&clusval_in);
 
   ASSERT_EQ(curr.mean().data(0), cluster.get_mean()(0));

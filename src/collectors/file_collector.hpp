@@ -1,7 +1,7 @@
-#ifndef BAYESMIX_COLLECTORS_COLLECTOR_FILE_HPP_
-#define BAYESMIX_COLLECTORS_COLLECTOR_FILE_HPP_
+#ifndef BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_
+#define BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_
 
-#include "collector_base.hpp"
+#include "base_collector.hpp"
 
 //! Class for a collector that writes its content to a file.
 
@@ -13,7 +13,7 @@
 //! main programs are used both to run the algorithm and the estimates.
 //! Therefore, a file collector has both a reading and a writing mode.
 
-class CollectorFile : public CollectorBase {
+class FileCollector : public BaseCollector {
  protected:
   //! Unix file descriptor for reading mode
   int infd;
@@ -39,7 +39,7 @@ class CollectorFile : public CollectorBase {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~CollectorFile() {
+  ~FileCollector() {
     if (is_open_write) {
       fout->Close();
       close(outfd);
@@ -49,7 +49,7 @@ class CollectorFile : public CollectorBase {
       close(infd);
     }
   }
-  CollectorFile(const std::string &filename_) : filename(filename_) {}
+  FileCollector(const std::string &filename_) : filename(filename_) {}
   //! Initializes collector
   void start() override;
   //! Closes collector
@@ -63,4 +63,4 @@ class CollectorFile : public CollectorBase {
   std::deque<bayesmix::MarginalState> get_chain() override;
 };
 
-#endif  // BAYESMIX_COLLECTORS_COLLECTOR_FILE_HPP_
+#endif  // BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_

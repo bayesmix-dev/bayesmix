@@ -1,4 +1,4 @@
-#include "algorithm_base.hpp"
+#include "base_algorithm.hpp"
 
 #include <Eigen/Dense>
 
@@ -6,7 +6,7 @@
 
 //! \param iter Number of the current iteration
 //! \return     Protobuf-object version of the current state
-bayesmix::MarginalState AlgorithmBase::get_state_as_proto(unsigned int iter) {
+bayesmix::MarginalState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
   bayesmix::MarginalState iter_out;
   // Transcribe iteration number and allocations vector
   iter_out.set_iteration_num(iter);
