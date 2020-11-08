@@ -1,5 +1,5 @@
-#ifndef CONDITIONALALGORITHM_HPP
-#define CONDITIONALALGORITHM_HPP
+#ifndef BAYESMIX_ALGORITHMS_ALGORITHM_CONDITIONAL_HPP_
+#define BAYESMIX_ALGORITHMS_ALGORITHM_CONDITIONAL_HPP_
 
 #include "algorithm_base.hpp"
 
@@ -14,4 +14,4 @@ class AlgorithmConditional : public AlgorithmBase {
                                     CollectorBase *const collector) override;
 };
 
-#endif  // CONDITIONALALGORITHM_HPP
+#endif  // BAYESMIX_ALGORITHMS_ALGORITHM_CONDITIONAL_HPP_

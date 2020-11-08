@@ -1,5 +1,5 @@
-#ifndef FILECOLLECTOR_HPP
-#define FILECOLLECTOR_HPP
+#ifndef BAYESMIX_COLLECTORS_COLLECTOR_FILE_HPP_
+#define BAYESMIX_COLLECTORS_COLLECTOR_FILE_HPP_
 
 #include "collector_base.hpp"
 
@@ -63,4 +63,4 @@ class CollectorFile : public CollectorBase {
   std::deque<bayesmix::MarginalState> get_chain() override;
 };
 
-#endif  // FILECOLLECTOR_HPP
+#endif  // BAYESMIX_COLLECTORS_COLLECTOR_FILE_HPP_

@@ -1,5 +1,5 @@
-#ifndef FACTORY_HPP
-#define FACTORY_HPP
+#ifndef BAYESMIX_RUNTIME_FACTORY_HPP_
+#define BAYESMIX_RUNTIME_FACTORY_HPP_
 #include <functional>
 #include <iostream>
 #include <map>
@@ -93,4 +93,4 @@ class Factory {
   }
 };
 
-#endif  // FACTORY_HPP
+#endif  // BAYESMIX_RUNTIME_FACTORY_HPP_

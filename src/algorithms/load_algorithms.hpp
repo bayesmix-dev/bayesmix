@@ -1,5 +1,5 @@
-#ifndef LOAD_ALGORITHMS_HPP
-#define LOAD_ALGORITHMS_HPP
+#ifndef BAYESMIX_ALGORITHMS_LOAD_ALGORITHMS_HPP_
+#define BAYESMIX_ALGORITHMS_LOAD_ALGORITHMS_HPP_
 
 #include "../runtime/factory.hpp"
 
@@ -18,4 +18,4 @@ __attribute__((constructor)) static void load_algorithms() {
   factory.add_builder("N8", Neal8builder);
 }
 
-#endif  // LOAD_ALGORITHMS_HPP
+#endif  // BAYESMIX_ALGORITHMS_LOAD_ALGORITHMS_HPP_

@@ -1,5 +1,5 @@
-#ifndef MEMORYCOLLECTOR_HPP
-#define MEMORYCOLLECTOR_HPP
+#ifndef BAYESMIX_COLLECTORS_COLLECTOR_MEMORY_HPP_
+#define BAYESMIX_COLLECTORS_COLLECTOR_MEMORY_HPP_
 
 #include "collector_base.hpp"
 
@@ -43,4 +43,4 @@ class CollectorMemory : public CollectorBase {
   std::deque<bayesmix::MarginalState> get_chain() override { return chain; }
 };
 
-#endif  // MEMORYCOLLECTOR_HPP
+#endif  // BAYESMIX_COLLECTORS_COLLECTOR_MEMORY_HPP_

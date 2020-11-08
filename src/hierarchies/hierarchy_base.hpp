@@ -1,5 +1,5 @@
-#ifndef HIERARCHYBASE_HPP
-#define HIERARCHYBASE_HPP
+#ifndef BAYESMIX_HIERARCHIES_HIERARCHY_BASE_HPP_
+#define BAYESMIX_HIERARCHIES_HIERARCHY_BASE_HPP_
 
 #include <google/protobuf/message.h>
 
@@ -75,4 +75,4 @@ class HierarchyBase {
   virtual std::string get_id() const = 0;
 };
 
-#endif  // HIERARCHYBASE_HPP
+#endif  // BAYESMIX_HIERARCHIES_HIERARCHY_BASE_HPP_

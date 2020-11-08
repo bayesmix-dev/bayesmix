@@ -1,5 +1,5 @@
-#ifndef PITYORMIXING_HPP
-#define PITYORMIXING_HPP
+#ifndef BAYESMIX_MIXINGS_MIXING_PITYOR_HPP_
+#define BAYESMIX_MIXINGS_MIXING_PITYOR_HPP_
 
 #include "mixing_base.hpp"
 
@@ -63,4 +63,4 @@ class MixingPitYor : public MixingBase {
   std::string get_id() const override { return "Pitman-Yor"; }
 };
 
-#endif  // PITYORMIXING_HPP
+#endif  // BAYESMIX_MIXINGS_MIXING_PITYOR_HPP_

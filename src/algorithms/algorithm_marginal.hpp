@@ -1,5 +1,5 @@
-#ifndef MARGINALALGORITHM_HPP
-#define MARGINALALGORITHM_HPP
+#ifndef BAYESMIX_ALGORITHMS_ALGORITHM_MARGINAL_HPP_
+#define BAYESMIX_ALGORITHMS_ALGORITHM_MARGINAL_HPP_
 
 #include "algorithm_base.hpp"
 
@@ -14,4 +14,4 @@ class AlgorithmMarginal : public AlgorithmBase {
                                     CollectorBase *const collector) override;
 };
 
-#endif  // MARGINALALGORITHM_HPP
+#endif  // BAYESMIX_ALGORITHMS_ALGORITHM_MARGINAL_HPP_

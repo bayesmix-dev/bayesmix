@@ -1,5 +1,5 @@
-#ifndef HIERARCHYNNIG_HPP
-#define HIERARCHYNNIG_HPP
+#ifndef BAYESMIX_HIERARCHIES_HIERARCHY_NNIG_HPP_
+#define BAYESMIX_HIERARCHIES_HIERARCHY_NNIG_HPP_
 
 #include <google/protobuf/stubs/casts.h>
 
@@ -102,4 +102,4 @@ class HierarchyNNIG : public HierarchyBase {
   std::string get_id() const override { return "NNIG"; }
 };
 
-#endif  // HIERARCHYNNIG_HPP
+#endif  // BAYESMIX_HIERARCHIES_HIERARCHY_NNIG_HPP_

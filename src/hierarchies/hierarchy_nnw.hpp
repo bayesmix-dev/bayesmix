@@ -1,5 +1,5 @@
-#ifndef HIERARCHYNNW_HPP
-#define HIERARCHYNNW_HPP
+#ifndef BAYESMIX_HIERARCHIES_HIERARCHY_NNW_HPP_
+#define BAYESMIX_HIERARCHIES_HIERARCHY_NNW_HPP_
 
 #include <google/protobuf/stubs/casts.h>
 
@@ -129,4 +129,4 @@ class HierarchyNNW : public HierarchyBase {
   std::string get_id() const override { return "NNW"; }
 };
 
-#endif  // HIERARCHYNNW_HPP
+#endif  // BAYESMIX_HIERARCHIES_HIERARCHY_NNW_HPP_

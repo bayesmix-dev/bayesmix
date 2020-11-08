@@ -1,5 +1,5 @@
-#ifndef LOAD_HIERARCHIES_HPP
-#define LOAD_HIERARCHIES_HPP
+#ifndef BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_HPP_
+#define BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_HPP_
 
 #include "../runtime/factory.hpp"
 
@@ -18,4 +18,4 @@ __attribute__((constructor)) static void load_hierarchies() {
   factory.add_builder("NNW", NNWbuilder);
 }
 
-#endif  // LOAD_HIERARCHIES_HPP
+#endif  // BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_HPP_

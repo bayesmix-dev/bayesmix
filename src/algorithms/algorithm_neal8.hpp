@@ -1,5 +1,5 @@
-#ifndef NEAL8_HPP
-#define NEAL8_HPP
+#ifndef BAYESMIX_ALGORITHMS_ALGORITHM_NEAL8_HPP_
+#define BAYESMIX_ALGORITHMS_ALGORITHM_NEAL8_HPP_
 
 #include "algorithm_neal2.hpp"
 
@@ -52,4 +52,4 @@ class AlgorithmNeal8 : public AlgorithmNeal2 {
   std::string get_id() const override { return "Neal8"; }
 };
 
-#endif  // NEAL8_HPP
+#endif  // BAYESMIX_ALGORITHMS_ALGORITHM_NEAL8_HPP_

@@ -1,5 +1,5 @@
-#ifndef ALGORITHM_HPP
-#define ALGORITHM_HPP
+#ifndef BAYESMIX_ALGORITHMS_ALGORITHM_BASE_HPP_
+#define BAYESMIX_ALGORITHMS_ALGORITHM_BASE_HPP_
 
 #include <math.h>
 
@@ -170,4 +170,4 @@ class AlgorithmBase {
   virtual std::string get_id() const = 0;
 };
 
-#endif  // ALGORITHM_HPP
+#endif  // BAYESMIX_ALGORITHMS_ALGORITHM_BASE_HPP_

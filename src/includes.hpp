@@ -1,5 +1,5 @@
-#ifndef INCLUDES_HPP
-#define INCLUDES_HPP
+#ifndef BAYESMIX_INCLUDES_HPP_
+#define BAYESMIX_INCLUDES_HPP_
 
 #include "algorithms/algorithm_neal2.hpp"
 #include "algorithms/algorithm_neal8.hpp"
@@ -16,4 +16,4 @@
 #include "utils/cluster_utils.hpp"
 #include "utils/io_utils.hpp"
 
-#endif  // INCLUDES_HPP
+#endif  // BAYESMIX_INCLUDES_HPP_

@@ -1,5 +1,5 @@
-#ifndef NEAL2_HPP
-#define NEAL2_HPP
+#ifndef BAYESMIX_ALGORITHMS_ALGORITHM_NEAL2_HPP_
+#define BAYESMIX_ALGORITHMS_ALGORITHM_NEAL2_HPP_
 
 #include "algorithm_marginal.hpp"
 
@@ -48,4 +48,4 @@ class AlgorithmNeal2 : public AlgorithmMarginal {
   std::string get_id() const override { return "Neal2"; }
 };
 
-#endif  // NEAL2_HPP
+#endif  // BAYESMIX_ALGORITHMS_ALGORITHM_NEAL2_HPP_

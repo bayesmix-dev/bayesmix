@@ -1,5 +1,5 @@
-#ifndef LOAD_MIXINGS_HPP
-#define LOAD_MIXINGS_HPP
+#ifndef BAYESMIX_MIXINGS_LOAD_MIXINGS_HPP_
+#define BAYESMIX_MIXINGS_LOAD_MIXINGS_HPP_
 
 #include "../runtime/factory.hpp"
 
@@ -18,4 +18,4 @@ __attribute__((constructor)) static void load_mixings() {
   factory.add_builder("PY", PYbuilder);
 }
 
-#endif  // LOAD_MIXINGS_HPP
+#endif  // BAYESMIX_MIXINGS_LOAD_MIXINGS_HPP_

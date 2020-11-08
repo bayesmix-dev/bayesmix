@@ -1,5 +1,5 @@
-#ifndef BASEMIXING_HPP
-#define BASEMIXING_HPP
+#ifndef BAYESMIX_MIXINGS_MIXING_BASE_HPP_
+#define BAYESMIX_MIXINGS_MIXING_BASE_HPP_
 
 #include <cassert>
 
@@ -42,4 +42,4 @@ class MixingBase {
   virtual std::string get_id() const = 0;
 };
 
-#endif  // BASEMIXING_HPP
+#endif  // BAYESMIX_MIXINGS_MIXING_BASE_HPP_

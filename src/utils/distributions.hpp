@@ -1,5 +1,5 @@
-#ifndef DISTRIBUTIONS_HPP
-#define DISTRIBUTIONS_HPP
+#ifndef BAYESMIX_UTILS_DISTRIBUTIONS_HPP_
+#define BAYESMIX_UTILS_DISTRIBUTIONS_HPP_
 
 #include <Eigen/Dense>
 #include <random>
@@ -14,4 +14,4 @@ double multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
                               double prec_logdet);
 }  // namespace bayesmix
 
-#endif  // DISTRIBUTIONS_HPP
+#endif  // BAYESMIX_UTILS_DISTRIBUTIONS_HPP_
