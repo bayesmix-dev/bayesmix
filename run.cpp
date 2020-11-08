@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
   unsigned int init = 0;
   unsigned int maxiter = 1000;
   unsigned int burnin = 1;
+  int rng_seed = 20201103;
 
   // Create factories and objects
   auto &factory_mixing = Factory<BaseMixing>::Instance();
@@ -30,6 +31,7 @@ int main(int argc, char *argv[]) {
   auto algo = factory_algo.create_object(type_algo);
   // Initialize RNG object
   auto rng = bayesmix::Rng::Instance().get();
+  rng.seed(rng_seed);
 
   // Set parameters
 
