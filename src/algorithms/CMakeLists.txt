@@ -2,8 +2,8 @@ target_sources(bayesmix
   PUBLIC
     Algorithm.hpp
     Algorithm.cpp
-    # ConditionalAlgorithm.hpp  # TODO
-    # ConditionalAlgorithm.cpp  # TODO
+    # ConditionalAlgorithm.hpp
+    # ConditionalAlgorithm.cpp
     MarginalAlgorithm.hpp
     MarginalAlgorithm.cpp
     Neal2.hpp
