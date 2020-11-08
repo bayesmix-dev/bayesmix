@@ -2,9 +2,11 @@
 #define BAYESMIX_HIERARCHIES_HIERARCHY_NNW_HPP_
 
 #include <google/protobuf/stubs/casts.h>
+
 #include <Eigen/Dense>
-#include "hierarchy_base.hpp"
 #include <stan/math/prim/fun.hpp>
+
+#include "hierarchy_base.hpp"
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 

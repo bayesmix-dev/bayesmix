@@ -2,10 +2,12 @@
 #define BAYESMIX_HIERARCHIES_HIERARCHY_NNIG_HPP_
 
 #include <google/protobuf/stubs/casts.h>
-#include "hierarchy_base.hpp"
+
+#include <Eigen/Dense>
 #include <cassert>
 #include <memory>
-#include <Eigen/Dense>
+
+#include "hierarchy_base.hpp"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.
 

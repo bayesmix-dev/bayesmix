@@ -1,12 +1,13 @@
 #ifndef BAYESMIX_MIXINGS_LOAD_MIXINGS_HPP_
 #define BAYESMIX_MIXINGS_LOAD_MIXINGS_HPP_
 
-#include "../runtime/factory.hpp"
-#include "mixing_dirichlet.hpp"
-#include "mixing_pityor.hpp"
-#include "mixing_base.hpp"
 #include <functional>
 #include <memory>
+
+#include "../runtime/factory.hpp"
+#include "mixing_base.hpp"
+#include "mixing_dirichlet.hpp"
+#include "mixing_pityor.hpp"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;

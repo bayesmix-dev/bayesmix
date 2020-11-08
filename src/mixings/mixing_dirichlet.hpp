@@ -2,6 +2,7 @@
 #define BAYESMIX_MIXINGS_MIXING_DIRICHLET_HPP_
 
 #include <cassert>
+
 #include "mixing_base.hpp"
 
 //! Class that represents the Dirichlet process mixture model.

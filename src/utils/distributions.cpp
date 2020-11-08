@@ -1,4 +1,5 @@
 #include "distributions.hpp"
+
 #include <Eigen/Dense>
 #include <random>
 #include <stan/math/prim/prob.hpp>

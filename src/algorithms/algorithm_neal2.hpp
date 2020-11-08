@@ -1,10 +1,11 @@
 #ifndef BAYESMIX_ALGORITHMS_ALGORITHM_NEAL2_HPP_
 #define BAYESMIX_ALGORITHMS_ALGORITHM_NEAL2_HPP_
 
-#include "algorithm_marginal.hpp"
 #include <Eigen/Dense>
 #include <memory>
+
 #include "../hierarchies/hierarchy_base.hpp"
+#include "algorithm_marginal.hpp"
 
 //! Template class for Neal's algorithm 2 for conjugate hierarchies
 

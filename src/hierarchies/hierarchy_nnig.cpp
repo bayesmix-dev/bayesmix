@@ -1,10 +1,13 @@
 #include "hierarchy_nnig.hpp"
+
 #include <google/protobuf/stubs/casts.h>
+
 #include <Eigen/Dense>
+#include <stan/math/prim/prob.hpp>
+
 #include "../../proto/cpp/ls_state.pb.h"
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
-#include <stan/math/prim/prob.hpp>
 
 void HierarchyNNIG::check_and_initialize() {
   check_hypers_validity();

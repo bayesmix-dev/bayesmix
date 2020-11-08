@@ -1,5 +1,7 @@
 #include "proto_utils.hpp"
+
 #include <Eigen/Dense>
+
 #include "../../proto/cpp/matrix.pb.h"
 
 void bayesmix::to_proto(const Eigen::MatrixXd &mat, Matrix *out) {

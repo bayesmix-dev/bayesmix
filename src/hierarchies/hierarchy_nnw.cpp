@@ -1,13 +1,16 @@
 #include "hierarchy_nnw.hpp"
+
 #include <google/protobuf/stubs/casts.h>
+
 #include <Eigen/Dense>
+#include <stan/math/prim/prob.hpp>
+
 #include "../../proto/cpp/ls_state.pb.h"
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../../proto/cpp/matrix.pb.h"
 #include "../utils/distributions.hpp"
 #include "../utils/proto_utils.hpp"
 #include "../utils/rng.hpp"
-#include <stan/math/prim/prob.hpp>
 
 void HierarchyNNW::check_hypers_validity() {
   unsigned int dim = mu0.size();

@@ -1,9 +1,10 @@
 #ifndef BAYESMIX_ALGORITHMS_ALGORITHM_CONDITIONAL_HPP_
 #define BAYESMIX_ALGORITHMS_ALGORITHM_CONDITIONAL_HPP_
 
-#include "algorithm_base.hpp"
 #include <Eigen/Dense>
+
 #include "../collectors/collector_base.hpp"
+#include "algorithm_base.hpp"
 
 class AlgorithmConditional : public AlgorithmBase {
  protected:

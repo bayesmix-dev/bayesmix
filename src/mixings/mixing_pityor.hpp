@@ -2,6 +2,7 @@
 #define BAYESMIX_MIXINGS_MIXING_PITYOR_HPP_
 
 #include <cassert>
+
 #include "mixing_base.hpp"
 
 //! Class that represents the Pitman-Yor process mixture model.

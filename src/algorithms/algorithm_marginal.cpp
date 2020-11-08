@@ -1,8 +1,10 @@
 #include "algorithm_marginal.hpp"
+
 #include <Eigen/Dense>
-#include "../collectors/collector_base.hpp"
-#include "../../proto/cpp/marginal_state.pb.h"
 #include <stan/math/prim/fun.hpp>
+
+#include "../../proto/cpp/marginal_state.pb.h"
+#include "../collectors/collector_base.hpp"
 
 //! \param grid Grid of points in matrix form to evaluate the density on
 //! \param coll Collector containing the algorithm chain

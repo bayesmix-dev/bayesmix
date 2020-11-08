@@ -2,9 +2,11 @@
 #define BAYESMIX_HIERARCHIES_HIERARCHY_BASE_HPP_
 
 #include <google/protobuf/message.h>
-#include <random>
+
 #include <Eigen/Dense>
 #include <memory>
+#include <random>
+
 #include "../utils/rng.hpp"
 
 //! Abstract base template class for a hierarchy object.

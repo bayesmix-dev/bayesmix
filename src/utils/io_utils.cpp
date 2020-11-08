@@ -1,6 +1,7 @@
 #include "io_utils.hpp"
-#include <fstream>
+
 #include <Eigen/Dense>
+#include <fstream>
 
 Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename) {
   // Initialize objects
@@ -46,7 +47,7 @@ Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename) {
 };
 
 void bayesmix::write_matrix_to_file(const Eigen::MatrixXd &mat,
-	                                std::string filename) {
+                                    std::string filename) {
   using namespace Eigen;
   const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ",", "\n");
   std::ofstream file(filename.c_str());

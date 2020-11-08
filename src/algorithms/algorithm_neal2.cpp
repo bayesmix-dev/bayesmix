@@ -1,13 +1,15 @@
 #include "algorithm_neal2.hpp"
+
 #include <Eigen/Dense>
 #include <memory>
+#include <stan/math/prim/fun.hpp>
 #include <vector>
+
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../hierarchies/hierarchy_base.hpp"
 #include "../mixings/mixing_base.hpp"
-#include "../utils/rng.hpp"
 #include "../utils/distributions.hpp"
-#include <stan/math/prim/fun.hpp>
+#include "../utils/rng.hpp"
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid

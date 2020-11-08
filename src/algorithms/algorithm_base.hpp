@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <vector>
+
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/collector_base.hpp"
 #include "../hierarchies/hierarchy_base.hpp"
@@ -150,8 +151,6 @@ class AlgorithmBase {
     }
     data = data_;
     init_num_clusters = (init == 0) ? data.rows() : init;
-    // "Warning: initial number of clusters will be set equal to the data
-    // size (" << data.rows() << ")"  // TODO
     // Initialize hierarchies for starting clusters
     unique_values.clear();
     for (size_t i = 0; i < init_num_clusters; i++) {
