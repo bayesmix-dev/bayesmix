@@ -11,7 +11,7 @@ class AlgorithmMarginal : public AlgorithmBase {
   ~AlgorithmMarginal() = default;
   AlgorithmMarginal() = default;
   virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                                    BaseCollector *const collector) override;
+                                    CollectorBase *const collector) override;
 };
 
 #endif  // MARGINALALGORITHM_HPP

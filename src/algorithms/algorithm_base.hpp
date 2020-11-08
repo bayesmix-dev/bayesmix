@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "../../proto/cpp/marginal_state.pb.h"
-#include "../collectors/BaseCollector.hpp"
+#include "../collectors/collector_base.hpp"
 #include "../hierarchies/HierarchyBase.hpp"
 #include "../mixings/BaseMixing.hpp"
 #include "../utils/distributions.hpp"
@@ -91,7 +91,7 @@ class AlgorithmBase {
     std::cout << "Done" << std::endl;
   };
   //! Saves the current iteration's state in Protobuf form to a collector
-  void save_state(BaseCollector *collector, unsigned int iter) {
+  void save_state(CollectorBase *collector, unsigned int iter) {
     collector->collect(get_state_as_proto(iter));
   }
 
@@ -105,7 +105,7 @@ class AlgorithmBase {
 
  public:
   //! Runs the algorithm and saves the whole chain to a collector
-  void run(BaseCollector *collector) {
+  void run(CollectorBase *collector) {
     print_startup_message();
     for (auto &un : unique_values) {
       un->check_and_initialize();
@@ -128,7 +128,7 @@ class AlgorithmBase {
   // ESTIMATE FUNCTION
   //! Evaluates the logpdf for each single iteration on a given grid of points
   virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                                    BaseCollector *const collector) = 0;
+                                    CollectorBase *const collector) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~AlgorithmBase() = default;

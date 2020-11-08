@@ -11,7 +11,7 @@ class AlgorithmConditional : public AlgorithmBase {
   ~AlgorithmConditional() = default;
   AlgorithmConditional() = default;
   virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                                    BaseCollector *const collector) override;
+                                    CollectorBase *const collector) override;
 };
 
 #endif  // CONDITIONALALGORITHM_HPP

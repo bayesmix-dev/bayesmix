@@ -4,7 +4,7 @@
 //! \param coll Collector containing the algorithm chain
 //! \return     Matrix whose i-th column is the lpdf at i-th iteration
 Eigen::MatrixXd AlgorithmMarginal::eval_lpdf(const Eigen::MatrixXd &grid,
-                                             BaseCollector *coll) {
+                                             CollectorBase *coll) {
   // Read chain from collector
   std::deque<bayesmix::MarginalState> chain = coll->get_chain();
   unsigned int n_data = chain[0].cluster_allocs_size();

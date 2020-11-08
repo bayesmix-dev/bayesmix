@@ -26,7 +26,7 @@
 //! collector. This means that the collector will contain the states of the
 //! whole Markov chain by the end of the running of the algorithm.
 
-class BaseCollector {
+class CollectorBase {
  protected:
   //! Current size of the chain
   unsigned int size = 0;
@@ -39,8 +39,8 @@ class BaseCollector {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~BaseCollector() = default;
-  BaseCollector() = default;
+  virtual ~CollectorBase() = default;
+  CollectorBase() = default;
 
   //! Initializes collector
   virtual void start() = 0;

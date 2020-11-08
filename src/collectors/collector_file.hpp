@@ -1,7 +1,7 @@
 #ifndef FILECOLLECTOR_HPP
 #define FILECOLLECTOR_HPP
 
-#include "BaseCollector.hpp"
+#include "collector_base.hpp"
 
 //! Class for a collector that writes its content to a file.
 
@@ -13,7 +13,7 @@
 //! main programs are used both to run the algorithm and the estimates.
 //! Therefore, a file collector has both a reading and a writing mode.
 
-class FileCollector : public BaseCollector {
+class CollectorFile : public CollectorBase {
  protected:
   //! Unix file descriptor for reading mode
   int infd;
@@ -39,7 +39,7 @@ class FileCollector : public BaseCollector {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~FileCollector() {
+  ~CollectorFile() {
     if (is_open_write) {
       fout->Close();
       close(outfd);
@@ -49,7 +49,7 @@ class FileCollector : public BaseCollector {
       close(infd);
     }
   }
-  FileCollector(const std::string &filename_) : filename(filename_) {}
+  CollectorFile(const std::string &filename_) : filename(filename_) {}
   //! Initializes collector
   void start() override;
   //! Closes collector

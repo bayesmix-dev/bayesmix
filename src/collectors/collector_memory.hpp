@@ -1,7 +1,7 @@
 #ifndef MEMORYCOLLECTOR_HPP
 #define MEMORYCOLLECTOR_HPP
 
-#include "BaseCollector.hpp"
+#include "collector_base.hpp"
 
 //! Class for a "virtual" collector which contains all objects of the chain
 
@@ -13,7 +13,7 @@
 //! is not needed, for instance in a main program that both runes and algorithm
 //! and computes the estimates.
 
-class MemoryCollector : public BaseCollector {
+class CollectorMemory : public CollectorBase {
  protected:
   //! Deque that contains all states in Protobuf-object form
   std::deque<bayesmix::MarginalState> chain;
@@ -23,8 +23,8 @@ class MemoryCollector : public BaseCollector {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~MemoryCollector() = default;
-  MemoryCollector() = default;
+  ~CollectorMemory() = default;
+  CollectorMemory() = default;
 
   //! Initializes collector (here, it does nothing)
   void start() override { return; }
