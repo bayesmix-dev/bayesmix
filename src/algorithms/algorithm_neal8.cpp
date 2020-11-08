@@ -7,7 +7,7 @@
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../hierarchies/hierarchy_base.hpp"
 #include "../mixings/mixing_base.hpp"
-#include "../utils/distributions.cpp"
+#include "../utils/distributions.hpp"
 #include "algorithm_neal2.hpp"
 
 //! \param temp_hier Temporary hierarchy object
