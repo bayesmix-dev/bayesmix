@@ -12,9 +12,9 @@ int main(int argc, char *argv[]) {
   //std::string type_mixing = "PY";
   //std::string type_hier = "NNW";
   std::string type_algo = "N2";
-  std::string datafile = "resources/data_multi.csv";  //TEST
-  std::string gridfile = "resources/grid_multi.csv";  //TEST
-  std::string densfile = "resources/dens_multi.csv";  //TEST
+  std::string datafile = "resources/data_uni.csv";  //TEST
+  std::string gridfile = "resources/grid_uni.csv";  //TEST
+  std::string densfile = "resources/dens_uni.csv";  //TEST
   unsigned int init = 0;
   unsigned int maxiter = 1000;
   unsigned int burnin = 1;
@@ -26,27 +26,27 @@ int main(int argc, char *argv[]) {
   //auto mixing = factory_mixing.create_object(type_mixing);
   auto mixing = std::make_shared<DirichletMixing>();
   //auto hier = factory_hier.create_object(type_hier);
-  auto hier = std::make_shared<HierarchyNNW>();  //TEST
+  auto hier = std::make_shared<HierarchyNNIG>();  //TEST
   auto algo = factory_algo.create_object(type_algo);
   // Initialize RNG object
   auto rng = bayesmix::Rng::Instance().get();
 
   // Set parameters
 
-  // // NNIG  //TEST
-  // hier->set_mu0(5.0);
-  // hier->set_lambda(0.1);
-  // hier->set_alpha0(2.0);
-  // hier->set_beta0(2.0);
+  // NNIG  //TEST
+  hier->set_mu0(5.0);
+  hier->set_lambda(0.1);
+  hier->set_alpha0(2.0);
+  hier->set_beta0(2.0);
 
-  // NNW  //TEST
-  Eigen::Matrix<double, 1, 2> mu0; mu0 << 5.5, 5.5;
-  hier->set_mu0(mu0);
-  hier->set_lambda(0.2);
-  double nu = 5.0;
-  hier->set_nu(nu);
-  Eigen::MatrixXd tau0 = (1 / nu) * Eigen::Matrix<double, 2, 2>::Identity();
-  hier->set_tau0(tau0);
+  // // NNW  //TEST
+  // Eigen::Matrix<double, 1, 2> mu0; mu0 << 5.5, 5.5;
+  // hier->set_mu0(mu0);
+  // hier->set_lambda(0.2);
+  // double nu = 5.0;
+  // hier->set_nu(nu);
+  // Eigen::MatrixXd tau0 = (1 / nu) * Eigen::Matrix<double, 2, 2>::Identity();
+  // hier->set_tau0(tau0);
   
   mixing->set_totalmass(2.0);
   algo->set_maxiter(maxiter);
