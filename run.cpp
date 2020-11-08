@@ -20,11 +20,11 @@ int main(int argc, char *argv[]) {
   unsigned int burnin = 1;
 
   // Create factories and objects
-  // Factory<BaseMixing> &factory_mixing = Factory<BaseMixing>::Instance();
-  // Factory<HierarchyBase> &factory_hier = Factory<HierarchyBase>::Instance();
-  Factory<Algorithm> &factory_algo = Factory<Algorithm>::Instance();
+  auto &factory_mixing = Factory<MixingBase>::Instance();
+  auto &factory_hier = Factory<HierarchyBase>::Instance();
+  auto &factory_algo = Factory<AlgorithmBase>::Instance();
   // auto mixing = factory_mixing.create_object(type_mixing);
-  auto mixing = std::make_shared<DirichletMixing>();
+  auto mixing = std::make_shared<MixingDirichlet>();
   // auto hier = factory_hier.create_object(type_hier);
   auto hier = std::make_shared<HierarchyNNIG>();  // TEST
   auto algo = factory_algo.create_object(type_algo);
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
   if (type_algo == "N8") {
     algo->set_n_aux(3);
   }
-  BaseCollector *coll = new MemoryCollector();
+  CollectorBase *coll = new CollectorMemory();
 
   algo->run(coll);
   Eigen::MatrixXd dens = algo->eval_lpdf(grid, coll);
