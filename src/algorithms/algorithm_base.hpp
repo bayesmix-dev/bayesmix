@@ -13,7 +13,7 @@
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/collector_base.hpp"
 #include "../hierarchies/hierarchy_base.hpp"
-#include "../mixings/BaseMixing.hpp"
+#include "../mixings/mixing_base.hpp"
 #include "../utils/distributions.hpp"
 #include "../utils/proto_utils.hpp"
 
@@ -70,7 +70,7 @@ class AlgorithmBase {
   //! Hierarchy of the unique values that identify each cluster
   std::vector<std::shared_ptr<HierarchyBase>> unique_values;
   //! Mixing object
-  std::shared_ptr<BaseMixing> mixing;
+  std::shared_ptr<MixingBase> mixing;
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object
@@ -143,7 +143,7 @@ class AlgorithmBase {
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
   //! Does nothing except for Neal8
   virtual void set_n_aux(const unsigned int n_aux_) { return; }
-  void set_mixing(std::shared_ptr<BaseMixing> mixing_) { mixing = mixing_; }
+  void set_mixing(std::shared_ptr<MixingBase> mixing_) { mixing = mixing_; }
   void set_data_and_initial_clusters(const Eigen::MatrixXd &data_,
                                      std::shared_ptr<HierarchyBase> hier_,
                                      const unsigned int init = 0) {

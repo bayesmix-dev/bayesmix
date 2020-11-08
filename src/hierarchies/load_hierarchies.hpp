@@ -1,7 +1,7 @@
 #ifndef LOAD_HIERARCHIES_HPP
 #define LOAD_HIERARCHIES_HPP
 
-#include "../runtime/Factory.hpp"
+#include "../runtime/factory.hpp"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;

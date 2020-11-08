@@ -16,11 +16,11 @@
 //! aforementioned events. The class will then have its own parameters, and
 //! maybe even prior distributions on them.
 
-class BaseMixing {
+class MixingBase {
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~BaseMixing() = default;
-  BaseMixing() = default;
+  virtual ~MixingBase() = default;
+  MixingBase() = default;
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster

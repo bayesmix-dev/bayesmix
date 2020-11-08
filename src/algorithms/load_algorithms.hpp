@@ -1,7 +1,7 @@
 #ifndef LOAD_ALGORITHMS_HPP
 #define LOAD_ALGORITHMS_HPP
 
-#include "../runtime/Factory.hpp"
+#include "../runtime/factory.hpp"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
