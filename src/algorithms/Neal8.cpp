@@ -36,6 +36,7 @@ void Neal8::initialize() {
 void Neal8::sample_allocations() {
   // Initialize relevant values
   unsigned int n = data.rows();
+  auto rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
   for (size_t i = 0; i < n; i++) {
@@ -80,7 +81,6 @@ void Neal8::sample_allocations() {
                                log(n_aux);
     }
     // Draw a NEW value for datum allocation
-    auto rng = bayesmix::Rng::Instance().get();
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
 
