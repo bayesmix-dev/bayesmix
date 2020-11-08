@@ -1,4 +1,4 @@
-#include "AlgorithmBase.hpp"
+#include "algorithm_base.hpp"
 
 //! \param iter Number of the current iteration
 //! \return     Protobuf-object version of the current state

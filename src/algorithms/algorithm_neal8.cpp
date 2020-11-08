@@ -1,4 +1,4 @@
-#include "Algorithm_neal8.hpp"
+#include "algorithm_neal8.hpp"
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
