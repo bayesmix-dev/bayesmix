@@ -20,13 +20,13 @@ int main(int argc, char *argv[]) {
   unsigned int burnin = 1;
 
   // Create factories and objects
-  // Factory<BaseMixing> &factory_mixing = Factory<BaseMixing>::Instance();
-  // Factory<HierarchyBase> &factory_hier = Factory<HierarchyBase>::Instance();
-  Factory<Algorithm> &factory_algo = Factory<Algorithm>::Instance();
+  auto &factory_mixing = Factory<BaseMixing>::Instance();
+  auto &factory_hier = Factory<BaseHierarchy>::Instance();
+  auto &factory_algo = Factory<BaseAlgorithm>::Instance();
   // auto mixing = factory_mixing.create_object(type_mixing);
   auto mixing = std::make_shared<DirichletMixing>();
   // auto hier = factory_hier.create_object(type_hier);
-  auto hier = std::make_shared<HierarchyNNIG>();  // TEST
+  auto hier = std::make_shared<NNIGHierarchy>();  // TEST
   auto algo = factory_algo.create_object(type_algo);
   // Initialize RNG object
   auto rng = bayesmix::Rng::Instance().get();

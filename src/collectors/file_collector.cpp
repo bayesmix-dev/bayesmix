@@ -1,4 +1,4 @@
-#include "FileCollector.hpp"
+#include "file_collector.hpp"
 
 void FileCollector::open_for_reading() {
   infd = open(filename.c_str(), O_RDONLY);

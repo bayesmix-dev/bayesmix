@@ -1,8 +1,8 @@
 target_sources(bayesmix
   PUBLIC
-    BaseCollector.hpp
-    FileCollector.hpp
-    FileCollector.cpp
-    MemoryCollector.hpp
-    MemoryCollector.cpp
+    base_collector.hpp
+    file_collector.hpp
+    file_collector.cpp
+    memory_collector.hpp
+    memory_collector.cpp
 )

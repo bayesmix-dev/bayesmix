@@ -1,5 +1,10 @@
 #include "cluster_utils.hpp"
 
+#include <Eigen/Dense>
+#include <Eigen/SparseCore>
+
+#include "proto_utils.hpp"
+
 //! \param coll Collector containing the algorithm chain
 //! \return     Index of the iteration containing the best estimate
 Eigen::VectorXi bayesmix::cluster_estimate(Eigen::MatrixXi allocation_chain) {

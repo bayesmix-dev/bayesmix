@@ -1,21 +1,14 @@
-#ifndef ALGORITHM_HPP
-#define ALGORITHM_HPP
-
-#include <math.h>
+#ifndef BAYESMIX_ALGORITHMS_BASE_ALGORITHM_HPP_
+#define BAYESMIX_ALGORITHMS_BASE_ALGORITHM_HPP_
 
 #include <Eigen/Dense>
-#include <fstream>
-#include <random>
-#include <stan/math/prim/fun.hpp>
-#include <stan/math/prim/prob.hpp>
+#include <memory>
 #include <vector>
 
 #include "../../proto/cpp/marginal_state.pb.h"
-#include "../collectors/BaseCollector.hpp"
-#include "../hierarchies/HierarchyBase.hpp"
-#include "../mixings/BaseMixing.hpp"
-#include "../utils/distributions.hpp"
-#include "../utils/proto_utils.hpp"
+#include "../collectors/base_collector.hpp"
+#include "../hierarchies/base_hierarchy.hpp"
+#include "../mixings/base_mixing.hpp"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -50,7 +43,7 @@
 //! This class is templatized over the types of the elements of this model: the
 //! hierarchies of cluster, their hyperparameters, and the mixing mode.
 
-class Algorithm {
+class BaseAlgorithm {
  protected:
   // METHOD PARAMETERS
   //! Iterations of the algorithm
@@ -68,7 +61,7 @@ class Algorithm {
   //! Allocation for each datum, i.e. label of the cluster it belongs to
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
-  std::vector<std::shared_ptr<HierarchyBase>> unique_values;
+  std::vector<std::shared_ptr<BaseHierarchy>> unique_values;
   //! Mixing object
   std::shared_ptr<BaseMixing> mixing;
 
@@ -77,7 +70,7 @@ class Algorithm {
   bayesmix::MarginalState get_state_as_proto(unsigned int iter);
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<HierarchyBase> temp_hier,
+      std::shared_ptr<BaseHierarchy> temp_hier,
       const Eigen::MatrixXd &grid) = 0;
 
   // ALGORITHM FUNCTIONS
@@ -131,8 +124,8 @@ class Algorithm {
                                     BaseCollector *const collector) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~Algorithm() = default;
-  Algorithm() = default;
+  virtual ~BaseAlgorithm() = default;
+  BaseAlgorithm() = default;
 
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }
@@ -145,7 +138,7 @@ class Algorithm {
   virtual void set_n_aux(const unsigned int n_aux_) { return; }
   void set_mixing(std::shared_ptr<BaseMixing> mixing_) { mixing = mixing_; }
   void set_data_and_initial_clusters(const Eigen::MatrixXd &data_,
-                                     std::shared_ptr<HierarchyBase> hier_,
+                                     std::shared_ptr<BaseHierarchy> hier_,
                                      const unsigned int init = 0) {
     if (data.rows() == 0) {
       std::invalid_argument("Error: empty data matrix");
@@ -158,8 +151,6 @@ class Algorithm {
     }
     data = data_;
     init_num_clusters = (init == 0) ? data.rows() : init;
-    // "Warning: initial number of clusters will be set equal to the data
-    // size (" << data.rows() << ")"  // TODO
     // Initialize hierarchies for starting clusters
     unique_values.clear();
     for (size_t i = 0; i < init_num_clusters; i++) {
@@ -170,4 +161,4 @@ class Algorithm {
   virtual std::string get_id() const = 0;
 };
 
-#endif  // ALGORITHM_HPP
+#endif  // BAYESMIX_ALGORITHMS_BASE_ALGORITHM_HPP_

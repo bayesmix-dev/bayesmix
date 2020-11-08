@@ -1,7 +1,7 @@
-#ifndef MEMORYCOLLECTOR_HPP
-#define MEMORYCOLLECTOR_HPP
+#ifndef BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
+#define BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
 
-#include "BaseCollector.hpp"
+#include "base_collector.hpp"
 
 //! Class for a "virtual" collector which contains all objects of the chain
 
@@ -43,4 +43,4 @@ class MemoryCollector : public BaseCollector {
   std::deque<bayesmix::MarginalState> get_chain() override { return chain; }
 };
 
-#endif  // MEMORYCOLLECTOR_HPP
+#endif  // BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_

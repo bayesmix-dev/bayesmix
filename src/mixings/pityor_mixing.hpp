@@ -1,7 +1,9 @@
-#ifndef PITYORMIXING_HPP
-#define PITYORMIXING_HPP
+#ifndef BAYESMIX_MIXINGS_PITYOR_MIXING_HPP_
+#define BAYESMIX_MIXINGS_PITYOR_MIXING_HPP_
 
-#include "BaseMixing.hpp"
+#include <cassert>
+
+#include "base_mixing.hpp"
 
 //! Class that represents the Pitman-Yor process mixture model.
 
@@ -37,11 +39,7 @@ class PitYorMixing : public BaseMixing {
   //! \return     Probability value
   double mass_existing_cluster(const unsigned int card,
                                const unsigned int n) const override {
-    if (card == 0) {
-      return 0;
-    } else {
-      return (card - discount) / (n + strength);
-    }
+    return (card == 0) ? 0 : (card - discount) / (n + strength);
   }
 
   //! Mass probability for choosing a newly created cluster
@@ -63,4 +61,4 @@ class PitYorMixing : public BaseMixing {
   std::string get_id() const override { return "Pitman-Yor"; }
 };
 
-#endif  // PITYORMIXING_HPP
+#endif  // BAYESMIX_MIXINGS_PITYOR_MIXING_HPP_

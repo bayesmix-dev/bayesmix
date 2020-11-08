@@ -1,7 +1,7 @@
-#ifndef FILECOLLECTOR_HPP
-#define FILECOLLECTOR_HPP
+#ifndef BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_
+#define BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_
 
-#include "BaseCollector.hpp"
+#include "base_collector.hpp"
 
 //! Class for a collector that writes its content to a file.
 
@@ -63,4 +63,4 @@ class FileCollector : public BaseCollector {
   std::deque<bayesmix::MarginalState> get_chain() override;
 };
 
-#endif  // FILECOLLECTOR_HPP
+#endif  // BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_

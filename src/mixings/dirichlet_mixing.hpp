@@ -1,7 +1,9 @@
-#ifndef DIRICHLETMIXING_HPP
-#define DIRICHLETMIXING_HPP
+#ifndef BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
+#define BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
 
-#include "BaseMixing.hpp"
+#include <cassert>
+
+#include "base_mixing.hpp"
 
 //! Class that represents the Dirichlet process mixture model.
 
@@ -54,4 +56,4 @@ class DirichletMixing : public BaseMixing {
   std::string get_id() const override { return "Dirichlet"; }
 };
 
-#endif  // DIRICHLETMIXING_HPP
+#endif  // BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_

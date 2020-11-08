@@ -1,7 +1,11 @@
-#ifndef NEAL2_HPP
-#define NEAL2_HPP
+#ifndef BAYESMIX_ALGORITHMS_NEAL2_ALGORITHM_HPP_
+#define BAYESMIX_ALGORITHMS_NEAL2_ALGORITHM_HPP_
 
-#include "MarginalAlgorithm.hpp"
+#include <Eigen/Dense>
+#include <memory>
+
+#include "../hierarchies/base_hierarchy.hpp"
+#include "marginal_algorithm.hpp"
 
 //! Template class for Neal's algorithm 2 for conjugate hierarchies
 
@@ -22,12 +26,12 @@
 //! cluster are instead updated via the posterior distribution, which again has
 //! a closed-form expression thanks to conjugacy.
 
-class Neal2 : public MarginalAlgorithm {
+class Neal2Algorithm : public MarginalAlgorithm {
  protected:
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<HierarchyBase> temp_hier,
+      std::shared_ptr<BaseHierarchy> temp_hier,
       const Eigen::MatrixXd &grid) override;
 
   // ALGORITHM FUNCTIONS
@@ -42,10 +46,10 @@ class Neal2 : public MarginalAlgorithm {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~Neal2() = default;
-  Neal2() = default;
+  ~Neal2Algorithm() = default;
+  Neal2Algorithm() = default;
 
   std::string get_id() const override { return "Neal2"; }
 };
 
-#endif  // NEAL2_HPP
+#endif  // BAYESMIX_ALGORITHMS_NEAL2_ALGORITHM_HPP_

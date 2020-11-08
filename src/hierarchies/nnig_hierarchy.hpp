@@ -1,12 +1,13 @@
-#ifndef HIERARCHYNNIG_HPP
-#define HIERARCHYNNIG_HPP
+#ifndef BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_HPP_
+#define BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_HPP_
 
 #include <google/protobuf/stubs/casts.h>
 
-#include "../../proto/cpp/ls_state.pb.h"
-#include "../../proto/cpp/marginal_state.pb.h"
-#include "../utils/rng.hpp"
-#include "HierarchyBase.hpp"
+#include <Eigen/Dense>
+#include <cassert>
+#include <memory>
+
+#include "base_hierarchy.hpp"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.
 
@@ -24,7 +25,7 @@
 //! thus the marginal and the posterior distribution are available in closed
 //! form and Neal's algorithm 2 may be used with it.
 
-class HierarchyNNIG : public HierarchyBase {
+class NNIGHierarchy : public BaseHierarchy {
  protected:
   // state
   double mean;
@@ -57,10 +58,10 @@ class HierarchyNNIG : public HierarchyBase {
   bool is_multivariate() const override { return false; }
 
   // DESTRUCTOR AND CONSTRUCTORS
-  ~HierarchyNNIG() = default;
-  HierarchyNNIG() = default;
-  std::shared_ptr<HierarchyBase> clone() const override {
-    return std::make_shared<HierarchyNNIG>(*this);
+  ~NNIGHierarchy() = default;
+  NNIGHierarchy() = default;
+  std::shared_ptr<BaseHierarchy> clone() const override {
+    return std::make_shared<NNIGHierarchy>(*this);
   }
 
   // EVALUATION FUNCTIONS
@@ -102,4 +103,4 @@ class HierarchyNNIG : public HierarchyBase {
   std::string get_id() const override { return "NNIG"; }
 };
 
-#endif  // HIERARCHYNNIG_HPP
+#endif  // BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_HPP_

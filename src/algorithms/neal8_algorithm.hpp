@@ -1,7 +1,12 @@
-#ifndef NEAL8_HPP
-#define NEAL8_HPP
+#ifndef BAYESMIX_ALGORITHMS_NEAL8_ALGORITHM_HPP_
+#define BAYESMIX_ALGORITHMS_NEAL8_ALGORITHM_HPP_
 
-#include "Neal2.hpp"
+#include <Eigen/Dense>
+#include <cassert>
+#include <memory>
+#include <vector>
+
+#include "neal2_algorithm.hpp"
 
 //! Template class for Neal's algorithm 8 for conjugate hierarchies
 
@@ -18,18 +23,18 @@
 //! and some minor adjustments in the allocation sampling phase to circumvent
 //! non-conjugacy, it is the same as Neal's algorithm 2.
 
-class Neal8 : public Neal2 {
+class Neal8Algorithm : public Neal2Algorithm {
  protected:
   //! Number of auxiliary blocks
   unsigned int n_aux;
 
   //! Vector of auxiliary blocks
-  std::vector<std::shared_ptr<HierarchyBase>> aux_unique_values;
+  std::vector<std::shared_ptr<BaseHierarchy>> aux_unique_values;
 
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<HierarchyBase> temp_hier,
+      std::shared_ptr<BaseHierarchy> temp_hier,
       const Eigen::MatrixXd &grid) override;
 
   // ALGORITHM FUNCTIONS
@@ -39,8 +44,8 @@ class Neal8 : public Neal2 {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~Neal8() = default;
-  Neal8() = default;
+  ~Neal8Algorithm() = default;
+  Neal8Algorithm() = default;
 
   // GETTERS AND SETTERS
   unsigned int get_n_aux() const { return n_aux; }
@@ -52,4 +57,4 @@ class Neal8 : public Neal2 {
   std::string get_id() const override { return "Neal8"; }
 };
 
-#endif  // NEAL8_HPP
+#endif  // BAYESMIX_ALGORITHMS_NEAL8_ALGORITHM_HPP_

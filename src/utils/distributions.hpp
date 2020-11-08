@@ -1,9 +1,8 @@
-#ifndef DISTRIBUTIONS_HPP
-#define DISTRIBUTIONS_HPP
+#ifndef BAYESMIX_UTILS_DISTRIBUTIONS_HPP_
+#define BAYESMIX_UTILS_DISTRIBUTIONS_HPP_
 
 #include <Eigen/Dense>
 #include <random>
-#include <stan/math/prim/prob.hpp>
 
 namespace bayesmix {
 int categorical_rng(const Eigen::VectorXd &probas, std::mt19937_64 &rng,
@@ -14,4 +13,4 @@ double multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
                               double prec_logdet);
 }  // namespace bayesmix
 
-#endif  // DISTRIBUTIONS_HPP
+#endif  // BAYESMIX_UTILS_DISTRIBUTIONS_HPP_

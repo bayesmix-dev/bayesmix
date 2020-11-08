@@ -1,5 +1,5 @@
-#ifndef BASECOLLECTOR_HPP
-#define BASECOLLECTOR_HPP
+#ifndef BAYESMIX_COLLECTORS_BASE_COLLECTOR_HPP_
+#define BAYESMIX_COLLECTORS_BASE_COLLECTOR_HPP_
 
 #include <fcntl.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -69,4 +69,4 @@ class BaseCollector {
   unsigned int get_size() const { return size; }
 };
 
-#endif  // BASECOLLECTOR_HPP
+#endif  // BAYESMIX_COLLECTORS_BASE_COLLECTOR_HPP_

@@ -1,7 +1,5 @@
-#ifndef BASEMIXING_HPP
-#define BASEMIXING_HPP
-
-#include <cassert>
+#ifndef BAYESMIX_MIXINGS_BASE_MIXING_HPP_
+#define BAYESMIX_MIXINGS_BASE_MIXING_HPP_
 
 //! Abstract base class for a generic mixture model
 
@@ -42,4 +40,4 @@ class BaseMixing {
   virtual std::string get_id() const = 0;
 };
 
-#endif  // BASEMIXING_HPP
+#endif  // BAYESMIX_MIXINGS_BASE_MIXING_HPP_

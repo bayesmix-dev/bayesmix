@@ -1,5 +1,5 @@
-#ifndef RNG_HPP
-#define RNG_HPP
+#ifndef BAYESMIX_UTILS_RNG_HPP_
+#define BAYESMIX_UTILS_RNG_HPP_
 
 #include <random>
 
@@ -25,4 +25,4 @@ class Rng {
 };
 }  // namespace bayesmix
 
-#endif  // RNG_HPP
+#endif  // BAYESMIX_UTILS_RNG_HPP_

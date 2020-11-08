@@ -1,4 +1,4 @@
-#include "MemoryCollector.hpp"
+#include "memory_collector.hpp"
 
 bayesmix::MarginalState MemoryCollector::next_state() {
   if (curr_iter == size - 1) {
