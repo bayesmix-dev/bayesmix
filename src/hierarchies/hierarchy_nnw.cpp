@@ -1,4 +1,4 @@
-#include "HierarchyNNW.hpp"
+#include "hierarchy_nnw.hpp"
 
 void HierarchyNNW::check_hypers_validity() {
   unsigned int dim = mu0.size();

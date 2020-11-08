@@ -12,7 +12,7 @@
 
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/collector_base.hpp"
-#include "../hierarchies/HierarchyBase.hpp"
+#include "../hierarchies/hierarchy_base.hpp"
 #include "../mixings/BaseMixing.hpp"
 #include "../utils/distributions.hpp"
 #include "../utils/proto_utils.hpp"

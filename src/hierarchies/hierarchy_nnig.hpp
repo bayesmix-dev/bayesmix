@@ -6,7 +6,7 @@
 #include "../../proto/cpp/ls_state.pb.h"
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
-#include "HierarchyBase.hpp"
+#include "hierarchy_base.hpp"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.
 

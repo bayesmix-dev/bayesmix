@@ -1,8 +1,8 @@
 target_sources(bayesmix
   PUBLIC
-    HierarchyBase.hpp
-    HierarchyNNIG.hpp
-    HierarchyNNIG.cpp
-    HierarchyNNW.hpp
-    HierarchyNNW.cpp
+    hierarchy_base.hpp
+    hierarchy_nnig.hpp
+    hierarchy_nnig.cpp
+    hierarchy_nnw.hpp
+    hierarchy_nnw.cpp
 )

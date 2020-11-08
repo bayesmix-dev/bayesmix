@@ -1,4 +1,4 @@
-#include "HierarchyNNIG.hpp"
+#include "hierarchy_nnig.hpp"
 
 void HierarchyNNIG::check_and_initialize() {
   check_hypers_validity();

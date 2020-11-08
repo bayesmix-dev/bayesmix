@@ -10,7 +10,7 @@
 #include "../../proto/cpp/matrix.pb.h"
 #include "../utils/distributions.hpp"
 #include "../utils/proto_utils.hpp"
-#include "HierarchyBase.hpp"
+#include "hierarchy_base.hpp"
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 
