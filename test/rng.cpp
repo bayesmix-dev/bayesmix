@@ -18,7 +18,7 @@ TEST(rng, test1) {
     int c = bayesmix::categorical_rng(probas, rng);
     counts[c]++;
   }
-  std::cout << "[          ] >>>>> ";
+  std::cout << "[          ] ----> ";
   for (int i = 0; i < dim; i++) {
     std::cout << counts[i] << " ";
   }
@@ -38,7 +38,7 @@ TEST(rng, test2) {
   auto rng2 = bayesmix::Rng::Instance().get();
   int c2 = bayesmix::categorical_rng(probas, rng2);
 
-  std::cout << "[          ] >>>>> ";
+  std::cout << "[          ] ----> ";
   std::cout << c1 << " " << c2 << " ";
 
   if (true) {

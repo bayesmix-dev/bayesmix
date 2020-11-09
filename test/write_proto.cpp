@@ -2,8 +2,9 @@
 
 #include "../proto/cpp/ls_state.pb.h"
 #include "../proto/cpp/marginal_state.pb.h"
-#include "../src/hierarchies/NNIGHierarchy.hpp"
-#include "../src/hierarchies/NNWHierarchy.hpp"
+#include "../src/hierarchies/nnig_hierarchy.hpp"
+#include "../src/hierarchies/nnw_hierarchy.hpp"
+#include "../src/utils/proto_utils.hpp"
 
 TEST(set_state, univ_ls) {
   using namespace bayesmix;
@@ -24,7 +25,7 @@ TEST(set_state, univ_ls) {
   ASSERT_EQ(curr.mean(), cluster.get_mean());
 }
 
-TEST(get_state_as_proto_test, univ_ls) {
+TEST(write_proto, univ_ls) {
   using namespace bayesmix;
   double mean = 5;
   double std = 1.0;
@@ -41,7 +42,7 @@ TEST(get_state_as_proto_test, univ_ls) {
   MarginalState out;
   MarginalState::ClusterVal* clusval = out.add_cluster_vals();
 
-  cluster.get_state_as_proto(clusval);
+  cluster.write_state_to_proto(clusval);
 
   double out_mean = clusval->univ_ls_state().mean();
   double out_std = clusval->univ_ls_state().std();
@@ -56,8 +57,8 @@ TEST(set_state, multi_ls) {
   prec(1, 1) = 10.0;
 
   MultiLSState curr;
-  to_proto(mean, curr.mutable_mean());
-  to_proto(prec, curr.mutable_precision());
+  bayesmix::to_proto(mean, curr.mutable_mean());
+  bayesmix::to_proto(prec, curr.mutable_precision());
 
   ASSERT_EQ(curr.mean().data(0), 1.0);
   ASSERT_EQ(curr.precision().data(0), 1.0);
