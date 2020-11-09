@@ -30,10 +30,8 @@ class NNWHierarchy : public BaseHierarchy {
   Eigen::VectorXd mean;
   Eigen::MatrixXd tau;
 
-  using EigenRowVec = Eigen::Matrix<double, 1, Eigen::Dynamic>;
-
   // HYPERPARAMETERS
-  EigenRowVec mu0;
+  Eigen::RowVectorXd mu0;
   double lambda;
   Eigen::MatrixXd tau0, tau0_inv;
   double nu;
@@ -56,8 +54,8 @@ class NNWHierarchy : public BaseHierarchy {
 
   //! Returns updated values of the prior hyperparameters via their posterior
   std::vector<Eigen::MatrixXd> normal_wishart_update(
-      const Eigen::MatrixXd &data, const EigenRowVec &mu0, const double lambda,
-      const Eigen::MatrixXd &tau0_inv, const double nu);
+      const Eigen::MatrixXd &data, const Eigen::RowVectorXd &mu0,
+      const double lambda, const Eigen::MatrixXd &tau0_inv, const double nu);
 
  public:
   void check_and_initialize() override;
@@ -95,7 +93,7 @@ class NNWHierarchy : public BaseHierarchy {
   //! \param check  If true, a state validity check occurs after assignment
   void set_state(google::protobuf::Message *curr, bool check = true) override;
 
-  EigenRowVec get_mu0() const { return mu0; }
+  Eigen::RowVectorXd get_mu0() const { return mu0; }
 
   Eigen::VectorXd get_mean() const { return mean; }
 
@@ -109,7 +107,7 @@ class NNWHierarchy : public BaseHierarchy {
 
   double get_nu() const { return nu; }
 
-  void set_mu0(const EigenRowVec &mu0_) { mu0 = mu0_; }
+  void set_mu0(const Eigen::RowVectorXd &mu0_) { mu0 = mu0_; }
 
   void set_lambda(const double lambda_) { lambda = lambda_; }
 

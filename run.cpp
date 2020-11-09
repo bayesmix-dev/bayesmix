@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
   hier->set_beta0(2.0);
 
   // // NNW  //TEST
-  // Eigen::Vector2d; mu0 << 5.5, 5.5;
+  // Eigen::Vector2d mu0; mu0 << 5.5, 5.5;
   // hier->set_mu0(mu0);
   // hier->set_lambda(0.2);
   // double nu = 5.0;
