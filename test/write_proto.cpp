@@ -7,17 +7,16 @@
 #include "../src/utils/proto_utils.hpp"
 
 TEST(set_state, univ_ls) {
-  using namespace bayesmix;
   double mean = 5;
   double std = 1.0;
 
-  UnivLSState curr;
+  bayesmix::UnivLSState curr;
   curr.set_mean(mean);
   curr.set_std(std);
 
   ASSERT_EQ(curr.mean(), mean);
 
-  MarginalState::ClusterVal clusval;
+  bayesmix::MarginalState::ClusterVal clusval;
   clusval.mutable_univ_ls_state()->CopyFrom(curr);
   NNIGHierarchy cluster;
   cluster.set_state(&clusval);
@@ -26,22 +25,20 @@ TEST(set_state, univ_ls) {
 }
 
 TEST(write_proto, univ_ls) {
-  using namespace bayesmix;
   double mean = 5;
   double std = 1.0;
 
-  UnivLSState curr;
+  bayesmix::UnivLSState curr;
   curr.set_mean(mean);
   curr.set_std(std);
 
-  MarginalState::ClusterVal clusval_in;
+  bayesmix::MarginalState::ClusterVal clusval_in;
   clusval_in.mutable_univ_ls_state()->CopyFrom(curr);
   NNIGHierarchy cluster;
   cluster.set_state(&clusval_in);
 
-  MarginalState out;
-  MarginalState::ClusterVal* clusval = out.add_cluster_vals();
-
+  bayesmix::MarginalState out;
+  bayesmix::MarginalState::ClusterVal* clusval = out.add_cluster_vals();
   cluster.write_state_to_proto(clusval);
 
   double out_mean = clusval->univ_ls_state().mean();
@@ -51,12 +48,11 @@ TEST(write_proto, univ_ls) {
 }
 
 TEST(set_state, multi_ls) {
-  using namespace bayesmix;
   Eigen::VectorXd mean = Eigen::VectorXd::Ones(5);
   Eigen::MatrixXd prec = Eigen::MatrixXd::Identity(5, 5);
   prec(1, 1) = 10.0;
 
-  MultiLSState curr;
+  bayesmix::MultiLSState curr;
   bayesmix::to_proto(mean, curr.mutable_mean());
   bayesmix::to_proto(prec, curr.mutable_precision());
 
@@ -64,7 +60,7 @@ TEST(set_state, multi_ls) {
   ASSERT_EQ(curr.precision().data(0), 1.0);
   ASSERT_EQ(curr.precision().data(6), 10.0);
 
-  MarginalState::ClusterVal clusval_in;
+  bayesmix::MarginalState::ClusterVal clusval_in;
   clusval_in.mutable_multi_ls_state()->CopyFrom(curr);
   NNWHierarchy cluster;
   cluster.set_state(&clusval_in);

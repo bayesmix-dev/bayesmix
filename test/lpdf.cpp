@@ -5,6 +5,7 @@
 
 #include "../src/hierarchies/nnig_hierarchy.hpp"
 #include "../src/hierarchies/nnw_hierarchy.hpp"
+#include "../proto/cpp/marginal_state.pb.h"
 
 TEST(lpdf, nnig) {
   NNIGHierarchy hier;
@@ -17,8 +18,9 @@ TEST(lpdf, nnig) {
   hier.set_alpha0(alpha0);
   hier.set_beta0(beta0);
   hier.check_and_initialize();
+
   double mean = mu0;
-  double std = beta0 / (alpha0 - 1);
+  double std = sqrt(beta0 / (alpha0 - 1));
 
   Eigen::VectorXd datum(1);
   datum << 4.5;
@@ -30,18 +32,31 @@ TEST(lpdf, nnig) {
                                  (datum(0) - mu0);
   double lambda_post = lambda + 1;
 
-  // logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
-  double prior = stan::math::inv_gamma_lpdf(std, alpha0, beta0) +
-                 stan::math::normal_lpdf(mean, mu0, std / sqrt(lambda));
-  double lik = hier.lpdf(datum)(0);
-  double post =
-      stan::math::inv_gamma_lpdf(std, alpha_post, beta_post) +
-      stan::math::normal_lpdf(mean, mu_post, std / sqrt(lambda_post));
-  double marg = prior + lik - post;
-  double marg2 = hier.marg_lpdf(datum)(0);
+  // Compute pieces
+  double prior1 = stan::math::inv_gamma_lpdf(std, alpha0, 1/beta0);
+  double prior2 = stan::math::normal_lpdf(mean, mu0, std / sqrt(lambda));
+  double prior = prior1 + prior2;
+  double like = hier.lpdf(datum)(0);
+  double post1 = stan::math::inv_gamma_lpdf(std, alpha_post, 1/beta_post);
+  double post2 =
+    stan::math::normal_lpdf(mean, mu_post, std / sqrt(lambda_post));
+  double post = post1 + post2;
+  // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
+  double sum = prior + like - post;
+  double marg = hier.marg_lpdf(datum)(0);
 
-  ASSERT_EQ(marg, marg2);
+  std::cout << "prior1=" << prior1 << std::endl;
+  std::cout << "prior2=" << prior2 << std::endl;
+  std::cout << "prior =" << prior  << std::endl;
+  std::cout << "like  =" << like   << std::endl;
+  std::cout << "post1 =" << post1  << std::endl;
+  std::cout << "post2 =" << post2  << std::endl;
+  std::cout << "post  =" << post   << std::endl;
+
+  ASSERT_EQ(sum, marg);
 }
+
+
 
 TEST(lpdf, nnw) {
   NNWHierarchy hier;
@@ -75,14 +90,25 @@ TEST(lpdf, nnw) {
                                           (datum - mu0.transpose());
   Eigen::MatrixXd tau_post = lambda_post * stan::math::inverse_spd(tau_temp);
 
+  // Compute pieces
+  double prior1 = stan::math::wishart_lpdf(tau, nu, tau0);
+  double prior2 = stan::math::multi_normal_prec_lpdf(mu, mu0, tau_pr);
+  double prior = prior1 + prior2;
+  double like = hier.lpdf(datum)(0);
+  double post1 = stan::math::wishart_lpdf(tau, nu_post, tau_post);
+  double post2 = stan::math::multi_normal_prec_lpdf(mu, mu0, tau_post);
+  double post = post1 + post2;
   // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
-  double prior = stan::math::wishart_lpdf(tau, nu, tau0) +
-                 stan::math::multi_normal_prec_lpdf(mu, mu0, tau_pr);
-  double lik = hier.lpdf(datum)(0);
-  double post =
-      stan::math::wishart_lpdf(tau, nu_post, tau_post) +
-      stan::math::multi_normal_prec_lpdf(mu, mu0, tau_post);
-  double marg = prior + lik - post;
-  double marg2 = hier.marg_lpdf(datum)(0);
-  ASSERT_EQ(marg, marg2);
+  double sum = prior + like - post;
+  double marg = hier.marg_lpdf(datum)(0);
+
+  std::cout << "prior1=" << prior1 << std::endl;
+  std::cout << "prior2=" << prior2 << std::endl;
+  std::cout << "prior =" << prior  << std::endl;
+  std::cout << "like  =" << like   << std::endl;
+  std::cout << "post1 =" << post1  << std::endl;
+  std::cout << "post2 =" << post2  << std::endl;
+  std::cout << "post  =" << post   << std::endl;
+
+  ASSERT_EQ(sum, marg);
 }
