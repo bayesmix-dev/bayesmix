@@ -12,7 +12,7 @@
 void NNIGHierarchy::check_and_initialize() {
   check_hypers_validity();
   mean = get_mu0();
-  std = sqrt(get_beta0() / (get_alpha0() - 1));
+  sd = sqrt(get_beta0() / (get_alpha0() - 1));
 }
 
 //! \param data                       Column vector of data points
@@ -54,7 +54,7 @@ Eigen::VectorXd NNIGHierarchy::lpdf(const Eigen::MatrixXd &data) {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
-    result(i) = stan::math::normal_lpdf(data(i, 0), mean, std);
+    result(i) = stan::math::normal_lpdf(data(i, 0), mean, sd);
   }
   return result;
 }
@@ -95,8 +95,8 @@ void NNIGHierarchy::draw() {
 
   // Update state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  std = sqrt(stan::math::inv_gamma_rng(alpha0, beta0, rng));
-  mean = stan::math::normal_rng(mu0, std / sqrt(lambda), rng);
+  sd = sqrt(stan::math::inv_gamma_rng(alpha0, beta0, rng));
+  mean = stan::math::normal_rng(mu0, sd / sqrt(lambda), rng);
 }
 
 //! \param data Column vector of data points
@@ -111,8 +111,8 @@ void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 
   // Update state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  std = sqrt(stan::math::inv_gamma_rng(alpha_post, beta_post, rng));
-  mean = stan::math::normal_rng(mu_post, std / sqrt(lambda_post), rng);
+  sd = sqrt(stan::math::inv_gamma_rng(alpha_post, beta_post, rng));
+  mean = stan::math::normal_rng(mu_post, sd / sqrt(lambda_post), rng);
 }
 
 void NNIGHierarchy::set_state(google::protobuf::Message *curr, bool check) {
@@ -123,7 +123,7 @@ void NNIGHierarchy::set_state(google::protobuf::Message *curr, bool check) {
       down_cast<MarginalState::ClusterVal *>(curr);
 
   mean = currcast->univ_ls_state().mean();
-  std = currcast->univ_ls_state().std();
+  sd = currcast->univ_ls_state().sd();
 
   if (check) {
     check_state_validity();
@@ -136,7 +136,7 @@ void NNIGHierarchy::write_state_to_proto(google::protobuf::Message *out) {
 
   UnivLSState state;
   state.set_mean(mean);
-  state.set_std(std);
+  state.set_sd(sd);
 
   down_cast<MarginalState::ClusterVal *>(out)
       ->mutable_univ_ls_state()

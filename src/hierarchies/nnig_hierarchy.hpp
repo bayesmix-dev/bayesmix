@@ -29,7 +29,7 @@ class NNIGHierarchy : public BaseHierarchy {
  protected:
   // state
   double mean;
-  double std;
+  double sd;
 
   // HYPERPARAMETERS
   double mu0, lambda, alpha0, beta0;
@@ -43,7 +43,7 @@ class NNIGHierarchy : public BaseHierarchy {
   }
 
   //! Raises error if the state values are not valid w.r.t. their own domain
-  void check_state_validity() override { assert(std > 0); }
+  void check_state_validity() override { assert(sd > 0); }
 
   //! Returns updated values of the prior hyperparameters via their posterior
   std::vector<double> normal_gamma_update(const Eigen::VectorXd &data,

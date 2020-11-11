@@ -6,7 +6,7 @@ package bayesmix;
 
 message UnivLSState {
     double mean = 1;
-    double std = 2;
+    double sd = 2;
 }
 
 message MultiLSState {
