@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 
   // NNIG  //TEST
   hier->set_mu0(5.0);
-  hier->set_lambda(0.1);
+  hier->set_lambda0(0.1);
   hier->set_alpha0(2.0);
   hier->set_beta0(2.0);
 

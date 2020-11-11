@@ -15,28 +15,28 @@ void NNIGHierarchy::check_and_initialize() {
   sd = sqrt(get_beta0() / (get_alpha0() - 1));
 }
 
-//! \param data                       Column vector of data points
-//! \param mu0, alpha0, beta0, lambda Original values for hyperparameters
-//! \return                           Vector of updated values for hyperpar.s
+//! \param data                        Column vector of data points
+//! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
+//! \return                            Vector of updated values for hyperpar.s
 std::vector<double> NNIGHierarchy::normal_gamma_update(
     const Eigen::VectorXd &data, const double mu0, const double alpha0,
-    const double beta0, const double lambda) {
+    const double beta0, const double lambda0) {
   // Initialize relevant variables
   double mu_post, alpha_post, beta_post, lambda_post;
   unsigned int n = data.rows();
 
   if (n == 0) {  // no update possible
-    return std::vector<double>{mu0, alpha0, beta0, lambda};
+    return std::vector<double>{mu0, alpha0, beta0, lambda0};
   }
 
   // Compute updated hyperparameters
   double y_bar = data.mean();  // sample mean
-  mu_post = (lambda * mu0 + n * y_bar) / (lambda + n);
+  mu_post = (lambda0 * mu0 + n * y_bar) / (lambda0 + n);
   alpha_post = alpha0 + 0.5 * n;
   double ss = (data.dot(data)) - n * y_bar * y_bar;  // sum of squares
   beta_post = beta0 + 0.5 * ss +
-              0.5 * lambda * n * (y_bar - mu0) * (y_bar - mu0) / (n + lambda);
-  lambda_post = lambda + n;
+              0.5 * lambda0 * n * (y_bar - mu0) * (y_bar - mu0) / (n + lambda0);
+  lambda_post = lambda0 + n;
 
   return std::vector<double>{mu_post, alpha_post, beta_post, lambda_post};
 }
@@ -71,12 +71,12 @@ Eigen::VectorXd NNIGHierarchy::eval_marg(const Eigen::MatrixXd &data) {
 Eigen::VectorXd NNIGHierarchy::marg_lpdf(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
   double mu0 = get_mu0();
-  double lambda = get_lambda();
+  double lambda0 = get_lambda0();
   double alpha0 = get_alpha0();
   double beta0 = get_beta0();
 
   // Compute standard deviation of marginal distribution
-  double sig_n = sqrt(beta0 * (lambda + 1) / (alpha0 * lambda));
+  double sig_n = sqrt(beta0 * (lambda0 + 1) / (alpha0 * lambda0));
 
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
@@ -89,21 +89,21 @@ Eigen::VectorXd NNIGHierarchy::marg_lpdf(const Eigen::MatrixXd &data) {
 void NNIGHierarchy::draw() {
   // Get values of hyperparameters
   double mu0 = get_mu0();
-  double lambda = get_lambda();
+  double lambda0 = get_lambda0();
   double alpha0 = get_alpha0();
   double beta0 = get_beta0();
 
   // Update state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
   sd = sqrt(stan::math::inv_gamma_rng(alpha0, beta0, rng));
-  mean = stan::math::normal_rng(mu0, sd / sqrt(lambda), rng);
+  mean = stan::math::normal_rng(mu0, sd / sqrt(lambda0), rng);
 }
 
 //! \param data Column vector of data points
 void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   // Update values
   std::vector<double> temp = normal_gamma_update(
-      data.col(0), get_mu0(), get_alpha0(), get_beta0(), get_lambda());
+      data.col(0), get_mu0(), get_alpha0(), get_beta0(), get_lambda0());
   double mu_post = temp[0];
   double alpha_post = temp[1];
   double beta_post = temp[2];

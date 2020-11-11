@@ -20,8 +20,8 @@
 //!             G ~ MM           (mixture model);
 //!            G0 = N-IG         (centering distribution).
 //! state[0] = mu is called location, and state[1] = sig is called scale. The
-//! state's hyperparameters, contained in the Hypers object, are (mu_0, lambda,
-//! alpha, beta), all scalar values. Note that this hierarchy is conjugate,
+//! state hyperparameters, contained in the Hypers object, are (mu_0, lambda0,
+//! alpha0, beta0), all scalar values. Note that this hierarchy is conjugate,
 //! thus the marginal and the posterior distribution are available in closed
 //! form and Neal's algorithm 2 may be used with it.
 
@@ -32,12 +32,12 @@ class NNIGHierarchy : public BaseHierarchy {
   double sd;
 
   // HYPERPARAMETERS
-  double mu0, lambda, alpha0, beta0;
+  double mu0, lambda0, alpha0, beta0;
 
   // AUXILIARY TOOLS
   //! Raises error if the hypers values are not valid w.r.t. their own domain
   void check_hypers_validity() override {
-    assert(lambda > 0);
+    assert(lambda0 > 0);
     assert(alpha0 > 0);
     assert(beta0 > 0);
   }
@@ -50,7 +50,7 @@ class NNIGHierarchy : public BaseHierarchy {
                                           const double mu0,
                                           const double alpha0,
                                           const double beta0,
-                                          const double lambda);
+                                          const double lambda0);
 
  public:
   void check_and_initialize() override;
@@ -84,7 +84,7 @@ class NNIGHierarchy : public BaseHierarchy {
   double get_mu0() const { return mu0; }
   double get_alpha0() const { return alpha0; }
   double get_beta0() const { return beta0; }
-  double get_lambda() const { return lambda; }
+  double get_lambda0() const { return lambda0; }
   double get_mean() const { return mean; }
   void set_mu0(const double mu0_) {
     mu0 = mu0_;
@@ -92,7 +92,7 @@ class NNIGHierarchy : public BaseHierarchy {
   }
   void set_alpha0(const double alpha0_) { alpha0 = alpha0_; }
   void set_beta0(const double beta0_) { beta0 = beta0_; }
-  void set_lambda(const double lambda_) { lambda = lambda_; }
+  void set_lambda0(const double lambda0_) { lambda0 = lambda0_; }
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
