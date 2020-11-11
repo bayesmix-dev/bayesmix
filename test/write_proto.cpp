@@ -8,11 +8,11 @@
 
 TEST(set_state, univ_ls) {
   double mean = 5;
-  double std = 1.0;
+  double sd = 1.0;
 
   bayesmix::UnivLSState curr;
   curr.set_mean(mean);
-  curr.set_std(std);
+  curr.set_sd(sd);
 
   ASSERT_EQ(curr.mean(), mean);
 
@@ -26,11 +26,11 @@ TEST(set_state, univ_ls) {
 
 TEST(write_proto, univ_ls) {
   double mean = 5;
-  double std = 1.0;
+  double sd = 1.0;
 
   bayesmix::UnivLSState curr;
   curr.set_mean(mean);
-  curr.set_std(std);
+  curr.set_sd(sd);
 
   bayesmix::MarginalState::ClusterVal clusval_in;
   clusval_in.mutable_univ_ls_state()->CopyFrom(curr);
@@ -42,9 +42,9 @@ TEST(write_proto, univ_ls) {
   cluster.write_state_to_proto(clusval);
 
   double out_mean = clusval->univ_ls_state().mean();
-  double out_std = clusval->univ_ls_state().std();
+  double out_sd = clusval->univ_ls_state().sd();
   ASSERT_EQ(mean, out_mean);
-  ASSERT_EQ(std, out_std);
+  ASSERT_EQ(sd, out_sd);
 }
 
 TEST(set_state, multi_ls) {
