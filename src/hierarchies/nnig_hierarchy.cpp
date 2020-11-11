@@ -34,8 +34,9 @@ std::vector<double> NNIGHierarchy::normal_gamma_update(
   mu_post = (lambda0 * mu0 + n * y_bar) / (lambda0 + n);
   alpha_post = alpha0 + 0.5 * n;
   double ss = (data.dot(data)) - n * y_bar * y_bar;  // sum of squares
-  beta_post = beta0 + 0.5 * ss +
-              0.5 * lambda0 * n * (y_bar - mu0) * (y_bar - mu0) / (n + lambda0);
+  beta_post =
+      beta0 + 0.5 * ss +
+      0.5 * lambda0 * n * (y_bar - mu0) * (y_bar - mu0) / (n + lambda0);
   lambda_post = lambda0 + n;
 
   return std::vector<double>{mu_post, alpha_post, beta_post, lambda_post};
