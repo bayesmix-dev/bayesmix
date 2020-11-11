@@ -22,7 +22,7 @@ std::vector<double> NNIGHierarchy::normal_gamma_update(
     const Eigen::VectorXd &data, const double mu0, const double alpha0,
     const double beta0, const double lambda0) {
   // Initialize relevant variables
-  double mu_post, alpha_post, beta_post, lambda_post;
+  double mu_n, alpha_n, beta_n, lambda_n;
   unsigned int n = data.rows();
 
   if (n == 0) {  // no update possible
@@ -31,15 +31,14 @@ std::vector<double> NNIGHierarchy::normal_gamma_update(
 
   // Compute updated hyperparameters
   double y_bar = data.mean();  // sample mean
-  mu_post = (lambda0 * mu0 + n * y_bar) / (lambda0 + n);
-  alpha_post = alpha0 + 0.5 * n;
+  mu_n = (lambda0 * mu0 + n * y_bar) / (lambda0 + n);
+  alpha_n = alpha0 + 0.5 * n;
   double ss = (data.dot(data)) - n * y_bar * y_bar;  // sum of squares
-  beta_post =
-      beta0 + 0.5 * ss +
-      0.5 * lambda0 * n * (y_bar - mu0) * (y_bar - mu0) / (n + lambda0);
-  lambda_post = lambda0 + n;
+  beta_n = beta0 + 0.5 * ss +
+           0.5 * lambda0 * n * (y_bar - mu0) * (y_bar - mu0) / (n + lambda0);
+  lambda_n = lambda0 + n;
 
-  return std::vector<double>{mu_post, alpha_post, beta_post, lambda_post};
+  return std::vector<double>{mu_n, alpha_n, beta_n, lambda_n};
 }
 
 //! \param data Column vector of data points
@@ -105,15 +104,15 @@ void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   // Update values
   std::vector<double> temp = normal_gamma_update(
       data.col(0), get_mu0(), get_alpha0(), get_beta0(), get_lambda0());
-  double mu_post = temp[0];
-  double alpha_post = temp[1];
-  double beta_post = temp[2];
-  double lambda_post = temp[3];
+  double mu_n = temp[0];
+  double alpha_n = temp[1];
+  double beta_n = temp[2];
+  double lambda_n = temp[3];
 
   // Update state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  sd = sqrt(stan::math::inv_gamma_rng(alpha_post, beta_post, rng));
-  mean = stan::math::normal_rng(mu_post, sd / sqrt(lambda_post), rng);
+  sd = sqrt(stan::math::inv_gamma_rng(alpha_n, beta_n, rng));
+  mean = stan::math::normal_rng(mu_n, sd / sqrt(lambda_n), rng);
 }
 
 void NNIGHierarchy::set_state(google::protobuf::Message *curr, bool check) {

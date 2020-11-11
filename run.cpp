@@ -44,9 +44,9 @@ int main(int argc, char *argv[]) {
   // // NNW  //TEST
   // Eigen::Vector2d mu0; mu0 << 5.5, 5.5;
   // hier->set_mu0(mu0);
-  // hier->set_lambda(0.2);
-  // double nu = 5.0;
-  // hier->set_nu(nu);
+  // hier->set_lambda0(0.2);
+  // double nu0 = 5.0;
+  // hier->set_nu0(nu0);
   // Eigen::Matrix2d tau0 = (1 / nu) * Eigen::Matrix2d::Identity();
   // hier->set_tau0(tau0);
 

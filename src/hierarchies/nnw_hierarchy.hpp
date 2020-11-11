@@ -20,7 +20,7 @@
 //!            G0 = N-W        (centering distribution).
 //! state[0] = mu is called location, and state[1] = tau is called precision.
 //! The state's hyperparameters, contained in the Hypers object, are (mu0,
-//! lambda, tau0, nu), which are respectively vector, scalar, matrix, and
+//! lambda0, tau0, nu0), which are respectively vector, scalar, matrix, and
 //! scalar. Note that this hierarchy is conjugate, thus the marginal and the
 //! posterior distribution are available in closed form and Neal's algorithm 2
 //! may be used with it.
@@ -32,9 +32,9 @@ class NNWHierarchy : public BaseHierarchy {
 
   // HYPERPARAMETERS
   Eigen::RowVectorXd mu0;
-  double lambda;
+  double lambda0;
   Eigen::MatrixXd tau0, tau0_inv;
-  double nu;
+  double nu0;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
   //! Lower factor object of the Cholesky decomposition of tau
@@ -55,7 +55,7 @@ class NNWHierarchy : public BaseHierarchy {
   //! Returns updated values of the prior hyperparameters via their posterior
   std::vector<Eigen::MatrixXd> normal_wishart_update(
       const Eigen::MatrixXd &data, const Eigen::RowVectorXd &mu0,
-      const double lambda, const Eigen::MatrixXd &tau0_inv, const double nu);
+      const double lambda0, const Eigen::MatrixXd &tau0_inv, const double nu0);
 
  public:
   void check_and_initialize() override;
@@ -99,24 +99,24 @@ class NNWHierarchy : public BaseHierarchy {
 
   Eigen::MatrixXd get_tau() const { return tau; }
 
-  double get_lambda() const { return lambda; }
+  double get_lambda0() const { return lambda0; }
 
   Eigen::MatrixXd get_tau0() const { return tau0; }
 
   Eigen::MatrixXd get_tau0_inv() const { return tau0_inv; }
 
-  double get_nu() const { return nu; }
+  double get_nu0() const { return nu0; }
 
   void set_mu0(const Eigen::RowVectorXd &mu0_) { mu0 = mu0_; }
 
-  void set_lambda(const double lambda_) { lambda = lambda_; }
+  void set_lambda0(const double lambda0_) { lambda0 = lambda0_; }
 
   void set_tau0(const Eigen::MatrixXd &tau0_) {
     tau0 = tau0_;
     tau0_inv = stan::math::inverse_spd(tau0);
   }
 
-  void set_nu(const double nu_) { nu = nu_; }
+  void set_nu0(const double nu0_) { nu0 = nu0_; }
 
   void write_state_to_proto(google::protobuf::Message *out) override;
 

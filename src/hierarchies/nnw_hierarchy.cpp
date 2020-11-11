@@ -14,9 +14,9 @@
 
 void NNWHierarchy::check_hypers_validity() {
   unsigned int dim = mu0.size();
-  assert(lambda > 0);
+  assert(lambda0 > 0);
   assert(dim == tau0.rows());
-  assert(nu > dim - 1);
+  assert(nu0 > dim - 1);
 
   // Check if tau0 is a square symmetric positive semidefinite matrix
   assert(tau0.rows() == tau0.cols());
@@ -50,35 +50,35 @@ void NNWHierarchy::check_and_initialize() {
   check_hypers_validity();
   unsigned int dim = get_mu0().size();
   mean = get_mu0();
-  set_tau_and_utilities(get_lambda() * Eigen::MatrixXd::Identity(dim, dim));
+  set_tau_and_utilities(get_lambda0() * Eigen::MatrixXd::Identity(dim, dim));
 }
 
-//! \param data                  Matrix of row-vectorial data points
-//! \param mu0, lambda, tau0, nu Original values for hyperparameters
-//! \return                      Vector of updated values for hyperparameters
+//! \param data                    Matrix of row-vectorial data points
+//! \param mu0, lambda0, tau0, nu0 Original values for hyperparameters
+//! \return                        Vector of updated values for hyperparameters
 std::vector<Eigen::MatrixXd> NNWHierarchy::normal_wishart_update(
     const Eigen::MatrixXd &data, const Eigen::RowVectorXd &mu0,
-    const double lambda, const Eigen::MatrixXd &tau0_inv, const double nu) {
+    const double lambda0, const Eigen::MatrixXd &tau0_inv, const double nu0) {
   // Initialize relevant objects
   unsigned int n = data.rows();
-  Eigen::MatrixXd lambda_post(1, 1), nu_post(1, 1);
+  Eigen::MatrixXd lambda_n(1, 1), nu_n(1, 1);
 
   // Compute updated hyperparameters
   Eigen::RowVectorXd mubar = data.colwise().mean();  // sample mean
-  lambda_post(0, 0) = lambda + n;
-  nu_post(0, 0) = nu + 0.5 * n;
-  Eigen::RowVectorXd mu_post = (lambda * mu0 + n * mubar) * (1 / (lambda + n));
-  // Compute tau_post
+  lambda_n(0, 0) = lambda0 + n;
+  nu_n(0, 0) = nu0 + 0.5 * n;
+  Eigen::RowVectorXd mu_n = (lambda0 * mu0 + n * mubar) * (1 / (lambda0 + n));
+  // Compute tau_n
   Eigen::MatrixXd tau_temp = Eigen::MatrixXd::Zero(data.cols(), data.cols());
   for (size_t i = 0; i < n; i++) {
     Eigen::RowVectorXd datum = data.row(i);
     tau_temp += (datum - mubar).transpose() * (datum - mubar);  // column * row
   }
-  tau_temp +=
-      (n * lambda / (n + lambda)) * (mubar - mu0).transpose() * (mubar - mu0);
+  tau_temp += (n * lambda0 / (n + lambda0)) * (mubar - mu0).transpose() *
+              (mubar - mu0);
   tau_temp = 0.5 * tau_temp + tau0_inv;
-  Eigen::MatrixXd tau_post = stan::math::inverse_spd(tau_temp);
-  return std::vector<Eigen::MatrixXd>{mu_post, lambda_post, tau_post, nu_post};
+  Eigen::MatrixXd tau_n = stan::math::inverse_spd(tau_temp);
+  return std::vector<Eigen::MatrixXd>{mu_n, lambda_n, tau_n, nu_n};
 }
 
 //! \param data Matrix of row-vectorial data points
@@ -119,14 +119,14 @@ Eigen::VectorXd NNWHierarchy::marg_lpdf(const Eigen::MatrixXd &data) {
 
   // Get values of hyperparameters
   Eigen::RowVectorXd mu0 = get_mu0();
-  double lambda = get_lambda();
+  double lambda0 = get_lambda0();
   Eigen::MatrixXd tau0_inv = get_tau0_inv();
-  double nu = get_nu();
+  double nu0 = get_nu0();
 
   // Compute dof and scale of marginal distribution
-  double nu_n = 2 * nu - dim + 1;
+  double nu_n = 2 * nu0 - dim + 1;
   Eigen::MatrixXd sigma_n =
-      tau0_inv * (nu - 0.5 * (dim - 1)) * lambda / (lambda + 1);
+      tau0_inv * (nu0 - 0.5 * (dim - 1)) * lambda0 / (lambda0 + 1);
 
   for (size_t i = 0; i < n; i++) {
     // Compute marginal for each data point
@@ -139,15 +139,15 @@ Eigen::VectorXd NNWHierarchy::marg_lpdf(const Eigen::MatrixXd &data) {
 void NNWHierarchy::draw() {
   // Get values of hyperparameters
   Eigen::RowVectorXd mu0 = get_mu0();
-  double lambda = get_lambda();
+  double lambda0 = get_lambda0();
   Eigen::MatrixXd tau0 = get_tau0();
-  double nu = get_nu();
+  double nu0 = get_nu0();
 
   // Generate new state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  Eigen::MatrixXd tau_new = stan::math::wishart_rng(nu, tau0, rng);
+  Eigen::MatrixXd tau_new = stan::math::wishart_rng(nu0, tau0, rng);
   Eigen::RowVectorXd mean =
-      stan::math::multi_normal_prec_rng(mu0, tau_new * lambda, rng);
+      stan::math::multi_normal_prec_rng(mu0, tau_new * lambda0, rng);
 
   // Update state
   set_tau_and_utilities(tau_new);
@@ -157,23 +157,23 @@ void NNWHierarchy::draw() {
 void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   // Get values of hyperparameters
   Eigen::RowVectorXd mu0 = get_mu0();
-  double lambda = get_lambda();
+  double lambda0 = get_lambda0();
   Eigen::MatrixXd tau0_inv = get_tau0_inv();
-  double nu = get_nu();
+  double nu0 = get_nu0();
 
   // Update values
   std::vector<Eigen::MatrixXd> temp =
-      normal_wishart_update(data, mu0, lambda, tau0_inv, nu);
-  Eigen::RowVectorXd mu_post = temp[0];
-  double lambda_post = temp[1](0, 0);
-  Eigen::MatrixXd tau_post = temp[2];
-  double nu_post = temp[3](0, 0);
+      normal_wishart_update(data, mu0, lambda0, tau0_inv, nu0);
+  Eigen::RowVectorXd mu_n = temp[0];
+  double lambda_n = temp[1](0, 0);
+  Eigen::MatrixXd tau_n = temp[2];
+  double nu_n = temp[3](0, 0);
 
   // Generate new state values from their prior centering distribution
   auto rng = bayesmix::Rng::Instance().get();
-  Eigen::MatrixXd tau_new = stan::math::wishart_rng(nu_post, tau_post, rng);
+  Eigen::MatrixXd tau_new = stan::math::wishart_rng(nu_n, tau_n, rng);
   Eigen::RowVectorXd mean =
-      stan::math::multi_normal_prec_rng(mu_post, tau_new * lambda_post, rng);
+      stan::math::multi_normal_prec_rng(mu_n, tau_new * lambda_n, rng);
 
   // Update state
   set_tau_and_utilities(tau_new);
