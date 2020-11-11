@@ -10,7 +10,7 @@
 TEST(nnighierarchy, draw) {
   auto hier = std::make_shared<NNIGHierarchy>();
   hier->set_mu0(5.0);
-  hier->set_lambda(0.1);
+  hier->set_lambda0(0.1);
   hier->set_alpha0(2.0);
   hier->set_beta0(2.0);
   hier->check_and_initialize();
@@ -30,7 +30,7 @@ TEST(nnighierarchy, draw) {
 TEST(nnighierarchy, sample_given_data) {
   auto hier = std::make_shared<NNIGHierarchy>();
   hier->set_mu0(5.0);
-  hier->set_lambda(0.1);
+  hier->set_lambda0(0.1);
   hier->set_alpha0(2.0);
   hier->set_beta0(2.0);
   hier->check_and_initialize();
@@ -55,10 +55,10 @@ TEST(nnwhierarchy, draw) {
   Eigen::VectorXd mu0(2);
   mu0 << 5.5, 5.5;
   hier->set_mu0(mu0);
-  hier->set_lambda(0.2);
-  double nu = 5.0;
-  hier->set_nu(nu);
-  Eigen::Matrix2d tau0 = (1 / nu) * Eigen::Matrix2d::Identity();
+  hier->set_lambda0(0.2);
+  double nu0 = 5.0;
+  hier->set_nu0(nu0);
+  Eigen::Matrix2d tau0 = (1 / nu0) * Eigen::Matrix2d::Identity();
   hier->set_tau0(tau0);
   hier->check_and_initialize();
 
@@ -79,10 +79,10 @@ TEST(nnwhierarchy, sample_given_data) {
   Eigen::VectorXd mu0(2);
   mu0 << 5.5, 5.5;
   hier->set_mu0(mu0);
-  hier->set_lambda(0.2);
-  double nu = 5.0;
-  hier->set_nu(nu);
-  Eigen::Matrix2d tau0 = (1 / nu) * Eigen::Matrix2d::Identity();
+  hier->set_lambda0(0.2);
+  double nu0 = 5.0;
+  hier->set_nu0(nu0);
+  Eigen::Matrix2d tau0 = (1 / nu0) * Eigen::Matrix2d::Identity();
   hier->set_tau0(tau0);
   hier->check_and_initialize();
 
