@@ -26,6 +26,14 @@
 //! form and Neal's algorithm 2 may be used with it.
 
 class NNIGHierarchy : public BaseHierarchy {
+ public:
+  struct PostParams {
+    double mu_n;
+    double alpha_n;
+    double beta_n;
+    double lambda_n;
+  };
+
  protected:
   // state
   double mean;
@@ -46,11 +54,9 @@ class NNIGHierarchy : public BaseHierarchy {
   void check_state_validity() override { assert(sd > 0); }
 
   //! Returns updated values of the prior hyperparameters via their posterior
-  std::vector<double> normal_gamma_update(const Eigen::VectorXd &data,
-                                          const double mu0,
-                                          const double alpha0,
-                                          const double beta0,
-                                          const double lambda0);
+  PostParams normal_invgamma_update(const Eigen::VectorXd &data,
+                                    const double mu0, const double alpha0,
+                                    const double beta0, const double lambda0);
 
  public:
   void check_and_initialize() override;
@@ -67,12 +73,16 @@ class NNIGHierarchy : public BaseHierarchy {
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points
   Eigen::VectorXd like(const Eigen::MatrixXd &data) override;
+  //! Evaluates the log-likelihood of data in a single point
+  double lpdf(const Eigen::RowVectorXd &datum) override;
   //! Evaluates the log-likelihood of data in the given points
-  Eigen::VectorXd lpdf(const Eigen::MatrixXd &data) override;
+  Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data) override;
   //! Evaluates the marginal distribution of data in the given points
   Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) override;
+  //! Evaluates the log-marginal distribution of data in a single point
+  double marg_lpdf(const Eigen::RowVectorXd &datum) override;
   //! Evaluates the log-marginal distribution of data in the given points
-  Eigen::VectorXd marg_lpdf(const Eigen::MatrixXd &data) override;
+  Eigen::VectorXd marg_lpdf_grid(const Eigen::MatrixXd &data) override;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution

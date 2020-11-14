@@ -26,6 +26,14 @@
 //! may be used with it.
 
 class NNWHierarchy : public BaseHierarchy {
+ public:
+  struct PostParams {
+    Eigen::RowVectorXd mu_n;
+    double lambda_n;
+    Eigen::MatrixXd tau_n;
+    double nu_n;
+  };
+
  protected:
   Eigen::VectorXd mean;
   Eigen::MatrixXd tau;
@@ -53,9 +61,11 @@ class NNWHierarchy : public BaseHierarchy {
   void set_tau_and_utilities(const Eigen::MatrixXd &tau_);
 
   //! Returns updated values of the prior hyperparameters via their posterior
-  std::vector<Eigen::MatrixXd> normal_wishart_update(
-      const Eigen::MatrixXd &data, const Eigen::RowVectorXd &mu0,
-      const double lambda0, const Eigen::MatrixXd &tau0_inv, const double nu0);
+  PostParams normal_wishart_update(const Eigen::MatrixXd &data,
+                                   const Eigen::RowVectorXd &mu0,
+                                   const double lambda0,
+                                   const Eigen::MatrixXd &tau0_inv,
+                                   const double nu0);
 
  public:
   void check_and_initialize() override;
@@ -73,14 +83,20 @@ class NNWHierarchy : public BaseHierarchy {
   //! Evaluates the likelihood of data in the given points
   Eigen::VectorXd like(const Eigen::MatrixXd &data) override;
 
+  //! Evaluates the log-likelihood of data in a single point
+  double lpdf(const Eigen::RowVectorXd &datum) override;
+
   //! Evaluates the log-likelihood of data in the given points
-  Eigen::VectorXd lpdf(const Eigen::MatrixXd &data) override;
+  Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data) override;
 
   //! Evaluates the marginal distribution of data in the given points
   Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) override;
 
+  //! Evaluates the log-marginal distribution of data in a single point
+  double marg_lpdf(const Eigen::RowVectorXd &datum) override;
+
   //! Evaluates the log-marginal distribution of data in the given points
-  Eigen::VectorXd marg_lpdf(const Eigen::MatrixXd &data) override;
+  Eigen::VectorXd marg_lpdf_grid(const Eigen::MatrixXd &data) override;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution

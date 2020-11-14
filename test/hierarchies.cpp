@@ -58,7 +58,7 @@ TEST(nnwhierarchy, draw) {
   hier->set_lambda0(0.2);
   double nu0 = 5.0;
   hier->set_nu0(nu0);
-  Eigen::Matrix2d tau0 = (1 / nu0) * Eigen::Matrix2d::Identity();
+  Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
   hier->set_tau0(tau0);
   hier->check_and_initialize();
 
@@ -82,7 +82,7 @@ TEST(nnwhierarchy, sample_given_data) {
   hier->set_lambda0(0.2);
   double nu0 = 5.0;
   hier->set_nu0(nu0);
-  Eigen::Matrix2d tau0 = (1 / nu0) * Eigen::Matrix2d::Identity();
+  Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
   hier->set_tau0(tau0);
   hier->check_and_initialize();
 
