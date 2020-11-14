@@ -40,7 +40,7 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
 
       // Compute cluster component (vector + scalar * unity vector)
       lpdf_local.col(j) = log(mixing->mass_existing_cluster(card[j], n_data)) +
-                          temp_hier->lpdf(grid).array();
+                          temp_hier->lpdf_grid(grid).array();
     }
     // Compute marginal component (vector + scalar * unity vector)
     lpdf_local.col(n_clust) = log(mixing->mass_new_cluster(n_clust, n_data)) +

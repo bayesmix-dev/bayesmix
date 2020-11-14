@@ -38,14 +38,14 @@ TEST(lpdf, nnig) {
   double prior1 = stan::math::inv_gamma_lpdf(sd*sd, alpha0, beta0);
   double prior2 = stan::math::normal_lpdf(mean, mu0, sd / sqrt(lambda0));
   double prior = prior1 + prior2;
-  double like = hier.lpdf(datum)(0);
+  double like = hier.lpdf(datum);
   double post1 = stan::math::inv_gamma_lpdf(sd*sd, alpha_n, beta_n);
   double post2 = stan::math::normal_lpdf(mean, mu_n, sd / sqrt(lambda_n));
   double post = post1 + post2;
 
   // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
   double sum = prior + like - post;
-  double marg = hier.marg_lpdf(datum)(0);
+  double marg = hier.marg_lpdf(datum);
 
   ASSERT_FLOAT_EQ(sum, marg);
 }
@@ -92,13 +92,13 @@ TEST(lpdf, nnw) {
   double prior1 = stan::math::wishart_lpdf(tau, nu0, tau0);
   double prior2 = stan::math::multi_normal_prec_lpdf(mu, mu0, tau_pr);
   double prior = prior1 + prior2;
-  double like = hier.lpdf(datum)(0);
+  double like = hier.lpdf(datum);
   double post1 = stan::math::wishart_lpdf(tau, nu_n, tau_post);
   double post2 = stan::math::multi_normal_prec_lpdf(mu, mu0, tau_post);
   double post = post1 + post2;
   // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
   double sum = prior + like - post;
-  double marg = hier.marg_lpdf(datum)(0);
+  double marg = hier.marg_lpdf(datum);
 
   // Compute logdet's
   Eigen::MatrixXd tauchol0 =
