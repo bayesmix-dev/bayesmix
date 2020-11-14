@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   // hier->set_lambda0(0.2);
   // double nu0 = 5.0;
   // hier->set_nu0(nu0);
-  // Eigen::Matrix2d tau0 = (1 / nu) * Eigen::Matrix2d::Identity();
+  // Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu;
   // hier->set_tau0(tau0);
 
   mixing->set_totalmass(2.0);

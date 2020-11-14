@@ -70,7 +70,7 @@ NNWHierarchy::PostParams NNWHierarchy::normal_wishart_update(
   out.nu_n = nu0 + 0.5 * n;
 
   Eigen::RowVectorXd mubar = data.colwise().mean();  // sample mean
-  out.mu_n = (lambda0 * mu0 + n * mubar) * (1 / (lambda0 + n));
+  out.mu_n = (lambda0 * mu0 + n * mubar) / (lambda0 + n);
   // Compute tau_n
   Eigen::MatrixXd tau_temp = Eigen::MatrixXd::Zero(data.cols(), data.cols());
   for (size_t i = 0; i < n; i++) {

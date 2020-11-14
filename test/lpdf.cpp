@@ -64,7 +64,7 @@ TEST(lpdf, nnw) {
   hier.set_lambda0(lambda0);
   double nu0 = 5.0;
   hier.set_nu0(nu0);
-  Eigen::MatrixXd tau0 = (1 / nu0) * Eigen::Matrix2d::Identity();
+  Eigen::MatrixXd tau0 = Eigen::Matrix2d::Identity() / nu0;
   hier.set_tau0(tau0);
   hier.check_and_initialize();
   Eigen::VectorXd mu = mu0;
@@ -80,7 +80,7 @@ TEST(lpdf, nnw) {
   double lambda_n = lambda0 + 1;
   double nu_n = nu0 + 0.5;
   Eigen::VectorXd mu_n =
-      (lambda0 * mu0 + datum.transpose()) * (1 / (lambda0 + 1));
+      (lambda0 * mu0 + datum.transpose()) / (lambda0 + 1);
   Eigen::MatrixXd tau_temp =
       stan::math::inverse_spd(tau0) + (0.5 * lambda0 / (lambda0 + 1)) *
                                           (datum.transpose() - mu0) *
