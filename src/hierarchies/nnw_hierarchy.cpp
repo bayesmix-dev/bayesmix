@@ -93,11 +93,10 @@ Eigen::VectorXd NNWHierarchy::like(const Eigen::MatrixXd &data) {
 
 //! \param data Matrix of row-vectorial single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNWHierarchy::lpdf(const Eigen::MatrixXd &datum) {
+double NNWHierarchy::lpdf(const Eigen::RowVectorXd &datum) {
   // Initialize relevant objects
-  assert(datum.rows() == 1);
-  return bayesmix::multi_normal_prec_lpdf(datum.row(0), mean,
-                                          tau_chol_factor_eval, tau_logdet);
+  return bayesmix::multi_normal_prec_lpdf(datum, mean, tau_chol_factor_eval,
+                                          tau_logdet);
 }
 
 //! \param data Matrix of row-vectorial data points
@@ -123,9 +122,7 @@ Eigen::VectorXd NNWHierarchy::eval_marg(const Eigen::MatrixXd &data) {
 
 //! \param data Matrix of row-vectorial a single data point
 //! \return     Marginal distribution vector evaluated in data
-double NNWHierarchy::marg_lpdf(const Eigen::MatrixXd &datum) {
-  assert(datum.rows() == 1);
-
+double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) {
   unsigned int dim = datum.cols();
 
   // Compute dof and scale of marginal distribution
@@ -134,7 +131,7 @@ double NNWHierarchy::marg_lpdf(const Eigen::MatrixXd &datum) {
       tau0_inv * (nu0 - 0.5 * (dim - 1)) * lambda0 / (lambda0 + 1);
 
   // TODO: chec if this is optimized as our bayesmix::multi_normal_prec_lpdf
-  return stan::math::multi_student_t_lpdf(datum.row(0), nu_n, mu0, sigma_n);
+  return stan::math::multi_student_t_lpdf(datum, nu_n, mu0, sigma_n);
 }
 
 //! \param data Matrix of row-vectorial data points

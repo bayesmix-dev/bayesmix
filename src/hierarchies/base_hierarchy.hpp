@@ -48,7 +48,7 @@ class BaseHierarchy {
   virtual Eigen::VectorXd like(const Eigen::MatrixXd &data) = 0;
 
   //! Evaluates the log-likelihood of data in a single point
-  virtual double lpdf(const Eigen::MatrixXd &datum) = 0;
+  virtual double lpdf(const Eigen::RowVectorXd &datum) = 0;
 
   //! Evaluates the log-likelihood of data in the given points
   virtual Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data) = 0;
@@ -57,7 +57,7 @@ class BaseHierarchy {
   virtual Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) = 0;
 
   //! Evaluates the log-marginal distribution of data in a single point
-  virtual double marg_lpdf(const Eigen::MatrixXd &datum) = 0;
+  virtual double marg_lpdf(const Eigen::RowVectorXd &datum) = 0;
 
   //! Evaluates the log-marginal distribution of data in the given points
   virtual Eigen::VectorXd marg_lpdf_grid(const Eigen::MatrixXd &data) = 0;
