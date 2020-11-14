@@ -144,10 +144,8 @@ class BaseAlgorithm {
       std::invalid_argument("Error: empty data matrix");
     }
     if (hier_->is_multivariate() == false && data.cols() > 1) {
-      std::cout
-          << "Warning: multivariate data supplied to univariate hierarchy."
-          << " The algorithm will run correctly, but all data rows other"
-          << " than the first one will be ignored" << std::endl;
+      std::invalid_argument(
+          "Error: multivariate data supplied to univariate hierarchy");
     }
     data = data_;
     init_num_clusters = (init == 0) ? data.rows() : init;
