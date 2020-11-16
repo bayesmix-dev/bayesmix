@@ -91,7 +91,7 @@ class BaseAlgorithm {
     sample_allocations();
     sample_unique_values();
     // some_hierarchy->update_hypers(unique_values);  // TODO
-    mixing->update_hypers(unique_values, n);
+    mixing->update_hypers(unique_values, data.size());
   }
 
  public:

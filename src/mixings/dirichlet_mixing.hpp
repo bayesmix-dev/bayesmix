@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "../../proto/cpp/mixings.pb.h"
-#include "../hierarchies/BaseHierarchy.hpp"
+#include "../hierarchies/base_hierarchy.hpp"
 #include "base_mixing.hpp"
 
 //! Class that represents the Dirichlet process mixture model.
@@ -22,7 +22,7 @@ class DirichletMixing : public BaseMixing {
  protected:
   //! Total mass parameters
   double totalmass;
-  DPState state;
+  bayesmix::DPState state;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS

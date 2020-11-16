@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "../../proto/cpp/mixings.pb.h"
-#include "../hierarchies/BaseHierarchy.hpp"
+#include "../hierarchies/base_hierarchy.hpp"
 
 //! Abstract base class for a generic mixture model
 
@@ -47,8 +47,6 @@ class BaseMixing {
       unsigned int n) = 0;
 
   virtual void set_state(const google::protobuf::Message &curr) = 0;
-  // TODO is it needed?:
-  virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
   virtual std::string get_id() const = 0;
 };

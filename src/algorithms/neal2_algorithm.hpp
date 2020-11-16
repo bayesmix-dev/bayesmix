@@ -39,10 +39,6 @@ class Neal2Algorithm : public MarginalAlgorithm {
   void initialize() override;
   void sample_allocations() override;
   void sample_unique_values() override;
-  //! Empty: this algorithm does not use weights
-  void sample_weights() override { return; }
-  //! Empty: this algorithm does not update hyperparameters
-  void update_hypers() override { return; }
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
