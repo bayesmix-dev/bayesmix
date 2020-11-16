@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "base_mixing.hpp"
+#include "../../proto/cpp/mixings.pb.h"
 
 //! Class that represents the Dirichlet process mixture model.
 
@@ -19,14 +20,12 @@ class DirichletMixing : public BaseMixing {
  protected:
   //! Total mass parameters
   double totalmass;
+  DPState state;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   ~DirichletMixing() = default;
   DirichletMixing() = default;
-  DirichletMixing(const double totalmass_) : totalmass(totalmass_) {
-    assert(totalmass >= 0);
-  }
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
@@ -51,7 +50,10 @@ class DirichletMixing : public BaseMixing {
 
   // GETTERS AND SETTERS
   double get_totalmass() const { return totalmass; }
+  // TODO delete:
   void set_totalmass(const double totalmass_) { totalmass = totalmass_; }
+
+  void set_state(const google::protobuf::Message &curr) override;
 
   std::string get_id() const override { return "Dirichlet"; }
 };

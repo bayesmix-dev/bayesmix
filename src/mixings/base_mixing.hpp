@@ -1,6 +1,8 @@
 #ifndef BAYESMIX_MIXINGS_BASE_MIXING_HPP_
 #define BAYESMIX_MIXINGS_BASE_MIXING_HPP_
 
+#include "../../proto/cpp/mixings.pb.h"
+
 //! Abstract base class for a generic mixture model
 
 //! This class represents a mixture model object to be used in a BNP iterative
@@ -36,6 +38,10 @@ class BaseMixing {
   //! \return        Probability value
   virtual double mass_new_cluster(const unsigned int n_clust,
                                   const unsigned int n) const = 0;
+
+  virtual void set_state(const google::protobuf::Message &curr) = 0;
+  // TODO is it needed?:
+  virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
   virtual std::string get_id() const = 0;
 };
