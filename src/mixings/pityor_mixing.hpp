@@ -19,17 +19,13 @@
 class PitYorMixing : public BaseMixing {
  protected:
   //! Strength and discount parameters
-  double strength, discount;
+  double strength;
+  double discount = 0.1;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   ~PitYorMixing() = default;
   PitYorMixing() = default;
-  PitYorMixing(const double strength_, const double discount_)
-      : strength(strength_), discount(discount_) {
-    assert(strength > -discount);
-    assert(0 <= discount && discount < 1);
-  }
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
@@ -59,8 +55,14 @@ class PitYorMixing : public BaseMixing {
   // GETTERS AND SETTERS
   double get_strength() const { return strength; }
   double get_discount() const { return discount; }
-  void set_strength(const double strength_) { strength = strength_; }
-  void set_discount(const double discount_) { discount = discount_; }
+
+  void set_strength_and_discount(const double strength_,
+                                 const double discount_) {
+    assert(strength_ > -discount_);
+    assert(0 <= discount_ && discount_ < 1);
+    strength = strength_;
+    discount = discount_;
+  }
 
   void set_state(const google::protobuf::Message &curr) override {}
 
