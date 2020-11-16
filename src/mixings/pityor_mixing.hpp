@@ -52,11 +52,17 @@ class PitYorMixing : public BaseMixing {
     return (strength + discount * n_clust) / (n + strength);
   }
 
+  void update_hypers(
+    const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+    unsigned int n) override {}
+
   // GETTERS AND SETTERS
   double get_strength() const { return strength; }
   double get_discount() const { return discount; }
   void set_strength(const double strength_) { strength = strength_; }
   void set_discount(const double discount_) { discount = discount_; }
+
+  void set_state(const google::protobuf::Message &curr) override {}
 
   std::string get_id() const override { return "Pitman-Yor"; }
 };
