@@ -2,9 +2,11 @@
 #define BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
 
 #include <cassert>
+#include <memory>
 
-#include "base_mixing.hpp"
 #include "../../proto/cpp/mixings.pb.h"
+#include "../hierarchies/BaseHierarchy.hpp"
+#include "base_mixing.hpp"
 
 //! Class that represents the Dirichlet process mixture model.
 
@@ -47,6 +49,10 @@ class DirichletMixing : public BaseMixing {
                           const unsigned int n) const override {
     return totalmass / (n + totalmass);
   }
+
+  void update_hypers(
+      const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+      unsigned int n) override;
 
   // GETTERS AND SETTERS
   double get_totalmass() const { return totalmass; }

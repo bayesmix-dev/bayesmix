@@ -1,7 +1,10 @@
 #ifndef BAYESMIX_MIXINGS_BASE_MIXING_HPP_
 #define BAYESMIX_MIXINGS_BASE_MIXING_HPP_
 
+#include <memory>
+
 #include "../../proto/cpp/mixings.pb.h"
+#include "../hierarchies/BaseHierarchy.hpp"
 
 //! Abstract base class for a generic mixture model
 
@@ -38,6 +41,10 @@ class BaseMixing {
   //! \return        Probability value
   virtual double mass_new_cluster(const unsigned int n_clust,
                                   const unsigned int n) const = 0;
+
+  virtual void update_hypers(
+      const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+      unsigned int n) = 0;
 
   virtual void set_state(const google::protobuf::Message &curr) = 0;
   // TODO is it needed?:
