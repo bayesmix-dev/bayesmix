@@ -2,6 +2,11 @@
 build/
 # Resources folder
 resources/
+build
+cmake-build-debug
+.idea
+# Local files
+*.local.*
 # Visual Studio Code folder
 .vscode
 # SFTP configuration file
