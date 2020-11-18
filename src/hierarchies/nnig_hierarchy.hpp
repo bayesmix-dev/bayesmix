@@ -96,6 +96,8 @@ class NNIGHierarchy : public BaseHierarchy {
   double get_beta0() const { return beta0; }
   double get_lambda0() const { return lambda0; }
   double get_mean() const { return mean; }
+  double get_sd() const { return sd; }
+
   void set_mu0(const double mu0_) {
     mu0 = mu0_;
     mean = mu0;
