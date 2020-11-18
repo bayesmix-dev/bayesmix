@@ -89,7 +89,8 @@ void Neal8Algorithm::sample_allocations() {
     for (size_t j = 0; j < n_aux; j++) {
       // Probability of being assigned to a newly generated cluster
       logprobas(n_clust + j) = log(mixing->mass_new_cluster(n_clust, n - 1)) +
-                               aux_unique_values[j]->like_lpdf(datum) - log(n_aux);
+                               aux_unique_values[j]->like_lpdf(datum) -
+                               log(n_aux);
     }
     // Draw a NEW value for datum allocation
     unsigned int c_new =

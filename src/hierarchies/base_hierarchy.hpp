@@ -47,7 +47,8 @@ class BaseHierarchy {
   //! Evaluates the log-likelihood of data in a single point
   virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
   //! Evaluates the log-likelihood of data in the given points
-  virtual Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data) const = 0;
+  virtual Eigen::VectorXd like_lpdf_grid(
+      const Eigen::MatrixXd &data) const = 0;
   //! Evaluates the log-marginal distribution of data in a single point
   virtual double marg_lpdf(const Eigen::RowVectorXd &datum) const = 0;
   //! Evaluates the log-marginal distribution of data in the given points
@@ -66,7 +67,7 @@ class BaseHierarchy {
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
   virtual void set_state(const google::protobuf::Message &state_,
-    bool check = true) = 0;
+                         bool check = true) = 0;
 
   virtual std::string get_id() const = 0;
 };

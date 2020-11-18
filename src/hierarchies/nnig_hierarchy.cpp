@@ -56,7 +56,8 @@ double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
 
 //! \param data Column vector of data points
 //! \return     Log-Likehood vector evaluated in data
-Eigen::VectorXd NNIGHierarchy::like_lpdf_grid(const Eigen::MatrixXd &data) const {
+Eigen::VectorXd NNIGHierarchy::like_lpdf_grid(
+    const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
@@ -77,7 +78,8 @@ double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
 
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data (log)
-Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(const Eigen::MatrixXd &data) const {
+Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(
+    const Eigen::MatrixXd &data) const {
   // Compute standard deviation of marginal distribution
   double sig_n = sqrt(beta0 * (lambda0 + 1) / (alpha0 * lambda0));
 
@@ -109,10 +111,10 @@ void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 }
 
 void NNIGHierarchy::set_state(const google::protobuf::Message &state_,
-    bool check /*= true*/) {
+                              bool check /*= true*/) {
   const bayesmix::MarginalState::ClusterVal &currcast =
-      google::protobuf::internal::down_cast<const bayesmix::MarginalState::ClusterVal &>(
-          state_);
+      google::protobuf::internal::down_cast<
+          const bayesmix::MarginalState::ClusterVal &>(state_);
 
   mean = currcast.univ_ls_state().mean();
   sd = currcast.univ_ls_state().sd();
@@ -122,7 +124,8 @@ void NNIGHierarchy::set_state(const google::protobuf::Message &state_,
   }
 }
 
-void NNIGHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
+void NNIGHierarchy::write_state_to_proto(
+    google::protobuf::Message *out) const {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
 

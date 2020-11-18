@@ -94,7 +94,8 @@ double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Log-Likehood vector evaluated in data
-Eigen::VectorXd NNWHierarchy::like_lpdf_grid(const Eigen::MatrixXd &data) const {
+Eigen::VectorXd NNWHierarchy::like_lpdf_grid(
+    const Eigen::MatrixXd &data) const {
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);
@@ -122,7 +123,8 @@ double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Marginal distribution vector evaluated in data
-Eigen::VectorXd NNWHierarchy::marg_lpdf_grid(const Eigen::MatrixXd &data) const {
+Eigen::VectorXd NNWHierarchy::marg_lpdf_grid(
+    const Eigen::MatrixXd &data) const {
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);
@@ -181,10 +183,10 @@ void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 }
 
 void NNWHierarchy::set_state(const google::protobuf::Message &state_,
-    bool check /*= true*/) {
+                             bool check /*= true*/) {
   const bayesmix::MarginalState::ClusterVal &currcast =
-      google::protobuf::internal::down_cast<const bayesmix::MarginalState::ClusterVal &>(
-          state_);
+      google::protobuf::internal::down_cast<
+          const bayesmix::MarginalState::ClusterVal &>(state_);
 
   mean = to_eigen(currcast.multi_ls_state().mean());
   set_tau_and_utilities(to_eigen(currcast.multi_ls_state().precision()));
