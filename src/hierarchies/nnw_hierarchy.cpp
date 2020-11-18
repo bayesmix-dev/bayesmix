@@ -197,14 +197,12 @@ void NNWHierarchy::set_state(const google::protobuf::Message &state_,
 }
 
 void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
-  using namespace google::protobuf::internal;
-  using namespace bayesmix;
-
-  MultiLSState state;
+  bayesmix::MultiLSState state;
   to_proto(mean, state.mutable_mean());
   to_proto(tau, state.mutable_precision());
 
-  down_cast<MarginalState::ClusterVal *>(out)
+  google::protobuf::internal::down_cast<bayesmix::MarginalState::ClusterVal *>(
+      out)
       ->mutable_multi_ls_state()
       ->CopyFrom(state);
 }

@@ -126,14 +126,12 @@ void NNIGHierarchy::set_state(const google::protobuf::Message &state_,
 
 void NNIGHierarchy::write_state_to_proto(
     google::protobuf::Message *out) const {
-  using namespace google::protobuf::internal;
-  using namespace bayesmix;
-
-  UnivLSState state;
+  bayesmix::UnivLSState state;
   state.set_mean(mean);
   state.set_sd(sd);
 
-  down_cast<MarginalState::ClusterVal *>(out)
+  google::protobuf::internal::down_cast<bayesmix::MarginalState::ClusterVal *>(
+      out)
       ->mutable_univ_ls_state()
       ->CopyFrom(state);
 }

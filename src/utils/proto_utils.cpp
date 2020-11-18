@@ -27,17 +27,17 @@ Eigen::VectorXd bayesmix::to_eigen(const bayesmix::Vector &vec) {
 }
 
 Eigen::MatrixXd bayesmix::to_eigen(const bayesmix::Matrix &mat) {
-  using namespace Eigen;
   int nrow = mat.rows();
   int ncol = mat.cols();
   Eigen::MatrixXd out;
   if (nrow > 0 & ncol > 0) {
     const double *p = &(mat.data())[0];
     if (mat.rowmajor()) {
-      out = Map<const Eigen::Matrix<double, Dynamic, Dynamic, RowMajor> >(
+      out = Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic,
+                                           Eigen::Dynamic, Eigen::RowMajor> >(
           p, nrow, ncol);
     } else {
-      out = Map<const MatrixXd>(p, nrow, ncol);
+      out = Eigen::Map<const Eigen::MatrixXd>(p, nrow, ncol);
     }
   }
   return out;
