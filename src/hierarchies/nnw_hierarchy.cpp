@@ -86,7 +86,7 @@ NNWHierarchy::PostParams NNWHierarchy::normal_wishart_update(
 
 //! \param data Matrix of row-vectorial single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNWHierarchy::lpdf(const Eigen::RowVectorXd &datum) const {
+double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   // Initialize relevant objects
   return bayesmix::multi_normal_prec_lpdf(datum, mean, tau_chol_factor_eval,
                                           tau_logdet);
@@ -94,7 +94,7 @@ double NNWHierarchy::lpdf(const Eigen::RowVectorXd &datum) const {
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Log-Likehood vector evaluated in data
-Eigen::VectorXd NNWHierarchy::lpdf_grid(const Eigen::MatrixXd &data) const {
+Eigen::VectorXd NNWHierarchy::like_lpdf_grid(const Eigen::MatrixXd &data) const {
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);

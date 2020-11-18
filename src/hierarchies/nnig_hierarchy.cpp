@@ -49,14 +49,14 @@ NNIGHierarchy::PostParams NNIGHierarchy::normal_invgamma_update(
 
 //! \param data Column vector containing a single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNIGHierarchy::lpdf(const Eigen::RowVectorXd &datum) const {
+double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   assert(datum.size() == 1);
   return stan::math::normal_lpdf(datum(0), mean, sd);
 }
 
 //! \param data Column vector of data points
 //! \return     Log-Likehood vector evaluated in data
-Eigen::VectorXd NNIGHierarchy::lpdf_grid(const Eigen::MatrixXd &data) const {
+Eigen::VectorXd NNIGHierarchy::like_lpdf_grid(const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point

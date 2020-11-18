@@ -45,9 +45,9 @@ class BaseHierarchy {
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
-  virtual double lpdf(const Eigen::RowVectorXd &datum) const = 0;
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
   //! Evaluates the log-likelihood of data in the given points
-  virtual Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data) const = 0;
+  virtual Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data) const = 0;
   //! Evaluates the log-marginal distribution of data in a single point
   virtual double marg_lpdf(const Eigen::RowVectorXd &datum) const = 0;
   //! Evaluates the log-marginal distribution of data in the given points

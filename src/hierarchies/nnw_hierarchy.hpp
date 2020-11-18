@@ -81,9 +81,9 @@ class NNWHierarchy : public BaseHierarchy {
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
-  double lpdf(const Eigen::RowVectorXd &datum) const override;
+  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
   //! Evaluates the log-likelihood of data in the given points
-  Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data) const override;
+  Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data) const override;
   //! Evaluates the log-marginal distribution of data in a single point
   double marg_lpdf(const Eigen::RowVectorXd &datum) const override;
   //! Evaluates the log-marginal distribution of data in the given points
