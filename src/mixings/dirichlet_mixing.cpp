@@ -36,8 +36,7 @@ void DirichletMixing::update_hypers(
 
 void DirichletMixing::set_prior(const google::protobuf::Message &prior_) {
   const bayesmix::DPPrior &currcast =
-      google::protobuf::internal::down_cast<const bayesmix::DPPrior &>(
-          prior_);
+      google::protobuf::internal::down_cast<const bayesmix::DPPrior &>(prior_);
   prior = currcast;
   if (prior.has_fixed_value()) {
     totalmass = prior.fixed_value().value();
@@ -46,4 +45,13 @@ void DirichletMixing::set_prior(const google::protobuf::Message &prior_) {
   } else {
     std::invalid_argument("Error: argument proto is not appropriate");
   }
+}
+
+void DirichletMixing::write_state_to_proto(
+    google::protobuf::Message *out) const {
+  bayesmix::DPState state;
+  state.set_totalmass(totalmass);
+
+  google::protobuf::internal::down_cast<bayesmix::DPState *>(out)->CopyFrom(
+      state);
 }

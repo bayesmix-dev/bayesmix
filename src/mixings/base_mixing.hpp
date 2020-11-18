@@ -49,7 +49,7 @@ class BaseMixing {
   // GETTERS AND SETTERS
   virtual void set_prior(const google::protobuf::Message &prior_) = 0;
 
-  // virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
+  virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
   virtual std::string get_id() const = 0;
 };

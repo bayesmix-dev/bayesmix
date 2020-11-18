@@ -49,8 +49,8 @@ class PitYorMixing : public BaseMixing {
   }
 
   void update_hypers(
-    const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
-    unsigned int n) override {}
+      const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+      unsigned int n) override {}
 
   // GETTERS AND SETTERS
   double get_strength() const { return strength; }
@@ -64,9 +64,9 @@ class PitYorMixing : public BaseMixing {
     discount = discount_;
   }
 
-  // void set_prior(const google::protobuf::Message &prior_) override;
+  void set_prior(const google::protobuf::Message &prior_) override {}
 
-  // void write_state_to_proto(google::protobuf::Message *out) const override;
+  void write_state_to_proto(google::protobuf::Message *out) const override;
 
   std::string get_id() const override { return "Pitman-Yor"; }
 };

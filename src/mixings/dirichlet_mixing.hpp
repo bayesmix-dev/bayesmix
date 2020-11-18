@@ -59,7 +59,7 @@ class DirichletMixing : public BaseMixing {
 
   void set_prior(const google::protobuf::Message &prior_) override;
 
-  // void write_state_to_proto(google::protobuf::Message *out) const override;
+  void write_state_to_proto(google::protobuf::Message *out) const override;
 
   std::string get_id() const override { return "Dirichlet"; }
 };
