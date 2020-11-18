@@ -52,6 +52,7 @@ void DirichletMixing::write_state_to_proto(
   bayesmix::DPState state;
   state.set_totalmass(totalmass);
 
-  google::protobuf::internal::down_cast<bayesmix::DPState *>(out)->CopyFrom(
-      state);
+  google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
+      ->mutable_dp_state()
+      ->CopyFrom(state);
 }
