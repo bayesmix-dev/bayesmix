@@ -1,15 +1,9 @@
 #include <gtest/gtest.h>
+
 #include <memory>
 
-//#include <Eigen/Dense>
-// #include <stan/math/prim/fun.hpp>
-// #include <stan/math/prim/prob.hpp>
-
-//#include "../proto/cpp/marginal_state.pb.h"
 #include "../src/hierarchies/base_hierarchy.hpp"
-//#include "../src/hierarchies/nnig_hierarchy.hpp"
 #include "../src/mixings/dirichlet_mixing.hpp"
-
 
 TEST(mixing, fixed_value) {
   DirichletMixing mix;
@@ -27,8 +21,6 @@ TEST(mixing, fixed_value) {
   double m_mix_after = mix.get_totalmass();
   ASSERT_FLOAT_EQ(m, m_mix_after);
 }
-
-
 
 TEST(mixing, gamma_prior) {
   DirichletMixing mix;
