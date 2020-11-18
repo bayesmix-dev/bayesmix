@@ -13,7 +13,7 @@ void DirichletMixing::update_hypers(
   if (state.has_fixed_value()) {
     return;
   } else if (state.has_gamma_prior()) {
-    auto rng = bayesmix::Rng::Instance().get();
+    auto &rng = bayesmix::Rng::Instance().get();
 
     // Recover parameters
     unsigned int k = unique_values.size();

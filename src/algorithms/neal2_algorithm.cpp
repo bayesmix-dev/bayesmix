@@ -50,7 +50,7 @@ void Neal2Algorithm::initialize() {
 void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
-  auto rng = bayesmix::Rng::Instance().get();
+  auto &rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
   for (size_t i = 0; i < n_data; i++) {

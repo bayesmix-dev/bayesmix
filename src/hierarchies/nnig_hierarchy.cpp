@@ -105,7 +105,7 @@ Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(const Eigen::MatrixXd &data) {
 
 void NNIGHierarchy::draw() {
   // Update state values from their prior centering distribution
-  auto rng = bayesmix::Rng::Instance().get();
+  auto &rng = bayesmix::Rng::Instance().get();
   sd = sqrt(stan::math::inv_gamma_rng(alpha0, beta0, rng));
   mean = stan::math::normal_rng(mu0, sd / sqrt(lambda0), rng);
 }
@@ -117,7 +117,7 @@ void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
       normal_invgamma_update(data.col(0), mu0, alpha0, beta0, lambda0);
 
   // Update state values from their prior centering distribution
-  auto rng = bayesmix::Rng::Instance().get();
+  auto &rng = bayesmix::Rng::Instance().get();
   sd = sqrt(stan::math::inv_gamma_rng(params.alpha_n, params.beta_n, rng));
   mean = stan::math::normal_rng(params.mu_n, sd / sqrt(params.lambda_n), rng);
 }
