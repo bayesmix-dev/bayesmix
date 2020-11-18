@@ -84,13 +84,6 @@ NNWHierarchy::PostParams NNWHierarchy::normal_wishart_update(
   return out;
 }
 
-//! \param data Matrix of row-vectorial data points
-//! \return     Likehood vector evaluated in data
-Eigen::VectorXd NNWHierarchy::like(const Eigen::MatrixXd &data) const {
-  Eigen::VectorXd result = lpdf_grid(data);
-  return result.array().exp();
-}
-
 //! \param data Matrix of row-vectorial single data point
 //! \return     Log-Likehood vector evaluated in data
 double NNWHierarchy::lpdf(const Eigen::RowVectorXd &datum) const {
@@ -111,13 +104,6 @@ Eigen::VectorXd NNWHierarchy::lpdf_grid(const Eigen::MatrixXd &data) const {
         data.row(i), mean, tau_chol_factor_eval, tau_logdet);
   }
   return result;
-}
-
-//! \param data Matrix of row-vectorial data points
-//! \return     Marginal distribution vector evaluated in data
-Eigen::VectorXd NNWHierarchy::eval_marg(const Eigen::MatrixXd &data) const {
-  Eigen::VectorXd result = marg_lpdf_grid(data);
-  return result.array().exp();
 }
 
 //! \param data Matrix of row-vectorial a single data point

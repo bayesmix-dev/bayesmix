@@ -47,13 +47,6 @@ NNIGHierarchy::PostParams NNIGHierarchy::normal_invgamma_update(
   return out;
 }
 
-//! \param data Column vector of data points
-//! \return     Likehood vector evaluated in data
-Eigen::VectorXd NNIGHierarchy::like(const Eigen::MatrixXd &data) const {
-  Eigen::VectorXd result = lpdf_grid(data);
-  return result.array().exp();
-}
-
 //! \param data Column vector containing a single data point
 //! \return     Log-Likehood vector evaluated in data
 double NNIGHierarchy::lpdf(const Eigen::RowVectorXd &datum) const {
@@ -70,13 +63,6 @@ Eigen::VectorXd NNIGHierarchy::lpdf_grid(const Eigen::MatrixXd &data) const {
     result(i) = stan::math::normal_lpdf(data(i, 0), mean, sd);
   }
   return result;
-}
-
-//! \param data Column vector of data points
-//! \return     Marginal distribution vector evaluated in data
-Eigen::VectorXd NNIGHierarchy::eval_marg(const Eigen::MatrixXd &data) const {
-  Eigen::VectorXd result = marg_lpdf_grid(data);
-  return result.array().exp();
 }
 
 //! \param data Column vector of data points
