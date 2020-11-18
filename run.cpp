@@ -15,11 +15,11 @@ int main(int argc, char *argv[]) {
   std::string datafile = "resources/data_uni.csv";  // TEST
   std::string gridfile = "resources/grid_uni.csv";  // TEST
   std::string densfile = "resources/dens_uni.csv";  // TEST
+  std::string massfile = "resources/mass_uni.csv";  // TEST
   unsigned int init = 0;
   unsigned int maxiter = 1000;
   unsigned int burnin = 1;
   int rng_seed = 20201103;
-  std::string massesfile = "resources/masses.csv";
 
   // Total mass
   bayesmix::DPPrior mix_prior;
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
       masses[i] = mixstate.dp_state().totalmass();
     }
   }
-  bayesmix::write_matrix_to_file(masses, massesfile);
+  bayesmix::write_matrix_to_file(masses, massfile);
 
   std::cout << "End of run.cpp" << std::endl;
   return 0;
