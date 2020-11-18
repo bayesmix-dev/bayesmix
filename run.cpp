@@ -22,14 +22,14 @@ int main(int argc, char *argv[]) {
 
   // Total mass
   bayesmix::DPParams mix_params;
-  // Fixed total mass
-  double totalmass = 2.0;
-  mix_params.mutable_fixed_value()->set_value(totalmass);
-  // // Gamma-prior total mass
-  // double alpha_mass = 4.0;
-  // double beta_mass = 2.0;
-  // mix_params.mutable_gamma_prior()->set_alpha(alpha_mass);
-  // mix_params.mutable_gamma_prior()->set_beta(beta_mass);
+  // // Fixed total mass
+  // double totalmass = 2.0;
+  // mix_params.mutable_fixed_value()->set_value(totalmass);
+  // Gamma-prior total mass
+  double alpha_mass = 4.0;
+  double beta_mass = 2.0;
+  mix_params.mutable_gamma_prior()->set_alpha(alpha_mass);
+  mix_params.mutable_gamma_prior()->set_beta(beta_mass);
 
   // Create factories and objects
   auto &factory_mixing = Factory<BaseMixing>::Instance();
