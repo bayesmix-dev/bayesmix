@@ -6,7 +6,7 @@ message DPState {
     double totalmass = 1;
 }
 
-message DPParams {
+message DPPrior {
     message FixedValue {
         double value = 1;
     }

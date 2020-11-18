@@ -7,12 +7,12 @@
 
 TEST(mixing, fixed_value) {
   DirichletMixing mix;
-  bayesmix::DPParams params;
+  bayesmix::DPPrior prior;
   double m = 2.0;
-  params.mutable_fixed_value()->set_value(m);
-  double m_state = params.fixed_value().value();
+  prior.mutable_fixed_value()->set_value(m);
+  double m_state = prior.fixed_value().value();
   ASSERT_FLOAT_EQ(m, m_state);
-  mix.set_params(params);
+  mix.set_prior(prior);
   double m_mix = mix.get_totalmass();
   ASSERT_FLOAT_EQ(m, m_mix);
 
@@ -25,13 +25,13 @@ TEST(mixing, fixed_value) {
 
 TEST(mixing, gamma_prior) {
   DirichletMixing mix;
-  bayesmix::DPParams params;
+  bayesmix::DPPrior prior;
   double alpha = 1.0;
   double beta = 2.0;
   double m_prior = alpha / beta;
-  params.mutable_gamma_prior()->set_alpha(alpha);
-  params.mutable_gamma_prior()->set_beta(beta);
-  mix.set_params(params);
+  prior.mutable_gamma_prior()->set_alpha(alpha);
+  prior.mutable_gamma_prior()->set_beta(beta);
+  mix.set_prior(prior);
   double m_mix = mix.get_totalmass();
   ASSERT_FLOAT_EQ(m_prior, m_mix);
 
