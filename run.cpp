@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
   unsigned int maxiter = 1000;
   unsigned int burnin = 1;
   int rng_seed = 20201103;
+  std::string massesfile = "resources/masses.csv";
 
   // Total mass
   bayesmix::DPPrior mix_prior;
@@ -82,6 +83,17 @@ int main(int argc, char *argv[]) {
   algo->run(coll);
   Eigen::MatrixXd dens = algo->eval_lpdf(grid, coll);
   bayesmix::write_matrix_to_file(dens, densfile);
+
+  // Collect mixing states
+  auto chain = coll->get_chain();
+  Eigen::VectorXd masses(chain.size());
+  for (int i = 0; i < chain.size(); i++) {
+    bayesmix::MixingState mixstate = chain[i].mixing_states(0);
+    if (mixstate.has_dp_state()) {
+      masses[i] = mixstate.dp_state().totalmass();
+    }
+  }
+  bayesmix::write_matrix_to_file(masses, massesfile);
 
   std::cout << "End of run.cpp" << std::endl;
   return 0;
