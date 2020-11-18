@@ -16,8 +16,9 @@ TEST(mixing, fixed_value) {
   double m_mix = mix.get_totalmass();
   ASSERT_FLOAT_EQ(m, m_mix);
 
-  std::vector<std::shared_ptr<BaseHierarchy>> hiers(5);
-  mix.update_hypers(hiers, 100);
+  std::vector<std::shared_ptr<BaseHierarchy>> hiers(100);
+  unsigned int n_data = 1000;
+  mix.update_hypers(hiers, n_data);
   double m_mix_after = mix.get_totalmass();
   ASSERT_FLOAT_EQ(m, m_mix_after);
 }
@@ -34,10 +35,11 @@ TEST(mixing, gamma_prior) {
   double m_mix = mix.get_totalmass();
   ASSERT_FLOAT_EQ(m_prior, m_mix);
 
-  std::vector<std::shared_ptr<BaseHierarchy>> hiers(5);
-  mix.update_hypers(hiers, 100);
+  std::vector<std::shared_ptr<BaseHierarchy>> hiers(100);
+  unsigned int n_data = 1000;
+  mix.update_hypers(hiers, n_data);
   double m_mix_after = mix.get_totalmass();
 
   std::cout << "[          ] after = " << m_mix_after << std::endl;
-  ASSERT_TRUE(m_mix != m_mix_after);
+  ASSERT_TRUE(m_mix_after > m_mix);
 }
