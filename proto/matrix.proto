@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package bayesmix;
+
 message Vector {
     int32 size = 1;
     repeated double data = 2 [packed = true];

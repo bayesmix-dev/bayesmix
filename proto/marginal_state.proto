@@ -6,7 +6,6 @@ import "ls_state.proto";
 
 package bayesmix;
 
-
 message MarginalState {
     message ClusterVal {
         oneof val {

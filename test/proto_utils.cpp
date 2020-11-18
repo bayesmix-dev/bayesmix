@@ -10,7 +10,7 @@ TEST(to_proto, vector) {
   Eigen::VectorXd vec = Eigen::VectorXd::Ones(5);
   vec(1) = 100.0;
 
-  Vector vecproto;
+  bayesmix::Vector vecproto;
   bayesmix::to_proto(vec, &vecproto);
 
   ASSERT_EQ(vecproto.size(), 5);
@@ -21,7 +21,7 @@ TEST(to_proto, vector) {
 TEST(to_proto, matrix) {
   Eigen::MatrixXd mat = Eigen::MatrixXd::Identity(5, 5);
 
-  Matrix matproto;
+  bayesmix::Matrix matproto;
   bayesmix::to_proto(mat, &matproto);
 
   ASSERT_EQ(matproto.rows(), 5);
@@ -39,7 +39,7 @@ TEST(to_eigen, vector) {
   Eigen::VectorXd vec = Eigen::VectorXd::Ones(5);
   vec(1) = 100.0;
 
-  Vector vecproto;
+  bayesmix::Vector vecproto;
   bayesmix::to_proto(vec, &vecproto);
 
   Eigen::VectorXd vecnew = bayesmix::to_eigen(vecproto);
@@ -52,7 +52,7 @@ TEST(to_eigen, matrix_colmajor) {
   Eigen::MatrixXd mat = Eigen::MatrixXd::Identity(5, 5);
   mat(0, 1) = 100.0;
 
-  Matrix matproto;
+  bayesmix::Matrix matproto;
   bayesmix::to_proto(mat, &matproto);
 
   Eigen::MatrixXd matnew = bayesmix::to_eigen(matproto);
@@ -68,7 +68,7 @@ TEST(to_eigen, matrix_rowmajor) {
   Eigen::MatrixXd mat = Eigen::MatrixXd::Identity(5, 5);
   mat(0, 1) = 100.0;
 
-  Matrix matproto;
+  bayesmix::Matrix matproto;
   bayesmix::to_proto(mat, &matproto);
   matproto.set_rowmajor(true);
 
