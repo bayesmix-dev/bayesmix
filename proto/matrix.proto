@@ -3,13 +3,13 @@ syntax = "proto3";
 package bayesmix;
 
 message Vector {
-    int32 size = 1;
-    repeated double data = 2 [packed = true];
+  int32 size = 1;
+  repeated double data = 2 [packed = true];
 }
 
 message Matrix {
-    int32 rows = 1;
-    int32 cols = 2;
-    repeated double data = 3 [packed = true];
-    bool rowmajor = 4;
+  int32 rows = 1;
+  int32 cols = 2;
+  repeated double data = 3 [packed = true];
+  bool rowmajor = 4;
 }
