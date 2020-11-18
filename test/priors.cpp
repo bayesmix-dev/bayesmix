@@ -12,7 +12,7 @@ TEST(mixing, fixed_value) {
   state.mutable_fixed_value()->set_value(m);
   double m_state = state.fixed_value().value();
   ASSERT_FLOAT_EQ(m, m_state);
-  mix.set_state(&state);
+  mix.set_state(state);
   double m_mix = mix.get_totalmass();
   ASSERT_FLOAT_EQ(m, m_mix);
 
@@ -30,7 +30,7 @@ TEST(mixing, gamma_prior) {
   double m_prior = alpha / beta;
   state.mutable_gamma_prior()->set_alpha(alpha);
   state.mutable_gamma_prior()->set_beta(beta);
-  mix.set_state(&state);
+  mix.set_state(state);
   double m_mix = mix.get_totalmass();
   ASSERT_FLOAT_EQ(m_prior, m_mix);
 

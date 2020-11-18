@@ -34,10 +34,10 @@ void DirichletMixing::update_hypers(
   }
 }
 
-void DirichletMixing::set_state(google::protobuf::Message *out) {
-  bayesmix::DPState *currcast =
-      google::protobuf::internal::down_cast<bayesmix::DPState *>(out);
-  state = *currcast;
+void DirichletMixing::set_state(const google::protobuf::Message &state_) {
+  const bayesmix::DPState &currcast =
+      google::protobuf::internal::down_cast<const bayesmix::DPState &>(state_);
+  state = currcast;
   if (state.has_fixed_value()) {
     totalmass = state.fixed_value().value();
   } else if (state.has_gamma_prior()) {
