@@ -21,7 +21,7 @@ Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
   for (size_t i = 0; i < n_aux; i++) {
     // Generate unique values from their prior centering distribution
     temp_hier->draw();
-    lpdf_temp.col(i) = temp_hier->lpdf_grid(grid);
+    lpdf_temp.col(i) = temp_hier->like_lpdf_grid(grid);
   }
   for (size_t i = 0; i < n_grid; i++) {
     lpdf_(i) = stan::math::log_sum_exp(lpdf_temp.row(i));
@@ -62,7 +62,7 @@ void Neal8Algorithm::sample_allocations() {
       // Save unique value in the first auxiliary block
       bayesmix::MarginalState::ClusterVal curr_val;
       unique_values[allocations[i]]->write_state_to_proto(&curr_val);
-      aux_unique_values[0]->set_state(&curr_val, false);
+      aux_unique_values[0]->set_state(curr_val, false);
       singleton = 1;
     }
 
@@ -81,7 +81,7 @@ void Neal8Algorithm::sample_allocations() {
       // Probability of being assigned to an already existing cluster
       logprobas(j) =
           log(mixing->mass_existing_cluster(cardinalities[j], n - 1)) +
-          unique_values[j]->lpdf(datum);
+          unique_values[j]->like_lpdf(datum);
       // Note: if datum is a singleton, then, when j = allocations[i],
       // one has card[j] = 0: cluster j will never be chosen
     }
@@ -89,7 +89,8 @@ void Neal8Algorithm::sample_allocations() {
     for (size_t j = 0; j < n_aux; j++) {
       // Probability of being assigned to a newly generated cluster
       logprobas(n_clust + j) = log(mixing->mass_new_cluster(n_clust, n - 1)) +
-                               aux_unique_values[j]->lpdf(datum) - log(n_aux);
+                               aux_unique_values[j]->like_lpdf(datum) -
+                               log(n_aux);
     }
     // Draw a NEW value for datum allocation
     unsigned int c_new =
@@ -103,7 +104,7 @@ void Neal8Algorithm::sample_allocations() {
         // Take unique values from an auxiliary block
         bayesmix::MarginalState::ClusterVal curr_val;
         aux_unique_values[c_new - n_clust]->write_state_to_proto(&curr_val);
-        unique_values[allocations[i]]->set_state(&curr_val, false);
+        unique_values[allocations[i]]->set_state(curr_val, false);
         cardinalities[allocations[i]] += 1;
       } else {  // Case 2: datum moves from a singleton to an old cluster
         unique_values.erase(unique_values.begin() + allocations[i]);

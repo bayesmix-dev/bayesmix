@@ -22,7 +22,7 @@ class DirichletMixing : public BaseMixing {
  protected:
   //! Total mass parameters
   double totalmass;
-  bayesmix::DPParams params;
+  bayesmix::DPPrior prior;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -56,10 +56,10 @@ class DirichletMixing : public BaseMixing {
 
   // GETTERS AND SETTERS
   double get_totalmass() const { return totalmass; }
-  // TODO delete:
-  void set_totalmass(const double totalmass_) { totalmass = totalmass_; }
 
-  void set_params(const google::protobuf::Message &params_) override;
+  void set_prior(const google::protobuf::Message &prior_) override;
+
+  void write_state_to_proto(google::protobuf::Message *out) const override;
 
   std::string get_id() const override { return "Dirichlet"; }
 };

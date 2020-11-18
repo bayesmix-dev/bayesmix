@@ -71,7 +71,7 @@ void Neal2Algorithm::sample_allocations() {
       // Probability of being assigned to an already existing cluster
       logprobas(j) =
           log(mixing->mass_existing_cluster(cardinalities[j], n_data - 1)) +
-          unique_values[j]->lpdf(datum);
+          unique_values[j]->like_lpdf(datum);
       if (singleton == 1 && j == allocations[i]) {
         // Probability of being assigned to a newly generated cluster
         logprobas(j) = log(mixing->mass_new_cluster(n_clust, n_data - 1)) +

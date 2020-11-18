@@ -2,27 +2,34 @@ syntax = "proto3";
 
 package bayesmix;
 
-message DPState {
-    double totalmass = 1;
+message MixingState {
+  oneof state {
+    DPState dp_state = 1;
+    PYState py_state = 2;
+  }
 }
 
-message DPParams {
-    message FixedValue {
-        double value = 1;
-    }
-    
-    message GammaPrior {
-        double alpha = 1;
-        double beta  = 2;
-    }
+message DPState {
+  double totalmass = 1;
+}
 
-    oneof totalmass {
-        FixedValue fixed_value = 1;
-        GammaPrior gamma_prior = 2;
-    }
+message DPPrior {
+  message FixedValue {
+    double value = 1;
+  }
+
+  message GammaPrior {
+    double alpha = 1;
+    double beta  = 2;
+  }
+
+  oneof totalmass {
+    FixedValue fixed_value = 1;
+    GammaPrior gamma_prior = 2;
+  }
 }
 
 message PYState {
-    double strength = 1;
-    double discount = 2;
+  double strength = 1;
+  double discount = 2;
 }

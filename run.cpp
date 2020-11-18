@@ -20,6 +20,18 @@ int main(int argc, char *argv[]) {
   unsigned int burnin = 1;
   int rng_seed = 20201103;
 
+  // Total mass
+  bayesmix::DPPrior mix_prior;
+
+  // Fixed total mass
+  double totalmass = 2.0;
+  mix_prior.mutable_fixed_value()->set_value(totalmass);
+  // // Gamma-prior total mass
+  // double alpha_mass = 4.0;
+  // double beta_mass = 2.0;
+  // mix_prior.mutable_gamma_prior()->set_alpha(alpha_mass);
+  // mix_prior.mutable_gamma_prior()->set_beta(beta_mass);
+
   // Create factories and objects
   auto &factory_mixing = Factory<BaseMixing>::Instance();
   auto &factory_hier = Factory<BaseHierarchy>::Instance();
@@ -30,7 +42,7 @@ int main(int argc, char *argv[]) {
   auto hier = std::make_shared<NNIGHierarchy>();  // TEST
   auto algo = factory_algo.create_object(type_algo);
   // Initialize RNG object
-  auto rng = bayesmix::Rng::Instance().get();
+  auto &rng = bayesmix::Rng::Instance().get();
   rng.seed(rng_seed);
 
   // Set parameters
@@ -50,7 +62,7 @@ int main(int argc, char *argv[]) {
   // Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
   // hier->set_tau0(tau0);
 
-  mixing->set_totalmass(2.0);
+  mixing->set_prior(mix_prior);
   algo->set_maxiter(maxiter);
   algo->set_burnin(burnin);
 

@@ -10,15 +10,15 @@
 void DirichletMixing::update_hypers(
     const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
     unsigned int n) {
-  if (params.has_fixed_value()) {
+  if (prior.has_fixed_value()) {
     return;
-  } else if (params.has_gamma_prior()) {
+  } else if (prior.has_gamma_prior()) {
     auto &rng = bayesmix::Rng::Instance().get();
 
     // Recover parameters
     unsigned int k = unique_values.size();
-    double alpha = params.gamma_prior().alpha();
-    double beta = params.gamma_prior().beta();
+    double alpha = prior.gamma_prior().alpha();
+    double beta = prior.gamma_prior().beta();
 
     double phi = stan::math::gamma_rng(totalmass + 1, n, rng);
     double odds = (alpha + k - 1) / (n * (beta - log(phi)));
@@ -34,16 +34,24 @@ void DirichletMixing::update_hypers(
   }
 }
 
-void DirichletMixing::set_params(const google::protobuf::Message &params_) {
-  const bayesmix::DPParams &currcast =
-      google::protobuf::internal::down_cast<const bayesmix::DPParams &>(
-          params_);
-  params = currcast;
-  if (params.has_fixed_value()) {
-    totalmass = params.fixed_value().value();
-  } else if (params.has_gamma_prior()) {
-    totalmass = params.gamma_prior().alpha() / params.gamma_prior().beta();
+void DirichletMixing::set_prior(const google::protobuf::Message &prior_) {
+  const bayesmix::DPPrior &currcast =
+      google::protobuf::internal::down_cast<const bayesmix::DPPrior &>(prior_);
+  prior = currcast;
+  if (prior.has_fixed_value()) {
+    totalmass = prior.fixed_value().value();
+  } else if (prior.has_gamma_prior()) {
+    totalmass = prior.gamma_prior().alpha() / prior.gamma_prior().beta();
   } else {
     std::invalid_argument("Error: argument proto is not appropriate");
   }
+}
+
+void DirichletMixing::write_state_to_proto(
+    google::protobuf::Message *out) const {
+  bayesmix::DPState state;
+  state.set_totalmass(totalmass);
+
+  google::protobuf::internal::down_cast<bayesmix::DPState *>(out)->CopyFrom(
+      state);
 }

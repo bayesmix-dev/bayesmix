@@ -36,11 +36,11 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
     for (size_t j = 0; j < n_clust; j++) {
       // Extract and copy unique values in temp_hier
       bayesmix::MarginalState::ClusterVal curr_val = chain[i].cluster_vals(j);
-      temp_hier->set_state(&curr_val, false);
+      temp_hier->set_state(curr_val, false);
 
       // Compute cluster component (vector + scalar * unity vector)
       lpdf_local.col(j) = log(mixing->mass_existing_cluster(card[j], n_data)) +
-                          temp_hier->lpdf_grid(grid).array();
+                          temp_hier->like_lpdf_grid(grid).array();
     }
     // Compute marginal component (vector + scalar * unity vector)
     lpdf_local.col(n_clust) = log(mixing->mass_new_cluster(n_clust, n_data)) +
