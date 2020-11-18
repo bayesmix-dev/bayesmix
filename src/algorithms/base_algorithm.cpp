@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 
 #include "../../proto/cpp/marginal_state.pb.h"
+#include "../../proto/cpp/mixings.pb.h"
 
 //! \param iter Number of the current iteration
 //! \return     Protobuf-object version of the current state
@@ -20,8 +21,10 @@ bayesmix::MarginalState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
     iter_out.add_cluster_vals()->CopyFrom(clusval);
   }
 
-  // Transcribe total mass from mixing object
-  // ...
+  // Transcribe mixing state
+  bayesmix::MixingState mixstate;
+  mixing->write_state_to_proto(&mixstate);
+  iter_out.add_mixing_states()->CopyFrom(mixstate);
 
   return iter_out;
 }

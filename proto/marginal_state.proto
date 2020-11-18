@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 import "mixings.proto";
-
 import "ls_state.proto";
 
 package bayesmix;
@@ -18,10 +17,7 @@ message MarginalState {
 
     repeated int32 cluster_allocs = 2 [packed = true];
 
-    oneof mixing_state {
-        DPState dp_state = 3;
-        PYState py_state = 4;
-    }
+    repeated MixingState mixing_states = 3;
 
-    int32 iteration_num = 5;
+    int32 iteration_num = 4;
 }

@@ -2,6 +2,13 @@ syntax = "proto3";
 
 package bayesmix;
 
+message MixingState {
+    oneof state {
+        DPState dp_state = 1;
+        PYState py_state = 2;
+    }
+}
+
 message DPState {
     double totalmass = 1;
 }
