@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.13.0)
 project(bayesmix)
 
+
+set (CMAKE_CXX_STANDARD 14)
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
 find_package(PkgConfig REQUIRED)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)

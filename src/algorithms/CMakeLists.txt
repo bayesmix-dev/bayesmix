@@ -10,4 +10,6 @@ target_sources(bayesmix
     neal2_algorithm.cpp
     neal8_algorithm.hpp
     neal8_algorithm.cpp
+    semihdp_sampler.hpp
+    semihdp_sampler.cpp
 )
