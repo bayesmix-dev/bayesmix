@@ -17,8 +17,8 @@ void DirichletMixing::update_hypers(
 
     // Recover parameters
     unsigned int k = unique_values.size();
-    double alpha = state.totalmass.alpha();
-    double beta = state.totalmass.beta();
+    double alpha = state.gamma_prior().alpha();
+    double beta = state.gamma_prior().beta();
 
     double phi = stan::math::gamma_rng(totalmass + 1, n, rng);
     double odds = (alpha + k - 1) / (n * (beta - log(phi)));
@@ -34,13 +34,14 @@ void DirichletMixing::update_hypers(
   }
 }
 
-void DirichletMixing::set_state(const google::protobuf::Message &curr) {
-  DPState *currcast = google::protobuf::internal::down_cast<DPState *>(curr);
+void DirichletMixing::set_state(google::protobuf::Message *out) {
+  bayesmix::DPState *currcast =
+      google::protobuf::internal::down_cast<bayesmix::DPState *>(out);
   state = *currcast;
   if (state.has_fixed_value()) {
-    totalmass = state.totalmass.value();
+    totalmass = state.fixed_value().value();
   } else if (state.has_gamma_prior()) {
-    totalmass = state.totalmass.alpha() / state.totalmass.beta();
+    totalmass = state.gamma_prior().alpha() / state.gamma_prior().beta();
   } else {
     std::invalid_argument("Error: argument proto is not appropriate");
   }

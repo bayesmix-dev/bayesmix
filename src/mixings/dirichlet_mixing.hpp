@@ -59,7 +59,7 @@ class DirichletMixing : public BaseMixing {
   // TODO delete:
   void set_totalmass(const double totalmass_) { totalmass = totalmass_; }
 
-  void set_state(const google::protobuf::Message &curr) override;
+  void set_state(google::protobuf::Message *out) override;
 
   std::string get_id() const override { return "Dirichlet"; }
 };

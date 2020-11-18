@@ -46,7 +46,7 @@ class BaseMixing {
       const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
       unsigned int n) = 0;
 
-  virtual void set_state(const google::protobuf::Message &curr) = 0;
+  virtual void set_state(google::protobuf::Message *out) = 0;
 
   virtual std::string get_id() const = 0;
 };
