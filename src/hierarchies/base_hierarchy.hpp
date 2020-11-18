@@ -45,22 +45,23 @@ class BaseHierarchy {
 
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points
-  virtual Eigen::VectorXd like(const Eigen::MatrixXd &data) = 0;
+  virtual Eigen::VectorXd like(const Eigen::MatrixXd &data) const = 0;
 
   //! Evaluates the log-likelihood of data in a single point
-  virtual double lpdf(const Eigen::RowVectorXd &datum) = 0;
+  virtual double lpdf(const Eigen::RowVectorXd &datum) const = 0;
 
   //! Evaluates the log-likelihood of data in the given points
-  virtual Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data) = 0;
+  virtual Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data) const = 0;
 
   //! Evaluates the marginal distribution of data in the given points
-  virtual Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) = 0;
+  virtual Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) const = 0;
 
   //! Evaluates the log-marginal distribution of data in a single point
-  virtual double marg_lpdf(const Eigen::RowVectorXd &datum) = 0;
+  virtual double marg_lpdf(const Eigen::RowVectorXd &datum) const = 0;
 
   //! Evaluates the log-marginal distribution of data in the given points
-  virtual Eigen::VectorXd marg_lpdf_grid(const Eigen::MatrixXd &data) = 0;
+  virtual Eigen::VectorXd marg_lpdf_grid(
+      const Eigen::MatrixXd &data) const = 0;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
@@ -69,7 +70,7 @@ class BaseHierarchy {
   virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;
 
   // GETTERS AND SETTERS
-  virtual void write_state_to_proto(google::protobuf::Message *out) = 0;
+  virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment

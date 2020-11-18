@@ -86,14 +86,14 @@ NNWHierarchy::PostParams NNWHierarchy::normal_wishart_update(
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Likehood vector evaluated in data
-Eigen::VectorXd NNWHierarchy::like(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNWHierarchy::like(const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result = lpdf_grid(data);
   return result.array().exp();
 }
 
 //! \param data Matrix of row-vectorial single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNWHierarchy::lpdf(const Eigen::RowVectorXd &datum) {
+double NNWHierarchy::lpdf(const Eigen::RowVectorXd &datum) const {
   // Initialize relevant objects
   return bayesmix::multi_normal_prec_lpdf(datum, mean, tau_chol_factor_eval,
                                           tau_logdet);
@@ -101,7 +101,7 @@ double NNWHierarchy::lpdf(const Eigen::RowVectorXd &datum) {
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Log-Likehood vector evaluated in data
-Eigen::VectorXd NNWHierarchy::lpdf_grid(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNWHierarchy::lpdf_grid(const Eigen::MatrixXd &data) const {
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);
@@ -115,14 +115,14 @@ Eigen::VectorXd NNWHierarchy::lpdf_grid(const Eigen::MatrixXd &data) {
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Marginal distribution vector evaluated in data
-Eigen::VectorXd NNWHierarchy::eval_marg(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNWHierarchy::eval_marg(const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result = marg_lpdf_grid(data);
   return result.array().exp();
 }
 
 //! \param data Matrix of row-vectorial a single data point
 //! \return     Marginal distribution vector evaluated in data
-double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) {
+double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
   unsigned int dim = datum.cols();
 
   // Compute dof and scale of marginal distribution
@@ -136,7 +136,7 @@ double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) {
 
 //! \param data Matrix of row-vectorial data points
 //! \return     Marginal distribution vector evaluated in data
-Eigen::VectorXd NNWHierarchy::marg_lpdf_grid(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNWHierarchy::marg_lpdf_grid(const Eigen::MatrixXd &data) const {
   // Initialize relevant objects
   unsigned int n = data.rows();
   Eigen::VectorXd result(n);
@@ -209,7 +209,7 @@ void NNWHierarchy::set_state(google::protobuf::Message *curr, bool check) {
   }
 }
 
-void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) {
+void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
 

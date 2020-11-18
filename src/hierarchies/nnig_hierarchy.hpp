@@ -72,17 +72,17 @@ class NNIGHierarchy : public BaseHierarchy {
 
   // EVALUATION FUNCTIONS
   //! Evaluates the likelihood of data in the given points
-  Eigen::VectorXd like(const Eigen::MatrixXd &data) override;
+  Eigen::VectorXd like(const Eigen::MatrixXd &data) const override;
   //! Evaluates the log-likelihood of data in a single point
-  double lpdf(const Eigen::RowVectorXd &datum) override;
+  double lpdf(const Eigen::RowVectorXd &datum) const override;
   //! Evaluates the log-likelihood of data in the given points
-  Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data) override;
+  Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data) const override;
   //! Evaluates the marginal distribution of data in the given points
-  Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) override;
+  Eigen::VectorXd eval_marg(const Eigen::MatrixXd &data) const override;
   //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const Eigen::RowVectorXd &datum) override;
+  double marg_lpdf(const Eigen::RowVectorXd &datum) const override;
   //! Evaluates the log-marginal distribution of data in the given points
-  Eigen::VectorXd marg_lpdf_grid(const Eigen::MatrixXd &data) override;
+  Eigen::VectorXd marg_lpdf_grid(const Eigen::MatrixXd &data) const override;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
@@ -108,7 +108,7 @@ class NNIGHierarchy : public BaseHierarchy {
   //! \param check  If true, a state validity check occurs after assignment
   void set_state(google::protobuf::Message *curr, bool check = true) override;
 
-  void write_state_to_proto(google::protobuf::Message *out);
+  void write_state_to_proto(google::protobuf::Message *out) const override;
 
   std::string get_id() const override { return "NNIG"; }
 };

@@ -49,21 +49,21 @@ NNIGHierarchy::PostParams NNIGHierarchy::normal_invgamma_update(
 
 //! \param data Column vector of data points
 //! \return     Likehood vector evaluated in data
-Eigen::VectorXd NNIGHierarchy::like(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNIGHierarchy::like(const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result = lpdf_grid(data);
   return result.array().exp();
 }
 
 //! \param data Column vector containing a single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNIGHierarchy::lpdf(const Eigen::RowVectorXd &datum) {
+double NNIGHierarchy::lpdf(const Eigen::RowVectorXd &datum) const {
   assert(datum.size() == 1);
   return stan::math::normal_lpdf(datum(0), mean, sd);
 }
 
 //! \param data Column vector of data points
 //! \return     Log-Likehood vector evaluated in data
-Eigen::VectorXd NNIGHierarchy::lpdf_grid(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNIGHierarchy::lpdf_grid(const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
@@ -74,14 +74,14 @@ Eigen::VectorXd NNIGHierarchy::lpdf_grid(const Eigen::MatrixXd &data) {
 
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data
-Eigen::VectorXd NNIGHierarchy::eval_marg(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNIGHierarchy::eval_marg(const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result = marg_lpdf_grid(data);
   return result.array().exp();
 }
 
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data (log)
-double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) {
+double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
   assert(datum.size() == 1);
 
   // Compute standard deviation of marginal distribution
@@ -91,7 +91,7 @@ double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) {
 
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data (log)
-Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(const Eigen::MatrixXd &data) const {
   // Compute standard deviation of marginal distribution
   double sig_n = sqrt(beta0 * (lambda0 + 1) / (alpha0 * lambda0));
 
@@ -137,7 +137,7 @@ void NNIGHierarchy::set_state(google::protobuf::Message *curr, bool check) {
   }
 }
 
-void NNIGHierarchy::write_state_to_proto(google::protobuf::Message *out) {
+void NNIGHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   using namespace google::protobuf::internal;
   using namespace bayesmix;
 
