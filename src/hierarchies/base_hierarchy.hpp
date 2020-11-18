@@ -65,7 +65,8 @@ class BaseHierarchy {
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  virtual void set_state(google::protobuf::Message *curr, bool check) = 0;
+  virtual void set_state(const google::protobuf::Message &state_,
+    bool check = true) = 0;
 
   virtual std::string get_id() const = 0;
 };

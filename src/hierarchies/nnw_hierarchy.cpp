@@ -180,15 +180,14 @@ void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   set_tau_and_utilities(tau_new);
 }
 
-void NNWHierarchy::set_state(google::protobuf::Message *curr, bool check) {
-  using namespace google::protobuf::internal;
-  using namespace bayesmix;
+void NNWHierarchy::set_state(const google::protobuf::Message &state_,
+    bool check /*= true*/) {
+  const bayesmix::MarginalState::ClusterVal &currcast =
+      google::protobuf::internal::down_cast<const bayesmix::MarginalState::ClusterVal &>(
+          state_);
 
-  MarginalState::ClusterVal *currcast =
-      down_cast<MarginalState::ClusterVal *>(curr);
-
-  mean = to_eigen(currcast->multi_ls_state().mean());
-  set_tau_and_utilities(to_eigen(currcast->multi_ls_state().precision()));
+  mean = to_eigen(currcast.multi_ls_state().mean());
+  set_tau_and_utilities(to_eigen(currcast.multi_ls_state().precision()));
 
   if (check) {
     check_state_validity();

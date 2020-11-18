@@ -108,15 +108,14 @@ void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   mean = stan::math::normal_rng(params.mu_n, sd / sqrt(params.lambda_n), rng);
 }
 
-void NNIGHierarchy::set_state(google::protobuf::Message *curr, bool check) {
-  using namespace google::protobuf::internal;
-  using namespace bayesmix;
+void NNIGHierarchy::set_state(const google::protobuf::Message &state_,
+    bool check /*= true*/) {
+  const bayesmix::MarginalState::ClusterVal &currcast =
+      google::protobuf::internal::down_cast<const bayesmix::MarginalState::ClusterVal &>(
+          state_);
 
-  MarginalState::ClusterVal *currcast =
-      down_cast<MarginalState::ClusterVal *>(curr);
-
-  mean = currcast->univ_ls_state().mean();
-  sd = currcast->univ_ls_state().sd();
+  mean = currcast.univ_ls_state().mean();
+  sd = currcast.univ_ls_state().sd();
 
   if (check) {
     check_state_validity();

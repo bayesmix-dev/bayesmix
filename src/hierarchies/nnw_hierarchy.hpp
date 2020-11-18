@@ -98,7 +98,8 @@ class NNWHierarchy : public BaseHierarchy {
   // GETTERS AND SETTERS
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  void set_state(google::protobuf::Message *curr, bool check = true) override;
+  void set_state(const google::protobuf::Message &state_,
+    bool check = true) override;
 
   Eigen::RowVectorXd get_mu0() const { return mu0; }
 
