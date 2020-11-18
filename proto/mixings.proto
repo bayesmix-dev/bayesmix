@@ -6,6 +6,22 @@ message DPState {
     double totalmass = 1;
 }
 
+message DPParams {
+    message FixedValue {
+        double value = 1;
+    }
+    
+    message GammaPrior {
+        double alpha = 1;
+        double beta  = 2;
+    }
+
+    oneof totalmass {
+        FixedValue fixed_value = 1;
+        GammaPrior gamma_prior = 2;
+    }
+}
+
 message PYState {
     double strength = 1;
     double discount = 2;

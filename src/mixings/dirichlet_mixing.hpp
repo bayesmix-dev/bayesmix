@@ -2,7 +2,10 @@
 #define BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
 
 #include <cassert>
+#include <memory>
 
+#include "../../proto/cpp/mixings.pb.h"
+#include "../hierarchies/base_hierarchy.hpp"
 #include "base_mixing.hpp"
 
 //! Class that represents the Dirichlet process mixture model.
@@ -19,14 +22,12 @@ class DirichletMixing : public BaseMixing {
  protected:
   //! Total mass parameters
   double totalmass;
+  bayesmix::DPParams params;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   ~DirichletMixing() = default;
   DirichletMixing() = default;
-  DirichletMixing(const double totalmass_) : totalmass(totalmass_) {
-    assert(totalmass >= 0);
-  }
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
@@ -49,9 +50,16 @@ class DirichletMixing : public BaseMixing {
     return totalmass / (n + totalmass);
   }
 
+  void update_hypers(
+      const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+      unsigned int n) override;
+
   // GETTERS AND SETTERS
   double get_totalmass() const { return totalmass; }
+  // TODO delete:
   void set_totalmass(const double totalmass_) { totalmass = totalmass_; }
+
+  void set_params(const google::protobuf::Message &params_) override;
 
   std::string get_id() const override { return "Dirichlet"; }
 };

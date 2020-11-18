@@ -4,19 +4,19 @@
 
 #include "../../proto/cpp/matrix.pb.h"
 
-void bayesmix::to_proto(const Eigen::MatrixXd &mat, Matrix *out) {
+void bayesmix::to_proto(const Eigen::MatrixXd &mat, bayesmix::Matrix *out) {
   out->set_rows(mat.rows());
   out->set_cols(mat.cols());
   out->set_rowmajor(false);
   *out->mutable_data() = {mat.data(), mat.data() + mat.size()};
 }
 
-void bayesmix::to_proto(const Eigen::VectorXd &vec, Vector *out) {
+void bayesmix::to_proto(const Eigen::VectorXd &vec, bayesmix::Vector *out) {
   out->set_size(vec.size());
   *out->mutable_data() = {vec.data(), vec.data() + vec.size()};
 }
 
-Eigen::VectorXd bayesmix::to_eigen(const Vector &vec) {
+Eigen::VectorXd bayesmix::to_eigen(const bayesmix::Vector &vec) {
   int size = vec.size();
   Eigen::VectorXd out;
   if (size > 0) {
@@ -26,7 +26,7 @@ Eigen::VectorXd bayesmix::to_eigen(const Vector &vec) {
   return out;
 }
 
-Eigen::MatrixXd bayesmix::to_eigen(const Matrix &mat) {
+Eigen::MatrixXd bayesmix::to_eigen(const bayesmix::Matrix &mat) {
   using namespace Eigen;
   int nrow = mat.rows();
   int ncol = mat.cols();

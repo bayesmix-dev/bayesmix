@@ -48,7 +48,7 @@ void Neal8Algorithm::initialize() {
 void Neal8Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n = data.rows();
-  auto rng = bayesmix::Rng::Instance().get();
+  auto &rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
   for (size_t i = 0; i < n; i++) {
@@ -89,8 +89,7 @@ void Neal8Algorithm::sample_allocations() {
     for (size_t j = 0; j < n_aux; j++) {
       // Probability of being assigned to a newly generated cluster
       logprobas(n_clust + j) = log(mixing->mass_new_cluster(n_clust, n - 1)) +
-                               aux_unique_values[j]->lpdf(datum) -
-                               log(n_aux);
+                               aux_unique_values[j]->lpdf(datum) - log(n_aux);
     }
     // Draw a NEW value for datum allocation
     unsigned int c_new =
