@@ -64,7 +64,7 @@ class PitYorMixing : public BaseMixing {
     discount = discount_;
   }
 
-  void set_state(const google::protobuf::Message &state_) override {}
+  void set_params(const google::protobuf::Message &params_) override {}
 
   std::string get_id() const override { return "Pitman-Yor"; }
 };

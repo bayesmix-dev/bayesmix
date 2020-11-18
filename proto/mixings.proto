@@ -3,6 +3,10 @@ syntax = "proto3";
 package bayesmix;
 
 message DPState {
+    double totalmass = 1;
+}
+
+message DPParams {
     message FixedValue {
         double value = 1;
     }
