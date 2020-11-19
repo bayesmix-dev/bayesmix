@@ -26,6 +26,7 @@
 //! collector. This means that the collector will contain the states of the
 //! whole Markov chain by the end of the running of the algorithm.
 
+template <typename MsgType>
 class BaseCollector {
  protected:
   //! Current size of the chain
@@ -35,7 +36,7 @@ class BaseCollector {
 
   //! Reads the next state, based on the curr_iter curson
   //! \return The requested state in protobuf-object form
-  virtual bayesmix::MarginalState next_state() = 0;
+  virtual MsgType next_state() = 0;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -49,7 +50,7 @@ class BaseCollector {
 
   //! Reads the next state and advances the cursor by 1
   //! \return The requested state in protobuf-object form
-  bayesmix::MarginalState get_next_state() {
+  MsgType get_next_state() {
     curr_iter++;
     if (curr_iter >= size) {
       throw std::out_of_range("Error: curr_iter > size in collector");
@@ -58,13 +59,13 @@ class BaseCollector {
   }
 
   //! Writes the given state to the collector
-  virtual void collect(bayesmix::MarginalState iter_state) = 0;
+  virtual void collect(MsgType iter_state) = 0;
 
   // GETTERS AND SETTERS
   //! Returns i-th state in the collector
-  virtual bayesmix::MarginalState get_state(unsigned int i) = 0;
+  virtual MsgType get_state(unsigned int i) = 0;
   //! Returns the whole chain in form of a deque of States
-  virtual std::deque<bayesmix::MarginalState> get_chain() = 0;
+  virtual std::deque<MsgType> get_chain() = 0;
 
   unsigned int get_size() const { return size; }
 };

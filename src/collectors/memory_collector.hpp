@@ -14,7 +14,7 @@
 //! and computes the estimates.
 
 template <typename MsgType>
-class MemoryCollector : public BaseCollector {
+class MemoryCollector : public BaseCollector<MsgType> {
  protected:
   //! Deque that contains all states in Protobuf-object form
   std::deque<MsgType> chain;
@@ -28,6 +28,9 @@ class MemoryCollector : public BaseCollector {
       return chain[curr_iter];
     }
   }
+
+  using BaseCollector<MsgType>::size;
+  using BaseCollector<MsgType>::curr_iter;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS

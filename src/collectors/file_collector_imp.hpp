@@ -1,3 +1,8 @@
+#ifndef BAYESMIX_COLLECTORS_FILE_COLLECTOR_IMP_HPP_
+#define BAYESMIX_COLLECTORS_FILE_COLLECTOR_IMP_HPP_
+
+#include "file_collector.hpp"
+
 template <typename MsgType>
 void FileCollector<MsgType>::open_for_reading() {
   infd = open(filename.c_str(), O_RDONLY);
@@ -94,3 +99,5 @@ std::deque<MsgType> FileCollector<MsgType>::get_chain() {
   close_reading();
   return out;
 }
+
+#endif

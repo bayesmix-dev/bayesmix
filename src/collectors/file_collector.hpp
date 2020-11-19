@@ -14,7 +14,7 @@
 //! Therefore, a file collector has both a reading and a writing mode.
 
 template <typename MsgType>
-class FileCollector : public BaseCollector {
+class FileCollector : public BaseCollector<MsgType> {
  protected:
   //! Unix file descriptor for reading mode
   int infd;
@@ -37,6 +37,10 @@ class FileCollector : public BaseCollector {
   void close_reading();
   //! Reads the next state, based on the curr_iter curson
   MsgType next_state() override;
+
+  using BaseCollector<MsgType>::size;
+  using BaseCollector<MsgType>::curr_iter;
+  using BaseCollector<MsgType>::get_next_state;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
