@@ -98,7 +98,7 @@ class NNIGHierarchy : public BaseHierarchy {
   // TODO remove the following 4:
   void set_mu0(const double mu0_) {
     hypers->mu = mu0_;
-    mean = hypers->mu;
+    mean = mu0_;
   }
   void set_alpha0(const double alpha0_) { hypers->alpha = alpha0_; }
   void set_beta0(const double beta0_) { hypers->beta = beta0_; }
