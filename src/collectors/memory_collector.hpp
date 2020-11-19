@@ -13,13 +13,24 @@
 //! is not needed, for instance in a main program that both runes and algorithm
 //! and computes the estimates.
 
-class MemoryCollector : public BaseCollector {
+template <typename MsgType>
+class MemoryCollector : public BaseCollector<MsgType> {
  protected:
   //! Deque that contains all states in Protobuf-object form
-  std::deque<bayesmix::MarginalState> chain;
+  std::deque<MsgType> chain;
 
   //! Reads the next state, based on the curr_iter curson
-  bayesmix::MarginalState next_state() override;
+  MsgType next_state() override {
+    if (curr_iter == size - 1) {
+      curr_iter = -1;
+      return chain[size - 1];
+    } else {
+      return chain[curr_iter];
+    }
+  }
+
+  using BaseCollector<MsgType>::size;
+  using BaseCollector<MsgType>::curr_iter;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -32,15 +43,16 @@ class MemoryCollector : public BaseCollector {
   void finish() override { return; }
 
   //! Writes the given state to the collector
-  void collect(bayesmix::MarginalState iter_state) override;
+  void collect(MsgType iter_state) override {
+    chain.push_back(iter_state);
+    size++;
+  }
 
   // GETTERS AND SETTERS
   //! Returns i-th state in the collector
-  bayesmix::MarginalState get_state(unsigned int i) override {
-    return chain[i];
-  }
+  MsgType get_state(unsigned int i) override { return chain[i]; }
   //! Returns the whole chain in form of a deque of States
-  std::deque<bayesmix::MarginalState> get_chain() override { return chain; }
+  std::deque<MsgType> get_chain() override { return chain; }
 };
 
 #endif  // BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_

@@ -77,12 +77,14 @@ int main(int argc, char *argv[]) {
   if (type_algo == "N8") {
     algo->set_n_aux(3);
   }
-  BaseCollector *coll = new MemoryCollector();
+  BaseCollector<bayesmix::MarginalState> *coll =
+      new MemoryCollector<bayesmix::MarginalState>();
 
   algo->run(coll);
   Eigen::MatrixXd dens = algo->eval_lpdf(grid, coll);
   bayesmix::write_matrix_to_file(dens, densfile);
 
   std::cout << "End of run.cpp" << std::endl;
+  delete coll;
   return 0;
 }
