@@ -1,8 +1,0 @@
-#ifndef BAYESMIX_COLLECTORS_FILE_COLLECTOR_IMP_HPP_
-#define BAYESMIX_COLLECTORS_FILE_COLLECTOR_IMP_HPP_
-
-#include "file_collector.hpp"
-
-
-
-#endif
