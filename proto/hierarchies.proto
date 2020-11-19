@@ -46,8 +46,8 @@ message NNWPrior {
   }
 
   message GammaPrior {
-    double alpha0 = 1;
-    double beta0  = 2;
+    double alpha00 = 1;
+    double beta00  = 2;
   }
 
   message WishartPrior {
