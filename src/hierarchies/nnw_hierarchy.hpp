@@ -105,21 +105,8 @@ class NNWHierarchy : public BaseHierarchy {
   // GETTERS AND SETTERS
   Eigen::VectorXd get_mean() const { return mean; }
   Eigen::MatrixXd get_tau() const { return tau; }
-  // TODO delete the following 4:
-  Eigen::RowVectorXd get_mu0() const { return hypers->mu; }
-  double get_lambda0() const { return hypers->lambda; }
-  Eigen::MatrixXd get_tau0() const { return hypers->tau; }
+  Hyperparams get_hypers() const { return *hypers; }
   Eigen::MatrixXd get_tau0_inv() const { return tau0_inv; }
-  double get_nu0() const { return hypers->nu; }
-
-  // TODO remove the following 4:
-  void set_mu0(const Eigen::RowVectorXd &mu0_) { hypers->mu = mu0_; }
-  void set_lambda0(const double lambda0_) { hypers->lambda = lambda0_; }
-  void set_tau0(const Eigen::MatrixXd &tau0_) {
-    hypers->tau = tau0_;
-    tau0_inv = stan::math::inverse_spd(tau0_);
-  }
-  void set_nu0(const double nu0_) { hypers->nu = nu0_; }
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment

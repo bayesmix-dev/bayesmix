@@ -89,20 +89,9 @@ class NNIGHierarchy : public BaseHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
-  double get_mu0() const { return hypers->mu; }
-  double get_alpha0() const { return hypers->alpha; }
-  double get_beta0() const { return hypers->beta; }
-  double get_lambda0() const { return hypers->lambda; }
   double get_mean() const { return mean; }
   double get_sd() const { return sd; }
-  // TODO remove the following 4:
-  void set_mu0(const double mu0_) {
-    hypers->mu = mu0_;
-    mean = mu0_;
-  }
-  void set_alpha0(const double alpha0_) { hypers->alpha = alpha0_; }
-  void set_beta0(const double beta0_) { hypers->beta = beta0_; }
-  void set_lambda0(const double lambda0_) { hypers->lambda = lambda0_; }
+  Hyperparams get_hypers() const { return *hypers; }
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
