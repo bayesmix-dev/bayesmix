@@ -163,7 +163,7 @@ void NNWHierarchy::draw() {
   double nu0 = get_nu0();
 
   // Generate new state values from their prior centering distribution
-  auto rng = bayesmix::Rng::Instance().get();
+  auto& rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new = stan::math::wishart_rng(nu0, tau0, rng);
   Eigen::RowVectorXd mean =
       stan::math::multi_normal_prec_rng(mu0, tau_new * lambda0, rng);
@@ -184,7 +184,7 @@ void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   PostParams params = normal_wishart_update(data, mu0, lambda0, tau0_inv, nu0);
 
   // Generate new state values from their prior centering distribution
-  auto rng = bayesmix::Rng::Instance().get();
+  auto& rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new =
       stan::math::wishart_rng(params.nu_n, params.tau_n, rng);
   Eigen::RowVectorXd mean = stan::math::multi_normal_prec_rng(

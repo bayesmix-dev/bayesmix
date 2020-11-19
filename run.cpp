@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
   auto hier = std::make_shared<NNIGHierarchy>();  // TEST
   auto algo = factory_algo.create_object(type_algo);
   // Initialize RNG object
-  auto rng = bayesmix::Rng::Instance().get();
+  auto& rng = bayesmix::Rng::Instance().get();
   rng.seed(rng_seed);
 
   // Set parameters

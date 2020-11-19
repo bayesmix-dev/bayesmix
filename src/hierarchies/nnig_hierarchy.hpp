@@ -66,6 +66,15 @@ class NNIGHierarchy : public BaseHierarchy {
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNIGHierarchy() = default;
   NNIGHierarchy() = default;
+  NNIGHierarchy(const NNIGHierarchy &h) {
+    mu0 = h.mu0;
+    lambda0 = h.lambda0;
+    alpha0 = h.alpha0;
+    beta0 = h.beta0;
+    mean = h.mean;
+    sd = h.sd;
+  }
+
   std::shared_ptr<BaseHierarchy> clone() const override {
     return std::make_shared<NNIGHierarchy>(*this);
   }

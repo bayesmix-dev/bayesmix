@@ -48,7 +48,7 @@ void Neal8Algorithm::initialize() {
 void Neal8Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n = data.rows();
-  auto rng = bayesmix::Rng::Instance().get();
+  auto& rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
   for (size_t i = 0; i < n; i++) {

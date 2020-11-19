@@ -5,25 +5,33 @@
 #include <algorithm>
 #include <src/utils/eigen_utils.hpp>
 
-SemiHdpSampler::SemiHdpSampler(const std::vector<MatrixXd> &data)
+SemiHdpSampler::SemiHdpSampler(const std::vector<MatrixXd>& data)
     : data(data) {
   ngroups = data.size();
   n_by_group.resize(ngroups);
   for (int i = 0; i < ngroups; i++) n_by_group[i] = data[i].size();
-
-  master_hierarchy.set_mu0(0);
-  master_hierarchy.set_lambda0(0.1);
-  master_hierarchy.set_alpha0(2);
-  master_hierarchy.set_beta0(2);
 }
 
 void SemiHdpSampler::initialize() {
-  auto rng = bayesmix::Rng::Instance().get();
+  auto& rng = bayesmix::Rng::Instance().get();
+
+  // compute overall mean
+  double mu0 = std::accumulate(
+      data.begin(), data.end(), 0,
+      [&](int curr, const MatrixXd dat) { return curr + dat.sum(); });
+  mu0 /= (1.0 * std::accumulate(n_by_group.begin(), n_by_group.end(), 0));
+  omega = VectorXd::Ones(ngroups).array() / ngroups;
+
+  master_hierarchy.set_mu0(mu0);
+  master_hierarchy.set_lambda0(0.1);
+  master_hierarchy.set_alpha0(2);
+  master_hierarchy.set_beta0(2);
 
   int INIT_N_CLUS = 5;
   VectorXd probas = VectorXd::Ones(INIT_N_CLUS);
   probas /= (1.0 * INIT_N_CLUS);
   c.resize(ngroups);
+  is_used_c.resize(ngroups);
   s.resize(ngroups);
   v.resize(ngroups);
   t.resize(ngroups);
@@ -39,6 +47,7 @@ void SemiHdpSampler::initialize() {
 
   for (int i = 0; i < ngroups; i++) {
     c[i] = i;
+    is_used_c[i] = true;
     s[i].resize(n_by_group[i]);
 
     for (int j = 0; j < INIT_N_CLUS; j++) s[i][j] = j;
@@ -122,14 +131,14 @@ void SemiHdpSampler::update_unique_vals() {
 }
 
 void SemiHdpSampler::update_s() {
-  auto rng = bayesmix::Rng::Instance().get();
+  auto& rng = bayesmix::Rng::Instance().get();
 
   // compute counts
   m = std::vector<int>(taus.size(), 0);
   for (int r = 0; r < ngroups; r++) {
     for (int l = 0; l < t[r].size(); l++)
       if (t[r][l] >= 0) {
-        std::cout << "t[r][l]: " << t[r][l] << std::endl;
+        // std::cout << "t[r][l]: " << t[r][l] << std::endl;
         m[t[r][l]] += 1;
       }
 
@@ -143,7 +152,7 @@ void SemiHdpSampler::update_s() {
     }
   }
 
-  int m_sum = std::accumulate(m.begin(), m.end(), 0);
+  double m_sum = std::accumulate(m.begin(), m.end(), 0) + 1e-20;
 
   // cicle through observations
   for (int i = 0; i < ngroups; i++) {
@@ -151,7 +160,6 @@ void SemiHdpSampler::update_s() {
     for (int j = 0; j < n_by_group[i]; j++) {
       int s_old = s[i][j];
       // remove current observation from its allocation
-      // TODO: check what happens if n becomes 0?
       n_by_theta_star[r][s[i][j]] -= 1;
       if (t[r][s_old] >= 0) {
         m[t[r][s_old]] -= 1;
@@ -159,20 +167,15 @@ void SemiHdpSampler::update_s() {
 
       VectorXd probas = VectorXd::Zero(theta_star[r].size() + 1);
       for (int l = 0; l < theta_star[r].size(); l++) {
-        std::cout << "l: " << l << ", mean: " << theta_star[r][l].get_mean()
-                  << ", sd: " << theta_star[r][l].get_sd();
         double log_n;
         if (n_by_theta_star[r][l] > 0)
           log_n = std::log(1.0 * n_by_theta_star[r][l]);
         else
           log_n = 1e-20;
 
-        std::cout << ", lpdf: " << theta_star[r][l].lpdf(data[i].row(j))
-                  << ", log_n: " << log_n << std::endl;
         probas[l] = log_n + theta_star[r][l].lpdf(data[i].row(j));
       }
 
-      std::cout << "probas1: " << probas.transpose() << std::endl;
       double margG0 = std::log(w) + master_hierarchy.marg_lpdf(data[i].row(j));
 
       VectorXd hdp_contribs(taus.size() + 1);
@@ -182,25 +185,24 @@ void SemiHdpSampler::update_s() {
           log_m = std::log(1.0 * m[h]);
         else
           log_m = 1e-20;
-        hdp_contribs[h] = log_m + taus[h].lpdf(data[i].row(j));
+        hdp_contribs[h] =
+            log_m - std::log(m_sum) + taus[h].lpdf(data[i].row(j));
       }
 
-      hdp_contribs[taus.size()] =
-          std::log(gamma) + master_hierarchy.marg_lpdf(data[i].row(j));
+      hdp_contribs[taus.size()] = std::log(gamma) - std::log(m_sum) +
+                                  master_hierarchy.marg_lpdf(data[i].row(j));
       double margHDP = std::log(1 - w) + stan::math::log_sum_exp(hdp_contribs);
       VectorXd marg(2);
       marg << margG0, margHDP;
-      std::cout << "marg: " << marg.transpose() << std::endl;
       probas[theta_star[r].size()] =
           std::log(alpha) + stan::math::log_sum_exp(marg);
 
-      std::cout << "probas: " << stan::math::softmax(probas).transpose()
-                << std::endl;
       int snew = bayesmix::categorical_rng(stan::math::softmax(probas), rng);
       s[i][j] = snew;
-      if (snew < probas.size()) {
+      if (snew < theta_star[r].size()) {
         n_by_theta_star[r][snew] += 1;
       } else {
+        // std::cout << "creating new theta_star" << std::endl;
         n_by_theta_star[r].push_back(1);
         if (stan::math::uniform_rng(0, 1, rng) < w) {
           // sample from G0, add it to theta_star and theta_tilde and adjust
@@ -222,6 +224,8 @@ void SemiHdpSampler::update_s() {
             theta_star[r].push_back(taus[tnew]);
             m[tnew] += 1;
           } else {
+            // std::cout << "creating new tau!" << std::endl;
+
             NNIGHierarchy hierarchy = master_hierarchy;
             hierarchy.sample_given_data(data[i].row(j));
             taus.push_back(hierarchy);
@@ -236,10 +240,51 @@ void SemiHdpSampler::update_s() {
 
 void SemiHdpSampler::update_t() {}
 
-void SemiHdpSampler::update_c() {}
+void SemiHdpSampler::update_c() {
+  for (int i = 0; i < ngroups; i++) {
+    int curr_r = c[i];
+    VectorXd probas(ngroups);
+    for (int r = 0; r < ngroups; r++) {
+      VectorXd lpdf_data(n_by_group[i]);
+      MatrixXd lpdf_local;
+      if (is_used_c[r]) {
+        int nr = std::accumulate(n_by_theta_star[r].begin(),
+                                 n_by_theta_star[r].end(), 0);
+        lpdf_local.resize(n_by_group[i], theta_star[r].size());
+        for (int h = 0; h < theta_star[r].size(); h++) {
+          lpdf_local.col(h) = log(1.0 * n_by_theta_star[r][h] / (alpha + nr)) +
+                              theta_star[r][h].lpdf_grid(data[i]).array();
+        }
+
+      } else {
+        int nr = std::accumulate(n_by_theta_star_pseudo[r].begin(),
+                                 n_by_theta_star_pseudo[r].end(), 0);
+        lpdf_local.resize(n_by_group[i], theta_star_pseudo[r].size());
+        for (int h = 0; h < theta_star_pseudo[r].size(); h++) {
+          lpdf_local.col(h) =
+              log(1.0 * n_by_theta_star_pseudo[r][h] / (alpha + nr)) +
+              theta_star_pseudo[r][h].lpdf_grid(data[i]).array();
+        }
+      }
+      for (int j = 0; j < n_by_group[i]; j++)
+        lpdf_data(j) = stan::math::log_sum_exp(lpdf_local.row(j));
+      probas(r) = lpdf_data.sum() + std::log(omega(r));
+    }
+    probas = stan::math::softmax(probas);
+    std::cout << "probas for c: " << probas.transpose() << std::endl;
+    int new_r =
+        bayesmix::categorical_rng(probas, bayesmix::Rng::Instance().get());
+    if (new_r != curr_r) {
+        std::cout << "changing c" << std::endl;
+        throw "case not implemented yet.";
+        // TODO: reallocate, and check if curr_r becomes unused
+        
+    }
+  }
+}
 
 void SemiHdpSampler::update_w() {
-  auto rng = bayesmix::Rng::Instance().get();
+  auto& rng = bayesmix::Rng::Instance().get();
   // cnt how many from the iodisincratic
   int cnt = 0;
   int tot = 0;
@@ -252,13 +297,22 @@ void SemiHdpSampler::update_w() {
     }
   }
   w = stan::math::beta_rng(a_w + cnt, b_w + tot - cnt, rng);
-
 }
 
 void SemiHdpSampler::relabel() {
   // find the theta_* which are not allocated
   // need to loop through the restaurants and then trhough each group
   // entering in the restaurant
+
+  //   std::cout << "s before: " << std::endl;
+  //   for (int i = 0; i < ngroups; i++) {
+  //     for (auto& k : s[i]) std::cout << k << ", ";
+  //     std::cout << std::endl;
+  //   }
+
+  //   std::cout << "theta_star sizes before: ";
+  //   for (int i = 0; i < ngroups; i++) std::cout << theta_star[i].size() <<
+  //   ", "; std::cout << std::endl;
 
   // make sure there are no holes in v and t
   int min_t = INT_MAX;
@@ -309,38 +363,45 @@ void SemiHdpSampler::relabel() {
 
     for (int l = isused.size() - 1; l >= 0; l--) {
       if (!isused[l]) {
-        for (auto i : groups) {
-          // cluster allocations
-          for (int j = 0; j < n_by_group[i]; j++) {
-            if (s[i][j] >= l) {
-              s[i][j] -= 1;
+        // theta_star
+        theta_star[r].erase(theta_star[r].begin() + l);
+
+        // maybe theta tilde
+        if (v[r][l] >= 0) {
+          // std::cout << "decreasing v by one if greater than: " <<
+          // v[i][l]
+          // << std::endl;
+          for (int k = 0; k < v[r].size(); k++) {
+            if (v[r][k] > v[r][l]) {
+              v[r][k] -= 1;
             }
           }
-          // theta_star
-          theta_star[i].erase(theta_star[i].begin() + l);
+          // std::cout << "removing theta_tilde " << i << ", " << v[i][l]
+          //           << std::endl;
+          theta_tilde[r].erase(theta_tilde[r].begin() + v[r][l]);
+        }
+        // v variables
+        v[r].erase(v[r].begin() + l);
 
-          // maybe theta tilde
-          if (v[i][l] >= 0) {
-            // std::cout << "decreasing v by one if greater than: " <<
-            // v[i][l]
-            // << std::endl;
-            for (int k = 0; k < v[i].size(); k++) {
-              if (v[i][k] > v[i][l]) {
-                v[i][k] -= 1;
+        // t variables
+        t[r].erase(t[r].begin() + l);
+
+        for (auto i : groups) {
+          if (c[i] == r) {
+            // cluster allocations
+            for (int j = 0; j < n_by_group[i]; j++) {
+              if (s[i][j] >= l) {
+                s[i][j] -= 1;
               }
             }
-            // std::cout << "removing theta_tilde " << i << ", " << v[i][l]
-            //           << std::endl;
-            theta_tilde[i].erase(theta_tilde[i].begin() + v[i][l]);
           }
-          // v variables
-          v[i].erase(v[i].begin() + l);
-
-          // t variables
-          t[i].erase(t[i].begin() + l);
+          assert(std::max_element(s[i].begin(), s[i].end()) <
+                 theta_star[r].size());
         }
       }
     }
+
+    // std::cout << "theta_star.size(): " << theta_star[r].size() << std::endl;
   }
 
   // find the taus which are not allocated and delete them
@@ -371,6 +432,17 @@ void SemiHdpSampler::relabel() {
     }
   }
 
+  for (int r = 0; r < ngroups; r++) {
+    n_by_theta_star[r] = std::vector<int>(theta_star[r].size(), 0);
+    for (int i = 0; i < ngroups; i++) {
+      if (c[i] == r) {
+        for (int j = 0; j < n_by_group[i]; j++) {
+          n_by_theta_star[r][s[i][j]] += 1;
+        }
+      }
+    }
+  }
+
   //   std::cout << "t: " << std::endl;
   //   for (int i = 0; i < ngroups; i++) {
   //     for (auto k : t[i]) std::cout << k << ", ";
@@ -385,4 +457,44 @@ void SemiHdpSampler::relabel() {
   //   }
 
   //   std::cout << "taus.size(): " << taus.size() << std::endl;
+
+  //   std::cout << "s after: " << std::endl;
+  //   for (int i = 0; i < ngroups; i++) {
+  //     for (auto& k : s[i]) std::cout << k << ", ";
+  //     std::cout << std::endl;
+  //   }
+}
+
+void SemiHdpSampler::print_debug_string() {
+  std::cout << "c: ";
+  for (auto& k : c) std::cout << k << ", ";
+  std::cout << std::endl << std::endl;
+
+  std::cout << "w: " << w << std::endl;
+
+  for (int r = 0; r < ngroups; r++) {
+    std::cout << "**** RESTAURANT: " << r << " *****" << std::endl;
+    std::vector<MatrixXd> data_by_theta_star(theta_star[r].size());
+    std::cout << "theta_star[r].size(): " << theta_star[r].size() << std::endl;
+    for (int i = 0; i < ngroups; i++) {
+      if (c[i] == r) {
+        for (int j = 0; j < n_by_group[i]; j++) {
+          //   std::cout << "s[i][j]" << s[i][j] << std::endl;
+          //   std::cout << "currdata: " <<
+          //   data_by_theta_star[s[i][j]].transpose() << std::endl; std::cout
+          //   << "appending: " << data[i].row(j) << std::endl;
+          bayesmix::append_by_row(&data_by_theta_star[s[i][j]],
+                                  data[i].row(j));
+        }
+      }
+    }
+    for (int l = 0; l < theta_star[r].size(); l++) {
+      std::cout << "THETA STAR (" << r << ", " << l
+                << "): m=" << theta_star[r][l].get_mean()
+                << ", sd: " << theta_star[r][l].get_sd();
+
+      std::cout << ", DATA: " << data_by_theta_star[l].transpose()
+                << std::endl;
+    }
+  }
 }

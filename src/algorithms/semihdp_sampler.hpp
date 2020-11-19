@@ -2,6 +2,7 @@
 #define SRC_ALGORITHMS_SEMI_HDP_SAMPLER_HPP
 
 #include <Eigen/Dense>
+#include <src/collectors/memory_collector.hpp>
 #include <src/hierarchies/nnig_hierarchy.hpp>
 #include <src/utils/distributions.hpp>
 #include <src/utils/rng.hpp>
@@ -25,14 +26,19 @@ class SemiHdpSampler {
   std::vector<std::vector<NNIGHierarchy>> theta_tilde;
   // shared tables
   std::vector<NNIGHierarchy> taus;
-
   // counts
   std::vector<std::vector<int>> n_by_theta_star;
+
+  // stuff for pseudoprior
+  std::vector<std::vector<NNIGHierarchy>> theta_star_pseudo;
+  std::vector<std::vector<int>> n_by_theta_star_pseudo;
 
   // theta_{ij} = theta_{c_i, s_{ij}}
   std::vector<std::vector<int>> s;
   // which restaurant each grups enters from
   std::vector<int> c;
+  std::vector<bool> is_used_c;
+  VectorXd omega;
   //
   std::vector<std::vector<int>> t;
   std::vector<std::vector<int>> v;
@@ -48,6 +54,7 @@ class SemiHdpSampler {
 
   double a_w = 2;
   double b_w = 2;
+  
 
  public:
   SemiHdpSampler() {}
@@ -58,7 +65,18 @@ class SemiHdpSampler {
   void initialize();
 
   void step() {
-      
+    update_unique_vals();
+    update_s();
+    update_w();
+    update_c();
+    relabel();
+  }
+
+  void pseudo_step() {
+    update_unique_vals();
+    update_s();
+    relabel();
+    update_w();
   }
 
   void update_unique_vals();
@@ -102,6 +120,8 @@ class SemiHdpSampler {
   NNIGHierarchy get_tau(int h) { return taus[h]; }
 
   NNIGHierarchy get_theta_tilde(int r, int l) { return theta_tilde[r][l]; }
+
+  void print_debug_string();
 };
 
 #endif
