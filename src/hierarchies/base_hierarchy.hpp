@@ -39,8 +39,8 @@ class BaseHierarchy {
   virtual bool is_multivariate() const = 0;
 
   virtual void update_hypers(
-    const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
-    unsigned int n) = 0;
+      const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+      unsigned int n) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseHierarchy() = default;

@@ -135,7 +135,21 @@ void NNIGHierarchy::set_state(const google::protobuf::Message &state_,
 }
 
 void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
-  return;
+  const bayesmix::NNIGPrior &currcast =
+      google::protobuf::internal::down_cast<const bayesmix::NNIGPrior &>(
+          prior_);
+  prior = currcast;
+  hypers = std::make_shared<Hyperparams>();
+  if (prior.has_fixed_values()) {
+    hypers->mu = prior.fixed_values().mu0();
+    hypers->lambda = prior.fixed_values().lambda0();
+    hypers->alpha = prior.fixed_values().alpha0();
+    hypers->beta = prior.fixed_values().beta0();
+  } else if (prior.has_normal_mean_prior()) {
+    // TODO
+  } else {
+    std::invalid_argument("Error: argument proto is not appropriate");
+  }
 }
 
 void NNIGHierarchy::write_state_to_proto(

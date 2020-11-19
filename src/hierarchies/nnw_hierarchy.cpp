@@ -192,7 +192,22 @@ void NNWHierarchy::set_state(const google::protobuf::Message &state_,
 }
 
 void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
-  return;
+  const bayesmix::NNWPrior &currcast =
+      google::protobuf::internal::down_cast<const bayesmix::NNWPrior &>(
+          prior_);
+  prior = currcast;
+  hypers = std::make_shared<Hyperparams>();
+  if (prior.has_fixed_values()) {
+    hypers->mu = bayesmix::to_eigen(prior.fixed_values().mu0());
+    hypers->lambda = prior.fixed_values().lambda0();
+    hypers->tau = bayesmix::to_eigen(prior.fixed_values().tau0());
+    tau0_inv = stan::math::inverse_spd(hypers->tau);
+    hypers->nu = prior.fixed_values().nu0();
+  } else if (prior.has_ngw_prior()) {
+    // TODO
+  } else {
+    std::invalid_argument("Error: argument proto is not appropriate");
+  }
 }
 
 void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {

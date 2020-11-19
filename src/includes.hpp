@@ -15,5 +15,6 @@
 #include "runtime/factory.hpp"
 #include "utils/cluster_utils.hpp"
 #include "utils/io_utils.hpp"
+#include "utils/proto_utils.hpp"
 
 #endif  // BAYESMIX_INCLUDES_HPP_

@@ -21,7 +21,9 @@ int main(int argc, char *argv[]) {
   unsigned int burnin = 1;
   int rng_seed = 20201103;
 
-  // Total mass
+  // Initialize prior protos
+  bayesmix::NNIGPrior hier_prior;  // TEST
+  // bayesmix::NNWPrior hier_prior;  // TEST
   bayesmix::DPPrior mix_prior;
 
   // // Fixed total mass
@@ -46,28 +48,39 @@ int main(int argc, char *argv[]) {
   auto &rng = bayesmix::Rng::Instance().get();
   rng.seed(rng_seed);
 
-  // Set parameters
+  // Write parameters
 
   // NNIG  //TEST
-  hier->set_mu0(5.0);
-  hier->set_lambda0(0.1);
-  hier->set_alpha0(2.0);
-  hier->set_beta0(2.0);
+  double mu0 = 5.0;
+  double lambda0 = 0.1;
+  double alpha0 = 2.0;
+  double beta0 = 2.0;
+  hier_prior.mutable_fixed_values()->set_mu0(mu0);
+  hier_prior.mutable_fixed_values()->set_lambda0(lambda0);
+  hier_prior.mutable_fixed_values()->set_alpha0(alpha0);
+  hier_prior.mutable_fixed_values()->set_beta0(beta0);
 
   // // NNW  //TEST
   // Eigen::Vector2d mu0; mu0 << 5.5, 5.5;
-  // hier->set_mu0(mu0);
-  // hier->set_lambda0(0.2);
+  // bayesmix::Vector mu0_proto;
+  // bayesmix::to_proto(mu0, &mu0_proto);
+  // double lambda0 = 0.2;
   // double nu0 = 5.0;
-  // hier->set_nu0(nu0);
   // Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
-  // hier->set_tau0(tau0);
+  // bayesmix::Matrix tau0_proto;
+  // bayesmix::to_proto(tau0, &tau0_proto);
+  // hier_prior.mutable_fixed_values()->set_mu0(mu0_proto);
+  // hier_prior.mutable_fixed_values()->set_lambda0(lambda0);
+  // hier_prior.mutable_fixed_values()->set_nu0(nu0);
+  // hier_prior.mutable_fixed_values()->set_tau0(tau0_proto);
 
+  // Set parameters
+  hier->set_prior(hier_prior);
   mixing->set_prior(mix_prior);
   algo->set_maxiter(maxiter);
   algo->set_burnin(burnin);
 
-  // Other objects
+  // Read data objects
   Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
   Eigen::MatrixXd grid = bayesmix::read_eigen_matrix(gridfile);
 
@@ -80,6 +93,7 @@ int main(int argc, char *argv[]) {
   }
   BaseCollector *coll = new MemoryCollector();
 
+  // Run algorithm and density evaluation
   algo->run(coll);
   Eigen::MatrixXd dens = algo->eval_lpdf(grid, coll);
   bayesmix::write_matrix_to_file(dens, densfile);
