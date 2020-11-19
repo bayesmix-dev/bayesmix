@@ -22,10 +22,13 @@ add_library(bayesmix)
 add_subdirectory(src)
 add_subdirectory(proto)
 add_subdirectory(test)
+add_subdirectory(scripts)
+
 
 message("source dir: " "${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_include_directories(bayesmix PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/math
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/stan/math
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/boost_1.72.0
