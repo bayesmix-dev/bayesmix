@@ -28,16 +28,12 @@
 class NNIGHierarchy : public BaseHierarchy {
  public:
   struct PostParams {
-    double mu_n;
-    double alpha_n;
-    double beta_n;
-    double lambda_n;
+    double mu_n, alpha_n, beta_n, lambda_n;
   };
 
  protected:
-  // state
-  double mean;
-  double sd;
+  // STATE
+  double mean, sd;
 
   // HYPERPARAMETERS
   double mu0, lambda0, alpha0, beta0;

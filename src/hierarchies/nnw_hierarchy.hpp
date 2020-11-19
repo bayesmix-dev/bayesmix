@@ -35,6 +35,7 @@ class NNWHierarchy : public BaseHierarchy {
   };
 
  protected:
+  // STATE
   Eigen::VectorXd mean;
   Eigen::MatrixXd tau;
 
