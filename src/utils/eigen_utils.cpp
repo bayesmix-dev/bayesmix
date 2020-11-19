@@ -26,10 +26,10 @@ void bayesmix::append_by_row(Eigen::MatrixXd *a, const Eigen::MatrixXd &b) {
   if (!a->rows()) {
     *a = b;
   } else if (!b.rows()) {
-      return;
+    return;
   } else {
     int orig_rows = a->rows();
-    a->conservativeResize(a->rows() + b.rows(), a->cols());
-    a->block(orig_rows - 1, 0, b.rows(), a->cols()) = b;
+    a->conservativeResize(orig_rows + b.rows(), a->cols());
+    a->block(orig_rows, 0, b.rows(), a->cols()) = b;
   }
 }
