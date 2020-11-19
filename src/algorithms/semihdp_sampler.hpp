@@ -1,6 +1,8 @@
 #ifndef SRC_ALGORITHMS_SEMI_HDP_SAMPLER_HPP
 #define SRC_ALGORITHMS_SEMI_HDP_SAMPLER_HPP
 
+#include <proto/cpp/semihdp.pb.h>
+
 #include <Eigen/Dense>
 #include <src/collectors/memory_collector.hpp>
 #include <src/hierarchies/nnig_hierarchy.hpp>
@@ -54,7 +56,9 @@ class SemiHdpSampler {
 
   double a_w = 2;
   double b_w = 2;
-  
+
+  MemoryCollector<bayesmix::SemiHdpState> pseudoprior_collector;
+  int pseudo_iter;
 
  public:
   SemiHdpSampler() {}
@@ -79,6 +83,26 @@ class SemiHdpSampler {
     update_w();
   }
 
+  void run(int pseudo_burn, int pseudo_iter, int burnin, int iter, int thin,
+           BaseCollector *collector) {
+    this->pseudo_iter = pseudo_iter;
+    for (int i=0; i < pseudo_burn; i++) pseudo_step();
+
+    for (int i = 0; i < pseudo_iter; i++) {
+      pseudo_step();
+      collect_pseudo();
+    }
+
+    for (int i=0; i < burnin; i++) step();
+
+    for (int i = 0; i < iter; i++) {
+      step();
+      if (iter % thin == 0)
+        collector->collect(get_state_as_proto());
+    }
+
+  }
+
   void update_unique_vals();
 
   void update_s();
@@ -86,6 +110,8 @@ class SemiHdpSampler {
   void update_c();
   void update_w();
   void relabel();
+  void collect_pseudo();
+  bayesmix::SemiHdpState get_state_as_proto();
 
   std::vector<std::vector<int>> get_s() const { return s; }
   std::vector<std::vector<int>> get_t() const { return t; }

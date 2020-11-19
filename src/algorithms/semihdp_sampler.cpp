@@ -173,7 +173,7 @@ void SemiHdpSampler::update_s() {
         else
           log_n = 1e-20;
 
-        probas[l] = log_n + theta_star[r][l].lpdf(data[i].row(j));
+        probas[l] = log_n + theta_star[r][l].like_lpdf(data[i].row(j));
       }
 
       double margG0 = std::log(w) + master_hierarchy.marg_lpdf(data[i].row(j));
@@ -186,7 +186,7 @@ void SemiHdpSampler::update_s() {
         else
           log_m = 1e-20;
         hdp_contribs[h] =
-            log_m - std::log(m_sum) + taus[h].lpdf(data[i].row(j));
+            log_m - std::log(m_sum) + taus[h].like_lpdf(data[i].row(j));
       }
 
       hdp_contribs[taus.size()] = std::log(gamma) - std::log(m_sum) +
@@ -253,7 +253,7 @@ void SemiHdpSampler::update_c() {
         lpdf_local.resize(n_by_group[i], theta_star[r].size());
         for (int h = 0; h < theta_star[r].size(); h++) {
           lpdf_local.col(h) = log(1.0 * n_by_theta_star[r][h] / (alpha + nr)) +
-                              theta_star[r][h].lpdf_grid(data[i]).array();
+                              theta_star[r][h].like_lpdf_grid(data[i]).array();
         }
 
       } else {
@@ -263,7 +263,7 @@ void SemiHdpSampler::update_c() {
         for (int h = 0; h < theta_star_pseudo[r].size(); h++) {
           lpdf_local.col(h) =
               log(1.0 * n_by_theta_star_pseudo[r][h] / (alpha + nr)) +
-              theta_star_pseudo[r][h].lpdf_grid(data[i]).array();
+              theta_star_pseudo[r][h].like_lpdf_grid(data[i]).array();
         }
       }
       for (int j = 0; j < n_by_group[i]; j++)
@@ -275,10 +275,9 @@ void SemiHdpSampler::update_c() {
     int new_r =
         bayesmix::categorical_rng(probas, bayesmix::Rng::Instance().get());
     if (new_r != curr_r) {
-        std::cout << "changing c" << std::endl;
-        throw "case not implemented yet.";
-        // TODO: reallocate, and check if curr_r becomes unused
-        
+      std::cout << "changing c" << std::endl;
+      throw "case not implemented yet.";
+      // TODO: reallocate, and check if curr_r becomes unused
     }
   }
 }
@@ -464,6 +463,24 @@ void SemiHdpSampler::relabel() {
   //     std::cout << std::endl;
   //   }
 }
+
+void SemiHdpSampler::collect_pseudo() {
+  bayesmix::SemiHdpState state;
+  for (int i = 0; i < ngroups; i++) {
+    bayesmix::SemiHdpState::RestaurantState curr_restaurant;
+
+    for (int l = 0; l < theta_star[i].size(); l++) {
+      bayesmix::ClusterVal clusval;
+      theta_star[i][l].write_state_to_proto(&clusval);
+      curr_restaurant.add_theta_stars()->CopyFrom(clusval);
+    }
+    *curr_restaurant.mutable_n_by_clus() = {
+      n_by_theta_star[i].begin(), n_by_theta_star[i].end()};
+    state.add_restaurants()->CopyFrom(curr_restaurant);
+  }
+  pseudoprior_collector.collect(state);
+}
+
 
 void SemiHdpSampler::print_debug_string() {
   std::cout << "c: ";
