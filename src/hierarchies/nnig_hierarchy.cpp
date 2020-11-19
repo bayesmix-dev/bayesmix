@@ -47,23 +47,17 @@ NNIGHierarchy::PostParams NNIGHierarchy::normal_invgamma_update(
   return out;
 }
 
-//! \param data Column vector of data points
-//! \return     Likehood vector evaluated in data
-Eigen::VectorXd NNIGHierarchy::like(const Eigen::MatrixXd &data) {
-  Eigen::VectorXd result = lpdf_grid(data);
-  return result.array().exp();
-}
-
 //! \param data Column vector containing a single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNIGHierarchy::lpdf(const Eigen::RowVectorXd &datum) {
+double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   assert(datum.size() == 1);
   return stan::math::normal_lpdf(datum(0), mean, sd);
 }
 
 //! \param data Column vector of data points
 //! \return     Log-Likehood vector evaluated in data
-Eigen::VectorXd NNIGHierarchy::lpdf_grid(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNIGHierarchy::like_lpdf_grid(
+    const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
@@ -73,15 +67,8 @@ Eigen::VectorXd NNIGHierarchy::lpdf_grid(const Eigen::MatrixXd &data) {
 }
 
 //! \param data Column vector of data points
-//! \return     Marginal distribution vector evaluated in data
-Eigen::VectorXd NNIGHierarchy::eval_marg(const Eigen::MatrixXd &data) {
-  Eigen::VectorXd result = marg_lpdf_grid(data);
-  return result.array().exp();
-}
-
-//! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data (log)
-double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) {
+double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
   assert(datum.size() == 1);
 
   // Compute standard deviation of marginal distribution
@@ -91,7 +78,8 @@ double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) {
 
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data (log)
-Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(const Eigen::MatrixXd &data) {
+Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(
+    const Eigen::MatrixXd &data) const {
   // Compute standard deviation of marginal distribution
   double sig_n = sqrt(beta0 * (lambda0 + 1) / (alpha0 * lambda0));
 
@@ -105,7 +93,7 @@ Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(const Eigen::MatrixXd &data) {
 
 void NNIGHierarchy::draw() {
   // Update state values from their prior centering distribution
-  auto& rng = bayesmix::Rng::Instance().get();
+  auto &rng = bayesmix::Rng::Instance().get();
   sd = sqrt(stan::math::inv_gamma_rng(alpha0, beta0, rng));
   mean = stan::math::normal_rng(mu0, sd / sqrt(lambda0), rng);
 }
@@ -118,35 +106,33 @@ void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
       normal_invgamma_update(data.col(0), mu0, alpha0, beta0, lambda0);
 
   // Update state values from their prior centering distribution
-  auto& rng = bayesmix::Rng::Instance().get();
+  auto &rng = bayesmix::Rng::Instance().get();
   sd = sqrt(stan::math::inv_gamma_rng(params.alpha_n, params.beta_n, rng));
   mean = stan::math::normal_rng(params.mu_n, sd / sqrt(params.lambda_n), rng);
 }
 
-void NNIGHierarchy::set_state(google::protobuf::Message *curr, bool check) {
-  using namespace google::protobuf::internal;
-  using namespace bayesmix;
+void NNIGHierarchy::set_state(const google::protobuf::Message &state_,
+                              bool check /*= true*/) {
+  const bayesmix::MarginalState::ClusterVal &currcast =
+      google::protobuf::internal::down_cast<
+          const bayesmix::MarginalState::ClusterVal &>(state_);
 
-  MarginalState::ClusterVal *currcast =
-      down_cast<MarginalState::ClusterVal *>(curr);
-
-  mean = currcast->univ_ls_state().mean();
-  sd = currcast->univ_ls_state().sd();
+  mean = currcast.univ_ls_state().mean();
+  sd = currcast.univ_ls_state().sd();
 
   if (check) {
     check_state_validity();
   }
 }
 
-void NNIGHierarchy::write_state_to_proto(google::protobuf::Message *out) {
-  using namespace google::protobuf::internal;
-  using namespace bayesmix;
-
-  UnivLSState state;
+void NNIGHierarchy::write_state_to_proto(
+    google::protobuf::Message *out) const {
+  bayesmix::UnivLSState state;
   state.set_mean(mean);
   state.set_sd(sd);
 
-  down_cast<MarginalState::ClusterVal *>(out)
+  google::protobuf::internal::down_cast<bayesmix::MarginalState::ClusterVal *>(
+      out)
       ->mutable_univ_ls_state()
       ->CopyFrom(state);
 }

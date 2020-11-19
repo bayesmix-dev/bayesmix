@@ -78,8 +78,6 @@ class BaseAlgorithm {
   virtual void initialize() = 0;
   virtual void sample_allocations() = 0;
   virtual void sample_unique_values() = 0;
-  virtual void sample_weights() = 0;
-  virtual void update_hypers() = 0;
   virtual void print_ending_message() const {
     std::cout << "Done" << std::endl;
   };
@@ -92,8 +90,8 @@ class BaseAlgorithm {
   void step() {
     sample_allocations();
     sample_unique_values();
-    sample_weights();
-    update_hypers();
+    // some_hierarchy->update_hypers(unique_values);  // TODO
+    mixing->update_hypers(unique_values, data.size());
   }
 
  public:

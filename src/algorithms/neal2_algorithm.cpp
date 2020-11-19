@@ -50,7 +50,7 @@ void Neal2Algorithm::initialize() {
 void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
-  auto& rng = bayesmix::Rng::Instance().get();
+  auto &rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
   for (size_t i = 0; i < n_data; i++) {
@@ -71,7 +71,7 @@ void Neal2Algorithm::sample_allocations() {
       // Probability of being assigned to an already existing cluster
       logprobas(j) =
           log(mixing->mass_existing_cluster(cardinalities[j], n_data - 1)) +
-          unique_values[j]->lpdf(datum);
+          unique_values[j]->like_lpdf(datum);
       if (singleton == 1 && j == allocations[i]) {
         // Probability of being assigned to a newly generated cluster
         logprobas(j) = log(mixing->mass_new_cluster(n_clust, n_data - 1)) +
