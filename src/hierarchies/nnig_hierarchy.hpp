@@ -7,6 +7,7 @@
 #include <cassert>
 #include <memory>
 
+#include "../../proto/cpp/hierarchies.pb.h"
 #include "base_hierarchy.hpp"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.
@@ -34,9 +35,10 @@ class NNIGHierarchy : public BaseHierarchy {
  protected:
   // STATE
   double mean, sd;
-
   // HYPERPARAMETERS
   double mu0, lambda0, alpha0, beta0;
+  // HYPERPRIOR
+  bayesmix::NNIGPrior prior;
 
   // AUXILIARY TOOLS
   //! Raises error if the hypers values are not valid w.r.t. their own domain

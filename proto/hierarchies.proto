@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+import "matrix.proto";
+
+package bayesmix;
+
+message NNIGPrior {
+  message FixedValues {
+    double mu0 = 1;
+    double lambda0 = 2;
+    double alpha0 = 3;
+    double beta0 = 4;
+  }
+
+  message UnivNormalPrior {
+    double mu00 = 1;
+    double sig00 = 2;
+  }
+
+  message NormalMeanPrior {
+    UnivNormalPrior mu0_prior = 1;
+    double lambda0 = 2;
+    double alpha0 = 3;
+    double beta0 = 4;
+  }
+
+  oneof prior {
+    FixedValues fixed_values = 1;
+    NormalMeanPrior normal_mean_prior = 2;
+  }
+}
+
+
+
+message NNWPrior {
+  message FixedValues {
+    Vector mu0 = 1;
+    double lambda0 = 2;
+    Matrix tau0 = 3;
+    double nu0 = 4;
+  }
+
+  message MultiNormalPrior {
+    Vector mu00 = 1;
+    Matrix sigma00 = 2;
+  }
+
+  message GammaPrior {
+    double alpha0 = 1;
+    double beta0  = 2;
+  }
+
+  message WishartPrior {
+    double nu00 = 1;
+    Matrix tau00 = 2;
+  }
+
+  message NGWPrior {
+    MultiNormalPrior mu0_prior = 1;
+    GammaPrior lambda0_prior = 2;
+    WishartPrior tau0_prior = 3;
+    double nu0 = 4;
+  }
+
+  oneof prior {
+    FixedValues fixed_values = 1;
+    NGWPrior ngw_prior = 2;
+  }
+}

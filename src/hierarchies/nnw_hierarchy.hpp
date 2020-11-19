@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/fun.hpp>
 
+#include "../../proto/cpp/hierarchies.pb.h"
 #include "base_hierarchy.hpp"
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
@@ -44,6 +45,8 @@ class NNWHierarchy : public BaseHierarchy {
   double lambda0;
   Eigen::MatrixXd tau0, tau0_inv;
   double nu0;
+  // HYPERPRIOR
+  bayesmix::NNWPrior prior;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
   //! Lower factor object of the Cholesky decomposition of tau
@@ -103,28 +106,19 @@ class NNWHierarchy : public BaseHierarchy {
                  bool check = true) override;
 
   Eigen::RowVectorXd get_mu0() const { return mu0; }
-
   Eigen::VectorXd get_mean() const { return mean; }
-
   Eigen::MatrixXd get_tau() const { return tau; }
-
   double get_lambda0() const { return lambda0; }
-
   Eigen::MatrixXd get_tau0() const { return tau0; }
-
   Eigen::MatrixXd get_tau0_inv() const { return tau0_inv; }
-
   double get_nu0() const { return nu0; }
 
   void set_mu0(const Eigen::RowVectorXd &mu0_) { mu0 = mu0_; }
-
   void set_lambda0(const double lambda0_) { lambda0 = lambda0_; }
-
   void set_tau0(const Eigen::MatrixXd &tau0_) {
     tau0 = tau0_;
     tau0_inv = stan::math::inverse_spd(tau0);
   }
-
   void set_nu0(const double nu0_) { nu0 = nu0_; }
 
   void write_state_to_proto(google::protobuf::Message *out) const override;
