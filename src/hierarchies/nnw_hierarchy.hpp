@@ -4,6 +4,7 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
+#include <memory>
 #include <stan/math/prim/fun.hpp>
 
 #include "../../proto/cpp/hierarchies.pb.h"
@@ -28,11 +29,11 @@
 
 class NNWHierarchy : public BaseHierarchy {
  public:
-  struct PostParams {
-    Eigen::RowVectorXd mu_n;
-    double lambda_n;
-    Eigen::MatrixXd tau_n;
-    double nu_n;
+  struct Hyperparams {
+    Eigen::RowVectorXd mu;
+    double lambda;
+    Eigen::MatrixXd tau;
+    double nu;
   };
 
  protected:
@@ -41,10 +42,8 @@ class NNWHierarchy : public BaseHierarchy {
   Eigen::MatrixXd tau;
 
   // HYPERPARAMETERS
-  Eigen::RowVectorXd mu0;
-  double lambda0;
-  Eigen::MatrixXd tau0, tau0_inv;
-  double nu0;
+  std::shared_ptr<Hyperparams> hypers;
+  Eigen::MatrixXd tau0_inv;
   // HYPERPRIOR
   bayesmix::NNWPrior prior;
 
@@ -65,16 +64,20 @@ class NNWHierarchy : public BaseHierarchy {
   void set_tau_and_utilities(const Eigen::MatrixXd &tau_);
 
   //! Returns updated values of the prior hyperparameters via their posterior
-  PostParams normal_wishart_update(const Eigen::MatrixXd &data,
-                                   const Eigen::RowVectorXd &mu0,
-                                   const double lambda0,
-                                   const Eigen::MatrixXd &tau0_inv,
-                                   const double nu0);
+  Hyperparams normal_wishart_update(const Eigen::MatrixXd &data,
+                                    const Eigen::RowVectorXd &mu0,
+                                    const double lambda0,
+                                    const Eigen::MatrixXd &tau0_inv,
+                                    const double nu0);
 
  public:
   void check_and_initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, true)
   bool is_multivariate() const override { return true; }
+
+  void update_hypers(
+      const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+      unsigned int n) override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNWHierarchy() = default;
@@ -100,26 +103,30 @@ class NNWHierarchy : public BaseHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
+  Eigen::VectorXd get_mean() const { return mean; }
+  Eigen::MatrixXd get_tau() const { return tau; }
+  // TODO delete the following 4:
+  Eigen::RowVectorXd get_mu0() const { return hypers->mu; }
+  double get_lambda0() const { return hypers->lambda; }
+  Eigen::MatrixXd get_tau0() const { return hypers->tau; }
+  Eigen::MatrixXd get_tau0_inv() const { return tau0_inv; }
+  double get_nu0() const { return hypers->nu; }
+
+  // TODO remove the following 4:
+  void set_mu0(const Eigen::RowVectorXd &mu0_) { hypers->mu = mu0_; }
+  void set_lambda0(const double lambda0_) { hypers->lambda = lambda0_; }
+  void set_tau0(const Eigen::MatrixXd &tau0_) {
+    hypers->tau = tau0_;
+    tau0_inv = stan::math::inverse_spd(tau0_);
+  }
+  void set_nu0(const double nu0_) { hypers->nu = nu0_; }
+
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
   void set_state(const google::protobuf::Message &state_,
                  bool check = true) override;
 
-  Eigen::RowVectorXd get_mu0() const { return mu0; }
-  Eigen::VectorXd get_mean() const { return mean; }
-  Eigen::MatrixXd get_tau() const { return tau; }
-  double get_lambda0() const { return lambda0; }
-  Eigen::MatrixXd get_tau0() const { return tau0; }
-  Eigen::MatrixXd get_tau0_inv() const { return tau0_inv; }
-  double get_nu0() const { return nu0; }
-
-  void set_mu0(const Eigen::RowVectorXd &mu0_) { mu0 = mu0_; }
-  void set_lambda0(const double lambda0_) { lambda0 = lambda0_; }
-  void set_tau0(const Eigen::MatrixXd &tau0_) {
-    tau0 = tau0_;
-    tau0_inv = stan::math::inverse_spd(tau0);
-  }
-  void set_nu0(const double nu0_) { nu0 = nu0_; }
+  void set_prior(const google::protobuf::Message &prior_) override;
 
   void write_state_to_proto(google::protobuf::Message *out) const override;
 

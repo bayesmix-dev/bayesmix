@@ -38,6 +38,10 @@ class BaseHierarchy {
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
 
+  virtual void update_hypers(
+    const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+    unsigned int n) = 0;
+
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseHierarchy() = default;
   BaseHierarchy() = default;
@@ -68,6 +72,8 @@ class BaseHierarchy {
   //! \param check  If true, a state validity check occurs after assignment
   virtual void set_state(const google::protobuf::Message &state_,
                          bool check = true) = 0;
+
+  virtual void set_prior(const google::protobuf::Message &prior_) = 0;
 
   virtual std::string get_id() const = 0;
 };

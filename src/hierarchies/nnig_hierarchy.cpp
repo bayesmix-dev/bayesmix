@@ -11,40 +11,46 @@
 
 void NNIGHierarchy::check_and_initialize() {
   check_hypers_validity();
-  mean = mu0;
-  sd = sqrt(beta0 / (alpha0 - 1));
+  mean = hypers->mu;
+  sd = sqrt(hypers->beta / (hypers->alpha - 1));
 }
 
 //! \param data                        Column vector of data points
 //! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
 //! \return                            Vector of updated values for hyperpar.s
-NNIGHierarchy::PostParams NNIGHierarchy::normal_invgamma_update(
+NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update(
     const Eigen::VectorXd &data, const double mu0, const double alpha0,
     const double beta0, const double lambda0) {
   // Initialize relevant variables
-  PostParams out;
+  Hyperparams post_params;
 
   unsigned int n = data.rows();
 
   if (n == 0) {  // no update possible
-    out.mu_n = mu0;
-    out.alpha_n = alpha0;
-    out.beta_n = beta0;
-    out.lambda_n = lambda0;
-    return out;
+    post_params.mu = mu0;
+    post_params.alpha = alpha0;
+    post_params.beta = beta0;
+    post_params.lambda = lambda0;
+    return post_params;
   }
 
   // Compute updated hyperparameters
   double y_bar = data.mean();  // sample mean
-  out.mu_n = (lambda0 * mu0 + n * y_bar) / (lambda0 + n);
-  out.alpha_n = alpha0 + 0.5 * n;
+  post_params.mu = (lambda0 * mu0 + n * y_bar) / (lambda0 + n);
+  post_params.alpha = alpha0 + 0.5 * n;
   double ss = (data.dot(data)) - n * y_bar * y_bar;  // sum of squares
-  out.beta_n =
+  post_params.beta =
       beta0 + 0.5 * ss +
       0.5 * lambda0 * n * (y_bar - mu0) * (y_bar - mu0) / (n + lambda0);
-  out.lambda_n = lambda0 + n;
+  post_params.lambda = lambda0 + n;
 
-  return out;
+  return post_params;
+}
+
+void NNIGHierarchy::update_hypers(
+    const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+    unsigned int n) {
+  return;
 }
 
 //! \param data Column vector containing a single data point
@@ -72,8 +78,10 @@ double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
   assert(datum.size() == 1);
 
   // Compute standard deviation of marginal distribution
-  double sig_n = sqrt(beta0 * (lambda0 + 1) / (alpha0 * lambda0));
-  return stan::math::student_t_lpdf(datum(0), 2 * alpha0, mu0, sig_n);
+  double sig_n = sqrt(hypers->beta * (hypers->lambda + 1) /
+                      (hypers->alpha * hypers->lambda));
+  return stan::math::student_t_lpdf(datum(0), 2 * hypers->alpha, hypers->mu,
+                                    sig_n);
 }
 
 //! \param data Column vector of data points
@@ -81,12 +89,14 @@ double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
 Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(
     const Eigen::MatrixXd &data) const {
   // Compute standard deviation of marginal distribution
-  double sig_n = sqrt(beta0 * (lambda0 + 1) / (alpha0 * lambda0));
+  double sig_n = sqrt(hypers->beta * (hypers->lambda + 1) /
+                      (hypers->alpha * hypers->lambda));
 
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute marginal for each data point
-    result(i) = stan::math::student_t_lpdf(data(i, 0), 2 * alpha0, mu0, sig_n);
+    result(i) = stan::math::student_t_lpdf(data(i, 0), 2 * hypers->alpha,
+                                           hypers->mu, sig_n);
   }
   return result;
 }
@@ -94,20 +104,20 @@ Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(
 void NNIGHierarchy::draw() {
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  sd = sqrt(stan::math::inv_gamma_rng(alpha0, beta0, rng));
-  mean = stan::math::normal_rng(mu0, sd / sqrt(lambda0), rng);
+  sd = sqrt(stan::math::inv_gamma_rng(hypers->alpha, hypers->beta, rng));
+  mean = stan::math::normal_rng(hypers->mu, sd / sqrt(hypers->lambda), rng);
 }
 
 //! \param data Column vector of data points
 void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   // Update values
-  PostParams params =
-      normal_invgamma_update(data.col(0), mu0, alpha0, beta0, lambda0);
+  Hyperparams params = normal_invgamma_update(
+      data.col(0), hypers->mu, hypers->alpha, hypers->beta, hypers->lambda);
 
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  sd = sqrt(stan::math::inv_gamma_rng(params.alpha_n, params.beta_n, rng));
-  mean = stan::math::normal_rng(params.mu_n, sd / sqrt(params.lambda_n), rng);
+  sd = sqrt(stan::math::inv_gamma_rng(params.alpha, params.beta, rng));
+  mean = stan::math::normal_rng(params.mu, sd / sqrt(params.lambda), rng);
 }
 
 void NNIGHierarchy::set_state(const google::protobuf::Message &state_,
@@ -122,6 +132,10 @@ void NNIGHierarchy::set_state(const google::protobuf::Message &state_,
   if (check) {
     check_state_validity();
   }
+}
+
+void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
+  return;
 }
 
 void NNIGHierarchy::write_state_to_proto(

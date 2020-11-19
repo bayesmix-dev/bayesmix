@@ -90,7 +90,7 @@ class BaseAlgorithm {
   void step() {
     sample_allocations();
     sample_unique_values();
-    // some_hierarchy->update_hypers(unique_values);  // TODO
+    unique_values[0]->update_hypers(unique_values, data.size());
     mixing->update_hypers(unique_values, data.size());
   }
 
