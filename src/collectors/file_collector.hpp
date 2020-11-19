@@ -13,6 +13,7 @@
 //! main programs are used both to run the algorithm and the estimates.
 //! Therefore, a file collector has both a reading and a writing mode.
 
+template <typename MsgType>
 class FileCollector : public BaseCollector {
  protected:
   //! Unix file descriptor for reading mode
@@ -35,7 +36,7 @@ class FileCollector : public BaseCollector {
   //! Terminates reading mode for the collector
   void close_reading();
   //! Reads the next state, based on the curr_iter curson
-  bayesmix::MarginalState next_state() override;
+  MsgType next_state() override;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -56,11 +57,13 @@ class FileCollector : public BaseCollector {
   void finish() override;
 
   //! Writes the given state to the collector
-  void collect(bayesmix::MarginalState iter_state) override;
+  void collect(MsgType iter_state) override;
   //! Returns i-th state in the collector
-  bayesmix::MarginalState get_state(unsigned int i) override;
+  MsgType get_state(unsigned int i) override;
   //! Returns the whole chain in form of a deque of States
-  std::deque<bayesmix::MarginalState> get_chain() override;
+  std::deque<MsgType> get_chain() override;
 };
+
+#include "file_collector_imp.hpp"
 
 #endif  // BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_

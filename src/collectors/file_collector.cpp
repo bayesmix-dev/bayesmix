@@ -1,5 +1,5 @@
 template <typename MsgType>
-void FileCollector<MsgType>::open_for_reading() {
+void FileCollector::open_for_reading() {
   infd = open(filename.c_str(), O_RDONLY);
   if (infd == -1) {
     std::cout << "Errno: " << strerror(errno) << std::endl;
@@ -9,7 +9,7 @@ void FileCollector<MsgType>::open_for_reading() {
 }
 
 template <typename MsgType>
-void FileCollector<MsgType>::close_reading() {
+void FileCollector::close_reading() {
   fin->Close();
   close(infd);
   is_open_read = false;
@@ -17,7 +17,7 @@ void FileCollector<MsgType>::close_reading() {
 
 // \return Chain state in Protobuf-object form
 template <typename MsgType>
-MsgType FileCollector<MsgType>::next_state() {
+MsgType FileCollector::next_state() {
   if (!is_open_read) {
     open_for_reading();
   }
@@ -36,14 +36,14 @@ MsgType FileCollector<MsgType>::next_state() {
 }
 
 template <typename MsgType>
-void FileCollector<MsgType>::start() {
+void FileCollector::start() {
   int outfd = open(filename.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
   fout = new google::protobuf::io::FileOutputStream(outfd);
   is_open_write = true;
 }
 
 template <typename MsgType>
-void FileCollector<MsgType>::finish() {
+void FileCollector::finish() {
   if (is_open_write) {
     fout->Close();
     close(outfd);
@@ -53,7 +53,7 @@ void FileCollector<MsgType>::finish() {
 
 // \param iter_state State in Protobuf-object form to write to the collector
 template <typename MsgType>
-void FileCollector<MsgType>::collect(MsgType iter_state) {
+void FileCollector::collect(MsgType iter_state) {
   bool success = google::protobuf::util::SerializeDelimitedToZeroCopyStream(
       iter_state, fout);
   size++;
@@ -65,7 +65,7 @@ void FileCollector<MsgType>::collect(MsgType iter_state) {
 // \param i Position of the requested state in the chain
 // \return  Chain state in Protobuf-object form
 template <typename MsgType>
-MsgType FileCollector<MsgType>::get_state(unsigned int i) {
+MsgType FileCollector::get_state(unsigned int i) {
   MsgType state;
   for (size_t j = 0; j < i + 1; j++) {
     state = get_next_state();
@@ -79,7 +79,7 @@ MsgType FileCollector<MsgType>::get_state(unsigned int i) {
 
 // \return Chain in deque form
 template <typename MsgType>
-std::deque<MsgType> FileCollector<MsgType>::get_chain() {
+std::deque<MsgType> FileCollector::get_chain() {
   open_for_reading();
   bool keep = true;
   std::deque<bayesmix::MarginalState> out;
