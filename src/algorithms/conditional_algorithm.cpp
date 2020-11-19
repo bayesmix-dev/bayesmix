@@ -8,5 +8,8 @@
 //! \param coll Collector containing the algorithm chain
 Eigen::MatrixXd ConditionalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
                                                 BaseCollector *coll) {
+  std::cout << "Computing log-density..." << std::endl;
+  // ...
+  std::cout << "Done" << std::endl;
   return Eigen::MatrixXd::Zero(1, 1);
 }

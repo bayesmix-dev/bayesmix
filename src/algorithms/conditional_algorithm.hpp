@@ -7,9 +7,6 @@
 #include "base_algorithm.hpp"
 
 class ConditionalAlgorithm : public BaseAlgorithm {
- protected:
-  virtual void print_startup_message() const override = 0;
-
  public:
   ~ConditionalAlgorithm() = default;
   ConditionalAlgorithm() = default;

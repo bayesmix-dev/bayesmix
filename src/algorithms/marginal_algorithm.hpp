@@ -7,9 +7,6 @@
 #include "base_algorithm.hpp"
 
 class MarginalAlgorithm : public BaseAlgorithm {
- protected:
-  virtual void print_startup_message() const override = 0;
-
  public:
   ~MarginalAlgorithm() = default;
   MarginalAlgorithm() = default;
