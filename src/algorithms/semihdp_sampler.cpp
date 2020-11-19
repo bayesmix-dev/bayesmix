@@ -481,6 +481,38 @@ void SemiHdpSampler::collect_pseudo() {
   pseudoprior_collector.collect(state);
 }
 
+bayesmix::SemiHdpState SemiHdpSampler::get_state_as_proto() {
+  bayesmix::SemiHdpState state;
+  for (int i = 0; i < ngroups; i++) {
+    bayesmix::SemiHdpState::RestaurantState curr_restaurant;
+
+    for (int l = 0; l < theta_star[i].size(); l++) {
+      bayesmix::ClusterVal clusval;
+      theta_star[i][l].write_state_to_proto(&clusval);
+      curr_restaurant.add_theta_stars()->CopyFrom(clusval);
+    }
+    *curr_restaurant.mutable_n_by_clus() = {n_by_theta_star[i].begin(),
+                                            n_by_theta_star[i].end()};
+    *curr_restaurant.mutable_table_to_shared() = {t[i].begin(), t[i].end()};
+    *curr_restaurant.mutable_table_to_idio() = {v[i].begin(), v[i].end()};
+
+    state.add_restaurants()->CopyFrom(curr_restaurant);
+
+    bayesmix::SemiHdpState::GroupState curr_group;
+    *curr_group.mutable_cluster_allocs() = {s[i].begin(), s[i].end()};
+    state.add_groups()->CopyFrom(curr_group);
+
+    for (int l=0; l < taus.size(); l++) {
+      bayesmix::ClusterVal clusval;
+      taus[l].write_state_to_proto(&clusval);
+      state.add_taus()->CopyFrom(clusval);
+    }
+
+    *state.mutable_c() = {c.begin(), c.end()};
+    state.set_w(w);
+  }
+  return state;
+}
 
 void SemiHdpSampler::print_debug_string() {
   std::cout << "c: ";

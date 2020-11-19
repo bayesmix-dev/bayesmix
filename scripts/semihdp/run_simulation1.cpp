@@ -5,6 +5,7 @@
 #include <src/utils/rng.hpp>
 #include <stan/math/prim.hpp>
 #include <vector>
+#include <src/collectors/memory_collector.hpp>
 
 using Eigen::MatrixXd;
 
@@ -50,19 +51,12 @@ int main() {
   std::cout << data1[0].transpose() << std::endl;
   std::cout << data1[1].transpose() << std::endl;
 
+  MemoryCollector<bayesmix::SemiHdpState> collector;
   SemiHdpSampler sampler1(data1);
   sampler1.initialize();
+  sampler1.relabel();
 
   int nburn = 10000;
   int niter = 10000;
-
-  sampler1.relabel();
-
-  for (int i = 0; i < nburn; i++) sampler1.pseudo_step();
-
-  sampler1.print_debug_string();
-
-  for (int i = 0; i < niter; i++) sampler1.step();
-
-  sampler1.print_debug_string();
+  sampler1.run(nburn, niter, nburn, niter, 5, &collector);
 }

@@ -84,7 +84,7 @@ class SemiHdpSampler {
   }
 
   void run(int pseudo_burn, int pseudo_iter, int burnin, int iter, int thin,
-           BaseCollector *collector) {
+           BaseCollector<bayesmix::SemiHdpState> *collector) {
     this->pseudo_iter = pseudo_iter;
     for (int i=0; i < pseudo_burn; i++) pseudo_step();
 
@@ -93,6 +93,9 @@ class SemiHdpSampler {
       collect_pseudo();
     }
 
+    std::cout << "Finished Pseudo Chain" << std::endl;
+    print_debug_string();
+
     for (int i=0; i < burnin; i++) step();
 
     for (int i = 0; i < iter; i++) {
@@ -100,7 +103,6 @@ class SemiHdpSampler {
       if (iter % thin == 0)
         collector->collect(get_state_as_proto());
     }
-
   }
 
   void update_unique_vals();
