@@ -21,7 +21,7 @@
 class DirichletMixing : public BaseMixing {
  protected:
   //! Total mass parameters
-  double totalmass;
+  double totalmass = 1.0;
   bayesmix::DPPrior prior;
 
  public:

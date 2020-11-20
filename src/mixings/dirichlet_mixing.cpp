@@ -40,7 +40,10 @@ void DirichletMixing::set_prior(const google::protobuf::Message &prior_) {
   prior = currcast;
   if (prior.has_fixed_value()) {
     totalmass = prior.fixed_value().value();
+    assert(totalmass > 0);
   } else if (prior.has_gamma_prior()) {
+    assert(prior.gamma_prior().alpha() > 0);
+    assert(prior.gamma_prior().beta() > 0);
     totalmass = prior.gamma_prior().alpha() / prior.gamma_prior().beta();
   } else {
     std::invalid_argument("Error: argument proto is not appropriate");
