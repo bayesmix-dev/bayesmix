@@ -33,5 +33,4 @@ target_compile_options(bayesmix PUBLIC -D_REENTRANT -fPIC)
 
 add_executable(run run.cpp)
 target_link_libraries(run bayesmix)
-target_include_directories(run PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(run PUBLIC -D_REENTRANT -fPIC)
