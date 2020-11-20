@@ -66,7 +66,8 @@ Eigen::VectorXd NNIGHierarchy::like_lpdf_grid(
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
-    result(i) = stan::math::normal_lpdf(data(i, 0), state.mean, sqrt(state.var));
+    result(i) =
+        stan::math::normal_lpdf(data(i, 0), state.mean, sqrt(state.var));
   }
   return result;
 }
@@ -103,8 +104,7 @@ Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(
 void NNIGHierarchy::draw() {
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  state.var =
-      stan::math::inv_gamma_rng(hypers->alpha, hypers->beta, rng);
+  state.var = stan::math::inv_gamma_rng(hypers->alpha, hypers->beta, rng);
   state.mean = stan::math::normal_rng(hypers->mu,
                                       sqrt(state.var / hypers->lambda), rng);
 }
