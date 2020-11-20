@@ -14,7 +14,7 @@ message NNIGPrior {
 
   message UnivNormalPrior {
     double mu00 = 1;
-    double sig00 = 2;
+    double sig200 = 2;
   }
 
   message NormalMeanPrior {
@@ -64,6 +64,6 @@ message NNWPrior {
 
   oneof prior {
     FixedValues fixed_values = 1;
-    NGIWPrior ngw_prior = 2;
+    NGIWPrior ngiw_prior = 2;
   }
 }
