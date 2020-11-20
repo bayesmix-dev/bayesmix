@@ -50,20 +50,20 @@ message NNWPrior {
     double beta00  = 2;
   }
 
-  message WishartPrior {
+  message InvWishartPrior {
     double nu00 = 1;
     Matrix tau00 = 2;
   }
 
-  message NGWPrior {
+  message NGIWPrior {
     MultiNormalPrior mu0_prior = 1;
     GammaPrior lambda0_prior = 2;
-    WishartPrior tau0_prior = 3;
+    InvWishartPrior tau0_prior = 3;
     double nu0 = 4;
   }
 
   oneof prior {
     FixedValues fixed_values = 1;
-    NGWPrior ngw_prior = 2;
+    NGIWPrior ngw_prior = 2;
   }
 }
