@@ -75,7 +75,48 @@ void NNWHierarchy::update_hypers(
   if (prior.has_fixed_values()) {
     return;
   } else if (prior.has_ngiw_prior()) {
-    // TODO
+    // Get hyperparameters:
+    // for mu0
+    Eigen::VectorXd mu00 =
+        bayesmix::to_eigen(prior.ngiw_prior().mu0_prior().mu00());
+    Eigen::MatrixXd sigma00 =
+        bayesmix::to_eigen(prior.ngiw_prior().mu0_prior().sigma00());
+    // for lambda0
+    double alpha00 = prior.ngiw_prior().lambda0_prior().alpha00();
+    double beta00 = prior.ngiw_prior().lambda0_prior().beta00();
+    // for tau0
+    double nu00 = prior.ngiw_prior().tau0_prior().nu00();
+    Eigen::MatrixXd tau00 =
+        bayesmix::to_eigen(prior.ngiw_prior().tau0_prior().tau00());
+    // for nu0
+    double nu0 = prior.ngiw_prior().nu0();
+
+    // Compute posterior hyperparameters
+    unsigned int dim = mu00.size();
+    Eigen::MatrixXd sigma00inv = stan::math::inverse_spd(sigma00);
+    Eigen::MatrixXd tau_n(dim, dim);
+    Eigen::VectorXd num(dim);
+    double beta_n = 0.0;
+    // for (auto &un : unique_values) {  // TODO fix!
+    //   tau_n += un->state.prec;
+    //   num += un->state.prec * un->state.mean;
+    //   beta_n += (hypers->mu - un->state.mean).transpose() * un->state.prec *
+    //     (hypers->mu - un->state.mean);
+    // }
+    Eigen::MatrixXd prec = hypers->lambda * tau_n + sigma00inv;
+    tau_n += tau00;
+    num = hypers->lambda * num + sigma00inv * mu00;
+    beta_n = beta00 + 0.5 * beta_n;
+    Eigen::MatrixXd sig_n = stan::math::inverse_spd(prec);
+    Eigen::VectorXd mu_n = sig_n * num;
+    double alpha_n = alpha00 + 0.5 * unique_values.size();
+    double nu_n = nu00 + unique_values.size() * hypers->nu;
+
+    // Update hyperparameters with posterior random sampling
+    auto &rng = bayesmix::Rng::Instance().get();
+    hypers->mu = stan::math::multi_normal_rng(mu_n, sig_n, rng);
+    hypers->lambda = stan::math::gamma_rng(alpha_n, beta_n, rng);
+    hypers->tau = stan::math::inv_wishart_rng(nu_n, tau_n, rng);
   } else {
     std::invalid_argument("Error: unrecognized prior");
   }
