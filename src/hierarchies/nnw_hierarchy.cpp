@@ -46,7 +46,7 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
   Eigen::VectorXd mubar = data.colwise().mean();  // sample mean
   post_params.mu = (lambda0 * mu0 + n * mubar) / (lambda0 + n);
   // Compute tau_n
-  Eigen::MatrixXd tau_temp(data.cols(), data.cols());
+  Eigen::MatrixXd tau_temp = Eigen::MatrixXd::Zero(data.cols(), data.cols());
   for (size_t i = 0; i < n; i++) {
     Eigen::VectorXd datum = data.row(i);
     tau_temp += (datum - mubar) * (datum - mubar).transpose();  // column * row
@@ -54,7 +54,7 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
   tau_temp += (n * lambda0 / (n + lambda0)) * (mubar - mu0) *
               (mubar - mu0).transpose();
   tau_temp = 0.5 * tau_temp + tau0_inv;
-  post_params.tau = stan::math::inverse_spd(tau_temp);
+  post_params.tau = stan::math::inverse_spd(tau_temp);  // TODO HERE!
   return post_params;
 }
 
