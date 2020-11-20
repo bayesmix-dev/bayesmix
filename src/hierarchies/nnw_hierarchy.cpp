@@ -117,6 +117,7 @@ void NNWHierarchy::update_hypers(
     hypers->mu = stan::math::multi_normal_rng(mu_n, sig_n, rng);
     hypers->lambda = stan::math::gamma_rng(alpha_n, beta_n, rng);
     hypers->tau = stan::math::inv_wishart_rng(nu_n, tau_n, rng);
+    tau0_inv = stan::math::inverse_spd(hypers->tau);
   } else {
     std::invalid_argument("Error: unrecognized prior");
   }
@@ -301,6 +302,7 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     hypers->mu = mu00;
     hypers->lambda = alpha00 / beta00;
     hypers->tau = tau00 / (nu00 + dim + 1);
+    tau0_inv = stan::math::inverse_spd(hypers->tau);
     hypers->nu = nu0;
 
   } else {
