@@ -13,13 +13,14 @@
 #include "../utils/rng.hpp"
 
 void NNWHierarchy::check_state_validity() {
-  // Check if prec is a square matrix
   unsigned int dim = state.mean.size();
-  assert(dim == state.prec.rows());
-  assert(dim == state.prec.cols());
-  // Check if prec is symmetric positive semi definite
-  assert(state.prec.isApprox(state.prec.transpose()));
-  assert(prec_chol_factor.info() != Eigen::NumericalIssue);
+  assert(dim == state.prec.rows() &&
+         "Error: state dimensions are not consistent");
+  assert(state.prec.rows() == state.prec.cols());
+  assert(state.prec.isApprox(state.prec.transpose()) &&
+         "Error: precision is not symmetric");
+  assert(prec_chol_factor.info() != Eigen::NumericalIssue &&
+         "Error: precision is not positive definite");
 }
 
 //! \param prec_ Value to set to prec
@@ -71,7 +72,13 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
 void NNWHierarchy::update_hypers(
     const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
     unsigned int n) {
-  return;
+  if (prior.has_fixed_values()) {
+    return;
+  } else if (prior.has_ngiw_prior()) {
+    // TODO
+  } else {
+    std::invalid_argument("Error: unrecognized prior");
+  }
 }
 
 //! \param data Matrix of row-vectorial single data point
@@ -193,16 +200,66 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     // Check validity
     unsigned int dim = hypers->mu.size();
     assert(hypers->lambda > 0);
-    assert(dim == hypers->tau.rows());
+    assert(dim == hypers->tau.rows() &&
+           "Error: hyperparameters dimensions are not consistent");
     assert(hypers->nu > dim - 1);
     assert(hypers->tau.rows() == hypers->tau.cols());
-    assert(hypers->tau.isApprox(hypers->tau.transpose()));
-    Eigen::LLT<Eigen::MatrixXd> llt(hypers->tau);  // check if tau0 is...
-    assert(llt.info() != Eigen::NumericalIssue);   // positive definite
+    assert(hypers->tau.isApprox(hypers->tau.transpose()) &&
+           "Error: tau0 is not symmetric");
+    Eigen::LLT<Eigen::MatrixXd> llt(hypers->tau);
+    assert(llt.info() != Eigen::NumericalIssue &&
+           "Error: tau0 is not positive definite");
   } else if (prior.has_ngiw_prior()) {
+    // Get hyperparameters:
+    // for mu0
+    Eigen::VectorXd mu00 =
+        bayesmix::to_eigen(prior.ngiw_prior().mu0_prior().mu00());
+    Eigen::MatrixXd sigma00 =
+        bayesmix::to_eigen(prior.ngiw_prior().mu0_prior().sigma00());
+    // for lambda0
+    double alpha00 = prior.ngiw_prior().lambda0_prior().alpha00();
+    double beta00 = prior.ngiw_prior().lambda0_prior().beta00();
+    // for tau0
+    double nu00 = prior.ngiw_prior().tau0_prior().nu00();
+    Eigen::MatrixXd tau00 =
+        bayesmix::to_eigen(prior.ngiw_prior().tau0_prior().tau00());
+    // for nu0
+    double nu0 = prior.ngiw_prior().nu0();
+
+    // Check validity:
+    // dimensionality
+    unsigned int dim = mu00.size();
+    assert(sigma00.rows() == dim &&
+           "Error: hyperparameters dimensions are not consistent");
+    assert(sigma00.rows() == sigma00.cols());
+    assert(tau00.rows() == dim &&
+           "Error: hyperparameters dimensions are not consistent");
+    assert(tau00.rows() == tau00.cols());
+    // for mu0
+    assert(sigma00.isApprox(sigma00.transpose()) &&
+           "Error: sigma00 is not symmetric");
+    auto chol = Eigen::LLT<Eigen::MatrixXd>(sigma00);
+    Eigen::MatrixXd chol_eval = chol.matrixL().transpose();
+    assert(chol.info() != Eigen::NumericalIssue &&
+           "Error: sigma00 is not positive definite");
+    // for lalmbda0
+    assert(alpha00 > 0);
+    assert(beta00 > 0);
+    // for tau0
+    assert(nu00 > 0);
+    assert(tau00.isApprox(tau00.transpose()) &&
+           "Error: tau00 is not symmetric");
+    auto chol2 = Eigen::LLT<Eigen::MatrixXd>(tau00);
+    Eigen::MatrixXd chol2_eval = chol2.matrixL().transpose();
+    assert(chol2.info() != Eigen::NumericalIssue &&
+           "Error: tau00 is not positive definite");
+    // check nu0
+    assert(nu0 > dim - 1);
+
+    // Set values
     // TODO
   } else {
-    std::invalid_argument("Error: argument proto is not appropriate");
+    std::invalid_argument("Error: unrecognized prior");
   }
 }
 
