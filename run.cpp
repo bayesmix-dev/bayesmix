@@ -91,7 +91,8 @@ int main(int argc, char *argv[]) {
   if (type_algo == "N8") {
     algo->set_n_aux(3);
   }
-  BaseCollector *coll = new MemoryCollector();
+  BaseCollector<bayesmix::MarginalState> *coll =
+      new MemoryCollector<bayesmix::MarginalState>();
 
   // Run algorithm and density evaluation
   algo->run(coll);
@@ -110,5 +111,6 @@ int main(int argc, char *argv[]) {
   bayesmix::write_matrix_to_file(masses, massfile);
 
   std::cout << "End of run.cpp" << std::endl;
+  delete coll;
   return 0;
 }

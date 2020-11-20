@@ -10,8 +10,9 @@ class MarginalAlgorithm : public BaseAlgorithm {
  public:
   ~MarginalAlgorithm() = default;
   MarginalAlgorithm() = default;
-  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                                    BaseCollector *const coll) override;
+  virtual Eigen::MatrixXd eval_lpdf(
+      const Eigen::MatrixXd &grid,
+      BaseCollector<bayesmix::MarginalState> *const coll) override;
 };
 
 #endif  // BAYESMIX_ALGORITHMS_MARGINAL_ALGORITHM_HPP_

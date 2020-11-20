@@ -82,8 +82,10 @@ class BaseAlgorithm {
   virtual void print_ending_message() const {
     std::cout << "Done" << std::endl;
   };
+
   //! Saves the current iteration's state in Protobuf form to a collector
-  void save_state(BaseCollector *collector, unsigned int iter) {
+  void save_state(BaseCollector<bayesmix::MarginalState> *collector,
+                  unsigned int iter) {
     collector->collect(get_state_as_proto(iter));
   }
 
@@ -97,7 +99,7 @@ class BaseAlgorithm {
 
  public:
   //! Runs the algorithm and saves the whole chain to a collector
-  void run(BaseCollector *collector) {
+  void run(BaseCollector<bayesmix::MarginalState> *collector) {
     initialize();
     print_startup_message();
     unsigned int iter = 0;
@@ -115,8 +117,9 @@ class BaseAlgorithm {
 
   // ESTIMATE FUNCTION
   //! Evaluates the logpdf for each single iteration on a given grid of points
-  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                                    BaseCollector *const collector) = 0;
+  virtual Eigen::MatrixXd eval_lpdf(
+      const Eigen::MatrixXd &grid,
+      BaseCollector<bayesmix::MarginalState> *const collector) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseAlgorithm() = default;
