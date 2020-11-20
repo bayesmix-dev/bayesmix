@@ -49,7 +49,35 @@ NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update(
 void NNIGHierarchy::update_hypers(
     const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
     unsigned int n) {
-  return;
+  if (prior.has_fixed_values()) {
+    return;
+  } else if (prior.has_normal_mean_prior()) {
+    // Get hyperparameters
+    double mu00 = prior.normal_mean_prior().mu0_prior().mu00();
+    double sig200 = prior.normal_mean_prior().mu0_prior().sig200();
+    double lambda0 = prior.normal_mean_prior().lambda0();
+
+    // Compute posterior hyperparameters
+    double prec = 0.0;
+    double num = 0.0;
+    // for (auto &un : unique_values) {  // TODO fix!
+    //   double prec_i = 1 / un->state.var;
+    //   prec += prec_i;
+    //   num += un->state.mean * prec_i;
+    // }
+    prec = 1 / sig200 + lambda0 * prec;
+    num = mu00 / sig200 + lambda0 * num;
+
+    double mu_n = num / prec;
+    double sig2_n = 1 / prec;
+
+    // Update hyperparameters with posterior random sampling
+    auto &rng = bayesmix::Rng::Instance().get();
+    hypers->mu = stan::math::normal_rng(mu_n, sqrt(sig2_n), rng);
+
+  } else {
+    std::invalid_argument("Error: unrecognized prior");
+  }
 }
 
 //! \param data Column vector containing a single data point
@@ -150,9 +178,17 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
     hypers->alpha = prior.fixed_values().alpha0();
     hypers->beta = prior.fixed_values().beta0();
   } else if (prior.has_normal_mean_prior()) {
-    // TODO
+    // Check validity
+    assert(prior.normal_mean_prior().lambda0() > 0);
+    assert(prior.normal_mean_prior().alpha0() > 0);
+    assert(prior.normal_mean_prior().beta0() > 0);
+    // Set values
+    hypers->mu = prior.normal_mean_prior().mu0_prior().mu00();
+    hypers->lambda = prior.normal_mean_prior().lambda0();
+    hypers->alpha = prior.normal_mean_prior().alpha0();
+    hypers->beta = prior.normal_mean_prior().beta0();
   } else {
-    std::invalid_argument("Error: argument proto is not appropriate");
+    std::invalid_argument("Error: unrecognized prior");
   }
 }
 
