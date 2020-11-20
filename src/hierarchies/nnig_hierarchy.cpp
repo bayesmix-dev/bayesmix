@@ -182,7 +182,7 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
     assert(prior.normal_mean_prior().lambda0() > 0);
     assert(prior.normal_mean_prior().alpha0() > 0);
     assert(prior.normal_mean_prior().beta0() > 0);
-    // Set values
+    // Set initial values
     hypers->mu = prior.normal_mean_prior().mu0_prior().mu00();
     hypers->lambda = prior.normal_mean_prior().lambda0();
     hypers->alpha = prior.normal_mean_prior().alpha0();
