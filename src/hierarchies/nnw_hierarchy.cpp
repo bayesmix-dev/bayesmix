@@ -12,45 +12,31 @@
 #include "../utils/proto_utils.hpp"
 #include "../utils/rng.hpp"
 
-void NNWHierarchy::check_hypers_validity() {
-  unsigned int dim = hypers->mu.size();
-  assert(hypers->lambda > 0);
-  assert(dim == hypers->tau.rows());
-  assert(hypers->nu > dim - 1);
-
-  // Check if tau0 is a square symmetric positive semidefinite matrix
-  assert(hypers->tau.rows() == hypers->tau.cols());
-  assert(hypers->tau.isApprox(hypers->tau.transpose()));
-  Eigen::LLT<Eigen::MatrixXd> llt(hypers->tau);
-  assert(llt.info() != Eigen::NumericalIssue);
-}
-
 void NNWHierarchy::check_state_validity() {
-  // Check if tau is a square matrix
-  unsigned int dim = mean.size();
-  assert(dim == tau.rows());
-  assert(dim == tau.cols());
-  // Check if tau is symmetric positive semi definite
-  assert(tau.isApprox(tau.transpose()));
-  assert(tau_chol_factor.info() != Eigen::NumericalIssue);
+  // Check if prec is a square matrix
+  unsigned int dim = state.mean.size();
+  assert(dim == state.prec.rows());
+  assert(dim == state.prec.cols());
+  // Check if prec is symmetric positive semi definite
+  assert(state.prec.isApprox(state.prec.transpose()));
+  assert(prec_chol_factor.info() != Eigen::NumericalIssue);
 }
 
-//! \param tau Value to set to state[1]
-void NNWHierarchy::set_tau_and_utilities(const Eigen::MatrixXd &tau_) {
-  tau = tau_;
+//! \param prec_ Value to set to prec
+void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
+  state.prec = prec_;
 
-  // Update tau utilities
-  tau_chol_factor = Eigen::LLT<Eigen::MatrixXd>(tau);
-  tau_chol_factor_eval = tau_chol_factor.matrixL().transpose();
-  Eigen::VectorXd diag = tau_chol_factor_eval.diagonal();
-  tau_logdet = 2 * log(diag.array()).sum();
+  // Update prec utilities
+  prec_chol_factor = Eigen::LLT<Eigen::MatrixXd>(prec_);
+  prec_chol_factor_eval = prec_chol_factor.matrixL().transpose();
+  Eigen::VectorXd diag = prec_chol_factor_eval.diagonal();
+  prec_logdet = 2 * log(diag.array()).sum();
 }
 
-void NNWHierarchy::check_and_initialize() {
-  check_hypers_validity();
+void NNWHierarchy::initialize() {
   unsigned int dim = hypers->mu.size();
-  mean = hypers->mu;
-  set_tau_and_utilities(hypers->lambda * Eigen::MatrixXd::Identity(dim, dim));
+  state.mean = hypers->mu;
+  set_prec_and_utilities(hypers->lambda * Eigen::MatrixXd::Identity(dim, dim));
 }
 
 //! \param data                    Matrix of row-vectorial data points
@@ -92,8 +78,8 @@ void NNWHierarchy::update_hypers(
 //! \return     Log-Likehood vector evaluated in data
 double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   // Initialize relevant objects
-  return bayesmix::multi_normal_prec_lpdf(datum, mean, tau_chol_factor_eval,
-                                          tau_logdet);
+  return bayesmix::multi_normal_prec_lpdf(datum, state.mean,
+                                          prec_chol_factor_eval, prec_logdet);
 }
 
 //! \param data Matrix of row-vectorial data points
@@ -106,7 +92,7 @@ Eigen::VectorXd NNWHierarchy::like_lpdf_grid(
   // Compute likelihood for each data point
   for (size_t i = 0; i < n; i++) {
     result(i) = bayesmix::multi_normal_prec_lpdf(
-        data.row(i), mean, tau_chol_factor_eval, tau_logdet);
+        data.row(i), state.mean, prec_chol_factor_eval, prec_logdet);
   }
   return result;
 }
@@ -155,9 +141,9 @@ void NNWHierarchy::draw() {
       stan::math::wishart_rng(hypers->nu, hypers->tau, rng);
 
   // Update state
-  Eigen::RowVectorXd mean = stan::math::multi_normal_prec_rng(
+  state.mean = stan::math::multi_normal_prec_rng(
       hypers->mu, tau_new * hypers->lambda, rng);
-  set_tau_and_utilities(tau_new);
+  set_prec_and_utilities(tau_new);
 }
 
 //! \param data Matrix of row-vectorial data points
@@ -170,21 +156,21 @@ void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   auto &rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new =
       stan::math::wishart_rng(params.nu, params.tau, rng);
-  Eigen::RowVectorXd mean = stan::math::multi_normal_prec_rng(
-      params.mu, tau_new * params.lambda, rng);
+  state.mean = stan::math::multi_normal_prec_rng(params.mu,
+                                                 tau_new * params.lambda, rng);
 
   // Update state
-  set_tau_and_utilities(tau_new);
+  set_prec_and_utilities(tau_new);
 }
 
-void NNWHierarchy::set_state(const google::protobuf::Message &state_,
-                             bool check /*= true*/) {
+void NNWHierarchy::set_state_from_proto(
+    const google::protobuf::Message &state_, bool check /*= true*/) {
   const bayesmix::MarginalState::ClusterVal &currcast =
       google::protobuf::internal::down_cast<
           const bayesmix::MarginalState::ClusterVal &>(state_);
 
-  mean = to_eigen(currcast.multi_ls_state().mean());
-  set_tau_and_utilities(to_eigen(currcast.multi_ls_state().precision()));
+  state.mean = to_eigen(currcast.multi_ls_state().mean());
+  set_prec_and_utilities(to_eigen(currcast.multi_ls_state().prec()));
 
   if (check) {
     check_state_validity();
@@ -198,12 +184,22 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
   prior = currcast;
   hypers = std::make_shared<Hyperparams>();
   if (prior.has_fixed_values()) {
+    // Set values
     hypers->mu = bayesmix::to_eigen(prior.fixed_values().mu0());
     hypers->lambda = prior.fixed_values().lambda0();
     hypers->tau = bayesmix::to_eigen(prior.fixed_values().tau0());
     tau0_inv = stan::math::inverse_spd(hypers->tau);
     hypers->nu = prior.fixed_values().nu0();
-  } else if (prior.has_ngw_prior()) {
+    // Check validity
+    unsigned int dim = hypers->mu.size();
+    assert(hypers->lambda > 0);
+    assert(dim == hypers->tau.rows());
+    assert(hypers->nu > dim - 1);
+    assert(hypers->tau.rows() == hypers->tau.cols());
+    assert(hypers->tau.isApprox(hypers->tau.transpose()));
+    Eigen::LLT<Eigen::MatrixXd> llt(hypers->tau);  // check if tau0 is...
+    assert(llt.info() != Eigen::NumericalIssue);   // positive definite
+  } else if (prior.has_ngiw_prior()) {
     // TODO
   } else {
     std::invalid_argument("Error: argument proto is not appropriate");
@@ -211,12 +207,12 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
 }
 
 void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
-  bayesmix::MultiLSState state;
-  to_proto(mean, state.mutable_mean());
-  to_proto(tau, state.mutable_precision());
+  bayesmix::MultiLSState state_;
+  to_proto(state.mean, state_.mutable_mean());
+  to_proto(state.prec, state_.mutable_prec());
 
   google::protobuf::internal::down_cast<bayesmix::MarginalState::ClusterVal *>(
       out)
       ->mutable_multi_ls_state()
-      ->CopyFrom(state);
+      ->CopyFrom(state_);
 }

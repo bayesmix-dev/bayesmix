@@ -29,6 +29,10 @@
 
 class NNWHierarchy : public BaseHierarchy {
  public:
+  struct State {
+    Eigen::VectorXd mean;
+    Eigen::MatrixXd prec;
+  };
   struct Hyperparams {
     Eigen::RowVectorXd mu;
     double lambda;
@@ -38,9 +42,7 @@ class NNWHierarchy : public BaseHierarchy {
 
  protected:
   // STATE
-  Eigen::VectorXd mean;
-  Eigen::MatrixXd tau;
-
+  State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
   Eigen::MatrixXd tau0_inv;
@@ -48,20 +50,18 @@ class NNWHierarchy : public BaseHierarchy {
   bayesmix::NNWPrior prior;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
-  //! Lower factor object of the Cholesky decomposition of tau
-  Eigen::LLT<Eigen::MatrixXd> tau_chol_factor;
-  //! Matrix-form evaluation of tau_chol_factor
-  Eigen::MatrixXd tau_chol_factor_eval;
-  //! Determinant of tau in logarithmic scale
-  double tau_logdet;
+  //! Lower factor object of the Cholesky decomposition of prec
+  Eigen::LLT<Eigen::MatrixXd> prec_chol_factor;
+  //! Matrix-form evaluation of prec_chol_factor
+  Eigen::MatrixXd prec_chol_factor_eval;  // TODO do we need both?
+  //! Determinant of prec in logarithmic scale
+  double prec_logdet;
 
   // AUXILIARY TOOLS
-  //! Raises error if the hypers values are not valid w.r.t. their own domain
-  void check_hypers_validity() override;
   //! Raises error if the state values are not valid w.r.t. their own domain
   void check_state_validity() override;
-  //! Special setter for tau and its utilities
-  void set_tau_and_utilities(const Eigen::MatrixXd &tau_);
+  //! Special setter for prec and its utilities
+  void set_prec_and_utilities(const Eigen::MatrixXd &prec_);
 
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_wishart_update(const Eigen::MatrixXd &data,
@@ -71,7 +71,7 @@ class NNWHierarchy : public BaseHierarchy {
                                     const double nu0);
 
  public:
-  void check_and_initialize() override;
+  void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, true)
   bool is_multivariate() const override { return true; }
 
@@ -103,15 +103,14 @@ class NNWHierarchy : public BaseHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
-  Eigen::VectorXd get_mean() const { return mean; }
-  Eigen::MatrixXd get_tau() const { return tau; }
+  State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
   Eigen::MatrixXd get_tau0_inv() const { return tau0_inv; }
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  void set_state(const google::protobuf::Message &state_,
-                 bool check = true) override;
+  void set_state_from_proto(const google::protobuf::Message &state_,
+                            bool check = true) override;
 
   void set_prior(const google::protobuf::Message &prior_) override;
 

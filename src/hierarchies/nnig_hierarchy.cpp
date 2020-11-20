@@ -9,10 +9,9 @@
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
 
-void NNIGHierarchy::check_and_initialize() {
-  check_hypers_validity();
-  mean = hypers->mu;
-  sd = sqrt(hypers->beta / (hypers->alpha - 1));
+void NNIGHierarchy::initialize() {
+  state.mean = hypers->mu;
+  state.var = sqrt(hypers->beta / (hypers->alpha - 1));
 }
 
 //! \param data                        Column vector of data points
@@ -57,7 +56,7 @@ void NNIGHierarchy::update_hypers(
 //! \return     Log-Likehood vector evaluated in data
 double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   assert(datum.size() == 1);
-  return stan::math::normal_lpdf(datum(0), mean, sd);
+  return stan::math::normal_lpdf(datum(0), state.mean, state.var);
 }
 
 //! \param data Column vector of data points
@@ -67,7 +66,7 @@ Eigen::VectorXd NNIGHierarchy::like_lpdf_grid(
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
-    result(i) = stan::math::normal_lpdf(data(i, 0), mean, sd);
+    result(i) = stan::math::normal_lpdf(data(i, 0), state.mean, state.var);
   }
   return result;
 }
@@ -104,8 +103,10 @@ Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(
 void NNIGHierarchy::draw() {
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  sd = sqrt(stan::math::inv_gamma_rng(hypers->alpha, hypers->beta, rng));
-  mean = stan::math::normal_rng(hypers->mu, sd / sqrt(hypers->lambda), rng);
+  state.var =
+      sqrt(stan::math::inv_gamma_rng(hypers->alpha, hypers->beta, rng));
+  state.mean = stan::math::normal_rng(hypers->mu,
+                                      state.var / sqrt(hypers->lambda), rng);
 }
 
 //! \param data Column vector of data points
@@ -116,18 +117,19 @@ void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  sd = sqrt(stan::math::inv_gamma_rng(params.alpha, params.beta, rng));
-  mean = stan::math::normal_rng(params.mu, sd / sqrt(params.lambda), rng);
+  state.var = sqrt(stan::math::inv_gamma_rng(params.alpha, params.beta, rng));
+  state.mean =
+      stan::math::normal_rng(params.mu, state.var / sqrt(params.lambda), rng);
 }
 
-void NNIGHierarchy::set_state(const google::protobuf::Message &state_,
-                              bool check /*= true*/) {
+void NNIGHierarchy::set_state_from_proto(
+    const google::protobuf::Message &state_, bool check /*= true*/) {
   const bayesmix::MarginalState::ClusterVal &currcast =
       google::protobuf::internal::down_cast<
           const bayesmix::MarginalState::ClusterVal &>(state_);
 
-  mean = currcast.univ_ls_state().mean();
-  sd = currcast.univ_ls_state().sd();
+  state.mean = currcast.univ_ls_state().mean();
+  state.var = currcast.univ_ls_state().var();
 
   if (check) {
     check_state_validity();
@@ -141,6 +143,11 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
   prior = currcast;
   hypers = std::make_shared<Hyperparams>();
   if (prior.has_fixed_values()) {
+    // Check validity
+    assert(prior.fixed_values().lambda0() > 0);
+    assert(prior.fixed_values().alpha0() > 0);
+    assert(prior.fixed_values().beta0() > 0);
+    // Set values
     hypers->mu = prior.fixed_values().mu0();
     hypers->lambda = prior.fixed_values().lambda0();
     hypers->alpha = prior.fixed_values().alpha0();
@@ -154,12 +161,12 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
 
 void NNIGHierarchy::write_state_to_proto(
     google::protobuf::Message *out) const {
-  bayesmix::UnivLSState state;
-  state.set_mean(mean);
-  state.set_sd(sd);
+  bayesmix::UnivLSState state_;
+  state_.set_mean(state.mean);
+  state_.set_var(state.var);
 
   google::protobuf::internal::down_cast<bayesmix::MarginalState::ClusterVal *>(
       out)
       ->mutable_univ_ls_state()
-      ->CopyFrom(state);
+      ->CopyFrom(state_);
 }

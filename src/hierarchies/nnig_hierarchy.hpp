@@ -28,28 +28,24 @@
 
 class NNIGHierarchy : public BaseHierarchy {
  public:
+  struct State {
+    double mean, var;
+  };
   struct Hyperparams {
     double mu, alpha, beta, lambda;
   };
 
  protected:
   // STATE
-  double mean, sd;
+  State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
   // HYPERPRIOR
   bayesmix::NNIGPrior prior;
 
   // AUXILIARY TOOLS
-  //! Raises error if the hypers values are not valid w.r.t. their own domain
-  void check_hypers_validity() override {
-    assert(hypers->lambda > 0);
-    assert(hypers->alpha > 0);
-    assert(hypers->beta > 0);
-  }
-
   //! Raises error if the state values are not valid w.r.t. their own domain
-  void check_state_validity() override { assert(sd > 0); }
+  void check_state_validity() override { assert(state.var > 0); }
 
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update(const Eigen::VectorXd &data,
@@ -57,7 +53,7 @@ class NNIGHierarchy : public BaseHierarchy {
                                      const double beta0, const double lambda0);
 
  public:
-  void check_and_initialize() override;
+  void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, false)
   bool is_multivariate() const override { return false; }
 
@@ -89,14 +85,13 @@ class NNIGHierarchy : public BaseHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
-  double get_mean() const { return mean; }
-  double get_sd() const { return sd; }
+  State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  void set_state(const google::protobuf::Message &state_,
-                 bool check = true) override;
+  void set_state_from_proto(const google::protobuf::Message &state_,
+                            bool check = true) override;
 
   void set_prior(const google::protobuf::Message &prior_) override;
 
