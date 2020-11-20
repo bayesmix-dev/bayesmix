@@ -75,7 +75,7 @@ class BaseAlgorithm {
 
   // ALGORITHM FUNCTIONS
   virtual void print_startup_message() const = 0;
-  virtual void initialize() = 0;
+  virtual void initialize();
   virtual void sample_allocations() = 0;
   virtual void sample_unique_values() = 0;
   virtual void print_ending_message() const {
@@ -97,15 +97,11 @@ class BaseAlgorithm {
  public:
   //! Runs the algorithm and saves the whole chain to a collector
   void run(BaseCollector *collector) {
-    print_startup_message();
-    for (auto &un : unique_values) {
-      un->check_and_initialize();
-    }
     initialize();
+    print_startup_message();
     unsigned int iter = 0;
     collector->start();
     while (iter < maxiter) {
-      // std::cout << "Iteration n. " << iter << std::endl;
       step();
       if (iter >= burnin) {
         save_state(collector, iter);
@@ -133,25 +129,17 @@ class BaseAlgorithm {
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
   //! Does nothing except for Neal8
-  virtual void set_n_aux(const unsigned int n_aux_) { return; }
-  void set_mixing(std::shared_ptr<BaseMixing> mixing_) { mixing = mixing_; }
-  void set_data_and_initial_clusters(const Eigen::MatrixXd &data_,
-                                     std::shared_ptr<BaseHierarchy> hier_,
-                                     const unsigned int init = 0) {
-    if (data.rows() == 0) {
-      std::invalid_argument("Error: empty data matrix");
-    }
-    if (hier_->is_multivariate() == false && data.cols() > 1) {
-      std::invalid_argument(
-          "Error: multivariate data supplied to univariate hierarchy");
-    }
-    data = data_;
-    init_num_clusters = (init == 0) ? data.rows() : init;
-    // Initialize hierarchies for starting clusters
+  virtual void set_n_aux(const unsigned int n_aux_) {}
+  void set_mixing(const std::shared_ptr<BaseMixing> mixing_) {
+    mixing = mixing_;
+  }
+  void set_data(const Eigen::MatrixXd &data_) { data = data_; }
+
+  void set_initial_clusters(const std::shared_ptr<BaseHierarchy> hier_,
+                            const unsigned int init = 0) {
     unique_values.clear();
-    for (size_t i = 0; i < init_num_clusters; i++) {
-      unique_values.push_back(hier_->clone());
-    }
+    unique_values.push_back(hier_);
+    init_num_clusters = init;
   }
 
   virtual std::string get_id() const = 0;

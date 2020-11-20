@@ -10,7 +10,7 @@
 //! \param coll Collector containing the algorithm chain
 //! \return     Matrix whose i-th column is the lpdf at i-th iteration
 Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
-                                             BaseCollector *coll) {
+                                             BaseCollector *const coll) {
   std::cout << "Computing log-density..." << std::endl;
 
   // Read chain from collector
@@ -38,7 +38,7 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
     for (size_t j = 0; j < n_clust; j++) {
       // Extract and copy unique values in temp_hier
       bayesmix::MarginalState::ClusterVal curr_val = chain[i].cluster_vals(j);
-      temp_hier->set_state(curr_val, false);
+      temp_hier->set_state_from_proto(curr_val, false);
 
       // Compute cluster component (vector + scalar * unity vector)
       lpdf_local.col(j) = log(mixing->mass_existing_cluster(card[j], n_data)) +

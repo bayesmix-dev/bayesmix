@@ -1,9 +1,49 @@
 #include "base_algorithm.hpp"
 
 #include <Eigen/Dense>
+#include <cassert>
 
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../../proto/cpp/mixings.pb.h"
+
+void BaseAlgorithm::initialize() {
+  std::cout << "Initializing..." << std::endl;
+
+  // Perform checks
+  assert(data.rows() == 0 && "Error: empty data matrix");
+  assert(unique_values.size() == 0 && "Error: hierarchy was not provided");
+  assert(unique_values[0]->is_multivariate() == false && data.cols() > 1 &&
+         "Error: multivariate data supplied to univariate hierarchy");
+
+  if (init_num_clusters == 0) {
+    init_num_clusters = data.rows();
+  }
+
+  // Initialize hierarchies
+  unique_values[0]->initialize();
+  for (size_t i = 0; i < init_num_clusters - 1; i++) {
+    unique_values.push_back(unique_values[0]->clone());
+  }
+
+  // Initialize needed objects
+  cardinalities.clear();
+  cardinalities.reserve(data.rows());
+  std::default_random_engine generator;
+  // Build uniform probability on clusters, given their initial number
+  std::uniform_int_distribution<int> distro(0, init_num_clusters - 1);
+  // Allocate one datum per cluster first, and update cardinalities
+  allocations.clear();
+  for (size_t i = 0; i < init_num_clusters; i++) {
+    allocations.push_back(i);
+    cardinalities.push_back(1);
+  }
+  // Randomly allocate all remaining data, and update cardinalities
+  for (size_t i = init_num_clusters; i < data.rows(); i++) {
+    unsigned int clust = distro(generator);
+    allocations.push_back(clust);
+    cardinalities[clust] += 1;
+  }
+}
 
 //! \param iter Number of the current iteration
 //! \return     Protobuf-object version of the current state

@@ -62,7 +62,7 @@ void Neal8Algorithm::sample_allocations() {
       // Save unique value in the first auxiliary block
       bayesmix::MarginalState::ClusterVal curr_val;
       unique_values[allocations[i]]->write_state_to_proto(&curr_val);
-      aux_unique_values[0]->set_state(curr_val, false);
+      aux_unique_values[0]->set_state_from_proto(curr_val, false);
       singleton = 1;
     }
 
@@ -104,7 +104,7 @@ void Neal8Algorithm::sample_allocations() {
         // Take unique values from an auxiliary block
         bayesmix::MarginalState::ClusterVal curr_val;
         aux_unique_values[c_new - n_clust]->write_state_to_proto(&curr_val);
-        unique_values[allocations[i]]->set_state(curr_val, false);
+        unique_values[allocations[i]]->set_state_from_proto(curr_val, false);
         cardinalities[allocations[i]] += 1;
       } else {  // Case 2: datum moves from a singleton to an old cluster
         unique_values.erase(unique_values.begin() + allocations[i]);
