@@ -59,8 +59,6 @@ class NNWHierarchy : public BaseHierarchy {
   double prec_logdet;
 
   // AUXILIARY TOOLS
-  //! Raises error if the state values are not valid w.r.t. their own domain
-  void check_state_validity() override;
   //! Special setter for prec and its utilities
   void set_prec_and_utilities(const Eigen::MatrixXd &prec_);
 
@@ -109,8 +107,7 @@ class NNWHierarchy : public BaseHierarchy {
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  void set_state_from_proto(const google::protobuf::Message &state_,
-                            bool check = true) override;
+  void set_state_from_proto(const google::protobuf::Message &state_) override;
 
   void set_prior(const google::protobuf::Message &prior_) override;
 

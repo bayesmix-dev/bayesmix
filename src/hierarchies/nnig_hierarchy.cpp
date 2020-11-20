@@ -149,17 +149,13 @@ void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 }
 
 void NNIGHierarchy::set_state_from_proto(
-    const google::protobuf::Message &state_, bool check /*= true*/) {
+    const google::protobuf::Message &state_) {
   const bayesmix::MarginalState::ClusterVal &currcast =
       google::protobuf::internal::down_cast<
           const bayesmix::MarginalState::ClusterVal &>(state_);
 
   state.mean = currcast.univ_ls_state().mean();
   state.var = currcast.univ_ls_state().var();
-
-  if (check) {
-    check_state_validity();
-  }
 }
 
 void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {

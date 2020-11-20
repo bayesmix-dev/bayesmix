@@ -12,17 +12,6 @@
 #include "../utils/proto_utils.hpp"
 #include "../utils/rng.hpp"
 
-void NNWHierarchy::check_state_validity() {
-  unsigned int dim = state.mean.size();
-  assert(dim == state.prec.rows() &&
-         "Error: state dimensions are not consistent");
-  assert(state.prec.rows() == state.prec.cols());
-  assert(state.prec.isApprox(state.prec.transpose()) &&
-         "Error: precision is not symmetric");
-  assert(prec_chol_factor.info() != Eigen::NumericalIssue &&
-         "Error: precision is not positive definite");
-}
-
 //! \param prec_ Value to set to prec
 void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
   state.prec = prec_;
@@ -213,17 +202,13 @@ void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 }
 
 void NNWHierarchy::set_state_from_proto(
-    const google::protobuf::Message &state_, bool check /*= true*/) {
+    const google::protobuf::Message &state_) {
   const bayesmix::MarginalState::ClusterVal &currcast =
       google::protobuf::internal::down_cast<
           const bayesmix::MarginalState::ClusterVal &>(state_);
 
   state.mean = to_eigen(currcast.multi_ls_state().mean());
   set_prec_and_utilities(to_eigen(currcast.multi_ls_state().prec()));
-
-  if (check) {
-    check_state_validity();
-  }
 }
 
 void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {

@@ -45,9 +45,6 @@ class NNIGHierarchy : public BaseHierarchy {
   bayesmix::NNIGPrior prior;
 
   // AUXILIARY TOOLS
-  //! Raises error if the state values are not valid w.r.t. their own domain
-  void check_state_validity() override { assert(state.var > 0); }
-
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update(const Eigen::VectorXd &data,
                                      const double mu0, const double alpha0,
@@ -90,8 +87,7 @@ class NNIGHierarchy : public BaseHierarchy {
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  void set_state_from_proto(const google::protobuf::Message &state_,
-                            bool check = true) override;
+  void set_state_from_proto(const google::protobuf::Message &state_) override;
 
   void set_prior(const google::protobuf::Message &prior_) override;
 

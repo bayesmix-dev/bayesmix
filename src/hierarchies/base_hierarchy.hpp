@@ -27,11 +27,6 @@
 //! likelihood (whose parameters are the state) or its marginal distribution.
 
 class BaseHierarchy {
- protected:
-  // AUXILIARY TOOLS
-  //! Raises error if the state values are not valid w.r.t. their own domain
-  virtual void check_state_validity() = 0;
-
  public:
   virtual void initialize() = 0;
   //! Returns true if the hierarchy models multivariate data
@@ -68,8 +63,8 @@ class BaseHierarchy {
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  virtual void set_state_from_proto(const google::protobuf::Message &state_,
-                                    bool check = true) = 0;
+  virtual void set_state_from_proto(
+      const google::protobuf::Message &state_) = 0;
 
   virtual void set_prior(const google::protobuf::Message &prior_) = 0;
 
