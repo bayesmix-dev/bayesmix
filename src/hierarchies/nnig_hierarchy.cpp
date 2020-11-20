@@ -55,7 +55,6 @@ void NNIGHierarchy::update_hypers(
 //! \param data Column vector containing a single data point
 //! \return     Log-Likehood vector evaluated in data
 double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
-  assert(datum.size() == 1);
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
@@ -75,8 +74,6 @@ Eigen::VectorXd NNIGHierarchy::like_lpdf_grid(
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data (log)
 double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
-  assert(datum.size() == 1);
-
   // Compute standard deviation of marginal distribution
   double sig_n = sqrt(hypers->beta * (hypers->lambda + 1) /
                       (hypers->alpha * hypers->lambda));
