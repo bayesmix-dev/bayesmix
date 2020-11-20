@@ -11,7 +11,7 @@
 
 void NNIGHierarchy::initialize() {
   state.mean = hypers->mu;
-  state.var = sqrt(hypers->beta / (hypers->alpha - 1));
+  state.var = hypers->beta / (hypers->alpha - 1);
 }
 
 //! \param data                        Column vector of data points
@@ -56,7 +56,7 @@ void NNIGHierarchy::update_hypers(
 //! \return     Log-Likehood vector evaluated in data
 double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   assert(datum.size() == 1);
-  return stan::math::normal_lpdf(datum(0), state.mean, state.var);
+  return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
 //! \param data Column vector of data points
@@ -66,7 +66,7 @@ Eigen::VectorXd NNIGHierarchy::like_lpdf_grid(
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
     // Compute likelihood for each data point
-    result(i) = stan::math::normal_lpdf(data(i, 0), state.mean, state.var);
+    result(i) = stan::math::normal_lpdf(data(i, 0), state.mean, sqrt(state.var));
   }
   return result;
 }
@@ -104,9 +104,9 @@ void NNIGHierarchy::draw() {
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   state.var =
-      sqrt(stan::math::inv_gamma_rng(hypers->alpha, hypers->beta, rng));
+      stan::math::inv_gamma_rng(hypers->alpha, hypers->beta, rng);
   state.mean = stan::math::normal_rng(hypers->mu,
-                                      state.var / sqrt(hypers->lambda), rng);
+                                      sqrt(state.var / hypers->lambda), rng);
 }
 
 //! \param data Column vector of data points
@@ -117,9 +117,9 @@ void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  state.var = sqrt(stan::math::inv_gamma_rng(params.alpha, params.beta, rng));
+  state.var = stan::math::inv_gamma_rng(params.alpha, params.beta, rng);
   state.mean =
-      stan::math::normal_rng(params.mu, state.var / sqrt(params.lambda), rng);
+      stan::math::normal_rng(params.mu, sqrt(state.var / params.lambda), rng);
 }
 
 void NNIGHierarchy::set_state_from_proto(
