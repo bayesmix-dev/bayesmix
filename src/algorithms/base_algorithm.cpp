@@ -10,9 +10,9 @@ void BaseAlgorithm::initialize() {
   std::cout << "Initializing..." << std::endl;
 
   // Perform checks
-  assert(data.rows() == 0 && "Error: empty data matrix");
-  assert(unique_values.size() == 0 && "Error: hierarchy was not provided");
-  assert(unique_values[0]->is_multivariate() == false && data.cols() > 1 &&
+  assert(data.rows() != 0 && "Error: empty data matrix");
+  assert(unique_values.size() != 0 && "Error: hierarchy was not provided");
+  assert(!(unique_values[0]->is_multivariate() == false && data.cols() > 1) &&
          "Error: multivariate data supplied to univariate hierarchy");
 
   if (init_num_clusters == 0) {
