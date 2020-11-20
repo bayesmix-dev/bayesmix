@@ -17,10 +17,18 @@ void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
   state.prec = prec_;
 
   // Update prec utilities
-  prec_chol_factor = Eigen::LLT<Eigen::MatrixXd>(prec_);
-  prec_chol_factor_eval = prec_chol_factor.matrixL().transpose();
-  Eigen::VectorXd diag = prec_chol_factor_eval.diagonal();
+  prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_);
+  prec_chol_eval = prec_chol.matrixL().transpose();
+  Eigen::VectorXd diag = prec_chol_eval.diagonal();
   prec_logdet = 2 * log(diag.array()).sum();
+}
+
+void NNWHierarchy::check_spd(const Eigen::MatrixXd &mat) {
+  assert(mat.rows() == mat.cols());
+  assert(mat.isApprox(mat.transpose()) && "Error: matrix is not symmetric");
+  Eigen::LLT<Eigen::MatrixXd> llt(mat);
+  assert(llt.info() != Eigen::NumericalIssue &&
+         "Error: matrix is not positive definite");
 }
 
 void NNWHierarchy::initialize() {
@@ -116,8 +124,8 @@ void NNWHierarchy::update_hypers(
 //! \return     Log-Likehood vector evaluated in data
 double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   // Initialize relevant objects
-  return bayesmix::multi_normal_prec_lpdf(datum, state.mean,
-                                          prec_chol_factor_eval, prec_logdet);
+  return bayesmix::multi_normal_prec_lpdf(datum, state.mean, prec_chol_eval,
+                                          prec_logdet);
 }
 
 //! \param data Matrix of row-vectorial data points
@@ -129,8 +137,8 @@ Eigen::VectorXd NNWHierarchy::like_lpdf_grid(
   Eigen::VectorXd result(n);
   // Compute likelihood for each data point
   for (size_t i = 0; i < n; i++) {
-    result(i) = bayesmix::multi_normal_prec_lpdf(
-        data.row(i), state.mean, prec_chol_factor_eval, prec_logdet);
+    result(i) = bayesmix::multi_normal_prec_lpdf(data.row(i), state.mean,
+                                                 prec_chol_eval, prec_logdet);
   }
   return result;
 }
@@ -230,12 +238,6 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     assert(dim == hypers->tau.rows() &&
            "Error: hyperparameters dimensions are not consistent");
     assert(hypers->nu > dim - 1);
-    assert(hypers->tau.rows() == hypers->tau.cols());
-    assert(hypers->tau.isApprox(hypers->tau.transpose()) &&
-           "Error: tau0 is not symmetric");
-    Eigen::LLT<Eigen::MatrixXd> llt(hypers->tau);
-    assert(llt.info() != Eigen::NumericalIssue &&
-           "Error: tau0 is not positive definite");
   } else if (prior.has_ngiw_prior()) {
     // Get hyperparameters:
     // for mu0
@@ -258,28 +260,16 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     unsigned int dim = mu00.size();
     assert(sigma00.rows() == dim &&
            "Error: hyperparameters dimensions are not consistent");
-    assert(sigma00.rows() == sigma00.cols());
     assert(tau00.rows() == dim &&
            "Error: hyperparameters dimensions are not consistent");
-    assert(tau00.rows() == tau00.cols());
     // for mu0
-    assert(sigma00.isApprox(sigma00.transpose()) &&
-           "Error: sigma00 is not symmetric");
-    auto chol = Eigen::LLT<Eigen::MatrixXd>(sigma00);
-    Eigen::MatrixXd chol_eval = chol.matrixL().transpose();
-    assert(chol.info() != Eigen::NumericalIssue &&
-           "Error: sigma00 is not positive definite");
+    check_spd(sigma00);
     // for lalmbda0
     assert(alpha00 > 0);
     assert(beta00 > 0);
     // for tau0
     assert(nu00 > 0);
-    assert(tau00.isApprox(tau00.transpose()) &&
-           "Error: tau00 is not symmetric");
-    auto chol2 = Eigen::LLT<Eigen::MatrixXd>(tau00);
-    Eigen::MatrixXd chol2_eval = chol2.matrixL().transpose();
-    assert(chol2.info() != Eigen::NumericalIssue &&
-           "Error: tau00 is not positive definite");
+    check_spd(tau00);
     // check nu0
     assert(nu0 > dim - 1);
 

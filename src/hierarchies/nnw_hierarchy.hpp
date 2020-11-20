@@ -52,13 +52,14 @@ class NNWHierarchy : public BaseHierarchy {
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
   //! Lower factor object of the Cholesky decomposition of prec
-  Eigen::LLT<Eigen::MatrixXd> prec_chol_factor;
-  //! Matrix-form evaluation of prec_chol_factor
-  Eigen::MatrixXd prec_chol_factor_eval;  // TODO do we need both?
+  Eigen::LLT<Eigen::MatrixXd> prec_chol;
+  //! Matrix-form evaluation of prec_chol
+  Eigen::MatrixXd prec_chol_eval;  // TODO do we need both?
   //! Determinant of prec in logarithmic scale
   double prec_logdet;
 
   // AUXILIARY TOOLS
+  void check_spd(const Eigen::MatrixXd &mat);
   //! Special setter for prec and its utilities
   void set_prec_and_utilities(const Eigen::MatrixXd &prec_);
 
