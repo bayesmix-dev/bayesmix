@@ -86,7 +86,8 @@ int main(int argc, char *argv[]) {
   // STUFF:
   // Object allocation
   algo->set_mixing(mixing);
-  algo->set_data_and_initial_clusters(data, hier, init);
+  algo->set_data(data);
+  algo->set_initial_clusters(hier, init);
   if (type_algo == "N8") {
     algo->set_n_aux(3);
   }
