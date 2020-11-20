@@ -35,7 +35,7 @@ class NNWHierarchy : public BaseHierarchy {
     Eigen::MatrixXd prec;
   };
   struct Hyperparams {
-    Eigen::RowVectorXd mu;
+    Eigen::VectorXd mu;
     double lambda;
     Eigen::MatrixXd tau;
     double nu;
@@ -66,7 +66,7 @@ class NNWHierarchy : public BaseHierarchy {
 
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_wishart_update(const Eigen::MatrixXd &data,
-                                    const Eigen::RowVectorXd &mu0,
+                                    const Eigen::VectorXd &mu0,
                                     const double lambda0,
                                     const Eigen::MatrixXd &tau0_inv,
                                     const double nu0);

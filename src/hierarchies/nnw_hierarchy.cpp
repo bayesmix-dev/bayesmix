@@ -44,7 +44,7 @@ void NNWHierarchy::initialize() {
 //! \param mu0, lambda0, tau0, nu0 Original values for hyperparameters
 //! \return                        Vector of updated values for hyperparameters
 NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
-    const Eigen::MatrixXd &data, const Eigen::RowVectorXd &mu0,
+    const Eigen::MatrixXd &data, const Eigen::VectorXd &mu0,
     const double lambda0, const Eigen::MatrixXd &tau0_inv, const double nu0) {
   // Initialize relevant objects
   Hyperparams post_params;
@@ -54,16 +54,16 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
   post_params.lambda = lambda0 + n;
   post_params.nu = nu0 + 0.5 * n;
 
-  Eigen::RowVectorXd mubar = data.colwise().mean();  // sample mean
+  Eigen::VectorXd mubar = data.colwise().mean();  // sample mean
   post_params.mu = (lambda0 * mu0 + n * mubar) / (lambda0 + n);
   // Compute tau_n
-  Eigen::MatrixXd tau_temp = Eigen::MatrixXd::Zero(data.cols(), data.cols());
+  Eigen::MatrixXd tau_temp(data.cols(), data.cols());
   for (size_t i = 0; i < n; i++) {
-    Eigen::RowVectorXd datum = data.row(i);
-    tau_temp += (datum - mubar).transpose() * (datum - mubar);  // column * row
+    Eigen::VectorXd datum = data.row(i);
+    tau_temp += (datum - mubar) * (datum - mubar).transpose();  // column * row
   }
-  tau_temp += (n * lambda0 / (n + lambda0)) * (mubar - mu0).transpose() *
-              (mubar - mu0);
+  tau_temp += (n * lambda0 / (n + lambda0)) * (mubar - mu0) *
+              (mubar - mu0).transpose();
   tau_temp = 0.5 * tau_temp + tau0_inv;
   post_params.tau = stan::math::inverse_spd(tau_temp);
   return post_params;
@@ -96,12 +96,13 @@ void NNWHierarchy::update_hypers(
     Eigen::MatrixXd tau_n(dim, dim);
     Eigen::VectorXd num(dim);
     double beta_n = 0.0;
-    // for (auto &un : states) {  // TODO fix!
-    //   tau_n += un->state.prec;
-    //   num += un->state.prec * un->state.mean;
-    //   beta_n += (hypers->mu - un->state.mean).transpose() * un->state.prec *
-    //     (hypers->mu - un->state.mean);
-    // }
+    for (auto &st : states) {
+      Eigen::VectorXd mean = bayesmix::to_eigen(st.multi_ls_state().mean());
+      Eigen::MatrixXd prec = bayesmix::to_eigen(st.multi_ls_state().prec());
+      tau_n += prec;
+      num += prec * mean;
+      beta_n += (hypers->mu - mean).transpose() * prec * (hypers->mu - mean);
+    }
     Eigen::MatrixXd prec = hypers->lambda * tau_n + sigma00inv;
     tau_n += tau00;
     num = hypers->lambda * num + sigma00inv * mu00;

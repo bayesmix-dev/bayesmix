@@ -59,11 +59,13 @@ void NNIGHierarchy::update_hypers(
     // Compute posterior hyperparameters
     double prec = 0.0;
     double num = 0.0;
-    // for (auto &un : states) {  // TODO fix!
-    //   double prec_i = 1 / un->state.var;
-    //   prec += prec_i;
-    //   num += un->state.mean * prec_i;
-    // }
+    for (auto &st : states) {
+      double mean = st.univ_ls_state().mean();
+      double var = st.univ_ls_state().var();
+      double prec_i = 1 / var;
+      prec += prec_i;
+      num += mean * prec_i;
+    }
     prec = 1 / sig200 + lambda0 * prec;
     num = mu00 / sig200 + lambda0 * num;
 
