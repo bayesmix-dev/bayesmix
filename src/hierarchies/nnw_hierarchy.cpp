@@ -256,8 +256,12 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     // check nu0
     assert(nu0 > dim - 1);
 
-    // Set values
-    // TODO
+    // Set initial values
+    hypers->mu = mu00;
+    hypers->lambda = alpha00 / beta00;
+    hypers->tau = tau00 / (nu00 + dim + 1);
+    hypers->nu = nu0;
+
   } else {
     std::invalid_argument("Error: unrecognized prior");
   }
