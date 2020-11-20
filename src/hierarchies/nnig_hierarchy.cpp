@@ -47,8 +47,7 @@ NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update(
 }
 
 void NNIGHierarchy::update_hypers(
-    const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
-    unsigned int n) {
+    const std::vector<bayesmix::MarginalState::ClusterVal> &states) {
   if (prior.has_fixed_values()) {
     return;
   } else if (prior.has_normal_mean_prior()) {
@@ -60,7 +59,7 @@ void NNIGHierarchy::update_hypers(
     // Compute posterior hyperparameters
     double prec = 0.0;
     double num = 0.0;
-    // for (auto &un : unique_values) {  // TODO fix!
+    // for (auto &un : states) {  // TODO fix!
     //   double prec_i = 1 / un->state.var;
     //   prec += prec_i;
     //   num += un->state.mean * prec_i;

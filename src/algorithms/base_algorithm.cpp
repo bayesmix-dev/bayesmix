@@ -45,6 +45,16 @@ void BaseAlgorithm::initialize() {
   }
 }
 
+void BaseAlgorithm::update_hierarchy_hypers() {
+  bayesmix::MarginalState::ClusterVal clust;
+  std::vector<bayesmix::MarginalState::ClusterVal> states;
+  for (auto &un : unique_values) {
+    un->write_state_to_proto(&clust);
+    states.push_back(clust);
+  }
+  unique_values[0]->update_hypers(states);
+}
+
 //! \param iter Number of the current iteration
 //! \return     Protobuf-object version of the current state
 bayesmix::MarginalState BaseAlgorithm::get_state_as_proto(unsigned int iter) {

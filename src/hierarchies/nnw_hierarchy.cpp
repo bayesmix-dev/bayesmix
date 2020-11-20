@@ -70,8 +70,7 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
 }
 
 void NNWHierarchy::update_hypers(
-    const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
-    unsigned int n) {
+    const std::vector<bayesmix::MarginalState::ClusterVal> &states) {
   if (prior.has_fixed_values()) {
     return;
   } else if (prior.has_ngiw_prior()) {
@@ -97,7 +96,7 @@ void NNWHierarchy::update_hypers(
     Eigen::MatrixXd tau_n(dim, dim);
     Eigen::VectorXd num(dim);
     double beta_n = 0.0;
-    // for (auto &un : unique_values) {  // TODO fix!
+    // for (auto &un : states) {  // TODO fix!
     //   tau_n += un->state.prec;
     //   num += un->state.prec * un->state.mean;
     //   beta_n += (hypers->mu - un->state.mean).transpose() * un->state.prec *
@@ -109,8 +108,8 @@ void NNWHierarchy::update_hypers(
     beta_n = beta00 + 0.5 * beta_n;
     Eigen::MatrixXd sig_n = stan::math::inverse_spd(prec);
     Eigen::VectorXd mu_n = sig_n * num;
-    double alpha_n = alpha00 + 0.5 * unique_values.size();
-    double nu_n = nu00 + unique_values.size() * hypers->nu;
+    double alpha_n = alpha00 + 0.5 * states.size();
+    double nu_n = nu00 + states.size() * hypers->nu;
 
     // Update hyperparameters with posterior random sampling
     auto &rng = bayesmix::Rng::Instance().get();

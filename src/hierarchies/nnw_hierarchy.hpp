@@ -8,6 +8,7 @@
 #include <stan/math/prim/fun.hpp>
 
 #include "../../proto/cpp/hierarchies.pb.h"
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "base_hierarchy.hpp"
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
@@ -76,8 +77,7 @@ class NNWHierarchy : public BaseHierarchy {
   bool is_multivariate() const override { return true; }
 
   void update_hypers(
-      const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
-      unsigned int n) override;
+      const std::vector<bayesmix::MarginalState::ClusterVal> &states) override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNWHierarchy() = default;

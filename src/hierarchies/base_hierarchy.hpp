@@ -7,6 +7,7 @@
 #include <memory>
 #include <random>
 
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
 
 //! Abstract base template class for a hierarchy object.
@@ -37,8 +38,7 @@ class BaseHierarchy {
   virtual bool is_multivariate() const = 0;
 
   virtual void update_hypers(
-      const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
-      unsigned int n) = 0;
+      const std::vector<bayesmix::MarginalState::ClusterVal> &states) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseHierarchy() = default;

@@ -78,6 +78,7 @@ class BaseAlgorithm {
   virtual void initialize();
   virtual void sample_allocations() = 0;
   virtual void sample_unique_values() = 0;
+  void update_hierarchy_hypers();
   virtual void print_ending_message() const {
     std::cout << "Done" << std::endl;
   };
@@ -90,7 +91,7 @@ class BaseAlgorithm {
   void step() {
     sample_allocations();
     sample_unique_values();
-    unique_values[0]->update_hypers(unique_values, data.size());
+    update_hierarchy_hypers();
     mixing->update_hypers(unique_values, data.size());
   }
 
