@@ -109,7 +109,7 @@ void NNWHierarchy::update_hypers(
     double alpha_n = alpha00 + 0.5 * states.size();
     double nu_n = nu00 + states.size() * hypers->nu;
 
-    // Update hyperparameters with posterior random sampling
+    // Update hyperparameters with posterior random Gibbs sampling
     auto &rng = bayesmix::Rng::Instance().get();
     hypers->mu = stan::math::multi_normal_rng(mu_n, sig_n, rng);
     hypers->lambda = stan::math::gamma_rng(alpha_n, beta_n, rng);
