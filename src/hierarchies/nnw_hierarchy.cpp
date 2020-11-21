@@ -62,7 +62,7 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
   tau_temp += (n * lambda0 / (n + lambda0)) * (mubar - mu0) *
               (mubar - mu0).transpose();
   tau_temp = 0.5 * tau_temp + tau0_inv;
-  post_params.tau = stan::math::inverse_spd(tau_temp);  // TODO HERE!
+  post_params.tau = stan::math::inverse_spd(tau_temp);
   return post_params;
 }
 
