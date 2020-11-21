@@ -5,7 +5,6 @@ find_package(PkgConfig REQUIRED)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath,/home/mario/dev/stan/math/lib/tbb")
 
 set(BASEPATH "${CMAKE_SOURCE_DIR}")
 include_directories("${BASEPATH}")
@@ -25,7 +24,6 @@ target_include_directories(bayesmix PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf/src
 )
 target_link_directories(bayesmix PUBLIC
-    #/home/mario/dev/stan/math/lib/tbb
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf/src/.libs
 )
 target_link_libraries(bayesmix tbb pthread protobuf)
