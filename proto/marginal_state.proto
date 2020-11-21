@@ -17,7 +17,9 @@ message MarginalState {
 
   repeated int32 cluster_allocs = 2 [packed = true];
 
-  repeated MixingState mixing_states = 3;
+  repeated int32 cluster_cards = 3 [packed = true];
 
-  int32 iteration_num = 4;
+  repeated MixingState mixing_states = 4;
+
+  int32 iteration_num = 5;
 }

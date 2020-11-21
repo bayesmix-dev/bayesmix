@@ -22,12 +22,9 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
 
   // Loop over non-burn-in algorithm iterations
   for (size_t i = 0; i < n_iter; i++) {
-    // Compute local clusters cardinalities (i.e. of the current iteration)
     unsigned int n_clust = chain[i].cluster_vals_size();
-    std::vector<unsigned int> card(n_clust, 0);
-    for (size_t j = 0; j < n_data; j++) {
-      card[chain[i].cluster_allocs(j)] += 1;
-    }
+    std::vector<unsigned int> card(chain[i].cluster_cards().data(),
+                                   chain[i].cluster_cards().data() + n_clust);
     // Initialize local matrix of log-densities
     Eigen::MatrixXd lpdf_local(grid.rows(), n_clust + 1);
     // Initialize local temporary hierarchy

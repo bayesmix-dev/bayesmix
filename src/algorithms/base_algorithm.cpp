@@ -59,11 +59,12 @@ void BaseAlgorithm::update_hierarchy_hypers() {
 //! \return     Protobuf-object version of the current state
 bayesmix::MarginalState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
   bayesmix::MarginalState iter_out;
-  // Transcribe iteration number and allocations vector
+  // Transcribe iteration number, allocations, and cardinalities
   iter_out.set_iteration_num(iter);
   *iter_out.mutable_cluster_allocs() = {allocations.begin(),
                                         allocations.end()};
-
+  *iter_out.mutable_cluster_cards() = {cardinalities.begin(),
+                                       cardinalities.end()};
   // Transcribe unique values vector
   for (size_t i = 0; i < unique_values.size(); i++) {
     bayesmix::MarginalState::ClusterVal clusval;
