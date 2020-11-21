@@ -12,7 +12,6 @@
 Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
     const Eigen::MatrixXd &grid,
     BaseCollector<bayesmix::MarginalState> *coll) {
-  std::cout << "Computing log-density..." << std::endl;
   // Read chain from collector
   std::deque<bayesmix::MarginalState> chain = coll->get_chain();
   unsigned int n_data = chain[0].cluster_allocs_size();
@@ -52,7 +51,5 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
       lpdf(j, i) = stan::math::log_sum_exp(lpdf_local.row(j));
     }
   }
-
-  std::cout << "Done" << std::endl;
   return lpdf;
 }
