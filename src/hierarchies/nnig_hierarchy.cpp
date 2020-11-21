@@ -11,7 +11,7 @@
 
 void NNIGHierarchy::initialize() {
   state.mean = hypers->mu;
-  state.var = hypers->beta / (hypers->alpha - 1);
+  state.var = hypers->beta / (hypers->alpha + 1);
 }
 
 //! \param data                        Column vector of data points
