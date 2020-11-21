@@ -3,6 +3,7 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
+#include <stan/math/prim/err.hpp>
 #include <stan/math/prim/prob.hpp>
 
 #include "../../proto/cpp/ls_state.pb.h"
@@ -26,9 +27,7 @@ void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
 void NNWHierarchy::check_spd(const Eigen::MatrixXd &mat) {
   assert(mat.rows() == mat.cols());
   assert(mat.isApprox(mat.transpose()) && "Error: matrix is not symmetric");
-  Eigen::LLT<Eigen::MatrixXd> llt(mat);
-  assert(llt.info() != Eigen::NumericalIssue &&
-         "Error: matrix is not positive definite");
+  stan::math::check_pos_definite("", "Matrix", mat);
 }
 
 void NNWHierarchy::initialize() {
