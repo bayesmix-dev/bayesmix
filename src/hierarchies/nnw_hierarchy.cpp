@@ -70,6 +70,32 @@ void NNWHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   if (prior.has_fixed_values()) {
     return;
+  } else if (prior.has_normal_mean_prior()) {
+    // Get hyperparameters
+    Eigen::VectorXd mu00 =
+        bayesmix::to_eigen(prior.normal_mean_prior().mean_prior().mean());
+    Eigen::MatrixXd sigma00 =
+        bayesmix::to_eigen(prior.normal_mean_prior().mean_prior().var());
+    double lambda0 = prior.normal_mean_prior().var_scaling();
+
+    // Compute posterior hyperparameters
+    unsigned int dim = mu00.size();
+    Eigen::MatrixXd sigma00inv = stan::math::inverse_spd(sigma00);
+    Eigen::MatrixXd prec(dim, dim);
+    Eigen::VectorXd num(dim);
+    for (auto &st : states) {
+      Eigen::MatrixXd prec_i = bayesmix::to_eigen(st.multi_ls_state().prec());
+      prec += prec_i;
+      num += prec_i * bayesmix::to_eigen(st.multi_ls_state().mean());
+    }
+    prec = hypers->lambda * prec + sigma00inv;
+    num = hypers->lambda * num + sigma00inv * mu00;
+    Eigen::MatrixXd sig_n = stan::math::inverse_spd(prec);
+    Eigen::VectorXd mu_n = sig_n * num;
+
+    // Update hyperparameters with posterior sampling
+    auto &rng = bayesmix::Rng::Instance().get();
+    hypers->mu = stan::math::multi_normal_rng(mu_n, sig_n, rng);
   } else if (prior.has_ngiw_prior()) {
     // Get hyperparameters:
     // for mu0
@@ -238,6 +264,34 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     assert(dim == hypers->tau.rows() &&
            "Error: hyperparameters dimensions are not consistent");
     assert(hypers->nu > dim - 1);
+  } else if (prior.has_normal_mean_prior()) {
+    // Get hyperparameters
+    Eigen::VectorXd mu00 =
+        bayesmix::to_eigen(prior.normal_mean_prior().mean_prior().mean());
+    Eigen::MatrixXd sigma00 =
+        bayesmix::to_eigen(prior.normal_mean_prior().mean_prior().var());
+    double lambda0 = prior.normal_mean_prior().var_scaling();
+    Eigen::MatrixXd tau0 =
+        bayesmix::to_eigen(prior.normal_mean_prior().scale());
+    double nu0 = prior.normal_mean_prior().deg_free();
+
+    // Check validity
+    unsigned int dim = mu00.size();
+    assert(sigma00.rows() == dim &&
+           "Error: hyperparameters dimensions are not consistent");
+    assert(tau0.rows() == dim &&
+           "Error: hyperparameters dimensions are not consistent");
+    check_spd(sigma00);
+    assert(lambda0 > 0);
+    check_spd(tau0);
+    assert(nu0 > dim - 1);
+
+    // Set initial values
+    hypers->mu = mu00;
+    hypers->lambda = lambda0;
+    hypers->tau = tau0;
+    tau0_inv = stan::math::inverse_spd(tau0);
+    hypers->nu = nu0;
   } else if (prior.has_ngiw_prior()) {
     // Get hyperparameters:
     // for mu0
@@ -264,7 +318,7 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
            "Error: hyperparameters dimensions are not consistent");
     // for mu0
     check_spd(sigma00);
-    // for lalmbda0
+    // for lambda0
     assert(alpha00 > 0);
     assert(beta00 > 0);
     // for tau0
@@ -279,7 +333,6 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     hypers->tau = tau00 / (nu00 + dim + 1);
     tau0_inv = stan::math::inverse_spd(hypers->tau);
     hypers->nu = nu0;
-
   } else {
     std::invalid_argument("Error: unrecognized prior");
   }
