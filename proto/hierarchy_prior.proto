@@ -20,9 +20,17 @@ message NNIGPrior {
     double rate = 4;
   }
 
+  message NGGPrior {
+    UnivNormalDistribution mean_prior = 1;
+    GammaDistribution var_scaling_prior = 2;
+    GammaDistribution shape_prior = 3;
+    double rate = 4;
+  }
+
   oneof prior {
     FixedValues fixed_values = 1;
     NormalMeanPrior normal_mean_prior = 2;
+    NGGPrior ngg_prior = 3;
   }
 }
 
@@ -30,6 +38,13 @@ message NNIGPrior {
 message NNWPrior {
   message FixedValues {
     Vector mean = 1;
+    double var_scaling = 2;
+    Matrix scale = 3;
+    double deg_free = 4;
+  }
+
+  message NormalMeanPrior {
+    MultiNormalDistribution mean_prior = 1;
     double var_scaling = 2;
     Matrix scale = 3;
     double deg_free = 4;
@@ -44,6 +59,7 @@ message NNWPrior {
 
   oneof prior {
     FixedValues fixed_values = 1;
-    NGIWPrior ngiw_prior = 2;
+    NormalMeanPrior normal_mean_prior = 2;
+    NGIWPrior ngiw_prior = 3;
   }
 }
