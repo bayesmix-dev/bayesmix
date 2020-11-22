@@ -19,9 +19,9 @@ TEST(set_state, univ_ls) {
   bayesmix::MarginalState::ClusterState clusval;
   clusval.mutable_univ_ls_state()->CopyFrom(curr);
   NNIGHierarchy cluster;
-  cluster.set_state(&clusval);
+  cluster.set_state_from_proto(clusval);
 
-  ASSERT_EQ(curr.mean(), cluster.get_mean());
+  ASSERT_EQ(curr.mean(), cluster.get_state().mean);
 }
 
 TEST(write_proto, univ_ls) {
@@ -35,7 +35,7 @@ TEST(write_proto, univ_ls) {
   bayesmix::MarginalState::ClusterState clusval_in;
   clusval_in.mutable_univ_ls_state()->CopyFrom(curr);
   NNIGHierarchy cluster;
-  cluster.set_state(&clusval_in);
+  cluster.set_state_from_proto(clusval_in);
 
   bayesmix::MarginalState out;
   bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
@@ -63,9 +63,9 @@ TEST(set_state, multi_ls) {
   bayesmix::MarginalState::ClusterState clusval_in;
   clusval_in.mutable_multi_ls_state()->CopyFrom(curr);
   NNWHierarchy cluster;
-  cluster.set_state(&clusval_in);
+  cluster.set_state_from_proto(clusval_in);
 
-  ASSERT_EQ(curr.mean().data(0), cluster.get_mean()(0));
-  ASSERT_EQ(curr.prec().data(0), cluster.get_prec()(0, 0));
-  ASSERT_EQ(curr.prec().data(6), cluster.get_prec()(1, 1));
+  ASSERT_EQ(curr.mean().data(0), cluster.get_state().mean(0));
+  ASSERT_EQ(curr.prec().data(0), cluster.get_state().prec(0, 0));
+  ASSERT_EQ(curr.prec().data(6), cluster.get_state().prec(1, 1));
 }

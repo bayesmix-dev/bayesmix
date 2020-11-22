@@ -10,18 +10,20 @@
 
 TEST(lpdf, nnig) {
   NNIGHierarchy hier;
+  bayesmix::NNIGPrior hier_prior;
   double mu0 = 5.0;
   double lambda0 = 0.1;
   double alpha0 = 2.0;
   double beta0 = 2.0;
-  hier.set_mu0(mu0);
-  hier.set_lambda0(lambda0);
-  hier.set_alpha0(alpha0);
-  hier.set_beta0(beta0);
-  hier.check_and_initialize();
+  hier_prior.mutable_fixed_values()->set_mean(mu0);
+  hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
+  hier_prior.mutable_fixed_values()->set_shape(alpha0);
+  hier_prior.mutable_fixed_values()->set_rate(beta0);
+  hier.set_prior(hier_prior);
+  hier.initialize();
 
   double mean = mu0;
-  double sd = sqrt(beta0 / (alpha0 - 1));
+  double var = beta0 / (alpha0 + 1);
 
   Eigen::VectorXd datum(1);
   datum << 4.5;
@@ -35,12 +37,12 @@ TEST(lpdf, nnig) {
   // equiv.ly: beta0 + 0.5*(mu0^2*lambda0 + datum^2 - mu_n^2*lambda_n);
 
   // Compute pieces
-  double prior1 = stan::math::inv_gamma_lpdf(sd * sd, alpha0, beta0);
-  double prior2 = stan::math::normal_lpdf(mean, mu0, sd / sqrt(lambda0));
+  double prior1 = stan::math::inv_gamma_lpdf(var, alpha0, beta0);
+  double prior2 = stan::math::normal_lpdf(mean, mu0, sqrt(var / lambda0));
   double prior = prior1 + prior2;
-  double like = hier.lpdf(datum);
-  double post1 = stan::math::inv_gamma_lpdf(sd * sd, alpha_n, beta_n);
-  double post2 = stan::math::normal_lpdf(mean, mu_n, sd / sqrt(lambda_n));
+  double like = hier.like_lpdf(datum);
+  double post1 = stan::math::inv_gamma_lpdf(var, alpha_n, beta_n);
+  double post2 = stan::math::normal_lpdf(mean, mu_n, sqrt(var / lambda_n));
   double post = post1 + post2;
 
   // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
@@ -53,16 +55,22 @@ TEST(lpdf, nnig) {
 // TEST(lpdf, nnw) {  // TODO
 //   using namespace stan::math;
 //   NNWHierarchy hier;
-//   Eigen::VectorXd mu0(2);
-//   mu0 << 5.5, 5.5;
-//   hier.set_mu0(mu0);
+//   bayesmix::NNWPrior hier_prior;
+//   Eigen::Vector2d mu0; mu0 << 5.5, 5.5;
+//   bayesmix::Vector mu0_proto;
+//   bayesmix::to_proto(mu0, &mu0_proto);
 //   double lambda0 = 0.2;
-//   hier.set_lambda0(lambda0);
 //   double nu0 = 5.0;
-//   hier.set_nu0(nu0);
-//   Eigen::MatrixXd tau0 = Eigen::Matrix2d::Identity() / nu0;
-//   hier.set_tau0(tau0);
-//   hier.check_and_initialize();
+//   Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
+//   bayesmix::Matrix tau0_proto;
+//   bayesmix::to_proto(tau0, &tau0_proto);
+//   *hier_prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
+//   hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
+//   hier_prior.mutable_fixed_values()->set_deg_free(nu0);
+//   *hier_prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
+//   hier.set_prior(hier_prior);
+//   hier.initialize();
+//
 //   Eigen::VectorXd mu = mu0;
 //   Eigen::MatrixXd tau = lambda0 * Eigen::Matrix2d::Identity();
 //
@@ -88,7 +96,7 @@ TEST(lpdf, nnig) {
 //   double prior1 = stan::math::wishart_lpdf(tau, nu0, tau0);
 //   double prior2 = stan::math::multi_normal_prec_lpdf(mu, mu0, tau_pr);
 //   double prior = prior1 + prior2;
-//   double like = hier.lpdf(datum);
+//   double like = hier.like_lpdf(datum);
 //   double post1 = stan::math::wishart_lpdf(tau, nu_n, tau_post);
 //   double post2 = stan::math::multi_normal_prec_lpdf(mu, mu0, tau_post);
 //   double post = post1 + post2;
