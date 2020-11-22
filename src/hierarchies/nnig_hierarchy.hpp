@@ -7,6 +7,8 @@
 #include <cassert>
 #include <memory>
 
+#include "../../proto/cpp/hierarchy_prior.pb.h"
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "base_hierarchy.hpp"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.
@@ -27,41 +29,34 @@
 
 class NNIGHierarchy : public BaseHierarchy {
  public:
-  struct PostParams {
-    double mu_n;
-    double alpha_n;
-    double beta_n;
-    double lambda_n;
+  struct State {
+    double mean, var;
+  };
+  struct Hyperparams {
+    double mu, alpha, beta, lambda;
   };
 
  protected:
-  // state
-  double mean;
-  double sd;
-
+  // STATE
+  State state;
   // HYPERPARAMETERS
-  double mu0, lambda0, alpha0, beta0;
+  std::shared_ptr<Hyperparams> hypers;
+  // HYPERPRIOR
+  bayesmix::NNIGPrior prior;
 
   // AUXILIARY TOOLS
-  //! Raises error if the hypers values are not valid w.r.t. their own domain
-  void check_hypers_validity() override {
-    assert(lambda0 > 0);
-    assert(alpha0 > 0);
-    assert(beta0 > 0);
-  }
-
-  //! Raises error if the state values are not valid w.r.t. their own domain
-  void check_state_validity() override { assert(sd > 0); }
-
   //! Returns updated values of the prior hyperparameters via their posterior
-  PostParams normal_invgamma_update(const Eigen::VectorXd &data,
-                                    const double mu0, const double alpha0,
-                                    const double beta0, const double lambda0);
+  Hyperparams normal_invgamma_update(const Eigen::VectorXd &data,
+                                     const double mu0, const double alpha0,
+                                     const double beta0, const double lambda0);
 
  public:
-  void check_and_initialize() override;
+  void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, false)
   bool is_multivariate() const override { return false; }
+
+  void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
+                         &states) override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNIGHierarchy() = default;
@@ -87,23 +82,14 @@ class NNIGHierarchy : public BaseHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
-  double get_mu0() const { return mu0; }
-  double get_alpha0() const { return alpha0; }
-  double get_beta0() const { return beta0; }
-  double get_lambda0() const { return lambda0; }
-  double get_mean() const { return mean; }
-  void set_mu0(const double mu0_) {
-    mu0 = mu0_;
-    mean = mu0;
-  }
-  void set_alpha0(const double alpha0_) { alpha0 = alpha0_; }
-  void set_beta0(const double beta0_) { beta0 = beta0_; }
-  void set_lambda0(const double lambda0_) { lambda0 = lambda0_; }
+  State get_state() const { return state; }
+  Hyperparams get_hypers() const { return *hypers; }
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  void set_state(const google::protobuf::Message &state_,
-                 bool check = true) override;
+  void set_state_from_proto(const google::protobuf::Message &state_) override;
+
+  void set_prior(const google::protobuf::Message &prior_) override;
 
   void write_state_to_proto(google::protobuf::Message *out) const override;
 

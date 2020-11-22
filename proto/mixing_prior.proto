@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "distribution.proto";
+
+package bayesmix;
+
+message DPPrior {
+  message FixedValue {
+    double value = 1;
+  }
+
+  oneof totalmass {
+    FixedValue fixed_value = 1;
+    GammaDistribution gamma_prior = 2;
+  }
+}

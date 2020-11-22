@@ -3,8 +3,10 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
+#include <stan/math/prim/err.hpp>
 #include <stan/math/prim/prob.hpp>
 
+#include "../../proto/cpp/hierarchy_prior.pb.h"
 #include "../../proto/cpp/ls_state.pb.h"
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../../proto/cpp/matrix.pb.h"
@@ -12,84 +14,118 @@
 #include "../utils/proto_utils.hpp"
 #include "../utils/rng.hpp"
 
-void NNWHierarchy::check_hypers_validity() {
-  unsigned int dim = mu0.size();
-  assert(lambda0 > 0);
-  assert(dim == tau0.rows());
-  assert(nu0 > dim - 1);
+//! \param prec_ Value to set to prec
+void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
+  state.prec = prec_;
 
-  // Check if tau0 is a square symmetric positive semidefinite matrix
-  assert(tau0.rows() == tau0.cols());
-  assert(tau0.isApprox(tau0.transpose()));
-  Eigen::LLT<Eigen::MatrixXd> llt(tau0);
-  assert(llt.info() != Eigen::NumericalIssue);
+  // Update prec utilities
+  prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_);
+  prec_chol_eval = prec_chol.matrixL().transpose();
+  Eigen::VectorXd diag = prec_chol_eval.diagonal();
+  prec_logdet = 2 * log(diag.array()).sum();
 }
 
-void NNWHierarchy::check_state_validity() {
-  // Check if tau is a square matrix
-  unsigned int dim = mean.size();
-  assert(dim == tau.rows());
-  assert(dim == tau.cols());
-  // Check if tau is symmetric positive semi definite
-  assert(tau.isApprox(tau.transpose()));
-  assert(tau_chol_factor.info() != Eigen::NumericalIssue);
+void NNWHierarchy::check_spd(const Eigen::MatrixXd &mat) {
+  assert(mat.rows() == mat.cols());
+  assert(mat.isApprox(mat.transpose()) && "Error: matrix is not symmetric");
+  stan::math::check_pos_definite("", "Matrix", mat);
 }
 
-//! \param tau Value to set to state[1]
-void NNWHierarchy::set_tau_and_utilities(const Eigen::MatrixXd &tau_) {
-  tau = tau_;
-
-  // Update tau utilities
-  tau_chol_factor = Eigen::LLT<Eigen::MatrixXd>(tau);
-  tau_chol_factor_eval = tau_chol_factor.matrixL().transpose();
-  Eigen::VectorXd diag = tau_chol_factor_eval.diagonal();
-  tau_logdet = 2 * log(diag.array()).sum();
-}
-
-void NNWHierarchy::check_and_initialize() {
-  check_hypers_validity();
-  unsigned int dim = get_mu0().size();
-  mean = get_mu0();
-  set_tau_and_utilities(get_lambda0() * Eigen::MatrixXd::Identity(dim, dim));
+void NNWHierarchy::initialize() {
+  unsigned int dim = hypers->mu.size();
+  state.mean = hypers->mu;
+  set_prec_and_utilities(hypers->lambda * Eigen::MatrixXd::Identity(dim, dim));
 }
 
 //! \param data                    Matrix of row-vectorial data points
 //! \param mu0, lambda0, tau0, nu0 Original values for hyperparameters
 //! \return                        Vector of updated values for hyperparameters
-NNWHierarchy::PostParams NNWHierarchy::normal_wishart_update(
-    const Eigen::MatrixXd &data, const Eigen::RowVectorXd &mu0,
+NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
+    const Eigen::MatrixXd &data, const Eigen::VectorXd &mu0,
     const double lambda0, const Eigen::MatrixXd &tau0_inv, const double nu0) {
   // Initialize relevant objects
-  PostParams out;
-
+  Hyperparams post_params;
   unsigned int n = data.rows();
-  // Eigen::MatrixXd lambda_n(1, 1), nu_n(1, 1);
 
   // Compute updated hyperparameters
-  out.lambda_n = lambda0 + n;
-  out.nu_n = nu0 + 0.5 * n;
+  post_params.lambda = lambda0 + n;
+  post_params.nu = nu0 + 0.5 * n;
 
-  Eigen::RowVectorXd mubar = data.colwise().mean();  // sample mean
-  out.mu_n = (lambda0 * mu0 + n * mubar) / (lambda0 + n);
+  Eigen::VectorXd mubar = data.colwise().mean();  // sample mean
+  post_params.mu = (lambda0 * mu0 + n * mubar) / (lambda0 + n);
   // Compute tau_n
   Eigen::MatrixXd tau_temp = Eigen::MatrixXd::Zero(data.cols(), data.cols());
   for (size_t i = 0; i < n; i++) {
-    Eigen::RowVectorXd datum = data.row(i);
-    tau_temp += (datum - mubar).transpose() * (datum - mubar);  // column * row
+    Eigen::VectorXd datum = data.row(i);
+    tau_temp += (datum - mubar) * (datum - mubar).transpose();  // column * row
   }
-  tau_temp += (n * lambda0 / (n + lambda0)) * (mubar - mu0).transpose() *
-              (mubar - mu0);
+  tau_temp += (n * lambda0 / (n + lambda0)) * (mubar - mu0) *
+              (mubar - mu0).transpose();
   tau_temp = 0.5 * tau_temp + tau0_inv;
-  out.tau_n = stan::math::inverse_spd(tau_temp);
-  return out;
+  post_params.tau = stan::math::inverse_spd(tau_temp);
+  return post_params;
+}
+
+void NNWHierarchy::update_hypers(
+    const std::vector<bayesmix::MarginalState::ClusterState> &states) {
+  if (prior.has_fixed_values()) {
+    return;
+  } else if (prior.has_ngiw_prior()) {
+    // Get hyperparameters:
+    // for mu0
+    Eigen::VectorXd mu00 =
+        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().mean());
+    Eigen::MatrixXd sigma00 =
+        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().var());
+    // for lambda0
+    double alpha00 = prior.ngiw_prior().var_scaling_prior().shape();
+    double beta00 = prior.ngiw_prior().var_scaling_prior().rate();
+    // for tau0
+    double nu00 = prior.ngiw_prior().scale_prior().deg_free();
+    Eigen::MatrixXd tau00 =
+        bayesmix::to_eigen(prior.ngiw_prior().scale_prior().scale());
+    // for nu0
+    double nu0 = prior.ngiw_prior().deg_free();
+
+    // Compute posterior hyperparameters
+    unsigned int dim = mu00.size();
+    Eigen::MatrixXd sigma00inv = stan::math::inverse_spd(sigma00);
+    Eigen::MatrixXd tau_n(dim, dim);
+    Eigen::VectorXd num(dim);
+    double beta_n = 0.0;
+    for (auto &st : states) {
+      Eigen::VectorXd mean = bayesmix::to_eigen(st.multi_ls_state().mean());
+      Eigen::MatrixXd prec = bayesmix::to_eigen(st.multi_ls_state().prec());
+      tau_n += prec;
+      num += prec * mean;
+      beta_n += (hypers->mu - mean).transpose() * prec * (hypers->mu - mean);
+    }
+    Eigen::MatrixXd prec = hypers->lambda * tau_n + sigma00inv;
+    tau_n += tau00;
+    num = hypers->lambda * num + sigma00inv * mu00;
+    beta_n = beta00 + 0.5 * beta_n;
+    Eigen::MatrixXd sig_n = stan::math::inverse_spd(prec);
+    Eigen::VectorXd mu_n = sig_n * num;
+    double alpha_n = alpha00 + 0.5 * states.size();
+    double nu_n = nu00 + states.size() * hypers->nu;
+
+    // Update hyperparameters with posterior random Gibbs sampling
+    auto &rng = bayesmix::Rng::Instance().get();
+    hypers->mu = stan::math::multi_normal_rng(mu_n, sig_n, rng);
+    hypers->lambda = stan::math::gamma_rng(alpha_n, beta_n, rng);
+    hypers->tau = stan::math::inv_wishart_rng(nu_n, tau_n, rng);
+    tau0_inv = stan::math::inverse_spd(hypers->tau);
+  } else {
+    std::invalid_argument("Error: unrecognized prior");
+  }
 }
 
 //! \param data Matrix of row-vectorial single data point
 //! \return     Log-Likehood vector evaluated in data
 double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   // Initialize relevant objects
-  return bayesmix::multi_normal_prec_lpdf(datum, mean, tau_chol_factor_eval,
-                                          tau_logdet);
+  return bayesmix::multi_normal_prec_lpdf(datum, state.mean, prec_chol_eval,
+                                          prec_logdet);
 }
 
 //! \param data Matrix of row-vectorial data points
@@ -101,8 +137,8 @@ Eigen::VectorXd NNWHierarchy::like_lpdf_grid(
   Eigen::VectorXd result(n);
   // Compute likelihood for each data point
   for (size_t i = 0; i < n; i++) {
-    result(i) = bayesmix::multi_normal_prec_lpdf(
-        data.row(i), mean, tau_chol_factor_eval, tau_logdet);
+    result(i) = bayesmix::multi_normal_prec_lpdf(data.row(i), state.mean,
+                                                 prec_chol_eval, prec_logdet);
   }
   return result;
 }
@@ -113,12 +149,12 @@ double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
   unsigned int dim = datum.cols();
 
   // Compute dof and scale of marginal distribution
-  double nu_n = 2 * nu0 - dim + 1;
-  Eigen::MatrixXd sigma_n =
-      tau0_inv * (nu0 - 0.5 * (dim - 1)) * lambda0 / (lambda0 + 1);
+  double nu_n = 2 * hypers->nu - dim + 1;
+  Eigen::MatrixXd sigma_n = tau0_inv * (hypers->nu - 0.5 * (dim - 1)) *
+                            hypers->lambda / (hypers->lambda + 1);
 
   // TODO: chec if this is optimized as our bayesmix::multi_normal_prec_lpdf
-  return stan::math::multi_student_t_lpdf(datum, nu_n, mu0, sigma_n);
+  return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mu, sigma_n);
 }
 
 //! \param data Matrix of row-vectorial data points
@@ -131,78 +167,131 @@ Eigen::VectorXd NNWHierarchy::marg_lpdf_grid(
   unsigned int dim = data.cols();
 
   // Compute dof and scale of marginal distribution
-  double nu_n = 2 * nu0 - dim + 1;
-  Eigen::MatrixXd sigma_n =
-      tau0_inv * (nu0 - 0.5 * (dim - 1)) * lambda0 / (lambda0 + 1);
+  double nu_n = 2 * hypers->nu - dim + 1;
+  Eigen::MatrixXd sigma_n = tau0_inv * (hypers->nu - 0.5 * (dim - 1)) *
+                            hypers->lambda / (hypers->lambda + 1);
 
   for (size_t i = 0; i < n; i++) {
     // Compute marginal for each data point
     Eigen::RowVectorXd datum = data.row(i);
-    result(i) = stan::math::multi_student_t_lpdf(datum, nu_n, mu0, sigma_n);
+    result(i) =
+        stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mu, sigma_n);
   }
   return result;
 }
 
 void NNWHierarchy::draw() {
-  // Get values of hyperparameters
-  Eigen::RowVectorXd mu0 = get_mu0();
-  double lambda0 = get_lambda0();
-  Eigen::MatrixXd tau0 = get_tau0();
-  double nu0 = get_nu0();
-
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  Eigen::MatrixXd tau_new = stan::math::wishart_rng(nu0, tau0, rng);
-  Eigen::RowVectorXd mean =
-      stan::math::multi_normal_prec_rng(mu0, tau_new * lambda0, rng);
+  Eigen::MatrixXd tau_new =
+      stan::math::wishart_rng(hypers->nu, hypers->tau, rng);
 
   // Update state
-  set_tau_and_utilities(tau_new);
+  state.mean = stan::math::multi_normal_prec_rng(
+      hypers->mu, tau_new * hypers->lambda, rng);
+  set_prec_and_utilities(tau_new);
 }
 
 //! \param data Matrix of row-vectorial data points
 void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
-  // Get values of hyperparameters
-  Eigen::RowVectorXd mu0 = get_mu0();
-  double lambda0 = get_lambda0();
-  Eigen::MatrixXd tau0_inv = get_tau0_inv();
-  double nu0 = get_nu0();
-
   // Update values
-  PostParams params = normal_wishart_update(data, mu0, lambda0, tau0_inv, nu0);
+  Hyperparams params = normal_wishart_update(data, hypers->mu, hypers->lambda,
+                                             tau0_inv, hypers->nu);
 
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new =
-      stan::math::wishart_rng(params.nu_n, params.tau_n, rng);
-  Eigen::RowVectorXd mean = stan::math::multi_normal_prec_rng(
-      params.mu_n, tau_new * params.lambda_n, rng);
+      stan::math::wishart_rng(params.nu, params.tau, rng);
+  state.mean = stan::math::multi_normal_prec_rng(params.mu,
+                                                 tau_new * params.lambda, rng);
 
   // Update state
-  set_tau_and_utilities(tau_new);
+  set_prec_and_utilities(tau_new);
 }
 
-void NNWHierarchy::set_state(const google::protobuf::Message &state_,
-                             bool check /*= true*/) {
-  const bayesmix::MarginalState::ClusterVal &currcast =
+void NNWHierarchy::set_state_from_proto(
+    const google::protobuf::Message &state_) {
+  const bayesmix::MarginalState::ClusterState &currcast =
       google::protobuf::internal::down_cast<
-          const bayesmix::MarginalState::ClusterVal &>(state_);
+          const bayesmix::MarginalState::ClusterState &>(state_);
 
-  mean = to_eigen(currcast.multi_ls_state().mean());
-  set_tau_and_utilities(to_eigen(currcast.multi_ls_state().precision()));
+  state.mean = to_eigen(currcast.multi_ls_state().mean());
+  set_prec_and_utilities(to_eigen(currcast.multi_ls_state().prec()));
+}
 
-  if (check) {
-    check_state_validity();
+void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
+  const bayesmix::NNWPrior &currcast =
+      google::protobuf::internal::down_cast<const bayesmix::NNWPrior &>(
+          prior_);
+  prior = currcast;
+  hypers = std::make_shared<Hyperparams>();
+  if (prior.has_fixed_values()) {
+    // Set values
+    hypers->mu = bayesmix::to_eigen(prior.fixed_values().mean());
+    hypers->lambda = prior.fixed_values().var_scaling();
+    hypers->tau = bayesmix::to_eigen(prior.fixed_values().scale());
+    tau0_inv = stan::math::inverse_spd(hypers->tau);
+    hypers->nu = prior.fixed_values().deg_free();
+    // Check validity
+    unsigned int dim = hypers->mu.size();
+    assert(hypers->lambda > 0);
+    assert(dim == hypers->tau.rows() &&
+           "Error: hyperparameters dimensions are not consistent");
+    assert(hypers->nu > dim - 1);
+  } else if (prior.has_ngiw_prior()) {
+    // Get hyperparameters:
+    // for mu0
+    Eigen::VectorXd mu00 =
+        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().mean());
+    Eigen::MatrixXd sigma00 =
+        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().var());
+    // for lambda0
+    double alpha00 = prior.ngiw_prior().var_scaling_prior().shape();
+    double beta00 = prior.ngiw_prior().var_scaling_prior().rate();
+    // for tau0
+    double nu00 = prior.ngiw_prior().scale_prior().deg_free();
+    Eigen::MatrixXd tau00 =
+        bayesmix::to_eigen(prior.ngiw_prior().scale_prior().scale());
+    // for nu0
+    double nu0 = prior.ngiw_prior().deg_free();
+
+    // Check validity:
+    // dimensionality
+    unsigned int dim = mu00.size();
+    assert(sigma00.rows() == dim &&
+           "Error: hyperparameters dimensions are not consistent");
+    assert(tau00.rows() == dim &&
+           "Error: hyperparameters dimensions are not consistent");
+    // for mu0
+    check_spd(sigma00);
+    // for lalmbda0
+    assert(alpha00 > 0);
+    assert(beta00 > 0);
+    // for tau0
+    assert(nu00 > 0);
+    check_spd(tau00);
+    // check nu0
+    assert(nu0 > dim - 1);
+
+    // Set initial values
+    hypers->mu = mu00;
+    hypers->lambda = alpha00 / beta00;
+    hypers->tau = tau00 / (nu00 + dim + 1);
+    tau0_inv = stan::math::inverse_spd(hypers->tau);
+    hypers->nu = nu0;
+
+  } else {
+    std::invalid_argument("Error: unrecognized prior");
   }
 }
 
 void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
-  bayesmix::MultiLSState state;
-  to_proto(mean, state.mutable_mean());
-  to_proto(tau, state.mutable_precision());
+  bayesmix::MultiLSState state_;
+  to_proto(state.mean, state_.mutable_mean());
+  to_proto(state.prec, state_.mutable_prec());
 
-  google::protobuf::internal::down_cast<bayesmix::MarginalState::ClusterVal *>(
-      out)
+  google::protobuf::internal::down_cast<
+      bayesmix::MarginalState::ClusterState *>(out)
       ->mutable_multi_ls_state()
-      ->CopyFrom(state);
+      ->CopyFrom(state_);
 }

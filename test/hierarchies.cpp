@@ -19,8 +19,8 @@ TEST(nnighierarchy, draw) {
   hier2->draw();
 
   bayesmix::MarginalState out;
-  bayesmix::MarginalState::ClusterVal* clusval = out.add_cluster_vals();
-  bayesmix::MarginalState::ClusterVal* clusval2 = out.add_cluster_vals();
+  bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::MarginalState::ClusterState* clusval2 = out.add_cluster_states();
   hier->write_state_to_proto(clusval);
   hier2->write_state_to_proto(clusval2);
 
@@ -42,8 +42,8 @@ TEST(nnighierarchy, sample_given_data) {
   hier2->sample_given_data(datum);
 
   bayesmix::MarginalState out;
-  bayesmix::MarginalState::ClusterVal* clusval = out.add_cluster_vals();
-  bayesmix::MarginalState::ClusterVal* clusval2 = out.add_cluster_vals();
+  bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::MarginalState::ClusterState* clusval2 = out.add_cluster_states();
   hier->write_state_to_proto(clusval);
   hier2->write_state_to_proto(clusval2);
 
@@ -66,8 +66,8 @@ TEST(nnwhierarchy, draw) {
   hier2->draw();
 
   bayesmix::MarginalState out;
-  bayesmix::MarginalState::ClusterVal* clusval = out.add_cluster_vals();
-  bayesmix::MarginalState::ClusterVal* clusval2 = out.add_cluster_vals();
+  bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::MarginalState::ClusterState* clusval2 = out.add_cluster_states();
   hier->write_state_to_proto(clusval);
   hier2->write_state_to_proto(clusval2);
 
@@ -93,8 +93,8 @@ TEST(nnwhierarchy, sample_given_data) {
   hier2->sample_given_data(datum);
 
   bayesmix::MarginalState out;
-  bayesmix::MarginalState::ClusterVal* clusval = out.add_cluster_vals();
-  bayesmix::MarginalState::ClusterVal* clusval2 = out.add_cluster_vals();
+  bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::MarginalState::ClusterState* clusval2 = out.add_cluster_states();
   hier->write_state_to_proto(clusval);
   hier2->write_state_to_proto(clusval2);
 

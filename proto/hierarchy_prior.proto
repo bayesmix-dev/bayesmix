@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+import "distribution.proto";
+import "matrix.proto";
+
+package bayesmix;
+
+message NNIGPrior {
+  message FixedValues {
+    double mean = 1;
+    double var_scaling = 2;
+    double shape = 3;
+    double rate = 4;
+  }
+
+  message NormalMeanPrior {
+    UnivNormalDistribution mean_prior = 1;
+    double var_scaling = 2;
+    double shape = 3;
+    double rate = 4;
+  }
+
+  oneof prior {
+    FixedValues fixed_values = 1;
+    NormalMeanPrior normal_mean_prior = 2;
+  }
+}
+
+
+message NNWPrior {
+  message FixedValues {
+    Vector mean = 1;
+    double var_scaling = 2;
+    Matrix scale = 3;
+    double deg_free = 4;
+  }
+
+  message NGIWPrior {
+    MultiNormalDistribution mean_prior = 1;
+    GammaDistribution var_scaling_prior = 2;
+    InvWishartDistribution scale_prior = 3;
+    double deg_free = 4;
+  }
+
+  oneof prior {
+    FixedValues fixed_values = 1;
+    NGIWPrior ngiw_prior = 2;
+  }
+}

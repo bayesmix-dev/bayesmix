@@ -26,27 +26,6 @@ void Neal2Algorithm::print_startup_message() const {
   std::cout << msg << std::endl;
 }
 
-void Neal2Algorithm::initialize() {
-  // Initialize objects
-  cardinalities.reserve(data.rows());
-  std::default_random_engine generator;
-  // Build uniform probability on clusters, given their initial number
-  std::uniform_int_distribution<int> distro(0, init_num_clusters - 1);
-
-  // Allocate one datum per cluster first, and update cardinalities
-  for (size_t i = 0; i < init_num_clusters; i++) {
-    allocations.push_back(i);
-    cardinalities.push_back(1);
-  }
-
-  // Randomly allocate all remaining data, and update cardinalities
-  for (size_t i = init_num_clusters; i < data.rows(); i++) {
-    unsigned int clust = distro(generator);
-    allocations.push_back(clust);
-    cardinalities[clust] += 1;
-  }
-}
-
 void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();

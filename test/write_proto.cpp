@@ -8,15 +8,15 @@
 
 TEST(set_state, univ_ls) {
   double mean = 5;
-  double sd = 1.0;
+  double var = 1.0;
 
   bayesmix::UnivLSState curr;
   curr.set_mean(mean);
-  curr.set_sd(sd);
+  curr.set_var(var);
 
   ASSERT_EQ(curr.mean(), mean);
 
-  bayesmix::MarginalState::ClusterVal clusval;
+  bayesmix::MarginalState::ClusterState clusval;
   clusval.mutable_univ_ls_state()->CopyFrom(curr);
   NNIGHierarchy cluster;
   cluster.set_state(&clusval);
@@ -26,25 +26,25 @@ TEST(set_state, univ_ls) {
 
 TEST(write_proto, univ_ls) {
   double mean = 5;
-  double sd = 1.0;
+  double var = 1.0;
 
   bayesmix::UnivLSState curr;
   curr.set_mean(mean);
-  curr.set_sd(sd);
+  curr.set_var(var);
 
-  bayesmix::MarginalState::ClusterVal clusval_in;
+  bayesmix::MarginalState::ClusterState clusval_in;
   clusval_in.mutable_univ_ls_state()->CopyFrom(curr);
   NNIGHierarchy cluster;
   cluster.set_state(&clusval_in);
 
   bayesmix::MarginalState out;
-  bayesmix::MarginalState::ClusterVal* clusval = out.add_cluster_vals();
+  bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
   cluster.write_state_to_proto(clusval);
 
   double out_mean = clusval->univ_ls_state().mean();
-  double out_sd = clusval->univ_ls_state().sd();
+  double out_var = clusval->univ_ls_state().var();
   ASSERT_EQ(mean, out_mean);
-  ASSERT_EQ(sd, out_sd);
+  ASSERT_EQ(var, out_var);
 }
 
 TEST(set_state, multi_ls) {
@@ -54,18 +54,18 @@ TEST(set_state, multi_ls) {
 
   bayesmix::MultiLSState curr;
   bayesmix::to_proto(mean, curr.mutable_mean());
-  bayesmix::to_proto(prec, curr.mutable_precision());
+  bayesmix::to_proto(prec, curr.mutable_prec());
 
   ASSERT_EQ(curr.mean().data(0), 1.0);
-  ASSERT_EQ(curr.precision().data(0), 1.0);
-  ASSERT_EQ(curr.precision().data(6), 10.0);
+  ASSERT_EQ(curr.prec().data(0), 1.0);
+  ASSERT_EQ(curr.prec().data(6), 10.0);
 
-  bayesmix::MarginalState::ClusterVal clusval_in;
+  bayesmix::MarginalState::ClusterState clusval_in;
   clusval_in.mutable_multi_ls_state()->CopyFrom(curr);
   NNWHierarchy cluster;
   cluster.set_state(&clusval_in);
 
   ASSERT_EQ(curr.mean().data(0), cluster.get_mean()(0));
-  ASSERT_EQ(curr.precision().data(0), cluster.get_tau()(0, 0));
-  ASSERT_EQ(curr.precision().data(6), cluster.get_tau()(1, 1));
+  ASSERT_EQ(curr.prec().data(0), cluster.get_prec()(0, 0));
+  ASSERT_EQ(curr.prec().data(6), cluster.get_prec()(1, 1));
 }

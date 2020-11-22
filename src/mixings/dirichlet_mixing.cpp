@@ -4,7 +4,8 @@
 
 #include <stan/math/prim/prob.hpp>
 
-#include "../../proto/cpp/mixings.pb.h"
+#include "../../proto/cpp/mixing_prior.pb.h"
+#include "../../proto/cpp/mixing_state.pb.h"
 #include "../utils/rng.hpp"
 
 void DirichletMixing::update_hypers(
@@ -17,8 +18,8 @@ void DirichletMixing::update_hypers(
 
     // Recover parameters
     unsigned int k = unique_values.size();
-    double alpha = prior.gamma_prior().alpha();
-    double beta = prior.gamma_prior().beta();
+    double alpha = prior.gamma_prior().shape();
+    double beta = prior.gamma_prior().rate();
 
     double phi = stan::math::gamma_rng(totalmass + 1, n, rng);
     double odds = (alpha + k - 1) / (n * (beta - log(phi)));
@@ -40,8 +41,11 @@ void DirichletMixing::set_prior(const google::protobuf::Message &prior_) {
   prior = currcast;
   if (prior.has_fixed_value()) {
     totalmass = prior.fixed_value().value();
+    assert(totalmass > 0);
   } else if (prior.has_gamma_prior()) {
-    totalmass = prior.gamma_prior().alpha() / prior.gamma_prior().beta();
+    assert(prior.gamma_prior().shape() > 0);
+    assert(prior.gamma_prior().rate() > 0);
+    totalmass = prior.gamma_prior().shape() / prior.gamma_prior().rate();
   } else {
     std::invalid_argument("Error: argument proto is not appropriate");
   }
@@ -52,6 +56,7 @@ void DirichletMixing::write_state_to_proto(
   bayesmix::DPState state;
   state.set_totalmass(totalmass);
 
-  google::protobuf::internal::down_cast<bayesmix::DPState *>(out)->CopyFrom(
-      state);
+  google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
+      ->mutable_dp_state()
+      ->CopyFrom(state);
 }

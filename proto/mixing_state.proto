@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package bayesmix;
+
+message DPState {
+  double totalmass = 1;
+}
+
+message PYState {
+  double strength = 1;
+  double discount = 2;
+}
+
+message MixingState {
+  oneof state {
+    DPState dp_state = 1;
+    PYState py_state = 2;
+  }
+}

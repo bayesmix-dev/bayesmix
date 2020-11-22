@@ -3,19 +3,17 @@
 
 #include <Eigen/Dense>
 
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/base_collector.hpp"
 #include "base_algorithm.hpp"
 
 class MarginalAlgorithm : public BaseAlgorithm {
- protected:
-  virtual void print_startup_message() const override = 0;
-
  public:
   ~MarginalAlgorithm() = default;
   MarginalAlgorithm() = default;
   virtual Eigen::MatrixXd eval_lpdf(
       const Eigen::MatrixXd &grid,
-      BaseCollector<bayesmix::MarginalState> *const collector) override;
+      BaseCollector<bayesmix::MarginalState> *const coll) override;
 };
 
 #endif  // BAYESMIX_ALGORITHMS_MARGINAL_ALGORITHM_HPP_
