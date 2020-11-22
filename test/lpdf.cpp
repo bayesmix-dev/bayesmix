@@ -18,7 +18,7 @@ TEST(lpdf, nnig) {
   hier_prior.mutable_fixed_values()->set_mean(mu0);
   hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
   hier_prior.mutable_fixed_values()->set_shape(alpha0);
-  hier_prior.mutable_fixed_values()->set_rate(beta0);
+  hier_prior.mutable_fixed_values()->set_scale(beta0);
   hier.set_prior(hier_prior);
   hier.initialize();
 
