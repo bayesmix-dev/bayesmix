@@ -19,9 +19,8 @@ void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
   state.prec = prec_;
 
   // Update prec utilities
-  prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_);
-  prec_chol_eval = prec_chol.matrixL().transpose();
-  Eigen::VectorXd diag = prec_chol_eval.diagonal();
+  prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_).matrixL().transpose();
+  Eigen::VectorXd diag = prec_chol.diagonal();
   prec_logdet = 2 * log(diag.array()).sum();
 }
 
@@ -150,7 +149,7 @@ void NNWHierarchy::update_hypers(
 //! \return     Log-Likehood vector evaluated in data
 double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   // Initialize relevant objects
-  return bayesmix::multi_normal_prec_lpdf(datum, state.mean, prec_chol_eval,
+  return bayesmix::multi_normal_prec_lpdf(datum, state.mean, prec_chol,
                                           prec_logdet);
 }
 
@@ -164,7 +163,7 @@ Eigen::VectorXd NNWHierarchy::like_lpdf_grid(
   // Compute likelihood for each data point
   for (size_t i = 0; i < n; i++) {
     result(i) = bayesmix::multi_normal_prec_lpdf(data.row(i), state.mean,
-                                                 prec_chol_eval, prec_logdet);
+                                                 prec_chol, prec_logdet);
   }
   return result;
 }

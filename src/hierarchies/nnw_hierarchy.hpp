@@ -51,10 +51,8 @@ class NNWHierarchy : public BaseHierarchy {
   bayesmix::NNWPrior prior;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
-  //! Lower factor object of the Cholesky decomposition of prec
-  Eigen::LLT<Eigen::MatrixXd> prec_chol;
-  //! Matrix-form evaluation of prec_chol
-  Eigen::MatrixXd prec_chol_eval;  // TODO do we need both?
+  //! Lower factor of the Cholesky decomposition of prec
+  Eigen::MatrixXd prec_chol;
   //! Determinant of prec in logarithmic scale
   double prec_logdet;
 
