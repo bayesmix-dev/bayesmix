@@ -169,21 +169,22 @@ void NNIGHierarchy::draw() {
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   state.var = stan::math::inv_gamma_rng(hypers->shape, hypers->scale, rng);
-  state.mean = stan::math::normal_rng(hypers->mean,
-                                      sqrt(state.var / hypers->var_scaling), rng);
+  state.mean = stan::math::normal_rng(
+      hypers->mean, sqrt(state.var / hypers->var_scaling), rng);
 }
 
 //! \param data Column vector of data points
 void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   // Update values
-  Hyperparams params = normal_invgamma_update(
-      data.col(0), hypers->mean, hypers->shape, hypers->scale, hypers->var_scaling);
+  Hyperparams params =
+      normal_invgamma_update(data.col(0), hypers->mean, hypers->shape,
+                             hypers->scale, hypers->var_scaling);
 
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   state.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
-  state.mean =
-      stan::math::normal_rng(params.mean, sqrt(state.var / params.var_scaling), rng);
+  state.mean = stan::math::normal_rng(
+      params.mean, sqrt(state.var / params.var_scaling), rng);
 }
 
 void NNIGHierarchy::set_state_from_proto(

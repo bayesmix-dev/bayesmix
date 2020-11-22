@@ -33,7 +33,8 @@ void NNWHierarchy::check_spd(const Eigen::MatrixXd &mat) {
 void NNWHierarchy::initialize() {
   unsigned int dim = hypers->mean.size();
   state.mean = hypers->mean;
-  set_prec_and_utilities(hypers->var_scaling * Eigen::MatrixXd::Identity(dim, dim));
+  set_prec_and_utilities(hypers->var_scaling *
+                         Eigen::MatrixXd::Identity(dim, dim));
 }
 
 //! \param data                    Matrix of row-vectorial data points
@@ -123,7 +124,8 @@ void NNWHierarchy::update_hypers(
       Eigen::MatrixXd prec = bayesmix::to_eigen(st.multi_ls_state().prec());
       tau_n += prec;
       num += prec * mean;
-      beta_n += (hypers->mean - mean).transpose() * prec * (hypers->mean - mean);
+      beta_n +=
+          (hypers->mean - mean).transpose() * prec * (hypers->mean - mean);
     }
     Eigen::MatrixXd prec = hypers->var_scaling * tau_n + sigma00inv;
     tau_n += tau00;
@@ -220,15 +222,15 @@ void NNWHierarchy::draw() {
 //! \param data Matrix of row-vectorial data points
 void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   // Update values
-  Hyperparams params = normal_wishart_update(data, hypers->mean, hypers->var_scaling,
-                                             scale0_inv, hypers->deg_free);
+  Hyperparams params = normal_wishart_update(
+      data, hypers->mean, hypers->var_scaling, scale0_inv, hypers->deg_free);
 
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new =
       stan::math::wishart_rng(params.deg_free, params.scale, rng);
-  state.mean = stan::math::multi_normal_prec_rng(params.mean,
-                                                 tau_new * params.var_scaling, rng);
+  state.mean = stan::math::multi_normal_prec_rng(
+      params.mean, tau_new * params.var_scaling, rng);
 
   // Update state
   set_prec_and_utilities(tau_new);
