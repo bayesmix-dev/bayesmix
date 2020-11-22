@@ -68,10 +68,10 @@ int main(int argc, char *argv[]) {
   // Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
   // bayesmix::Matrix tau0_proto;
   // bayesmix::to_proto(tau0, &tau0_proto);
-  // *hier_prior.mutable_fixed_values()->mutable_mu0() = mu0_proto;
-  // hier_prior.mutable_fixed_values()->set_lambda0(lambda0);
-  // hier_prior.mutable_fixed_values()->set_nu0(nu0);
-  // *hier_prior.mutable_fixed_values()->mutable_tau0() = tau0_proto;
+  // *hier_prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
+  // hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
+  // hier_prior.mutable_fixed_values()->set_deg_free(nu0);
+  // *hier_prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
 
   // Set parameters
   hier->set_prior(hier_prior);
