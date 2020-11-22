@@ -31,8 +31,8 @@ int main(int argc, char *argv[]) {
   // Gamma-prior total mass
   double alpha_mass = 4.0;
   double beta_mass = 2.0;
-  mix_prior.mutable_gamma_prior()->set_alpha(alpha_mass);
-  mix_prior.mutable_gamma_prior()->set_beta(beta_mass);
+  mix_prior.mutable_gamma_prior()->set_shape(alpha_mass);
+  mix_prior.mutable_gamma_prior()->set_rate(beta_mass);
 
   // Create factories and objects
   auto &factory_mixing = Factory<BaseMixing>::Instance();
@@ -54,10 +54,10 @@ int main(int argc, char *argv[]) {
   double lambda0 = 0.1;
   double alpha0 = 2.0;
   double beta0 = 2.0;
-  hier_prior.mutable_fixed_values()->set_mu0(mu0);
-  hier_prior.mutable_fixed_values()->set_lambda0(lambda0);
-  hier_prior.mutable_fixed_values()->set_alpha0(alpha0);
-  hier_prior.mutable_fixed_values()->set_beta0(beta0);
+  hier_prior.mutable_fixed_values()->set_mean(mu0);
+  hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
+  hier_prior.mutable_fixed_values()->set_shape(alpha0);
+  hier_prior.mutable_fixed_values()->set_rate(beta0);
 
   // // NNW  //TEST
   // Eigen::Vector2d mu0; mu0 << 5.5, 5.5;

@@ -4,7 +4,7 @@
 #include <cassert>
 #include <memory>
 
-#include "../../proto/cpp/mixings.pb.h"
+#include "../../proto/cpp/mixing_prior.pb.h"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "base_mixing.hpp"
 

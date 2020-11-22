@@ -33,7 +33,7 @@ class BaseHierarchy {
   virtual bool is_multivariate() const = 0;
 
   virtual void update_hypers(
-      const std::vector<bayesmix::MarginalState::ClusterVal> &states) = 0;
+      const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseHierarchy() = default;

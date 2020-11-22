@@ -4,7 +4,7 @@
 #include <cassert>
 
 #include "../../proto/cpp/marginal_state.pb.h"
-#include "../../proto/cpp/mixings.pb.h"
+#include "../../proto/cpp/mixing_state.pb.h"
 
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing..." << std::endl;
@@ -46,8 +46,8 @@ void BaseAlgorithm::initialize() {
 }
 
 void BaseAlgorithm::update_hierarchy_hypers() {
-  bayesmix::MarginalState::ClusterVal clust;
-  std::vector<bayesmix::MarginalState::ClusterVal> states;
+  bayesmix::MarginalState::ClusterState clust;
+  std::vector<bayesmix::MarginalState::ClusterState> states;
   for (auto &un : unique_values) {
     un->write_state_to_proto(&clust);
     states.push_back(clust);
@@ -67,9 +67,9 @@ bayesmix::MarginalState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
                                        cardinalities.end()};
   // Transcribe unique values vector
   for (size_t i = 0; i < unique_values.size(); i++) {
-    bayesmix::MarginalState::ClusterVal clusval;
+    bayesmix::MarginalState::ClusterState clusval;
     unique_values[i]->write_state_to_proto(&clusval);
-    iter_out.add_cluster_vals()->CopyFrom(clusval);
+    iter_out.add_cluster_states()->CopyFrom(clusval);
   }
 
   // Transcribe mixing state

@@ -7,7 +7,7 @@
 #include <memory>
 #include <stan/math/prim/fun.hpp>
 
-#include "../../proto/cpp/hierarchies.pb.h"
+#include "../../proto/cpp/hierarchy_prior.pb.h"
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "base_hierarchy.hpp"
 
@@ -75,8 +75,8 @@ class NNWHierarchy : public BaseHierarchy {
   //! Returns true if the hierarchy models multivariate data (here, true)
   bool is_multivariate() const override { return true; }
 
-  void update_hypers(
-      const std::vector<bayesmix::MarginalState::ClusterVal> &states) override;
+  void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
+                         &states) override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNWHierarchy() = default;

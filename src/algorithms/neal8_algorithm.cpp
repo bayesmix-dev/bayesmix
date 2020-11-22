@@ -60,7 +60,7 @@ void Neal8Algorithm::sample_allocations() {
     int singleton = 0;
     if (cardinalities[allocations[i]] == 1) {
       // Save unique value in the first auxiliary block
-      bayesmix::MarginalState::ClusterVal curr_val;
+      bayesmix::MarginalState::ClusterState curr_val;
       unique_values[allocations[i]]->write_state_to_proto(&curr_val);
       aux_unique_values[0]->set_state_from_proto(curr_val);
       singleton = 1;
@@ -102,7 +102,7 @@ void Neal8Algorithm::sample_allocations() {
       if (c_new >= n_clust) {
         // Case 1: datum moves from a singleton to a new cluster
         // Take unique values from an auxiliary block
-        bayesmix::MarginalState::ClusterVal curr_val;
+        bayesmix::MarginalState::ClusterState curr_val;
         aux_unique_values[c_new - n_clust]->write_state_to_proto(&curr_val);
         unique_values[allocations[i]]->set_state_from_proto(curr_val);
         cardinalities[allocations[i]] += 1;

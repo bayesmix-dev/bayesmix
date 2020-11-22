@@ -6,6 +6,7 @@
 #include <stan/math/prim/err.hpp>
 #include <stan/math/prim/prob.hpp>
 
+#include "../../proto/cpp/hierarchy_prior.pb.h"
 #include "../../proto/cpp/ls_state.pb.h"
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../../proto/cpp/matrix.pb.h"
@@ -66,25 +67,25 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
 }
 
 void NNWHierarchy::update_hypers(
-    const std::vector<bayesmix::MarginalState::ClusterVal> &states) {
+    const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   if (prior.has_fixed_values()) {
     return;
   } else if (prior.has_ngiw_prior()) {
     // Get hyperparameters:
     // for mu0
     Eigen::VectorXd mu00 =
-        bayesmix::to_eigen(prior.ngiw_prior().mu0_prior().mu00());
+        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().mean());
     Eigen::MatrixXd sigma00 =
-        bayesmix::to_eigen(prior.ngiw_prior().mu0_prior().sigma00());
+        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().var());
     // for lambda0
-    double alpha00 = prior.ngiw_prior().lambda0_prior().alpha00();
-    double beta00 = prior.ngiw_prior().lambda0_prior().beta00();
+    double alpha00 = prior.ngiw_prior().var_scaling_prior().shape();
+    double beta00 = prior.ngiw_prior().var_scaling_prior().rate();
     // for tau0
-    double nu00 = prior.ngiw_prior().tau0_prior().nu00();
+    double nu00 = prior.ngiw_prior().scale_prior().deg_free();
     Eigen::MatrixXd tau00 =
-        bayesmix::to_eigen(prior.ngiw_prior().tau0_prior().tau00());
+        bayesmix::to_eigen(prior.ngiw_prior().scale_prior().scale());
     // for nu0
-    double nu0 = prior.ngiw_prior().nu0();
+    double nu0 = prior.ngiw_prior().deg_free();
 
     // Compute posterior hyperparameters
     unsigned int dim = mu00.size();
@@ -210,9 +211,9 @@ void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 
 void NNWHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  const bayesmix::MarginalState::ClusterVal &currcast =
+  const bayesmix::MarginalState::ClusterState &currcast =
       google::protobuf::internal::down_cast<
-          const bayesmix::MarginalState::ClusterVal &>(state_);
+          const bayesmix::MarginalState::ClusterState &>(state_);
 
   state.mean = to_eigen(currcast.multi_ls_state().mean());
   set_prec_and_utilities(to_eigen(currcast.multi_ls_state().prec()));
@@ -226,11 +227,11 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
   hypers = std::make_shared<Hyperparams>();
   if (prior.has_fixed_values()) {
     // Set values
-    hypers->mu = bayesmix::to_eigen(prior.fixed_values().mu0());
-    hypers->lambda = prior.fixed_values().lambda0();
-    hypers->tau = bayesmix::to_eigen(prior.fixed_values().tau0());
+    hypers->mu = bayesmix::to_eigen(prior.fixed_values().mean());
+    hypers->lambda = prior.fixed_values().var_scaling();
+    hypers->tau = bayesmix::to_eigen(prior.fixed_values().scale());
     tau0_inv = stan::math::inverse_spd(hypers->tau);
-    hypers->nu = prior.fixed_values().nu0();
+    hypers->nu = prior.fixed_values().deg_free();
     // Check validity
     unsigned int dim = hypers->mu.size();
     assert(hypers->lambda > 0);
@@ -241,18 +242,18 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     // Get hyperparameters:
     // for mu0
     Eigen::VectorXd mu00 =
-        bayesmix::to_eigen(prior.ngiw_prior().mu0_prior().mu00());
+        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().mean());
     Eigen::MatrixXd sigma00 =
-        bayesmix::to_eigen(prior.ngiw_prior().mu0_prior().sigma00());
+        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().var());
     // for lambda0
-    double alpha00 = prior.ngiw_prior().lambda0_prior().alpha00();
-    double beta00 = prior.ngiw_prior().lambda0_prior().beta00();
+    double alpha00 = prior.ngiw_prior().var_scaling_prior().shape();
+    double beta00 = prior.ngiw_prior().var_scaling_prior().rate();
     // for tau0
-    double nu00 = prior.ngiw_prior().tau0_prior().nu00();
+    double nu00 = prior.ngiw_prior().scale_prior().deg_free();
     Eigen::MatrixXd tau00 =
-        bayesmix::to_eigen(prior.ngiw_prior().tau0_prior().tau00());
+        bayesmix::to_eigen(prior.ngiw_prior().scale_prior().scale());
     // for nu0
-    double nu0 = prior.ngiw_prior().nu0();
+    double nu0 = prior.ngiw_prior().deg_free();
 
     // Check validity:
     // dimensionality
@@ -289,8 +290,8 @@ void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   to_proto(state.mean, state_.mutable_mean());
   to_proto(state.prec, state_.mutable_prec());
 
-  google::protobuf::internal::down_cast<bayesmix::MarginalState::ClusterVal *>(
-      out)
+  google::protobuf::internal::down_cast<
+      bayesmix::MarginalState::ClusterState *>(out)
       ->mutable_multi_ls_state()
       ->CopyFrom(state_);
 }

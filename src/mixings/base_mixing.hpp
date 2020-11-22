@@ -3,7 +3,6 @@
 
 #include <memory>
 
-#include "../../proto/cpp/mixings.pb.h"
 #include "../hierarchies/base_hierarchy.hpp"
 
 //! Abstract base class for a generic mixture model

@@ -29,8 +29,8 @@ TEST(mixing, gamma_prior) {
   double alpha = 1.0;
   double beta = 2.0;
   double m_prior = alpha / beta;
-  prior.mutable_gamma_prior()->set_alpha(alpha);
-  prior.mutable_gamma_prior()->set_beta(beta);
+  prior.mutable_gamma_prior()->set_shape(alpha);
+  prior.mutable_gamma_prior()->set_rate(beta);
   mix.set_prior(prior);
   double m_mix = mix.get_totalmass();
   ASSERT_FLOAT_EQ(m_prior, m_mix);

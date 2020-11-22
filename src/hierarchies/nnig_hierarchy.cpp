@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/prob.hpp>
 
+#include "../../proto/cpp/hierarchy_prior.pb.h"
 #include "../../proto/cpp/ls_state.pb.h"
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
@@ -47,14 +48,14 @@ NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update(
 }
 
 void NNIGHierarchy::update_hypers(
-    const std::vector<bayesmix::MarginalState::ClusterVal> &states) {
+    const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   if (prior.has_fixed_values()) {
     return;
   } else if (prior.has_normal_mean_prior()) {
     // Get hyperparameters
-    double mu00 = prior.normal_mean_prior().mu0_prior().mu00();
-    double sig200 = prior.normal_mean_prior().mu0_prior().sig200();
-    double lambda0 = prior.normal_mean_prior().lambda0();
+    double mu00 = prior.normal_mean_prior().mean_prior().mean();
+    double sig200 = prior.normal_mean_prior().mean_prior().var();
+    double lambda0 = prior.normal_mean_prior().var_scaling();
 
     // Compute posterior hyperparameters
     double prec = 0.0;
@@ -150,9 +151,9 @@ void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 
 void NNIGHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  const bayesmix::MarginalState::ClusterVal &currcast =
+  const bayesmix::MarginalState::ClusterState &currcast =
       google::protobuf::internal::down_cast<
-          const bayesmix::MarginalState::ClusterVal &>(state_);
+          const bayesmix::MarginalState::ClusterState &>(state_);
 
   state.mean = currcast.univ_ls_state().mean();
   state.var = currcast.univ_ls_state().var();
@@ -166,24 +167,24 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
   hypers = std::make_shared<Hyperparams>();
   if (prior.has_fixed_values()) {
     // Check validity
-    assert(prior.fixed_values().lambda0() > 0);
-    assert(prior.fixed_values().alpha0() > 0);
-    assert(prior.fixed_values().beta0() > 0);
+    assert(prior.fixed_values().var_scaling() > 0);
+    assert(prior.fixed_values().shape() > 0);
+    assert(prior.fixed_values().rate() > 0);
     // Set values
-    hypers->mu = prior.fixed_values().mu0();
-    hypers->lambda = prior.fixed_values().lambda0();
-    hypers->alpha = prior.fixed_values().alpha0();
-    hypers->beta = prior.fixed_values().beta0();
+    hypers->mu = prior.fixed_values().mean();
+    hypers->lambda = prior.fixed_values().var_scaling();
+    hypers->alpha = prior.fixed_values().shape();
+    hypers->beta = prior.fixed_values().rate();
   } else if (prior.has_normal_mean_prior()) {
     // Check validity
-    assert(prior.normal_mean_prior().lambda0() > 0);
-    assert(prior.normal_mean_prior().alpha0() > 0);
-    assert(prior.normal_mean_prior().beta0() > 0);
+    assert(prior.normal_mean_prior().var_scaling() > 0);
+    assert(prior.normal_mean_prior().shape() > 0);
+    assert(prior.normal_mean_prior().rate() > 0);
     // Set initial values
-    hypers->mu = prior.normal_mean_prior().mu0_prior().mu00();
-    hypers->lambda = prior.normal_mean_prior().lambda0();
-    hypers->alpha = prior.normal_mean_prior().alpha0();
-    hypers->beta = prior.normal_mean_prior().beta0();
+    hypers->mu = prior.normal_mean_prior().mean_prior().mean();
+    hypers->lambda = prior.normal_mean_prior().var_scaling();
+    hypers->alpha = prior.normal_mean_prior().shape();
+    hypers->beta = prior.normal_mean_prior().rate();
   } else {
     std::invalid_argument("Error: unrecognized prior");
   }
@@ -195,8 +196,8 @@ void NNIGHierarchy::write_state_to_proto(
   state_.set_mean(state.mean);
   state_.set_var(state.var);
 
-  google::protobuf::internal::down_cast<bayesmix::MarginalState::ClusterVal *>(
-      out)
+  google::protobuf::internal::down_cast<
+      bayesmix::MarginalState::ClusterState *>(out)
       ->mutable_univ_ls_state()
       ->CopyFrom(state_);
 }
