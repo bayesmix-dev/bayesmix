@@ -35,10 +35,10 @@ class NNWHierarchy : public BaseHierarchy {
     Eigen::MatrixXd prec;
   };
   struct Hyperparams {
-    Eigen::VectorXd mu;
-    double lambda;
-    Eigen::MatrixXd tau;
-    double nu;
+    Eigen::VectorXd mean;
+    double var_scaling;
+    double deg_free;
+    Eigen::MatrixXd scale;
   };
 
  protected:
@@ -46,7 +46,7 @@ class NNWHierarchy : public BaseHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-  Eigen::MatrixXd tau0_inv;
+  Eigen::MatrixXd scale0_inv;
   // HYPERPRIOR
   bayesmix::NNWPrior prior;
 
@@ -104,7 +104,6 @@ class NNWHierarchy : public BaseHierarchy {
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
-  Eigen::MatrixXd get_tau0_inv() const { return tau0_inv; }
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment

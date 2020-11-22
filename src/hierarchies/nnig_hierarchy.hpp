@@ -33,7 +33,7 @@ class NNIGHierarchy : public BaseHierarchy {
     double mean, var;
   };
   struct Hyperparams {
-    double mu, alpha, beta, lambda;
+    double mean, var_scaling, shape, scale;
   };
 
  protected:
