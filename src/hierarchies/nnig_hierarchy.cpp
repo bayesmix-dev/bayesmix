@@ -63,9 +63,8 @@ void NNIGHierarchy::update_hypers(
     for (auto &st : states) {
       double mean = st.univ_ls_state().mean();
       double var = st.univ_ls_state().var();
-      double prec_i = 1 / var;
-      prec += prec_i;
-      num += mean * prec_i;
+      prec += 1 / var;
+      num += mean / var;
     }
     prec = 1 / sig200 + lambda0 * prec;
     num = mu00 / sig200 + lambda0 * num;
@@ -76,7 +75,45 @@ void NNIGHierarchy::update_hypers(
     // Update hyperparameters with posterior random sampling
     auto &rng = bayesmix::Rng::Instance().get();
     hypers->mu = stan::math::normal_rng(mu_n, sqrt(sig2_n), rng);
+  } else if (prior.has_ngg_prior()) {
+    // Get hyperparameters:
+    // for mu0
+    double mu00 = prior.ngg_prior().mean_prior().mean();
+    double sig200 = prior.ngg_prior().mean_prior().var();
+    // for lambda0
+    double alpha00 = prior.ngg_prior().var_scaling_prior().shape();
+    double beta00 = prior.ngg_prior().var_scaling_prior().rate();
+    // for alpha0
+    double nu0 = prior.ngg_prior().shape();
+    // for tau0
+    double a00 = prior.ngg_prior().scale_prior().shape();
+    double b00 = prior.ngg_prior().scale_prior().rate();
 
+    // Compute posterior hyperparameters
+    double b_n = 0.0;
+    double num = 0.0;
+    double beta_n = 0.0;
+    for (auto &st : states) {
+      double mean = st.univ_ls_state().mean();
+      double var = st.univ_ls_state().var();
+      b_n += 1 / var;
+      num += mean / var;
+      beta_n += (hypers->mu - mean) * (hypers->mu - mean) / var;
+    }
+    double var = hypers->lambda * b_n + 1 / sig200;
+    b_n += b00;
+    num = hypers->lambda * num + mu00 / sig200;
+    beta_n = beta00 + 0.5 * beta_n;
+    double sig_n = 1 / var;
+    double mu_n = num / var;
+    double alpha_n = alpha00 + 0.5 * states.size();
+    double a_n = a00 + states.size() * hypers->alpha;
+
+    // Update hyperparameters with posterior random Gibbs sampling
+    auto &rng = bayesmix::Rng::Instance().get();
+    hypers->mu = stan::math::normal_rng(mu_n, sig_n, rng);
+    hypers->lambda = stan::math::gamma_rng(alpha_n, beta_n, rng);
+    hypers->beta = stan::math::gamma_rng(a_n, b_n, rng);
   } else {
     std::invalid_argument("Error: unrecognized prior");
   }
@@ -169,22 +206,22 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
     // Check validity
     assert(prior.fixed_values().var_scaling() > 0);
     assert(prior.fixed_values().shape() > 0);
-    assert(prior.fixed_values().rate() > 0);
+    assert(prior.fixed_values().scale() > 0);
     // Set values
     hypers->mu = prior.fixed_values().mean();
     hypers->lambda = prior.fixed_values().var_scaling();
     hypers->alpha = prior.fixed_values().shape();
-    hypers->beta = prior.fixed_values().rate();
+    hypers->beta = prior.fixed_values().scale();
   } else if (prior.has_normal_mean_prior()) {
     // Check validity
     assert(prior.normal_mean_prior().var_scaling() > 0);
     assert(prior.normal_mean_prior().shape() > 0);
-    assert(prior.normal_mean_prior().rate() > 0);
+    assert(prior.normal_mean_prior().scale() > 0);
     // Set initial values
     hypers->mu = prior.normal_mean_prior().mean_prior().mean();
     hypers->lambda = prior.normal_mean_prior().var_scaling();
     hypers->alpha = prior.normal_mean_prior().shape();
-    hypers->beta = prior.normal_mean_prior().rate();
+    hypers->beta = prior.normal_mean_prior().scale();
   } else {
     std::invalid_argument("Error: unrecognized prior");
   }
