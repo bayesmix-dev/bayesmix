@@ -222,6 +222,32 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
     hypers->var_scaling = prior.normal_mean_prior().var_scaling();
     hypers->shape = prior.normal_mean_prior().shape();
     hypers->scale = prior.normal_mean_prior().scale();
+  } else if (prior.has_ngg_prior()) {
+    // Check validity
+    assert(prior.ngg_prior().mean_prior().var() > 0);
+    assert(prior.ngg_prior().var_scaling_prior().shape() > 0);
+    assert(prior.ngg_prior().var_scaling_prior().rate() > 0);
+    assert(prior.ngg_prior().scale_prior().shape() > 0);
+    assert(prior.ngg_prior().scale_prior().rate() > 0);
+    assert(prior.ngg_prior().shape() > 0);
+    // Get hyperparameters:
+    // for mu0
+    double mu00 = prior.ngg_prior().mean_prior().mean();
+    double sigma00 = prior.ngg_prior().mean_prior().var();
+    // for lambda0
+    double alpha00 = prior.ngg_prior().var_scaling_prior().shape();
+    double beta00 = prior.ngg_prior().var_scaling_prior().rate();
+    // for beta0
+    double a00 = prior.ngg_prior().scale_prior().shape();
+    double b00 = prior.ngg_prior().scale_prior().rate();
+    // for alpha0
+    double alpha0 = prior.ngg_prior().shape();
+
+    // Set initial values
+    hypers->mean = mu00;
+    hypers->var_scaling = alpha00 / beta00;
+    hypers->shape = nu0;
+    hypers->scale = b00 / (a00 + dim + 1);
   } else {
     std::invalid_argument("Error: unrecognized prior");
   }
