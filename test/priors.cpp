@@ -5,7 +5,9 @@
 
 #include "../proto/cpp/marginal_state.pb.h"
 #include "../src/hierarchies/nnig_hierarchy.hpp"
+#include "../src/hierarchies/nnw_hierarchy.hpp"
 #include "../src/mixings/dirichlet_mixing.hpp"
+#include "../src/utils/proto_utils.hpp"
 
 TEST(mixing, fixed_value) {
   DirichletMixing mix;
@@ -42,11 +44,11 @@ TEST(mixing, gamma_prior) {
   mix.update_hypers(hiers, n_data);
   double m_mix_after = mix.get_totalmass();
 
-  std::cout << "[          ] after = " << m_mix_after << std::endl;
+  std::cout << "             after = " << m_mix_after << std::endl;
   ASSERT_TRUE(m_mix_after > m_mix);
 }
 
-TEST(hierarchies, priors) {
+TEST(hierarchies, fixed_values) {
   bayesmix::NNIGPrior prior;
   bayesmix::NNIGPrior prior_out;
   prior.mutable_fixed_values()->set_mean(5.0);
@@ -76,4 +78,46 @@ TEST(hierarchies, priors) {
     unique_values[i]->write_hypers_to_proto(&prior_out);
     ASSERT_EQ(prior.DebugString(), prior_out.DebugString());
   }
+}
+
+TEST(hierarchies, normal_mean_prior) {
+  bayesmix::NNWPrior prior;
+  bayesmix::NNWPrior prior_out;
+  Eigen::Vector2d mu00;
+  mu00 << 0.0, 0.0;
+  auto ident = Eigen::Matrix2d::Identity();
+
+  prior.mutable_normal_mean_prior()->set_var_scaling(0.1);
+  bayesmix::to_proto(
+      mu00,
+      prior.mutable_normal_mean_prior()->mutable_mean_prior()->mutable_mean());
+  bayesmix::to_proto(
+      ident,
+      prior.mutable_normal_mean_prior()->mutable_mean_prior()->mutable_var());
+  prior.mutable_normal_mean_prior()->set_deg_free(2.0);
+  bayesmix::to_proto(ident,
+                     prior.mutable_normal_mean_prior()->mutable_scale());
+
+  std::vector<bayesmix::MarginalState::ClusterState> states(4);
+  for (int i = 0; i < states.size(); i++) {
+    double mean = 9.0 + i;
+    Eigen::Vector2d vec;
+    vec << mean, mean;
+    bayesmix::to_proto(vec,
+                       states[i].mutable_multi_ls_state()->mutable_mean());
+    bayesmix::to_proto(ident,
+                       states[i].mutable_multi_ls_state()->mutable_prec());
+  }
+
+  NNWHierarchy hier;
+  hier.set_prior(prior);
+  hier.initialize();
+
+  hier.update_hypers(states);
+  hier.write_hypers_to_proto(&prior_out);
+  Eigen::Vector2d mean_out =
+      bayesmix::to_eigen(prior_out.fixed_values().mean());
+  std::cout << "             after = " << mean_out(0) << " " << mean_out(1)
+            << std::endl;
+  assert(mu00(0) < mean_out(0) && mu00(1) < mean_out(1));
 }
