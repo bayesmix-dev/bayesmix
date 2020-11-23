@@ -91,11 +91,10 @@ void NNWHierarchy::update_hypers(
     }
     prec = hypers->var_scaling * prec + sigma00inv;
     num = hypers->var_scaling * num + sigma00inv * mu00;
-    Eigen::MatrixXd sig_n = stan::math::inverse_spd(prec);
-    Eigen::VectorXd mu_n = sig_n * num;
+    Eigen::VectorXd mu_n = prec.llt().solve(num);
 
     // Update hyperparameters with posterior sampling
-    hypers->mean = stan::math::multi_normal_rng(mu_n, sig_n, rng);
+    hypers->mean = stan::math::multi_normal_prec_rng(mu_n, prec, rng);
   } else if (prior.has_ngiw_prior()) {
     // Get hyperparameters:
     // for mu0
