@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
   Eigen::VectorXd masses(chain.size());
   Eigen::VectorXd num_clust(chain.size());
   for (int i = 0; i < chain.size(); i++) {
-    bayesmix::MixingState mixstate = chain[i].mixing_states(0);
+    bayesmix::MixingState mixstate = chain[i].mixing_state();
     if (mixstate.has_dp_state()) {
       masses[i] = mixstate.dp_state().totalmass();
       num_clust[i] = chain[i].cluster_states_size();
