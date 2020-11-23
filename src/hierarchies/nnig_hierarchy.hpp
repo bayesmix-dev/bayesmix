@@ -33,7 +33,7 @@ class NNIGHierarchy : public BaseHierarchy {
     double mean, var;
   };
   struct Hyperparams {
-    double mu, alpha, beta, lambda;
+    double mean, var_scaling, shape, scale;
   };
 
  protected:
@@ -42,7 +42,7 @@ class NNIGHierarchy : public BaseHierarchy {
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
   // HYPERPRIOR
-  bayesmix::NNIGPrior prior;
+  std::shared_ptr<bayesmix::NNIGPrior> prior;
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
@@ -88,10 +88,9 @@ class NNIGHierarchy : public BaseHierarchy {
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
   void set_state_from_proto(const google::protobuf::Message &state_) override;
-
   void set_prior(const google::protobuf::Message &prior_) override;
-
   void write_state_to_proto(google::protobuf::Message *out) const override;
+  void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
   std::string get_id() const override { return "NNIG"; }
 };

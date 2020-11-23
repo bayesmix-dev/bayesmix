@@ -35,10 +35,10 @@ class NNWHierarchy : public BaseHierarchy {
     Eigen::MatrixXd prec;
   };
   struct Hyperparams {
-    Eigen::VectorXd mu;
-    double lambda;
-    Eigen::MatrixXd tau;
-    double nu;
+    Eigen::VectorXd mean;
+    double var_scaling;
+    double deg_free;
+    Eigen::MatrixXd scale;
   };
 
  protected:
@@ -46,15 +46,13 @@ class NNWHierarchy : public BaseHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-  Eigen::MatrixXd tau0_inv;
+  Eigen::MatrixXd scale0_inv;
   // HYPERPRIOR
-  bayesmix::NNWPrior prior;
+  std::shared_ptr<bayesmix::NNWPrior> prior;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
-  //! Lower factor object of the Cholesky decomposition of prec
-  Eigen::LLT<Eigen::MatrixXd> prec_chol;
-  //! Matrix-form evaluation of prec_chol
-  Eigen::MatrixXd prec_chol_eval;  // TODO do we need both?
+  //! Lower factor of the Cholesky decomposition of prec
+  Eigen::MatrixXd prec_chol;
   //! Determinant of prec in logarithmic scale
   double prec_logdet;
 
@@ -104,15 +102,13 @@ class NNWHierarchy : public BaseHierarchy {
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
-  Eigen::MatrixXd get_tau0_inv() const { return tau0_inv; }
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
   void set_state_from_proto(const google::protobuf::Message &state_) override;
-
   void set_prior(const google::protobuf::Message &prior_) override;
-
   void write_state_to_proto(google::protobuf::Message *out) const override;
+  void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
   std::string get_id() const override { return "NNW"; }
 };

@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
   hier_prior.mutable_fixed_values()->set_mean(mu0);
   hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
   hier_prior.mutable_fixed_values()->set_shape(alpha0);
-  hier_prior.mutable_fixed_values()->set_rate(beta0);
+  hier_prior.mutable_fixed_values()->set_scale(beta0);
 
   // // NNW  //TEST
   // Eigen::Vector2d mu0; mu0 << 5.5, 5.5;
@@ -96,8 +96,11 @@ int main(int argc, char *argv[]) {
 
   // Run algorithm and density evaluation
   algo->run(coll);
+  std::cout << "Computing log-density..." << std::endl;
   Eigen::MatrixXd dens = algo->eval_lpdf(grid, coll);
+  std::cout << "Done" << std::endl;
   bayesmix::write_matrix_to_file(dens, densfile);
+  std::cout << "Successfully wrote density to " << densfile << std::endl;
 
   // Collect mixing states
   auto chain = coll->get_chain();
@@ -109,6 +112,7 @@ int main(int argc, char *argv[]) {
     }
   }
   bayesmix::write_matrix_to_file(masses, massfile);
+  std::cout << "Successfully wrote total masses to " << massfile << std::endl;
 
   std::cout << "End of run.cpp" << std::endl;
   delete coll;

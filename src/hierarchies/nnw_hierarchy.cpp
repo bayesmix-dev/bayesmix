@@ -19,9 +19,8 @@ void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
   state.prec = prec_;
 
   // Update prec utilities
-  prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_);
-  prec_chol_eval = prec_chol.matrixL().transpose();
-  Eigen::VectorXd diag = prec_chol_eval.diagonal();
+  prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_).matrixL().transpose();
+  Eigen::VectorXd diag = prec_chol.diagonal();
   prec_logdet = 2 * log(diag.array()).sum();
 }
 
@@ -32,9 +31,11 @@ void NNWHierarchy::check_spd(const Eigen::MatrixXd &mat) {
 }
 
 void NNWHierarchy::initialize() {
-  unsigned int dim = hypers->mu.size();
-  state.mean = hypers->mu;
-  set_prec_and_utilities(hypers->lambda * Eigen::MatrixXd::Identity(dim, dim));
+  assert(prior != nullptr && "Error: prior was not provided");
+  state.mean = hypers->mean;
+  unsigned int dim = hypers->mean.size();
+  set_prec_and_utilities(hypers->var_scaling *
+                         Eigen::MatrixXd::Identity(dim, dim));
 }
 
 //! \param data                    Matrix of row-vectorial data points
@@ -48,11 +49,11 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
   unsigned int n = data.rows();
 
   // Compute updated hyperparameters
-  post_params.lambda = lambda0 + n;
-  post_params.nu = nu0 + 0.5 * n;
+  post_params.var_scaling = lambda0 + n;
+  post_params.deg_free = nu0 + 0.5 * n;
 
   Eigen::VectorXd mubar = data.colwise().mean();  // sample mean
-  post_params.mu = (lambda0 * mu0 + n * mubar) / (lambda0 + n);
+  post_params.mean = (lambda0 * mu0 + n * mubar) / (lambda0 + n);
   // Compute tau_n
   Eigen::MatrixXd tau_temp = Eigen::MatrixXd::Zero(data.cols(), data.cols());
   for (size_t i = 0; i < n; i++) {
@@ -62,31 +63,55 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
   tau_temp += (n * lambda0 / (n + lambda0)) * (mubar - mu0) *
               (mubar - mu0).transpose();
   tau_temp = 0.5 * tau_temp + tau0_inv;
-  post_params.tau = stan::math::inverse_spd(tau_temp);
+  post_params.scale = stan::math::inverse_spd(tau_temp);
   return post_params;
 }
 
 void NNWHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
-  if (prior.has_fixed_values()) {
+  auto &rng = bayesmix::Rng::Instance().get();
+  if (prior->has_fixed_values()) {
     return;
-  } else if (prior.has_ngiw_prior()) {
+  }
+
+  else if (prior->has_normal_mean_prior()) {
+    // Get hyperparameters
+    Eigen::VectorXd mu00 =
+        bayesmix::to_eigen(prior->normal_mean_prior().mean_prior().mean());
+    Eigen::MatrixXd sigma00 =
+        bayesmix::to_eigen(prior->normal_mean_prior().mean_prior().var());
+    double lambda0 = prior->normal_mean_prior().var_scaling();
+    // Compute posterior hyperparameters
+    unsigned int dim = mu00.size();
+    Eigen::MatrixXd sigma00inv = stan::math::inverse_spd(sigma00);
+    Eigen::MatrixXd prec(dim, dim);
+    Eigen::VectorXd num(dim);
+    for (auto &st : states) {
+      Eigen::MatrixXd prec_i = bayesmix::to_eigen(st.multi_ls_state().prec());
+      prec += prec_i;
+      num += prec_i * bayesmix::to_eigen(st.multi_ls_state().mean());
+    }
+    prec = hypers->var_scaling * prec + sigma00inv;
+    num = hypers->var_scaling * num + sigma00inv * mu00;
+    Eigen::VectorXd mu_n = prec.llt().solve(num);
+    // Update hyperparameters with posterior sampling
+    hypers->mean = stan::math::multi_normal_prec_rng(mu_n, prec, rng);
+  }
+
+  else if (prior->has_ngiw_prior()) {
     // Get hyperparameters:
     // for mu0
     Eigen::VectorXd mu00 =
-        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().mean());
+        bayesmix::to_eigen(prior->ngiw_prior().mean_prior().mean());
     Eigen::MatrixXd sigma00 =
-        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().var());
+        bayesmix::to_eigen(prior->ngiw_prior().mean_prior().var());
     // for lambda0
-    double alpha00 = prior.ngiw_prior().var_scaling_prior().shape();
-    double beta00 = prior.ngiw_prior().var_scaling_prior().rate();
+    double alpha00 = prior->ngiw_prior().var_scaling_prior().shape();
+    double beta00 = prior->ngiw_prior().var_scaling_prior().rate();
     // for tau0
-    double nu00 = prior.ngiw_prior().scale_prior().deg_free();
+    double nu00 = prior->ngiw_prior().scale_prior().deg_free();
     Eigen::MatrixXd tau00 =
-        bayesmix::to_eigen(prior.ngiw_prior().scale_prior().scale());
-    // for nu0
-    double nu0 = prior.ngiw_prior().deg_free();
-
+        bayesmix::to_eigen(prior->ngiw_prior().scale_prior().scale());
     // Compute posterior hyperparameters
     unsigned int dim = mu00.size();
     Eigen::MatrixXd sigma00inv = stan::math::inverse_spd(sigma00);
@@ -98,24 +123,25 @@ void NNWHierarchy::update_hypers(
       Eigen::MatrixXd prec = bayesmix::to_eigen(st.multi_ls_state().prec());
       tau_n += prec;
       num += prec * mean;
-      beta_n += (hypers->mu - mean).transpose() * prec * (hypers->mu - mean);
+      beta_n +=
+          (hypers->mean - mean).transpose() * prec * (hypers->mean - mean);
     }
-    Eigen::MatrixXd prec = hypers->lambda * tau_n + sigma00inv;
+    Eigen::MatrixXd prec = hypers->var_scaling * tau_n + sigma00inv;
     tau_n += tau00;
-    num = hypers->lambda * num + sigma00inv * mu00;
+    num = hypers->var_scaling * num + sigma00inv * mu00;
     beta_n = beta00 + 0.5 * beta_n;
     Eigen::MatrixXd sig_n = stan::math::inverse_spd(prec);
     Eigen::VectorXd mu_n = sig_n * num;
     double alpha_n = alpha00 + 0.5 * states.size();
-    double nu_n = nu00 + states.size() * hypers->nu;
-
+    double nu_n = nu00 + states.size() * hypers->deg_free;
     // Update hyperparameters with posterior random Gibbs sampling
-    auto &rng = bayesmix::Rng::Instance().get();
-    hypers->mu = stan::math::multi_normal_rng(mu_n, sig_n, rng);
-    hypers->lambda = stan::math::gamma_rng(alpha_n, beta_n, rng);
-    hypers->tau = stan::math::inv_wishart_rng(nu_n, tau_n, rng);
-    tau0_inv = stan::math::inverse_spd(hypers->tau);
-  } else {
+    hypers->mean = stan::math::multi_normal_rng(mu_n, sig_n, rng);
+    hypers->var_scaling = stan::math::gamma_rng(alpha_n, beta_n, rng);
+    hypers->scale = stan::math::inv_wishart_rng(nu_n, tau_n, rng);
+    scale0_inv = stan::math::inverse_spd(hypers->scale);
+  }
+
+  else {
     std::invalid_argument("Error: unrecognized prior");
   }
 }
@@ -124,7 +150,7 @@ void NNWHierarchy::update_hypers(
 //! \return     Log-Likehood vector evaluated in data
 double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   // Initialize relevant objects
-  return bayesmix::multi_normal_prec_lpdf(datum, state.mean, prec_chol_eval,
+  return bayesmix::multi_normal_prec_lpdf(datum, state.mean, prec_chol,
                                           prec_logdet);
 }
 
@@ -138,7 +164,7 @@ Eigen::VectorXd NNWHierarchy::like_lpdf_grid(
   // Compute likelihood for each data point
   for (size_t i = 0; i < n; i++) {
     result(i) = bayesmix::multi_normal_prec_lpdf(data.row(i), state.mean,
-                                                 prec_chol_eval, prec_logdet);
+                                                 prec_chol, prec_logdet);
   }
   return result;
 }
@@ -149,12 +175,12 @@ double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
   unsigned int dim = datum.cols();
 
   // Compute dof and scale of marginal distribution
-  double nu_n = 2 * hypers->nu - dim + 1;
-  Eigen::MatrixXd sigma_n = tau0_inv * (hypers->nu - 0.5 * (dim - 1)) *
-                            hypers->lambda / (hypers->lambda + 1);
+  double nu_n = 2 * hypers->deg_free - dim + 1;
+  Eigen::MatrixXd sigma_n = scale0_inv * (hypers->deg_free - 0.5 * (dim - 1)) *
+                            hypers->var_scaling / (hypers->var_scaling + 1);
 
   // TODO: chec if this is optimized as our bayesmix::multi_normal_prec_lpdf
-  return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mu, sigma_n);
+  return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean, sigma_n);
 }
 
 //! \param data Matrix of row-vectorial data points
@@ -167,15 +193,15 @@ Eigen::VectorXd NNWHierarchy::marg_lpdf_grid(
   unsigned int dim = data.cols();
 
   // Compute dof and scale of marginal distribution
-  double nu_n = 2 * hypers->nu - dim + 1;
-  Eigen::MatrixXd sigma_n = tau0_inv * (hypers->nu - 0.5 * (dim - 1)) *
-                            hypers->lambda / (hypers->lambda + 1);
+  double nu_n = 2 * hypers->deg_free - dim + 1;
+  Eigen::MatrixXd sigma_n = scale0_inv * (hypers->deg_free - 0.5 * (dim - 1)) *
+                            hypers->var_scaling / (hypers->var_scaling + 1);
 
   for (size_t i = 0; i < n; i++) {
     // Compute marginal for each data point
     Eigen::RowVectorXd datum = data.row(i);
     result(i) =
-        stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mu, sigma_n);
+        stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean, sigma_n);
   }
   return result;
 }
@@ -184,26 +210,26 @@ void NNWHierarchy::draw() {
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new =
-      stan::math::wishart_rng(hypers->nu, hypers->tau, rng);
+      stan::math::wishart_rng(hypers->deg_free, hypers->scale, rng);
 
   // Update state
   state.mean = stan::math::multi_normal_prec_rng(
-      hypers->mu, tau_new * hypers->lambda, rng);
+      hypers->mean, tau_new * hypers->var_scaling, rng);
   set_prec_and_utilities(tau_new);
 }
 
 //! \param data Matrix of row-vectorial data points
 void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   // Update values
-  Hyperparams params = normal_wishart_update(data, hypers->mu, hypers->lambda,
-                                             tau0_inv, hypers->nu);
+  Hyperparams params = normal_wishart_update(
+      data, hypers->mean, hypers->var_scaling, scale0_inv, hypers->deg_free);
 
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new =
-      stan::math::wishart_rng(params.nu, params.tau, rng);
-  state.mean = stan::math::multi_normal_prec_rng(params.mu,
-                                                 tau_new * params.lambda, rng);
+      stan::math::wishart_rng(params.deg_free, params.scale, rng);
+  state.mean = stan::math::multi_normal_prec_rng(
+      params.mean, tau_new * params.var_scaling, rng);
 
   // Update state
   set_prec_and_utilities(tau_new);
@@ -211,50 +237,79 @@ void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 
 void NNWHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  const bayesmix::MarginalState::ClusterState &currcast =
+  const bayesmix::MarginalState::ClusterState &statecast =
       google::protobuf::internal::down_cast<
           const bayesmix::MarginalState::ClusterState &>(state_);
 
-  state.mean = to_eigen(currcast.multi_ls_state().mean());
-  set_prec_and_utilities(to_eigen(currcast.multi_ls_state().prec()));
+  state.mean = to_eigen(statecast.multi_ls_state().mean());
+  set_prec_and_utilities(to_eigen(statecast.multi_ls_state().prec()));
 }
 
 void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
-  const bayesmix::NNWPrior &currcast =
+  const bayesmix::NNWPrior &priorcast =
       google::protobuf::internal::down_cast<const bayesmix::NNWPrior &>(
           prior_);
-  prior = currcast;
+  prior = std::make_shared<bayesmix::NNWPrior>(priorcast);
   hypers = std::make_shared<Hyperparams>();
-  if (prior.has_fixed_values()) {
+  if (prior->has_fixed_values()) {
     // Set values
-    hypers->mu = bayesmix::to_eigen(prior.fixed_values().mean());
-    hypers->lambda = prior.fixed_values().var_scaling();
-    hypers->tau = bayesmix::to_eigen(prior.fixed_values().scale());
-    tau0_inv = stan::math::inverse_spd(hypers->tau);
-    hypers->nu = prior.fixed_values().deg_free();
+    hypers->mean = bayesmix::to_eigen(prior->fixed_values().mean());
+    hypers->var_scaling = prior->fixed_values().var_scaling();
+    hypers->scale = bayesmix::to_eigen(prior->fixed_values().scale());
+    scale0_inv = stan::math::inverse_spd(hypers->scale);
+    hypers->deg_free = prior->fixed_values().deg_free();
     // Check validity
-    unsigned int dim = hypers->mu.size();
-    assert(hypers->lambda > 0);
-    assert(dim == hypers->tau.rows() &&
+    unsigned int dim = hypers->mean.size();
+    assert(hypers->var_scaling > 0);
+    assert(dim == hypers->scale.rows() &&
            "Error: hyperparameters dimensions are not consistent");
-    assert(hypers->nu > dim - 1);
-  } else if (prior.has_ngiw_prior()) {
+    assert(hypers->deg_free > dim - 1);
+  }
+
+  else if (prior->has_normal_mean_prior()) {
+    // Get hyperparameters
+    Eigen::VectorXd mu00 =
+        bayesmix::to_eigen(prior->normal_mean_prior().mean_prior().mean());
+    Eigen::MatrixXd sigma00 =
+        bayesmix::to_eigen(prior->normal_mean_prior().mean_prior().var());
+    double lambda0 = prior->normal_mean_prior().var_scaling();
+    Eigen::MatrixXd tau0 =
+        bayesmix::to_eigen(prior->normal_mean_prior().scale());
+    double nu0 = prior->normal_mean_prior().deg_free();
+    // Check validity
+    unsigned int dim = mu00.size();
+    assert(sigma00.rows() == dim &&
+           "Error: hyperparameters dimensions are not consistent");
+    assert(tau0.rows() == dim &&
+           "Error: hyperparameters dimensions are not consistent");
+    check_spd(sigma00);
+    assert(lambda0 > 0);
+    check_spd(tau0);
+    assert(nu0 > dim - 1);
+    // Set initial values
+    hypers->mean = mu00;
+    hypers->var_scaling = lambda0;
+    hypers->scale = tau0;
+    scale0_inv = stan::math::inverse_spd(tau0);
+    hypers->deg_free = nu0;
+  }
+
+  else if (prior->has_ngiw_prior()) {
     // Get hyperparameters:
     // for mu0
     Eigen::VectorXd mu00 =
-        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().mean());
+        bayesmix::to_eigen(prior->ngiw_prior().mean_prior().mean());
     Eigen::MatrixXd sigma00 =
-        bayesmix::to_eigen(prior.ngiw_prior().mean_prior().var());
+        bayesmix::to_eigen(prior->ngiw_prior().mean_prior().var());
     // for lambda0
-    double alpha00 = prior.ngiw_prior().var_scaling_prior().shape();
-    double beta00 = prior.ngiw_prior().var_scaling_prior().rate();
+    double alpha00 = prior->ngiw_prior().var_scaling_prior().shape();
+    double beta00 = prior->ngiw_prior().var_scaling_prior().rate();
     // for tau0
-    double nu00 = prior.ngiw_prior().scale_prior().deg_free();
+    double nu00 = prior->ngiw_prior().scale_prior().deg_free();
     Eigen::MatrixXd tau00 =
-        bayesmix::to_eigen(prior.ngiw_prior().scale_prior().scale());
+        bayesmix::to_eigen(prior->ngiw_prior().scale_prior().scale());
     // for nu0
-    double nu0 = prior.ngiw_prior().deg_free();
-
+    double nu0 = prior->ngiw_prior().deg_free();
     // Check validity:
     // dimensionality
     unsigned int dim = mu00.size();
@@ -264,7 +319,7 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
            "Error: hyperparameters dimensions are not consistent");
     // for mu0
     check_spd(sigma00);
-    // for lalmbda0
+    // for lambda0
     assert(alpha00 > 0);
     assert(beta00 > 0);
     // for tau0
@@ -272,26 +327,41 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     check_spd(tau00);
     // check nu0
     assert(nu0 > dim - 1);
-
     // Set initial values
-    hypers->mu = mu00;
-    hypers->lambda = alpha00 / beta00;
-    hypers->tau = tau00 / (nu00 + dim + 1);
-    tau0_inv = stan::math::inverse_spd(hypers->tau);
-    hypers->nu = nu0;
+    hypers->mean = mu00;
+    hypers->var_scaling = alpha00 / beta00;
+    hypers->scale = tau00 / (nu00 + dim + 1);
+    scale0_inv = stan::math::inverse_spd(hypers->scale);
+    hypers->deg_free = nu0;
+  }
 
-  } else {
+  else {
     std::invalid_argument("Error: unrecognized prior");
   }
 }
 
 void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   bayesmix::MultiLSState state_;
-  to_proto(state.mean, state_.mutable_mean());
-  to_proto(state.prec, state_.mutable_prec());
+  bayesmix::to_proto(state.mean, state_.mutable_mean());
+  bayesmix::to_proto(state.prec, state_.mutable_prec());
 
   google::protobuf::internal::down_cast<
       bayesmix::MarginalState::ClusterState *>(out)
       ->mutable_multi_ls_state()
       ->CopyFrom(state_);
+}
+
+void NNWHierarchy::write_hypers_to_proto(
+    google::protobuf::Message *out) const {
+  bayesmix::NNWPrior hypers_;
+  bayesmix::to_proto(hypers->mean,
+                     hypers_.mutable_fixed_values()->mutable_mean());
+  hypers_.mutable_fixed_values()->set_var_scaling(hypers->var_scaling);
+  hypers_.mutable_fixed_values()->set_deg_free(hypers->deg_free);
+  bayesmix::to_proto(hypers->scale,
+                     hypers_.mutable_fixed_values()->mutable_scale());
+
+  google::protobuf::internal::down_cast<bayesmix::NNWPrior *>(out)
+      ->mutable_fixed_values()
+      ->CopyFrom(hypers_.fixed_values());
 }
