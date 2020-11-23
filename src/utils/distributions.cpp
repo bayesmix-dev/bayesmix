@@ -2,7 +2,8 @@
 
 #include <Eigen/Dense>
 #include <random>
-#include <stan/math/prim/prob.hpp>
+#include <src/utils/proto_utils.hpp>
+#include <stan/math/prim.hpp>
 
 int bayesmix::categorical_rng(const Eigen::VectorXd &probas,
                               std::mt19937_64 &rng, int start /*= 0*/) {
@@ -17,4 +18,134 @@ double bayesmix::multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
   double base = prec_logdet + NEG_LOG_SQRT_TWO_PI * datum.size();
   double exp = (prec_chol * (datum - mean)).squaredNorm();
   return 0.5 * (base - exp);
+}
+
+double bayesmix::gaussian_mixture_dist(
+    Eigen::VectorXd means1, Eigen::VectorXd sds1, Eigen::VectorXd weights1,
+    Eigen::VectorXd means2, Eigen::VectorXd sds2, Eigen::VectorXd weights2) {
+  
+  double mix1 = 0.0;
+  #pragma omp parallel for collapse(2) reduction(+: mix1)
+  for (int i = 0; i < means1.size(); i++) {
+    for (int j = 0; j < means1.size(); j++) {
+      mix1 += weights1(i) * weights1(j) *
+              std::exp(stan::math::normal_lpdf(
+                  means1(i), means1(j),
+                  std::sqrt(sds1(i) * sds1(i) + sds1(j) * sds1(j))));
+    }
+  }
+
+  double mix2 = 0.0;
+#pragma omp parallel for collapse(2) reduction(+ : mix2)
+  for (int i = 0; i < means2.size(); i++) {
+    for (int j = 0; j < means2.size(); j++) {
+      mix2 += weights2(i) * weights2(j) *
+              std::exp(stan::math::normal_lpdf(
+                  means2(i), means2(j),
+                  std::sqrt(sds2(i) * sds2(i) + sds2(j) * sds2(j))));
+    }
+  }
+
+  double inter = 0.0;
+#pragma omp parallel for collapse(2) reduction(+ : inter)
+  for (int i = 0; i < means1.size(); i++) {
+    for (int j = 0; j < means2.size(); j++) {
+      inter += weights1(i) * weights2(j) *
+              std::exp(stan::math::normal_lpdf(
+                  means1(i), means2(j),
+                  std::sqrt(sds1(i) * sds1(i) + sds2(j) * sds2(j))));
+    }
+  }
+
+  return mix1 + mix2 - 2 * inter;
+}
+
+double bayesmix::gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
+                                       std::vector<Eigen::MatrixXd> precs1,
+                                       Eigen::VectorXd weights1,
+                                       std::vector<Eigen::VectorXd> means2,
+                                       std::vector<Eigen::MatrixXd> precs2,
+                                       Eigen::VectorXd weights2) {
+  std::vector<Eigen::MatrixXd> vars1;
+  std::vector<Eigen::MatrixXd> vars2;
+
+  for (const auto &p : precs1) vars1.push_back(stan::math::inverse_spd(p));
+
+  for (const auto &p : precs2) vars2.push_back(stan::math::inverse_spd(p));
+
+  double mix1 = 0.0;
+  for (int i = 0; i < means1.size(); i++) {
+    for (int j = 0; j < means1.size(); j++) {
+      mix1 += weights1(i) * weights1(j) *
+              std::exp(stan::math::multi_normal_lpdf(means1[i], means1[j],
+                                                     vars1[i] + vars1[j]));
+    }
+  }
+
+  double mix2 = 0.0;
+  for (int i = 0; i < means2.size(); i++) {
+    for (int j = 0; j < means2.size(); j++) {
+      mix2 += weights2(i) * weights2(j) *
+              std::exp(stan::math::multi_normal_lpdf(means2[i], means2[j],
+                                                     vars2[i] + vars2[j]));
+    }
+  }
+
+  double inter = 0.0;
+  for (int i = 0; i < means1.size(); i++) {
+    for (int j = 0; j < means2.size(); j++) {
+      inter += weights1(i) * weights2(j) *
+              std::exp(stan::math::multi_normal_lpdf(means1[i], means2[j],
+                                                     vars1[i] + vars2[j]));
+    }
+  }
+
+  return mix1 + mix2 - 2 * inter;
+}
+
+double bayesmix::gaussian_mixture_dist(
+    std::vector<bayesmix::MarginalState::ClusterVal> clus1,
+    Eigen::VectorXd weights1,
+    std::vector<bayesmix::MarginalState::ClusterVal> clus2,
+    Eigen::VectorXd weights2) {
+  double out;
+
+  if (clus1[0].has_univ_ls_state()) {
+    Eigen::VectorXd means1(clus1.size());
+    Eigen::VectorXd sds1(clus1.size());
+    Eigen::VectorXd means2(clus2.size());
+    Eigen::VectorXd sds2(clus2.size());
+    for (int i = 0; i < clus1.size(); i++) {
+      means1(i) = clus1[i].univ_ls_state().mean();
+      sds1(i) = clus1[i].univ_ls_state().sd();
+    }
+
+    for (int i = 0; i < clus2.size(); i++) {
+      means2(i) = clus2[i].univ_ls_state().mean();
+      sds2(i) = clus2[i].univ_ls_state().sd();
+    }
+
+    out =
+        gaussian_mixture_dist(means1, sds1, weights1, means2, sds2, weights2);
+  } else if (clus1[0].has_multi_ls_state()) {
+    std::vector<Eigen::VectorXd> means1, means2;
+    std::vector<Eigen::MatrixXd> precs1, precs2;
+
+    for (const auto &c : clus1) {
+      means1.push_back(bayesmix::to_eigen(c.multi_ls_state().mean()));
+      precs1.push_back(bayesmix::to_eigen(c.multi_ls_state().precision()));
+    }
+
+    for (const auto &c : clus2) {
+      means2.push_back(bayesmix::to_eigen(c.multi_ls_state().mean()));
+      precs2.push_back(bayesmix::to_eigen(c.multi_ls_state().precision()));
+    }
+
+    out = gaussian_mixture_dist(means1, precs1, weights1, means2, precs2,
+                                weights2);
+  } else {
+    throw std::invalid_argument("Parameter type not recognized");
+  }
+
+  return out;
 }
