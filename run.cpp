@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
   std::string gridfile = "resources/grid_uni.csv";  // TEST
   std::string densfile = "resources/dens_uni.csv";  // TEST
   std::string massfile = "resources/mass_uni.csv";  // TEST
+  std::string nclufile = "resources/nclu_uni.csv";  // TEST
   unsigned int init = 0;
   unsigned int maxiter = 1000;
   unsigned int burnin = 1;
@@ -105,14 +106,18 @@ int main(int argc, char *argv[]) {
   // Collect mixing states
   auto chain = coll->get_chain();
   Eigen::VectorXd masses(chain.size());
+  Eigen::VectorXd num_clust(chain.size());
   for (int i = 0; i < chain.size(); i++) {
     bayesmix::MixingState mixstate = chain[i].mixing_states(0);
     if (mixstate.has_dp_state()) {
       masses[i] = mixstate.dp_state().totalmass();
+      num_clust[i] = chain[i].cluster_states_size();
     }
   }
   bayesmix::write_matrix_to_file(masses, massfile);
   std::cout << "Successfully wrote total masses to " << massfile << std::endl;
+  bayesmix::write_matrix_to_file(num_clust, nclufile);
+  std::cout << "Successfully wrote cluster sizes to " << nclufile << std::endl;
 
   std::cout << "End of run.cpp" << std::endl;
   delete coll;
