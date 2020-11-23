@@ -278,6 +278,7 @@ void NNIGHierarchy::write_hypers_to_proto(
   hypers_.mutable_fixed_values()->set_shape(hypers->shape);
   hypers_.mutable_fixed_values()->set_scale(hypers->scale);
 
-  google::protobuf::internal::down_cast<bayesmix::NNIGPrior *>(out)->CopyFrom(
-      hypers_);
+  google::protobuf::internal::down_cast<bayesmix::NNIGPrior *>(out)
+      ->mutable_fixed_values()
+      ->CopyFrom(hypers_.fixed_values());
 }

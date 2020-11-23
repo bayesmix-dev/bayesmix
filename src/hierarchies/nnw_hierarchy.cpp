@@ -32,8 +32,8 @@ void NNWHierarchy::check_spd(const Eigen::MatrixXd &mat) {
 
 void NNWHierarchy::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");
-  unsigned int dim = hypers->mean.size();
   state.mean = hypers->mean;
+  unsigned int dim = hypers->mean.size();
   set_prec_and_utilities(hypers->var_scaling *
                          Eigen::MatrixXd::Identity(dim, dim));
 }
@@ -361,6 +361,7 @@ void NNWHierarchy::write_hypers_to_proto(
   bayesmix::to_proto(hypers->scale,
                      hypers_.mutable_fixed_values()->mutable_scale());
 
-  google::protobuf::internal::down_cast<bayesmix::NNWPrior *>(out)->CopyFrom(
-      hypers_);
+  google::protobuf::internal::down_cast<bayesmix::NNWPrior *>(out)
+      ->mutable_fixed_values()
+      ->CopyFrom(hypers_.fixed_values());
 }
