@@ -68,6 +68,7 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
 
 void NNWHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
+  auto &rng = bayesmix::Rng::Instance().get();
   if (prior.has_fixed_values()) {
     return;
   } else if (prior.has_normal_mean_prior()) {
@@ -94,7 +95,6 @@ void NNWHierarchy::update_hypers(
     Eigen::VectorXd mu_n = sig_n * num;
 
     // Update hyperparameters with posterior sampling
-    auto &rng = bayesmix::Rng::Instance().get();
     hypers->mean = stan::math::multi_normal_rng(mu_n, sig_n, rng);
   } else if (prior.has_ngiw_prior()) {
     // Get hyperparameters:
@@ -137,7 +137,6 @@ void NNWHierarchy::update_hypers(
     double nu_n = nu00 + states.size() * hypers->deg_free;
 
     // Update hyperparameters with posterior random Gibbs sampling
-    auto &rng = bayesmix::Rng::Instance().get();
     hypers->mean = stan::math::multi_normal_rng(mu_n, sig_n, rng);
     hypers->var_scaling = stan::math::gamma_rng(alpha_n, beta_n, rng);
     hypers->scale = stan::math::inv_wishart_rng(nu_n, tau_n, rng);

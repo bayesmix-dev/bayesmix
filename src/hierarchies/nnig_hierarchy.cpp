@@ -49,6 +49,7 @@ NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update(
 
 void NNIGHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
+  auto &rng = bayesmix::Rng::Instance().get();
   if (prior.has_fixed_values()) {
     return;
   } else if (prior.has_normal_mean_prior()) {
@@ -73,7 +74,6 @@ void NNIGHierarchy::update_hypers(
     double sig2_n = 1 / prec;
 
     // Update hyperparameters with posterior random sampling
-    auto &rng = bayesmix::Rng::Instance().get();
     hypers->mean = stan::math::normal_rng(mu_n, sqrt(sig2_n), rng);
   } else if (prior.has_ngg_prior()) {
     // Get hyperparameters:
@@ -110,7 +110,6 @@ void NNIGHierarchy::update_hypers(
     double a_n = a00 + states.size() * hypers->shape;
 
     // Update hyperparameters with posterior random Gibbs sampling
-    auto &rng = bayesmix::Rng::Instance().get();
     hypers->mean = stan::math::normal_rng(mu_n, sig_n, rng);
     hypers->var_scaling = stan::math::gamma_rng(alpha_n, beta_n, rng);
     hypers->scale = stan::math::gamma_rng(a_n, b_n, rng);
