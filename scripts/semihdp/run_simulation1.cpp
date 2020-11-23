@@ -1,11 +1,15 @@
 // This scripts runs the simulations with two populations (Section 6.1)
 
 #include <Eigen/Dense>
+#include <src/algorithms/neal2_algorithm.hpp>
 #include <src/algorithms/semihdp_sampler.hpp>
+#include <src/collectors/file_collector.hpp>
+#include <src/collectors/memory_collector.hpp>
 #include <src/utils/rng.hpp>
 #include <stan/math/prim.hpp>
 #include <vector>
-#include <src/collectors/memory_collector.hpp>
+
+#include <src/includes.hpp>
 
 using Eigen::MatrixXd;
 
@@ -35,6 +39,43 @@ std::vector<MatrixXd> simulate_data(double m1, double s1, double m2, double s2,
   return out;
 }
 
+void run_semihdp(const std::vector<MatrixXd> data, std::string chainfile) {
+  
+  // Collect pseudo priors
+  std::vector<MemoryCollector<bayesmix::MarginalState>> pseudoprior_collectors;
+  pseudoprior_collectors.resize(data.size());
+  bayesmix::DPPrior mix_prior;
+  double totalmass = 1.0;
+  mix_prior.mutable_fixed_value()->set_value(totalmass);
+  for (int i=0; i < data.size(); i++) {
+    auto mixing = std::make_shared<DirichletMixing>();
+    mixing->set_prior(mix_prior);
+    auto hier = std::make_shared<NNIGHierarchy>();
+    hier->set_mu0(data[i].mean());
+    hier->set_lambda0(0.1);
+    hier->set_alpha0(2.0);
+    hier->set_beta0(2.0);
+
+    Neal2Algorithm sampler;
+    sampler.set_maxiter(2000);
+    sampler.set_burnin(1000);
+    sampler.set_mixing(mixing);
+    sampler.set_data_and_initial_clusters(data[i], hier, 5);
+    sampler.run(&pseudoprior_collectors[i]);
+
+    std::cout << "collector.size(): " << pseudoprior_collectors[i].get_size() << std::endl;
+  }
+
+  int nburn = 10000;
+  int niter = 10000;
+  MemoryCollector<bayesmix::SemiHdpState> collector;
+  SemiHdpSampler sampler(data);
+  sampler.initialize();
+  sampler.check();
+  sampler.run(nburn, nburn, niter, 5, &collector, pseudoprior_collectors);
+  collector.write_to_file(chainfile);
+}
+
 int main() {
   // Scenario I
   std::vector<MatrixXd> data1 = simulate_data(0.0, 1.0, 5.0, 1.0, 0.5, 0.0,
@@ -50,13 +91,28 @@ int main() {
 
   std::cout << data1[0].transpose() << std::endl;
   std::cout << data1[1].transpose() << std::endl;
+  data1[1] = data1[0];
 
-  MemoryCollector<bayesmix::SemiHdpState> collector;
-  SemiHdpSampler sampler1(data1);
-  sampler1.initialize();
-  sampler1.relabel();
+  run_semihdp(data1, "/home/mario/dev/bayesmix/s1e1_new.recordio");
 
-  int nburn = 10000;
-  int niter = 10000;
-  sampler1.run(nburn, niter, nburn, niter, 5, &collector);
+  // MemoryCollector<bayesmix::SemiHdpState> collector1;
+  // SemiHdpSampler sampler1(data1);
+  // sampler1.initialize();
+  // sampler1.check();
+  // sampler1.run(1000, 1000, nburn, niter, 5, &collector1);
+  // collector1.write_to_file("/home/mario/dev/bayesmix/s1e1.recordio");
+
+  // MemoryCollector<bayesmix::SemiHdpState> collector2;
+  // SemiHdpSampler sampler2(data2);
+  // sampler2.initialize();
+  // sampler2.check();
+  // sampler2.run(1000, 1000, nburn, niter, 5, &collector2);
+  // collector2.write_to_file("/home/mario/dev/bayesmix/s1e2.recordio");
+
+  // MemoryCollector<bayesmix::SemiHdpState> collector3;
+  // SemiHdpSampler sampler3(data3);
+  // sampler3.initialize();
+  // sampler3.check();
+  // sampler3.run(1000, 1000, nburn, niter, 5, &collector3);
+  // collector3.write_to_file("/home/mario/dev/bayesmix/s1e3.recordio");
 }

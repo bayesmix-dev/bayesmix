@@ -9,6 +9,13 @@ SET(CMAKE_CXX_FLAGS -pthread)
 
 include_directories(${GTEST_INCLUDE_DIR})
 
-add_executable(semihdp run_simulation1.cpp)
+add_executable(simu1 run_simulation1.cpp)
+add_executable(simu2 run_simulation2.cpp)
+add_executable(simu100 run_simulation_many.cpp)
 
-target_link_libraries(semihdp bayesmix)
+
+target_link_libraries(simu1 bayesmix)
+target_link_libraries(simu2 bayesmix)
+target_link_libraries(simu100 bayesmix)
+
+
