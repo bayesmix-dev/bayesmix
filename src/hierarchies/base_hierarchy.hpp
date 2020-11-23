@@ -60,6 +60,7 @@ class BaseHierarchy {
 
   // GETTERS AND SETTERS
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
+  virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment

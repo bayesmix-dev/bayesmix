@@ -350,3 +350,19 @@ void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
       ->mutable_multi_ls_state()
       ->CopyFrom(state_);
 }
+
+void NNWHierarchy::write_hypers_to_proto(
+    google::protobuf::Message *out) const {
+  bayesmix::NNWPrior hypers_;
+  bayesmix::Vector mean_;
+  bayesmix::to_proto(hypers->mean, mean_);
+  bayesmix::Matrix scale_;
+  bayesmix::to_proto(hypers->scale, scale_);
+  hypers_.mutable_fixed_values()->mutable_mean() = mean_;
+  hypers_.mutable_fixed_values()->set_var_scaling(hypers->var_scaling);
+  hypers_.mutable_fixed_values()->set_deg_free(hypers->deg_free);
+  hypers_.mutable_fixed_values()->mutable_scale() = scale_;
+
+  google::protobuf::internal::down_cast<bayesmix::NNWPrior *>(out)->CopyFrom(
+      hypers_);
+}
