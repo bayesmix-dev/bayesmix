@@ -11,5 +11,4 @@ target_sources(bayesmix
     rng.hpp
     eigen_utils.hpp
     eigen_utils.cpp
-
 )
