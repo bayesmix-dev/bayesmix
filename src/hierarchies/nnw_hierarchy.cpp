@@ -342,8 +342,8 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
 
 void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   bayesmix::MultiLSState state_;
-  to_proto(state.mean, state_.mutable_mean());
-  to_proto(state.prec, state_.mutable_prec());
+  bayesmix::to_proto(state.mean, state_.mutable_mean());
+  bayesmix::to_proto(state.prec, state_.mutable_prec());
 
   google::protobuf::internal::down_cast<
       bayesmix::MarginalState::ClusterState *>(out)
@@ -354,14 +354,12 @@ void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
 void NNWHierarchy::write_hypers_to_proto(
     google::protobuf::Message *out) const {
   bayesmix::NNWPrior hypers_;
-  bayesmix::Vector mean_;
-  bayesmix::to_proto(hypers->mean, mean_);
-  bayesmix::Matrix scale_;
-  bayesmix::to_proto(hypers->scale, scale_);
-  hypers_.mutable_fixed_values()->mutable_mean() = mean_;
+  bayesmix::to_proto(hypers->mean,
+                     hypers_.mutable_fixed_values()->mutable_mean());
   hypers_.mutable_fixed_values()->set_var_scaling(hypers->var_scaling);
   hypers_.mutable_fixed_values()->set_deg_free(hypers->deg_free);
-  hypers_.mutable_fixed_values()->mutable_scale() = scale_;
+  bayesmix::to_proto(hypers->scale,
+                     hypers_.mutable_fixed_values()->mutable_scale());
 
   google::protobuf::internal::down_cast<bayesmix::NNWPrior *>(out)->CopyFrom(
       hypers_);
