@@ -51,14 +51,19 @@ int main(int argc, char *argv[]) {
   // Write parameters
 
   // NNIG  //TEST
-  double mu0 = 5.0;
-  double lambda0 = 0.1;
-  double alpha0 = 2.0;
-  double beta0 = 2.0;
-  hier_prior.mutable_fixed_values()->set_mean(mu0);
-  hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
-  hier_prior.mutable_fixed_values()->set_shape(alpha0);
-  hier_prior.mutable_fixed_values()->set_scale(beta0);
+  // NGG hyperprior
+  hier_prior.mutable_ngg_prior()->mutable_mean_prior()->set_mean(5.5);
+  hier_prior.mutable_ngg_prior()->mutable_mean_prior()->set_var(2.25);
+  hier_prior.mutable_ngg_prior()->mutable_var_scaling_prior()->set_shape(0.2);
+  hier_prior.mutable_ngg_prior()->mutable_var_scaling_prior()->set_rate(0.6);
+  hier_prior.mutable_ngg_prior()->set_shape(1.5);
+  hier_prior.mutable_ngg_prior()->mutable_scale_prior()->set_shape(4.0);
+  hier_prior.mutable_ngg_prior()->mutable_scale_prior()->set_rate(2.0);
+  // // Fixed values hyperprior
+  // hier_prior.mutable_fixed_values()->set_mean(5.0);
+  // hier_prior.mutable_fixed_values()->set_var_scaling(0.1);
+  // hier_prior.mutable_fixed_values()->set_shape(2.0);
+  // hier_prior.mutable_fixed_values()->set_scale(2.0);
 
   // // NNW  //TEST
   // Eigen::Vector2d mu0; mu0 << 5.5, 5.5;
