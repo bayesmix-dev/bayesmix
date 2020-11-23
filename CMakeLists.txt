@@ -7,7 +7,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(BASEPATH "${CMAKE_SOURCE_DIR}")
 
-add_library(bayesmix OBJECT)
+add_library(bayesmix)
 
 add_subdirectory(src)
 add_subdirectory(proto)
@@ -26,6 +26,6 @@ target_link_directories(bayesmix PUBLIC
 target_link_libraries(bayesmix tbb pthread protobuf)
 target_compile_options(bayesmix PUBLIC -D_REENTRANT -fPIC)
 
-add_executable(run $<TARGET_OBJECTS:bayesmix> run.cpp)
+add_executable(run run.cpp)
 target_link_libraries(run bayesmix)
 target_compile_options(run PUBLIC -D_REENTRANT -fPIC)
