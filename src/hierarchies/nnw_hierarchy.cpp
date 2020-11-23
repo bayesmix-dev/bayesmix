@@ -115,7 +115,7 @@ void NNWHierarchy::update_hypers(
     // Compute posterior hyperparameters
     unsigned int dim = mu00.size();
     Eigen::MatrixXd sigma00inv = stan::math::inverse_spd(sigma00);
-    Eigen::MatrixXd tau_n(dim, dim);
+    Eigen::MatrixXd tau_n = Eigen::MatrixXd::Zero(dim, dim);
     Eigen::VectorXd num(dim);
     double beta_n = 0.0;
     for (auto &st : states) {
@@ -126,11 +126,11 @@ void NNWHierarchy::update_hypers(
       beta_n +=
           (hypers->mean - mean).transpose() * prec * (hypers->mean - mean);
     }
-    Eigen::MatrixXd prec = hypers->var_scaling * tau_n + sigma00inv;
+    Eigen::MatrixXd prec_n = hypers->var_scaling * tau_n + sigma00inv;
     tau_n += tau00;
     num = hypers->var_scaling * num + sigma00inv * mu00;
     beta_n = beta00 + 0.5 * beta_n;
-    Eigen::MatrixXd sig_n = stan::math::inverse_spd(prec);
+    Eigen::MatrixXd sig_n = stan::math::inverse_spd(prec_n);
     Eigen::VectorXd mu_n = sig_n * num;
     double alpha_n = alpha00 + 0.5 * states.size();
     double nu_n = nu00 + states.size() * hypers->deg_free;
