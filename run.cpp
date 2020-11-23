@@ -66,18 +66,40 @@ int main(int argc, char *argv[]) {
   // hier_prior.mutable_fixed_values()->set_scale(2.0);
 
   // // NNW  //TEST
-  // Eigen::Vector2d mu0; mu0 << 5.5, 5.5;
-  // bayesmix::Vector mu0_proto;
-  // bayesmix::to_proto(mu0, &mu0_proto);
-  // double lambda0 = 0.2;
+  // // NGIW hyperprior
+  // Eigen::Vector2d mu00;
+  // mu00 << 5.5, 5.5;
+  // Eigen::Matrix2d ident = Eigen::Matrix2d::Identity();
+  // double nu0 = 5.0;
+  // bayesmix::to_proto(
+  //     mu00,
+  //     hier_prior.mutable_ngiw_prior()->mutable_mean_prior()
+  //     ->mutable_mean());
+  // bayesmix::to_proto(
+  //     ident / nu0,
+  //     hier_prior.mutable_ngiw_prior()->mutable_mean_prior()
+  //     ->mutable_var());
+  // hier_prior.mutable_ngiw_prior()->mutable_var_scaling_prior()
+  //     ->set_shape(0.2);
+  // hier_prior.mutable_ngiw_prior()->mutable_var_scaling_prior()
+  //     ->set_rate(0.6);
+  // hier_prior.mutable_ngiw_prior()->set_deg_free(nu0);
+  // hier_prior.mutable_ngiw_prior()->mutable_scale_prior()->set_deg_free(nu0);
+  // bayesmix::to_proto(
+  //     ident * nu0,
+  //     hier_prior.mutable_ngiw_prior()->mutable_scale_prior()
+  //     ->mutable_scale());
+  // // Fixed values hyperprior
+  // Eigen::Vector2d mu0;
+  // mu0 << 5.5, 5.5;
   // double nu0 = 5.0;
   // Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
-  // bayesmix::Matrix tau0_proto;
-  // bayesmix::to_proto(tau0, &tau0_proto);
-  // *hier_prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
-  // hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
+  // bayesmix::to_proto(mu0,
+  // hier_prior.mutable_fixed_values()->mutable_mean());
+  // hier_prior.mutable_fixed_values()->set_var_scaling(0.2);
   // hier_prior.mutable_fixed_values()->set_deg_free(nu0);
-  // *hier_prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
+  // bayesmix::to_proto(tau0,
+  // hier_prior.mutable_fixed_values()->mutable_scale());
 
   // Set parameters
   hier->set_prior(hier_prior);
