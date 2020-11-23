@@ -71,14 +71,15 @@ void NNWHierarchy::update_hypers(
   auto &rng = bayesmix::Rng::Instance().get();
   if (prior.has_fixed_values()) {
     return;
-  } else if (prior.has_normal_mean_prior()) {
+  }
+
+  else if (prior.has_normal_mean_prior()) {
     // Get hyperparameters
     Eigen::VectorXd mu00 =
         bayesmix::to_eigen(prior.normal_mean_prior().mean_prior().mean());
     Eigen::MatrixXd sigma00 =
         bayesmix::to_eigen(prior.normal_mean_prior().mean_prior().var());
     double lambda0 = prior.normal_mean_prior().var_scaling();
-
     // Compute posterior hyperparameters
     unsigned int dim = mu00.size();
     Eigen::MatrixXd sigma00inv = stan::math::inverse_spd(sigma00);
@@ -92,10 +93,11 @@ void NNWHierarchy::update_hypers(
     prec = hypers->var_scaling * prec + sigma00inv;
     num = hypers->var_scaling * num + sigma00inv * mu00;
     Eigen::VectorXd mu_n = prec.llt().solve(num);
-
     // Update hyperparameters with posterior sampling
     hypers->mean = stan::math::multi_normal_prec_rng(mu_n, prec, rng);
-  } else if (prior.has_ngiw_prior()) {
+  }
+
+  else if (prior.has_ngiw_prior()) {
     // Get hyperparameters:
     // for mu0
     Eigen::VectorXd mu00 =
@@ -109,9 +111,6 @@ void NNWHierarchy::update_hypers(
     double nu00 = prior.ngiw_prior().scale_prior().deg_free();
     Eigen::MatrixXd tau00 =
         bayesmix::to_eigen(prior.ngiw_prior().scale_prior().scale());
-    // for nu0
-    double nu0 = prior.ngiw_prior().deg_free();
-
     // Compute posterior hyperparameters
     unsigned int dim = mu00.size();
     Eigen::MatrixXd sigma00inv = stan::math::inverse_spd(sigma00);
@@ -134,13 +133,14 @@ void NNWHierarchy::update_hypers(
     Eigen::VectorXd mu_n = sig_n * num;
     double alpha_n = alpha00 + 0.5 * states.size();
     double nu_n = nu00 + states.size() * hypers->deg_free;
-
     // Update hyperparameters with posterior random Gibbs sampling
     hypers->mean = stan::math::multi_normal_rng(mu_n, sig_n, rng);
     hypers->var_scaling = stan::math::gamma_rng(alpha_n, beta_n, rng);
     hypers->scale = stan::math::inv_wishart_rng(nu_n, tau_n, rng);
     scale0_inv = stan::math::inverse_spd(hypers->scale);
-  } else {
+  }
+
+  else {
     std::invalid_argument("Error: unrecognized prior");
   }
 }
@@ -263,7 +263,9 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     assert(dim == hypers->scale.rows() &&
            "Error: hyperparameters dimensions are not consistent");
     assert(hypers->deg_free > dim - 1);
-  } else if (prior.has_normal_mean_prior()) {
+  }
+
+  else if (prior.has_normal_mean_prior()) {
     // Get hyperparameters
     Eigen::VectorXd mu00 =
         bayesmix::to_eigen(prior.normal_mean_prior().mean_prior().mean());
@@ -273,7 +275,6 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     Eigen::MatrixXd tau0 =
         bayesmix::to_eigen(prior.normal_mean_prior().scale());
     double nu0 = prior.normal_mean_prior().deg_free();
-
     // Check validity
     unsigned int dim = mu00.size();
     assert(sigma00.rows() == dim &&
@@ -284,14 +285,15 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     assert(lambda0 > 0);
     check_spd(tau0);
     assert(nu0 > dim - 1);
-
     // Set initial values
     hypers->mean = mu00;
     hypers->var_scaling = lambda0;
     hypers->scale = tau0;
     scale0_inv = stan::math::inverse_spd(tau0);
     hypers->deg_free = nu0;
-  } else if (prior.has_ngiw_prior()) {
+  }
+
+  else if (prior.has_ngiw_prior()) {
     // Get hyperparameters:
     // for mu0
     Eigen::VectorXd mu00 =
@@ -307,7 +309,6 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
         bayesmix::to_eigen(prior.ngiw_prior().scale_prior().scale());
     // for nu0
     double nu0 = prior.ngiw_prior().deg_free();
-
     // Check validity:
     // dimensionality
     unsigned int dim = mu00.size();
@@ -325,14 +326,15 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     check_spd(tau00);
     // check nu0
     assert(nu0 > dim - 1);
-
     // Set initial values
     hypers->mean = mu00;
     hypers->var_scaling = alpha00 / beta00;
     hypers->scale = tau00 / (nu00 + dim + 1);
     scale0_inv = stan::math::inverse_spd(hypers->scale);
     hypers->deg_free = nu0;
-  } else {
+  }
+
+  else {
     std::invalid_argument("Error: unrecognized prior");
   }
 }
