@@ -53,6 +53,18 @@ class MemoryCollector : public BaseCollector<MsgType> {
   MsgType get_state(unsigned int i) override { return chain[i]; }
   //! Returns the whole chain in form of a deque of States
   std::deque<MsgType> get_chain() override { return chain; }
+
+  void write_to_file(std::string outfile) {
+    int outfd = open(outfile.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
+    google::protobuf::io::FileOutputStream* fout =
+        new google::protobuf::io::FileOutputStream(outfd);
+
+    for (MsgType& state: chain) {
+      bool success =
+          google::protobuf::util::SerializeDelimitedToZeroCopyStream(state,
+                                                                     fout);
+    }
+  }
 };
 
 #endif  // BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
