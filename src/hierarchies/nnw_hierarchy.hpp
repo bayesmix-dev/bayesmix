@@ -106,10 +106,9 @@ class NNWHierarchy : public BaseHierarchy {
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
   void set_state_from_proto(const google::protobuf::Message &state_) override;
-
   void set_prior(const google::protobuf::Message &prior_) override;
-
   void write_state_to_proto(google::protobuf::Message *out) const override;
+  void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
   std::string get_id() const override { return "NNW"; }
 };

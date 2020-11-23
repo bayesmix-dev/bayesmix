@@ -269,3 +269,15 @@ void NNIGHierarchy::write_state_to_proto(
       ->mutable_univ_ls_state()
       ->CopyFrom(state_);
 }
+
+void NNIGHierarchy::write_hypers_to_proto(
+    google::protobuf::Message *out) const {
+  bayesmix::NNIGPrior hypers_;
+  hypers_.mutable_fixed_values()->set_mean(hypers->mean);
+  hypers_.mutable_fixed_values()->set_var_scaling(hypers->var_scaling);
+  hypers_.mutable_fixed_values()->set_shape(hypers->shape);
+  hypers_.mutable_fixed_values()->set_scale(hypers->scale);
+
+  google::protobuf::internal::down_cast<bayesmix::NNIGPrior *>(out)->CopyFrom(
+      hypers_);
+}
