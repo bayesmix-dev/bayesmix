@@ -4,13 +4,18 @@
 #include <proto/cpp/semihdp.pb.h>
 
 #include <Eigen/Dense>
+#include <numeric>
 #include <src/collectors/memory_collector.hpp>
 #include <src/hierarchies/nnig_hierarchy.hpp>
 #include <src/utils/distributions.hpp>
 #include <src/utils/rng.hpp>
 #include <stan/math/prim.hpp>
+#include <stdexcept>
 #include <vector>
+#include <omp.h>
 
+using bayesmix::MarginalState;
+using bayesmix::SemiHdpState;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
@@ -57,64 +62,106 @@ class SemiHdpSampler {
   double a_w = 2;
   double b_w = 2;
 
-  MemoryCollector<bayesmix::SemiHdpState> pseudoprior_collector;
+  std::vector<MemoryCollector<MarginalState>> pseudoprior_collectors;
   int pseudo_iter;
+
+  bool adapt = false;
+  std::string c_update;
 
  public:
   SemiHdpSampler() {}
   ~SemiHdpSampler() {}
 
-  SemiHdpSampler(const std::vector<MatrixXd> &data);
+  SemiHdpSampler(const std::vector<MatrixXd> &data, std::string c_update="full");
 
   void initialize();
 
   void step() {
     update_unique_vals();
-    update_s();
+    // check();
+
     update_w();
-    update_c();
-    relabel();
-  }
+    // check();
 
-  void pseudo_step() {
-    update_unique_vals();
-    update_s();
-    relabel();
-    update_w();
-  }
-
-  void run(int pseudo_burn, int pseudo_iter, int burnin, int iter, int thin,
-           BaseCollector<bayesmix::SemiHdpState> *collector) {
-    this->pseudo_iter = pseudo_iter;
-    for (int i=0; i < pseudo_burn; i++) pseudo_step();
-
-    for (int i = 0; i < pseudo_iter; i++) {
-      pseudo_step();
-      collect_pseudo();
+    if (!adapt) {
+      sample_pseudo_prior();
+      update_c();
+      // check();
     }
 
-    std::cout << "Finished Pseudo Chain" << std::endl;
-    print_debug_string();
+    update_omega();
 
-    for (int i=0; i < burnin; i++) step();
+    update_s();
+    relabel();
+    // check();
+  }
+
+  void run(int adapt_iter, int burnin, int iter, int thin,
+           BaseCollector<bayesmix::SemiHdpState> *collector,
+           const std::vector<MemoryCollector<MarginalState>>
+               &pseudoprior_collectors) {
+    this->pseudoprior_collectors = pseudoprior_collectors;
+    std::cout << "Run, number of pseudoprior_collectors: "
+              << this->pseudoprior_collectors.size() << std::endl;
+    pseudo_iter = pseudoprior_collectors[0].get_size();
+
+    initialize();
+    update_unique_vals();
+
+    for (int i=i; i < ngroups; i++) {
+      reassign_group(i, 0, i);
+    }
+
+    sample_pseudo_prior();
+    update_c();
+
+    // if (adapt_iter > 0) {
+    //   adapt = true;
+    //   for (int i = 0; i < adapt_iter; i++) {
+    //     step();
+    //     if ((i+1) % 100 == 0) {
+    //       std::cout << "Adapt iter: " << i << " / " << adapt_iter << std::endl;
+    //     }
+    //   }
+    //   adapt = false;
+    // }
+
+    std::cout << "Beginning" << std::endl;
+    for (int i = 0; i < burnin; i++) {
+      step();
+      if ((i + 1) % 100 == 0) {
+        std::cout << "Burn-in iter: " << i + 1 << " / " << burnin << std::endl;
+      }
+    }
 
     for (int i = 0; i < iter; i++) {
       step();
-      if (iter % thin == 0)
-        collector->collect(get_state_as_proto());
+      if (iter % thin == 0) collector->collect(get_state_as_proto());
+      if ((i + 1) % 100 == 0) {
+        std::cout << "Running iter: " << i + 1 << " / " << iter << std::endl;
+      }
     }
   }
 
   void update_unique_vals();
-
   void update_s();
   void update_t();
   void update_c();
+  // void update_c_metropolis();
   void update_w();
-  void relabel();
-  void collect_pseudo();
-  bayesmix::SemiHdpState get_state_as_proto();
+  void update_omega();
 
+  void relabel();
+  void sample_pseudo_prior();
+  void perturb(MarginalState::ClusterVal *out);
+
+  double semihdp_marg_lpdf(const VectorXd& datum);
+
+  double lpdf_for_group(int i, int r);
+
+  void reassign_group(int i, int new_r, int old_r);
+
+  bayesmix::SemiHdpState get_state_as_proto();
   std::vector<std::vector<int>> get_s() const { return s; }
   std::vector<std::vector<int>> get_t() const { return t; }
   std::vector<std::vector<int>> get_v() const { return v; }
@@ -150,6 +197,8 @@ class SemiHdpSampler {
   NNIGHierarchy get_theta_tilde(int r, int l) { return theta_tilde[r][l]; }
 
   void print_debug_string();
+
+  void check();
 };
 
 #endif
