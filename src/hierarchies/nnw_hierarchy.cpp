@@ -237,19 +237,19 @@ void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 
 void NNWHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  const bayesmix::MarginalState::ClusterState &currcast =
+  const bayesmix::MarginalState::ClusterState &statecast =
       google::protobuf::internal::down_cast<
           const bayesmix::MarginalState::ClusterState &>(state_);
 
-  state.mean = to_eigen(currcast.multi_ls_state().mean());
-  set_prec_and_utilities(to_eigen(currcast.multi_ls_state().prec()));
+  state.mean = to_eigen(statecast.multi_ls_state().mean());
+  set_prec_and_utilities(to_eigen(statecast.multi_ls_state().prec()));
 }
 
 void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
-  const bayesmix::NNWPrior &currcast =
+  const bayesmix::NNWPrior &priorcast =
       google::protobuf::internal::down_cast<const bayesmix::NNWPrior &>(
           prior_);
-  *prior = currcast;
+  prior = std::make_shared<bayesmix::NNWPrior>(priorcast);
   hypers = std::make_shared<Hyperparams>();
   if (prior->has_fixed_values()) {
     // Set values
