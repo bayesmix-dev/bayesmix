@@ -14,6 +14,7 @@ void BaseAlgorithm::initialize() {
   assert(unique_values.size() != 0 && "Error: hierarchy was not provided");
   assert(!(unique_values[0]->is_multivariate() == false && data.cols() > 1) &&
          "Error: multivariate data supplied to univariate hierarchy");
+  assert(mixing != nullptr && "Error: mixing was not provided");
 
   if (init_num_clusters == 0) {
     init_num_clusters = data.rows();

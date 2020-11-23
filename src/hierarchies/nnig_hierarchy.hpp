@@ -42,7 +42,7 @@ class NNIGHierarchy : public BaseHierarchy {
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
   // HYPERPRIOR
-  bayesmix::NNIGPrior prior;
+  std::shared_ptr<bayesmix::NNIGPrior> prior;
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior

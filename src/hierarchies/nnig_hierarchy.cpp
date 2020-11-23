@@ -11,6 +11,7 @@
 #include "../utils/rng.hpp"
 
 void NNIGHierarchy::initialize() {
+  assert(prior != nullptr && "Error: prior was not provided");
   state.mean = hypers->mean;
   state.var = hypers->scale / (hypers->shape + 1);
 }
@@ -50,15 +51,15 @@ NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update(
 void NNIGHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();
-  if (prior.has_fixed_values()) {
+  if (prior->has_fixed_values()) {
     return;
   }
 
-  else if (prior.has_normal_mean_prior()) {
+  else if (prior->has_normal_mean_prior()) {
     // Get hyperparameters
-    double mu00 = prior.normal_mean_prior().mean_prior().mean();
-    double sig200 = prior.normal_mean_prior().mean_prior().var();
-    double lambda0 = prior.normal_mean_prior().var_scaling();
+    double mu00 = prior->normal_mean_prior().mean_prior().mean();
+    double sig200 = prior->normal_mean_prior().mean_prior().var();
+    double lambda0 = prior->normal_mean_prior().var_scaling();
     // Compute posterior hyperparameters
     double prec = 0.0;
     double num = 0.0;
@@ -76,17 +77,17 @@ void NNIGHierarchy::update_hypers(
     hypers->mean = stan::math::normal_rng(mu_n, sqrt(sig2_n), rng);
   }
 
-  else if (prior.has_ngg_prior()) {
+  else if (prior->has_ngg_prior()) {
     // Get hyperparameters:
     // for mu0
-    double mu00 = prior.ngg_prior().mean_prior().mean();
-    double sig200 = prior.ngg_prior().mean_prior().var();
+    double mu00 = prior->ngg_prior().mean_prior().mean();
+    double sig200 = prior->ngg_prior().mean_prior().var();
     // for lambda0
-    double alpha00 = prior.ngg_prior().var_scaling_prior().shape();
-    double beta00 = prior.ngg_prior().var_scaling_prior().rate();
+    double alpha00 = prior->ngg_prior().var_scaling_prior().shape();
+    double beta00 = prior->ngg_prior().var_scaling_prior().rate();
     // for tau0
-    double a00 = prior.ngg_prior().scale_prior().shape();
-    double b00 = prior.ngg_prior().scale_prior().rate();
+    double a00 = prior->ngg_prior().scale_prior().shape();
+    double b00 = prior->ngg_prior().scale_prior().rate();
     // Compute posterior hyperparameters
     double b_n = 0.0;
     double num = 0.0;
@@ -199,45 +200,45 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
   const bayesmix::NNIGPrior &currcast =
       google::protobuf::internal::down_cast<const bayesmix::NNIGPrior &>(
           prior_);
-  prior = currcast;
+  *prior = currcast;
   hypers = std::make_shared<Hyperparams>();
-  if (prior.has_fixed_values()) {
+  if (prior->has_fixed_values()) {
     // Set values
-    hypers->mean = prior.fixed_values().mean();
-    hypers->var_scaling = prior.fixed_values().var_scaling();
-    hypers->shape = prior.fixed_values().shape();
-    hypers->scale = prior.fixed_values().scale();
+    hypers->mean = prior->fixed_values().mean();
+    hypers->var_scaling = prior->fixed_values().var_scaling();
+    hypers->shape = prior->fixed_values().shape();
+    hypers->scale = prior->fixed_values().scale();
     // Check validity
     assert(hypers->var_scaling > 0);
     assert(hypers->shape > 0);
     assert(hypers->scale > 0);
   }
 
-  else if (prior.has_normal_mean_prior()) {
+  else if (prior->has_normal_mean_prior()) {
     // Set initial values
-    hypers->mean = prior.normal_mean_prior().mean_prior().mean();
-    hypers->var_scaling = prior.normal_mean_prior().var_scaling();
-    hypers->shape = prior.normal_mean_prior().shape();
-    hypers->scale = prior.normal_mean_prior().scale();
+    hypers->mean = prior->normal_mean_prior().mean_prior().mean();
+    hypers->var_scaling = prior->normal_mean_prior().var_scaling();
+    hypers->shape = prior->normal_mean_prior().shape();
+    hypers->scale = prior->normal_mean_prior().scale();
     // Check validity
     assert(hypers->var_scaling > 0);
     assert(hypers->shape > 0);
     assert(hypers->scale > 0);
   }
 
-  else if (prior.has_ngg_prior()) {
+  else if (prior->has_ngg_prior()) {
     // Get hyperparameters:
     // for mu0
-    double mu00 = prior.ngg_prior().mean_prior().mean();
-    double sigma00 = prior.ngg_prior().mean_prior().var();
+    double mu00 = prior->ngg_prior().mean_prior().mean();
+    double sigma00 = prior->ngg_prior().mean_prior().var();
     // for lambda0
-    double alpha00 = prior.ngg_prior().var_scaling_prior().shape();
-    double beta00 = prior.ngg_prior().var_scaling_prior().rate();
+    double alpha00 = prior->ngg_prior().var_scaling_prior().shape();
+    double beta00 = prior->ngg_prior().var_scaling_prior().rate();
     // for beta0
-    double a00 = prior.ngg_prior().scale_prior().shape();
-    double b00 = prior.ngg_prior().scale_prior().rate();
+    double a00 = prior->ngg_prior().scale_prior().shape();
+    double b00 = prior->ngg_prior().scale_prior().rate();
     // for alpha0
-    double alpha0 = prior.ngg_prior().shape();
+    double alpha0 = prior->ngg_prior().shape();
     // Check validity
     assert(sigma00 > 0);
     assert(alpha00 > 0);

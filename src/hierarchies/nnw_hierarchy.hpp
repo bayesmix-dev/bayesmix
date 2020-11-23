@@ -48,7 +48,7 @@ class NNWHierarchy : public BaseHierarchy {
   std::shared_ptr<Hyperparams> hypers;
   Eigen::MatrixXd scale0_inv;
   // HYPERPRIOR
-  bayesmix::NNWPrior prior;
+  std::shared_ptr<bayesmix::NNWPrior> prior;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
   //! Lower factor of the Cholesky decomposition of prec
