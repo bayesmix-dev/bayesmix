@@ -90,18 +90,24 @@ int main(int argc, char *argv[]) {
   // Collect mixing and cluster states
   auto chain = coll->get_chain();
   Eigen::VectorXd masses(chain.size());
+  Eigen::MatrixXd clusterings(chain.size(), data.rows());
   Eigen::VectorXd num_clust(chain.size());
   for (int i = 0; i < chain.size(); i++) {
+    for (int j = 0; j < data.rows(); j++) {
+      clusterings(i, j) = chain[i].cluster_allocs(j);
+    }
+    num_clust[i] = chain[i].cluster_states_size();
     bayesmix::MixingState mixstate = chain[i].mixing_state();
     if (mixstate.has_dp_state()) {
       masses[i] = mixstate.dp_state().totalmass();
-      num_clust[i] = chain[i].cluster_states_size();
     }
   }
 
-  // Write mixing and cluster states
+  // Write collected data to files
   bayesmix::write_matrix_to_file(masses, massfile);
   std::cout << "Successfully wrote total masses to " << massfile << std::endl;
+  bayesmix::write_matrix_to_file(clusterings, clusfile);
+  std::cout << "Successfully wrote clustering to " << clusfile << std::endl;
   bayesmix::write_matrix_to_file(num_clust, nclufile);
   std::cout << "Successfully wrote cluster sizes to " << nclufile << std::endl;
 
