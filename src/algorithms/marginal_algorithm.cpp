@@ -22,12 +22,9 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
 
   // Loop over non-burn-in algorithm iterations
   for (size_t i = 0; i < n_iter; i++) {
-    // Compute local clusters cardinalities (i.e. of the current iteration)
-    unsigned int n_clust = chain[i].cluster_vals_size();
-    std::vector<unsigned int> card(n_clust, 0);
-    for (size_t j = 0; j < n_data; j++) {
-      card[chain[i].cluster_allocs(j)] += 1;
-    }
+    unsigned int n_clust = chain[i].cluster_states_size();
+    std::vector<unsigned int> card(chain[i].cluster_cards().data(),
+                                   chain[i].cluster_cards().data() + n_clust);
     // Initialize local matrix of log-densities
     Eigen::MatrixXd lpdf_local(grid.rows(), n_clust + 1);
     // Initialize local temporary hierarchy
@@ -36,8 +33,9 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
     // Loop over local unique values i.e. clusters
     for (size_t j = 0; j < n_clust; j++) {
       // Extract and copy unique values in temp_hier
-      bayesmix::MarginalState::ClusterVal curr_val = chain[i].cluster_vals(j);
-      temp_hier->set_state(curr_val, false);
+      bayesmix::MarginalState::ClusterState curr_val =
+          chain[i].cluster_states(j);
+      temp_hier->set_state_from_proto(curr_val);
 
       // Compute cluster component (vector + scalar * unity vector)
       lpdf_local.col(j) = log(mixing->mass_existing_cluster(card[j], n_data)) +

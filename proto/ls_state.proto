@@ -6,10 +6,10 @@ package bayesmix;
 
 message UnivLSState {
     double mean = 1;
-    double sd = 2;
+    double var = 2;
 }
 
 message MultiLSState {
     Vector mean = 1;
-    Matrix precision = 2;
+    Matrix prec = 2;
 }

@@ -19,7 +19,7 @@
 class PitYorMixing : public BaseMixing {
  protected:
   //! Strength and discount parameters
-  double strength;
+  double strength = 1.0;
   double discount = 0.1;
 
  public:

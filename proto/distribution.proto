@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "matrix.proto";
+
+package bayesmix;
+
+message UnivNormalDistribution {
+  double mean = 1;
+  double var = 2;
+}
+
+message MultiNormalDistribution {
+  Vector mean = 1;
+  Matrix var = 2;
+}
+
+message GammaDistribution {
+  double shape = 1;
+  double rate = 2;
+}
+
+message InvWishartDistribution {
+  double deg_free = 1;
+  Matrix scale = 2;
+}

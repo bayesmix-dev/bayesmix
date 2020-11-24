@@ -4,8 +4,11 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
+#include <memory>
 #include <stan/math/prim/fun.hpp>
 
+#include "../../proto/cpp/hierarchy_prior.pb.h"
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "base_hierarchy.hpp"
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
@@ -27,50 +30,51 @@
 
 class NNWHierarchy : public BaseHierarchy {
  public:
-  struct PostParams {
-    Eigen::RowVectorXd mu_n;
-    double lambda_n;
-    Eigen::MatrixXd tau_n;
-    double nu_n;
+  struct State {
+    Eigen::VectorXd mean;
+    Eigen::MatrixXd prec;
+  };
+  struct Hyperparams {
+    Eigen::VectorXd mean;
+    double var_scaling;
+    double deg_free;
+    Eigen::MatrixXd scale;
   };
 
  protected:
-  Eigen::VectorXd mean;
-  Eigen::MatrixXd tau;
-
+  // STATE
+  State state;
   // HYPERPARAMETERS
-  Eigen::RowVectorXd mu0;
-  double lambda0;
-  Eigen::MatrixXd tau0, tau0_inv;
-  double nu0;
+  std::shared_ptr<Hyperparams> hypers;
+  Eigen::MatrixXd scale0_inv;
+  // HYPERPRIOR
+  std::shared_ptr<bayesmix::NNWPrior> prior;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
-  //! Lower factor object of the Cholesky decomposition of tau
-  Eigen::LLT<Eigen::MatrixXd> tau_chol_factor;
-  //! Matrix-form evaluation of tau_chol_factor
-  Eigen::MatrixXd tau_chol_factor_eval;
-  //! Determinant of tau in logarithmic scale
-  double tau_logdet;
+  //! Lower factor of the Cholesky decomposition of prec
+  Eigen::MatrixXd prec_chol;
+  //! Determinant of prec in logarithmic scale
+  double prec_logdet;
 
   // AUXILIARY TOOLS
-  //! Raises error if the hypers values are not valid w.r.t. their own domain
-  void check_hypers_validity() override;
-  //! Raises error if the state values are not valid w.r.t. their own domain
-  void check_state_validity() override;
-  //! Special setter for tau and its utilities
-  void set_tau_and_utilities(const Eigen::MatrixXd &tau_);
+  void check_spd(const Eigen::MatrixXd &mat);
+  //! Special setter for prec and its utilities
+  void set_prec_and_utilities(const Eigen::MatrixXd &prec_);
 
   //! Returns updated values of the prior hyperparameters via their posterior
-  PostParams normal_wishart_update(const Eigen::MatrixXd &data,
-                                   const Eigen::RowVectorXd &mu0,
-                                   const double lambda0,
-                                   const Eigen::MatrixXd &tau0_inv,
-                                   const double nu0);
+  Hyperparams normal_wishart_update(const Eigen::MatrixXd &data,
+                                    const Eigen::VectorXd &mu0,
+                                    const double lambda0,
+                                    const Eigen::MatrixXd &tau0_inv,
+                                    const double nu0);
 
  public:
-  void check_and_initialize() override;
+  void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, true)
   bool is_multivariate() const override { return true; }
+
+  void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
+                         &states) override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNWHierarchy() = default;
@@ -96,37 +100,15 @@ class NNWHierarchy : public BaseHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
+  State get_state() const { return state; }
+  Hyperparams get_hypers() const { return *hypers; }
+
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  void set_state(const google::protobuf::Message &state_,
-                 bool check = true) override;
-
-  Eigen::RowVectorXd get_mu0() const { return mu0; }
-
-  Eigen::VectorXd get_mean() const { return mean; }
-
-  Eigen::MatrixXd get_tau() const { return tau; }
-
-  double get_lambda0() const { return lambda0; }
-
-  Eigen::MatrixXd get_tau0() const { return tau0; }
-
-  Eigen::MatrixXd get_tau0_inv() const { return tau0_inv; }
-
-  double get_nu0() const { return nu0; }
-
-  void set_mu0(const Eigen::RowVectorXd &mu0_) { mu0 = mu0_; }
-
-  void set_lambda0(const double lambda0_) { lambda0 = lambda0_; }
-
-  void set_tau0(const Eigen::MatrixXd &tau0_) {
-    tau0 = tau0_;
-    tau0_inv = stan::math::inverse_spd(tau0);
-  }
-
-  void set_nu0(const double nu0_) { nu0 = nu0_; }
-
+  void set_state_from_proto(const google::protobuf::Message &state_) override;
+  void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
+  void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
   std::string get_id() const override { return "NNW"; }
 };

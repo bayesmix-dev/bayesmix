@@ -15,22 +15,24 @@ int main(int argc, char *argv[]) {
   std::string datafile = "resources/data_uni.csv";  // TEST
   std::string gridfile = "resources/grid_uni.csv";  // TEST
   std::string densfile = "resources/dens_uni.csv";  // TEST
+  std::string massfile = "resources/mass_uni.csv";  // TEST
   unsigned int init = 0;
   unsigned int maxiter = 1000;
   unsigned int burnin = 1;
   int rng_seed = 20201103;
 
-  // Total mass
+  // Initialize prior protos
+  bayesmix::NNIGPrior hier_prior;  // TEST
   bayesmix::DPPrior mix_prior;
 
-  // Fixed total mass
-  double totalmass = 2.0;
-  mix_prior.mutable_fixed_value()->set_value(totalmass);
-  // // Gamma-prior total mass
-  // double alpha_mass = 4.0;
-  // double beta_mass = 2.0;
-  // mix_prior.mutable_gamma_prior()->set_alpha(alpha_mass);
-  // mix_prior.mutable_gamma_prior()->set_beta(beta_mass);
+  // // Fixed total mass
+  // double totalmass = 2.0;
+  // mix_prior.mutable_fixed_value()->set_value(totalmass);
+  // Gamma-prior total mass
+  double alpha_mass = 4.0;
+  double beta_mass = 2.0;
+  mix_prior.mutable_gamma_prior()->set_shape(alpha_mass);
+  mix_prior.mutable_gamma_prior()->set_rate(beta_mass);
 
   // Create factories and objects
   auto &factory_mixing = Factory<BaseMixing>::Instance();
@@ -45,44 +47,72 @@ int main(int argc, char *argv[]) {
   auto &rng = bayesmix::Rng::Instance().get();
   rng.seed(rng_seed);
 
-  // Set parameters
+  // Write parameters
 
   // NNIG  //TEST
-  hier->set_mu0(5.0);
-  hier->set_lambda0(0.1);
-  hier->set_alpha0(2.0);
-  hier->set_beta0(2.0);
+  double mu0 = 5.0;
+  double lambda0 = 0.1;
+  double alpha0 = 2.0;
+  double beta0 = 2.0;
+  hier_prior.mutable_fixed_values()->set_mean(mu0);
+  hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
+  hier_prior.mutable_fixed_values()->set_shape(alpha0);
+  hier_prior.mutable_fixed_values()->set_scale(beta0);
 
   // // NNW  //TEST
   // Eigen::Vector2d mu0; mu0 << 5.5, 5.5;
-  // hier->set_mu0(mu0);
-  // hier->set_lambda0(0.2);
+  // bayesmix::Vector mu0_proto;
+  // bayesmix::to_proto(mu0, &mu0_proto);
+  // double lambda0 = 0.2;
   // double nu0 = 5.0;
-  // hier->set_nu0(nu0);
   // Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
-  // hier->set_tau0(tau0);
+  // bayesmix::Matrix tau0_proto;
+  // bayesmix::to_proto(tau0, &tau0_proto);
+  // *hier_prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
+  // hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
+  // hier_prior.mutable_fixed_values()->set_deg_free(nu0);
+  // *hier_prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
 
+  // Set parameters
+  hier->set_prior(hier_prior);
   mixing->set_prior(mix_prior);
   algo->set_maxiter(maxiter);
   algo->set_burnin(burnin);
 
-  // Other objects
+  // Read data objects
   Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
   Eigen::MatrixXd grid = bayesmix::read_eigen_matrix(gridfile);
 
   // STUFF:
   // Object allocation
   algo->set_mixing(mixing);
-  algo->set_data_and_initial_clusters(data, hier, init);
+  algo->set_data(data);
+  algo->set_initial_clusters(hier, init);
   if (type_algo == "N8") {
     algo->set_n_aux(3);
   }
   BaseCollector<bayesmix::MarginalState> *coll =
       new MemoryCollector<bayesmix::MarginalState>();
 
-  algo->run(&coll);
-  Eigen::MatrixXd dens = algo->eval_lpdf(grid, &coll);
+  // Run algorithm and density evaluation
+  algo->run(coll);
+  std::cout << "Computing log-density..." << std::endl;
+  Eigen::MatrixXd dens = algo->eval_lpdf(grid, coll);
+  std::cout << "Done" << std::endl;
   bayesmix::write_matrix_to_file(dens, densfile);
+  std::cout << "Successfully wrote density to " << densfile << std::endl;
+
+  // Collect mixing states
+  auto chain = coll->get_chain();
+  Eigen::VectorXd masses(chain.size());
+  for (int i = 0; i < chain.size(); i++) {
+    bayesmix::MixingState mixstate = chain[i].mixing_states(0);
+    if (mixstate.has_dp_state()) {
+      masses[i] = mixstate.dp_state().totalmass();
+    }
+  }
+  bayesmix::write_matrix_to_file(masses, massfile);
+  std::cout << "Successfully wrote total masses to " << massfile << std::endl;
 
   std::cout << "End of run.cpp" << std::endl;
   delete coll;

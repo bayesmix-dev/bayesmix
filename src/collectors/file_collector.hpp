@@ -165,5 +165,4 @@ std::deque<MsgType> FileCollector<MsgType>::get_chain() {
   return out;
 }
 
-
 #endif  // BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_

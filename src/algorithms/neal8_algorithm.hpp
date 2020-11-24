@@ -26,7 +26,7 @@
 class Neal8Algorithm : public Neal2Algorithm {
  protected:
   //! Number of auxiliary blocks
-  unsigned int n_aux;
+  unsigned int n_aux = 3;
 
   //! Vector of auxiliary blocks
   std::vector<std::shared_ptr<BaseHierarchy>> aux_unique_values;

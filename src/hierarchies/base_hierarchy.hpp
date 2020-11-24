@@ -7,6 +7,7 @@
 #include <memory>
 #include <random>
 
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
 
 //! Abstract base template class for a hierarchy object.
@@ -26,17 +27,13 @@
 //! likelihood (whose parameters are the state) or its marginal distribution.
 
 class BaseHierarchy {
- protected:
-  // AUXILIARY TOOLS
-  //! Raises error if the hypers values are not valid w.r.t. their own domain
-  virtual void check_hypers_validity() = 0;
-  //! Raises error if the state values are not valid w.r.t. their own domain
-  virtual void check_state_validity() = 0;
-
  public:
-  virtual void check_and_initialize() = 0;
+  virtual void initialize() = 0;
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
+
+  virtual void update_hypers(
+      const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseHierarchy() = default;
@@ -63,11 +60,14 @@ class BaseHierarchy {
 
   // GETTERS AND SETTERS
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
+  virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
-  virtual void set_state(const google::protobuf::Message &state_,
-                         bool check = true) = 0;
+  virtual void set_state_from_proto(
+      const google::protobuf::Message &state_) = 0;
+
+  virtual void set_prior(const google::protobuf::Message &prior_) = 0;
 
   virtual std::string get_id() const = 0;
 };
