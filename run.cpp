@@ -9,9 +9,10 @@ int main(int argc, char *argv[]) {
   std::cout << "Running run.cpp" << std::endl;
 
   // Console parameters (temporarily assigned at compile-time)
-  // std::string type_mixing = "PY";
-  // std::string type_hier = "NNW";
-  std::string type_algo = "N2";
+  std::string algo_type = argv[1];
+  // std::string hier_type = "NNW";
+  std::string mixing_type = argv[3];
+  std::string mixing_args = argv[5];
   std::string datafile = "resources/data_uni.csv";  // TEST
   std::string gridfile = "resources/grid_uni.csv";  // TEST
   std::string densfile = "resources/dens_uni.csv";  // TEST
@@ -24,31 +25,32 @@ int main(int argc, char *argv[]) {
 
   // Initialize prior protos
   bayesmix::NNIGPrior hier_prior;  // TEST
-  bayesmix::DPPrior mix_prior;
-
-  // // Fixed total mass
-  // double totalmass = 2.0;
-  // mix_prior.mutable_fixed_value()->set_value(totalmass);
-  // Gamma-prior total mass
-  double alpha_mass = 4.0;
-  double beta_mass = 2.0;
-  mix_prior.mutable_gamma_prior()->set_shape(alpha_mass);
-  mix_prior.mutable_gamma_prior()->set_rate(beta_mass);
+  // bayesmix::DPPrior mix_prior;
 
   // Create factories and objects
-  auto &factory_mixing = Factory<BaseMixing>::Instance();
-  auto &factory_hier = Factory<BaseHierarchy>::Instance();
   auto &factory_algo = Factory<BaseAlgorithm>::Instance();
-  // auto mixing = factory_mixing.create_object(type_mixing);
-  auto mixing = std::make_shared<DirichletMixing>();
-  // auto hier = factory_hier.create_object(type_hier);
+  auto &factory_hier = Factory<BaseHierarchy>::Instance();
+  auto &factory_mixing = Factory<BaseMixing>::Instance();
+  auto algo = factory_algo.create_object(algo_type);
+  // auto hier = factory_hier.create_object(hier_type);
   auto hier = std::make_shared<NNIGHierarchy>();  // TEST
-  auto algo = factory_algo.create_object(type_algo);
+  auto mixing = factory_mixing.create_object(mixing_type);
+
   // Initialize RNG object
   auto &rng = bayesmix::Rng::Instance().get();
   rng.seed(rng_seed);
 
-  // Write parameters
+  // Set mixing hyperprior
+  std::string mix_prior_str = "bayesmix." + mixing_type + "Prior";
+  auto mix_prior_desc = google::protobuf::DescriptorPool::generated_pool()
+                            ->FindMessageTypeByName(mix_prior_str);
+  assert(mix_prior_desc != NULL);
+  google::protobuf::Message *mix_prior =
+      google::protobuf::MessageFactory::generated_factory()
+          ->GetPrototype(mix_prior_desc)
+          ->New();
+  bayesmix::read_proto_from_file(mixing_args, mix_prior);
+  mixing->set_prior(*mix_prior);
 
   // NNIG  //TEST
   // NGG hyperprior
@@ -103,7 +105,6 @@ int main(int argc, char *argv[]) {
 
   // Set parameters
   hier->set_prior(hier_prior);
-  mixing->set_prior(mix_prior);
   algo->set_maxiter(maxiter);
   algo->set_burnin(burnin);
 
@@ -116,7 +117,7 @@ int main(int argc, char *argv[]) {
   algo->set_mixing(mixing);
   algo->set_data(data);
   algo->set_initial_clusters(hier, init);
-  if (type_algo == "N8") {
+  if (algo_type == "N8") {
     algo->set_n_aux(3);
   }
   BaseCollector<bayesmix::MarginalState> *coll =
