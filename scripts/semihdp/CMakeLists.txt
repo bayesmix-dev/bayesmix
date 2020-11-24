@@ -12,10 +12,12 @@ include_directories(${GTEST_INCLUDE_DIR})
 add_executable(simu1 run_simulation1.cpp)
 add_executable(simu2 run_simulation2.cpp)
 add_executable(simu100 run_simulation_many.cpp)
-
+add_executable(chile run_chile.cpp)
 
 target_link_libraries(simu1 bayesmix)
 target_link_libraries(simu2 bayesmix)
 target_link_libraries(simu100 bayesmix)
+target_link_libraries(chile bayesmix)
+
 
 
