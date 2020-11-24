@@ -1,6 +1,0 @@
-fixed_values {
-  mean: 5.0
-  var_scaling: 0.1
-  shape: 2.0
-  scale: 2.0
-}

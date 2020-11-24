@@ -1,4 +1,0 @@
-gamma_prior {
-  shape: 4.0
-  rate: 2.0
-}
