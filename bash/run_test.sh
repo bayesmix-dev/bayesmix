@@ -10,21 +10,21 @@
 
 if [ "$1" == "uni" ]; then
   build/run \
-    N2 20201103 0 1000 100 \
-    NNIG resources/nnig_ngg_prior.asciipb \
-    DP resources/dp_gamma_prior.asciipb \
-    resources/data_uni.csv resources/grid_uni.csv \
-    resources/dens_uni.csv resources/mass_uni.csv \
-    resources/nclu_uni.csv resources/clus_uni.csv
+    N2 20201124 0 1000 100 \
+    NNIG resources/asciipb/nnig_ngg_prior.asciipb \
+    DP resources/asciipb/dp_gamma_prior.asciipb \
+    resources/csv/in/data_uni.csv resources/csv_in/grid_uni.csv \
+    resources/csv/out/un_dens.csv resources/csv_out/un_mass.csv \
+    resources/csv/out/un_nclu.csv resources/csv_out/un_clus.csv
 
 elif [ "$1" == "multi" ]; then
   build/run \
-    N2 20201103 0 1000 100 \
+    N2 20201124 0 1000 100 \
     NNW resources/nnw_ngiw_prior.asciipb \
     DP resources/dp_gamma_prior.asciipb \
-    resources/data_multi.csv resources/grid_multi.csv \
-    resources/dens_multi.csv resources/mass_multi.csv \
-    resources/nclu_multi.csv resources/clus_multi.csv
+    resources/csv/in/data_multi.csv resources/csv/in/grid_multi.csv \
+    resources/csv/out/mn_dens.csv resources/csv/out/mn_mass.csv \
+    resources/csv/out/mn_nclu.csv resources/csv/out/mn_clus.csv
 
 else
   echo "Syntax: bash/run_test.sh uni (or multi)"
