@@ -61,7 +61,7 @@ class DirichletMixing : public BaseMixing {
 
   void write_state_to_proto(google::protobuf::Message *out) const override;
 
-  std::string get_id() const override { return "Dirichlet"; }
+  std::string get_id() const override { return "DP"; }
 };
 
 #endif  // BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
