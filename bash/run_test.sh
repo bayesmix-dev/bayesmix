@@ -13,9 +13,9 @@ if [ "$1" == "uni" ]; then
     N2 20201124 0 1000 100 \
     NNIG resources/asciipb/nnig_ngg_prior.asciipb \
     DP resources/asciipb/dp_gamma_prior.asciipb \
-    resources/csv/in/data_uni.csv resources/csv_in/grid_uni.csv \
-    resources/csv/out/un_dens.csv resources/csv_out/un_mass.csv \
-    resources/csv/out/un_nclu.csv resources/csv_out/un_clus.csv
+    resources/csv/in/data_uni.csv resources/csv/in/grid_uni.csv \
+    resources/csv/out/un_dens.csv resources/csv/out/un_mass.csv \
+    resources/csv/out/un_nclu.csv resources/csv/out/un_clus.csv
 
 elif [ "$1" == "multi" ]; then
   build/run \
