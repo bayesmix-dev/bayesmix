@@ -218,10 +218,10 @@ void SemiHdpSampler::update_s() {
         // else
         //   log_n = 1e-20;
 
-        probas[l] = log_n + theta_star[r][l].like_lpdf(data[i].row(j));
+        probas[l] = log_n + theta_star[r][l]->like_lpdf(data[i].row(j));
       }
 
-      double margG0 = logw + master_hierarchy.marg_lpdf(data[i].row(j));
+      double margG0 = logw + master_hierarchy->marg_lpdf(data[i].row(j));
 
       VectorXd hdp_contribs(taus.size() + 1);
 #pragma omp parallel for
@@ -231,7 +231,7 @@ void SemiHdpSampler::update_s() {
         //   logm = std::log(1.0 * m[h]);
         // else
         //   logm = 1e-20;
-        hdp_contribs[h] = logm - logmsum + taus[h].like_lpdf(data[i].row(j));
+        hdp_contribs[h] = logm - logmsum + taus[h]->like_lpdf(data[i].row(j));
       }
 
       hdp_contribs[taus.size()] =
@@ -254,8 +254,8 @@ void SemiHdpSampler::update_s() {
         if (stan::math::uniform_rng(0, 1, rng) < w) {
           // sample from G0, add it to theta_star and theta_tilde and adjust
           // counts and stuff
-          NNIGHierarchy hierarchy = master_hierarchy;
-          hierarchy.sample_given_data(data[i].row(j));
+          std::shared_ptr<BaseHierarchy> hierarchy = G0_master_hierarchy->clone();
+          hierarchy->sample_given_data(data[i].row(j));
           theta_tilde[r].push_back(hierarchy);
           theta_star[r].push_back(hierarchy);
           t[r].push_back(-1);
@@ -273,6 +273,8 @@ void SemiHdpSampler::update_s() {
             m[tnew] += 1;
           } else {
             // std::cout << "creating new tau!" << std::endl;
+            std::shared_ptr<BaseHierarchy> hierarchy =
+                G00_master_hierarchy->clone();
             NNIGHierarchy hierarchy = master_hierarchy;
             hierarchy.sample_given_data(data[i].row(j));
             taus.push_back(hierarchy);
@@ -322,7 +324,7 @@ void SemiHdpSampler::update_c() {
       VectorXd weights1(theta_star[curr_r].size());
       for (int l = 0; l < theta_star[curr_r].size(); l++) {
         bayesmix::MarginalState::ClusterState clus;
-        theta_star[curr_r][l].write_state_to_proto(&clus);
+        theta_star[curr_r][l]->write_state_to_proto(&clus);
         clus1[l] = clus;
         weights1(l) = n_by_theta_star[curr_r][l];
       }
@@ -336,7 +338,7 @@ void SemiHdpSampler::update_c() {
         VectorXd weights2(theta_star[r].size());
         for (int l = 0; l < theta_star[r].size(); l++) {
           bayesmix::MarginalState::ClusterState clus;
-          theta_star[r][l].write_state_to_proto(&clus);
+          theta_star[r][l]->write_state_to_proto(&clus);
           clus2[l] = clus;
           weights2(l) = n_by_theta_star[r][l];
         }
@@ -354,16 +356,7 @@ void SemiHdpSampler::update_c() {
       int prop_r = bayesmix::categorical_rng(proposal_weights, rng);
       double num = lpdf_for_group(i, prop_r) + std::log(omega(prop_r));
       double den = lpdf_for_group(i, curr_r) + std::log(omega(curr_r));
-      // if (i == 0) {
-      //   std::cout << "dists: " << dists.transpose() << std::endl;
-
-      //   std::cout << "proposal_weights: " << proposal_weights.transpose()
-      //             << std::endl;
-      //   std::cout << "curr_r: " << curr_r << ", prop_r: " << prop_r
-      //             << ", num: " << num << ", den: " << den
-      //             << ", arate: " << std::exp(num - den) << std::endl;
-      // }
-
+    
       if (std::log(stan::math::uniform_rng(0, 1, rng)) < num - den) {
         new_r = prop_r;
       }
@@ -376,7 +369,6 @@ void SemiHdpSampler::update_c() {
 }
 
 void SemiHdpSampler::update_w() {
-  // std::cout << "update_w" << std::endl;
 
   auto& rng = bayesmix::Rng::Instance().get();
   // cnt how many from the iodisincratic
@@ -391,7 +383,6 @@ void SemiHdpSampler::update_w() {
     }
   }
   w = stan::math::beta_rng(a_w + cnt, b_w + tot - cnt, rng);
-  // std::cout << "update_w DONE" << std::endl;
 }
 
 void SemiHdpSampler::update_omega() {
@@ -500,7 +491,7 @@ void SemiHdpSampler::sample_pseudo_prior() {
   for (int r = 0; r < ngroups; r++) {
     MarginalState state = pseudoprior_collectors[r].get_state(iter);
     // compute the cardinalities
-    int nclus = state.cluster_vals_size();
+    int nclus = state.cluster_states_size();
     VectorXd cards = VectorXd::Zero(nclus);
     for (size_t j = 0; j < state.cluster_allocs_size(); j++) {
       cards[state.cluster_allocs(j)] += 1;
@@ -508,8 +499,6 @@ void SemiHdpSampler::sample_pseudo_prior() {
 
     // generate a multinomial random variable with the weights given by
     // the (normalized) cardinalities of the pseudoprior
-    // std::cout << "cards before: " << cards.transpose() << std::endl;
-
     cards = cards.array() / cards.sum();
     VectorXd cards_perturb =
         0.5 * cards.array() +
@@ -517,18 +506,12 @@ void SemiHdpSampler::sample_pseudo_prior() {
     n_by_theta_star_pseudo[r] =
         stan::math::multinomial_rng(cards_perturb, n_by_group[r], rng);
 
-    // n_by_theta_star_pseudo[r] = {cards.data(), cards.data() + cards.size()};
-
-    // std::cout << "cards perturb: ";
-    // for (int k: n_by_theta_star_pseudo[r]) std::cout << k << ", ";
-    // std::cout << std::endl;
-
     theta_star_pseudo[r].resize(0);
-    for (int l = 0; l < state.cluster_vals_size(); l++) {
-      MarginalState::ClusterState clusval = state.cluster_vals(l);
+    for (int l = 0; l < state.cluster_states_size(); l++) {
+      MarginalState::ClusterState clusval = state.cluster_states(l);
       // perturb(&clusval);
-      NNIGHierarchy curr_clus = master_hierarchy;
-      curr_clus.set_state(clusval);
+      std::shared_ptr<BaseHierarchy> curr_clus = G0_master_hierarchy->clone();
+      curr_clus->set_state_from_proto(clusval);
       theta_star_pseudo[r].push_back(curr_clus);
     }
   }
@@ -539,11 +522,11 @@ void SemiHdpSampler::perturb(MarginalState::ClusterState* out) {
   if (out->has_univ_ls_state()) {
     double m =
         out->univ_ls_state().mean() + stan::math::normal_rng(0, 1.5, rng);
-    double curr_sd = out->univ_ls_state().sd();
-    double sd =
-        curr_sd + stan::math::uniform_rng(-curr_sd / 4, curr_sd / 4, rng);
+    double curr_var = out->univ_ls_state().var();
+    double var =
+        curr_var + stan::math::uniform_rng(-curr_var / 4, curr_var / 4, rng);
     out->mutable_univ_ls_state()->set_mean(m);
-    out->mutable_univ_ls_state()->set_sd(sd);
+    out->mutable_univ_ls_state()->set_var(var);
   } else {
     throw std::invalid_argument("Case not implemented yet!");
   }
@@ -560,7 +543,7 @@ double SemiHdpSampler::lpdf_for_group(int i, int r) {
     lpdf_local.resize(n_by_group[i], theta_star[r].size());
     for (int h = 0; h < theta_star[r].size(); h++) {
       lpdf_local.col(h) = log(1.0 * n_by_theta_star[r][h] / (alpha + nr)) +
-                          theta_star[r][h].like_lpdf_grid(data[i]).array();
+                          theta_star[r][h]->like_lpdf_grid(data[i]).array();
     }
 
   } else {
@@ -570,7 +553,7 @@ double SemiHdpSampler::lpdf_for_group(int i, int r) {
     for (int h = 0; h < theta_star_pseudo[r].size(); h++) {
       lpdf_local.col(h) =
           log(1.0 * n_by_theta_star_pseudo[r][h] / (alpha + nr)) +
-          theta_star_pseudo[r][h].like_lpdf_grid(data[i]).array();
+          theta_star_pseudo[r][h]->like_lpdf_grid(data[i]).array();
     }
   }
   for (int j = 0; j < n_by_group[i]; j++)
@@ -606,7 +589,7 @@ void SemiHdpSampler::reassign_group(int i, int new_r, int old_r) {
       else
         log_n = 1e-20;
 
-      probas[l] = log_n + theta_star[new_r][l].like_lpdf(data[i].row(j));
+      probas[l] = log_n + theta_star[new_r][l]->like_lpdf(data[i].row(j));
     }
     s[i][j] = bayesmix::categorical_rng(stan::math::softmax(probas), rng);
   }
@@ -620,7 +603,7 @@ bayesmix::SemiHdpState SemiHdpSampler::get_state_as_proto() {
 
     for (int l = 0; l < theta_star[i].size(); l++) {
       bayesmix::SemiHdpState::ClusterState clusval;
-      theta_star[i][l].write_state_to_proto(&clusval);
+      theta_star[i][l]->write_state_to_proto(&clusval);
       curr_restaurant.add_theta_stars()->CopyFrom(clusval);
     }
     *curr_restaurant.mutable_n_by_clus() = {n_by_theta_star[i].begin(),
@@ -636,7 +619,7 @@ bayesmix::SemiHdpState SemiHdpSampler::get_state_as_proto() {
 
     for (int l = 0; l < taus.size(); l++) {
       bayesmix::SemiHdpState::ClusterState clusval;
-      taus[l].write_state_to_proto(&clusval);
+      taus[l]->write_state_to_proto(&clusval);
       state.add_taus()->CopyFrom(clusval);
     }
 

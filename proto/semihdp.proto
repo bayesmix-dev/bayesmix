@@ -33,7 +33,7 @@ message SemiHdpState {
 message SemiHdpParams {
   message PseudoPriorParams {
     double card_weight = 1;
-    double mean_perturb_sd = 2:
+    double mean_perturb_sd = 2;
     double sd_perturb_frac = 3;
   }
 

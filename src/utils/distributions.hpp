@@ -29,9 +29,9 @@ double gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
                              Eigen::VectorXd weights2);
 
 double gaussian_mixture_dist(
-    std::vector<bayesmix::MarginalState::ClusterVal> clus1,
+    std::vector<bayesmix::MarginalState::ClusterState> clus1,
     Eigen::VectorXd weights1,
-    std::vector<bayesmix::MarginalState::ClusterVal> clus2,
+    std::vector<bayesmix::MarginalState::ClusterState> clus2,
     Eigen::VectorXd weights2);
 
 }  // namespace bayesmix
