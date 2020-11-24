@@ -10,7 +10,7 @@ SET(CMAKE_CXX_FLAGS -pthread)
 include_directories(${GTEST_INCLUDE_DIR})
 
 add_executable(test_bayesmix write_proto.cpp proto_utils.cpp rng.cpp
-               hierarchies.cpp lpdf.cpp priors.cpp)
+               hierarchies.cpp lpdf.cpp priors.cpp distributions.cpp)
 
 target_link_libraries(test_bayesmix ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY}
                       bayesmix)

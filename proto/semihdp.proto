@@ -30,3 +30,29 @@ message SemiHdpState {
   repeated int32 c = 4;
   double w = 5;
 }
+
+message SemiHdpParams {
+  message PseudoPriorParams {
+    double card_weight = 1;
+    double mean_perturb_sd = 2:
+    double sd_perturb_frac = 3;
+  }
+
+  message WPriorParams {
+    double shape1 = 1;
+    double shape2 = 2;
+  }
+
+  PseudoPriorParams pseudo_prior = 1;
+
+  double omega_prior = 2;
+
+  string c_update = 3; // Either "full", "metro_base", "metro_dist"
+
+  double alpha = 4;
+
+  double gamma = 5;
+
+  WPriorParams w_prior = 6;
+
+}

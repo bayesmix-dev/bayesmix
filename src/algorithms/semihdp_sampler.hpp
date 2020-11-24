@@ -108,23 +108,25 @@ class SemiHdpSampler {
     initialize();
     update_unique_vals();
 
-    for (int i=i; i < ngroups; i++) {
-      reassign_group(i, 0, i);
+    // for (int i=i; i < ngroups; i++) {
+    //   reassign_group(i, 0, i);
+    // }
+
+    // update_c();
+
+    if (adapt_iter > 0) {
+      adapt = true;
+      for (int i = 0; i < adapt_iter; i++) {
+        step();
+        if ((i+1) % 100 == 0) {
+          std::cout << "Adapt iter: " << i << " / " << adapt_iter << std::endl;
+        }
+      }
+      adapt = false;
     }
 
+    print_debug_string();
     sample_pseudo_prior();
-    update_c();
-
-    // if (adapt_iter > 0) {
-    //   adapt = true;
-    //   for (int i = 0; i < adapt_iter; i++) {
-    //     step();
-    //     if ((i+1) % 100 == 0) {
-    //       std::cout << "Adapt iter: " << i << " / " << adapt_iter << std::endl;
-    //     }
-    //   }
-    //   adapt = false;
-    // }
 
     std::cout << "Beginning" << std::endl;
     for (int i = 0; i < burnin; i++) {

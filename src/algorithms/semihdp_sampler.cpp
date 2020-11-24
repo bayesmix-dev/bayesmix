@@ -23,7 +23,7 @@ void SemiHdpSampler::initialize() {
       data.begin(), data.end(), 0,
       [&](int curr, const MatrixXd dat) { return curr + dat.sum(); });
   mu0 /= (1.0 * std::accumulate(n_by_group.begin(), n_by_group.end(), 0));
-  omega = VectorXd::Ones(ngroups).array() / ngroups;
+  omega = VectorXd::Ones(ngroups).array();
 
   master_hierarchy.set_mu0(mu0);
   master_hierarchy.set_lambda0(0.1);
@@ -301,6 +301,7 @@ void SemiHdpSampler::update_c() {
       for (int r = 0; r < ngroups; r++)
         probas(r) = lpdf_for_group(i, r) + std::log(omega(r));
 
+      std::cout << "group: " << i << ", probas: " << probas.transpose() << std::endl;
       // sample new group
       probas = stan::math::softmax(probas);
       new_r = bayesmix::categorical_rng(probas, rng);
@@ -508,10 +509,12 @@ void SemiHdpSampler::sample_pseudo_prior() {
 
     cards = cards.array() / cards.sum();
     VectorXd cards_perturb =
-        0.75 * cards.array() +
-        0.25 * VectorXd::Ones(cards.size()).array() / cards.size();
+        0.5 * cards.array() +
+        0.5 * VectorXd::Ones(cards.size()).array() / cards.size();
     n_by_theta_star_pseudo[r] =
         stan::math::multinomial_rng(cards_perturb, n_by_group[r], rng);
+
+    // n_by_theta_star_pseudo[r] = {cards.data(), cards.data() + cards.size()};
 
     // std::cout << "cards perturb: ";
     // for (int k: n_by_theta_star_pseudo[r]) std::cout << k << ", ";
@@ -520,7 +523,7 @@ void SemiHdpSampler::sample_pseudo_prior() {
     theta_star_pseudo[r].resize(0);
     for (int l = 0; l < state.cluster_vals_size(); l++) {
       MarginalState::ClusterVal clusval = state.cluster_vals(l);
-      perturb(&clusval);
+      // perturb(&clusval);
       NNIGHierarchy curr_clus = master_hierarchy;
       curr_clus.set_state(clusval);
       theta_star_pseudo[r].push_back(curr_clus);
@@ -532,10 +535,10 @@ void SemiHdpSampler::perturb(MarginalState::ClusterVal* out) {
   auto& rng = bayesmix::Rng::Instance().get();
   if (out->has_univ_ls_state()) {
     double m =
-        out->univ_ls_state().mean() + stan::math::normal_rng(0, 2.5, rng);
+        out->univ_ls_state().mean() + stan::math::normal_rng(0, 1.5, rng);
     double curr_sd = out->univ_ls_state().sd();
     double sd =
-        curr_sd + stan::math::uniform_rng(-curr_sd / 2, curr_sd / 2, rng);
+        curr_sd + stan::math::uniform_rng(-curr_sd / 4, curr_sd / 4, rng);
     out->mutable_univ_ls_state()->set_mean(m);
     out->mutable_univ_ls_state()->set_sd(sd);
   } else {
