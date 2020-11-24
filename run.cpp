@@ -32,18 +32,16 @@ int main(int argc, char *argv[]) {
   auto algo = factory_algo.create_object(algo_type);
   auto hier = factory_hier.create_object(hier_type);
   auto mixing = factory_mixing.create_object(mix_type);
-  BaseCollector<bayesmix::MarginalState> *coll =
-      new MemoryCollector<bayesmix::MarginalState>();
+  auto *coll = new MemoryCollector<bayesmix::MarginalState>();
 
   // Set mixing hyperprior
   std::string mix_prior_str = "bayesmix." + mix_type + "Prior";
   auto mix_prior_desc = google::protobuf::DescriptorPool::generated_pool()
                             ->FindMessageTypeByName(mix_prior_str);
   assert(mix_prior_desc != NULL);
-  google::protobuf::Message *mix_prior =
-      google::protobuf::MessageFactory::generated_factory()
-          ->GetPrototype(mix_prior_desc)
-          ->New();
+  auto *mix_prior = google::protobuf::MessageFactory::generated_factory()
+                        ->GetPrototype(mix_prior_desc)
+                        ->New();
   bayesmix::read_proto_from_file(mix_args, mix_prior);
   mixing->set_prior(*mix_prior);
 
@@ -52,10 +50,9 @@ int main(int argc, char *argv[]) {
   auto hier_prior_desc = google::protobuf::DescriptorPool::generated_pool()
                              ->FindMessageTypeByName(hier_prior_str);
   assert(hier_prior_desc != NULL);
-  google::protobuf::Message *hier_prior =
-      google::protobuf::MessageFactory::generated_factory()
-          ->GetPrototype(hier_prior_desc)
-          ->New();
+  auto *hier_prior = google::protobuf::MessageFactory::generated_factory()
+                         ->GetPrototype(hier_prior_desc)
+                         ->New();
   bayesmix::read_proto_from_file(hier_args, hier_prior);
   hier->set_prior(*hier_prior);
 
