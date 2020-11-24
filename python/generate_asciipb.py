@@ -1,9 +1,7 @@
 from google.protobuf.text_format import PrintMessage
 from math import sqrt
-import sys
-sys.path.insert(1, 'proto/py')
-import mixing_prior_pb2
-import hierarchy_prior_pb2
+from proto.py import mixing_prior_pb2
+from proto.py import hierarchy_prior_pb2
 
 # DP gamma hyperprior
 dp_prior = mixing_prior_pb2.DPPrior()
