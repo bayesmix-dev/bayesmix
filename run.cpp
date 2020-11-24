@@ -10,9 +10,10 @@ int main(int argc, char *argv[]) {
 
   // Console parameters (temporarily assigned at compile-time)
   std::string algo_type = argv[1];
-  // std::string hier_type = "NNW";
-  std::string mixing_type = argv[3];
-  std::string mixing_args = argv[5];
+  std::string hier_type = argv[2];
+  std::string hier_args = argv[3];
+  std::string mix_type = argv[4];
+  std::string mix_args = argv[5];
   std::string datafile = "resources/data_uni.csv";  // TEST
   std::string gridfile = "resources/grid_uni.csv";  // TEST
   std::string densfile = "resources/dens_uni.csv";  // TEST
@@ -23,10 +24,6 @@ int main(int argc, char *argv[]) {
   unsigned int burnin = 1;
   int rng_seed = 20201103;
 
-  // Initialize prior protos
-  bayesmix::NNIGPrior hier_prior;  // TEST
-  // bayesmix::DPPrior mix_prior;
-
   // Create factories and objects
   auto &factory_algo = Factory<BaseAlgorithm>::Instance();
   auto &factory_hier = Factory<BaseHierarchy>::Instance();
@@ -34,14 +31,14 @@ int main(int argc, char *argv[]) {
   auto algo = factory_algo.create_object(algo_type);
   // auto hier = factory_hier.create_object(hier_type);
   auto hier = std::make_shared<NNIGHierarchy>();  // TEST
-  auto mixing = factory_mixing.create_object(mixing_type);
+  auto mixing = factory_mixing.create_object(mix_type);
 
   // Initialize RNG object
   auto &rng = bayesmix::Rng::Instance().get();
   rng.seed(rng_seed);
 
   // Set mixing hyperprior
-  std::string mix_prior_str = "bayesmix." + mixing_type + "Prior";
+  std::string mix_prior_str = "bayesmix." + mix_type + "Prior";
   auto mix_prior_desc = google::protobuf::DescriptorPool::generated_pool()
                             ->FindMessageTypeByName(mix_prior_str);
   assert(mix_prior_desc != NULL);
@@ -49,23 +46,20 @@ int main(int argc, char *argv[]) {
       google::protobuf::MessageFactory::generated_factory()
           ->GetPrototype(mix_prior_desc)
           ->New();
-  bayesmix::read_proto_from_file(mixing_args, mix_prior);
+  bayesmix::read_proto_from_file(mix_args, mix_prior);
   mixing->set_prior(*mix_prior);
 
-  // NNIG  //TEST
-  // NGG hyperprior
-  hier_prior.mutable_ngg_prior()->mutable_mean_prior()->set_mean(5.5);
-  hier_prior.mutable_ngg_prior()->mutable_mean_prior()->set_var(2.25);
-  hier_prior.mutable_ngg_prior()->mutable_var_scaling_prior()->set_shape(0.2);
-  hier_prior.mutable_ngg_prior()->mutable_var_scaling_prior()->set_rate(0.6);
-  hier_prior.mutable_ngg_prior()->set_shape(1.5);
-  hier_prior.mutable_ngg_prior()->mutable_scale_prior()->set_shape(4.0);
-  hier_prior.mutable_ngg_prior()->mutable_scale_prior()->set_rate(2.0);
-  // // Fixed values hyperprior
-  // hier_prior.mutable_fixed_values()->set_mean(5.0);
-  // hier_prior.mutable_fixed_values()->set_var_scaling(0.1);
-  // hier_prior.mutable_fixed_values()->set_shape(2.0);
-  // hier_prior.mutable_fixed_values()->set_scale(2.0);
+  // Set hierarchies hyperprior
+  std::string hier_prior_str = "bayesmix." + hier_type + "Prior";
+  auto hier_prior_desc = google::protobuf::DescriptorPool::generated_pool()
+                             ->FindMessageTypeByName(hier_prior_str);
+  assert(hier_prior_desc != NULL);
+  google::protobuf::Message *hier_prior =
+      google::protobuf::MessageFactory::generated_factory()
+          ->GetPrototype(hier_prior_desc)
+          ->New();
+  bayesmix::read_proto_from_file(hier_args, hier_prior);
+  hier->set_prior(*hier_prior);
 
   // // NNW  //TEST
   // // NGIW hyperprior
@@ -104,7 +98,6 @@ int main(int argc, char *argv[]) {
   // hier_prior.mutable_fixed_values()->mutable_scale());
 
   // Set parameters
-  hier->set_prior(hier_prior);
   algo->set_maxiter(maxiter);
   algo->set_burnin(burnin);
 
