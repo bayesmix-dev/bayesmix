@@ -1,18 +1,18 @@
 #ifndef SRC_ALGORITHMS_SEMI_HDP_SAMPLER_HPP
 #define SRC_ALGORITHMS_SEMI_HDP_SAMPLER_HPP
 
+#include <omp.h>
 #include <proto/cpp/semihdp.pb.h>
 
 #include <Eigen/Dense>
 #include <numeric>
 #include <src/collectors/memory_collector.hpp>
-#include <src/hierarchies/nnig_hierarchy.hpp>
+#include <src/hierarchies/base_hierarchy.hpp>
 #include <src/utils/distributions.hpp>
 #include <src/utils/rng.hpp>
 #include <stan/math/prim.hpp>
 #include <stdexcept>
 #include <vector>
-#include <omp.h>
 
 using bayesmix::MarginalState;
 using bayesmix::SemiHdpState;
@@ -25,19 +25,20 @@ class SemiHdpSampler {
   int ngroups;
   std::vector<int> n_by_group;
 
-  NNIGHierarchy master_hierarchy;
+  std::shared_ptr<BaseHierarchy> G0_master_hierarchy;
+  std::shared_ptr<BaseHierarchy> G00_master_hierarchy;
 
   // these should be just copies
-  std::vector<std::vector<NNIGHierarchy>> theta_star;
+  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> theta_star;
   // idiosincratic tables
-  std::vector<std::vector<NNIGHierarchy>> theta_tilde;
+  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> theta_tilde;
   // shared tables
-  std::vector<NNIGHierarchy> taus;
+  std::vector<std::shared_ptr<BaseHierarchy>> taus;
   // counts
   std::vector<std::vector<int>> n_by_theta_star;
 
   // stuff for pseudoprior
-  std::vector<std::vector<NNIGHierarchy>> theta_star_pseudo;
+  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> theta_star_pseudo;
   std::vector<std::vector<int>> n_by_theta_star_pseudo;
 
   // theta_{ij} = theta_{c_i, s_{ij}}
@@ -49,7 +50,6 @@ class SemiHdpSampler {
   //
   std::vector<std::vector<int>> t;
   std::vector<std::vector<int>> v;
-  //   std::vector<std::vector<int>> h;
 
   // number of theta_stars equal to tau_h across all groups
   std::vector<int> m;
@@ -72,28 +72,22 @@ class SemiHdpSampler {
   SemiHdpSampler() {}
   ~SemiHdpSampler() {}
 
-  SemiHdpSampler(const std::vector<MatrixXd> &data, std::string c_update="full");
+  SemiHdpSampler(const std::vector<MatrixXd> &data,
+                 std::shared_ptr<BaseHierarchy> hier,
+                 std::string c_update = "full");
 
   void initialize();
 
   void step() {
     update_unique_vals();
-    // check();
-
     update_w();
-    // check();
-
     if (!adapt) {
       sample_pseudo_prior();
       update_c();
-      // check();
     }
-
     update_omega();
-
     update_s();
     relabel();
-    // check();
   }
 
   void run(int adapt_iter, int burnin, int iter, int thin,
@@ -118,7 +112,7 @@ class SemiHdpSampler {
       adapt = true;
       for (int i = 0; i < adapt_iter; i++) {
         step();
-        if ((i+1) % 100 == 0) {
+        if ((i + 1) % 100 == 0) {
           std::cout << "Adapt iter: " << i << " / " << adapt_iter << std::endl;
         }
       }
@@ -155,9 +149,9 @@ class SemiHdpSampler {
 
   void relabel();
   void sample_pseudo_prior();
-  void perturb(MarginalState::ClusterVal *out);
+  void perturb(MarginalState::ClusterState *out);
 
-  double semihdp_marg_lpdf(const VectorXd& datum);
+  double semihdp_marg_lpdf(const VectorXd &datum);
 
   double lpdf_for_group(int i, int r);
 
@@ -192,11 +186,13 @@ class SemiHdpSampler {
 
   void set_tau_debug(int size) { taus.resize(size); }
 
-  NNIGHierarchy get_theta_star(int r, int l) const { return theta_star[r][l]; }
-
-  NNIGHierarchy get_tau(int h) { return taus[h]; }
-
-  NNIGHierarchy get_theta_tilde(int r, int l) { return theta_tilde[r][l]; }
+  std::shared_ptr<BaseHierarchy> get_theta_star(int r, int l) const {
+    return theta_star[r][l];
+  }
+  std::shared_ptr<BaseHierarchy> get_tau(int h) { return taus[h]; }
+  std::shared_ptr<BaseHierarchy> get_theta_tilde(int r, int l) {
+    return theta_tilde[r][l];
+  }
 
   void print_debug_string();
 

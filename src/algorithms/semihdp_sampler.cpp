@@ -8,11 +8,14 @@
 #include "../utils/distributions.hpp"
 
 SemiHdpSampler::SemiHdpSampler(const std::vector<MatrixXd>& data,
-                               std::string c_update)
+                               std::shared_ptr<BaseHierarchy> hier,
+                               std::string c_update = "full")
     : data(data), c_update(c_update) {
   ngroups = data.size();
   n_by_group.resize(ngroups);
   for (int i = 0; i < ngroups; i++) n_by_group[i] = data[i].size();
+  G0_master_hierarchy = hier->clone();
+  G00_master_hierarchy = hier->clone();
 }
 
 void SemiHdpSampler::initialize() {
@@ -25,10 +28,10 @@ void SemiHdpSampler::initialize() {
   mu0 /= (1.0 * std::accumulate(n_by_group.begin(), n_by_group.end(), 0));
   omega = VectorXd::Ones(ngroups).array();
 
-  master_hierarchy.set_mu0(mu0);
-  master_hierarchy.set_lambda0(0.1);
-  master_hierarchy.set_alpha0(2);
-  master_hierarchy.set_beta0(2);
+  // master_hierarchy.set_mu0(mu0);
+  // master_hierarchy.set_lambda0(0.1);
+  // master_hierarchy.set_alpha0(2);
+  // master_hierarchy.set_beta0(2);
 
   int INIT_N_CLUS = 5;
   VectorXd probas = VectorXd::Ones(INIT_N_CLUS);
@@ -45,8 +48,8 @@ void SemiHdpSampler::initialize() {
   n_by_theta_star_pseudo.resize(ngroups);
 
   for (int l = 0; l < INIT_N_CLUS; l++) {
-    NNIGHierarchy hierarchy = master_hierarchy;
-    hierarchy.draw();
+    std::shared_ptr<BaseHierarchy> hierarchy = G00_master_hierarchy->clone();
+    hierarchy->draw();
     taus.push_back(hierarchy);
   }
 
@@ -64,8 +67,8 @@ void SemiHdpSampler::initialize() {
     t[i].resize(2 * INIT_N_CLUS);
 
     for (int l = 0; l < INIT_N_CLUS; l++) {
-      NNIGHierarchy hierarchy = master_hierarchy;
-      hierarchy.draw();
+      std::shared_ptr<BaseHierarchy> hierarchy = G0_master_hierarchy->clone();
+      hierarchy->draw();
       theta_tilde[i].push_back(hierarchy);
       theta_star[i].push_back(hierarchy);
       v[i][l] = l;
@@ -115,9 +118,9 @@ void SemiHdpSampler::update_unique_vals() {
     for (int l = 0; l < theta_star[r].size(); l++) {
       if (v[r][l] >= 0) {
         if (data_by_theta_star[l].rows() > 0)
-          theta_tilde[r][v[r][l]].sample_given_data(data_by_theta_star[l]);
+          theta_tilde[r][v[r][l]]->sample_given_data(data_by_theta_star[l]);
         else
-          theta_tilde[r][v[r][l]].draw();
+          theta_tilde[r][v[r][l]]->draw();
         theta_star[r][l] = theta_tilde[r][v[r][l]];
       } else {
         bayesmix::append_by_row(&data_by_tau[t[r][l]], data_by_theta_star[l]);
@@ -127,9 +130,9 @@ void SemiHdpSampler::update_unique_vals() {
 
   for (int h = 0; h < taus.size(); h++) {
     if (data_by_tau[h].rows() > 0)
-      taus[h].sample_given_data(data_by_tau[h]);
+      taus[h]->sample_given_data(data_by_tau[h]);
     else
-      taus[h].draw();
+      taus[h]->draw();
   }
 
   // reassign stuff to teta_stars
@@ -314,11 +317,11 @@ void SemiHdpSampler::update_c() {
         new_r = prop_r;
       }
     } else if (c_update == "metro_dist") {
-      std::vector<bayesmix::MarginalState::ClusterVal> clus1(
+      std::vector<bayesmix::MarginalState::ClusterState> clus1(
           theta_star[curr_r].size());
       VectorXd weights1(theta_star[curr_r].size());
       for (int l = 0; l < theta_star[curr_r].size(); l++) {
-        bayesmix::MarginalState::ClusterVal clus;
+        bayesmix::MarginalState::ClusterState clus;
         theta_star[curr_r][l].write_state_to_proto(&clus);
         clus1[l] = clus;
         weights1(l) = n_by_theta_star[curr_r][l];
@@ -328,11 +331,11 @@ void SemiHdpSampler::update_c() {
       VectorXd dists(ngroups);
 
       for (int r = 0; r < ngroups; r++) {
-        std::vector<bayesmix::MarginalState::ClusterVal> clus2(
+        std::vector<bayesmix::MarginalState::ClusterState> clus2(
             theta_star[r].size());
         VectorXd weights2(theta_star[r].size());
         for (int l = 0; l < theta_star[r].size(); l++) {
-          bayesmix::MarginalState::ClusterVal clus;
+          bayesmix::MarginalState::ClusterState clus;
           theta_star[r][l].write_state_to_proto(&clus);
           clus2[l] = clus;
           weights2(l) = n_by_theta_star[r][l];
@@ -522,7 +525,7 @@ void SemiHdpSampler::sample_pseudo_prior() {
 
     theta_star_pseudo[r].resize(0);
     for (int l = 0; l < state.cluster_vals_size(); l++) {
-      MarginalState::ClusterVal clusval = state.cluster_vals(l);
+      MarginalState::ClusterState clusval = state.cluster_vals(l);
       // perturb(&clusval);
       NNIGHierarchy curr_clus = master_hierarchy;
       curr_clus.set_state(clusval);
@@ -531,7 +534,7 @@ void SemiHdpSampler::sample_pseudo_prior() {
   }
 }
 
-void SemiHdpSampler::perturb(MarginalState::ClusterVal* out) {
+void SemiHdpSampler::perturb(MarginalState::ClusterState* out) {
   auto& rng = bayesmix::Rng::Instance().get();
   if (out->has_univ_ls_state()) {
     double m =
@@ -616,7 +619,7 @@ bayesmix::SemiHdpState SemiHdpSampler::get_state_as_proto() {
     bayesmix::SemiHdpState::RestaurantState curr_restaurant;
 
     for (int l = 0; l < theta_star[i].size(); l++) {
-      bayesmix::ClusterVal clusval;
+      bayesmix::SemiHdpState::ClusterState clusval;
       theta_star[i][l].write_state_to_proto(&clusval);
       curr_restaurant.add_theta_stars()->CopyFrom(clusval);
     }
@@ -632,7 +635,7 @@ bayesmix::SemiHdpState SemiHdpSampler::get_state_as_proto() {
     state.add_groups()->CopyFrom(curr_group);
 
     for (int l = 0; l < taus.size(); l++) {
-      bayesmix::ClusterVal clusval;
+      bayesmix::SemiHdpState::ClusterState clusval;
       taus[l].write_state_to_proto(&clusval);
       state.add_taus()->CopyFrom(clusval);
     }
