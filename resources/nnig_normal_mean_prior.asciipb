@@ -1,0 +1,9 @@
+normal_mean_prior {
+  mean_prior {
+    mean: 5.5
+    var: 2.25
+  }
+  var_scaling: 0.1
+  shape: 2.0
+  scale: 2.0
+}

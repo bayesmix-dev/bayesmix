@@ -1,0 +1,27 @@
+ngiw_prior {
+  mean_prior {
+    mean {
+      size: 2
+      data: 5.5
+      data: 5.5
+    }
+    var {
+      rows: 2
+      cols: 2
+      data: 0.2
+      data: 0.0
+      data: 0.0
+      data: 0.2
+    }
+  }
+  var_scaling: 0.2
+  deg_free: 5.0
+  scale {
+    rows: 2
+    cols: 2
+    data: 0.2
+    data: 0.0
+    data: 0.0
+    data: 0.2
+  }
+}

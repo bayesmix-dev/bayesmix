@@ -20,11 +20,11 @@ int main(int argc, char *argv[]) {
   std::string hier_args = argv[3];
   std::string mix_type = argv[4];
   std::string mix_args = argv[5];
-  std::string datafile = "resources/data_uni.csv";
-  std::string gridfile = "resources/grid_uni.csv";
-  std::string densfile = "resources/dens_uni.csv";
-  std::string massfile = "resources/mass_uni.csv";
-  std::string nclufile = "resources/nclu_uni.csv";
+  std::string datafile = "resources/data_multi.csv";
+  std::string gridfile = "resources/grid_multi.csv";
+  std::string densfile = "resources/dens_multi.csv";
+  std::string massfile = "resources/mass_multi.csv";
+  std::string nclufile = "resources/nclu_multi.csv";
 
   // Create factories and objects
   auto &factory_algo = Factory<BaseAlgorithm>::Instance();
@@ -59,42 +59,6 @@ int main(int argc, char *argv[]) {
           ->New();
   bayesmix::read_proto_from_file(hier_args, hier_prior);
   hier->set_prior(*hier_prior);
-
-  // // NNW  //TEST
-  // // NGIW hyperprior
-  // Eigen::Vector2d mu00;
-  // mu00 << 5.5, 5.5;
-  // Eigen::Matrix2d ident = Eigen::Matrix2d::Identity();
-  // double nu0 = 5.0;
-  // bayesmix::to_proto(
-  //     mu00,
-  //     hier_prior.mutable_ngiw_prior()->mutable_mean_prior()
-  //     ->mutable_mean());
-  // bayesmix::to_proto(
-  //     ident / nu0,
-  //     hier_prior.mutable_ngiw_prior()->mutable_mean_prior()
-  //     ->mutable_var());
-  // hier_prior.mutable_ngiw_prior()->mutable_var_scaling_prior()
-  //     ->set_shape(0.2);
-  // hier_prior.mutable_ngiw_prior()->mutable_var_scaling_prior()
-  //     ->set_rate(0.6);
-  // hier_prior.mutable_ngiw_prior()->set_deg_free(nu0);
-  // hier_prior.mutable_ngiw_prior()->mutable_scale_prior()->set_deg_free(nu0);
-  // bayesmix::to_proto(
-  //     ident * nu0,
-  //     hier_prior.mutable_ngiw_prior()->mutable_scale_prior()
-  //     ->mutable_scale());
-  // // Fixed values hyperprior
-  // Eigen::Vector2d mu0;
-  // mu0 << 5.5, 5.5;
-  // double nu0 = 5.0;
-  // Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
-  // bayesmix::to_proto(mu0,
-  // hier_prior.mutable_fixed_values()->mutable_mean());
-  // hier_prior.mutable_fixed_values()->set_var_scaling(0.2);
-  // hier_prior.mutable_fixed_values()->set_deg_free(nu0);
-  // bayesmix::to_proto(tau0,
-  // hier_prior.mutable_fixed_values()->mutable_scale());
 
   // Initialize RNG object
   auto &rng = bayesmix::Rng::Instance().get();
