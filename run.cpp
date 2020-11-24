@@ -99,11 +99,13 @@ int main(int argc, char *argv[]) {
       masses(i) = mixstate.dp_state().totalmass();
     }
   }
+  // Compute cluster estimate
+  Eigen::VectorXd clust_est = bayesmix::cluster_estimate(clusterings);
 
   // Write collected data to files
   bayesmix::write_matrix_to_file(masses, massfile);
   std::cout << "Successfully wrote total masses to " << massfile << std::endl;
-  bayesmix::write_matrix_to_file(clusterings, clusfile);
+  bayesmix::write_matrix_to_file(clust_est, clusfile);
   std::cout << "Successfully wrote clustering to " << clusfile << std::endl;
   bayesmix::write_matrix_to_file(num_clust, nclufile);
   std::cout << "Successfully wrote cluster sizes to " << nclufile << std::endl;
