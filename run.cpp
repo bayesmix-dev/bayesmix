@@ -8,23 +8,22 @@
 int main(int argc, char *argv[]) {
   std::cout << "Running run.cpp" << std::endl;
 
-  // Algorithm parameters
-  unsigned int init = 0;
-  unsigned int maxiter = 1000;
-  unsigned int burnin = 1;
-  int rng_seed = 20201103;
-
   // Get console parameters
   std::string algo_type = argv[1];
-  std::string hier_type = argv[2];
-  std::string hier_args = argv[3];
-  std::string mix_type = argv[4];
-  std::string mix_args = argv[5];
-  std::string datafile = "resources/data_multi.csv";
-  std::string gridfile = "resources/grid_multi.csv";
-  std::string densfile = "resources/dens_multi.csv";
-  std::string massfile = "resources/mass_multi.csv";
-  std::string nclufile = "resources/nclu_multi.csv";
+  int rng_seed = std::stoi(argv[2]);
+  unsigned int init_num_cl = std::stoi(argv[3]);
+  unsigned int maxiter = std::stoi(argv[4]);
+  unsigned int burnin = std::stoi(argv[5]);
+  std::string hier_type = argv[6];
+  std::string hier_args = argv[7];
+  std::string mix_type = argv[8];
+  std::string mix_args = argv[9];
+  std::string datafile = argv[10];
+  std::string gridfile = argv[11];
+  std::string densfile = argv[12];
+  std::string massfile = argv[13];
+  std::string nclufile = argv[14];
+  std::string clusfile = argv[15];
 
   // Create factories and objects
   auto &factory_algo = Factory<BaseAlgorithm>::Instance();
@@ -75,7 +74,7 @@ int main(int argc, char *argv[]) {
   // Allocate objects in algorithm
   algo->set_mixing(mixing);
   algo->set_data(data);
-  algo->set_initial_clusters(hier, init);
+  algo->set_initial_clusters(hier, init_num_cl);
   if (algo_type == "N8") {
     algo->set_n_aux(3);
   }
