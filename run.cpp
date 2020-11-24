@@ -87,12 +87,12 @@ int main(int argc, char *argv[]) {
   // Collect mixing and cluster states
   auto chain = coll->get_chain();
   Eigen::VectorXd masses(chain.size());
-  Eigen::MatrixXd clusterings(chain.size(), data.rows());
+  // Eigen::MatrixXd clusterings(chain.size(), data.rows());
   Eigen::VectorXd num_clust(chain.size());
   for (int i = 0; i < chain.size(); i++) {
-    for (int j = 0; j < data.rows(); j++) {
-      clusterings(i, j) = chain[i].cluster_allocs(j);
-    }
+    // for (int j = 0; j < data.rows(); j++) {
+    //   clusterings(i, j) = chain[i].cluster_allocs(j);
+    // }
     num_clust(i) = chain[i].cluster_states_size();
     bayesmix::MixingState mixstate = chain[i].mixing_state();
     if (mixstate.has_dp_state()) {
