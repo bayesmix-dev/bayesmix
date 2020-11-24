@@ -93,10 +93,10 @@ int main(int argc, char *argv[]) {
     for (int j = 0; j < data.rows(); j++) {
       clusterings(i, j) = chain[i].cluster_allocs(j);
     }
-    num_clust[i] = chain[i].cluster_states_size();
+    num_clust(i) = chain[i].cluster_states_size();
     bayesmix::MixingState mixstate = chain[i].mixing_state();
     if (mixstate.has_dp_state()) {
-      masses[i] = mixstate.dp_state().totalmass();
+      masses(i) = mixstate.dp_state().totalmass();
     }
   }
 
