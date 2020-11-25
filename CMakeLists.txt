@@ -3,6 +3,9 @@ project(bayesmix)
 
 find_package(PkgConfig REQUIRED)
 
+set (CMAKE_CXX_STANDARD 14)
+set(CMAKE_BUILD_TYPE Debug)
+
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(BASEPATH "${CMAKE_SOURCE_DIR}")
@@ -14,6 +17,7 @@ add_subdirectory(proto)
 add_subdirectory(test)
 
 target_include_directories(bayesmix PUBLIC
+${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/math
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/boost_1.72.0
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/eigen_3.3.7

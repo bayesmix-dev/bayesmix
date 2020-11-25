@@ -61,6 +61,7 @@ class NNIGHierarchy : public BaseHierarchy {
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNIGHierarchy() = default;
   NNIGHierarchy() = default;
+
   std::shared_ptr<BaseHierarchy> clone() const override {
     return std::make_shared<NNIGHierarchy>(*this);
   }
@@ -82,8 +83,16 @@ class NNIGHierarchy : public BaseHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
+  double get_mu0() const { return hypers->mean; }
+  double get_alpha0() const { return hypers->shape; }
+  double get_beta0() const { return hypers->scale; }
+  double get_lambda0() const { return hypers->var_scaling; }
+  double get_mean() const { return state.mean; }
+  double get_sd() const { return std::sqrt(state.var); }
+
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
+
 
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment

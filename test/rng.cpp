@@ -56,10 +56,12 @@ TEST(rng, test2) {
 
 TEST(rng, test3) {
   NNIGHierarchy hierarchy;
-  hierarchy.set_mu0(0);
-  hierarchy.set_lambda0(0.1);
-  hierarchy.set_alpha0(2);
-  hierarchy.set_beta0(2);
+  bayesmix::NNIGPrior hier_prior;
+  hier_prior.mutable_fixed_values()->set_mean(0.0);
+  hier_prior.mutable_fixed_values()->set_var_scaling(0.1);
+  hier_prior.mutable_fixed_values()->set_shape(2.0);
+  hier_prior.mutable_fixed_values()->set_scale(2.0);
+  hierarchy.set_prior(hier_prior);
 
   hierarchy.draw();
   double m1 = hierarchy.get_mean();
