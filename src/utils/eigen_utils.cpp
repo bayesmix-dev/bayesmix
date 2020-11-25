@@ -21,20 +21,12 @@ Eigen::MatrixXd bayesmix::vstack(const std::vector<Eigen::MatrixXd> &mats) {
     return curr + mat.rows();};
   int nrows = std::accumulate(mats.begin(), mats.end(), 0, cnt_rows);
 
-  std::cout << "tot_nrows: " << nrows << std::endl;
-
   Eigen::MatrixXd out(nrows, ncols);
-
   int begin = 0;
-
-  std::cout << "HERE0" << std::endl;
-
   for (int i = 0; i < mats.size(); i++) {
     out.block(begin, 0, mats[i].rows(), ncols) = mats[i];
     begin += mats[i].rows();
   }
-
-  std::cout << "HERE" << std::endl;
 
   return out;
 }
