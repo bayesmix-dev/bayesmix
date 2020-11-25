@@ -82,10 +82,9 @@ class NNIGHierarchy : public BaseHierarchy {
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
+  // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
-
-
   //! \param state_ State value to set
   //! \param check  If true, a state validity check occurs after assignment
   void set_state_from_proto(const google::protobuf::Message &state_) override;

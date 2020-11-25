@@ -6,9 +6,8 @@
 #include <sstream>
 
 Eigen::MatrixXd bayesmix::vstack(const std::vector<Eigen::MatrixXd> &mats) {
-
   int ncols = mats[0].cols();
-  for (int i=0; i < mats.size(); i++) {
+  for (int i = 0; i < mats.size(); i++) {
     if (mats[i].cols() != ncols) {
       std::stringstream msg;
       msg << "Expected all elements to have " << ncols << " columns, but entry"
@@ -18,7 +17,8 @@ Eigen::MatrixXd bayesmix::vstack(const std::vector<Eigen::MatrixXd> &mats) {
   }
 
   auto cnt_rows = [&](int curr, const Eigen::MatrixXd &mat) {
-    return curr + mat.rows();};
+    return curr + mat.rows();
+  };
   int nrows = std::accumulate(mats.begin(), mats.end(), 0, cnt_rows);
 
   Eigen::MatrixXd out(nrows, ncols);
@@ -32,7 +32,6 @@ Eigen::MatrixXd bayesmix::vstack(const std::vector<Eigen::MatrixXd> &mats) {
 }
 
 void bayesmix::append_by_row(Eigen::MatrixXd *a, const Eigen::MatrixXd &b) {
- 
   if (a->rows() == 0) {
     *a = b;
   } else if (b.rows() == 0) {
@@ -53,7 +52,7 @@ void bayesmix::append_by_row(Eigen::MatrixXd *a, const Eigen::MatrixXd &b) {
 
 Eigen::MatrixXd bayesmix::append_by_row(const Eigen::MatrixXd &a,
                                         const Eigen::MatrixXd &b) {
-  if (a.rows() == 0) 
+  if (a.rows() == 0)
     return b;
   else if (b.rows() == 0)
     return a;
@@ -69,5 +68,4 @@ Eigen::MatrixXd bayesmix::append_by_row(const Eigen::MatrixXd &a,
     out << a, b;
     return out;
   }
-
 }
