@@ -1,7 +1,8 @@
 #include "pityor_mixing.hpp"
 
-#include <cassert>
 #include <google/protobuf/stubs/casts.h>
+
+#include <cassert>
 
 #include "../../proto/cpp/mixing_prior.pb.h"
 #include "../../proto/cpp/mixing_state.pb.h"
@@ -15,13 +16,13 @@ void PitYorMixing::update_state(
     unsigned int n) {
   if (prior->has_fixed_values()) {
     return;
-  }
-  else {
+  } else {
     throw std::invalid_argument("Error: unrecognized prior");
   }
 }
 
-void PitYorMixing::set_state_from_proto(const google::protobuf::Message &state_) {
+void PitYorMixing::set_state_from_proto(
+    const google::protobuf::Message &state_) {
   auto &statecast =
       google::protobuf::internal::down_cast<const bayesmix::PYState &>(state_);
   state.strength = statecast.strength();

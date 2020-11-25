@@ -34,7 +34,8 @@ void DirichletMixing::update_state(
     if (p <= prob) {
       state.totalmass = stan::math::gamma_rng(alpha + k, beta - log(phi), rng);
     } else {
-      state.totalmass = stan::math::gamma_rng(alpha + k - 1, beta - log(phi), rng);
+      state.totalmass =
+          stan::math::gamma_rng(alpha + k - 1, beta - log(phi), rng);
     }
   }
 
