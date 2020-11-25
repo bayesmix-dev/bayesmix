@@ -22,11 +22,6 @@ void SemiHdpSampler::initialize() {
   auto& rng = bayesmix::Rng::Instance().get();
   omega = VectorXd::Ones(ngroups).array();
 
-  // master_hierarchy.set_mu0(mu0);
-  // master_hierarchy.set_lambda0(0.1);
-  // master_hierarchy.set_alpha0(2);
-  // master_hierarchy.set_beta0(2);
-
   int INIT_N_CLUS = 5;
   VectorXd probas = VectorXd::Ones(INIT_N_CLUS);
   probas /= (1.0 * INIT_N_CLUS);
