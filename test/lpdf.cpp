@@ -49,7 +49,7 @@ TEST(lpdf, nnig) {
   double sum = prior + like - post;
   double marg = hier.marg_lpdf(datum);
 
-  ASSERT_FLOAT_EQ(sum, marg);
+  ASSERT_DOUBLE_EQ(sum, marg);
 }
 
 // TEST(lpdf, nnw) {  // TODO
@@ -129,5 +129,5 @@ TEST(lpdf, nnig) {
 //   std::cout << "sum   =" << sum << std::endl;
 //   std::cout << "marg  =" << marg << std::endl;
 //   std::cout << "murphy=" << marg_murphy << std::endl;
-//   ASSERT_FLOAT_EQ(marg, marg_murphy);
+//   ASSERT_DOUBLE_EQ(marg, marg_murphy);
 // }
