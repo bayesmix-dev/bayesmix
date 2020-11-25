@@ -9,4 +9,6 @@ target_sources(bayesmix
     proto_utils.hpp
     proto_utils.cpp
     rng.hpp
+    eigen_utils.hpp
+    eigen_utils.cpp
 )
