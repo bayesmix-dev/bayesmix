@@ -1,6 +1,10 @@
 #include "proto_utils.hpp"
 
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/text_format.h>
+
 #include <Eigen/Dense>
+#include <fstream>
 
 #include "../../proto/cpp/matrix.pb.h"
 
@@ -41,4 +45,15 @@ Eigen::MatrixXd bayesmix::to_eigen(const bayesmix::Matrix &mat) {
     }
   }
   return out;
+}
+
+void bayesmix::read_proto_from_file(const std::string &filename,
+                                    google::protobuf::Message *out) {
+  std::ifstream ifs(filename);
+  google::protobuf::io::IstreamInputStream iis(&ifs);
+  auto success = google::protobuf::TextFormat::Parse(&iis, out);
+  if (!success) {
+    std::cout << "Error " << success << " in read_proto_from_file"
+              << std::endl;
+  }
 }

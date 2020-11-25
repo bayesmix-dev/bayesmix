@@ -7,10 +7,11 @@
 
 //! \param coll Collector containing the algorithm chain
 //! \return     Index of the iteration containing the best estimate
-Eigen::VectorXi bayesmix::cluster_estimate(Eigen::MatrixXi allocation_chain) {
+Eigen::VectorXd bayesmix::cluster_estimate(
+    const Eigen::MatrixXd &alloc_chain) {
   // Initialize objects
-  unsigned n_iter = allocation_chain.rows();
-  unsigned int n_data = allocation_chain.cols();
+  unsigned n_iter = alloc_chain.rows();
+  unsigned int n_data = alloc_chain.cols();
   Eigen::VectorXd errors(n_iter);
   Eigen::MatrixXd mean_diss(n_data, n_data);
   std::vector<Eigen::SparseMatrix<double> > all_diss;
@@ -22,7 +23,7 @@ Eigen::VectorXi bayesmix::cluster_estimate(Eigen::MatrixXi allocation_chain) {
     triplets_list.reserve(n_data * n_data / 4);
     for (size_t j = 0; j < n_data; i++) {
       for (size_t k = 0; k < j; k++) {
-        if (allocation_chain(i, j) == allocation_chain(i, k)) {
+        if (alloc_chain(i, j) == alloc_chain(i, k)) {
           triplets_list.push_back(Eigen::Triplet<double>(j, k, 1.0));
         }
       }
@@ -45,5 +46,5 @@ Eigen::VectorXi bayesmix::cluster_estimate(Eigen::MatrixXi allocation_chain) {
   // Find iteration with the least error
   std::ptrdiff_t ibest;
   unsigned int min_err = errors.minCoeff(&ibest);
-  return allocation_chain.row(ibest).transpose();
+  return alloc_chain.row(ibest).transpose();
 }

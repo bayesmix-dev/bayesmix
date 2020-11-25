@@ -189,16 +189,14 @@ void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
 
 void NNIGHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  const bayesmix::MarginalState::ClusterState &statecast =
-      google::protobuf::internal::down_cast<
-          const bayesmix::MarginalState::ClusterState &>(state_);
-
+  auto &statecast = google::protobuf::internal::down_cast<
+      const bayesmix::MarginalState::ClusterState &>(state_);
   state.mean = statecast.univ_ls_state().mean();
   state.var = statecast.univ_ls_state().var();
 }
 
 void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
-  const bayesmix::NNIGPrior &priorcast =
+  auto &priorcast =
       google::protobuf::internal::down_cast<const bayesmix::NNIGPrior &>(
           prior_);
   prior = std::make_shared<bayesmix::NNIGPrior>(priorcast);

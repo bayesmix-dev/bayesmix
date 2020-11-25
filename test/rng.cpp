@@ -56,18 +56,20 @@ TEST(rng, test2) {
 
 TEST(rng, test3) {
   NNIGHierarchy hierarchy;
-  hierarchy.set_mu0(0);
-  hierarchy.set_lambda0(0.1);
-  hierarchy.set_alpha0(2);
-  hierarchy.set_beta0(2);
+  bayesmix::NNIGPrior hier_prior;
+  hier_prior.mutable_fixed_values()->set_mean(0.0);
+  hier_prior.mutable_fixed_values()->set_var_scaling(0.1);
+  hier_prior.mutable_fixed_values()->set_shape(2.0);
+  hier_prior.mutable_fixed_values()->set_scale(2.0);
+  hierarchy.set_prior(hier_prior);
 
   hierarchy.draw();
-  double m1 = hierarchy.get_mean();
-  double s1 = hierarchy.get_sd();
+  double m1 = hierarchy.get_state().mean;
+  double s1 = hierarchy.get_state().var;
 
   hierarchy.draw();
-  double m2 = hierarchy.get_mean();
-  double s2 = hierarchy.get_sd();
+  double m2 = hierarchy.get_state().mean;
+  double s2 = hierarchy.get_state().var;
 
   ASSERT_NE(m1, m2);
   ASSERT_NE(s1, s2);
@@ -75,8 +77,8 @@ TEST(rng, test3) {
   NNIGHierarchy hierarchy2 = hierarchy;
   hierarchy2.draw();
 
-  double m3 = hierarchy2.get_mean();
-  double s3 = hierarchy2.get_sd();
+  double m3 = hierarchy2.get_state().mean;
+  double s3 = hierarchy2.get_state().var;
 
   ASSERT_NE(m1, m3);
   ASSERT_NE(s1, s3);

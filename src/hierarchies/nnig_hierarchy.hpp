@@ -82,22 +82,6 @@ class NNIGHierarchy : public BaseHierarchy {
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
-  // GETTERS AND SETTERS
-  double get_mu0() const { return hypers->mean; }
-  double get_alpha0() const { return hypers->shape; }
-  double get_beta0() const { return hypers->scale; }
-  double get_lambda0() const { return hypers->var_scaling; }
-  double get_mean() const { return state.mean; }
-  double get_sd() const { return state.var; }
-
-  // void set_mu0(const double mu0_) {
-  //   mu0 = mu0_;
-  //   mean = mu0;
-  // }
-  // void set_alpha0(const double alpha0_) { alpha0 = alpha0_; }
-  // void set_beta0(const double beta0_) { beta0 = beta0_; }
-  // void set_lambda0(const double lambda0_) { lambda0 = lambda0_; }
-
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
 

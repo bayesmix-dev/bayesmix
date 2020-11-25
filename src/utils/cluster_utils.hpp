@@ -5,7 +5,7 @@
 
 namespace bayesmix {
 //! Estimates the clustering structure of the data via LS minimization
-Eigen::VectorXi cluster_estimate(Eigen::MatrixXi allocation_chain);
+Eigen::VectorXd cluster_estimate(const Eigen::MatrixXd &alloc_chain);
 }  // namespace bayesmix
 
 #endif  // BAYESMIX_UTILS_CLUSTER_UTILS_HPP_
