@@ -174,7 +174,6 @@ void NNIGHierarchy::draw() {
 
 //! \param data Column vector of data points
 void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
-  // std::cout << "sampling given: " << data.transpose() << std::endl;
   // Update values
   Hyperparams params =
       normal_invgamma_update(data.col(0), hypers->mean, hypers->shape,

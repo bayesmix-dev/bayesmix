@@ -1,12 +1,12 @@
-// #include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
-// #include <Eigen/Dense>
-// #include <stan/math/prim/fun.hpp>  // lgamma, lmgamma
-// #include <stan/math/prim/prob.hpp>
+#include <Eigen/Dense>
+#include <stan/math/prim/fun.hpp>  // lgamma, lmgamma
+#include <stan/math/prim/prob.hpp>
 
-// #include "../proto/cpp/marginal_state.pb.h"
-// #include "../src/hierarchies/nnig_hierarchy.hpp"
-// #include "../src/hierarchies/nnw_hierarchy.hpp"
+#include "../proto/cpp/marginal_state.pb.h"
+#include "../src/hierarchies/nnig_hierarchy.hpp"
+#include "../src/hierarchies/nnw_hierarchy.hpp"
 
 TEST(lpdf, nnig) {
   NNIGHierarchy hier;
