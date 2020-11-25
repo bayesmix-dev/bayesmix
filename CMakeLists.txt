@@ -24,6 +24,9 @@ target_include_directories(bayesmix PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(bayesmix PUBLIC ${LINK_LIBRARIES})
 target_compile_options(bayesmix PUBLIC ${COMPILE_OPTIONS})
 
+# Build static library
+add_library(bayesmixlib $<TARGET_OBJECTS:bayesmix>)
+
 # Build run executable
 add_executable(run $<TARGET_OBJECTS:bayesmix> run.cpp)
 target_include_directories(run PUBLIC ${INCLUDE_PATHS})
