@@ -31,7 +31,7 @@ void DirichletMixing::update_hypers(
       totalmass = stan::math::gamma_rng(alpha + k - 1, beta - log(phi), rng);
     }
   } else {
-    throw std::invalid_argument("Error: no possible valid update");
+    throw std::invalid_argument("Error: unrecognized prior");
   }
 }
 
@@ -47,7 +47,7 @@ void DirichletMixing::set_prior(const google::protobuf::Message &prior_) {
     assert(prior.gamma_prior().rate() > 0);
     totalmass = prior.gamma_prior().shape() / prior.gamma_prior().rate();
   } else {
-    throw std::invalid_argument("Error: argument proto is not appropriate");
+    throw std::invalid_argument("Error: unrecognized prior");
   }
 }
 
