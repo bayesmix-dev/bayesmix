@@ -142,7 +142,7 @@ void NNWHierarchy::update_hypers(
   }
 
   else {
-    std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Error: unrecognized prior");
   }
 }
 
@@ -334,7 +334,7 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
   }
 
   else {
-    std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Error: unrecognized prior");
   }
 }
 

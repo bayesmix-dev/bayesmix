@@ -96,7 +96,7 @@ MsgType FileCollector<MsgType>::next_state() {
   bool keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(
       &out, fin, nullptr);
   if (!keep) {
-    std::out_of_range("Error: surpassed EOF in FileCollector");
+    throw std::out_of_range("Error: surpassed EOF in FileCollector");
   }
   if (curr_iter == size - 1) {
     curr_iter = -1;
