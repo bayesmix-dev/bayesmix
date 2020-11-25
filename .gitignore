@@ -4,3 +4,7 @@ build
 *.local.*
 # Visual Studio Code folder
 .vscode
+
+*.pyc
+*.recordio
+*.pdf

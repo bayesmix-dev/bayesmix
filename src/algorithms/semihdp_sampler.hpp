@@ -86,6 +86,7 @@ class SemiHdpSampler {
       update_c();
     }
     update_omega();
+    update_t();
     update_s();
     relabel();
   }

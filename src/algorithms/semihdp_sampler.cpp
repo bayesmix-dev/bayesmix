@@ -9,7 +9,7 @@
 
 SemiHdpSampler::SemiHdpSampler(const std::vector<MatrixXd>& data,
                                std::shared_ptr<BaseHierarchy> hier,
-                               std::string c_update = "full")
+                               std::string c_update)
     : data(data), c_update(c_update) {
   ngroups = data.size();
   n_by_group.resize(ngroups);
@@ -20,12 +20,6 @@ SemiHdpSampler::SemiHdpSampler(const std::vector<MatrixXd>& data,
 
 void SemiHdpSampler::initialize() {
   auto& rng = bayesmix::Rng::Instance().get();
-
-  // compute overall mean
-  double mu0 = std::accumulate(
-      data.begin(), data.end(), 0,
-      [&](int curr, const MatrixXd dat) { return curr + dat.sum(); });
-  mu0 /= (1.0 * std::accumulate(n_by_group.begin(), n_by_group.end(), 0));
   omega = VectorXd::Ones(ngroups).array();
 
   // master_hierarchy.set_mu0(mu0);
@@ -157,24 +151,23 @@ void SemiHdpSampler::update_s() {
 
   // compute counts
   m = std::vector<int>(taus.size(), 0);
-  for (int l = 0; l < taus.size(); l++)
-    for (int r = 0; r < ngroups; r++) {
-      for (int l = 0; l < t[r].size(); l++)
-        if (t[r][l] >= 0) {
-          // std::cout << "t[r][l]: " << t[r][l] << std::endl;
-          m[t[r][l]] += 1;
-        }
+  for (int r = 0; r < ngroups; r++) {
+    for (int l = 0; l < t[r].size(); l++)
+      if (t[r][l] >= 0) {
+        // std::cout << "t[r][l]: " << t[r][l] << std::endl;
+        m[t[r][l]] += 1;
+      }
 
-      n_by_theta_star[r] = std::vector<int>(theta_star[r].size(), 0);
+    n_by_theta_star[r] = std::vector<int>(theta_star[r].size(), 0);
 #pragma omp parallel for
-      for (int i = 0; i < ngroups; i++) {
-        if (c[i] == r) {
-          for (int j = 0; j < n_by_group[i]; j++) {
-            n_by_theta_star[r][s[i][j]] += 1;
-          }
+    for (int i = 0; i < ngroups; i++) {
+      if (c[i] == r) {
+        for (int j = 0; j < n_by_group[i]; j++) {
+          n_by_theta_star[r][s[i][j]] += 1;
         }
       }
     }
+  }
   std::vector<std::vector<int>> log_n_by_theta_star(ngroups);
   for (int r = 0; r < ngroups; r++) {
     for (int n : n_by_theta_star[r]) {
@@ -221,7 +214,7 @@ void SemiHdpSampler::update_s() {
         probas[l] = log_n + theta_star[r][l]->like_lpdf(data[i].row(j));
       }
 
-      double margG0 = logw + master_hierarchy->marg_lpdf(data[i].row(j));
+      double margG0 = logw + G0_master_hierarchy->marg_lpdf(data[i].row(j));
 
       VectorXd hdp_contribs(taus.size() + 1);
 #pragma omp parallel for
@@ -235,7 +228,7 @@ void SemiHdpSampler::update_s() {
       }
 
       hdp_contribs[taus.size()] =
-          loggamma - logmsum + master_hierarchy.marg_lpdf(data[i].row(j));
+          loggamma - logmsum + G00_master_hierarchy->marg_lpdf(data[i].row(j));
       double margHDP = log1mw + stan::math::log_sum_exp(hdp_contribs);
       VectorXd marg(2);
       marg << margG0, margHDP;
@@ -254,7 +247,8 @@ void SemiHdpSampler::update_s() {
         if (stan::math::uniform_rng(0, 1, rng) < w) {
           // sample from G0, add it to theta_star and theta_tilde and adjust
           // counts and stuff
-          std::shared_ptr<BaseHierarchy> hierarchy = G0_master_hierarchy->clone();
+          std::shared_ptr<BaseHierarchy> hierarchy =
+              G0_master_hierarchy->clone();
           hierarchy->sample_given_data(data[i].row(j));
           theta_tilde[r].push_back(hierarchy);
           theta_star[r].push_back(hierarchy);
@@ -275,8 +269,7 @@ void SemiHdpSampler::update_s() {
             // std::cout << "creating new tau!" << std::endl;
             std::shared_ptr<BaseHierarchy> hierarchy =
                 G00_master_hierarchy->clone();
-            NNIGHierarchy hierarchy = master_hierarchy;
-            hierarchy.sample_given_data(data[i].row(j));
+            hierarchy->sample_given_data(data[i].row(j));
             taus.push_back(hierarchy);
             m.push_back(1);
             log_m.push_back(0);
@@ -289,7 +282,62 @@ void SemiHdpSampler::update_s() {
   // std::cout << "update_s DONE" << std::endl;
 }
 
-void SemiHdpSampler::update_t() {}
+void SemiHdpSampler::update_t() {
+  m = std::vector<int>(taus.size(), 0);
+  for (int r = 0; r < ngroups; r++) {
+    for (int l = 0; l < t[r].size(); l++)
+      if (t[r][l] >= 0) m[t[r][l]] += 1;
+  }
+
+  for (int r = 0; r < ngroups; r++) {
+    // aggregate data together
+    std::vector<MatrixXd> data_by_theta_star;
+    for (int l = 0; l < theta_star[r].size(); l++) {
+      data_by_theta_star.push_back(MatrixXd::Zero(0, 0));
+    }
+
+    for (int i = 0; i < ngroups; i++) {
+      if (c[i] == r) {
+        for (int j = 0; j < n_by_group[i]; j++) {
+          data_by_theta_star[s[i][j]] = bayesmix::append_by_row(
+              data_by_theta_star[s[i][j]], data[i].row(j));
+        }
+      }
+    }
+
+    // compute logprobas
+    for (int l = 0; l < theta_star[r].size(); l++) {
+      if ((t[r][l] >= 0) && (data_by_theta_star[l].size() > 0)) {
+
+        VectorXd probas(taus.size() + 1);
+        m[t[r][l]] -= 1;
+        for (int k = 0; k < taus.size(); k++) {
+          probas(k) = std::log(m[k]) +
+                      taus[k]->like_lpdf_grid(data_by_theta_star[l]).sum();
+        }
+
+        probas(taus.size()) =
+            std::log(gamma) +
+            G00_master_hierarchy->marg_lpdf_grid(data_by_theta_star[l]).sum();
+
+        probas = stan::math::softmax(probas);
+
+        int newt =
+            bayesmix::categorical_rng(probas, bayesmix::Rng::Instance().get());
+        if (newt < taus.size()) {
+          m[newt] += 1;
+          t[r][l] = newt;
+        } else {
+          m.push_back(1);
+          t[r][l] = newt;
+          std::shared_ptr<BaseHierarchy> hier = G00_master_hierarchy->clone();
+          hier->sample_given_data(data_by_theta_star[l]);
+          taus.push_back(hier);
+        }
+      }
+    }
+  }
+}
 
 void SemiHdpSampler::update_c() {
   // std::cout << "update_c" << std::endl;
@@ -306,7 +354,8 @@ void SemiHdpSampler::update_c() {
       for (int r = 0; r < ngroups; r++)
         probas(r) = lpdf_for_group(i, r) + std::log(omega(r));
 
-      std::cout << "group: " << i << ", probas: " << probas.transpose() << std::endl;
+      // std::cout << "group: " << i << ", probas: " << probas.transpose()
+      //           << std::endl;
       // sample new group
       probas = stan::math::softmax(probas);
       new_r = bayesmix::categorical_rng(probas, rng);
@@ -356,7 +405,7 @@ void SemiHdpSampler::update_c() {
       int prop_r = bayesmix::categorical_rng(proposal_weights, rng);
       double num = lpdf_for_group(i, prop_r) + std::log(omega(prop_r));
       double den = lpdf_for_group(i, curr_r) + std::log(omega(curr_r));
-    
+
       if (std::log(stan::math::uniform_rng(0, 1, rng)) < num - den) {
         new_r = prop_r;
       }
@@ -369,7 +418,6 @@ void SemiHdpSampler::update_c() {
 }
 
 void SemiHdpSampler::update_w() {
-
   auto& rng = bayesmix::Rng::Instance().get();
   // cnt how many from the iodisincratic
   int cnt = 0;
@@ -654,9 +702,9 @@ void SemiHdpSampler::print_debug_string() {
       }
     }
     for (int l = 0; l < theta_star[r].size(); l++) {
-      std::cout << "THETA STAR (" << r << ", " << l
-                << "): m=" << theta_star[r][l].get_mean()
-                << ", sd: " << theta_star[r][l].get_sd();
+      // std::cout << "THETA STAR (" << r << ", " << l
+      //           << "): m=" << theta_star[r][l]->get_mean()
+      //           << ", sd: " << theta_star[r][l].get_sd();
 
       std::cout << ", DATA: " << data_by_theta_star[l].transpose()
                 << std::endl;

@@ -61,14 +61,6 @@ class NNIGHierarchy : public BaseHierarchy {
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNIGHierarchy() = default;
   NNIGHierarchy() = default;
-  NNIGHierarchy(const NNIGHierarchy &h) {
-    mu0 = h.mu0;
-    lambda0 = h.lambda0;
-    alpha0 = h.alpha0;
-    beta0 = h.beta0;
-    mean = h.mean;
-    sd = h.sd;
-  }
 
   std::shared_ptr<BaseHierarchy> clone() const override {
     return std::make_shared<NNIGHierarchy>(*this);
@@ -91,20 +83,20 @@ class NNIGHierarchy : public BaseHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
-  double get_mu0() const { return mu0; }
-  double get_alpha0() const { return alpha0; }
-  double get_beta0() const { return beta0; }
-  double get_lambda0() const { return lambda0; }
-  double get_mean() const { return mean; }
-  double get_sd() const { return sd; }
+  double get_mu0() const { return hypers->mean; }
+  double get_alpha0() const { return hypers->shape; }
+  double get_beta0() const { return hypers->scale; }
+  double get_lambda0() const { return hypers->var_scaling; }
+  double get_mean() const { return state.mean; }
+  double get_sd() const { return state.var; }
 
-  void set_mu0(const double mu0_) {
-    mu0 = mu0_;
-    mean = mu0;
-  }
-  void set_alpha0(const double alpha0_) { alpha0 = alpha0_; }
-  void set_beta0(const double beta0_) { beta0 = beta0_; }
-  void set_lambda0(const double lambda0_) { lambda0 = lambda0_; }
+  // void set_mu0(const double mu0_) {
+  //   mu0 = mu0_;
+  //   mean = mu0;
+  // }
+  // void set_alpha0(const double alpha0_) { alpha0 = alpha0_; }
+  // void set_beta0(const double beta0_) { beta0 = beta0_; }
+  // void set_lambda0(const double lambda0_) { lambda0 = lambda0_; }
 
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
