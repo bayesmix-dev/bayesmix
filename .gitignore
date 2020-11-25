@@ -1,6 +1,6 @@
 # Build folder
-build
+build/
+# Resources folder
+resources/
 # Local files
 *.local.*
-# Visual Studio Code folder
-.vscode

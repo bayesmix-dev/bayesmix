@@ -68,7 +68,7 @@ class PitYorMixing : public BaseMixing {
 
   void write_state_to_proto(google::protobuf::Message *out) const override;
 
-  std::string get_id() const override { return "Pitman-Yor"; }
+  std::string get_id() const override { return "PY"; }
 };
 
 #endif  // BAYESMIX_MIXINGS_PITYOR_MIXING_HPP_
