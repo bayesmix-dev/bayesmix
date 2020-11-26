@@ -4,8 +4,8 @@
 
 #include <Eigen/Dense>
 
-#include "../src/utils/distributions.hpp"
 #include "../src/hierarchies/nnig_hierarchy.hpp"
+#include "../src/utils/distributions.hpp"
 
 TEST(rng, test1) {
   int rounds = 1000;

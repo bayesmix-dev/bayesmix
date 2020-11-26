@@ -12,8 +12,7 @@ Eigen::VectorXd bayesmix::cluster_estimate(
   // Initialize objects
   unsigned n_iter = alloc_chain.rows();
   unsigned int n_data = alloc_chain.cols();
-  Eigen::VectorXd errors(n_iter);
-  Eigen::MatrixXd mean_diss(n_data, n_data);
+  Eigen::MatrixXd mean_diss = Eigen::MatrixXd::Zero(n_data, n_data);
   std::vector<Eigen::SparseMatrix<double> > all_diss;
 
   // Loop over iterations
@@ -39,6 +38,7 @@ Eigen::VectorXd bayesmix::cluster_estimate(
   mean_diss = mean_diss / n_iter;
 
   // Compute Frobenius norm error of all iterations
+  Eigen::VectorXd errors(n_iter);
   for (size_t i = 0; i < n_iter; i++) {
     errors(i) = (mean_diss - all_diss[i]).norm();
   }

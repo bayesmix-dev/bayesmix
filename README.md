@@ -25,6 +25,11 @@ After cloning this git repository, run
 
 This will install the [Stan math library](https://github.com/stan-dev/math) and Protocol buffers in `lib`
 
+Compile the proto objects:
+```shell
+./bash/compile_protos.sh
+```
+
 To run the executable:
 ```shell
 mkdir build

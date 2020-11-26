@@ -2,11 +2,12 @@
 #define BAYESMIX_UTILS_DISTRIBUTIONS_HPP_
 
 #include <omp.h>
-#include <proto/cpp/marginal_state.pb.h>
 
 #include <Eigen/Dense>
 #include <random>
 #include <vector>
+
+#include "../../proto/cpp/marginal_state.pb.h"
 
 namespace bayesmix {
 
@@ -23,16 +24,15 @@ namespace bayesmix {
 int categorical_rng(const Eigen::VectorXd &probas, std::mt19937_64 &rng,
                     int start = 0);
 
-
 /*
  * Evaluates the log probability density function of a multivariate Gaussian
  * distribution parametrized by mean and precision matrix
- * 
+ *
  * @param datum where to evaluate the the lpdf
  * @param mean the mean of the Gaussian distribution
  * @prec_chol the (lower) cholesky factor of the precision matric
  * @prec_logdet logarithm of the determinant of the precision matrix
- * @return the evaluation of the lpdf 
+ * @return the evaluation of the lpdf
  */
 double multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
                               const Eigen::VectorXd &mean,
@@ -41,9 +41,9 @@ double multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
 
 /*
  * Computes the L2 distance between the univariate mixture of Gaussian
- * densities p1(x) = \sum_{h=1}^m1 w1[h] N(x | mean1[h], var1[h]) and 
+ * densities p1(x) = \sum_{h=1}^m1 w1[h] N(x | mean1[h], var1[h]) and
  * p2(x) = \sum_{h=1}^m2 w2[h] N(x | mean2[h], var2[h])
- * 
+ *
  * The L2 distance amounts to
  * d(p, q) = (\int (p(x) - q(x)^2 dx))^{1/2}
  *
@@ -61,7 +61,7 @@ double gaussian_mixture_dist(Eigen::VectorXd means1, Eigen::VectorXd vars1,
 
 /*
  * Computes the L2 distance between the multivariate mixture of Gaussian
- * densities p1(x) = \sum_{h=1}^m1 w1[h] N(x | mean1[h], Prec[1]^{-1}) and 
+ * densities p1(x) = \sum_{h=1}^m1 w1[h] N(x | mean1[h], Prec[1]^{-1}) and
  * p2(x) = \sum_{h=1}^m2 w2[h] N(x | mean2[h], Prec2[h]^{-1})
  *
  * The L2 distance amounts to

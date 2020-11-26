@@ -84,8 +84,8 @@ void NNWHierarchy::update_hypers(
     // Compute posterior hyperparameters
     unsigned int dim = mu00.size();
     Eigen::MatrixXd sigma00inv = stan::math::inverse_spd(sigma00);
-    Eigen::MatrixXd prec(dim, dim);
-    Eigen::VectorXd num(dim);
+    Eigen::MatrixXd prec = Eigen::MatrixXd::Zero(dim, dim);
+    Eigen::VectorXd num = Eigen::MatrixXd::Zero(dim, 1);
     for (auto &st : states) {
       Eigen::MatrixXd prec_i = bayesmix::to_eigen(st.multi_ls_state().prec());
       prec += prec_i;
@@ -116,7 +116,7 @@ void NNWHierarchy::update_hypers(
     unsigned int dim = mu00.size();
     Eigen::MatrixXd sigma00inv = stan::math::inverse_spd(sigma00);
     Eigen::MatrixXd tau_n = Eigen::MatrixXd::Zero(dim, dim);
-    Eigen::VectorXd num(dim);
+    Eigen::VectorXd num = Eigen::MatrixXd::Zero(dim, 1);
     double beta_n = 0.0;
     for (auto &st : states) {
       Eigen::VectorXd mean = bayesmix::to_eigen(st.multi_ls_state().mean());
@@ -142,7 +142,7 @@ void NNWHierarchy::update_hypers(
   }
 
   else {
-    std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Error: unrecognized prior");
   }
 }
 
@@ -334,7 +334,7 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
   }
 
   else {
-    std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Error: unrecognized prior");
   }
 }
 

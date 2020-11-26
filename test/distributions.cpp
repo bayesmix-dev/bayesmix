@@ -1,10 +1,12 @@
+#include "../src/utils/distributions.hpp"
+
 #include <gtest/gtest.h>
 
 #include <Eigen/Dense>
-#include <src/utils/distributions.hpp>
-#include <src/utils/rng.hpp>
 #include <stan/math/prim.hpp>
 #include <vector>
+
+#include "../src/utils/rng.hpp"
 
 TEST(mix_dist, 1) {
   auto& rng = bayesmix::Rng::Instance().get();
@@ -31,8 +33,8 @@ TEST(mix_dist, 1) {
     sds2(i) = stan::math::uniform_rng(0.1, 2.0, rng);
   }
 
-  double dist = bayesmix::gaussian_mixture_dist(
-      means1, sds1, weights1, means2, sds2, weights2);
+  double dist = bayesmix::gaussian_mixture_dist(means1, sds1, weights1, means2,
+                                                sds2, weights2);
 
   ASSERT_GE(dist, 0.0);
 }
@@ -54,5 +56,5 @@ TEST(mix_dist, 2) {
   double dist_to_self = bayesmix::gaussian_mixture_dist(
       means1, sds1, weights1, means1, sds1, weights1);
 
-  ASSERT_FLOAT_EQ(dist_to_self, 0.0);
+  ASSERT_DOUBLE_EQ(dist_to_self, 0.0);
 }

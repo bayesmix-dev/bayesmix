@@ -6,11 +6,26 @@ package bayesmix;
 
 message DPPrior {
   message FixedValue {
-    double value = 1;
+    double totalmass = 1;
+  }
+
+  message GammaPrior {
+    GammaDistribution totalmass_prior = 1;
   }
 
   oneof totalmass {
     FixedValue fixed_value = 1;
-    GammaDistribution gamma_prior = 2;
+    GammaPrior gamma_prior = 2;
+  }
+}
+
+message PYPrior {
+  message FixedValues {
+    double strength = 1;
+    double discount = 2;
+  }
+
+  oneof totalmass {
+    FixedValues fixed_values = 1;
   }
 }

@@ -41,15 +41,17 @@ class BaseMixing {
   virtual double mass_new_cluster(const unsigned int n_clust,
                                   const unsigned int n) const = 0;
 
-  virtual void update_hypers(
+  virtual void initialize() = 0;
+
+  virtual void update_state(
       const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
       unsigned int n) = 0;
 
   // GETTERS AND SETTERS
+  virtual void set_state_from_proto(
+      const google::protobuf::Message &state_) = 0;
   virtual void set_prior(const google::protobuf::Message &prior_) = 0;
-
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
-
   virtual std::string get_id() const = 0;
 };
 
