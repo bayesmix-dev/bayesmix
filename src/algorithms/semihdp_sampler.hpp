@@ -62,20 +62,15 @@ class SemiHdpSampler {
   std::vector<int> c;
   std::vector<bool> is_used_c;
   VectorXd omega;
-  //
-  std::vector<std::vector<int>> t;
-  std::vector<std::vector<int>> v;
+  std::vector<std::vector<int>> t, v;
 
   // number of theta_stars equal to tau_h across all groups
   std::vector<int> m;
 
   double w = 0.5;
 
-  double alpha = 1;
+  double alpha, gamma, a_w, b_w;
   double gamma = 1;
-
-  double a_w = 2;
-  double b_w = 2;
 
   std::vector<MemoryCollector<MarginalState>> pseudoprior_collectors;
   int pseudo_iter;
