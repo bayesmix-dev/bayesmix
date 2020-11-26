@@ -68,9 +68,7 @@ class SemiHdpSampler {
   std::vector<int> m;
 
   double w = 0.5;
-
   double alpha, gamma, a_w, b_w;
-  double gamma = 1;
 
   std::vector<MemoryCollector<MarginalState>> pseudoprior_collectors;
   int pseudo_iter;
