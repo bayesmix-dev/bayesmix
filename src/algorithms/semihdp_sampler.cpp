@@ -357,50 +357,20 @@ void SemiHdpSampler::update_c() {
       // sample new group
       probas = stan::math::softmax(probas);
       new_r = bayesmix::categorical_rng(probas, rng);
-    } else if (params.c_update() == "metro_base") {
-      std::uniform_int_distribution<int> proposal_dens(0, ngroups - 1);
-      int prop_r = proposal_dens(rng);
-      double num = lpdf_for_group(i, prop_r) + std::log(omega(prop_r));
-      double den = lpdf_for_group(i, curr_r) + std::log(omega(curr_r));
-      if (std::log(stan::math::uniform_rng(0, 1, rng)) < num - den) {
-        new_r = prop_r;
-      }
-    } else if (params.c_update() == "metro_dist") {
-      std::vector<bayesmix::MarginalState::ClusterState> clus1(
-          theta_star[curr_r].size());
-      VectorXd weights1(theta_star[curr_r].size());
-      for (int l = 0; l < theta_star[curr_r].size(); l++) {
-        bayesmix::MarginalState::ClusterState clus;
-        theta_star[curr_r][l]->write_state_to_proto(&clus);
-        clus1[l] = clus;
-        weights1(l) = n_by_theta_star[curr_r][l];
-      }
-      weights1 = weights1.array() / weights1.sum();
-
-      VectorXd dists(ngroups);
-
-      for (int r = 0; r < ngroups; r++) {
-        std::vector<bayesmix::MarginalState::ClusterState> clus2(
-            theta_star[r].size());
-        VectorXd weights2(theta_star[r].size());
-        for (int l = 0; l < theta_star[r].size(); l++) {
-          bayesmix::MarginalState::ClusterState clus;
-          theta_star[r][l]->write_state_to_proto(&clus);
-          clus2[l] = clus;
-          weights2(l) = n_by_theta_star[r][l];
-        }
-        weights2 = weights2.array() / weights2.sum();
-
-        dists(r) =
-            bayesmix::gaussian_mixture_dist(clus1, weights1, clus2, weights2);
+    } else {
+      int prop_r = curr_r;
+      if (params.c_update() == "metro_base") {
+        std::uniform_int_distribution<int> proposal_dens(0, ngroups - 1);
+        prop_r = proposal_dens(rng);
+      } else if (params.c_update() == "metro_dist") {
+        VectorXd dists = _compute_mixture_distance(curr_r);
+        VectorXd proposal_weights = VectorXd::Ones(ngroups);
+        for (int r = 0; r < ngroups; r++)
+          proposal_weights[r] += 0.1 / (0.0001 + dists(r));
+        proposal_weights /= proposal_weights.sum();
+        prop_r = bayesmix::categorical_rng(proposal_weights, rng);
       }
 
-      VectorXd proposal_weights = VectorXd::Ones(ngroups);
-      for (int r = 0; r < ngroups; r++)
-        proposal_weights[r] += 0.1 / (0.0001 + dists(r));
-      proposal_weights /= proposal_weights.sum();
-
-      int prop_r = bayesmix::categorical_rng(proposal_weights, rng);
       double num = lpdf_for_group(i, prop_r) + std::log(omega(prop_r));
       double den = lpdf_for_group(i, curr_r) + std::log(omega(curr_r));
 
@@ -565,21 +535,20 @@ void SemiHdpSampler::sample_pseudo_prior() {
 void SemiHdpSampler::perturb(MarginalState::ClusterState* out) {
   auto& rng = bayesmix::Rng::Instance().get();
   if (out->has_univ_ls_state()) {
-    double m =
-        out->univ_ls_state().mean() +
-        stan::math::normal_rng(0, params.pseudo_prior().mean_perturb_sd(), rng);
+    double m = out->univ_ls_state().mean() +
+               stan::math::normal_rng(
+                   0, params.pseudo_prior().mean_perturb_sd(), rng);
     double curr_var = out->univ_ls_state().var();
-    double var =
-        curr_var + stan::math::uniform_rng(
-                       -curr_var / params.pseudo_prior().var_perturb_frac(),
-                       curr_var / params.pseudo_prior().var_perturb_frac(), rng);
+    double var = curr_var +
+                 stan::math::uniform_rng(
+                     -curr_var / params.pseudo_prior().var_perturb_frac(),
+                     curr_var / params.pseudo_prior().var_perturb_frac(), rng);
     out->mutable_univ_ls_state()->set_mean(m);
     out->mutable_univ_ls_state()->set_var(var);
   } else {
     throw std::invalid_argument("Case not implemented yet!");
   }
 }
-
 
 double SemiHdpSampler::lpdf_for_group(int i, int r) {
   VectorXd lpdf_data(n_by_group[i]);
@@ -641,6 +610,37 @@ void SemiHdpSampler::reassign_group(int i, int new_r, int old_r) {
     s[i][j] = bayesmix::categorical_rng(stan::math::softmax(probas), rng);
   }
   // std::cout << "done" << std::endl;
+}
+
+VectorXd SemiHdpSampler::_compute_mixture_distance(int i) {
+  std::vector<bayesmix::MarginalState::ClusterState> clus1(
+      theta_star[i].size());
+  VectorXd weights1(theta_star[i].size());
+  for (int l = 0; l < theta_star[i].size(); l++) {
+    bayesmix::MarginalState::ClusterState clus;
+    theta_star[i][l]->write_state_to_proto(&clus);
+    clus1[l] = clus;
+    weights1(l) = n_by_theta_star[i][l];
+  }
+  weights1 = weights1.array() / weights1.sum();
+  VectorXd dists(ngroups);
+
+  for (int r = 0; r < ngroups; r++) {
+    std::vector<bayesmix::MarginalState::ClusterState> clus2(
+        theta_star[r].size());
+    VectorXd weights2(theta_star[r].size());
+    for (int l = 0; l < theta_star[r].size(); l++) {
+      bayesmix::MarginalState::ClusterState clus;
+      theta_star[r][l]->write_state_to_proto(&clus);
+      clus2[l] = clus;
+      weights2(l) = n_by_theta_star[r][l];
+    }
+    weights2 = weights2.array() / weights2.sum();
+
+    dists(r) = bayesmix::gaussian_mixture_dist(clus1, weights1, clus2,
+                                               weights2);
+  }
+  return dists;
 }
 
 bayesmix::SemiHdpState SemiHdpSampler::get_state_as_proto() {

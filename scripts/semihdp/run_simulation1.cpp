@@ -89,8 +89,8 @@ void run_semihdp(const std::vector<MatrixXd> data, std::string chainfile) {
   hier_prior.mutable_fixed_values()->set_scale(2.0);
   hier->set_prior(hier_prior);
 
-  int nburn = 10000;
-  int niter = 10000;
+  int nburn = 100;
+  int niter = 100;
   MemoryCollector<bayesmix::SemiHdpState> collector;
   SemiHdpSampler sampler(data, hier, params);
   sampler.run(nburn, nburn, niter, 5, &collector, pseudoprior_collectors);

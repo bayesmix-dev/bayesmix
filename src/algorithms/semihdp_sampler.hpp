@@ -156,6 +156,8 @@ class SemiHdpSampler {
   double lpdf_for_group(int i, int r);
   void reassign_group(int i, int new_r, int old_r);
 
+  VectorXd _compute_mixture_distance(int i);
+
   bayesmix::SemiHdpState get_state_as_proto();
   std::vector<std::vector<int>> get_s() const { return s; }
   std::vector<std::vector<int>> get_t() const { return t; }
