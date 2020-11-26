@@ -89,8 +89,8 @@ void run_semihdp(const std::vector<MatrixXd> data, std::string chainfile) {
   hier_prior.mutable_fixed_values()->set_scale(2.0);
   hier->set_prior(hier_prior);
 
-  int nburn = 100;
-  int niter = 100;
+  int nburn = 10000;
+  int niter = 10000;
   MemoryCollector<bayesmix::SemiHdpState> collector;
   SemiHdpSampler sampler(data, hier, params);
   sampler.run(nburn, nburn, niter, 5, &collector, pseudoprior_collectors);
@@ -110,9 +110,11 @@ int main() {
   std::vector<MatrixXd> data3 = simulate_data(0.0, 1.0, 5.0, 1.0, 0.8, 0.0,
                                               1.0, 5.0, 1.0, 0.2, 100, 100);
 
-  data1[1] = data1[0];
+  // data1[1] = data1[0];
 
-  run_semihdp(data1, "/home/mario/dev/bayesmix/s1e1_new2.recordio");
+  run_semihdp(data1, "/home/mario/dev/bayesmix/s1e1_new3.recordio");
+  run_semihdp(data2, "/home/mario/dev/bayesmix/s1e2_new3.recordio");
+  run_semihdp(data3, "/home/mario/dev/bayesmix/s1e3_new3.recordio");
 
   // MemoryCollector<bayesmix::SemiHdpState> collector1;
   // SemiHdpSampler sampler1(data1);

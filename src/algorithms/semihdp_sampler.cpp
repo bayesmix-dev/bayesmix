@@ -96,12 +96,9 @@ void SemiHdpSampler::update_unique_vals() {
 
   for (int r = 0; r < ngroups; r++) {
     std::vector<MatrixXd> data_by_theta_star(theta_star[r].size());
-    // std::cout << "theta_star[r].size() " << theta_star[r].size() <<
-    // std::endl;
     for (int i = 0; i < ngroups; i++) {
       if (c[i] == r) {
         for (int j = 0; j < n_by_group[i]; j++) {
-          // std::cout << "s[i][j]: " << s[i][j] << std::endl;
           bayesmix::append_by_row(&data_by_theta_star[s[i][j]],
                                   data[i].row(j));
         }
@@ -136,11 +133,9 @@ void SemiHdpSampler::update_unique_vals() {
       }
     }
   }
-  // std::cout << "update_unique_vals DONE" << std::endl;
 }
 
 void SemiHdpSampler::update_s() {
-  // std::cout << "update_s" << std::endl;
 
   auto& rng = bayesmix::Rng::Instance().get();
   const double logw = std::log(w);
@@ -149,24 +144,9 @@ void SemiHdpSampler::update_s() {
   const double loggamma = std::log(gamma);
 
   // compute counts
-  m = std::vector<int>(taus.size(), 0);
-  for (int r = 0; r < ngroups; r++) {
-    for (int l = 0; l < t[r].size(); l++)
-      if (t[r][l] >= 0) {
-        // std::cout << "t[r][l]: " << t[r][l] << std::endl;
-        m[t[r][l]] += 1;
-      }
+  _count_m();
+  _count_n_by_theta_star();
 
-    n_by_theta_star[r] = std::vector<int>(theta_star[r].size(), 0);
-#pragma omp parallel for
-    for (int i = 0; i < ngroups; i++) {
-      if (c[i] == r) {
-        for (int j = 0; j < n_by_group[i]; j++) {
-          n_by_theta_star[r][s[i][j]] += 1;
-        }
-      }
-    }
-  }
   std::vector<std::vector<int>> log_n_by_theta_star(ngroups);
   for (int r = 0; r < ngroups; r++) {
     for (int n : n_by_theta_star[r]) {
@@ -205,11 +185,6 @@ void SemiHdpSampler::update_s() {
 #pragma omp parallel for
       for (int l = 0; l < theta_star[r].size(); l++) {
         double log_n = log_n_by_theta_star[r][l];
-        // if (n_by_theta_star[r][l] > 0)
-        //   log_n = std::log(1.0 * n_by_theta_star[r][l]);
-        // else
-        //   log_n = 1e-20;
-
         probas[l] = log_n + theta_star[r][l]->like_lpdf(data[i].row(j));
       }
 
@@ -219,10 +194,6 @@ void SemiHdpSampler::update_s() {
 #pragma omp parallel for
       for (int h = 0; h < taus.size(); h++) {
         double logm = log_m[h];
-        // if (m[h] > 0)
-        //   logm = std::log(1.0 * m[h]);
-        // else
-        //   logm = 1e-20;
         hdp_contribs[h] = logm - logmsum + taus[h]->like_lpdf(data[i].row(j));
       }
 
@@ -240,7 +211,6 @@ void SemiHdpSampler::update_s() {
         log_n_by_theta_star[r][snew] =
             std::log(1.0 * n_by_theta_star[r][snew]);
       } else {
-        // std::cout << "creating new theta_star" << std::endl;
         n_by_theta_star[r].push_back(1);
         log_n_by_theta_star[r].push_back(0);
         if (stan::math::uniform_rng(0, 1, rng) < w) {
@@ -278,15 +248,10 @@ void SemiHdpSampler::update_s() {
       }
     }
   }
-  // std::cout << "update_s DONE" << std::endl;
 }
 
 void SemiHdpSampler::update_t() {
-  m = std::vector<int>(taus.size(), 0);
-  for (int r = 0; r < ngroups; r++) {
-    for (int l = 0; l < t[r].size(); l++)
-      if (t[r][l] >= 0) m[t[r][l]] += 1;
-  }
+  _count_m();
 
   for (int r = 0; r < ngroups; r++) {
     // aggregate data together
@@ -338,8 +303,6 @@ void SemiHdpSampler::update_t() {
 }
 
 void SemiHdpSampler::update_c() {
-  // std::cout << "update_c" << std::endl;
-
   auto& rng = bayesmix::Rng::Instance().get();
   for (int i = 0; i < ngroups; i++) {
     int curr_r = c[i];
@@ -351,10 +314,6 @@ void SemiHdpSampler::update_c() {
 #pragma omp parallel for
       for (int r = 0; r < ngroups; r++)
         probas(r) = lpdf_for_group(i, r) + std::log(omega(r));
-
-      // std::cout << "group: " << i << ", probas: " << probas.transpose()
-      //           << std::endl;
-      // sample new group
       probas = stan::math::softmax(probas);
       new_r = bayesmix::categorical_rng(probas, rng);
     } else {
@@ -486,16 +445,8 @@ void SemiHdpSampler::relabel() {
     }
   }
 
-  for (int r = 0; r < ngroups; r++) {
-    n_by_theta_star[r] = std::vector<int>(theta_star[r].size(), 0);
-    for (int i = 0; i < ngroups; i++) {
-      if (c[i] == r) {
-        for (int j = 0; j < n_by_group[i]; j++) {
-          n_by_theta_star[r][s[i][j]] += 1;
-        }
-      }
-    }
-  }
+  _count_n_by_theta_star();
+  _count_m();
 }
 
 void SemiHdpSampler::sample_pseudo_prior() {
@@ -579,8 +530,6 @@ double SemiHdpSampler::lpdf_for_group(int i, int r) {
 }
 
 void SemiHdpSampler::reassign_group(int i, int new_r, int old_r) {
-  // std::cout << "changing c, group: " << i << ", old_r: " << old_r
-  //           << ", new_r: " << new_r << std::endl;
   auto& rng = bayesmix::Rng::Instance().get();
   c[i] = new_r;
   is_used_c[old_r] = (std::find(c.begin(), c.end(), old_r) != c.end());
@@ -609,7 +558,6 @@ void SemiHdpSampler::reassign_group(int i, int new_r, int old_r) {
     }
     s[i][j] = bayesmix::categorical_rng(stan::math::softmax(probas), rng);
   }
-  // std::cout << "done" << std::endl;
 }
 
 VectorXd SemiHdpSampler::_compute_mixture_distance(int i) {
@@ -641,6 +589,28 @@ VectorXd SemiHdpSampler::_compute_mixture_distance(int i) {
                                                weights2);
   }
   return dists;
+}
+
+void SemiHdpSampler::_count_m() {
+  m = std::vector<int>(taus.size(), 0);
+  for (int r = 0; r < ngroups; r++) {
+    for (int l = 0; l < t[r].size(); l++)
+      if (t[r][l] >= 0) {
+        m[t[r][l]] += 1;
+      }
+  }
+}
+void SemiHdpSampler::_count_n_by_theta_star() {
+  for (int r = 0; r < ngroups; r++) {
+    n_by_theta_star[r] = std::vector<int>(theta_star[r].size(), 0);
+    for (int i = 0; i < ngroups; i++) {
+      if (c[i] == r) {
+        for (int j = 0; j < n_by_group[i]; j++) {
+          n_by_theta_star[r][s[i][j]] += 1;
+        }
+      }
+    }
+  }
 }
 
 bayesmix::SemiHdpState SemiHdpSampler::get_state_as_proto() {
@@ -690,21 +660,12 @@ void SemiHdpSampler::print_debug_string() {
     for (int i = 0; i < ngroups; i++) {
       if (c[i] == r) {
         for (int j = 0; j < n_by_group[i]; j++) {
-          //   std::cout << "s[i][j]" << s[i][j] << std::endl;
-          //   std::cout << "currdata: " <<
-          //   data_by_theta_star[s[i][j]].transpose() << std::endl;
-          //   std::cout
-          //   << "appending: " << data[i].row(j) << std::endl;
           bayesmix::append_by_row(&data_by_theta_star[s[i][j]],
                                   data[i].row(j));
         }
       }
     }
     for (int l = 0; l < theta_star[r].size(); l++) {
-      // std::cout << "THETA STAR (" << r << ", " << l
-      //           << "): m=" << theta_star[r][l]->get_mean()
-      //           << ", sd: " << theta_star[r][l].get_sd();
-
       std::cout << ", DATA: " << data_by_theta_star[l].transpose()
                 << std::endl;
     }

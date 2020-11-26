@@ -157,6 +157,8 @@ class SemiHdpSampler {
   void reassign_group(int i, int new_r, int old_r);
 
   VectorXd _compute_mixture_distance(int i);
+  void _count_m();
+  void _count_n_by_theta_star();
 
   bayesmix::SemiHdpState get_state_as_proto();
   std::vector<std::vector<int>> get_s() const { return s; }
