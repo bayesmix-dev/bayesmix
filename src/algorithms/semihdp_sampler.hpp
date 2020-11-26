@@ -19,6 +19,19 @@ using bayesmix::SemiHdpState;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
+/*
+ * This class implements the algorithm for posterior simulation under the
+ * semi-hierarchical Dirichlet process in [1].
+ * 
+ * Extra goodies: we can now tune the pseudo-prior generation, by randomly
+ * drawing the cardinalities from a multinomial distribution, and perturbing
+ * the atoms of the mixing measure.
+ *
+ * [1]: "The semi-hierarchical Dirichlet Process and its application to
+ * clustering homogeneous distributions", Beraha, Guglielmi and Quintana
+ * arXiv: 2005.10287
+ */
+
 class SemiHdpSampler {
  protected:
   bayesmix::SemiHdpParams params;
@@ -104,12 +117,6 @@ class SemiHdpSampler {
 
     initialize();
     update_unique_vals();
-
-    // for (int i=i; i < ngroups; i++) {
-    //   reassign_group(i, 0, i);
-    // }
-
-    // update_c();
 
     if (adapt_iter > 0) {
       adapt = true;
