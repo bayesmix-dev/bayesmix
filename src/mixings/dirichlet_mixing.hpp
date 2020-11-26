@@ -1,7 +1,6 @@
 #ifndef BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
 #define BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
 
-#include <cassert>
 #include <memory>
 
 #include "../../proto/cpp/mixing_prior.pb.h"
@@ -19,10 +18,14 @@
 //! proportional to their cardinalities.
 
 class DirichletMixing : public BaseMixing {
+ public:
+  struct State {
+    double totalmass;
+  };
+
  protected:
-  //! Total mass parameters
-  double totalmass = 1.0;
-  bayesmix::DPPrior prior;
+  State state;
+  std::shared_ptr<bayesmix::DPPrior> prior;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -37,7 +40,7 @@ class DirichletMixing : public BaseMixing {
   //! \return     Probability value
   double mass_existing_cluster(const unsigned int card,
                                const unsigned int n) const override {
-    return card / (n + totalmass);
+    return card / (n + state.totalmass);
   }
 
   //! Mass probability for choosing a newly created cluster
@@ -47,20 +50,20 @@ class DirichletMixing : public BaseMixing {
   //! \return        Probability value
   double mass_new_cluster(const unsigned int n_clust,
                           const unsigned int n) const override {
-    return totalmass / (n + totalmass);
+    return state.totalmass / (n + state.totalmass);
   }
 
-  void update_hypers(
+  void initialize() override;
+
+  void update_state(
       const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
       unsigned int n) override;
 
   // GETTERS AND SETTERS
-  double get_totalmass() const { return totalmass; }
-
+  State get_state() const { return state; }
+  void set_state_from_proto(const google::protobuf::Message &state_) override;
   void set_prior(const google::protobuf::Message &prior_) override;
-
   void write_state_to_proto(google::protobuf::Message *out) const override;
-
   std::string get_id() const override { return "DP"; }
 };
 

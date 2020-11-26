@@ -6,9 +6,9 @@ from proto.py import hierarchy_prior_pb2
 if __name__ == "__main__":
   # DP gamma hyperprior
   dp_prior = mixing_prior_pb2.DPPrior()
-  dp_prior.gamma_prior.shape = 4.0
-  dp_prior.gamma_prior.rate = 2.0
-  with open("resources/dp_gamma_prior.asciipb", "w") as f:
+  dp_prior.gamma_prior.totalmass_prior.shape = 4.0
+  dp_prior.gamma_prior.totalmass_prior.rate = 2.0
+  with open("resources/asciipb/dp_gamma_prior.asciipb", "w") as f:
     PrintMessage(dp_prior, f)
 
   # NNIG NGG hyperprior
@@ -20,7 +20,7 @@ if __name__ == "__main__":
   nnig_prior.ngg_prior.shape = 1.5
   nnig_prior.ngg_prior.scale_prior.shape = 4.0
   nnig_prior.ngg_prior.scale_prior.rate = 2.0
-  with open("resources/nnig_ngg_prior.asciipb", "w") as f:
+  with open("resources/asciipb/nnig_ngg_prior.asciipb", "w") as f:
     PrintMessage(nnig_prior, f)
 
   # NNW NGIW hyperprior
@@ -44,5 +44,5 @@ if __name__ == "__main__":
   nnw_prior.ngiw_prior.scale_prior.scale.cols = int(sqrt(len(tau00)))
   nnw_prior.ngiw_prior.scale_prior.scale.data[:] = tau00
   nnw_prior.ngiw_prior.scale_prior.scale.rowmajor = False
-  with open("resources/nnw_ngiw_prior.asciipb", "w") as f:
+  with open("resources/asciipb/nnw_ngiw_prior.asciipb", "w") as f:
     PrintMessage(nnw_prior, f)

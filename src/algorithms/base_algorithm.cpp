@@ -26,6 +26,9 @@ void BaseAlgorithm::initialize() {
     unique_values.push_back(unique_values[0]->clone());
   }
 
+  // Initialize mixing
+  mixing->initialize();
+
   // Initialize needed objects
   cardinalities.clear();
   cardinalities.reserve(data.rows());

@@ -1,8 +1,7 @@
 #ifndef BAYESMIX_MIXINGS_PITYOR_MIXING_HPP_
 #define BAYESMIX_MIXINGS_PITYOR_MIXING_HPP_
 
-#include <cassert>
-
+#include "../../proto/cpp/mixing_prior.pb.h"
 #include "base_mixing.hpp"
 
 //! Class that represents the Pitman-Yor process mixture model.
@@ -17,10 +16,14 @@
 //! one counting the total amount as the sample size increased by the strength.
 
 class PitYorMixing : public BaseMixing {
+ public:
+  struct State {
+    double strength, discount;
+  };
+
  protected:
-  //! Strength and discount parameters
-  double strength = 1.0;
-  double discount = 0.1;
+  State state;
+  std::shared_ptr<bayesmix::PYPrior> prior;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -35,7 +38,7 @@ class PitYorMixing : public BaseMixing {
   //! \return     Probability value
   double mass_existing_cluster(const unsigned int card,
                                const unsigned int n) const override {
-    return (card == 0) ? 0 : (card - discount) / (n + strength);
+    return (card == 0) ? 0 : (card - state.discount) / (n + state.strength);
   }
 
   //! Mass probability for choosing a newly created cluster
@@ -45,29 +48,20 @@ class PitYorMixing : public BaseMixing {
   //! \return        Probability value
   double mass_new_cluster(const unsigned int n_clust,
                           const unsigned int n) const override {
-    return (strength + discount * n_clust) / (n + strength);
+    return (state.strength + state.discount * n_clust) / (n + state.strength);
   }
 
-  void update_hypers(
+  void initialize() override;
+
+  void update_state(
       const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
-      unsigned int n) override {}
+      unsigned int n) override;
 
   // GETTERS AND SETTERS
-  double get_strength() const { return strength; }
-  double get_discount() const { return discount; }
-
-  void set_strength_and_discount(const double strength_,
-                                 const double discount_) {
-    assert(strength_ > -discount_);
-    assert(0 <= discount_ && discount_ < 1);
-    strength = strength_;
-    discount = discount_;
-  }
-
-  void set_prior(const google::protobuf::Message &prior_) override {}
-
+  State get_state() const { return state; }
+  void set_state_from_proto(const google::protobuf::Message &state_) override;
+  void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
-
   std::string get_id() const override { return "PY"; }
 };
 

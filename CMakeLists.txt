@@ -3,7 +3,7 @@ project(bayesmix)
 
 find_package(PkgConfig REQUIRED)
 
-set (CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE Debug)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
