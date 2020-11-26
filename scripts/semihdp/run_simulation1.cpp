@@ -1,6 +1,7 @@
 // This scripts runs the simulations with two populations (Section 6.1)
 
 #include <Eigen/Dense>
+#include <proto/cpp/semihdp.pb.h>
 #include <src/algorithms/neal2_algorithm.hpp>
 #include <src/algorithms/semihdp_sampler.hpp>
 #include <src/collectors/file_collector.hpp>
@@ -39,12 +40,16 @@ std::vector<MatrixXd> simulate_data(double m1, double s1, double m2, double s2,
 }
 
 void run_semihdp(const std::vector<MatrixXd> data, std::string chainfile) {
+  std::string paramsfile = "/home/mario/dev/bayesmix/resources/semihdp_params.asciipb";
+  bayesmix::SemiHdpParams params;
+  bayesmix::read_proto_from_file(paramsfile, &params);
+  
   // Collect pseudo priors
   std::vector<MemoryCollector<bayesmix::MarginalState>> pseudoprior_collectors;
   pseudoprior_collectors.resize(data.size());
   bayesmix::DPPrior mix_prior;
   double totalmass = 1.0;
-  mix_prior.mutable_fixed_value()->set_value(totalmass);
+  mix_prior.mutable_fixed_value()->set_totalmass(totalmass);
   for (int i = 0; i < data.size(); i++) {
     auto mixing = std::make_shared<DirichletMixing>();
     mixing->set_prior(mix_prior);
@@ -87,7 +92,7 @@ void run_semihdp(const std::vector<MatrixXd> data, std::string chainfile) {
   int nburn = 10000;
   int niter = 10000;
   MemoryCollector<bayesmix::SemiHdpState> collector;
-  SemiHdpSampler sampler(data, hier);
+  SemiHdpSampler sampler(data, hier, params);
   sampler.run(nburn, nburn, niter, 5, &collector, pseudoprior_collectors);
   collector.write_to_file(chainfile);
 }

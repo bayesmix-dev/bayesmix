@@ -34,7 +34,7 @@ message SemiHdpParams {
   message PseudoPriorParams {
     double card_weight = 1;
     double mean_perturb_sd = 2;
-    double sd_perturb_frac = 3;
+    double var_perturb_frac = 3;
   }
 
   message WPriorParams {

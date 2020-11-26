@@ -9,13 +9,17 @@
 
 SemiHdpSampler::SemiHdpSampler(const std::vector<MatrixXd>& data,
                                std::shared_ptr<BaseHierarchy> hier,
-                               std::string c_update)
-    : data(data), c_update(c_update) {
+                               bayesmix::SemiHdpParams params)
+    : data(data), params(params) {
   ngroups = data.size();
   n_by_group.resize(ngroups);
   for (int i = 0; i < ngroups; i++) n_by_group[i] = data[i].size();
   G0_master_hierarchy = hier->clone();
   G00_master_hierarchy = hier->clone();
+  alpha = params.alpha();
+  gamma = params.gamma();
+  a_w = params.w_prior().shape1();
+  b_w = params.w_prior().shape2();
 }
 
 void SemiHdpSampler::initialize() {
@@ -303,7 +307,6 @@ void SemiHdpSampler::update_t() {
     // compute logprobas
     for (int l = 0; l < theta_star[r].size(); l++) {
       if ((t[r][l] >= 0) && (data_by_theta_star[l].size() > 0)) {
-
         VectorXd probas(taus.size() + 1);
         m[t[r][l]] -= 1;
         for (int k = 0; k < taus.size(); k++) {
@@ -342,7 +345,7 @@ void SemiHdpSampler::update_c() {
     int curr_r = c[i];
     int new_r = curr_r;
 
-    if (c_update == "full") {
+    if (params.c_update() == "full") {
       VectorXd probas(ngroups);
 // Compute probability for group change
 #pragma omp parallel for
@@ -354,7 +357,7 @@ void SemiHdpSampler::update_c() {
       // sample new group
       probas = stan::math::softmax(probas);
       new_r = bayesmix::categorical_rng(probas, rng);
-    } else if (c_update == "metro_base") {
+    } else if (params.c_update() == "metro_base") {
       std::uniform_int_distribution<int> proposal_dens(0, ngroups - 1);
       int prop_r = proposal_dens(rng);
       double num = lpdf_for_group(i, prop_r) + std::log(omega(prop_r));
@@ -362,7 +365,7 @@ void SemiHdpSampler::update_c() {
       if (std::log(stan::math::uniform_rng(0, 1, rng)) < num - den) {
         new_r = prop_r;
       }
-    } else if (c_update == "metro_dist") {
+    } else if (params.c_update() == "metro_dist") {
       std::vector<bayesmix::MarginalState::ClusterState> clus1(
           theta_star[curr_r].size());
       VectorXd weights1(theta_star[curr_r].size());
@@ -434,7 +437,7 @@ void SemiHdpSampler::update_omega() {
     cnts[c[i]] += 1;
   }
 
-  omega = stan::math::dirichlet_rng(cnts.array() + 1.0 / ngroups,
+  omega = stan::math::dirichlet_rng(cnts.array() + params.omega_prior(),
                                     bayesmix::Rng::Instance().get());
 }
 
@@ -526,8 +529,6 @@ void SemiHdpSampler::relabel() {
 }
 
 void SemiHdpSampler::sample_pseudo_prior() {
-  // std::cout << "sample_pseudo_prior" << std::endl;
-
   auto& rng = bayesmix::Rng::Instance().get();
   VectorXd probas = VectorXd::Ones(pseudo_iter).array() / (1.0 * pseudo_iter);
   int iter = bayesmix::categorical_rng(probas, rng);
@@ -543,9 +544,10 @@ void SemiHdpSampler::sample_pseudo_prior() {
     // generate a multinomial random variable with the weights given by
     // the (normalized) cardinalities of the pseudoprior
     cards = cards.array() / cards.sum();
+    double weight = params.pseudo_prior().card_weight();
     VectorXd cards_perturb =
-        0.5 * cards.array() +
-        0.5 * VectorXd::Ones(cards.size()).array() / cards.size();
+        weight * cards.array() +
+        (1 - weight) * VectorXd::Ones(cards.size()).array() / cards.size();
     n_by_theta_star_pseudo[r] =
         stan::math::multinomial_rng(cards_perturb, n_by_group[r], rng);
 
@@ -564,10 +566,13 @@ void SemiHdpSampler::perturb(MarginalState::ClusterState* out) {
   auto& rng = bayesmix::Rng::Instance().get();
   if (out->has_univ_ls_state()) {
     double m =
-        out->univ_ls_state().mean() + stan::math::normal_rng(0, 1.5, rng);
+        out->univ_ls_state().mean() +
+        stan::math::normal_rng(0, params.pseudo_prior().mean_perturb_sd(), rng);
     double curr_var = out->univ_ls_state().var();
     double var =
-        curr_var + stan::math::uniform_rng(-curr_var / 4, curr_var / 4, rng);
+        curr_var + stan::math::uniform_rng(
+                       -curr_var / params.pseudo_prior().var_perturb_frac(),
+                       curr_var / params.pseudo_prior().var_perturb_frac(), rng);
     out->mutable_univ_ls_state()->set_mean(m);
     out->mutable_univ_ls_state()->set_var(var);
   } else {
@@ -575,7 +580,6 @@ void SemiHdpSampler::perturb(MarginalState::ClusterState* out) {
   }
 }
 
-double SemiHdpSampler::semihdp_marg_lpdf(const VectorXd& datum) {}
 
 double SemiHdpSampler::lpdf_for_group(int i, int r) {
   VectorXd lpdf_data(n_by_group[i]);

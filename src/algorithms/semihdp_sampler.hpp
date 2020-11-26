@@ -21,6 +21,8 @@ using Eigen::VectorXd;
 
 class SemiHdpSampler {
  protected:
+  bayesmix::SemiHdpParams params;
+
   std::vector<MatrixXd> data;  // one vector per group
   int ngroups;
   std::vector<int> n_by_group;
@@ -74,7 +76,7 @@ class SemiHdpSampler {
 
   SemiHdpSampler(const std::vector<MatrixXd> &data,
                  std::shared_ptr<BaseHierarchy> hier,
-                 std::string c_update = "full");
+                 bayesmix::SemiHdpParams params);
 
   void initialize();
 
@@ -144,7 +146,6 @@ class SemiHdpSampler {
   void update_s();
   void update_t();
   void update_c();
-  // void update_c_metropolis();
   void update_w();
   void update_omega();
 
@@ -152,10 +153,7 @@ class SemiHdpSampler {
   void sample_pseudo_prior();
   void perturb(MarginalState::ClusterState *out);
 
-  double semihdp_marg_lpdf(const VectorXd &datum);
-
   double lpdf_for_group(int i, int r);
-
   void reassign_group(int i, int new_r, int old_r);
 
   bayesmix::SemiHdpState get_state_as_proto();
