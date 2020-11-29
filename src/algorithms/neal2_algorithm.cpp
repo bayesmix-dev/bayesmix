@@ -38,29 +38,32 @@ void Neal2Algorithm::sample_allocations() {
     // Initialize current number of clusters
     unsigned int n_clust = unique_values.size();
     // Initialize pseudo-flag
-    int singleton = (cardinalities[allocations[i]] == 1) ? 1 : 0;
+    int singleton = (unique_values[allocations[i]]->get_card() == 1) ? 1 : 0;
 
     // Remove datum from cluster
     cardinalities[allocations[i]] -= 1;
+    unique_values[allocations[i]]->remove_datum(i);
 
     // Compute probabilities of clusters in log-space
-    Eigen::VectorXd logprobas(n_clust + (1 - singleton));
+    Eigen::VectorXd logprobas(n_clust + 1 - singleton);
     // Loop over clusters
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
-      logprobas(j) =
-          log(mixing->mass_existing_cluster(cardinalities[j], n_data - 1)) +
-          unique_values[j]->like_lpdf(datum);
+      logprobas(j) = mixing->mass_existing_cluster(unique_values[j],
+                                                   n_data - 1, true, true) +
+                     unique_values[j]->like_lpdf(datum);
       if (singleton == 1 && j == allocations[i]) {
         // Probability of being assigned to a newly generated cluster
-        logprobas(j) = log(mixing->mass_new_cluster(n_clust, n_data - 1)) +
-                       unique_values[0]->marg_lpdf(datum);
+        logprobas(j) =
+            mixing->mass_new_cluster(n_clust, n_data - 1, true, true) +
+            unique_values[0]->marg_lpdf(datum);
       }
     }
     if (singleton == 0) {
       // Further update with marginal component
-      logprobas(n_clust) = log(mixing->mass_new_cluster(n_clust, n_data - 1)) +
-                           unique_values[0]->marg_lpdf(datum);
+      logprobas(n_clust) =
+          mixing->mass_new_cluster(n_clust, n_data - 1, true, true) +
+          unique_values[0]->marg_lpdf(datum);
     }
     // Draw a NEW value for datum allocation
     unsigned int c_new =
@@ -71,14 +74,15 @@ void Neal2Algorithm::sample_allocations() {
       if (c_new == allocations[i]) {
         // Case 1: datum moves from a singleton to a new cluster
         // Replace former with new cluster by updating unique values
-        unique_values[allocations[i]]->sample_given_data(datum);
+        unique_values[allocations[i]]->add_datum(i, datum);
+        unique_values[allocations[i]]->sample_given_data();
         cardinalities[c_new] += 1;
       }
-
       else {  // Case 2: datum moves from a singleton to an old cluster
         unique_values.erase(unique_values.begin() + allocations[i]);
         unsigned int c_old = allocations[i];
         allocations[i] = c_new;
+        unique_values[allocations[i]]->add_datum(i, datum);
         // Relabel allocations so that they are consecutive numbers
         for (auto &c : allocations) {
           if (c > c_old) {
@@ -94,8 +98,9 @@ void Neal2Algorithm::sample_allocations() {
       if (c_new == n_clust) {
         // Case 3: datum moves from a non-singleton to a new cluster
         std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
+        new_unique.add_datum(i, datum);
         // Generate new unique values with posterior sampling
-        new_unique->sample_given_data(datum);
+        new_unique->sample_given_data();
         unique_values.push_back(new_unique);
         allocations[i] = n_clust;
         cardinalities.push_back(1);
@@ -103,6 +108,7 @@ void Neal2Algorithm::sample_allocations() {
 
       else {  // Case 4: datum moves from a non-singleton to an old cluster
         allocations[i] = c_new;
+        unique_values[allocations[i]]->add_datum(i, datum);
         cardinalities[c_new] += 1;
       }
     }
@@ -110,25 +116,6 @@ void Neal2Algorithm::sample_allocations() {
 }
 
 void Neal2Algorithm::sample_unique_values() {
-  // Initialize relevant values
-  unsigned int n_clust = unique_values.size();
-  unsigned int n_data = allocations.size();
-
-  // Vector that represents all clusters by the indexes of their data points
-  std::vector<std::vector<unsigned int>> clust_idxs(n_clust);
-  for (size_t i = 0; i < n_data; i++) {
-    clust_idxs[allocations[i]].push_back(i);
-  }
-
-  // Loop over clusters
-  for (size_t i = 0; i < n_clust; i++) {
-    unsigned int curr_size = clust_idxs[i].size();
-    // Build vector that contains the data points in the current cluster
-    Eigen::MatrixXd curr_data(curr_size, data.cols());
-    for (size_t j = 0; j < curr_size; j++) {
-      curr_data.row(j) = data.row(clust_idxs[i][j]);
-    }
-    // Update unique values via the posterior distribution
-    unique_values[i]->sample_given_data(curr_data);
-  }
+  for (auto& clus: unique_values)
+    clus->sample_given_data();
 }

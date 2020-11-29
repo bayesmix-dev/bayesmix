@@ -37,6 +37,8 @@ class NNIGHierarchy : public BaseHierarchy {
   };
 
  protected:
+  double data_sum = 0;
+  double data_sum_squares = 0;
   // STATE
   State state;
   // HYPERPARAMETERS
@@ -44,11 +46,30 @@ class NNIGHierarchy : public BaseHierarchy {
   // HYPERPRIOR
   std::shared_ptr<bayesmix::NNIGPrior> prior;
 
+  void reset() {
+    data_sum = 0;
+    data_sum_squares = 0;
+    card = 0;
+    cluster_data = std::unordered_map<int, Eigen::VectorXd>();
+  }
+
+  void update_summary_statistics(const Eigen::VectorXd &datum, bool add) {
+    if (add) {
+      data_sum += datum(0);
+      data_sum_squares += datum(0) * datum(0);
+    }
+    else {
+      data_sum -= datum(0);
+      data_sum_squares -= datum(0) * datum(0);
+    }
+  }
+
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams normal_invgamma_update(const Eigen::VectorXd &data,
-                                     const double mu0, const double alpha0,
-                                     const double beta0, const double lambda0);
+  Hyperparams normal_invgamma_update();
+  // Hyperparams normal_invgamma_update(const Eigen::VectorXd &data,
+  //                                    const double mu0, const double alpha0,
+  //                                    const double beta0, const double lambda0);
 
  public:
   void initialize() override;
@@ -63,7 +84,9 @@ class NNIGHierarchy : public BaseHierarchy {
   NNIGHierarchy() = default;
 
   std::shared_ptr<BaseHierarchy> clone() const override {
-    return std::make_shared<NNIGHierarchy>(*this);
+    auto out = std::make_shared<NNIGHierarchy>(*this);
+    out->reset();
+    return out;
   }
 
   // EVALUATION FUNCTIONS
@@ -80,7 +103,7 @@ class NNIGHierarchy : public BaseHierarchy {
   //! Generates new values for state from the centering prior distribution
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
-  void sample_given_data(const Eigen::MatrixXd &data) override;
+  void sample_given_data() override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }

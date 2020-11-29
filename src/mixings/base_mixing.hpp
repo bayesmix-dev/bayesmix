@@ -30,8 +30,9 @@ class BaseMixing {
   //! \param card Cardinality of the cluster
   //! \param n    Total number of data points
   //! \return     Probability value
-  virtual double mass_existing_cluster(const unsigned int card,
-                                       const unsigned int n) const = 0;
+  virtual double mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
+                                       const unsigned int n, bool log,
+                                       bool propto) const = 0;
 
   //! Mass probability for choosing a newly created cluster
 

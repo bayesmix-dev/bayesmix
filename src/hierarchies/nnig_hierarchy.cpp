@@ -19,31 +19,25 @@ void NNIGHierarchy::initialize() {
 //! \param data                        Column vector of data points
 //! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
 //! \return                            Vector of updated values for hyperpar.s
-NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update(
-    const Eigen::VectorXd &data, const double mu0, const double alpha0,
-    const double beta0, const double lambda0) {
+NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() {
   // Initialize relevant variables
   Hyperparams post_params;
 
-  unsigned int n = data.rows();
-
-  if (n == 0) {  // no update possible
-    post_params.mean = mu0;
-    post_params.var_scaling = lambda0;
-    post_params.shape = alpha0;
-    post_params.scale = beta0;
+  if (card == 0) {  // no update possible
+    post_params = *hypers;
     return post_params;
   }
 
   // Compute updated hyperparameters
-  double y_bar = data.mean();  // sample mean
-  post_params.mean = (lambda0 * mu0 + n * y_bar) / (lambda0 + n);
-  post_params.var_scaling = lambda0 + n;
-  post_params.shape = alpha0 + 0.5 * n;
-  double ss = (data.dot(data)) - n * y_bar * y_bar;  // sum of squares
-  post_params.scale =
-      beta0 + 0.5 * ss +
-      0.5 * lambda0 * n * (y_bar - mu0) * (y_bar - mu0) / (n + lambda0);
+  double y_bar = data_sum /= (1.0 * card);  // sample mean
+  post_params.mean = (hypers->var_scaling * hypers->mean + data_sum) /
+                     (hypers->var_scaling + card);
+  post_params.var_scaling = hypers->var_scaling + card;
+  post_params.shape = hypers->shape + 0.5 * card;
+  post_params.scale = hypers->scale + 0.5 * data_sum_squares +
+                      0.5 * hypers->var_scaling * card *
+                          (y_bar - hypers->mean) * (y_bar - hypers->mean) /
+                          (card + hypers->var_scaling);
 
   return post_params;
 }
@@ -173,11 +167,12 @@ void NNIGHierarchy::draw() {
 }
 
 //! \param data Column vector of data points
-void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
+void NNIGHierarchy::sample_given_data() {
   // Update values
-  Hyperparams params =
-      normal_invgamma_update(data.col(0), hypers->mean, hypers->shape,
-                             hypers->scale, hypers->var_scaling);
+  // Hyperparams params = normal_invgamma_update(data.col(0), hypers->mean,
+  // hypers->shape,
+  //                            hypers->scale, hypers->var_scaling);
+  Hyperparams params = normal_invgamma_update();
 
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();

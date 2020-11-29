@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <random>
+#include <unordered_map>
 
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
@@ -27,10 +28,38 @@
 //! likelihood (whose parameters are the state) or its marginal distribution.
 
 class BaseHierarchy {
+ protected:
+  // map: data_id -> datum
+  std::unordered_map<int, Eigen::VectorXd> cluster_data;
+  int card = 0;
+  double log_card;
+
  public:
+  void add_datum(const int &id, const Eigen::VectorXd &datum) {
+    cluster_data[id] = datum;
+    card += 1;
+    log_card = std::log(card);
+    update_summary_statistics(datum, true);
+  }
+
+  void remove_datum(const int &id) {
+    auto it = cluster_data.find(id);
+    assert(it != cluster_data.end());
+    update_summary_statistics(cluster_data[id], false);
+    cluster_data.erase(it);
+    card -= 1;
+    log_card = std::log(card);
+  }
+
+  int get_card() const { return card; }
+  double get_log_card() const { return card; }
+
   virtual void initialize() = 0;
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
+
+  virtual void update_summary_statistics(const Eigen::VectorXd &datum,
+                                         bool add) = 0;
 
   virtual void update_hypers(
       const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
@@ -56,7 +85,7 @@ class BaseHierarchy {
   //! Generates new values for state from the centering prior distribution
   virtual void draw() = 0;
   //! Generates new values for state from the centering posterior distribution
-  virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;
+  virtual void sample_given_data() = 0;
 
   // GETTERS AND SETTERS
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
