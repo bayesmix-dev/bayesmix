@@ -29,7 +29,7 @@ NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() {
   }
 
   // Compute updated hyperparameters
-  double y_bar = data_sum /= (1.0 * card);  // sample mean
+  double y_bar = data_sum = (1.0 * card);  // sample mean
   post_params.mean = (hypers->var_scaling * hypers->mean + data_sum) /
                      (hypers->var_scaling + card);
   post_params.var_scaling = hypers->var_scaling + card;

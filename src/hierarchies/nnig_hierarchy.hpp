@@ -46,11 +46,11 @@ class NNIGHierarchy : public BaseHierarchy {
   // HYPERPRIOR
   std::shared_ptr<bayesmix::NNIGPrior> prior;
 
-  void reset() {
+  void clear_data() {
     data_sum = 0;
     data_sum_squares = 0;
     card = 0;
-    cluster_data = std::unordered_map<int, Eigen::VectorXd>();
+    cluster_data_idx = std::unordered_set<int>();
   }
 
   void update_summary_statistics(const Eigen::VectorXd &datum, bool add) {
@@ -85,7 +85,7 @@ class NNIGHierarchy : public BaseHierarchy {
 
   std::shared_ptr<BaseHierarchy> clone() const override {
     auto out = std::make_shared<NNIGHierarchy>(*this);
-    out->reset();
+    out->clear_data();
     return out;
   }
 

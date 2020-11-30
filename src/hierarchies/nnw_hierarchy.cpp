@@ -36,33 +36,32 @@ void NNWHierarchy::initialize() {
   unsigned int dim = hypers->mean.size();
   set_prec_and_utilities(hypers->var_scaling *
                          Eigen::MatrixXd::Identity(dim, dim));
+  data_sum = Eigen::VectorXd::Zero(dim);
+  data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
 }
 
 //! \param data                    Matrix of row-vectorial data points
 //! \param mu0, lambda0, tau0, nu0 Original values for hyperparameters
 //! \return                        Vector of updated values for hyperparameters
-NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update(
-    const Eigen::MatrixXd &data, const Eigen::VectorXd &mu0,
-    const double lambda0, const Eigen::MatrixXd &tau0_inv, const double nu0) {
+NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update() {
   // Initialize relevant objects
   Hyperparams post_params;
   unsigned int n = data.rows();
 
   // Compute updated hyperparameters
-  post_params.var_scaling = lambda0 + n;
-  post_params.deg_free = nu0 + 0.5 * n;
+  post_params.var_scaling = hypers->var_scaling + n;
+  post_params.deg_free = hypers->deg_free + 0.5 * n;
 
-  Eigen::VectorXd mubar = data.colwise().mean();  // sample mean
-  post_params.mean = (lambda0 * mu0 + n * mubar) / (lambda0 + n);
+  Eigen::VectorXd mubar = data_sum.array() / card;  // sample mean
+  post_params.mean = (hypers->var_scaling * hypers->mean + card * mubar) /
+                     (hypers->var_scaling + card);
   // Compute tau_n
   Eigen::MatrixXd tau_temp = Eigen::MatrixXd::Zero(data.cols(), data.cols());
-  for (size_t i = 0; i < n; i++) {
-    Eigen::VectorXd datum = data.row(i);
-    tau_temp += (datum - mubar) * (datum - mubar).transpose();  // column * row
-  }
-  tau_temp += (n * lambda0 / (n + lambda0)) * (mubar - mu0) *
-              (mubar - mu0).transpose();
-  tau_temp = 0.5 * tau_temp + tau0_inv;
+  tau_temp -= (mubar * data_sum.transpose() + data_sum.transpose() * mubar);
+  tau_temp += mubar * mubar.transpose();
+  tau_temp += (n * hypers->var_scaling / (n + hypers->var_scaling)) *
+              (mubar - hypers->mean) * (mubar - hypers->mean).transpose();
+  tau_temp = 0.5 * tau_temp + hypers->scale_inv;
   post_params.scale = stan::math::inverse_spd(tau_temp);
   return post_params;
 }
@@ -138,7 +137,7 @@ void NNWHierarchy::update_hypers(
     hypers->mean = stan::math::multi_normal_rng(mu_n, sig_n, rng);
     hypers->var_scaling = stan::math::gamma_rng(alpha_n, beta_n, rng);
     hypers->scale = stan::math::inv_wishart_rng(nu_n, tau_n, rng);
-    scale0_inv = stan::math::inverse_spd(hypers->scale);
+    hypers->scale_inv = stan::math::inverse_spd(hypers->scale);
   }
 
   else {
@@ -219,10 +218,9 @@ void NNWHierarchy::draw() {
 }
 
 //! \param data Matrix of row-vectorial data points
-void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
+void NNWHierarchy::sample_given_data() {
   // Update values
-  Hyperparams params = normal_wishart_update(
-      data, hypers->mean, hypers->var_scaling, scale0_inv, hypers->deg_free);
+  Hyperparams params = normal_wishart_update();
 
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();

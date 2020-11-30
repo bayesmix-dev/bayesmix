@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <random>
-#include <unordered_map>
+#include <unordered_set>
 
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
@@ -30,36 +30,40 @@
 class BaseHierarchy {
  protected:
   // map: data_id -> datum
-  std::unordered_map<int, Eigen::VectorXd> cluster_data;
+  std::unordered_set<int> cluster_data_idx;
   int card = 0;
   double log_card;
 
+  virtual void update_summary_statistics(const Eigen::VectorXd &datum,
+                                         bool add) = 0;
+
  public:
   void add_datum(const int &id, const Eigen::VectorXd &datum) {
-    cluster_data[id] = datum;
     card += 1;
     log_card = std::log(card);
     update_summary_statistics(datum, true);
+#ifdef DEBUG
+    cluster_data_idx.insert(id);
+#endif
   }
 
-  void remove_datum(const int &id) {
-    auto it = cluster_data.find(id);
-    assert(it != cluster_data.end());
-    update_summary_statistics(cluster_data[id], false);
-    cluster_data.erase(it);
+  void remove_datum(const int &id, const Eigen::VectorXd &datum) {
+    update_summary_statistics(datum, false);
     card -= 1;
     log_card = std::log(card);
+#ifdef DEBUG
+    auto it = cluster_data_idx.find(id);
+    assert(it != cluster_data_idx.end());
+    cluster_data_idx.erase(it);
+#endif
   }
 
   int get_card() const { return card; }
-  double get_log_card() const { return card; }
+  double get_log_card() const { return log_card; }
 
   virtual void initialize() = 0;
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
-
-  virtual void update_summary_statistics(const Eigen::VectorXd &datum,
-                                         bool add) = 0;
 
   virtual void update_hypers(
       const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
