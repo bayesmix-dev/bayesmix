@@ -11,6 +11,14 @@ if __name__ == "__main__":
   with open("resources/asciipb/dp_gamma_prior.asciipb", "w") as f:
     PrintMessage(dp_prior, f)
 
+  # PY fixed values
+  py_prior = mixing_prior_pb2.PYPrior()
+  py_prior.fixed_values.strength = 1.0
+  py_prior.fixed_values.discount = 0.1
+  with open("resources/asciipb/py_fixed.asciipb", "w") as f:
+    PrintMessage(py_prior, f)
+
+
   # NNIG NGG hyperprior
   nnig_prior = hierarchy_prior_pb2.NNIGPrior()
   nnig_prior.ngg_prior.mean_prior.mean = 5.5
@@ -22,6 +30,16 @@ if __name__ == "__main__":
   nnig_prior.ngg_prior.scale_prior.rate = 2.0
   with open("resources/asciipb/nnig_ngg_prior.asciipb", "w") as f:
     PrintMessage(nnig_prior, f)
+
+  nnig_prior = hierarchy_prior_pb2.NNIGPrior()
+  nnig_prior.fixed_values.mean = 0.0
+  nnig_prior.fixed_values.var_scaling = 0.1
+  nnig_prior.fixed_values.shape = 2.0
+  nnig_prior.fixed_values.scale = 2.0
+  with open("resources/asciipb/nnig_fixed.asciipb", "w") as f:
+    PrintMessage(nnig_prior, f)
+
+
 
   # NNW NGIW hyperprior
   nnw_prior = hierarchy_prior_pb2.NNWPrior()
