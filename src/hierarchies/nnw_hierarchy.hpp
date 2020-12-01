@@ -43,6 +43,7 @@ class NNWHierarchy : public BaseHierarchy {
   };
 
  protected:
+  int dim;
   Eigen::VectorXd data_sum;
   Eigen::MatrixXd data_sum_squares;
   // STATE
@@ -67,7 +68,7 @@ class NNWHierarchy : public BaseHierarchy {
     data_sum = Eigen::VectorXd::Zero(dim);
     data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
     card = 0;
-    cluster_data_idx = std::unordered_set<int>();
+    cluster_data_idx = std::set<int>();
   }
 
   void update_summary_statistics(const Eigen::VectorXd &datum, bool add) {
@@ -95,7 +96,9 @@ class NNWHierarchy : public BaseHierarchy {
   ~NNWHierarchy() = default;
   NNWHierarchy() = default;
   std::shared_ptr<BaseHierarchy> clone() const override {
-    return std::make_shared<NNWHierarchy>(*this);
+    auto out = std::make_shared<NNWHierarchy>(*this);
+    out->clear_data();
+    return out;
   }
 
   // EVALUATION FUNCTIONS

@@ -47,6 +47,7 @@ class BaseHierarchy {
     log_card = std::log(card);
     update_summary_statistics(datum, true);
     cluster_data_idx.insert(id);
+
   }
 
   void remove_datum(const int &id, const Eigen::VectorXd &datum) {
