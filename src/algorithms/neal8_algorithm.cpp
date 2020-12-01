@@ -57,13 +57,12 @@ void Neal8Algorithm::sample_allocations() {
     // Initialize current number of clusters
     unsigned int n_clust = unique_values.size();
     // Initialize pseudo-flag
-    int singleton = 0;
-    if (unique_values[allocations[i]]->get_card() == 1) {
+    int singleton = int(unique_values[allocations[i]]->get_card() == 1);
+    if (singleton) {
       // Save unique value in the first auxiliary block
       bayesmix::MarginalState::ClusterState curr_val;
       unique_values[allocations[i]]->write_state_to_proto(&curr_val);
       aux_unique_values[0]->set_state_from_proto(curr_val);
-      singleton = 1;
     }
 
     // Remove datum from cluster
@@ -96,57 +95,41 @@ void Neal8Algorithm::sample_allocations() {
     // Draw a NEW value for datum allocation
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
+    unsigned int c_old = allocations[i];
 
-    // Assign datum to its new cluster and update cardinalities:
-    // 4 cases are handled separately
-    if (singleton == 1) {
-      if (c_new >= n_clust) {
-        // Case 1: datum moves from a singleton to a new cluster
-        // Take unique values from an auxiliary block
-        bayesmix::MarginalState::ClusterState curr_val;
-        aux_unique_values[c_new - n_clust]->write_state_to_proto(&curr_val);
-        unique_values[allocations[i]]->set_state_from_proto(curr_val);
-        cardinalities[allocations[i]] += 1;
-        unique_values[allocations[i]]->add_datum(i, datum);
-        assert(unique_values[allocations[i]]->get_card() ==
-               cardinalities[allocations[i]]);
-      } else {  // Case 2: datum moves from a singleton to an old cluster
-        unique_values.erase(unique_values.begin() + allocations[i]);
-        unsigned int c_old = allocations[i];
-        allocations[i] = c_new;
-        // Relabel allocations so that they are consecutive numbers
-        for (auto &c : allocations) {
-          if (c > c_old) {
-            c -= 1;
-          }
-        }
-        cardinalities[c_new] += 1;
-        cardinalities.erase(cardinalities.begin() + c_old);
-        unique_values[allocations[i]]->add_datum(i, datum);
-        assert(unique_values[allocations[i]]->get_card() ==
-               cardinalities[allocations[i]]);
-      }  // end of else
-    }    // end of if(singleton == 1)
-
-    else {  // if singleton == 0
-      if (c_new >= n_clust) {
-        // Case 3: datum moves from a non-singleton to a new cluster
-        // Copy one of the auxiliary block as the new cluster
-        std::shared_ptr<BaseHierarchy> hier_new =
-            aux_unique_values[c_new - n_clust]->clone();
-        unique_values.push_back(hier_new);
-        cardinalities.push_back(1);
-        allocations[i] = n_clust;
-        unique_values[allocations[i]]->add_datum(i, datum);
-        assert(unique_values[allocations[i]]->get_card() ==
-               cardinalities[allocations[i]]);
-      } else {  // Case 4: datum moves from a non-singleton to an old cluster
-        allocations[i] = c_new;
-        cardinalities[c_new] += 1;
-        unique_values[allocations[i]]->add_datum(i, datum);
-        assert(unique_values[allocations[i]]->get_card() ==
-               cardinalities[allocations[i]]);
-      }
+    if (c_new >= n_clust) {
+      // datum moves to a new cluster
+      // Copy one of the auxiliary block as the new cluster
+      std::shared_ptr<BaseHierarchy> hier_new =
+          aux_unique_values[c_new - n_clust]->clone();
+      unique_values.push_back(hier_new);
+      cardinalities.push_back(1);
+      allocations[i] = n_clust;
+      unique_values[allocations[i]]->add_datum(i, datum);
+      assert(unique_values[allocations[i]]->get_card() ==
+             cardinalities[allocations[i]]);
+    } else {
+      allocations[i] = c_new;
+      cardinalities[c_new] += 1;
+      unique_values[allocations[i]]->add_datum(i, datum);
+      assert(unique_values[allocations[i]]->get_card() ==
+             cardinalities[allocations[i]]);
     }
+
+    if (singleton) {
+      assert(unique_values[allocations[i]]->get_card() ==
+             cardinalities[allocations[i]]);
+      // Relabel allocations so that they are consecutive numbers
+      for (auto &c : allocations) {
+        if (c > c_old) {
+          c -= 1;
+        }
+      }
+      cardinalities.erase(cardinalities.begin() + c_old);
+      unique_values.erase(unique_values.begin() + c_old);
+      assert(unique_values[allocations[i]]->get_card() ==
+             cardinalities[allocations[i]]);
+    }
+
   }
 }
