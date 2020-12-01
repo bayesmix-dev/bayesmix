@@ -55,6 +55,7 @@ int main(int argc, char *argv[]) {
                          ->New();
   bayesmix::read_proto_from_file(hier_args, hier_prior);
   hier->set_prior(*hier_prior);
+  hier->initialize();
 
   // Initialize RNG object
   auto &rng = bayesmix::Rng::Instance().get();
