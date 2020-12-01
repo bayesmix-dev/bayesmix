@@ -25,8 +25,6 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
     mixing->set_state_from_proto(chain[i].mixing_state());
 
     unsigned int n_clust = chain[i].cluster_states_size();
-    std::vector<unsigned int> card(chain[i].cluster_cards().data(),
-                                   chain[i].cluster_cards().data() + n_clust);
     // Initialize local matrix of log-densities
     Eigen::MatrixXd lpdf_local(grid.rows(), n_clust + 1);
     // Initialize local temporary hierarchy
@@ -39,7 +37,6 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
       bayesmix::MarginalState::ClusterState curr_val =
           chain[i].cluster_states(j);
       temp_hier->set_state_from_proto(curr_val);
-      temp_hier->set_card(card[j]);
       // Compute cluster component (vector + scalar * unity vector)
       lpdf_local.col(j) =
           mixing->mass_existing_cluster(temp_hier, n_data, true, false) +

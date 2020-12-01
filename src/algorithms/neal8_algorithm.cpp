@@ -66,7 +66,6 @@ void Neal8Algorithm::sample_allocations() {
     }
 
     // Remove datum from cluster
-    cardinalities[allocations[i]] -= 1;
     unique_values[allocations[i]]->remove_datum(i, datum);
 
     // Draw the unique values in the auxiliary blocks from their prior
@@ -103,32 +102,21 @@ void Neal8Algorithm::sample_allocations() {
       std::shared_ptr<BaseHierarchy> hier_new =
           aux_unique_values[c_new - n_clust]->clone();
       unique_values.push_back(hier_new);
-      cardinalities.push_back(1);
       allocations[i] = n_clust;
       unique_values[allocations[i]]->add_datum(i, datum);
-      assert(unique_values[allocations[i]]->get_card() ==
-             cardinalities[allocations[i]]);
     } else {
       allocations[i] = c_new;
-      cardinalities[c_new] += 1;
       unique_values[allocations[i]]->add_datum(i, datum);
-      assert(unique_values[allocations[i]]->get_card() ==
-             cardinalities[allocations[i]]);
     }
 
     if (singleton) {
-      assert(unique_values[allocations[i]]->get_card() ==
-             cardinalities[allocations[i]]);
       // Relabel allocations so that they are consecutive numbers
       for (auto &c : allocations) {
         if (c > c_old) {
           c -= 1;
         }
       }
-      cardinalities.erase(cardinalities.begin() + c_old);
       unique_values.erase(unique_values.begin() + c_old);
-      assert(unique_values[allocations[i]]->get_card() ==
-             cardinalities[allocations[i]]);
     }
 
   }

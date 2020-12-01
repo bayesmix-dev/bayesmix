@@ -38,6 +38,11 @@ class BaseHierarchy {
   virtual void update_summary_statistics(const Eigen::VectorXd &datum,
                                          bool add) = 0;
 
+  void set_card(int card_) {
+    card = card_;
+    log_card = std::log(card_);
+  }
+
  public:
   void add_datum(const int &id, const Eigen::VectorXd &datum) {
     auto it = cluster_data_idx.find(id);
@@ -60,11 +65,6 @@ class BaseHierarchy {
 
   int get_card() const { return card; }
   double get_log_card() const { return log_card; }
-
-  void set_card(int card_) { 
-    card = card_; 
-    log_card = std::log(card_);
-  }
 
   std::set<int> get_data_idx() {return cluster_data_idx;}
 

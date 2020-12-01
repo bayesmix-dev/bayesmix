@@ -187,6 +187,7 @@ void NNIGHierarchy::set_state_from_proto(
       const bayesmix::MarginalState::ClusterState &>(state_);
   state.mean = statecast.univ_ls_state().mean();
   state.var = statecast.univ_ls_state().var();
+  set_card(statecast.cardinality());
 }
 
 void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
@@ -257,10 +258,10 @@ void NNIGHierarchy::write_state_to_proto(
   state_.set_mean(state.mean);
   state_.set_var(state.var);
 
-  google::protobuf::internal::down_cast<
-      bayesmix::MarginalState::ClusterState *>(out)
-      ->mutable_univ_ls_state()
-      ->CopyFrom(state_);
+  auto *out_cast = google::protobuf::internal::down_cast<
+      bayesmix::MarginalState::ClusterState *>(out);
+  out_cast->mutable_univ_ls_state()->CopyFrom(state_);
+  out_cast->set_cardinality(card);
 }
 
 void NNIGHierarchy::write_hypers_to_proto(

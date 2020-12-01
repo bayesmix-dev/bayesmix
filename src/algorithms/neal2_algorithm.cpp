@@ -30,10 +30,10 @@ void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
   int ndata_from_hier = 0;
-#ifdef DEBUG
+// #ifdef DEBUG
   for (auto &clus : unique_values) ndata_from_hier += clus->get_card();
   assert(n_data == ndata_from_hier);
-#endif
+// #endif
   auto &rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
@@ -45,10 +45,7 @@ void Neal2Algorithm::sample_allocations() {
     // Initialize pseudo-flag
     int singleton = (unique_values[allocations[i]]->get_card() <= 1) ? 1 : 0;
     // Remove datum from cluster
-    cardinalities[allocations[i]] -= 1;
     unique_values[allocations[i]]->remove_datum(i, datum);
-    assert(unique_values[allocations[i]]->get_card() ==
-           cardinalities[allocations[i]]);
 
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas(n_clust + 1);
@@ -76,29 +73,18 @@ void Neal2Algorithm::sample_allocations() {
       new_unique->sample_given_data();
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
-      cardinalities.push_back(1);
-      assert(unique_values[allocations[i]]->get_card() ==
-             cardinalities[allocations[i]]);
     } else {
       allocations[i] = c_new;
       unique_values[allocations[i]]->add_datum(i, datum);
-      cardinalities[c_new] += 1;
-      assert(unique_values[allocations[i]]->get_card() ==
-             cardinalities[allocations[i]]);
     }
     if (singleton) {
-      assert(unique_values[allocations[i]]->get_card() ==
-             cardinalities[allocations[i]]);
       // Relabel allocations so that they are consecutive numbers
       for (auto &c : allocations) {
         if (c > c_old) {
           c -= 1;
         }
       }
-      cardinalities.erase(cardinalities.begin() + c_old);
       unique_values.erase(unique_values.begin() + c_old);
-      assert(unique_values[allocations[i]]->get_card() ==
-             cardinalities[allocations[i]]);
     }
   }
 }

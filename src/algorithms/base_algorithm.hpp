@@ -56,8 +56,6 @@ class BaseAlgorithm {
   Eigen::MatrixXd data;
   //! Prescribed number of clusters for the algorithm initialization
   unsigned int init_num_clusters;
-  //! Cardinalities of clusters
-  std::vector<unsigned int> cardinalities;
   //! Allocation for each datum, i.e. label of the cluster it belongs to
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
