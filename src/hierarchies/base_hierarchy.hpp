@@ -7,6 +7,8 @@
 #include <memory>
 #include <random>
 #include <unordered_set>
+#include <set>
+#include <stan/math/prim.hpp>
 
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
@@ -30,36 +32,41 @@
 class BaseHierarchy {
  protected:
   // map: data_id -> datum
-  std::unordered_set<int> cluster_data_idx;
+  std::set<int> cluster_data_idx;
   int card = 0;
-  double log_card;
+  double log_card = stan::math::NEGATIVE_INFTY;
 
   virtual void update_summary_statistics(const Eigen::VectorXd &datum,
                                          bool add) = 0;
 
  public:
   void add_datum(const int &id, const Eigen::VectorXd &datum) {
+    auto it = cluster_data_idx.find(id);
+    assert(it == cluster_data_idx.end());
     card += 1;
     log_card = std::log(card);
     update_summary_statistics(datum, true);
-#ifdef DEBUG
     cluster_data_idx.insert(id);
-#endif
   }
 
   void remove_datum(const int &id, const Eigen::VectorXd &datum) {
     update_summary_statistics(datum, false);
     card -= 1;
-    log_card = std::log(card);
-#ifdef DEBUG
+    log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
     auto it = cluster_data_idx.find(id);
     assert(it != cluster_data_idx.end());
     cluster_data_idx.erase(it);
-#endif
   }
 
   int get_card() const { return card; }
   double get_log_card() const { return log_card; }
+
+  void set_card(int card_) { 
+    card = card_; 
+    log_card = std::log(card_);
+  }
+
+  std::set<int> get_data_idx() {return cluster_data_idx;}
 
   virtual void initialize() = 0;
   //! Returns true if the hierarchy models multivariate data

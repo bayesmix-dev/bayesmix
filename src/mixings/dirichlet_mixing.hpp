@@ -43,10 +43,13 @@ class DirichletMixing : public BaseMixing {
                                const unsigned int n, bool log,
                                bool propto) const override {
     double out;
-    if (log)
-      out = hier->get_log_card() - propto ? 0 : std::log(n +state.totalmass);
-    else 
-      out = hier->get_card() / propto ? 1 : (n + state.totalmass);
+    if (log) {
+      out = hier->get_log_card();
+      if (!propto) out -= std::log(n + state.totalmass);
+    } else {
+      out = 1.0 * hier->get_card();
+      if (!propto) out /= (n + state.totalmass);
+    }
     return out;
   }
 
@@ -58,11 +61,13 @@ class DirichletMixing : public BaseMixing {
   double mass_new_cluster(const unsigned int n_clust, const unsigned int n,
                           bool log, bool propto) const override {
     double out;
-    if (log)
-      out = state.logtotmass - propto ? 0 : std::log(n + state.totalmass);
-    else
-      out = state.totalmass / propto ? 1 : (n + state.totalmass);
-
+    if (log) {
+      out = state.logtotmass;
+      if (!propto) out -= std::log(n + state.totalmass);
+    } else {
+      out = state.totalmass;
+      if (!propto) out /= (n + state.totalmass);
+    }
     return out;
   }
 

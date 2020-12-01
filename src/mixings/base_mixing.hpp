@@ -40,7 +40,8 @@ class BaseMixing {
   //! \param n       Total number of data points
   //! \return        Probability value
   virtual double mass_new_cluster(const unsigned int n_clust,
-                                  const unsigned int n) const = 0;
+                                  const unsigned int n, bool log,
+                                  bool propto) const = 0;
 
   virtual void initialize() = 0;
 
