@@ -50,7 +50,7 @@ class NNIGHierarchy : public BaseHierarchy {
     data_sum = 0;
     data_sum_squares = 0;
     card = 0;
-    cluster_data_idx = std::unordered_set<int>();
+    cluster_data_idx = std::set<int>();
   }
 
   void update_summary_statistics(const Eigen::VectorXd &datum, bool add) {
