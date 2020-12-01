@@ -47,18 +47,18 @@ void Neal8Algorithm::initialize() {
 
 void Neal8Algorithm::sample_allocations() {
   // Initialize relevant values
-  unsigned int n = data.rows();
+  unsigned int n_data = data.rows();
   auto &rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
-  for (size_t i = 0; i < n; i++) {
+  for (size_t i = 0; i < n_data; i++) {
     // Current i-th datum as row vector
     Eigen::Matrix<double, 1, Eigen::Dynamic> datum = data.row(i);
     // Initialize current number of clusters
     unsigned int n_clust = unique_values.size();
     // Initialize pseudo-flag
     int singleton = 0;
-    if (cardinalities[allocations[i]] == 1) {
+    if (unique_values[allocations[i]]->get_card() == 1) {
       // Save unique value in the first auxiliary block
       bayesmix::MarginalState::ClusterState curr_val;
       unique_values[allocations[i]]->write_state_to_proto(&curr_val);
@@ -68,6 +68,7 @@ void Neal8Algorithm::sample_allocations() {
 
     // Remove datum from cluster
     cardinalities[allocations[i]] -= 1;
+    unique_values[allocations[i]]->remove_datum(i, datum);
 
     // Draw the unique values in the auxiliary blocks from their prior
     for (size_t j = singleton; j < n_aux; j++) {
@@ -79,18 +80,18 @@ void Neal8Algorithm::sample_allocations() {
     // Loop over clusters
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
-      logprobas(j) =
-          log(mixing->mass_existing_cluster(cardinalities[j], n - 1)) +
-          unique_values[j]->like_lpdf(datum);
+      logprobas(j) = mixing->mass_existing_cluster(unique_values[j],
+                                                   n_data - 1, true, true) +
+                     unique_values[j]->like_lpdf(datum);
       // Note: if datum is a singleton, then, when j = allocations[i],
       // one has card[j] = 0: cluster j will never be chosen
     }
     // Loop over auxiliary blocks
     for (size_t j = 0; j < n_aux; j++) {
       // Probability of being assigned to a newly generated cluster
-      logprobas(n_clust + j) = log(mixing->mass_new_cluster(n_clust, n - 1)) +
-                               aux_unique_values[j]->like_lpdf(datum) -
-                               log(n_aux);
+      logprobas(n_clust + j) =
+          mixing->mass_new_cluster(n_clust, n_data - 1, true, true) +
+          aux_unique_values[j]->like_lpdf(datum) - log(n_aux);
     }
     // Draw a NEW value for datum allocation
     unsigned int c_new =
@@ -106,6 +107,9 @@ void Neal8Algorithm::sample_allocations() {
         aux_unique_values[c_new - n_clust]->write_state_to_proto(&curr_val);
         unique_values[allocations[i]]->set_state_from_proto(curr_val);
         cardinalities[allocations[i]] += 1;
+        unique_values[allocations[i]]->add_datum(i, datum);
+        assert(unique_values[allocations[i]]->get_card() ==
+               cardinalities[allocations[i]]);
       } else {  // Case 2: datum moves from a singleton to an old cluster
         unique_values.erase(unique_values.begin() + allocations[i]);
         unsigned int c_old = allocations[i];
@@ -118,6 +122,9 @@ void Neal8Algorithm::sample_allocations() {
         }
         cardinalities[c_new] += 1;
         cardinalities.erase(cardinalities.begin() + c_old);
+        unique_values[allocations[i]]->add_datum(i, datum);
+        assert(unique_values[allocations[i]]->get_card() ==
+               cardinalities[allocations[i]]);
       }  // end of else
     }    // end of if(singleton == 1)
 
@@ -130,9 +137,15 @@ void Neal8Algorithm::sample_allocations() {
         unique_values.push_back(hier_new);
         cardinalities.push_back(1);
         allocations[i] = n_clust;
+        unique_values[allocations[i]]->add_datum(i, datum);
+        assert(unique_values[allocations[i]]->get_card() ==
+               cardinalities[allocations[i]]);
       } else {  // Case 4: datum moves from a non-singleton to an old cluster
         allocations[i] = c_new;
         cardinalities[c_new] += 1;
+        unique_values[allocations[i]]->add_datum(i, datum);
+        assert(unique_values[allocations[i]]->get_card() ==
+               cardinalities[allocations[i]]);
       }
     }
   }
