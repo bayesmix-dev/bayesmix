@@ -24,6 +24,7 @@ void BaseAlgorithm::initialize() {
   unique_values[0]->initialize();
   for (size_t i = 0; i < init_num_clusters - 1; i++) {
     unique_values.push_back(unique_values[0]->clone());
+    unique_values[i]->draw();
   }
 
   // Initialize mixing
@@ -39,12 +40,14 @@ void BaseAlgorithm::initialize() {
   allocations.clear();
   for (size_t i = 0; i < init_num_clusters; i++) {
     allocations.push_back(i);
+    unique_values[i]->add_datum(i, data.row(i));
     cardinalities.push_back(1);
   }
   // Randomly allocate all remaining data, and update cardinalities
   for (size_t i = init_num_clusters; i < data.rows(); i++) {
     unsigned int clust = distro(generator);
     allocations.push_back(clust);
+    unique_values[clust]->add_datum(i, data.row(i));
     cardinalities[clust] += 1;
   }
 }
