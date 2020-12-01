@@ -6,7 +6,6 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <random>
-#include <unordered_set>
 #include <set>
 #include <stan/math/prim.hpp>
 

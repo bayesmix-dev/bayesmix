@@ -30,9 +30,11 @@ void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
   int ndata_from_hier = 0;
+#ifdef DEBUG
   for (auto &clus : unique_values) ndata_from_hier += clus->get_card();
   assert(n_data == ndata_from_hier);
-  // auto &rng = bayesmix::Rng::Instance().get();
+#endif
+  auto &rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
   for (size_t i = 0; i < n_data; i++) {
@@ -63,8 +65,8 @@ void Neal2Algorithm::sample_allocations() {
         unique_values[0]->marg_lpdf(datum);
 
     // Draw a NEW value for datum allocation
-    unsigned int c_new = bayesmix::categorical_rng(
-        stan::math::softmax(logprobas), bayesmix::Rng::Instance().get(), 0);
+    unsigned int c_new =
+        bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
     unsigned int c_old = allocations[i];
 
     if (c_new == n_clust) {
@@ -87,7 +89,6 @@ void Neal2Algorithm::sample_allocations() {
     if (singleton) {
       assert(unique_values[allocations[i]]->get_card() ==
              cardinalities[allocations[i]]);
-      // unique_values[c_new]->add_datum(i, datum);
       // Relabel allocations so that they are consecutive numbers
       for (auto &c : allocations) {
         if (c > c_old) {

@@ -33,7 +33,6 @@ void NNWHierarchy::check_spd(const Eigen::MatrixXd &mat) {
 void NNWHierarchy::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");
   state.mean = hypers->mean;
-  dim = hypers->mean.size();
   set_prec_and_utilities(hypers->var_scaling *
                          Eigen::MatrixXd::Identity(dim, dim));
   data_sum = Eigen::VectorXd::Zero(dim);
