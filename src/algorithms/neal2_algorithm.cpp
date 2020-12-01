@@ -29,7 +29,10 @@ void Neal2Algorithm::print_startup_message() const {
 void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
-  auto &rng = bayesmix::Rng::Instance().get();
+  int ndata_from_hier = 0;
+  for (auto &clus : unique_values) ndata_from_hier += clus->get_card();
+  assert(n_data == ndata_from_hier);
+  // auto &rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
   for (size_t i = 0; i < n_data; i++) {
@@ -38,84 +41,67 @@ void Neal2Algorithm::sample_allocations() {
     // Initialize current number of clusters
     unsigned int n_clust = unique_values.size();
     // Initialize pseudo-flag
-    int singleton = (unique_values[allocations[i]]->get_card() == 1) ? 1 : 0;
-
+    int singleton = (unique_values[allocations[i]]->get_card() <= 1) ? 1 : 0;
     // Remove datum from cluster
     cardinalities[allocations[i]] -= 1;
-    unique_values[allocations[i]]->remove_datum(i);
+    unique_values[allocations[i]]->remove_datum(i, datum);
+    assert(unique_values[allocations[i]]->get_card() ==
+           cardinalities[allocations[i]]);
 
     // Compute probabilities of clusters in log-space
-    Eigen::VectorXd logprobas(n_clust + 1 - singleton);
+    Eigen::VectorXd logprobas(n_clust + 1);
     // Loop over clusters
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
       logprobas(j) = mixing->mass_existing_cluster(unique_values[j],
                                                    n_data - 1, true, true) +
                      unique_values[j]->like_lpdf(datum);
-      if (singleton == 1 && j == allocations[i]) {
-        // Probability of being assigned to a newly generated cluster
-        logprobas(j) =
-            mixing->mass_new_cluster(n_clust, n_data - 1, true, true) +
-            unique_values[0]->marg_lpdf(datum);
-      }
     }
-    if (singleton == 0) {
-      // Further update with marginal component
-      logprobas(n_clust) =
-          mixing->mass_new_cluster(n_clust, n_data - 1, true, true) +
-          unique_values[0]->marg_lpdf(datum);
-    }
+    // Further update with marginal component
+    logprobas(n_clust) =
+        mixing->mass_new_cluster(n_clust, n_data - 1, true, true) +
+        unique_values[0]->marg_lpdf(datum);
+
     // Draw a NEW value for datum allocation
-    unsigned int c_new =
-        bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
-    // Assign datum to its new cluster and update cardinalities:
-    // 4 cases are handled separately
-    if (singleton == 1) {
-      if (c_new == allocations[i]) {
-        // Case 1: datum moves from a singleton to a new cluster
-        // Replace former with new cluster by updating unique values
-        unique_values[allocations[i]]->add_datum(i, datum);
-        unique_values[allocations[i]]->sample_given_data();
-        cardinalities[c_new] += 1;
-      }
-      else {  // Case 2: datum moves from a singleton to an old cluster
-        unique_values.erase(unique_values.begin() + allocations[i]);
-        unsigned int c_old = allocations[i];
-        allocations[i] = c_new;
-        unique_values[allocations[i]]->add_datum(i, datum);
-        // Relabel allocations so that they are consecutive numbers
-        for (auto &c : allocations) {
-          if (c > c_old) {
-            c -= 1;
-          }
-        }
-        cardinalities[c_new] += 1;
-        cardinalities.erase(cardinalities.begin() + c_old);
-      }
+    unsigned int c_new = bayesmix::categorical_rng(
+        stan::math::softmax(logprobas), bayesmix::Rng::Instance().get(), 0);
+    unsigned int c_old = allocations[i];
+
+    if (c_new == n_clust) {
+      std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
+      new_unique->add_datum(i, datum);
+      // Generate new unique values with posterior sampling
+      new_unique->sample_given_data();
+      unique_values.push_back(new_unique);
+      allocations[i] = unique_values.size() - 1;
+      cardinalities.push_back(1);
+      assert(unique_values[allocations[i]]->get_card() ==
+             cardinalities[allocations[i]]);
+    } else {
+      allocations[i] = c_new;
+      unique_values[allocations[i]]->add_datum(i, datum);
+      cardinalities[c_new] += 1;
+      assert(unique_values[allocations[i]]->get_card() ==
+             cardinalities[allocations[i]]);
     }
-
-    else {  // if singleton == 0
-      if (c_new == n_clust) {
-        // Case 3: datum moves from a non-singleton to a new cluster
-        std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
-        new_unique.add_datum(i, datum);
-        // Generate new unique values with posterior sampling
-        new_unique->sample_given_data();
-        unique_values.push_back(new_unique);
-        allocations[i] = n_clust;
-        cardinalities.push_back(1);
+    if (singleton) {
+      assert(unique_values[allocations[i]]->get_card() ==
+             cardinalities[allocations[i]]);
+      // unique_values[c_new]->add_datum(i, datum);
+      // Relabel allocations so that they are consecutive numbers
+      for (auto &c : allocations) {
+        if (c > c_old) {
+          c -= 1;
+        }
       }
-
-      else {  // Case 4: datum moves from a non-singleton to an old cluster
-        allocations[i] = c_new;
-        unique_values[allocations[i]]->add_datum(i, datum);
-        cardinalities[c_new] += 1;
-      }
+      cardinalities.erase(cardinalities.begin() + c_old);
+      unique_values.erase(unique_values.begin() + c_old);
+      assert(unique_values[allocations[i]]->get_card() ==
+             cardinalities[allocations[i]]);
     }
   }
 }
 
 void Neal2Algorithm::sample_unique_values() {
-  for (auto& clus: unique_values)
-    clus->sample_given_data();
+  for (auto &clus : unique_values) clus->sample_given_data();
 }
