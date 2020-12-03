@@ -21,3 +21,7 @@ sftp-config.json
 *.pdf
 # Local files
 *.local.*
+
+# To be deleted when we finalize the way to compile files.
+*.o
+src/pointestimates/lossfunction/loss
