@@ -11,6 +11,7 @@ private:
     double l2;
 
 public:
+    BinderLoss() : BinderLoss(1, 1) {};
     BinderLoss(double l1_, double l2_);
     double Loss();
 };

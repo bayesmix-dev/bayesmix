@@ -19,21 +19,26 @@ int main(int argc, char const *argv[])
 
     // Call the desired loss functions
     BinderLoss binder_loss(1.0, 1.0);        // l1 = l2 = 1 (penalties)
+    BinderLoss binder_loss_default;
     VariationInformation vi_loss(false);     // normalise = false
     VariationInformation vi_loss_norm(true); // normalise = true
 
     // Populate the members for each loss above
     binder_loss.SetCluster(c1, c2);
+    binder_loss_default.SetCluster(c1, c2);
     vi_loss.SetCluster(c1, c2);
     vi_loss_norm.SetCluster(c1, c2);
 
     // Calculate the loss function
     double bl_value = binder_loss.Loss();
+    double bld_value = binder_loss_default.Loss();
     double vi_value = vi_loss.Loss();
     double vi_norm_value = vi_loss_norm.Loss();
 
     // Print the calculated values
     cout << "Binder Loss (this should be 5): " << bl_value << '\n';
+    cout << "---------------------------------" << '\n';
+    cout << "Binder Loss with default parameters (this should be 5): " << bld_value << '\n';
     cout << "---------------------------------" << '\n';
     cout << "(Unormalised) VI Loss: " << vi_value << '\n';
     cout << "---------------------------------" << '\n';
