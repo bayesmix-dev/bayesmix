@@ -7,7 +7,7 @@ VariationInformation::VariationInformation(bool normalise_)
     normalise = normalise_;
 }
 
-double VariationInformation::Entropy(std::vector<int> cluster)
+double VariationInformation::Entropy(Eigen::VectorXi cluster)
 {
     double H = 0.0;
     int K = GetNumberOfGroups(cluster);

@@ -1,5 +1,5 @@
 #include <iostream>
-#include <vector>
+#include "../../../lib/math/lib/eigen_3.3.7/Eigen/Dense"
 
 #include "BinderLoss.hpp"
 #include "VariationInformation.hpp"
@@ -7,15 +7,25 @@
 using namespace std;
 
 // To run this main.cpp file, run the following CLI in a terminal:
-// (i) g++ -Wall -O -c LossFunction.cpp, (ii) g++ -Wall -O -c VariationInformation.cpp, (iii) g++ -Wall -O -c BinderLoss.cpp
-// (iv) g++ -lm -o loss loss.cpp BinderLoss.o VariationInformation.o LossFunction.o
-// (v) ./main
+// make loss
 
 int main(int argc, char const *argv[])
 {
-    // Initialize the clusters (N = 5)
-    vector<int> c1{1, 1, 1, 2, 3}; // K = 3
-    vector<int> c2{1, 1, 2, 2, 2}; // K = 2
+  // Initialize the clusters (N = 5)
+    Eigen::VectorXi c1(5); // K = 3
+    c1(0) = 1;
+    c1(1) = 1;
+    c1(2) = 1;
+    c1(3) = 2;
+    c1(4) = 3;
+
+    Eigen::VectorXi c2(5); // K = 2
+    c2(0) = 1;
+    c2(1) = 1;
+    c2(2) = 2;
+    c2(3) = 2;
+    c2(4) = 2;
+
 
     // Call the desired loss functions
     BinderLoss binder_loss(1.0, 1.0);        // l1 = l2 = 1 (penalties)
@@ -29,7 +39,8 @@ int main(int argc, char const *argv[])
     vi_loss.SetCluster(c1, c2);
     vi_loss_norm.SetCluster(c1, c2);
 
-    // Calculate the loss function
+
+  // Calculate the loss function
     double bl_value = binder_loss.Loss();
     double bld_value = binder_loss_default.Loss();
     double vi_value = vi_loss.Loss();

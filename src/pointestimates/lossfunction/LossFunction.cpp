@@ -1,39 +1,43 @@
 #include "LossFunction.hpp"
+#include <iostream>
 
-void LossFunction::SetCluster(std::vector<int> cluster1_,
-                              std::vector<int> cluster2_)
+void LossFunction::SetCluster(Eigen::VectorXi cluster1_,
+                              Eigen::VectorXi cluster2_)
 {
-    auto tmp = cluster1_.size();
-    if (tmp != cluster2_.size())
+    auto n_rows = cluster1_.rows();
+
+    if (n_rows != cluster2_.rows())
     {
         throw std::domain_error("Clusters of different sizes!");
     }
 
-    N = (int)tmp;
+    N = (int) n_rows;
+
     cluster1 = cluster1_;
     K1 = GetNumberOfGroups(cluster1_);
     cluster2 = cluster2_;
     K2 = GetNumberOfGroups(cluster2_);
 }
 
-int LossFunction::GetNumberOfGroups(std::vector<int> cluster)
+int LossFunction::GetNumberOfGroups(Eigen::VectorXi cluster)
 {
     std::set<int> groups;
 
-    for (auto &elem : cluster)
+    for (int i = 0; i < cluster.rows(); i++)
     {
-        groups.insert(elem);
+        groups.insert(cluster(i));
     }
 
+    std::cout << "GetNumberOfGroups :" << (int)groups.size() << std::endl;
     return (int)groups.size();
 }
 
-int LossFunction::ClassCounter(std::vector<int> cluster, int index)
+int LossFunction::ClassCounter(Eigen::VectorXi cluster, int index)
 {
     int count = 0;
-    for (const auto &val : cluster)
+    for (int i = 0; i < N; i++)
     {
-        if (val == index)
+        if (cluster(i) == index)
         {
             count += 1;
         }
@@ -42,8 +46,7 @@ int LossFunction::ClassCounter(std::vector<int> cluster, int index)
     return count;
 }
 
-int LossFunction::ClassCounterExtended(std::vector<int> cluster1,
-                                       std::vector<int> cluster2, int g, int h)
+int LossFunction::ClassCounterExtended(Eigen::VectorXi cluster1, Eigen::VectorXi cluster2, int g, int h)
 {
     int count = 0;
 
