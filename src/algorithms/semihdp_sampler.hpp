@@ -16,8 +16,6 @@
 
 using bayesmix::MarginalState;
 using bayesmix::SemiHdpState;
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
 
 /*
  * This class implements the algorithm for posterior simulation under the
@@ -36,7 +34,7 @@ class SemiHdpSampler {
  protected:
   bayesmix::SemiHdpParams params;
 
-  std::vector<MatrixXd> data;  // one vector per group
+  std::vector<Eigen::MatrixXd> data;  // one vector per group
   int ngroups;
   std::vector<int> n_by_group;
 
@@ -61,7 +59,7 @@ class SemiHdpSampler {
   // which restaurant each grups enters from
   std::vector<int> c;
   std::vector<bool> is_used_c;
-  VectorXd omega;
+  Eigen::VectorXd omega;
   std::vector<std::vector<int>> t, v;
 
   // number of theta_stars equal to tau_h across all groups
@@ -70,7 +68,7 @@ class SemiHdpSampler {
   double w = 0.5;
   double alpha, gamma, a_w, b_w;
 
-  std::vector<MemoryCollector<MarginalState>> pseudoprior_collectors;
+  std::vector<MemoryCollector<bayesmix::MarginalState>> pseudoprior_collectors;
   int pseudo_iter;
 
   bool adapt = false;
@@ -80,7 +78,7 @@ class SemiHdpSampler {
   SemiHdpSampler() {}
   ~SemiHdpSampler() {}
 
-  SemiHdpSampler(const std::vector<MatrixXd> &data,
+  SemiHdpSampler(const std::vector<Eigen::MatrixXd> &data,
                  std::shared_ptr<BaseHierarchy> hier,
                  bayesmix::SemiHdpParams params);
 
@@ -101,7 +99,7 @@ class SemiHdpSampler {
 
   void run(int adapt_iter, int burnin, int iter, int thin,
            BaseCollector<bayesmix::SemiHdpState> *collector,
-           const std::vector<MemoryCollector<MarginalState>>
+           const std::vector<MemoryCollector<bayesmix::MarginalState>>
                &pseudoprior_collectors) {
     this->pseudoprior_collectors = pseudoprior_collectors;
     std::cout << "Run, number of pseudoprior_collectors: "
@@ -151,12 +149,12 @@ class SemiHdpSampler {
 
   void relabel();
   void sample_pseudo_prior();
-  void perturb(MarginalState::ClusterState *out);
+  void perturb(bayesmix::MarginalState::ClusterState *out);
 
   double lpdf_for_group(int i, int r);
   void reassign_group(int i, int new_r, int old_r);
 
-  VectorXd _compute_mixture_distance(int i);
+  Eigen::VectorXd _compute_mixture_distance(int i);
   void _count_m();
   void _count_n_by_theta_star();
 

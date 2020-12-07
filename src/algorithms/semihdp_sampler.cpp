@@ -7,7 +7,7 @@
 
 #include "../utils/distributions.hpp"
 
-SemiHdpSampler::SemiHdpSampler(const std::vector<MatrixXd>& data,
+SemiHdpSampler::SemiHdpSampler(const std::vector<Eigen::MatrixXd>& data,
                                std::shared_ptr<BaseHierarchy> hier,
                                bayesmix::SemiHdpParams params)
     : data(data), params(params) {
@@ -24,10 +24,10 @@ SemiHdpSampler::SemiHdpSampler(const std::vector<MatrixXd>& data,
 
 void SemiHdpSampler::initialize() {
   auto& rng = bayesmix::Rng::Instance().get();
-  omega = VectorXd::Ones(ngroups).array();
+  omega = Eigen::VectorXd::Ones(ngroups).array();
 
   int INIT_N_CLUS = 5;
-  VectorXd probas = VectorXd::Ones(INIT_N_CLUS);
+  Eigen::VectorXd probas = Eigen::VectorXd::Ones(INIT_N_CLUS);
   probas /= (1.0 * INIT_N_CLUS);
   c.resize(ngroups);
   is_used_c.resize(ngroups);
@@ -89,13 +89,13 @@ void SemiHdpSampler::update_unique_vals() {
   // update it on the fly. Otherwise we store the the data in a vector
   // and then update all the taus
 
-  std::vector<MatrixXd> data_by_tau(taus.size());
+  std::vector<Eigen::MatrixXd> data_by_tau(taus.size());
   for (int h = 0; h < taus.size(); h++) {
-    data_by_tau[h] = Eigen::MatrixXd(0, 1);
+    data_by_tau[h] = Eigen::Eigen::MatrixXd(0, 1);
   }
 
   for (int r = 0; r < ngroups; r++) {
-    std::vector<MatrixXd> data_by_theta_star(theta_star[r].size());
+    std::vector<Eigen::MatrixXd> data_by_theta_star(theta_star[r].size());
     for (int i = 0; i < ngroups; i++) {
       if (c[i] == r) {
         for (int j = 0; j < n_by_group[i]; j++) {
@@ -181,7 +181,7 @@ void SemiHdpSampler::update_s() {
         log_m[t[r][s_old]] = std::log(t[r][s_old]);
       }
 
-      VectorXd probas = VectorXd::Zero(theta_star[r].size() + 1);
+      Eigen::VectorXd probas = Eigen::VectorXd::Zero(theta_star[r].size() + 1);
 #pragma omp parallel for
       for (int l = 0; l < theta_star[r].size(); l++) {
         double log_n = log_n_by_theta_star[r][l];
@@ -190,7 +190,7 @@ void SemiHdpSampler::update_s() {
 
       double margG0 = logw + G0_master_hierarchy->marg_lpdf(data[i].row(j));
 
-      VectorXd hdp_contribs(taus.size() + 1);
+      Eigen::VectorXd hdp_contribs(taus.size() + 1);
 #pragma omp parallel for
       for (int h = 0; h < taus.size(); h++) {
         double logm = log_m[h];
@@ -200,7 +200,7 @@ void SemiHdpSampler::update_s() {
       hdp_contribs[taus.size()] =
           loggamma - logmsum + G00_master_hierarchy->marg_lpdf(data[i].row(j));
       double margHDP = log1mw + stan::math::log_sum_exp(hdp_contribs);
-      VectorXd marg(2);
+      Eigen::VectorXd marg(2);
       marg << margG0, margHDP;
       probas[theta_star[r].size()] = logalpha + stan::math::log_sum_exp(marg);
 
@@ -255,9 +255,9 @@ void SemiHdpSampler::update_t() {
 
   for (int r = 0; r < ngroups; r++) {
     // aggregate data together
-    std::vector<MatrixXd> data_by_theta_star;
+    std::vector<Eigen::MatrixXd> data_by_theta_star;
     for (int l = 0; l < theta_star[r].size(); l++) {
-      data_by_theta_star.push_back(MatrixXd::Zero(0, 0));
+      data_by_theta_star.push_back(Eigen::MatrixXd::Zero(0, 0));
     }
 
     for (int i = 0; i < ngroups; i++) {
@@ -272,7 +272,7 @@ void SemiHdpSampler::update_t() {
     // compute logprobas
     for (int l = 0; l < theta_star[r].size(); l++) {
       if ((t[r][l] >= 0) && (data_by_theta_star[l].size() > 0)) {
-        VectorXd probas(taus.size() + 1);
+        Eigen::VectorXd probas(taus.size() + 1);
         m[t[r][l]] -= 1;
         for (int k = 0; k < taus.size(); k++) {
           probas(k) = std::log(m[k]) +
@@ -309,7 +309,7 @@ void SemiHdpSampler::update_c() {
     int new_r = curr_r;
 
     if (params.c_update() == "full") {
-      VectorXd probas(ngroups);
+      Eigen::VectorXd probas(ngroups);
 // Compute probability for group change
 #pragma omp parallel for
       for (int r = 0; r < ngroups; r++)
@@ -322,8 +322,8 @@ void SemiHdpSampler::update_c() {
         std::uniform_int_distribution<int> proposal_dens(0, ngroups - 1);
         prop_r = proposal_dens(rng);
       } else if (params.c_update() == "metro_dist") {
-        VectorXd dists = _compute_mixture_distance(curr_r);
-        VectorXd proposal_weights = VectorXd::Ones(ngroups);
+        Eigen::VectorXd dists = _compute_mixture_distance(curr_r);
+        Eigen::VectorXd proposal_weights = Eigen::VectorXd::Ones(ngroups);
         for (int r = 0; r < ngroups; r++)
           proposal_weights[r] += 0.1 / (0.0001 + dists(r));
         proposal_weights /= proposal_weights.sum();
@@ -361,7 +361,7 @@ void SemiHdpSampler::update_w() {
 }
 
 void SemiHdpSampler::update_omega() {
-  VectorXd cnts = VectorXd::Zero(ngroups);
+  Eigen::VectorXd cnts = Eigen::VectorXd::Zero(ngroups);
   for (int i = 0; i < ngroups; i++) {
     cnts[c[i]] += 1;
   }
@@ -451,13 +451,13 @@ void SemiHdpSampler::relabel() {
 
 void SemiHdpSampler::sample_pseudo_prior() {
   auto& rng = bayesmix::Rng::Instance().get();
-  VectorXd probas = VectorXd::Ones(pseudo_iter).array() / (1.0 * pseudo_iter);
+  Eigen::VectorXd probas = Eigen::VectorXd::Ones(pseudo_iter).array() / (1.0 * pseudo_iter);
   int iter = bayesmix::categorical_rng(probas, rng);
   for (int r = 0; r < ngroups; r++) {
-    MarginalState state = pseudoprior_collectors[r].get_state(iter);
+    bayesmix::MarginalState state = pseudoprior_collectors[r].get_state(iter);
     // compute the cardinalities
     int nclus = state.cluster_states_size();
-    VectorXd cards = VectorXd::Zero(nclus);
+    Eigen::VectorXd cards = Eigen::VectorXd::Zero(nclus);
     for (size_t j = 0; j < state.cluster_allocs_size(); j++) {
       cards[state.cluster_allocs(j)] += 1;
     }
@@ -466,15 +466,15 @@ void SemiHdpSampler::sample_pseudo_prior() {
     // the (normalized) cardinalities of the pseudoprior
     cards = cards.array() / cards.sum();
     double weight = params.pseudo_prior().card_weight();
-    VectorXd cards_perturb =
+    Eigen::VectorXd cards_perturb =
         weight * cards.array() +
-        (1 - weight) * VectorXd::Ones(cards.size()).array() / cards.size();
+        (1 - weight) * Eigen::VectorXd::Ones(cards.size()).array() / cards.size();
     n_by_theta_star_pseudo[r] =
         stan::math::multinomial_rng(cards_perturb, n_by_group[r], rng);
 
     theta_star_pseudo[r].resize(0);
     for (int l = 0; l < state.cluster_states_size(); l++) {
-      MarginalState::ClusterState clusval = state.cluster_states(l);
+      bayesmix::MarginalState::ClusterState clusval = state.cluster_states(l);
       // perturb(&clusval);
       std::shared_ptr<BaseHierarchy> curr_clus = G0_master_hierarchy->clone();
       curr_clus->set_state_from_proto(clusval);
@@ -483,7 +483,7 @@ void SemiHdpSampler::sample_pseudo_prior() {
   }
 }
 
-void SemiHdpSampler::perturb(MarginalState::ClusterState* out) {
+void SemiHdpSampler::perturb(bayesmix::MarginalState::ClusterState* out) {
   auto& rng = bayesmix::Rng::Instance().get();
   if (out->has_univ_ls_state()) {
     double m = out->univ_ls_state().mean() +
@@ -502,8 +502,8 @@ void SemiHdpSampler::perturb(MarginalState::ClusterState* out) {
 }
 
 double SemiHdpSampler::lpdf_for_group(int i, int r) {
-  VectorXd lpdf_data(n_by_group[i]);
-  MatrixXd lpdf_local;
+  Eigen::VectorXd lpdf_data(n_by_group[i]);
+  Eigen::MatrixXd lpdf_local;
   if (is_used_c[r]) {
     int nr = std::accumulate(n_by_theta_star[r].begin(),
                              n_by_theta_star[r].end(), 0);
@@ -546,7 +546,7 @@ void SemiHdpSampler::reassign_group(int i, int new_r, int old_r) {
   }
 
   for (int j = 0; j < n_by_group[i]; j++) {
-    VectorXd probas = VectorXd::Zero(theta_star[new_r].size());
+    Eigen::VectorXd probas = Eigen::VectorXd::Zero(theta_star[new_r].size());
     for (int l = 0; l < theta_star[new_r].size(); l++) {
       double log_n;
       if (n_by_theta_star[new_r][l] > 0)
@@ -560,25 +560,25 @@ void SemiHdpSampler::reassign_group(int i, int new_r, int old_r) {
   }
 }
 
-VectorXd SemiHdpSampler::_compute_mixture_distance(int i) {
-  std::vector<bayesmix::MarginalState::ClusterState> clus1(
+Eigen::VectorXd SemiHdpSampler::_compute_mixture_distance(int i) {
+  std::vector<bayesmix::bayesmix::MarginalState::ClusterState> clus1(
       theta_star[i].size());
-  VectorXd weights1(theta_star[i].size());
+  Eigen::VectorXd weights1(theta_star[i].size());
   for (int l = 0; l < theta_star[i].size(); l++) {
-    bayesmix::MarginalState::ClusterState clus;
+    bayesmix::bayesmix::MarginalState::ClusterState clus;
     theta_star[i][l]->write_state_to_proto(&clus);
     clus1[l] = clus;
     weights1(l) = n_by_theta_star[i][l];
   }
   weights1 = weights1.array() / weights1.sum();
-  VectorXd dists(ngroups);
+  Eigen::VectorXd dists(ngroups);
 
   for (int r = 0; r < ngroups; r++) {
-    std::vector<bayesmix::MarginalState::ClusterState> clus2(
+    std::vector<bayesmix::bayesmix::MarginalState::ClusterState> clus2(
         theta_star[r].size());
-    VectorXd weights2(theta_star[r].size());
+    Eigen::VectorXd weights2(theta_star[r].size());
     for (int l = 0; l < theta_star[r].size(); l++) {
-      bayesmix::MarginalState::ClusterState clus;
+      bayesmix::bayesmix::MarginalState::ClusterState clus;
       theta_star[r][l]->write_state_to_proto(&clus);
       clus2[l] = clus;
       weights2(l) = n_by_theta_star[r][l];
@@ -655,7 +655,7 @@ void SemiHdpSampler::print_debug_string() {
 
   for (int r = 0; r < ngroups; r++) {
     std::cout << "**** RESTAURANT: " << r << " *****" << std::endl;
-    std::vector<MatrixXd> data_by_theta_star(theta_star[r].size());
+    std::vector<Eigen::MatrixXd> data_by_theta_star(theta_star[r].size());
     std::cout << "theta_star[r].size(): " << theta_star[r].size() << std::endl;
     for (int i = 0; i < ngroups; i++) {
       if (c[i] == r) {
