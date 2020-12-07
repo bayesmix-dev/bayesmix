@@ -4,3 +4,9 @@ build/
 resources/
 # Local files
 *.local.*
+# Visual Studio Code folder
+.vscode
+
+*.pyc
+*.recordio
+*.pdf

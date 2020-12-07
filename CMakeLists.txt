@@ -1,7 +1,19 @@
 cmake_minimum_required(VERSION 3.13.0)
 project(bayesmix)
 
+
+set (CMAKE_CXX_STANDARD 14)
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+# set(CMAKE_BUILD_TYPE Release)
+
+
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
+
+
 find_package(PkgConfig REQUIRED)
+find_package(OpenMP REQUIRED)
+
+
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE Debug)
@@ -39,3 +51,5 @@ target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 
 # Build test executable
 add_subdirectory(test)
+add_subdirectory(scripts)
+
