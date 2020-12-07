@@ -16,8 +16,8 @@ bayesmix::SemiHdpParams get_params() {
   out.mutable_pseudo_prior()->set_var_perturb_frac(0.5);
   out.set_omega_prior(1.0);
   out.set_c_update("full");
-  out.set_alpha(1.0);
-  out.set_gamma(1.0);
+  out.set_totalmass_rest(1.0);
+  out.set_totalmass_hdp(1.0);
   out.mutable_w_prior()->set_shape1(2.0);
   out.mutable_w_prior()->set_shape2(2.0);
   return out;
@@ -58,24 +58,24 @@ TEST(relabel, 1) {
   SemiHdpSampler sampler(data, get_hierarchy(), get_params());
   sampler.initialize();
 
-  sampler.set_theta_star_debug(theta_star_sizes);
-  sampler.set_theta_tilde_debug(theta_tilde_sizes);
-  sampler.set_tau_debug(tau_size);
+  sampler.set_rest_tables_debug(theta_star_sizes);
+  sampler.set_private_tables_debug(theta_tilde_sizes);
+  sampler.set_shared_tables_debug(tau_size);
 
-  sampler.set_s(s);
-  sampler.set_t(t);
-  sampler.set_v(v);
-  sampler.set_c({0, 1});
+  sampler.set_table_allocs(s);
+  sampler.set_to_shared(t);
+  sampler.set_to_private(v);
+  sampler.set_rest_allocs({0, 1});
 
   sampler.relabel();
 
-  std::vector<std::vector<int>> snew = sampler.get_s();
+  std::vector<std::vector<int>> snew = sampler.get_table_allocs();
   ASSERT_EQ(*std::max_element(snew[0].begin(), snew[0].end()),
             *std::max_element(s[0].begin(), s[0].end()) - 1);
   ASSERT_EQ(*std::max_element(snew[1].begin(), snew[1].end()),
             *std::max_element(s[1].begin(), s[1].end()) - 2);
 
-  std::vector<std::vector<int>> tnew = sampler.get_t();
+  std::vector<std::vector<int>> tnew = sampler.get_to_shared();
 
   ASSERT_EQ(1, 1);
 }
@@ -104,20 +104,20 @@ TEST(relabel, 2) {
   SemiHdpSampler sampler(data, get_hierarchy(), get_params());
   sampler.initialize();
 
-  sampler.set_theta_star_debug(theta_star_sizes);
-  sampler.set_theta_tilde_debug(theta_tilde_sizes);
-  sampler.set_tau_debug(tau_size);
+  sampler.set_rest_tables_debug(theta_star_sizes);
+  sampler.set_private_tables_debug(theta_tilde_sizes);
+  sampler.set_shared_tables_debug(tau_size);
 
-  sampler.set_s(s);
-  sampler.set_t(t);
-  sampler.set_v(v);
-  sampler.set_c({0, 1});
+  sampler.set_table_allocs(s);
+  sampler.set_to_shared(t);
+  sampler.set_to_private(v);
+  sampler.set_rest_allocs({0, 1});
 
   sampler.relabel();
 
-  std::vector<std::vector<int>> snew = sampler.get_s();
-  std::vector<std::vector<int>> tnew = sampler.get_t();
-  std::vector<std::vector<int>> vnew = sampler.get_v();
+  std::vector<std::vector<int>> snew = sampler.get_table_allocs();
+  std::vector<std::vector<int>> tnew = sampler.get_to_shared();
+  std::vector<std::vector<int>> vnew = sampler.get_to_private();
 
   ASSERT_EQ(*std::max_element(snew[0].begin(), snew[0].end()), 5);
   ASSERT_EQ(*std::max_element(snew[1].begin(), snew[1].end()), 2);
@@ -174,47 +174,47 @@ TEST(sample_unique_values, 1) {
   SemiHdpSampler sampler(data, get_hierarchy(), get_params());
   sampler.initialize();
 
-  sampler.set_s(s);
-  sampler.set_t(t);
-  sampler.set_v(v);
+  sampler.set_table_allocs(s);
+  sampler.set_to_shared(t);
+  sampler.set_to_private(v);
   sampler.update_unique_vals();
 
   ASSERT_DOUBLE_EQ(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(0, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(0, 0))
           ->get_state()
           .mean,
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_tilde(0, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_private_table(0, 0))
           ->get_state()
           .mean);
 
   ASSERT_DOUBLE_EQ(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(0, 1))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(0, 1))
           ->get_state()
           .mean,
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_tilde(0, 1))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_private_table(0, 1))
           ->get_state()
           .mean);
 
   ASSERT_DOUBLE_EQ(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(1, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 0))
           ->get_state()
           .mean,
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_tilde(1, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_private_table(1, 0))
           ->get_state()
           .mean);
 
   ASSERT_GT(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(0, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(0, 0))
           ->get_state()
           .mean,
       0);
   ASSERT_LT(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(1, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 0))
           ->get_state()
           .mean,
       0);
   ASSERT_GT(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(1, 1))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 1))
           ->get_state()
           .mean,
       0);
@@ -251,54 +251,54 @@ TEST(sample_unique_values, 2) {
   SemiHdpSampler sampler(data, get_hierarchy(), get_params());
   sampler.initialize();
 
-  sampler.set_s(s);
-  sampler.set_t(t);
-  sampler.set_v(v);
+  sampler.set_table_allocs(s);
+  sampler.set_to_shared(t);
+  sampler.set_to_private(v);
   sampler.update_unique_vals();
 
   ASSERT_FLOAT_EQ(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(0, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(0, 0))
           ->get_state()
           .mean,
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(1, 1))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 1))
           ->get_state()
           .mean);
 
   ASSERT_FLOAT_EQ(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(0, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(0, 0))
           ->get_state()
           .mean,
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_tau(0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_shared_table(0))
           ->get_state()
           .mean);
 
   ASSERT_FLOAT_EQ(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(0, 1))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(0, 1))
           ->get_state()
           .mean,
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_tilde(0, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_private_table(0, 0))
           ->get_state()
           .mean);
 
   ASSERT_FLOAT_EQ(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(1, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 0))
           ->get_state()
           .mean,
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_tilde(1, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_private_table(1, 0))
           ->get_state()
           .mean);
 
-  ASSERT_GT(std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_tau(0))
+  ASSERT_GT(std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_shared_table(0))
                 ->get_state()
                 .mean,
             0);
   ASSERT_LT(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(1, 0))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 0))
           ->get_state()
           .mean,
       0);
   ASSERT_GT(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_theta_star(1, 1))
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 1))
           ->get_state()
           .mean,
       0);
@@ -342,15 +342,15 @@ TEST(sample_allocations, 1) {
   SemiHdpSampler sampler(data, get_hierarchy(), get_params());
   sampler.initialize();
 
-  sampler.set_s(s);
-  sampler.set_t(t);
-  sampler.set_v(v);
+  sampler.set_table_allocs(s);
+  sampler.set_to_shared(t);
+  sampler.set_to_private(v);
   sampler.update_unique_vals();
 
-  sampler.set_s(swrong);
-  sampler.update_s();
+  sampler.set_table_allocs(swrong);
+  sampler.update_table_allocs();
 
-  std::vector<std::vector<int>> snew = sampler.get_s();
+  std::vector<std::vector<int>> snew = sampler.get_table_allocs();
 
   ASSERT_EQ(snew[0][1], 0);
   ASSERT_EQ(1, 1);

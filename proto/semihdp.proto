@@ -46,11 +46,11 @@ message SemiHdpParams {
 
   double omega_prior = 2;
 
-  string c_update = 3; // Either "full", "metro_base", "metro_dist"
+  string rest_allocs_update = 3; // Either "full", "metro_base", "metro_dist"
 
-  double alpha = 4;
+  double totalmass_rest = 4;
 
-  double gamma = 5;
+  double totalmass_hdp = 5;
 
   WPriorParams w_prior = 6;
 

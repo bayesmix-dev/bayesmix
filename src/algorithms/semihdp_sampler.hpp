@@ -42,37 +42,36 @@ class SemiHdpSampler {
   std::shared_ptr<BaseHierarchy> G00_master_hierarchy;
 
   // these should be just copies
-  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> theta_star;
+  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> rest_tables;
   // idiosincratic tables
-  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> theta_tilde;
+  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> private_tables;
   // shared tables
-  std::vector<std::shared_ptr<BaseHierarchy>> taus;
+  std::vector<std::shared_ptr<BaseHierarchy>> shared_tables;
   // counts
-  std::vector<std::vector<int>> n_by_theta_star;
+  std::vector<std::vector<int>> n_by_table;
 
   // stuff for pseudoprior
-  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> theta_star_pseudo;
-  std::vector<std::vector<int>> n_by_theta_star_pseudo;
+  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> rest_tables_pseudo;
+  std::vector<std::vector<int>> n_by_table_pseudo;
 
   // theta_{ij} = theta_{c_i, s_{ij}}
-  std::vector<std::vector<int>> s;
+  std::vector<std::vector<int>> table_allocs;
   // which restaurant each grups enters from
-  std::vector<int> c;
-  std::vector<bool> is_used_c;
+  std::vector<int> rest_allocs;
+  std::vector<bool> is_used_rest;
   Eigen::VectorXd omega;
-  std::vector<std::vector<int>> t, v;
+  std::vector<std::vector<int>> table_to_shared, table_to_private;
 
   // number of theta_stars equal to tau_h across all groups
   std::vector<int> m;
 
-  double w = 0.5;
-  double alpha, gamma, a_w, b_w;
+  double semihdp_weight = 0.5;
+  double totalmass_rest, totalmass_hdp;
 
   std::vector<MemoryCollector<bayesmix::MarginalState>> pseudoprior_collectors;
   int pseudo_iter;
 
   bool adapt = false;
-  std::string c_update;
 
  public:
   SemiHdpSampler() {}
@@ -86,21 +85,22 @@ class SemiHdpSampler {
 
   void step() {
     update_unique_vals();
-    update_w();
+    update_semihdp_weight();
     if (!adapt) {
       sample_pseudo_prior();
-      update_c();
+      update_rest_allocs();
     }
     update_omega();
-    update_t();
-    update_s();
+    update_to_shared();
+    update_table_allocs();
     relabel();
   }
 
   void run(int adapt_iter, int burnin, int iter, int thin,
            BaseCollector<bayesmix::SemiHdpState> *collector,
            const std::vector<MemoryCollector<bayesmix::MarginalState>>
-               &pseudoprior_collectors) {
+               &pseudoprior_collectors,
+           bool display_progress=false, int log_every=1) {
     this->pseudoprior_collectors = pseudoprior_collectors;
     std::cout << "Run, number of pseudoprior_collectors: "
               << this->pseudoprior_collectors.size() << std::endl;
@@ -113,7 +113,7 @@ class SemiHdpSampler {
       adapt = true;
       for (int i = 0; i < adapt_iter; i++) {
         step();
-        if ((i + 1) % 100 == 0) {
+        if (display_progress & (i + 1) % log_every == 0) {
           std::cout << "Adapt iter: " << i << " / " << adapt_iter << std::endl;
         }
       }
@@ -126,7 +126,7 @@ class SemiHdpSampler {
     std::cout << "Beginning" << std::endl;
     for (int i = 0; i < burnin; i++) {
       step();
-      if ((i + 1) % 100 == 0) {
+      if (display_progress & (i + 1) % log_every == 0) {
         std::cout << "Burn-in iter: " << i + 1 << " / " << burnin << std::endl;
       }
     }
@@ -134,17 +134,17 @@ class SemiHdpSampler {
     for (int i = 0; i < iter; i++) {
       step();
       if (iter % thin == 0) collector->collect(get_state_as_proto());
-      if ((i + 1) % 100 == 0) {
+      if (display_progress && (i + 1) % log_every == 0) {
         std::cout << "Running iter: " << i + 1 << " / " << iter << std::endl;
       }
     }
   }
 
   void update_unique_vals();
-  void update_s();
-  void update_t();
-  void update_c();
-  void update_w();
+  void update_table_allocs();
+  void update_to_shared();
+  void update_rest_allocs();
+  void update_semihdp_weight();
   void update_omega();
 
   void relabel();
@@ -159,40 +159,42 @@ class SemiHdpSampler {
   void _count_n_by_theta_star();
 
   bayesmix::SemiHdpState get_state_as_proto();
-  std::vector<std::vector<int>> get_s() const { return s; }
-  std::vector<std::vector<int>> get_t() const { return t; }
-  std::vector<std::vector<int>> get_v() const { return v; }
+  std::vector<std::vector<int>> get_table_allocs() const { return table_allocs; }
+  std::vector<std::vector<int>> get_to_shared() const {
+    return table_to_shared;
+  }
+  std::vector<std::vector<int>> get_to_private() const { return table_to_private; }
   std::vector<int> get_m() const { return m; }
-  std::vector<int> get_c() const { return c; }
+  std::vector<int> get_rest_allocs() const { return rest_allocs; }
 
-  void set_s(const std::vector<std::vector<int>> &s_) { s = s_; }
-  void set_t(const std::vector<std::vector<int>> &t_) { t = t_; }
-  void set_v(const std::vector<std::vector<int>> &v_) { v = v_; }
+  void set_table_allocs(const std::vector<std::vector<int>> &s_) { table_allocs = s_; }
+  void set_to_shared(const std::vector<std::vector<int>> &t_) { table_to_shared = t_; }
+  void set_to_private(const std::vector<std::vector<int>> &v_) { table_to_private = v_; }
   void set_m(std::vector<int> &m_) { m = m_; }
-  void set_c(const std::vector<int> &c_) { c = c_; }
+  void set_rest_allocs(const std::vector<int> &c_) { rest_allocs = c_; }
 
-  void set_theta_star_debug(std::vector<int> sizes) {
-    theta_star.resize(sizes.size());
+  void set_rest_tables_debug(std::vector<int> sizes) {
+    rest_tables.resize(sizes.size());
     for (int i = 0; i < sizes.size(); i++) {
-      theta_star[i].resize(sizes[i]);
+      rest_tables[i].resize(sizes[i]);
     }
   }
 
-  void set_theta_tilde_debug(std::vector<int> sizes) {
-    theta_tilde.resize(sizes.size());
+  void set_private_tables_debug(std::vector<int> sizes) {
+    private_tables.resize(sizes.size());
     for (int i = 0; i < sizes.size(); i++) {
-      theta_tilde[i].resize(sizes[i]);
+      private_tables[i].resize(sizes[i]);
     }
   }
 
-  void set_tau_debug(int size) { taus.resize(size); }
+  void set_shared_tables_debug(int size) { shared_tables.resize(size); }
 
-  std::shared_ptr<BaseHierarchy> get_theta_star(int r, int l) const {
-    return theta_star[r][l];
+  std::shared_ptr<BaseHierarchy> get_table(int r, int l) const {
+    return rest_tables[r][l];
   }
-  std::shared_ptr<BaseHierarchy> get_tau(int h) { return taus[h]; }
-  std::shared_ptr<BaseHierarchy> get_theta_tilde(int r, int l) {
-    return theta_tilde[r][l];
+  std::shared_ptr<BaseHierarchy> get_shared_table(int h) { return shared_tables[h]; }
+  std::shared_ptr<BaseHierarchy> get_private_table(int r, int l) {
+    return private_tables[r][l];
   }
 
   void print_debug_string();
