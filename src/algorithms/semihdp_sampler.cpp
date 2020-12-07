@@ -22,7 +22,8 @@ SemiHdpSampler::SemiHdpSampler(const std::vector<Eigen::MatrixXd>& data,
 
 void SemiHdpSampler::initialize() {
   auto& rng = bayesmix::Rng::Instance().get();
-  omega = Eigen::VectorXd::Ones(ngroups).array();
+  dirichlet_concentration = Eigen::VectorXd::Ones(ngroups).array() *
+                            params.dirichlet_concentration();
 
   int INIT_N_CLUS = 5;
   Eigen::VectorXd probas = Eigen::VectorXd::Ones(INIT_N_CLUS);
@@ -72,7 +73,7 @@ void SemiHdpSampler::initialize() {
       table_to_shared[i][INIT_N_CLUS + l] = l;
     }
   }
-  m = std::vector<int>(shared_tables.size(), 0);
+  cnt_shared_tables = std::vector<int>(shared_tables.size(), 0);
 
   for (int i = 0; i < ngroups; i++) {
     n_by_table[i] = std::vector<int>(rest_tables[i].size(), 0);
@@ -106,12 +107,14 @@ void SemiHdpSampler::update_unique_vals() {
     for (int l = 0; l < rest_tables[r].size(); l++) {
       if (table_to_private[r][l] >= 0) {
         if (data_by_theta_star[l].rows() > 0)
-          private_tables[r][table_to_private[r][l]]->sample_given_data(data_by_theta_star[l]);
+          private_tables[r][table_to_private[r][l]]->sample_given_data(
+              data_by_theta_star[l]);
         else
           private_tables[r][table_to_private[r][l]]->draw();
         rest_tables[r][l] = private_tables[r][table_to_private[r][l]];
       } else {
-        bayesmix::append_by_row(&data_by_shared[table_to_shared[r][l]], data_by_theta_star[l]);
+        bayesmix::append_by_row(&data_by_shared[table_to_shared[r][l]],
+                                data_by_theta_star[l]);
       }
     }
   }
@@ -147,15 +150,17 @@ void SemiHdpSampler::update_table_allocs() {
   std::vector<std::vector<int>> log_n_by_table(ngroups);
   for (int r = 0; r < ngroups; r++) {
     for (int n : n_by_table[r]) {
-        log_n_by_table[r].push_back(std::log(1.0 * n));
+      log_n_by_table[r].push_back(std::log(1.0 * n));
     }
   }
   std::vector<int> log_m;
   for (int l = 0; l < shared_tables.size(); l++) {
-      log_m.push_back(std::log(1.0 * m[l]));
+    log_m.push_back(std::log(1.0 * cnt_shared_tables[l]));
   }
 
-  double m_sum = std::accumulate(m.begin(), m.end(), 0) + 1e-20;
+  double m_sum =
+      std::accumulate(cnt_shared_tables.begin(), cnt_shared_tables.end(), 0) +
+      1e-20;
   double logmsum = std::log(1.0 * m_sum);
 
   // cicle through observations
@@ -168,11 +173,12 @@ void SemiHdpSampler::update_table_allocs() {
       log_n_by_table[r][table_allocs[i][j]] =
           std::log(1.0 * n_by_table[r][table_allocs[i][j]]);
       if (table_to_shared[r][s_old] >= 0) {
-        m[table_to_shared[r][s_old]] -= 1;
+        cnt_shared_tables[table_to_shared[r][s_old]] -= 1;
         log_m[table_to_shared[r][s_old]] = std::log(table_to_shared[r][s_old]);
       }
 
-      Eigen::VectorXd probas = Eigen::VectorXd::Zero(rest_tables[r].size() + 1);
+      Eigen::VectorXd probas =
+          Eigen::VectorXd::Zero(rest_tables[r].size() + 1);
 #pragma omp parallel for
       for (int l = 0; l < rest_tables[r].size(); l++) {
         double log_n = log_n_by_table[r][l];
@@ -185,7 +191,8 @@ void SemiHdpSampler::update_table_allocs() {
 #pragma omp parallel for
       for (int h = 0; h < shared_tables.size(); h++) {
         double logm = log_m[h];
-        hdp_contribs[h] = logm - logmsum + shared_tables[h]->like_lpdf(data[i].row(j));
+        hdp_contribs[h] =
+            logm - logmsum + shared_tables[h]->like_lpdf(data[i].row(j));
       }
 
       hdp_contribs[shared_tables.size()] =
@@ -199,14 +206,13 @@ void SemiHdpSampler::update_table_allocs() {
       table_allocs[i][j] = snew;
       if (snew < rest_tables[r].size()) {
         n_by_table[r][snew] += 1;
-        log_n_by_table[r][snew] =
-            std::log(1.0 * n_by_table[r][snew]);
+        log_n_by_table[r][snew] = std::log(1.0 * n_by_table[r][snew]);
       } else {
         n_by_table[r].push_back(1);
         log_n_by_table[r].push_back(0);
         if (stan::math::uniform_rng(0, 1, rng) < semihdp_weight) {
-          // sample from G0, add it to rest_tables and private_tables and adjust
-          // counts and stuff
+          // sample from G0, add it to rest_tables and private_tables and
+          // adjust counts and stuff
           std::shared_ptr<BaseHierarchy> hierarchy =
               G0_master_hierarchy->clone();
           hierarchy->sample_given_data(data[i].row(j));
@@ -224,14 +230,14 @@ void SemiHdpSampler::update_table_allocs() {
           table_to_shared[r].push_back(tnew);
           if (tnew < shared_tables.size()) {
             rest_tables[r].push_back(shared_tables[tnew]);
-            m[tnew] += 1;
+            cnt_shared_tables[tnew] += 1;
           } else {
             // std::cout << "creating new tau!" << std::endl;
             std::shared_ptr<BaseHierarchy> hierarchy =
                 G00_master_hierarchy->clone();
             hierarchy->sample_given_data(data[i].row(j));
             shared_tables.push_back(hierarchy);
-            m.push_back(1);
+            cnt_shared_tables.push_back(1);
             log_m.push_back(0);
             rest_tables[r].push_back(hierarchy);
           }
@@ -264,10 +270,11 @@ void SemiHdpSampler::update_to_shared() {
     for (int l = 0; l < rest_tables[r].size(); l++) {
       if ((table_to_shared[r][l] >= 0) && (data_by_theta_star[l].size() > 0)) {
         Eigen::VectorXd probas(shared_tables.size() + 1);
-        m[table_to_shared[r][l]] -= 1;
+        cnt_shared_tables[table_to_shared[r][l]] -= 1;
         for (int k = 0; k < shared_tables.size(); k++) {
-          probas(k) = std::log(m[k]) +
-                      shared_tables[k]->like_lpdf_grid(data_by_theta_star[l]).sum();
+          probas(k) =
+              std::log(cnt_shared_tables[k]) +
+              shared_tables[k]->like_lpdf_grid(data_by_theta_star[l]).sum();
         }
 
         probas(shared_tables.size()) =
@@ -279,10 +286,10 @@ void SemiHdpSampler::update_to_shared() {
         int newt =
             bayesmix::categorical_rng(probas, bayesmix::Rng::Instance().get());
         if (newt < shared_tables.size()) {
-          m[newt] += 1;
+          cnt_shared_tables[newt] += 1;
           table_to_shared[r][l] = newt;
         } else {
-          m.push_back(1);
+          cnt_shared_tables.push_back(1);
           table_to_shared[r][l] = newt;
           std::shared_ptr<BaseHierarchy> hier = G00_master_hierarchy->clone();
           hier->sample_given_data(data_by_theta_star[l]);
@@ -304,7 +311,8 @@ void SemiHdpSampler::update_rest_allocs() {
 // Compute probability for group change
 #pragma omp parallel for
       for (int r = 0; r < ngroups; r++)
-        probas(r) = lpdf_for_group(i, r) + std::log(omega(r));
+        probas(r) =
+            lpdf_for_group(i, r) + std::log(dirichlet_concentration(r));
       probas = stan::math::softmax(probas);
       new_r = bayesmix::categorical_rng(probas, rng);
     } else {
@@ -321,8 +329,10 @@ void SemiHdpSampler::update_rest_allocs() {
         prop_r = bayesmix::categorical_rng(proposal_weights, rng);
       }
 
-      double num = lpdf_for_group(i, prop_r) + std::log(omega(prop_r));
-      double den = lpdf_for_group(i, curr_r) + std::log(omega(curr_r));
+      double num = lpdf_for_group(i, prop_r) +
+                   std::log(dirichlet_concentration(prop_r));
+      double den = lpdf_for_group(i, curr_r) +
+                   std::log(dirichlet_concentration(curr_r));
 
       if (std::log(stan::math::uniform_rng(0, 1, rng)) < num - den) {
         new_r = prop_r;
@@ -341,7 +351,8 @@ void SemiHdpSampler::update_semihdp_weight() {
   int cnt = 0;
   int tot = 0;
   for (int r = 0; r < ngroups; r++) {
-    if (std::find(rest_allocs.begin(), rest_allocs.end(), r) != rest_allocs.end()) {
+    if (std::find(rest_allocs.begin(), rest_allocs.end(), r) !=
+        rest_allocs.end()) {
       for (auto table_to_private : table_to_private[r]) {
         tot += 1;
         cnt += 1.0 * (table_to_private >= 0);
@@ -353,14 +364,15 @@ void SemiHdpSampler::update_semihdp_weight() {
                            params.w_prior().shape2() + tot - cnt, rng);
 }
 
-void SemiHdpSampler::update_omega() {
+void SemiHdpSampler::update_dirichlet_concentration() {
   Eigen::VectorXd cnts = Eigen::VectorXd::Zero(ngroups);
   for (int i = 0; i < ngroups; i++) {
     cnts[rest_allocs[i]] += 1;
   }
 
-  omega = stan::math::dirichlet_rng(cnts.array() + params.omega_prior(),
-                                    bayesmix::Rng::Instance().get());
+  dirichlet_concentration = stan::math::dirichlet_rng(
+      cnts.array() + params.dirichlet_concentration(),
+      bayesmix::Rng::Instance().get());
 }
 
 void SemiHdpSampler::relabel() {
@@ -391,7 +403,8 @@ void SemiHdpSampler::relabel() {
             }
           }
 
-          private_tables[r].erase(private_tables[r].begin() + table_to_private[r][l]);
+          private_tables[r].erase(private_tables[r].begin() +
+                                  table_to_private[r][l]);
         }
         // table_to_private variables
         table_to_private[r].erase(table_to_private[r].begin() + l);
@@ -406,9 +419,11 @@ void SemiHdpSampler::relabel() {
               table_allocs[i][j] -= 1;
             }
           }
-          int max_s = *std::max_element(table_allocs[i].begin(), table_allocs[i].end());
+          int max_s = *std::max_element(table_allocs[i].begin(),
+                                        table_allocs[i].end());
           if (max_s >= rest_tables[r].size()) {
-            throw std::invalid_argument("max table_allocs greater than rest_tables size");
+            throw std::invalid_argument(
+                "max table_allocs greater than rest_tables size");
           }
         }
       }
@@ -444,7 +459,8 @@ void SemiHdpSampler::relabel() {
 
 void SemiHdpSampler::sample_pseudo_prior() {
   auto& rng = bayesmix::Rng::Instance().get();
-  Eigen::VectorXd probas = Eigen::VectorXd::Ones(pseudo_iter).array() / (1.0 * pseudo_iter);
+  Eigen::VectorXd probas =
+      Eigen::VectorXd::Ones(pseudo_iter).array() / (1.0 * pseudo_iter);
   int iter = bayesmix::categorical_rng(probas, rng);
   for (int r = 0; r < ngroups; r++) {
     bayesmix::MarginalState state = pseudoprior_collectors[r].get_state(iter);
@@ -461,7 +477,8 @@ void SemiHdpSampler::sample_pseudo_prior() {
     double weight = params.pseudo_prior().card_weight();
     Eigen::VectorXd cards_perturb =
         weight * cards.array() +
-        (1 - weight) * Eigen::VectorXd::Ones(cards.size()).array() / cards.size();
+        (1 - weight) * Eigen::VectorXd::Ones(cards.size()).array() /
+            cards.size();
     n_by_table_pseudo[r] =
         stan::math::multinomial_rng(cards_perturb, n_by_group[r], rng);
 
@@ -479,15 +496,16 @@ void SemiHdpSampler::sample_pseudo_prior() {
 void SemiHdpSampler::perturb(bayesmix::MarginalState::ClusterState* out) {
   auto& rng = bayesmix::Rng::Instance().get();
   if (out->has_univ_ls_state()) {
-    double m = out->univ_ls_state().mean() +
-               stan::math::normal_rng(
-                   0, params.pseudo_prior().mean_perturb_sd(), rng);
+    double cnt_shared_tables =
+        out->univ_ls_state().mean() +
+        stan::math::normal_rng(0, params.pseudo_prior().mean_perturb_sd(),
+                               rng);
     double curr_var = out->univ_ls_state().var();
     double var = curr_var +
                  stan::math::uniform_rng(
                      -curr_var / params.pseudo_prior().var_perturb_frac(),
                      curr_var / params.pseudo_prior().var_perturb_frac(), rng);
-    out->mutable_univ_ls_state()->set_mean(m);
+    out->mutable_univ_ls_state()->set_mean(cnt_shared_tables);
     out->mutable_univ_ls_state()->set_var(var);
   } else {
     throw std::invalid_argument("Case not implemented yet!");
@@ -498,13 +516,11 @@ double SemiHdpSampler::lpdf_for_group(int i, int r) {
   Eigen::VectorXd lpdf_data(n_by_group[i]);
   Eigen::MatrixXd lpdf_local;
   if (is_used_rest[r]) {
-    int nr = std::accumulate(n_by_table[r].begin(),
-                             n_by_table[r].end(), 0);
+    int nr = std::accumulate(n_by_table[r].begin(), n_by_table[r].end(), 0);
     lpdf_local.resize(n_by_group[i], rest_tables[r].size());
     for (int h = 0; h < rest_tables[r].size(); h++) {
-      lpdf_local.col(h) =
-          log(1.0 * n_by_table[r][h] / (totalmass_rest + nr)) +
-          rest_tables[r][h]->like_lpdf_grid(data[i]).array();
+      lpdf_local.col(h) = log(1.0 * n_by_table[r][h] / (totalmass_rest + nr)) +
+                          rest_tables[r][h]->like_lpdf_grid(data[i]).array();
     }
 
   } else {
@@ -526,7 +542,8 @@ double SemiHdpSampler::lpdf_for_group(int i, int r) {
 void SemiHdpSampler::reassign_group(int i, int new_r, int old_r) {
   auto& rng = bayesmix::Rng::Instance().get();
   rest_allocs[i] = new_r;
-  is_used_rest[old_r] = (std::find(rest_allocs.begin(), rest_allocs.end(), old_r) != rest_allocs.end());
+  is_used_rest[old_r] = (std::find(rest_allocs.begin(), rest_allocs.end(),
+                                   old_r) != rest_allocs.end());
 
   if (!is_used_rest[new_r]) {
     // std::cout << "Copying from pseudoprior" << std::endl;
@@ -535,7 +552,8 @@ void SemiHdpSampler::reassign_group(int i, int new_r, int old_r) {
     private_tables[new_r] = rest_tables_pseudo[new_r];
     table_to_shared[new_r] = std::vector<int>(rest_tables[new_r].size(), -1);
     table_to_private[new_r].resize(rest_tables[new_r].size());
-    for (int l = 0; l < rest_tables[new_r].size(); l++) table_to_private[new_r][l] = l;
+    for (int l = 0; l < rest_tables[new_r].size(); l++)
+      table_to_private[new_r][l] = l;
     is_used_rest[new_r] = true;
   }
 
@@ -550,7 +568,8 @@ void SemiHdpSampler::reassign_group(int i, int new_r, int old_r) {
 
       probas[l] = log_n + rest_tables[new_r][l]->like_lpdf(data[i].row(j));
     }
-    table_allocs[i][j] = bayesmix::categorical_rng(stan::math::softmax(probas), rng);
+    table_allocs[i][j] =
+        bayesmix::categorical_rng(stan::math::softmax(probas), rng);
   }
 }
 
@@ -579,18 +598,18 @@ Eigen::VectorXd SemiHdpSampler::_compute_mixture_distance(int i) {
     }
     weights2 = weights2.array() / weights2.sum();
 
-    dists(r) = bayesmix::gaussian_mixture_dist(clus1, weights1, clus2,
-                                               weights2);
+    dists(r) =
+        bayesmix::gaussian_mixture_dist(clus1, weights1, clus2, weights2);
   }
   return dists;
 }
 
 void SemiHdpSampler::_count_m() {
-  m = std::vector<int>(shared_tables.size(), 0);
+  cnt_shared_tables = std::vector<int>(shared_tables.size(), 0);
   for (int r = 0; r < ngroups; r++) {
     for (int l = 0; l < table_to_shared[r].size(); l++)
       if (table_to_shared[r][l] >= 0) {
-        m[table_to_shared[r][l]] += 1;
+        cnt_shared_tables[table_to_shared[r][l]] += 1;
       }
   }
 }
@@ -619,13 +638,16 @@ bayesmix::SemiHdpState SemiHdpSampler::get_state_as_proto() {
     }
     *curr_restaurant.mutable_n_by_clus() = {n_by_table[i].begin(),
                                             n_by_table[i].end()};
-    *curr_restaurant.mutable_table_to_shared() = {table_to_shared[i].begin(), table_to_shared[i].end()};
-    *curr_restaurant.mutable_table_to_idio() = {table_to_private[i].begin(), table_to_private[i].end()};
+    *curr_restaurant.mutable_table_to_shared() = {table_to_shared[i].begin(),
+                                                  table_to_shared[i].end()};
+    *curr_restaurant.mutable_table_to_idio() = {table_to_private[i].begin(),
+                                                table_to_private[i].end()};
 
     state.add_restaurants()->CopyFrom(curr_restaurant);
 
     bayesmix::SemiHdpState::GroupState curr_group;
-    *curr_group.mutable_cluster_allocs() = {table_allocs[i].begin(), table_allocs[i].end()};
+    *curr_group.mutable_cluster_allocs() = {table_allocs[i].begin(),
+                                            table_allocs[i].end()};
     state.add_groups()->CopyFrom(curr_group);
 
     for (int l = 0; l < shared_tables.size(); l++) {
@@ -650,7 +672,8 @@ void SemiHdpSampler::print_debug_string() {
   for (int r = 0; r < ngroups; r++) {
     std::cout << "**** RESTAURANT: " << r << " *****" << std::endl;
     std::vector<Eigen::MatrixXd> data_by_theta_star(rest_tables[r].size());
-    std::cout << "rest_tables[r].size(): " << rest_tables[r].size() << std::endl;
+    std::cout << "rest_tables[r].size(): " << rest_tables[r].size()
+              << std::endl;
     for (int i = 0; i < ngroups; i++) {
       if (rest_allocs[i] == r) {
         for (int j = 0; j < n_by_group[i]; j++) {
@@ -699,9 +722,11 @@ void SemiHdpSampler::check() {
   for (int i = 0; i < ngroups; i++) {
     int r = rest_allocs[i];
     // std::cout << "i: " << i << ", r: " << r << std::endl;
-    int max_s = *std::max_element(table_allocs[i].begin(), table_allocs[i].end());
+    int max_s =
+        *std::max_element(table_allocs[i].begin(), table_allocs[i].end());
     if (max_s >= rest_tables[r].size()) {
-      throw std::invalid_argument("max table_allocs greater than rest_tables size");
+      throw std::invalid_argument(
+          "max table_allocs greater than rest_tables size");
     }
   }
 }

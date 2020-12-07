@@ -20,7 +20,7 @@ using bayesmix::SemiHdpState;
 /*
  * This class implements the algorithm for posterior simulation under the
  * semi-hierarchical Dirichlet process in [1].
- * 
+ *
  * Extra goodies: we can now tune the pseudo-prior generation, by randomly
  * drawing the cardinalities from a multinomial distribution, and perturbing
  * the atoms of the mixing measure.
@@ -59,11 +59,11 @@ class SemiHdpSampler {
   // which restaurant each grups enters from
   std::vector<int> rest_allocs;
   std::vector<bool> is_used_rest;
-  Eigen::VectorXd omega;
+  Eigen::VectorXd dirichlet_concentration;
   std::vector<std::vector<int>> table_to_shared, table_to_private;
 
   // number of theta_stars equal to tau_h across all groups
-  std::vector<int> m;
+  std::vector<int> cnt_shared_tables;
 
   double semihdp_weight = 0.5;
   double totalmass_rest, totalmass_hdp;
@@ -90,7 +90,7 @@ class SemiHdpSampler {
       sample_pseudo_prior();
       update_rest_allocs();
     }
-    update_omega();
+    update_dirichlet_concentration();
     update_to_shared();
     update_table_allocs();
     relabel();
@@ -100,7 +100,7 @@ class SemiHdpSampler {
            BaseCollector<bayesmix::SemiHdpState> *collector,
            const std::vector<MemoryCollector<bayesmix::MarginalState>>
                &pseudoprior_collectors,
-           bool display_progress=false, int log_every=1) {
+           bool display_progress = false, int log_every = 1) {
     this->pseudoprior_collectors = pseudoprior_collectors;
     std::cout << "Run, number of pseudoprior_collectors: "
               << this->pseudoprior_collectors.size() << std::endl;
@@ -145,7 +145,7 @@ class SemiHdpSampler {
   void update_to_shared();
   void update_rest_allocs();
   void update_semihdp_weight();
-  void update_omega();
+  void update_dirichlet_concentration();
 
   void relabel();
   void sample_pseudo_prior();
@@ -159,18 +159,28 @@ class SemiHdpSampler {
   void _count_n_by_theta_star();
 
   bayesmix::SemiHdpState get_state_as_proto();
-  std::vector<std::vector<int>> get_table_allocs() const { return table_allocs; }
+  std::vector<std::vector<int>> get_table_allocs() const {
+    return table_allocs;
+  }
   std::vector<std::vector<int>> get_to_shared() const {
     return table_to_shared;
   }
-  std::vector<std::vector<int>> get_to_private() const { return table_to_private; }
-  std::vector<int> get_m() const { return m; }
+  std::vector<std::vector<int>> get_to_private() const {
+    return table_to_private;
+  }
+  std::vector<int> get_cnt_shared_tables() const { return cnt_shared_tables; }
   std::vector<int> get_rest_allocs() const { return rest_allocs; }
 
-  void set_table_allocs(const std::vector<std::vector<int>> &s_) { table_allocs = s_; }
-  void set_to_shared(const std::vector<std::vector<int>> &t_) { table_to_shared = t_; }
-  void set_to_private(const std::vector<std::vector<int>> &v_) { table_to_private = v_; }
-  void set_m(std::vector<int> &m_) { m = m_; }
+  void set_table_allocs(const std::vector<std::vector<int>> &s_) {
+    table_allocs = s_;
+  }
+  void set_to_shared(const std::vector<std::vector<int>> &t_) {
+    table_to_shared = t_;
+  }
+  void set_to_private(const std::vector<std::vector<int>> &v_) {
+    table_to_private = v_;
+  }
+  void set_cnt_shared_tables(std::vector<int> &m_) { cnt_shared_tables = m_; }
   void set_rest_allocs(const std::vector<int> &c_) { rest_allocs = c_; }
 
   void set_rest_tables_debug(std::vector<int> sizes) {
@@ -192,7 +202,9 @@ class SemiHdpSampler {
   std::shared_ptr<BaseHierarchy> get_table(int r, int l) const {
     return rest_tables[r][l];
   }
-  std::shared_ptr<BaseHierarchy> get_shared_table(int h) { return shared_tables[h]; }
+  std::shared_ptr<BaseHierarchy> get_shared_table(int h) {
+    return shared_tables[h];
+  }
   std::shared_ptr<BaseHierarchy> get_private_table(int r, int l) {
     return private_tables[r][l];
   }

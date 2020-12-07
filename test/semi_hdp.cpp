@@ -14,8 +14,8 @@ bayesmix::SemiHdpParams get_params() {
   out.mutable_pseudo_prior()->set_card_weight(0.5);
   out.mutable_pseudo_prior()->set_mean_perturb_sd(0.5);
   out.mutable_pseudo_prior()->set_var_perturb_frac(0.5);
-  out.set_omega_prior(1.0);
-  out.set_c_update("full");
+  out.set_dirichlet_concentration(1.0);
+  out.set_rest_allocs_update("full");
   out.set_totalmass_rest(1.0);
   out.set_totalmass_hdp(1.0);
   out.mutable_w_prior()->set_shape1(2.0);

@@ -44,7 +44,7 @@ message SemiHdpParams {
 
   PseudoPriorParams pseudo_prior = 1;
 
-  double omega_prior = 2;
+  double dirichlet_concentration = 2;
 
   string rest_allocs_update = 3; // Either "full", "metro_base", "metro_dist"
 
