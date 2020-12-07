@@ -152,9 +152,9 @@ template <typename MsgType>
 std::deque<MsgType> FileCollector<MsgType>::get_chain() {
   open_for_reading();
   bool keep = true;
-  std::deque<bayesmix::MarginalState> out;
+  std::deque<MsgType> out;
   while (keep) {
-    bayesmix::MarginalState msg;
+    MsgType msg;
     keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(&msg, fin,
                                                                     nullptr);
     if (keep) {

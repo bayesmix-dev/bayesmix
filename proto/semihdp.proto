@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+import "ls_state.proto";
+
+package bayesmix;
+
+message SemiHdpState {
+  message ClusterState {
+    oneof val {
+      UnivLSState univ_ls_state = 1;
+      MultiLSState multi_ls_state = 2;
+    }
+  }
+
+  message RestaurantState {
+      repeated ClusterState theta_stars = 1;
+      repeated int32 n_by_clus = 2;
+      repeated int32 table_to_shared = 3;
+      repeated int32 table_to_idio = 4;
+  }
+
+  message GroupState {
+      repeated int32 cluster_allocs = 1;
+  }
+
+  repeated RestaurantState restaurants = 1;
+  repeated GroupState groups = 2;
+  repeated ClusterState taus = 3;
+  repeated int32 c = 4;
+  double w = 5;
+}
+
+message SemiHdpParams {
+  message PseudoPriorParams {
+    double card_weight = 1;
+    double mean_perturb_sd = 2;
+    double var_perturb_frac = 3;
+  }
+
+  message WPriorParams {
+    double shape1 = 1;
+    double shape2 = 2;
+  }
+
+  PseudoPriorParams pseudo_prior = 1;
+
+  double dirichlet_concentration = 2;
+
+  string rest_allocs_update = 3; // Either "full", "metro_base", "metro_dist"
+
+  double totalmass_rest = 4;
+
+  double totalmass_hdp = 5;
+
+  WPriorParams w_prior = 6;
+
+}

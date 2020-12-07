@@ -17,6 +17,8 @@ add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   lpdf.cpp
   priors.cpp
   eigen_utils.cpp
+  distributions.cpp
+  semi_hdp.cpp
 )
 target_include_directories(test_bayesmix PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(test_bayesmix PUBLIC
