@@ -73,27 +73,30 @@ double bayesmix::gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
   double mix1 = 0.0;
   for (int i = 0; i < means1.size(); i++) {
     for (int j = 0; j < means1.size(); j++) {
+      Eigen::MatrixXd var_ij = vars1[i] + vars1[j];
       mix1 += weights1(i) * weights1(j) *
-              std::exp(stan::math::multi_normal_lpdf(means1[i], means1[j],
-                                                     vars1[i] + vars1[j]));
+              std::exp(
+                  stan::math::multi_normal_lpdf(means1[i], means1[j], var_ij));
     }
   }
 
   double mix2 = 0.0;
   for (int i = 0; i < means2.size(); i++) {
     for (int j = 0; j < means2.size(); j++) {
+      Eigen::MatrixXd var_ij = vars2[i] + vars2[j];
       mix2 += weights2(i) * weights2(j) *
-              std::exp(stan::math::multi_normal_lpdf(means2[i], means2[j],
-                                                     vars2[i] + vars2[j]));
+              std::exp(
+                  stan::math::multi_normal_lpdf(means2[i], means2[j], var_ij));
     }
   }
 
   double inter = 0.0;
   for (int i = 0; i < means1.size(); i++) {
     for (int j = 0; j < means2.size(); j++) {
+      Eigen::MatrixXd var_ij = vars1[i] + vars2[j];
       inter += weights1(i) * weights2(j) *
                std::exp(stan::math::multi_normal_lpdf(means1[i], means2[j],
-                                                      vars1[i] + vars2[j]));
+                                                      var_ij));
     }
   }
 
