@@ -13,10 +13,47 @@ void LossFunction::SetCluster(Eigen::VectorXi cluster1_,
 
     N = (int) n_rows;
 
-    cluster1 = cluster1_;
+    cluster1 = &cluster1_;
     K1 = GetNumberOfGroups(cluster1_);
-    cluster2 = cluster2_;
+    cluster2 = &cluster2_;
     K2 = GetNumberOfGroups(cluster2_);
+}
+
+void LossFunction::SetFirstCluster(Eigen::VectorXi cluster1_)
+{
+    auto n_rows = cluster1_.rows();
+    std::cout << "3.1.1" << std::endl;
+
+    /*
+    if (n_rows != cluster2.rows())
+    {
+      throw std::domain_error("Clusters of different sizes!");
+    }
+    */
+
+    N = (int) n_rows;
+    std::cout << "3.1.2 : " << cluster1_ << std::endl;
+
+    cluster1 = &cluster1_;
+    std::cout << "3.1.3" << std::endl;
+
+    K1 = GetNumberOfGroups(cluster1_);
+}
+
+void LossFunction::SetSecondCluster(Eigen::VectorXi cluster2_) {
+  auto n_rows = cluster2_.rows();
+
+  /*
+  if (n_rows != cluster1.rows())
+  {
+    throw std::domain_error("Clusters of different sizes!");
+  }
+  */
+
+  N = (int) n_rows;
+
+  cluster2 = &cluster2_;
+  K2 = GetNumberOfGroups(cluster2_);
 }
 
 int LossFunction::GetNumberOfGroups(Eigen::VectorXi cluster)

@@ -11,9 +11,9 @@
 class LossFunction
 {
 protected:
-    Eigen::VectorXi cluster1;
+    Eigen::VectorXi * cluster1;
     int K1; // nº of groups in cluster1
-    Eigen::VectorXi cluster2;
+    Eigen::VectorXi * cluster2;
     int K2; // nº of groups in cluster2
     int N;  // nº of points
 

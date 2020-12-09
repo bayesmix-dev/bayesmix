@@ -13,19 +13,10 @@ int main(int argc, char const *argv[])
 {
   // Initialize the clusters (N = 5)
     Eigen::VectorXi c1(5); // K = 3
-    c1(0) = 1;
-    c1(1) = 1;
-    c1(2) = 1;
-    c1(3) = 2;
-    c1(4) = 3;
+    c1 << 1, 1, 1, 2, 3;
 
     Eigen::VectorXi c2(5); // K = 2
-    c2(0) = 1;
-    c2(1) = 1;
-    c2(2) = 2;
-    c2(3) = 2;
-    c2(4) = 2;
-
+    c2 << 1, 1, 2, 2, 2;
 
     // Call the desired loss functions
     BinderLoss binder_loss(1.0, 1.0);        // l1 = l2 = 1 (penalties)
