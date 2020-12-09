@@ -39,15 +39,18 @@ class NNWHierarchy : public BaseHierarchy {
     double var_scaling;
     double deg_free;
     Eigen::MatrixXd scale;
+    Eigen::MatrixXd scale_inv;
   };
 
  protected:
+  int dim;
+  Eigen::VectorXd data_sum;
+  Eigen::MatrixXd data_sum_squares;
   // STATE
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-  Eigen::MatrixXd scale0_inv;
-  // HYPERPRIOR
+    // HYPERPRIOR
   std::shared_ptr<bayesmix::NNWPrior> prior;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
@@ -61,12 +64,25 @@ class NNWHierarchy : public BaseHierarchy {
   //! Special setter for prec and its utilities
   void set_prec_and_utilities(const Eigen::MatrixXd &prec_);
 
+  void clear_data() {
+    data_sum = Eigen::VectorXd::Zero(dim);
+    data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
+    card = 0;
+    cluster_data_idx = std::set<int>();
+  }
+
+  void update_summary_statistics(const Eigen::VectorXd &datum, bool add) {
+    if (add) {
+      data_sum += datum;
+      data_sum_squares += datum * datum.transpose();
+    } else {
+      data_sum -= datum;
+      data_sum_squares -= datum * datum.transpose();
+    }
+  }
+
   //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams normal_wishart_update(const Eigen::MatrixXd &data,
-                                    const Eigen::VectorXd &mu0,
-                                    const double lambda0,
-                                    const Eigen::MatrixXd &tau0_inv,
-                                    const double nu0);
+  Hyperparams normal_wishart_update();
 
  public:
   void initialize() override;
@@ -80,7 +96,9 @@ class NNWHierarchy : public BaseHierarchy {
   ~NNWHierarchy() = default;
   NNWHierarchy() = default;
   std::shared_ptr<BaseHierarchy> clone() const override {
-    return std::make_shared<NNWHierarchy>(*this);
+    auto out = std::make_shared<NNWHierarchy>(*this);
+    out->clear_data();
+    return out;
   }
 
   // EVALUATION FUNCTIONS
@@ -97,6 +115,7 @@ class NNWHierarchy : public BaseHierarchy {
   //! Generates new values for state from the centering prior distribution
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
+  void sample_given_data() override;
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS

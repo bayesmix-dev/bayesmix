@@ -21,6 +21,7 @@ class DirichletMixing : public BaseMixing {
  public:
   struct State {
     double totalmass;
+    double logtotmass;
   };
 
  protected:
@@ -38,9 +39,18 @@ class DirichletMixing : public BaseMixing {
   //! \param card Cardinality of the cluster
   //! \param n    Total number of data points
   //! \return     Probability value
-  double mass_existing_cluster(const unsigned int card,
-                               const unsigned int n) const override {
-    return card / (n + state.totalmass);
+  double mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
+                               const unsigned int n, bool log,
+                               bool propto) const override {
+    double out;
+    if (log) {
+      out = hier->get_log_card();
+      if (!propto) out -= std::log(n + state.totalmass);
+    } else {
+      out = 1.0 * hier->get_card();
+      if (!propto) out /= (n + state.totalmass);
+    }
+    return out;
   }
 
   //! Mass probability for choosing a newly created cluster
@@ -48,9 +58,17 @@ class DirichletMixing : public BaseMixing {
   //! \param n_clust Number of clusters
   //! \param n       Total number of data points
   //! \return        Probability value
-  double mass_new_cluster(const unsigned int n_clust,
-                          const unsigned int n) const override {
-    return state.totalmass / (n + state.totalmass);
+  double mass_new_cluster(const unsigned int n_clust, const unsigned int n,
+                          bool log, bool propto) const override {
+    double out;
+    if (log) {
+      out = state.logtotmass;
+      if (!propto) out -= std::log(n + state.totalmass);
+    } else {
+      out = state.totalmass;
+      if (!propto) out /= (n + state.totalmass);
+    }
+    return out;
   }
 
   void initialize() override;

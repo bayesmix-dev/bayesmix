@@ -6,6 +6,8 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <random>
+#include <set>
+#include <stan/math/prim.hpp>
 
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../utils/rng.hpp"
@@ -27,7 +29,45 @@
 //! likelihood (whose parameters are the state) or its marginal distribution.
 
 class BaseHierarchy {
+ protected:
+  // map: data_id -> datum
+  std::set<int> cluster_data_idx;
+  int card = 0;
+  double log_card = stan::math::NEGATIVE_INFTY;
+
+  virtual void update_summary_statistics(const Eigen::VectorXd &datum,
+                                         bool add) = 0;
+
+  void set_card(int card_) {
+    card = card_;
+    log_card = std::log(card_);
+  }
+
  public:
+  void add_datum(const int &id, const Eigen::VectorXd &datum) {
+    auto it = cluster_data_idx.find(id);
+    assert(it == cluster_data_idx.end());
+    card += 1;
+    log_card = std::log(card);
+    update_summary_statistics(datum, true);
+    cluster_data_idx.insert(id);
+
+  }
+
+  void remove_datum(const int &id, const Eigen::VectorXd &datum) {
+    update_summary_statistics(datum, false);
+    card -= 1;
+    log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
+    auto it = cluster_data_idx.find(id);
+    assert(it != cluster_data_idx.end());
+    cluster_data_idx.erase(it);
+  }
+
+  int get_card() const { return card; }
+  double get_log_card() const { return log_card; }
+
+  std::set<int> get_data_idx() {return cluster_data_idx;}
+
   virtual void initialize() = 0;
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
@@ -56,6 +96,7 @@ class BaseHierarchy {
   //! Generates new values for state from the centering prior distribution
   virtual void draw() = 0;
   //! Generates new values for state from the centering posterior distribution
+  virtual void sample_given_data() = 0;
   virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;
 
   // GETTERS AND SETTERS

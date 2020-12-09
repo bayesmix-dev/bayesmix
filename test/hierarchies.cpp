@@ -52,7 +52,8 @@ TEST(nnighierarchy, sample_given_data) {
   datum << 4.5;
 
   auto hier2 = hier->clone();
-  hier2->sample_given_data(datum);
+  hier2->add_datum(0, datum);
+  hier2->sample_given_data();
 
   bayesmix::MarginalState out;
   bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
@@ -117,7 +118,8 @@ TEST(nnwhierarchy, sample_given_data) {
   datum << 4.5, 4.5;
 
   auto hier2 = hier->clone();
-  hier2->sample_given_data(datum);
+  hier2 -> add_datum(0, datum);
+  hier2->sample_given_data();
 
   bayesmix::MarginalState out;
   bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();

@@ -49,6 +49,7 @@ void DirichletMixing::set_state_from_proto(
   auto &statecast =
       google::protobuf::internal::down_cast<const bayesmix::DPState &>(state_);
   state.totalmass = statecast.totalmass();
+  state.logtotmass = std::log(state.totalmass);
 }
 
 void DirichletMixing::set_prior(const google::protobuf::Message &prior_) {

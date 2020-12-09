@@ -24,14 +24,13 @@ void BaseAlgorithm::initialize() {
   unique_values[0]->initialize();
   for (size_t i = 0; i < init_num_clusters - 1; i++) {
     unique_values.push_back(unique_values[0]->clone());
+    unique_values[i]->draw();
   }
 
   // Initialize mixing
   mixing->initialize();
 
   // Initialize needed objects
-  cardinalities.clear();
-  cardinalities.reserve(data.rows());
   std::default_random_engine generator;
   // Build uniform probability on clusters, given their initial number
   std::uniform_int_distribution<int> distro(0, init_num_clusters - 1);
@@ -39,13 +38,13 @@ void BaseAlgorithm::initialize() {
   allocations.clear();
   for (size_t i = 0; i < init_num_clusters; i++) {
     allocations.push_back(i);
-    cardinalities.push_back(1);
+    unique_values[i]->add_datum(i, data.row(i));
   }
   // Randomly allocate all remaining data, and update cardinalities
   for (size_t i = init_num_clusters; i < data.rows(); i++) {
     unsigned int clust = distro(generator);
     allocations.push_back(clust);
-    cardinalities[clust] += 1;
+    unique_values[clust]->add_datum(i, data.row(i));
   }
 }
 
@@ -67,8 +66,6 @@ bayesmix::MarginalState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
   iter_out.set_iteration_num(iter);
   *iter_out.mutable_cluster_allocs() = {allocations.begin(),
                                         allocations.end()};
-  *iter_out.mutable_cluster_cards() = {cardinalities.begin(),
-                                       cardinalities.end()};
   // Transcribe unique values vector
   for (size_t i = 0; i < unique_values.size(); i++) {
     bayesmix::MarginalState::ClusterState clusval;

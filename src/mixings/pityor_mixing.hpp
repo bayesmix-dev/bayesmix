@@ -36,9 +36,17 @@ class PitYorMixing : public BaseMixing {
   //! \param card Cardinality of the cluster
   //! \param n    Total number of data points
   //! \return     Probability value
-  double mass_existing_cluster(const unsigned int card,
-                               const unsigned int n) const override {
-    return (card == 0) ? 0 : (card - state.discount) / (n + state.strength);
+  double mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
+                               const unsigned int n, bool log,
+                               bool propto) const override {
+    double out;
+    if (hier->get_card() == 0) {
+      out = 0;
+    } else {
+      out = (hier->get_card() - state.discount) / (n + state.strength);
+    }
+    if (log) out = std::log(out);
+    return out;
   }
 
   //! Mass probability for choosing a newly created cluster
@@ -46,9 +54,12 @@ class PitYorMixing : public BaseMixing {
   //! \param n_clust Number of clusters
   //! \param n       Total number of data points
   //! \return        Probability value
-  double mass_new_cluster(const unsigned int n_clust,
-                          const unsigned int n) const override {
-    return (state.strength + state.discount * n_clust) / (n + state.strength);
+  double mass_new_cluster(const unsigned int n_clust, const unsigned int n,
+                          bool log, bool propto) const override {
+    double out =
+        (state.strength + state.discount * n_clust) / (n + state.strength);
+    if (log) out = std::log(out);
+    return out;
   }
 
   void initialize() override;
