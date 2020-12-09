@@ -116,6 +116,7 @@ class NNWHierarchy : public BaseHierarchy {
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data() override;
+  void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }

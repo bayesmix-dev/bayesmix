@@ -67,9 +67,6 @@ class NNIGHierarchy : public BaseHierarchy {
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update();
-  // Hyperparams normal_invgamma_update(const Eigen::VectorXd &data,
-  //                                    const double mu0, const double alpha0,
-  //                                    const double beta0, const double lambda0);
 
  public:
   void initialize() override;
@@ -104,6 +101,7 @@ class NNIGHierarchy : public BaseHierarchy {
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data() override;
+  void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }
