@@ -5,8 +5,8 @@
 int main() {
   Eigen::MatrixXi mcmc(3, 5);  // T = 3
   mcmc << 1, 1, 1, 2, 3,
-          1, 1, 2, 3, 3,
-          1, 1, 2, 2, 2;
+      1, 1, 2, 3, 3,
+      1, 1, 2, 2, 2;
 
   Eigen::VectorXi a(5);
   a << 1, 1, 2, 3, 3;
