@@ -18,6 +18,8 @@ protected:
     int N;  // nº of points
 
 public:
+    LossFunction();
+    virtual ~LossFunction() = 0;
     void SetCluster(Eigen::VectorXi cluster1_,
                     Eigen::VectorXi cluster2_);           // Populate the members
     void SetFirstCluster(Eigen::VectorXi cluster1_);

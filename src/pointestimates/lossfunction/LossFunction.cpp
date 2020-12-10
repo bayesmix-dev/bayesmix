@@ -1,6 +1,15 @@
 #include "LossFunction.hpp"
 #include <iostream>
 
+LossFunction::LossFunction() : cluster1(0), cluster2(0) {
+  std::cout << "Loss Function Constructor" << std::endl;
+}
+
+LossFunction::~LossFunction() {
+  std::cout << "Loss Function virtual destructor" << std::endl;
+}
+
+
 void LossFunction::SetCluster(Eigen::VectorXi cluster1_,
                               Eigen::VectorXi cluster2_)
 {
@@ -22,9 +31,9 @@ void LossFunction::SetCluster(Eigen::VectorXi cluster1_,
 void LossFunction::SetFirstCluster(Eigen::VectorXi cluster1_)
 {
     auto n_rows = cluster1_.rows();
-    std::cout << "3.1.1" << std::endl;
 
-    /*
+    /* Since we don't set clusters at the same time, there are many cases
+     * where c1 and c2 are from differents sizes.
     if (n_rows != cluster2.rows())
     {
       throw std::domain_error("Clusters of different sizes!");
@@ -32,11 +41,7 @@ void LossFunction::SetFirstCluster(Eigen::VectorXi cluster1_)
     */
 
     N = (int) n_rows;
-    std::cout << "3.1.2 : " << cluster1_ << std::endl;
-
     cluster1 = &cluster1_;
-    std::cout << "3.1.3" << std::endl;
-
     K1 = GetNumberOfGroups(cluster1_);
 }
 
@@ -65,7 +70,6 @@ int LossFunction::GetNumberOfGroups(Eigen::VectorXi cluster)
         groups.insert(cluster(i));
     }
 
-    std::cout << "GetNumberOfGroups :" << (int)groups.size() << std::endl;
     return (int)groups.size();
 }
 
@@ -87,7 +91,7 @@ int LossFunction::ClassCounterExtended(Eigen::VectorXi cluster1, Eigen::VectorXi
 {
     int count = 0;
 
-    for (std::size_t i = 0; i < cluster1.size(); i++)
+    for (int i = 0; i < cluster1.size(); i++)
     {
         if (cluster1[i] == g && cluster2[i] == h)
         {

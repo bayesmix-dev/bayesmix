@@ -19,11 +19,12 @@ enum LOSS_FUNCTION {
 class ClusteringProcess
 {
   private:
-      LossFunction * loss_function;
+      LossFunction* loss_function;
       Eigen::MatrixXi mcmc_sample;
       int T; // total time of the process
    public:
       ClusteringProcess(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTION loss_type);
+      ~ClusteringProcess();
       double expected_posterior_loss(Eigen::VectorXi a);
       Eigen::VectorXi cluster_estimate(MINIMIZATION_METHOD method);
       Eigen::VectorXi greedy_algorithm();
