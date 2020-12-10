@@ -1,11 +1,15 @@
 #include "ClusteringProcess.hpp"
 #include <iostream>
 
+using namespace std;
+
 ClusteringProcess::ClusteringProcess(Eigen::MatrixXi &mcmc_sample_,
                                      LOSS_FUNCTION loss_type)
     : loss_function(0)
 {
+  std::cout << "[CONSTRUCTORS]" << std::endl;
   std::cout << "ClusteringProcess Constructor" << std::endl;
+
   mcmc_sample = mcmc_sample_;
   T = mcmc_sample.rows();
   switch(loss_type) {
@@ -19,6 +23,7 @@ ClusteringProcess::ClusteringProcess(Eigen::MatrixXi &mcmc_sample_,
 }
 
 ClusteringProcess::~ClusteringProcess() {
+  std::cout << std::endl << "[DESTRUCTORS]" << std::endl;
   std::cout << "Clustering Process destructor" << std::endl;
   delete loss_function;
 }
@@ -29,12 +34,12 @@ double ClusteringProcess::expected_posterior_loss(Eigen::VectorXi a)
   loss_function->SetFirstCluster(a);
 
   for (int t = 0; t < T; t++) {
-    loss_function->SetSecondCluster(a);
     loss_function->SetSecondCluster(mcmc_sample.row(t));
+    cout << loss_function << endl;
     epl += loss_function->Loss();
   }
-  std::cout << "epl (not normalized)=" << epl << "; T=" << T << std::endl;
 
+  std::cout << "epl (not normalized)=" << epl << "; T=" << T << std::endl;
   return epl / T;
 }
 

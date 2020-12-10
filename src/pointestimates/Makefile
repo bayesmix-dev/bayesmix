@@ -23,4 +23,4 @@ pe_test: compileClustering
 	./pe_estimate
 
 clean:
-	rm -f $(LOSS_DIR)/*.o
+	rm -f */*.o

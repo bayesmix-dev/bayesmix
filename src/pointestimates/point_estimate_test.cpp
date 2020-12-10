@@ -4,14 +4,15 @@
 
 int main() {
   Eigen::MatrixXi mcmc(3, 5);  // T = 3
-  mcmc << 1, 1, 1, 2, 3, 1, 1, 2, 3, 3, 1, 1, 2, 2, 2;
+  mcmc << 1, 1, 1, 2, 3,
+          1, 1, 2, 3, 3,
+          1, 1, 2, 2, 2;
 
   Eigen::VectorXi a(5);
   a << 1, 1, 2, 3, 3;
 
   ClusteringProcess cp(mcmc, BINDER_LOSS);
-
   double epl = cp.expected_posterior_loss(a);
 
-  std::cerr << "Expected posterior loss : " << epl << std::endl;
+  std::cout << "Expected posterior loss : " << epl << std::endl;
 }

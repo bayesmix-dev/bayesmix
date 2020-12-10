@@ -18,7 +18,6 @@ BinderLoss::~BinderLoss() {
 
 double BinderLoss::Loss()
 {
-    cout << "BinderLoss 'Loss' method called" << endl;
     double var = 0.0;
     int size = cluster1->size();
 

@@ -14,7 +14,7 @@ private:
 
 public:
     VariationInformation(bool normalise_);
-    double Entropy(Eigen::VectorXi cluster);
+    double Entropy(Eigen::VectorXi &cluster);
     double JointEntropy();      // This method calculates the value on the members of LossFunction directly
     double MutualInformation(); // This method calculates the value on the members of LossFunction directly
     double Loss();

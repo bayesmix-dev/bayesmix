@@ -9,7 +9,7 @@ using namespace std;
 // To run this main.cpp file, run the following CLI in a terminal:
 // make loss
 
-int main(int argc, char const *argv[])
+int main()
 {
   // Initialize the clusters (N = 5)
     Eigen::VectorXi c1(5); // K = 3
@@ -19,10 +19,12 @@ int main(int argc, char const *argv[])
     c2 << 1, 1, 2, 2, 2;
 
     // Call the desired loss functions
+    cout << "[CONSTRUCTORS]" << endl;
     BinderLoss binder_loss(1.0, 1.0);        // l1 = l2 = 1 (penalties)
     BinderLoss binder_loss_default;
     VariationInformation vi_loss(false);     // normalise = false
     VariationInformation vi_loss_norm(true); // normalise = true
+    cout <<  endl << endl;
 
     // Populate the members for each loss above
     binder_loss.SetCluster(c1, c2);
@@ -45,6 +47,8 @@ int main(int argc, char const *argv[])
     cout << "(Unormalised) VI Loss: " << vi_value << '\n';
     cout << "---------------------------------" << '\n';
     cout << "(Normalised) VI Loss: " << vi_norm_value << '\n';
+
+    cout << endl << "[DESTRUCTORS]" << endl;
 
     return 0;
 }

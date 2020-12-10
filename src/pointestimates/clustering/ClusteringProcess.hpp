@@ -16,6 +16,13 @@ enum LOSS_FUNCTION {
   VARIATION_INFORMATION_NORMALIZED,
 };
 
+/**
+ * Describe the full process of clustering :
+ *      - choice of loss function via LossFunction member
+ *      - Choice of minimization method via loss_type in the constructor
+ *      - computation of cluster estimate through cluster_estimate method.
+ */
+
 class ClusteringProcess
 {
   private:

@@ -4,14 +4,15 @@ using namespace std;
 
 VariationInformation::VariationInformation(bool normalise_)
 {
+    cout << "VariationInformation Constructor" << endl;
     normalise = normalise_;
 }
 
-double VariationInformation::Entropy(Eigen::VectorXi cluster)
+double VariationInformation::Entropy(Eigen::VectorXi &cluster)
 {
     double H = 0.0;
     int K = GetNumberOfGroups(cluster);
-    int nbr = (int)cluster.size();
+    int nbr = cluster.size();
 
     for (int i = 0; i < K; i++)
     {
@@ -36,7 +37,7 @@ double VariationInformation::JointEntropy()
         double tmp = 0;
         for (int h = 0; h < K2; h++)
         {
-            double p = (double)ClassCounterExtended(cluster1, cluster2, 1 + g, 1 + h) / N;
+            double p = (double)ClassCounterExtended(*cluster1, *cluster2, 1 + g, 1 + h) / N;
             // x*log(x) = 0, if x = 0
             if (fabs(p) >= 1.0e-9) // ie p != 0
             {
@@ -52,14 +53,14 @@ double VariationInformation::JointEntropy()
 double VariationInformation::MutualInformation()
 {
 
-    return Entropy(cluster1) + Entropy(cluster2) - JointEntropy();
+    return Entropy(*cluster1) + Entropy(*cluster2) - JointEntropy();
 }
 
 double VariationInformation::Loss()
 {
     if (!normalise)
     {
-        return 2 * JointEntropy() - Entropy(cluster1) - Entropy(cluster2);
+        return 2 * JointEntropy() - Entropy(*cluster1) - Entropy(*cluster2);
     }
     else
     {

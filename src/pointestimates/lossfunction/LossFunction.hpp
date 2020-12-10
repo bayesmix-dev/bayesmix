@@ -4,6 +4,9 @@
 #include "../../../lib/math/lib/eigen_3.3.7/Eigen/Dense"
 #include <set>
 #include <stdexcept>
+#include <ostream>
+
+using namespace std;
 
 // !This class implements a Loss Function for two partitions (clusters).
 // !This is the base class. The common information for Loss functions is implemented here.
@@ -24,11 +27,16 @@ public:
                     Eigen::VectorXi cluster2_);           // Populate the members
     void SetFirstCluster(Eigen::VectorXi cluster1_);
     void SetSecondCluster(Eigen::VectorXi cluster2_);
+    Eigen::VectorXi * GetCluster(int i) const; // return the i th cluster reference (i = 1 or 2)
 
     int GetNumberOfGroups(Eigen::VectorXi cluster);       // returns the nº of groups in a cluster (ie K)
     int ClassCounter(Eigen::VectorXi cluster, int index); // returns how many times the group "index" appears inside "cluster" (n(a,g) in the article)
     int ClassCounterExtended(Eigen::VectorXi cluster1,
                              Eigen::VectorXi cluster2, int g, int h); // mutual count of how many times the group "g" and "h" appear inside "cluster1" and "cluster2" simultaneously (n_{g,h} ^ (a,z) in the article)
-    virtual double Loss() = 0;                                         //* Loss Function to be implemented in the extended classes.
+    virtual double Loss() = 0;                                         // Loss Function to be implemented in the extended classes.
+    string Summarize();
 };
+
+ostream &operator<<(ostream &out, LossFunction const * loss_function);
+
 #endif

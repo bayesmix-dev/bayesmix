@@ -3,10 +3,14 @@
 
 LossFunction::LossFunction() : cluster1(0), cluster2(0) {
   std::cout << "Loss Function Constructor" << std::endl;
+  cluster1 = new Eigen::VectorXi();
+  cluster2 = new Eigen::VectorXi();
 }
 
 LossFunction::~LossFunction() {
   std::cout << "Loss Function virtual destructor" << std::endl;
+  delete cluster1;
+  delete cluster2;
 }
 
 
@@ -22,44 +26,33 @@ void LossFunction::SetCluster(Eigen::VectorXi cluster1_,
 
     N = (int) n_rows;
 
-    cluster1 = &cluster1_;
+    *cluster1 = cluster1_;
     K1 = GetNumberOfGroups(cluster1_);
-    cluster2 = &cluster2_;
+    *cluster2 = cluster2_;
     K2 = GetNumberOfGroups(cluster2_);
 }
 
 void LossFunction::SetFirstCluster(Eigen::VectorXi cluster1_)
 {
-    auto n_rows = cluster1_.rows();
-
-    /* Since we don't set clusters at the same time, there are many cases
-     * where c1 and c2 are from differents sizes.
-    if (n_rows != cluster2.rows())
-    {
-      throw std::domain_error("Clusters of different sizes!");
-    }
-    */
-
-    N = (int) n_rows;
-    cluster1 = &cluster1_;
+    N = cluster1_.rows();
+    *cluster1 = cluster1_;
     K1 = GetNumberOfGroups(cluster1_);
 }
 
 void LossFunction::SetSecondCluster(Eigen::VectorXi cluster2_) {
-  auto n_rows = cluster2_.rows();
-
-  /*
-  if (n_rows != cluster1.rows())
-  {
-    throw std::domain_error("Clusters of different sizes!");
-  }
-  */
-
-  N = (int) n_rows;
-
-  cluster2 = &cluster2_;
-  K2 = GetNumberOfGroups(cluster2_);
+    N = cluster2_.rows();
+    *cluster2 = cluster2_;
+    K2 = GetNumberOfGroups(cluster2_);
 }
+
+Eigen::VectorXi * LossFunction::GetCluster(int i) const {
+    switch(i) {
+      case 1 : return cluster1;
+      case 2: return cluster2;
+      default : throw std::domain_error("Wrong cluster index.");
+    }
+}
+
 
 int LossFunction::GetNumberOfGroups(Eigen::VectorXi cluster)
 {
@@ -100,4 +93,12 @@ int LossFunction::ClassCounterExtended(Eigen::VectorXi cluster1, Eigen::VectorXi
     }
 
     return count;
+}
+
+ostream &operator<<(ostream &out, LossFunction const * loss_function) {
+    out << "["    << typeid(*loss_function).name();
+    out << "; cluster1 = " << loss_function->GetCluster(1)->transpose();
+    out << "; cluster2 = " << loss_function->GetCluster(2)->transpose();
+    out << "]";
+    return out;
 }
