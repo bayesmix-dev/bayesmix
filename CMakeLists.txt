@@ -20,15 +20,21 @@ set(CMAKE_BUILD_TYPE Debug)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(BASEPATH "${CMAKE_SOURCE_DIR}")
+set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
 set(INCLUDE_PATHS
   ${BASEPATH}
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib/math
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/boost_1.72.0
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/eigen_3.3.7
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/tbb_2019_U8/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf/src
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.72.0
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2019_U8/include
 )
+
+message("************************* INCLUDE PATHS ${INCLUDE_PATHS}")
+
+message("CMAKE_CURRENT_LIST_DIR is ${CMAKE_CURRENT_LIST_DIR}")  
+message("CMAKE_SOURCE_DIR is ${CMAKE_SOURCE_DIR}")  
+
+
 set(LINK_LIBRARIES tbb pthread protobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
@@ -50,6 +56,6 @@ target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
 target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 
 # Build test executable
-add_subdirectory(test)
-add_subdirectory(scripts)
+# add_subdirectory(test)
+# add_subdirectory(scripts)
 
