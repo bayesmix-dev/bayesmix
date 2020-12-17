@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Install necessary tools
-sudo apt install autoconf automake libtool curl g++ unzip -y
+# sudo apt install autoconf automake libtool curl g++ unzip -y
 
 # Get libraries
 cd lib
