@@ -29,7 +29,6 @@ set(INCLUDE_PATHS
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2019_U8/include
 )
 
-message("************************* INCLUDE PATHS ${INCLUDE_PATHS}")
 
 message("CMAKE_CURRENT_LIST_DIR is ${CMAKE_CURRENT_LIST_DIR}")  
 message("CMAKE_SOURCE_DIR is ${CMAKE_SOURCE_DIR}")  
