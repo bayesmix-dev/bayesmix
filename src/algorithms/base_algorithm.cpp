@@ -8,7 +8,7 @@
 
 void BaseAlgorithm::add_datum_to_hierarchy(BaseHierarchy *hier,
                                            const int idx) {
-  hier->add_datum(idx, &data.row[idx], nullptr);
+  hier->add_datum(idx, &data.row[idx]);
 }
 
 void BaseAlgorithm::initialize() {

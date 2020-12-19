@@ -47,8 +47,8 @@ class BaseHierarchy {
   void add_datum(const int id, const Eigen::VectorXd &datum) {
     auto it = cluster_data_idx.find(id);
     assert(it == cluster_data_idx.end());
+    card += 1;
     log_card = std::log(card);
-    cluster_data_idx[id] = datum;
     update_summary_statistics(datum, true);
     cluster_data_idx.insert(id);
   }

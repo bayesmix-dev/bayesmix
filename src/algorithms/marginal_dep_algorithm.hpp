@@ -5,7 +5,7 @@
 
 #include "marginal_algorithm.hpp"
 
-class MarginalDepAlgorithhm : public MarginalAlgorithm {
+class MarginalDepAlgorithhm : virtual public MarginalAlgorithm {
  protected:
   Eigen::MatrixXd covariates = Eigen::MatrixXd(0,0);
 
