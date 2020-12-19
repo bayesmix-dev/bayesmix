@@ -44,7 +44,7 @@ class BaseHierarchy {
   }
 
  public:
-  void add_datum(const int id, const Eigen::VectorXd &datum) {
+  virtual void add_datum(const int id, const Eigen::VectorXd &datum) {
     auto it = cluster_data_idx.find(id);
     assert(it == cluster_data_idx.end());
     card += 1;
@@ -53,7 +53,7 @@ class BaseHierarchy {
     cluster_data_idx.insert(id);
   }
 
-  void remove_datum(const int id, const Eigen::VectorXd &datum) {
+  virtual void remove_datum(const int id, const Eigen::VectorXd &datum) {
     update_summary_statistics(datum, false);
     card -= 1;
     log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
