@@ -26,7 +26,7 @@
 //! cluster are instead updated via the posterior distribution, which again has
 //! a closed-form expression thanks to conjugacy.
 
-class Neal2Algorithm : virtual public MarginalAlgorithm {
+class Neal2Algorithm : public MarginalAlgorithm {
  protected:
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster

@@ -6,16 +6,14 @@
 
 #include "../hierarchies/base_hierarchy.hpp"
 #include "marginal_dependent_algorithm.hpp"
-#include "neal2_algorithm.hpp"
 
-class Neal2DepAlgorithm : public MarginalDependentAlgorithm, public
-  Neal2Algorithm {
+class Neal2DepAlgorithm : public MarginalDependentAlgorithm {
  protected:
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd lpdf_marginal_component(
       std::shared_ptr<BaseHierarchy> temp_hier,
-      const std::vector<int> &idxs) override;
+      const Eigen::MatrixXd &grid) override;
 
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;
