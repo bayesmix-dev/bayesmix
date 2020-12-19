@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_HPP_
-#define BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_HPP_
+#ifndef BAYESMIX_HIERARCHIES_LIN_DEP_NORMAL_HIERARCHY_HPP_
+#define BAYESMIX_HIERARCHIES_LIN_DEP_NORMAL_HIERARCHY_HPP_
 
 #include <google/protobuf/stubs/casts.h>
 
@@ -11,30 +11,12 @@
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "base_hierarchy.hpp"
 
-//! Normal Normal-InverseGamma hierarchy for univariate data.
-
-//! This class represents a hierarchy, i.e. a cluster, whose univariate data
-//! are distributed according to a normal likelihood, the parameters of which
-//! have a Normal-InverseGamma centering distribution. That is:
-//!           phi = (mu,sig)     (state);
-//! f(x_i|mu,sig) = N(mu,sig^2)  (data likelihood);
-//!    (mu,sig^2) ~ G            (unique values distribution);
-//!             G ~ MM           (mixture model);
-//!            G0 = N-IG         (centering distribution).
-//! state[0] = mu is called location, and state[1] = sig is called scale. The
-//! state hyperparameters, contained in the Hypers object, are (mu_0, lambda0,
-//! alpha0, beta0), all scalar values. Note that this hierarchy is conjugate,
-//! thus the marginal and the posterior distribution are available in closed
-//! form and Neal's algorithm 2 may be used with it.
-
-class NNIGHierarchy : public BaseHierarchy {
+class LinDepNormalHierarchy : public BaseHierarchy {
  public:
   struct State {
-    double mean, var;
+    Eigen::VectorXd parameters;
   };
-  struct Hyperparams {
-    double mean, var_scaling, shape, scale;
-  };
+  struct Hyperparams {};  // TODO
 
  protected:
   double data_sum = 0;
@@ -44,13 +26,14 @@ class NNIGHierarchy : public BaseHierarchy {
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
   // HYPERPRIOR
-  std::shared_ptr<bayesmix::NNIGPrior> prior;
+  std::shared_ptr<bayesmix::LDNormPrior> prior;  // TODO
 
   void clear_data() {
     data_sum = 0;
     data_sum_squares = 0;
     card = 0;
-    cluster_data_idx = std::set<int>();
+    data_map.clear();
+    covariate_map.clear();
   }
 
   void update_summary_statistics(const Eigen::VectorXd &datum, bool add) {
@@ -66,7 +49,7 @@ class NNIGHierarchy : public BaseHierarchy {
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams normal_invgamma_update();
+  Hyperparams some_update();  // TODO
 
  public:
   void initialize() override;
@@ -77,11 +60,11 @@ class NNIGHierarchy : public BaseHierarchy {
                          &states) override;
 
   // DESTRUCTOR AND CONSTRUCTORS
-  ~NNIGHierarchy() = default;
-  NNIGHierarchy() = default;
+  ~LinDepNormalHierarchy() = default;
+  LinDepNormalHierarchy() = default;
 
   std::shared_ptr<BaseHierarchy> clone() const override {
-    auto out = std::make_shared<NNIGHierarchy>(*this);
+    auto out = std::make_shared<LinDepNormalHierarchy>(*this);
     out->clear_data();
     return out;
   }
@@ -113,7 +96,7 @@ class NNIGHierarchy : public BaseHierarchy {
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  std::string get_id() const override { return "NNIG"; }
+  std::string get_id() const override { return "LDNorm"; }
 };
 
-#endif  // BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_HPP_
+#endif  // BAYESMIX_HIERARCHIES_LIN_DEP_NORMAL_HIERARCHY_HPP_

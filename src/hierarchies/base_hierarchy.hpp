@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <random>
-#include <set>
+#include <map>
 #include <stan/math/prim.hpp>
 
 #include "../../proto/cpp/marginal_state.pb.h"
@@ -31,7 +31,8 @@
 class BaseHierarchy {
  protected:
   // map: data_id -> datum
-  std::set<int> cluster_data_idx;
+  std::map<int, std::shared_ptr<Eigen::EigenXd>> data_map;
+  std::map<int, std::shared_ptr<Eigen::EigenXd>> covariate_map;
   int card = 0;
   double log_card = stan::math::NEGATIVE_INFTY;
 
@@ -44,29 +45,36 @@ class BaseHierarchy {
   }
 
  public:
-  void add_datum(const int &id, const Eigen::VectorXd &datum) {
-    auto it = cluster_data_idx.find(id);
-    assert(it == cluster_data_idx.end());
+  void add_datum(const int id, const Eigen::VectorXd *datum,
+    const Eigen::VectorXd *cov = nullptr) {
+    auto it = data_map.find(id);
+    assert(it == data_map.end());
     card += 1;
     log_card = std::log(card);
+    data_map[id] = datum;
+    covariate_map[id] = cov;
     update_summary_statistics(datum, true);
-    cluster_data_idx.insert(id);
-
+    data_map.insert(id);
   }
 
-  void remove_datum(const int &id, const Eigen::VectorXd &datum) {
-    update_summary_statistics(datum, false);
+  void remove_datum(const int id) {
+    update_summary_statistics(data_map[id], false);
     card -= 1;
     log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
-    auto it = cluster_data_idx.find(id);
-    assert(it != cluster_data_idx.end());
-    cluster_data_idx.erase(it);
+    // Datum
+    auto it = data_map.find(id);
+    assert(it != data_map.end());
+    data_map.erase(it);
+    // Covariate
+    auto it2 = covariates_map.find(id);
+    assert(it2 != covariates_map.end());
+    covariates_map.erase(it2);
   }
 
   int get_card() const { return card; }
   double get_log_card() const { return log_card; }
 
-  std::set<int> get_data_idx() {return cluster_data_idx;}
+  std::set<int> get_data_idx() {}  // TODO we can implement it if needed
 
   virtual void initialize() = 0;
   //! Returns true if the hierarchy models multivariate data
@@ -82,22 +90,23 @@ class BaseHierarchy {
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
+  virtual double like_lpdf(const int idx) const = 0;
   //! Evaluates the log-likelihood of data in the given points
   virtual Eigen::VectorXd like_lpdf_grid(
-      const Eigen::MatrixXd &data) const = 0;
+      const std::vector<int> &idxs) const = 0;
   //! Evaluates the log-marginal distribution of data in a single point
-  virtual double marg_lpdf(const Eigen::RowVectorXd &datum) const = 0;
+  virtual double marg_lpdf(const int idx) const = 0;
   //! Evaluates the log-marginal distribution of data in the given points
   virtual Eigen::VectorXd marg_lpdf_grid(
-      const Eigen::MatrixXd &data) const = 0;
+      const std::vector<int> &idxs) const = 0;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
   virtual void draw() = 0;
   //! Generates new values for state from the centering posterior distribution
   virtual void sample_given_data() = 0;
-  virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;
+  virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;  // TODO
+                                                                    // needed?
 
   // GETTERS AND SETTERS
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;

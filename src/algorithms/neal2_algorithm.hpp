@@ -6,6 +6,7 @@
 
 #include "../hierarchies/base_hierarchy.hpp"
 #include "marginal_algorithm.hpp"
+#include "neal2_dep_algorithm.hpp"
 
 //! Template class for Neal's algorithm 2 for conjugate hierarchies
 
@@ -28,11 +29,13 @@
 
 class Neal2Algorithm : public MarginalAlgorithm {
  protected:
+  friend class Neal2DepAlgorithm;
+
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd lpdf_marginal_component(
       std::shared_ptr<BaseHierarchy> temp_hier,
-      const Eigen::MatrixXd &grid) override;
+      const std::vector<int> &idxs) override;
 
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;

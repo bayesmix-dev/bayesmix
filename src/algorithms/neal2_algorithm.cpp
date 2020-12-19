@@ -14,9 +14,9 @@
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
-    std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid) {
+    std::shared_ptr<BaseHierarchy> temp_hier, const std::vector<int> &idxs) {
   // Exploit conjugacy of hierarchy
-  return temp_hier->marg_lpdf_grid(grid);
+  return temp_hier->marg_lpdf_grid(idxs);
 }
 
 void Neal2Algorithm::print_startup_message() const {
@@ -38,14 +38,12 @@ void Neal2Algorithm::sample_allocations() {
 
   // Loop over data points
   for (size_t i = 0; i < n_data; i++) {
-    // Current i-th datum as row vector
-    Eigen::Matrix<double, 1, Eigen::Dynamic> datum = data.row(i);
     // Initialize current number of clusters
     unsigned int n_clust = unique_values.size();
     // Initialize pseudo-flag
     int singleton = (unique_values[allocations[i]]->get_card() <= 1) ? 1 : 0;
     // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(i, datum);
+    unique_values[allocations[i]]->remove_datum(i);
 
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas(n_clust + 1);
@@ -54,12 +52,12 @@ void Neal2Algorithm::sample_allocations() {
       // Probability of being assigned to an already existing cluster
       logprobas(j) = mixing->mass_existing_cluster(unique_values[j],
                                                    n_data - 1, true, true) +
-                     unique_values[j]->like_lpdf(datum);
+                     unique_values[j]->like_lpdf(i);
     }
     // Further update with marginal component
     logprobas(n_clust) =
         mixing->mass_new_cluster(n_clust, n_data - 1, true, true) +
-        unique_values[0]->marg_lpdf(datum);
+        unique_values[0]->marg_lpdf(i);
 
     // Draw a NEW value for datum allocation
     unsigned int c_new =
@@ -68,14 +66,14 @@ void Neal2Algorithm::sample_allocations() {
 
     if (c_new == n_clust) {
       std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
-      new_unique->add_datum(i, datum);
+      add_datum_to_hierarchy(new_unique, i);
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      unique_values[allocations[i]]->add_datum(i, datum);
+      add_datum_to_hierarchy(unique_values[allocations[i]], i);
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers

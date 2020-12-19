@@ -28,7 +28,7 @@
 //! posterior distribution are available in closed form and Neal's algorithm 2
 //! may be used with it.
 
-class NNWHierarchy : public BaseHierarchy {
+class NNWHierarchy : public BaseHierarchy {  // TODO same changes as NNIG
  public:
   struct State {
     Eigen::VectorXd mean;
