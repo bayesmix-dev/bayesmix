@@ -1,7 +1,7 @@
 #include "probit_sb_algorithm.hpp"
 
 void ProbitSBAlgorithm::lpdf_marginal_component(
-    std::shared_ptr<BaseHierarchy> temp_hier, const std::vector<int> &idxs) {
+    std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid) {
   return;  // TODO
 }
 

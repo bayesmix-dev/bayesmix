@@ -44,7 +44,7 @@ class Neal2Algorithm : public MarginalAlgorithm {
   ~Neal2Algorithm() = default;
   Neal2Algorithm() = default;
 
-  virtual Eigen::MatrixXd eval_lpdf(
+  Eigen::MatrixXd eval_lpdf(
       const Eigen::MatrixXd &grid,
       BaseCollector<bayesmix::MarginalState> *const coll) override;
 

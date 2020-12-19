@@ -41,17 +41,35 @@ class DependentHierarchy : public BaseHierarchy {
   virtual ~DependentHierarchy() = default;
   DependentHierarchy() = default;
 
-  // EVALUATION FUNCTIONS  // TODO
+  // DEPRECATED EVALUATION FUNCTIONS // TODO give warning message?
+  double like_lpdf(const Eigen::RowVectorXd &datum) const override {
+    return 0;
+  };
+  Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data) const override {
+    return Eigen::VectorXd::Zero(1);
+  };
+  double marg_lpdf(const Eigen::RowVectorXd &datum) const override {
+    return 0;
+  };
+  Eigen::VectorXd marg_lpdf_grid(const Eigen::MatrixXd &data) const override {
+    return Eigen::VectorXd::Zero(1);
+  };
+
+  // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate) const = 0;
   //! Evaluates the log-likelihood of data in the given points
   virtual Eigen::VectorXd like_lpdf_grid(
-      const Eigen::MatrixXd &data) const = 0;
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates) const = 0;
   //! Evaluates the log-marginal distribution of data in a single point
-  virtual double marg_lpdf(const Eigen::RowVectorXd &datum) const = 0;
+  virtual double marg_lpdf(const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate) const = 0;
   //! Evaluates the log-marginal distribution of data in the given points
   virtual Eigen::VectorXd marg_lpdf_grid(
-      const Eigen::MatrixXd &data) const = 0;
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates) const = 0;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_DEPENDENT_HIERARCHY_HPP_
