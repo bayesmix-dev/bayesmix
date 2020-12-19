@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <random>
-#include <map>
+#include <set>
 #include <stan/math/prim.hpp>
 
 #include "../../proto/cpp/marginal_state.pb.h"
@@ -31,8 +31,7 @@
 class BaseHierarchy {
  protected:
   // map: data_id -> datum
-  std::map<int, std::shared_ptr<Eigen::EigenXd>> data_map;
-  std::map<int, std::shared_ptr<Eigen::EigenXd>> covariate_map;
+  std::set<int> cluster_data_idx;
   int card = 0;
   double log_card = stan::math::NEGATIVE_INFTY;
 
@@ -45,36 +44,28 @@ class BaseHierarchy {
   }
 
  public:
-  void add_datum(const int id, const Eigen::VectorXd *datum,
-    const Eigen::VectorXd *cov = nullptr) {
-    auto it = data_map.find(id);
-    assert(it == data_map.end());
-    card += 1;
+  void add_datum(const int id, const Eigen::VectorXd &datum) {
+    auto it = cluster_data_idx.find(id);
+    assert(it == cluster_data_idx.end());
     log_card = std::log(card);
-    data_map[id] = datum;
-    covariate_map[id] = cov;
+    cluster_data_idx[id] = datum;
     update_summary_statistics(datum, true);
-    data_map.insert(id);
+    cluster_data_idx.insert(id);
   }
 
-  void remove_datum(const int id) {
-    update_summary_statistics(data_map[id], false);
+  void remove_datum(const int id, const Eigen::VectorXd &datum) {
+    update_summary_statistics(datum, false);
     card -= 1;
     log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
-    // Datum
-    auto it = data_map.find(id);
-    assert(it != data_map.end());
-    data_map.erase(it);
-    // Covariate
-    auto it2 = covariates_map.find(id);
-    assert(it2 != covariates_map.end());
-    covariates_map.erase(it2);
+    auto it = cluster_data_idx.find(id);
+    assert(it != cluster_data_idx.end());
+    cluster_data_idx.erase(it);
   }
 
   int get_card() const { return card; }
   double get_log_card() const { return log_card; }
 
-  std::set<int> get_data_idx() {}  // TODO we can implement it if needed
+  std::set<int> get_data_idx() { return cluster_data_idx; }
 
   virtual void initialize() = 0;
   //! Returns true if the hierarchy models multivariate data

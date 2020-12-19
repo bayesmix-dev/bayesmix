@@ -115,7 +115,7 @@ void NNIGHierarchy::update_hypers(
 //! \param data Column vector containing a single data point
 //! \return     Log-Likehood vector evaluated in data
 double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
-  return stan::math::normal_lpdf(datum, state.mean, sqrt(state.var));
+  return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
 //! \param data Column vector of data points

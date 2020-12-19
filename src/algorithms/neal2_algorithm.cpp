@@ -14,9 +14,9 @@
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
-    std::shared_ptr<BaseHierarchy> temp_hier, const std::vector<int> &idxs) {
+    std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid) {
   // Exploit conjugacy of hierarchy
-  return temp_hier->marg_lpdf_grid(idxs);
+  return temp_hier->marg_lpdf_grid(grid);
 }
 
 void Neal2Algorithm::print_startup_message() const {
@@ -43,7 +43,7 @@ void Neal2Algorithm::sample_allocations() {
     // Initialize pseudo-flag
     int singleton = (unique_values[allocations[i]]->get_card() <= 1) ? 1 : 0;
     // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(i);
+    unique_values[allocations[i]]->remove_datum(i, data.row(i));
 
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas(n_clust + 1);
@@ -52,12 +52,12 @@ void Neal2Algorithm::sample_allocations() {
       // Probability of being assigned to an already existing cluster
       logprobas(j) = mixing->mass_existing_cluster(unique_values[j],
                                                    n_data - 1, true, true) +
-                     unique_values[j]->like_lpdf(i);
+                     unique_values[j]->like_lpdf(data.row(i));
     }
     // Further update with marginal component
     logprobas(n_clust) =
         mixing->mass_new_cluster(n_clust, n_data - 1, true, true) +
-        unique_values[0]->marg_lpdf(i);
+        unique_values[0]->marg_lpdf(data.row(i));
 
     // Draw a NEW value for datum allocation
     unsigned int c_new =
