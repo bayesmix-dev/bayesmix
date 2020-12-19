@@ -71,7 +71,8 @@ class NNWHierarchy : public BaseHierarchy {
     cluster_data_idx = std::set<int>();
   }
 
-  void update_summary_statistics(const Eigen::VectorXd &datum, bool add) {
+  void update_summary_statistics(
+    const Eigen::VectorXd &datum, bool add) override {
     if (add) {
       data_sum += datum;
       data_sum_squares += datum * datum.transpose();

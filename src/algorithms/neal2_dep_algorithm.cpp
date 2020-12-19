@@ -67,15 +67,18 @@ void Neal2DepAlgorithm::sample_allocations() {  // TODO with covariates
     unsigned int c_old = allocations[i];
 
     if (c_new == n_clust) {
-      std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
-      new_unique->add_datum(i, data.row[i]);
+      auto *new_unique = dynamic_cast<BaseDependentHierarchy *>(
+        unique_values[0]->clone());
+      new_unique->add_datum(i, data.row(i), covariates.row(i));
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      unique_values[allocations[i]]->add_datum(i, data.row[i]);
+      auto *unique_cast = dynamic_cast<BaseDependentHierarchy *>(
+        unique_values[c_new]);
+      unique_cast->add_datum(i, data.row[i], covariates.row(i));
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers
