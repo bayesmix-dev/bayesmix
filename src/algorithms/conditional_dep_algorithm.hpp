@@ -9,8 +9,6 @@ class ConditionalDepAlgorithhm : public ConditionalAlgorithm {
  protected:
   Eigen::MatrixXd covariates = Eigen::MatrixXd(0,0);
 
-  void add_datum_to_hierarchy(BaseHierarchy *hier, const int idx) override;
-
   // ALGORITHM FUNCTIONS
   void initialize() override;
 

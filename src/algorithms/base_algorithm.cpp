@@ -6,11 +6,6 @@
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../../proto/cpp/mixing_state.pb.h"
 
-void BaseAlgorithm::add_datum_to_hierarchy(BaseHierarchy *hier,
-                                           const int idx) {
-  hier->add_datum(idx, &data.row[idx]);
-}
-
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing..." << std::endl;
 

@@ -116,14 +116,14 @@ void Neal2Algorithm::sample_allocations() {
 
     if (c_new == n_clust) {
       std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
-      add_datum_to_hierarchy(new_unique, i);
+      new_unique->add_datum(i, data.row(i));
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      add_datum_to_hierarchy(unique_values[allocations[i]], i);
+      unique_values[allocations[i]]->add_datum(i, data.row(i));
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers

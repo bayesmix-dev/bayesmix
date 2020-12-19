@@ -64,7 +64,6 @@ class BaseAlgorithm {
   std::shared_ptr<BaseMixing> mixing;
 
   // AUXILIARY TOOLS
-  virtual void add_datum_to_hierarchy(BaseHierarchy *hier, const int idx);
   //! Returns the values of an algo iteration as a Protobuf object
   bayesmix::MarginalState get_state_as_proto(unsigned int iter);
 
