@@ -15,9 +15,8 @@
 
 class DependentHierarchy : public BaseHierarchy {
  public:
-  void add_datum(
-      const int id, const Eigen::VectorXd &datum,
-      const Eigen::VectorXd &covariate) {  // TODO with covariates
+  void add_datum(const int id, const Eigen::VectorXd &datum,
+                 const Eigen::VectorXd &covariate) {  // TODO with covariates
     auto it = cluster_data_idx.find(id);
     assert(it == cluster_data_idx.end());
     card += 1;

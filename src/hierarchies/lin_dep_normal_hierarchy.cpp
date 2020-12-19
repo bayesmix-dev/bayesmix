@@ -1,7 +1,7 @@
 #include "lin_dep_normal_hierarchy.hpp"
 
 void LinDepNormalHierarchy::initialize() {
-  int dim = 1;  // TODO set dimension somehow
+  int dim = 1;                                    // TODO set dimension somehow
   state.parameters = Eigen::VectorXd::Zero(dim);  // or other starting values
 
   // ... TODO

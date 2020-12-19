@@ -3,9 +3,9 @@
 
 #include <Eigen/Dense>
 
+#include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/base_collector.hpp"
 #include "base_algorithm.hpp"
-#include "../../proto/cpp/marginal_state.pb.h"
 
 class ConditionalAlgorithm : public BaseAlgorithm {
  public:
