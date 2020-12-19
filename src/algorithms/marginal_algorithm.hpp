@@ -8,6 +8,12 @@
 #include "base_algorithm.hpp"
 
 class MarginalAlgorithm : public BaseAlgorithm {
+ protected:
+  //! Computes marginal contribution of a given iteration & cluster
+  virtual Eigen::VectorXd lpdf_marginal_component(
+      std::shared_ptr<BaseHierarchy> temp_hier,
+      const std::vector<int> &idxs) = 0;
+
  public:
   ~MarginalAlgorithm() = default;
   MarginalAlgorithm() = default;

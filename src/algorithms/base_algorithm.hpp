@@ -67,10 +67,6 @@ class BaseAlgorithm {
   virtual void add_datum_to_hierarchy(BaseHierarchy *hier, const int idx);
   //! Returns the values of an algo iteration as a Protobuf object
   bayesmix::MarginalState get_state_as_proto(unsigned int iter);
-  //! Computes marginal contribution of a given iteration & cluster
-  virtual Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<BaseHierarchy> temp_hier,
-      const std::vector<int> &idxs) = 0;
 
   // ALGORITHM FUNCTIONS
   virtual void print_startup_message() const = 0;
