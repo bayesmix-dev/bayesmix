@@ -15,7 +15,7 @@
 //! \param grid Grid of points in matrix form to evaluate the density on
 //! \param coll Collector containing the algorithm chain
 //! \return     Matrix whose i-th column is the lpdf at i-th iteration
-Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
+Eigen::MatrixXd Neal2Algorithm::eval_lpdf(
     const Eigen::MatrixXd &grid,
     BaseCollector<bayesmix::MarginalState> *coll) {
   // Read chain from collector

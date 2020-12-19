@@ -1,10 +1,5 @@
 #include "probit_sb_algorithm.hpp"
 
-void ProbitSBAlgorithm::lpdf_marginal_component(
-    std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid) {
-  return;  // TODO
-}
-
 void ProbitSBAlgorithm::print_startup_message() const {
   std::string msg = "Running ProbitStickBreak algorithm with " +
                     unique_values[0]->get_id() + " hierarchies, " +

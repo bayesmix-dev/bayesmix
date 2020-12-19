@@ -8,6 +8,7 @@
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/base_collector.hpp"
 #include "../hierarchies/base_hierarchy.hpp"
+#include "../hierarchies/dependent_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
 #include "../utils/distributions.hpp"
 #include "../utils/rng.hpp"
@@ -21,7 +22,7 @@ void Neal2DepAlgorithm::print_startup_message() const {
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
-Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
+Eigen::VectorXd Neal2DepAlgorithm::lpdf_marginal_component(
     std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid) {
   // TODO with covariates
   // Exploit conjugacy of hierarchy
@@ -67,8 +68,8 @@ void Neal2DepAlgorithm::sample_allocations() {  // TODO with covariates
     unsigned int c_old = allocations[i];
 
     if (c_new == n_clust) {
-      auto *new_unique =
-          dynamic_cast<BaseDependentHierarchy *>(unique_values[0]->clone());
+      auto new_unique = std::dynamic_pointer_cast<DependentHierarchy>(
+        unique_values[0]->clone());
       new_unique->add_datum(i, data.row(i), covariates.row(i));
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
@@ -76,9 +77,9 @@ void Neal2DepAlgorithm::sample_allocations() {  // TODO with covariates
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      auto *unique_cast =
-          dynamic_cast<BaseDependentHierarchy *>(unique_values[c_new]);
-      unique_cast->add_datum(i, data.row[i], covariates.row(i));
+      auto unique_cast = std::dynamic_pointer_cast<DependentHierarchy>(
+        unique_values[c_new]);
+      unique_cast->add_datum(i, data.row(i), covariates.row(i));
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers

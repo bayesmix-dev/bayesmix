@@ -5,9 +5,9 @@
 #include <memory>
 
 #include "../hierarchies/base_hierarchy.hpp"
-#include "conditional_dependent_algorithm.hpp"
+#include "conditional_dep_algorithm.hpp"
 
-class ProbitSBAlgorithm : public ConditionalDependentAlgorithm {
+class ProbitSBAlgorithm : public ConditionalDepAlgorithm {
  protected:
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;

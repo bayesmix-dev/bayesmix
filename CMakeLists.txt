@@ -47,4 +47,4 @@ target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 
 # Build test executable
 add_subdirectory(test)
-add_subdirectory(scripts)
+# add_subdirectory(scripts)  # TODO what?

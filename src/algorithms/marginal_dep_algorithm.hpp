@@ -5,7 +5,7 @@
 
 #include "marginal_algorithm.hpp"
 
-class MarginalDepAlgorithhm : public MarginalAlgorithm {
+class MarginalDepAlgorithm : public MarginalAlgorithm {
  protected:
   Eigen::MatrixXd covariates = Eigen::MatrixXd(0, 0);
 
@@ -14,8 +14,8 @@ class MarginalDepAlgorithhm : public MarginalAlgorithm {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~MarginalDepAlgorithhm() = default;
-  MarginalDepAlgorithhm() = default;
+  ~MarginalDepAlgorithm() = default;
+  MarginalDepAlgorithm() = default;
 
   void set_covariates(const Eigen::MatrixXd &cov_) { covariates = cov_; }
 };

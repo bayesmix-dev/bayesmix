@@ -5,9 +5,9 @@
 #include <memory>
 
 #include "../hierarchies/base_hierarchy.hpp"
-#include "marginal_dependent_algorithm.hpp"
+#include "marginal_dep_algorithm.hpp"
 
-class Neal2DepAlgorithm : public MarginalDependentAlgorithm {
+class Neal2DepAlgorithm : public MarginalDepAlgorithm {
  protected:
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster

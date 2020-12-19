@@ -1,6 +1,9 @@
 target_sources(bayesmix
   PUBLIC
     base_hierarchy.hpp
+    dependent_hierarchy.hpp
+    lin_dep_normal_hierarchy.hpp
+    lin_dep_normal_hierarchy.cpp
     nnig_hierarchy.hpp
     nnig_hierarchy.cpp
     nnw_hierarchy.hpp
