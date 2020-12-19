@@ -44,6 +44,10 @@ class Neal2Algorithm : virtual public MarginalAlgorithm {
   ~Neal2Algorithm() = default;
   Neal2Algorithm() = default;
 
+  virtual Eigen::MatrixXd eval_lpdf(
+      const Eigen::MatrixXd &grid,
+      BaseCollector<bayesmix::MarginalState> *const coll) override;
+
   std::string get_id() const override { return "Neal2"; }
 };
 

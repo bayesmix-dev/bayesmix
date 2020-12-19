@@ -5,7 +5,6 @@ target_sources(bayesmix
     # conditional_algorithm.hpp
     # conditional_algorithm.cpp
     marginal_algorithm.hpp
-    marginal_algorithm.cpp
     neal2_algorithm.hpp
     neal2_algorithm.cpp
     neal8_algorithm.hpp
