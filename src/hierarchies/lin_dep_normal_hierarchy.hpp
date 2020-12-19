@@ -10,8 +10,9 @@
 #include "../../proto/cpp/hierarchy_prior.pb.h"
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "base_hierarchy.hpp"
+#include "dependent_hierarchy.hpp"
 
-class LinDepNormalHierarchy : public BaseHierarchy {
+class LinDepNormalHierarchy : public DependentHierarchy {
  public:
   struct State {
     Eigen::VectorXd parameters;
@@ -19,21 +20,20 @@ class LinDepNormalHierarchy : public BaseHierarchy {
   struct Hyperparams {};  // TODO
 
  protected:
-  double data_sum = 0;
-  double data_sum_squares = 0;
+  double data_sum = 0.0;
+  double data_sum_squares = 0.0;
   // STATE
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
   // HYPERPRIOR
-  std::shared_ptr<bayesmix::LDNormPrior> prior;  // TODO
+  std::shared_ptr<bayesmix::NNIGPrior> prior;  // TODO LDNormPrior?
 
   void clear_data() {
-    data_sum = 0;
-    data_sum_squares = 0;
+    data_sum = 0.0;
+    data_sum_squares = 0.0;
     card = 0;
-    data_map.clear();
-    covariate_map.clear();
+    cluster_data_idx.clear();
   }
 
   void update_summary_statistics(const Eigen::VectorXd &datum,

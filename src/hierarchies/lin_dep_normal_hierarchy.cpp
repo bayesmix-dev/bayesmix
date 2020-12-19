@@ -1,9 +1,8 @@
-#import "lin_dep_normal_hierarchy.hpp"
+#include "lin_dep_normal_hierarchy.hpp"
 
-LinDepNormalHierarchy::initialize() {
-  int dim = covariate_map.begin()->second->cols();  // or it can be done...
-                                                    // in the state
-  parameters = Eigen::VectorXd::Zero(dim);  // or any other starting value
+void LinDepNormalHierarchy::initialize() {
+  int dim = 1;  // TODO set dimension somehow
+  state.parameters = Eigen::VectorXd::Zero(dim);  // or other starting values
 
   // ... TODO
 }
@@ -16,8 +15,8 @@ double LinDepNormalHierarchy::like_lpdf(
 
 Eigen::VectorXd LinDepNormalHierarchy::like_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
-  Eigen::VectorXd result(idxs.size());
-  for (size_t i = 0; i < idxs.size(); i++) {
+  Eigen::VectorXd result(data.rows());
+  for (size_t i = 0; i < data.rows(); i++) {
     result(i) = 0;  // TODO
   }
   return result;
@@ -31,8 +30,8 @@ double LinDepNormalHierarchy::marg_lpdf(
 
 Eigen::VectorXd LinDepNormalHierarchy::marg_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
-  Eigen::VectorXd result(idxs.size());
-  for (size_t i = 0; i < idxs.size(); i++) {
+  Eigen::VectorXd result(data.rows());
+  for (size_t i = 0; i < data.rows(); i++) {
     result(i) = 0;  // TODO
   }
   return result;
