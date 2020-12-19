@@ -8,12 +8,13 @@ LinDepNormalHierarchy::initialize() {
   // ... TODO
 }
 
-double LinDepNormalHierarchy::like_lpdf(const int idx) const {
+double LinDepNormalHierarchy::like_lpdf(
+  const Eigen::RowVectorXd &datum) const {
   return 0;  // TODO
 }
 
 Eigen::VectorXd LinDepNormalHierarchy::like_lpdf_grid(
-  const std::vector<int> &idxs) const {
+  const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result(idxs.size());
   for (size_t i = 0; i < idxs.size(); i++) {
     result(i) = 0;  // TODO
@@ -21,12 +22,13 @@ Eigen::VectorXd LinDepNormalHierarchy::like_lpdf_grid(
   return result;
 }
 
-double LinDepNormalHierarchy::marg_lpdf(const int idx) const {
+double LinDepNormalHierarchy::marg_lpdf(
+  const Eigen::RowVectorXd &datum) const {
   return 0;  // TODO
 }
 
 Eigen::VectorXd LinDepNormalHierarchy::marg_lpdf_grid(
-  const std::vector<int> &idxs) const {
+  const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result(idxs.size());
   for (size_t i = 0; i < idxs.size(); i++) {
     result(i) = 0;  // TODO

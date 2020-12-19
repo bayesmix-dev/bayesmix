@@ -90,15 +90,15 @@ class BaseHierarchy {
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
-  virtual double like_lpdf(const int idx) const = 0;
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
   //! Evaluates the log-likelihood of data in the given points
   virtual Eigen::VectorXd like_lpdf_grid(
-      const std::vector<int> &idxs) const = 0;
+      const Eigen::MatrixXd &data) const = 0;
   //! Evaluates the log-marginal distribution of data in a single point
-  virtual double marg_lpdf(const int idx) const = 0;
+  virtual double marg_lpdf(const Eigen::RowVectorXd &datum) const = 0;
   //! Evaluates the log-marginal distribution of data in the given points
   virtual Eigen::VectorXd marg_lpdf_grid(
-      const std::vector<int> &idxs) const = 0;
+      const Eigen::MatrixXd &data) const = 0;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
