@@ -118,6 +118,5 @@ void Neal8Algorithm::sample_allocations() {
       }
       unique_values.erase(unique_values.begin() + c_old);
     }
-
   }
 }

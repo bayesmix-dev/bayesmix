@@ -6,11 +6,11 @@
 #include <vector>
 
 #include "../../proto/cpp/marginal_state.pb.h"
+#include "../collectors/base_collector.hpp"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
 #include "../utils/distributions.hpp"
 #include "../utils/rng.hpp"
-#include "../collectors/base_collector.hpp"
 
 void Neal2DepAlgorithm::print_startup_message() const {
   std::string msg = "Running Neal2 dependent algorithm with " +
@@ -32,10 +32,10 @@ void Neal2DepAlgorithm::sample_allocations() {  // TODO with covariates
   // Initialize relevant values
   unsigned int n_data = data.rows();
   int ndata_from_hier = 0;
-// #ifdef DEBUG
+  // #ifdef DEBUG
   for (auto &clus : unique_values) ndata_from_hier += clus->get_card();
   assert(n_data == ndata_from_hier);
-// #endif
+  // #endif
   auto &rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
@@ -67,8 +67,8 @@ void Neal2DepAlgorithm::sample_allocations() {  // TODO with covariates
     unsigned int c_old = allocations[i];
 
     if (c_new == n_clust) {
-      auto *new_unique = dynamic_cast<BaseDependentHierarchy *>(
-        unique_values[0]->clone());
+      auto *new_unique =
+          dynamic_cast<BaseDependentHierarchy *>(unique_values[0]->clone());
       new_unique->add_datum(i, data.row(i), covariates.row(i));
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
@@ -76,8 +76,8 @@ void Neal2DepAlgorithm::sample_allocations() {  // TODO with covariates
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      auto *unique_cast = dynamic_cast<BaseDependentHierarchy *>(
-        unique_values[c_new]);
+      auto *unique_cast =
+          dynamic_cast<BaseDependentHierarchy *>(unique_values[c_new]);
       unique_cast->add_datum(i, data.row[i], covariates.row(i));
     }
     if (singleton) {

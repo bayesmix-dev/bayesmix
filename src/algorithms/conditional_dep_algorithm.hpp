@@ -7,7 +7,7 @@
 
 class ConditionalDepAlgorithhm : public ConditionalAlgorithm {
  protected:
-  Eigen::MatrixXd covariates = Eigen::MatrixXd(0,0);
+  Eigen::MatrixXd covariates = Eigen::MatrixXd(0, 0);
 
   // ALGORITHM FUNCTIONS
   void initialize() override;

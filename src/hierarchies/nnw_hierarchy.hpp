@@ -50,7 +50,7 @@ class NNWHierarchy : public BaseHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-    // HYPERPRIOR
+  // HYPERPRIOR
   std::shared_ptr<bayesmix::NNWPrior> prior;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
@@ -71,8 +71,8 @@ class NNWHierarchy : public BaseHierarchy {
     cluster_data_idx = std::set<int>();
   }
 
-  void update_summary_statistics(
-    const Eigen::VectorXd &datum, bool add) override {
+  void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 bool add) override {
     if (add) {
       data_sum += datum;
       data_sum_squares += datum * datum.transpose();

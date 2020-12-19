@@ -36,13 +36,12 @@ class LinDepNormalHierarchy : public BaseHierarchy {
     covariate_map.clear();
   }
 
-  void update_summary_statistics(
-    const Eigen::VectorXd &datum, bool add) override {
+  void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 bool add) override {
     if (add) {
       data_sum += datum(0);
       data_sum_squares += datum(0) * datum(0);
-    }
-    else {
+    } else {
       data_sum -= datum(0);
       data_sum_squares -= datum(0) * datum(0);
     }

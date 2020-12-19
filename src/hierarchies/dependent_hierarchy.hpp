@@ -15,8 +15,9 @@
 
 class DependentHierarchy : public BaseHierarchy {
  public:
-  void add_datum(const int id, const Eigen::VectorXd &datum,
-    const Eigen::VectorXd &covariate) override {  // TODO with covariates
+  void add_datum(
+      const int id, const Eigen::VectorXd &datum,
+      const Eigen::VectorXd &covariate) override {  // TODO with covariates
     auto it = cluster_data_idx.find(id);
     assert(it == cluster_data_idx.end());
     card += 1;
@@ -25,8 +26,9 @@ class DependentHierarchy : public BaseHierarchy {
     cluster_data_idx.insert(id);
   }
 
-  void remove_datum(const int id, const Eigen::VectorXd &datum,
-    const Eigen::VectorXd &covariate) override {  // TODO with covariates
+  void remove_datum(
+      const int id, const Eigen::VectorXd &datum,
+      const Eigen::VectorXd &covariate) override {  // TODO with covariates
     update_summary_statistics(datum, false);
     card -= 1;
     log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);

@@ -6,11 +6,11 @@
 #include <vector>
 
 #include "../../proto/cpp/marginal_state.pb.h"
+#include "../collectors/base_collector.hpp"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
 #include "../utils/distributions.hpp"
 #include "../utils/rng.hpp"
-#include "../collectors/base_collector.hpp"
 
 //! \param grid Grid of points in matrix form to evaluate the density on
 //! \param coll Collector containing the algorithm chain
@@ -56,7 +56,6 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
     for (size_t j = 0; j < grid.rows(); j++) {
       lpdf(j, i) = stan::math::log_sum_exp(lpdf_local.row(j));
     }
-
   }
   return lpdf;
 }
@@ -80,10 +79,10 @@ void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
   int ndata_from_hier = 0;
-// #ifdef DEBUG
+  // #ifdef DEBUG
   for (auto &clus : unique_values) ndata_from_hier += clus->get_card();
   assert(n_data == ndata_from_hier);
-// #endif
+  // #endif
   auto &rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points

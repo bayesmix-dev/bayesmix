@@ -54,7 +54,8 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update() {
   post_params.mean = (hypers->var_scaling * hypers->mean + card * mubar) /
                      (hypers->var_scaling + card);
   // Compute tau_n
-  Eigen::MatrixXd tau_temp = data_sum_squares - card * mubar * mubar.transpose();
+  Eigen::MatrixXd tau_temp =
+      data_sum_squares - card * mubar * mubar.transpose();
   tau_temp += (card * hypers->var_scaling / (card + hypers->var_scaling)) *
               (mubar - hypers->mean) * (mubar - hypers->mean).transpose();
   tau_temp = 0.5 * tau_temp + hypers->scale_inv;
@@ -167,7 +168,8 @@ Eigen::VectorXd NNWHierarchy::like_lpdf_grid(
 double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * hypers->deg_free - dim + 1;
-  Eigen::MatrixXd sigma_n = hypers->scale_inv * (hypers->deg_free - 0.5 * (dim - 1)) *
+  Eigen::MatrixXd sigma_n = hypers->scale_inv *
+                            (hypers->deg_free - 0.5 * (dim - 1)) *
                             hypers->var_scaling / (hypers->var_scaling + 1);
 
   // TODO: chec if this is optimized as our bayesmix::multi_normal_prec_lpdf
@@ -184,7 +186,8 @@ Eigen::VectorXd NNWHierarchy::marg_lpdf_grid(
 
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * hypers->deg_free - dim + 1;
-  Eigen::MatrixXd sigma_n = hypers->scale_inv * (hypers->deg_free - 0.5 * (dim - 1)) *
+  Eigen::MatrixXd sigma_n = hypers->scale_inv *
+                            (hypers->deg_free - 0.5 * (dim - 1)) *
                             hypers->var_scaling / (hypers->var_scaling + 1);
 
   for (size_t i = 0; i < n; i++) {
@@ -228,9 +231,9 @@ void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   data_sum = Eigen::VectorXd::Zero(data.cols());
   data_sum_squares = Eigen::VectorXd::Zero(data.cols(), data.cols());
 
-  for (int i=0; i < data.rows(); i++) {
+  for (int i = 0; i < data.rows(); i++) {
     data_sum += data.row(i);
-    data_sum_squares += data.row(i).transpose() * data.row(i); 
+    data_sum_squares += data.row(i).transpose() * data.row(i);
   }
   card = data.rows();
   log_card = std::log(card);
