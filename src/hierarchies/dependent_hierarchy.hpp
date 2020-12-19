@@ -13,22 +13,6 @@
 #include "../utils/rng.hpp"
 #include "base_hierarchy.hpp"
 
-//! Abstract base template class for a hierarchy object.
-
-//! This template class represents a hierarchy object in a generic iterative
-//! BNP algorithm, that is, a single set of unique values with their own prior
-//! distribution attached to it. These values are part of the Markov chain's
-//! state chain (which includes multiple hierarchies) and are simply referred
-//! to as the state of the hierarchy. This object also corresponds to a single
-//! cluster in the algorithm, in the sense that its state is the set of
-//! parameters for the distribution of the data points that belong to it. Since
-//! the prior distribution for the state is often the same across multiple
-//! different hierarchies, the hyperparameters object is accessed via a shared
-//! pointer. Lastly, any hierarchy that inherits from this class contains
-//! multiple ways of updating the state, either via prior or posterior
-//! distributions, and of evaluating the distribution of the data, either its
-//! likelihood (whose parameters are the state) or its marginal distribution.
-
 class DependentHierarchy : public BaseHierarchy {
  public:
   void add_datum(const int id, const Eigen::VectorXd &datum,
