@@ -1,11 +1,11 @@
-#include "dependent_algorithm.hpp"
+#include "marginal_dep_algorithm.hpp"
 
-void DependentAlgorithhm::add_datum_to_hierarchy(BaseHierarchy *hier,
+void MarginalDepAlgorithhm::add_datum_to_hierarchy(BaseHierarchy *hier,
                                                  const int idx) {
   hier->add_datum(idx, &data.row[idx], &covariates.row[idx]);
 }
 
-void DependentAlgorithhm::initialize() {
+void MarginalDepAlgorithhm::initialize() {
   BaseAlgorithm::initialize();
 
   // Covariates checks

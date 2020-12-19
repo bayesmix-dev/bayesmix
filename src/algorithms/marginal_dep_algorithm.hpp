@@ -1,11 +1,11 @@
-#ifndef BAYESMIX_ALGORITHMS_DEPENDENT_ALGORITHM_HPP_
-#define BAYESMIX_ALGORITHMS_DEPENDENT_ALGORITHM_HPP_
+#ifndef BAYESMIX_ALGORITHMS_MARGINAL_DEP_ALGORITHM_HPP_
+#define BAYESMIX_ALGORITHMS_MARGINAL_DEP_ALGORITHM_HPP_
 
 #include <Eigen/Dense>
 
 #include "marginal_algorithm.hpp"
 
-class DependentAlgorithhm : public MarginalAlgorithm {
+class MarginalDepAlgorithhm : public MarginalAlgorithm {
  protected:
   Eigen::MatrixXd covariates = Eigen::MatrixXd(0,0);
 
@@ -16,10 +16,10 @@ class DependentAlgorithhm : public MarginalAlgorithm {
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  ~DependentAlgorithhm() = default;
-  DependentAlgorithhm() = default;
+  ~MarginalDepAlgorithhm() = default;
+  MarginalDepAlgorithhm() = default;
 
   void set_covariates(const Eigen::MatrixXd &cov_) { covariates = cov_; }
 };
 
-#endif  // BAYESMIX_ALGORITHMS_DEPENDENT_ALGORITHM_HPP_
+#endif  // BAYESMIX_ALGORITHMS_MARGINAL_DEP_ALGORITHM_HPP_

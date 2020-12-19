@@ -5,16 +5,10 @@
 #include <memory>
 
 #include "../hierarchies/base_hierarchy.hpp"
-#include "dependent_algorithm.hpp"
+#include "conditional_dependent_algorithm.hpp"
 
-class ProbitSBAlgorithm : public DependentAlgorithm {
+class ProbitSBAlgorithm : public ConditionalDependentAlgorithm {
  protected:
-  // AUXILIARY TOOLS
-  //! Computes marginal contribution of a given iteration & cluster
-  Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<BaseHierarchy> temp_hier,
-      const std::vector<int> &idxs) override;
-
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;
   void sample_allocations() override;
