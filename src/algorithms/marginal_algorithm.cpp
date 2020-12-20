@@ -1,6 +1,7 @@
 #include "marginal_algorithm.hpp"
 
 #include <Eigen/Dense>
+#include <stan/math/prim/fun.hpp>
 
 #include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/base_collector.hpp"
