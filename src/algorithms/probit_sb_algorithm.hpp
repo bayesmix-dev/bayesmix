@@ -2,9 +2,9 @@
 #define BAYESMIX_ALGORITHMS_PROBIT_SB_ALGORITHM_HPP_
 
 #include <Eigen/Dense>
-#include <memory>
 
-#include "../hierarchies/base_hierarchy.hpp"
+#include "../../proto/cpp/marginal_state.pb.h"
+#include "../collectors/base_collector.hpp"
 #include "conditional_dep_algorithm.hpp"
 
 class ProbitSBAlgorithm : public ConditionalDepAlgorithm {
@@ -13,11 +13,16 @@ class ProbitSBAlgorithm : public ConditionalDepAlgorithm {
   void print_startup_message() const override;
   void sample_allocations() override;
   void sample_unique_values() override;
+  void sample_weights() override;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   ~ProbitSBAlgorithm() = default;
   ProbitSBAlgorithm() = default;
+
+  Eigen::MatrixXd eval_lpdf(
+      const Eigen::MatrixXd &grid,
+      BaseCollector<bayesmix::MarginalState> *const coll) override;
 
   std::string get_id() const override { return "ProbitSB"; }
 };
