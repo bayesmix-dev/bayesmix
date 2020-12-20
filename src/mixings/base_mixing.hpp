@@ -1,6 +1,7 @@
 #ifndef BAYESMIX_MIXINGS_BASE_MIXING_HPP_
 #define BAYESMIX_MIXINGS_BASE_MIXING_HPP_
 
+#include <google/protobuf/message.h>
 #include <memory>
 
 #include "../hierarchies/base_hierarchy.hpp"
