@@ -23,13 +23,13 @@ void Neal2DepAlgorithm::print_startup_message() const {
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2DepAlgorithm::lpdf_marginal_component(
-    std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid) {
-  // TODO with covariates
+    std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid,
+    const Eigen::MatrixXd &covariates) { // TODO anything else?
   // Exploit conjugacy of hierarchy
-  return temp_hier->marg_lpdf_grid(grid);
+  return temp_hier->marg_lpdf_grid(grid, covariates);
 }
 
-void Neal2DepAlgorithm::sample_allocations() {  // TODO with covariates
+void Neal2DepAlgorithm::sample_allocations() {  // TODO anything else?
   // Initialize relevant values
   unsigned int n_data = data.rows();
   int ndata_from_hier = 0;

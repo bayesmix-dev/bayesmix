@@ -14,6 +14,9 @@
 #include "base_hierarchy.hpp"
 
 class DependentHierarchy : public BaseHierarchy {
+ protected:
+  unsigned int dim;
+
  public:
   void add_datum(const int id, const Eigen::VectorXd &datum,
                  const Eigen::VectorXd &covariate) {  // TODO with covariates
@@ -69,6 +72,10 @@ class DependentHierarchy : public BaseHierarchy {
   virtual Eigen::VectorXd marg_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates) const = 0;
+
+  // GETTERS AND SETTERS
+  unsigned int get_dim() { return dim; }
+  void set_dim(const unsigned int dim_) { dim = dim_; }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_DEPENDENT_HIERARCHY_HPP_

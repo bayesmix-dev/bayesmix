@@ -15,7 +15,7 @@
 class LinDepNormalHierarchy : public DependentHierarchy {
  public:
   struct State {
-    Eigen::VectorXd parameters;
+    Eigen::VectorXd coefficients;
   };
   struct Hyperparams {};  // TODO
 
