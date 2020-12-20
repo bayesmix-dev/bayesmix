@@ -84,7 +84,7 @@ class BaseAlgorithm {
   }
 
   //! Single step of algorithm
-  void step() {
+  virtual void step() {
     sample_allocations();
     sample_unique_values();
     update_hierarchy_hypers();

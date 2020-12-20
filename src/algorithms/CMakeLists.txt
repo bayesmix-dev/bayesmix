@@ -3,6 +3,7 @@ target_sources(bayesmix
     base_algorithm.hpp
     base_algorithm.cpp
     conditional_algorithm.hpp
+    conditional_algorithm.cpp
     conditional_dep_algorithm.hpp
     conditional_dep_algorithm.cpp
     marginal_algorithm.hpp

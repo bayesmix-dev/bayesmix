@@ -7,7 +7,7 @@
 
 class MarginalDepAlgorithm : public MarginalAlgorithm {
  protected:
-  Eigen::MatrixXd covariates = Eigen::MatrixXd(0, 0);
+  Eigen::MatrixXd covariates;
 
   // ALGORITHM FUNCTIONS
   void initialize() override;
