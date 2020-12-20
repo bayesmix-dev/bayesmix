@@ -1,5 +1,7 @@
 #include "conditional_dep_algorithm.hpp"
 
+#include <cassert>
+
 void ConditionalDepAlgorithm::initialize() {
   ConditionalAlgorithm::initialize();
 

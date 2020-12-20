@@ -1,5 +1,7 @@
 #include "conditional_algorithm.hpp"
 
+#include <Eigen/Dense>
+
 #include "base_algorithm.hpp"
 
 void ConditionalAlgorithm::initialize() {

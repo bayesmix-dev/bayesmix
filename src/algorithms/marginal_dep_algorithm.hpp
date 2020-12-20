@@ -3,6 +3,8 @@
 
 #include <Eigen/Dense>
 
+#include "../../proto/cpp/marginal_state.pb.h"
+#include "../collectors/base_collector.hpp"
 #include "marginal_algorithm.hpp"
 
 class MarginalDepAlgorithm : public MarginalAlgorithm {

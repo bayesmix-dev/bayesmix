@@ -1,5 +1,11 @@
 #include "marginal_dep_algorithm.hpp"
 
+#include <Eigen/Dense>
+#include <cassert>
+
+#include "../../proto/cpp/marginal_state.pb.h"
+#include "../collectors/base_collector.hpp"
+
 void MarginalDepAlgorithm::initialize() {
   BaseAlgorithm::initialize();
 
