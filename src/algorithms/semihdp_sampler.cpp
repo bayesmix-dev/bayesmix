@@ -1,6 +1,6 @@
 #include "semihdp_sampler.hpp"
 
-#include <proto/cpp/marginal_state.pb.h>
+#include "marginal_state.pb.h"
 
 #include <algorithm>
 #include <src/utils/eigen_utils.hpp>

@@ -2,7 +2,7 @@
 #define SRC_ALGORITHMS_SEMI_HDP_SAMPLER_HPP
 
 #include <omp.h>
-#include <proto/cpp/semihdp.pb.h>
+#include <semihdp.pb.h>
 
 #include <Eigen/Dense>
 #include <numeric>

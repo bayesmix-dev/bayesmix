@@ -6,10 +6,10 @@
 #include <stan/math/prim/err.hpp>
 #include <stan/math/prim/prob.hpp>
 
-#include "../../proto/cpp/hierarchy_prior.pb.h"
-#include "../../proto/cpp/ls_state.pb.h"
-#include "../../proto/cpp/marginal_state.pb.h"
-#include "../../proto/cpp/matrix.pb.h"
+#include "hierarchy_prior.pb.h"
+#include "ls_state.pb.h"
+#include "marginal_state.pb.h"
+#include "matrix.pb.h"
 #include "../utils/distributions.hpp"
 #include "../utils/proto_utils.hpp"
 #include "../utils/rng.hpp"

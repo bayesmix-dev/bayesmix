@@ -12,8 +12,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vect
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
-
-
+find_package(Protobuf REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE Debug)
@@ -23,24 +22,24 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
 set(INCLUDE_PATHS
   ${BASEPATH}
+  ${BASEPATH}/proto
   ${CMAKE_CURRENT_LIST_DIR}/lib/math
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.72.0
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2019_U8/include
+  ${CMAKE_CURRENT_BINARY_DIR}
 )
-
-
-message("CMAKE_CURRENT_LIST_DIR is ${CMAKE_CURRENT_LIST_DIR}")  
-message("CMAKE_SOURCE_DIR is ${CMAKE_SOURCE_DIR}")  
-
 
 set(LINK_LIBRARIES tbb pthread protobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
+file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
+PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${ProtoFiles})
+
 # Build library object
 add_library(bayesmix OBJECT)
+target_sources(bayesmix PUBLIC ${PROTO_SRCS} ${PROTO_HDRS})
 add_subdirectory(src)    # source files
-add_subdirectory(proto)  # source files
 target_include_directories(bayesmix PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(bayesmix PUBLIC ${LINK_LIBRARIES})
 target_compile_options(bayesmix PUBLIC ${COMPILE_OPTIONS})
@@ -54,7 +53,8 @@ target_include_directories(run PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
 target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 
+
 # Build test executable
-# add_subdirectory(test)
-# add_subdirectory(scripts)
+add_subdirectory(test)
+add_subdirectory(scripts)
 

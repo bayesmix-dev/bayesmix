@@ -3,8 +3,8 @@
 #include <Eigen/Dense>
 #include <cassert>
 
-#include "../../proto/cpp/marginal_state.pb.h"
-#include "../../proto/cpp/mixing_state.pb.h"
+#include "marginal_state.pb.h"
+#include "mixing_state.pb.h"
 
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing..." << std::endl;

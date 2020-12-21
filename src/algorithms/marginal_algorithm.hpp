@@ -3,7 +3,7 @@
 
 #include <Eigen/Dense>
 
-#include "../../proto/cpp/marginal_state.pb.h"
+#include "marginal_state.pb.h"
 #include "../collectors/base_collector.hpp"
 #include "base_algorithm.hpp"
 

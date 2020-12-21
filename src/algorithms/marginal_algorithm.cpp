@@ -3,7 +3,7 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/fun.hpp>
 
-#include "../../proto/cpp/marginal_state.pb.h"
+#include "marginal_state.pb.h"
 #include "../collectors/base_collector.hpp"
 
 //! \param grid Grid of points in matrix form to evaluate the density on
