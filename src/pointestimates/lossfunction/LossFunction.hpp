@@ -1,7 +1,7 @@
 #ifndef LOSSFUNCTIONHEADERDEF
 #define LOSSFUNCTIONHEADERDEF
 
-#include "../../../lib/math/lib/eigen_3.3.7/Eigen/Dense"
+#include "../../../lib/math/lib/eigen_3.3.9/Eigen/Dense"
 #include <set>
 #include <stdexcept>
 #include <ostream>

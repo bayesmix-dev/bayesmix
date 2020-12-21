@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <iostream>
-#include "../../../lib/math/lib/eigen_3.3.7/Eigen/Dense"
+#include "../../../lib/math/lib/eigen_3.3.9/Eigen/Dense"
 
 #include "LossFunction.hpp"
 

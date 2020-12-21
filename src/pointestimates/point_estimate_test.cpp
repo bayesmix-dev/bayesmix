@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../lib/math/lib/eigen_3.3.7/Eigen/Dense"
+#include "../../lib/math/lib/eigen_3.3.9/Eigen/Dense"
 #include "clustering/ClusteringProcess.hpp"
 
 int main() {
@@ -12,7 +12,8 @@ int main() {
   a << 1, 1, 2, 3, 3;
 
   ClusteringProcess cp(mcmc, BINDER_LOSS);
-  double epl = cp.expected_posterior_loss(a);
+  //double epl = cp.expected_posterior_loss(a);
+  //std::cout << "Expected posterior loss : " << epl << std::endl;
 
-  std::cout << "Expected posterior loss : " << epl << std::endl;
+  cp.cluster_estimate(GREEDY);
 }
