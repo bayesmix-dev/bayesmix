@@ -30,11 +30,18 @@ set(INCLUDE_PATHS
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+set(BAYESMIX_INCLUDE_PATHS ${INCLUDE_PATHS} PARENT_SCOPE)
+
+message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+
 set(LINK_LIBRARIES tbb pthread protobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
 file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${ProtoFiles})
+SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
+message("PROTO_HDRS: ${PROTO_HDRS}")
+
 
 # Build library object
 add_library(bayesmix OBJECT)
@@ -55,6 +62,4 @@ target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 
 
 # Build test executable
-add_subdirectory(test)
-add_subdirectory(scripts)
-
+# add_subdirectory(test)
