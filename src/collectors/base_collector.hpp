@@ -3,6 +3,7 @@
 
 #include <fcntl.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/message.h>
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/util/delimited_message_util.h>
 #include <stdio.h>
@@ -26,7 +27,6 @@
 //! collector. This means that the collector will contain the states of the
 //! whole Markov chain by the end of the running of the algorithm.
 
-template <typename MsgType>
 class BaseCollector {
  protected:
   //! Current size of the chain
@@ -35,8 +35,7 @@ class BaseCollector {
   unsigned int curr_iter = -1;
 
   //! Reads the next state, based on the curr_iter curson
-  //! \return The requested state in protobuf-object form
-  virtual MsgType next_state() = 0;
+  virtual bool next_state(google::protobuf::Message *out) = 0;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -49,23 +48,19 @@ class BaseCollector {
   virtual void finish() = 0;
 
   //! Reads the next state and advances the cursor by 1
-  //! \return The requested state in protobuf-object form
-  MsgType get_next_state() {
-    curr_iter++;
-    if (curr_iter >= size) {
-      throw std::out_of_range("Error: curr_iter > size in collector");
-    }
-    return next_state();
+  bool get_next_state(google::protobuf::Message *out) {
+    return next_state(out);
   }
 
   //! Writes the given state to the collector
-  virtual void collect(MsgType iter_state) = 0;
+  virtual void collect(const google::protobuf::Message& state) = 0;
 
   // GETTERS AND SETTERS
   //! Returns i-th state in the collector
-  virtual MsgType get_state(unsigned int i) = 0;
-  //! Returns the whole chain in form of a deque of States
-  virtual std::deque<MsgType> get_chain() = 0;
+  virtual void get_state(unsigned int i, google::protobuf::Message *out) = 0;
+  
+  // //! Returns the whole chain in form of a deque of States
+  // virtual std::deque<MsgType> get_chain() = 0;
 
   unsigned int get_size() const { return size; }
 };
