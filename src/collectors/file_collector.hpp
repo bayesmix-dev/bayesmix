@@ -13,8 +13,7 @@
 //! main programs are used both to run the algorithm and the estimates.
 //! Therefore, a file collector has both a reading and a writing mode.
 
-template <typename MsgType>
-class FileCollector : public BaseCollector<MsgType> {
+class FileCollector : public BaseCollector {
  protected:
   //! Unix file descriptor for reading mode
   int infd;
@@ -36,11 +35,7 @@ class FileCollector : public BaseCollector<MsgType> {
   //! Terminates reading mode for the collector
   void close_reading();
   //! Reads the next state, based on the curr_iter curson
-  MsgType next_state() override;
-
-  using BaseCollector<MsgType>::size;
-  using BaseCollector<MsgType>::curr_iter;
-  using BaseCollector<MsgType>::get_next_state;
+  bool next_state(google::protobuf::Message *out) override;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -61,15 +56,16 @@ class FileCollector : public BaseCollector<MsgType> {
   void finish() override;
 
   //! Writes the given state to the collector
-  void collect(MsgType iter_state) override;
+  void collect(const google::protobuf::Message &state) override;
+
   //! Returns i-th state in the collector
-  MsgType get_state(unsigned int i) override;
+  void get_state(unsigned int i, google::protobuf::Message *out) override;
+
   //! Returns the whole chain in form of a deque of States
-  std::deque<MsgType> get_chain() override;
+  // std::deque<MsgType> get_chain() override;
 };
 
-template <typename MsgType>
-void FileCollector<MsgType>::open_for_reading() {
+void FileCollector::open_for_reading() {
   infd = open(filename.c_str(), O_RDONLY);
   if (infd == -1) {
     std::cout << "Errno: " << strerror(errno) << std::endl;
@@ -78,42 +74,34 @@ void FileCollector<MsgType>::open_for_reading() {
   is_open_read = true;
 }
 
-template <typename MsgType>
-void FileCollector<MsgType>::close_reading() {
+void FileCollector::close_reading() {
   fin->Close();
   close(infd);
   is_open_read = false;
 }
 
 // \return Chain state in Protobuf-object form
-template <typename MsgType>
-MsgType FileCollector<MsgType>::next_state() {
+bool FileCollector::next_state(google::protobuf::Message *out) {
   if (!is_open_read) {
     open_for_reading();
   }
 
-  MsgType out;
   bool keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(
-      &out, fin, nullptr);
+      out, fin, nullptr);
   if (!keep) {
-    throw std::out_of_range("Error: surpassed EOF in FileCollector");
-  }
-  if (curr_iter == size - 1) {
     curr_iter = -1;
     close_reading();
   }
-  return out;
+  return keep;
 }
 
-template <typename MsgType>
-void FileCollector<MsgType>::start() {
+void FileCollector::start() {
   int outfd = open(filename.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
   fout = new google::protobuf::io::FileOutputStream(outfd);
   is_open_write = true;
 }
 
-template <typename MsgType>
-void FileCollector<MsgType>::finish() {
+void FileCollector::finish() {
   if (is_open_write) {
     fout->Close();
     close(outfd);
@@ -122,10 +110,9 @@ void FileCollector<MsgType>::finish() {
 }
 
 // \param iter_state State in Protobuf-object form to write to the collector
-template <typename MsgType>
-void FileCollector<MsgType>::collect(MsgType iter_state) {
-  bool success = google::protobuf::util::SerializeDelimitedToZeroCopyStream(
-      iter_state, fout);
+void FileCollector::collect(const google::protobuf::Message &state) {
+  bool success =
+      google::protobuf::util::SerializeDelimitedToZeroCopyStream(state, fout);
   size++;
   if (!success) {
     std::cout << "Writing in FileCollector failed" << std::endl;
@@ -133,36 +120,33 @@ void FileCollector<MsgType>::collect(MsgType iter_state) {
 }
 
 // \param i Position of the requested state in the chain
-// \return  Chain state in Protobuf-object form
-template <typename MsgType>
-MsgType FileCollector<MsgType>::get_state(unsigned int i) {
-  MsgType state;
+void FileCollector::get_state(unsigned int i, google::protobuf::Message *out) {
   for (size_t j = 0; j < i + 1; j++) {
-    state = get_next_state();
+    get_next_state(out);
   }
   if (i < size - 1) {
     curr_iter = -1;
     close_reading();
   }
-  return state;
 }
 
-// \return Chain in deque form
-template <typename MsgType>
-std::deque<MsgType> FileCollector<MsgType>::get_chain() {
-  open_for_reading();
-  bool keep = true;
-  std::deque<MsgType> out;
-  while (keep) {
-    MsgType msg;
-    keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(&msg, fin,
-                                                                    nullptr);
-    if (keep) {
-      out.push_back(msg);
-    }
-  }
-  close_reading();
-  return out;
-}
+// // \return Chain in deque form
+// template <typename MsgType>
+// std::deque<MsgType> FileCollector::get_chain() {
+//   open_for_reading();
+//   bool keep = true;
+//   std::deque<MsgType> out;
+//   while (keep) {
+//     MsgType msg;
+//     keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(&msg,
+//     fin,
+//                                                                     nullptr);
+//     if (keep) {
+//       out.push_back(msg);
+//     }
+//   }
+//   close_reading();
+//   return out;
+// }
 
 #endif  // BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_

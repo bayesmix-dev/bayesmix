@@ -13,24 +13,19 @@
 //! is not needed, for instance in a main program that both runes and algorithm
 //! and computes the estimates.
 
-template <typename MsgType>
-class MemoryCollector : public BaseCollector<MsgType> {
+class MemoryCollector : public BaseCollector {
  protected:
   //! Deque that contains all states in Protobuf-object form
-  std::deque<MsgType> chain;
+  std::deque<std::string> chain;
 
   //! Reads the next state, based on the curr_iter curson
-  MsgType next_state() override {
+  bool next_state(google::protobuf::Message* out) override {
+    curr_iter++;
     if (curr_iter == size - 1) {
-      curr_iter = -1;
-      return chain[size - 1];
-    } else {
-      return chain[curr_iter];
+      return false;
     }
+    out->ParseFromString(chain[curr_iter]);
   }
-
-  using BaseCollector<MsgType>::size;
-  using BaseCollector<MsgType>::curr_iter;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -43,23 +38,34 @@ class MemoryCollector : public BaseCollector<MsgType> {
   void finish() override { return; }
 
   //! Writes the given state to the collector
-  void collect(MsgType iter_state) override {
-    chain.push_back(iter_state);
+  void collect(const google::protobuf::Message& state) override {
+    std::string s;
+    state.SerializeToString(&s);
+    chain.push_back(s);
     size++;
   }
 
   // GETTERS AND SETTERS
   //! Returns i-th state in the collector
-  MsgType get_state(unsigned int i) override { return chain[i]; }
-  //! Returns the whole chain in form of a deque of States
-  std::deque<MsgType> get_chain() override { return chain; }
+  void get_state(unsigned int i, google::protobuf::Message* out) override {
+    out->ParseFromString(chain[i]);
+  }
 
+  // //! Returns the whole chain in form of a deque of States
+  // std::deque<MsgType> get_chain() override { return chain; }
+
+  template <typename MsgType>
   void write_to_file(std::string outfile) {
+    // THIS is probabily a HACK: we de-serialize from the chain
+    // and re-serialize to file. Still it's a reasonable work-around.
+
     int outfd = open(outfile.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
     google::protobuf::io::FileOutputStream* fout =
         new google::protobuf::io::FileOutputStream(outfd);
 
-    for (MsgType& state: chain) {
+    for (std::string& serialized_state : chain) {
+      MsgType state;
+      state.ParseFromString(serialized_state);
       bool success =
           google::protobuf::util::SerializeDelimitedToZeroCopyStream(state,
                                                                      fout);
