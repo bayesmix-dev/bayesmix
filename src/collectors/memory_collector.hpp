@@ -19,13 +19,7 @@ class MemoryCollector : public BaseCollector {
   std::deque<std::string> chain;
 
   //! Reads the next state, based on the curr_iter curson
-  bool next_state(google::protobuf::Message* out) override {
-    curr_iter++;
-    if (curr_iter == size - 1) {
-      return false;
-    }
-    out->ParseFromString(chain[curr_iter]);
-  }
+  bool next_state(google::protobuf::Message* out);
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -38,18 +32,11 @@ class MemoryCollector : public BaseCollector {
   void finish() override { return; }
 
   //! Writes the given state to the collector
-  void collect(const google::protobuf::Message& state) override {
-    std::string s;
-    state.SerializeToString(&s);
-    chain.push_back(s);
-    size++;
-  }
+  void collect(const google::protobuf::Message& state) override;
 
   // GETTERS AND SETTERS
   //! Returns i-th state in the collector
-  void get_state(unsigned int i, google::protobuf::Message* out) override {
-    out->ParseFromString(chain[i]);
-  }
+  void get_state(unsigned int i, google::protobuf::Message* out) override;
 
   // //! Returns the whole chain in form of a deque of States
   // std::deque<MsgType> get_chain() override { return chain; }
