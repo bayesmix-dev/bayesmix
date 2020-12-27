@@ -1,3 +1,7 @@
+#include "file_collector.hpp"
+
+
+
 void FileCollector::open_for_reading() {
   infd = open(filename.c_str(), O_RDWR);
   if (infd == -1) {

@@ -16,6 +16,6 @@ void MemoryCollector::collect(const google::protobuf::Message& state) {
 }
 
 void MemoryCollector::get_state(unsigned int i,
-                                google::protobuf::Message* out) override {
+                                google::protobuf::Message* out) {
   out->ParseFromString(chain[i]);
 }
