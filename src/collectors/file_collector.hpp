@@ -1,6 +1,9 @@
 #ifndef BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_
 #define BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_
 
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/message.h>
+
 #include "base_collector.hpp"
 
 //! Class for a collector that writes its content to a file.
@@ -57,12 +60,6 @@ class FileCollector : public BaseCollector {
 
   //! Writes the given state to the collector
   void collect(const google::protobuf::Message &state) override;
-
-  //! Returns i-th state in the collector
-  void get_state(unsigned int i, google::protobuf::Message *out) override;
-
-  //! Returns the whole chain in form of a deque of States
-  // std::deque<MsgType> get_chain() override;
 };
 
 #endif  // BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_

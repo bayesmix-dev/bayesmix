@@ -2,10 +2,7 @@
 #define BAYESMIX_COLLECTORS_BASE_COLLECTOR_HPP_
 
 #include <fcntl.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/message.h>
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/util/delimited_message_util.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -55,12 +52,6 @@ class BaseCollector {
   //! Writes the given state to the collector
   virtual void collect(const google::protobuf::Message& state) = 0;
 
-  // GETTERS AND SETTERS
-  //! Returns i-th state in the collector
-  virtual void get_state(unsigned int i, google::protobuf::Message *out) = 0;
-  
-  // //! Returns the whole chain in form of a deque of States
-  // virtual std::deque<MsgType> get_chain() = 0;
 
   unsigned int get_size() const { return size; }
 };

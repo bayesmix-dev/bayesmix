@@ -1,6 +1,8 @@
 #include "file_collector.hpp"
 
-
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/util/delimited_message_util.h>
 
 void FileCollector::open_for_reading() {
   infd = open(filename.c_str(), O_RDWR);
@@ -59,33 +61,3 @@ void FileCollector::collect(const google::protobuf::Message &state) {
     std::cout << "Writing in FileCollector failed" << std::endl;
   }
 }
-
-// \param i Position of the requested state in the chain
-void FileCollector::get_state(unsigned int i, google::protobuf::Message *out) {
-  for (size_t j = 0; j < i + 1; j++) {
-    get_next_state(out);
-  }
-  if (i < size - 1) {
-    curr_iter = -1;
-    close_reading();
-  }
-}
-
-// // \return Chain in deque form
-// template <typename MsgType>
-// std::deque<MsgType> FileCollector::get_chain() {
-//   open_for_reading();
-//   bool keep = true;
-//   std::deque<MsgType> out;
-//   while (keep) {
-//     MsgType msg;
-//     keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(&msg,
-//     fin,
-//                                                                     nullptr);
-//     if (keep) {
-//       out.push_back(msg);
-//     }
-//   }
-//   close_reading();
-//   return out;
-// }

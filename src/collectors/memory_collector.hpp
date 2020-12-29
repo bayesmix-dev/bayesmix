@@ -1,8 +1,10 @@
 #ifndef BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
 #define BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
 
-#include "base_collector.hpp"
+#include <google/protobuf/message.h>
+#include <google/protobuf/util/delimited_message_util.h>
 
+#include "base_collector.hpp"
 //! Class for a "virtual" collector which contains all objects of the chain
 
 //! This is a type of collector which includes a deque containing all states of
@@ -36,7 +38,7 @@ class MemoryCollector : public BaseCollector {
 
   // GETTERS AND SETTERS
   //! Returns i-th state in the collector
-  void get_state(unsigned int i, google::protobuf::Message* out) override;
+  void get_state(unsigned int i, google::protobuf::Message* out);
 
   // //! Returns the whole chain in form of a deque of States
   // std::deque<MsgType> get_chain() override { return chain; }
