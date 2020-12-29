@@ -5,7 +5,7 @@
 
 # Get libraries
 cd lib
-git clone https://github.com/stan-dev/math.git --depth 1
+git clone https://github.com/bayesmix-dev/math.git --depth 1
 
 # Compile protobuf library
 
