@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   auto algo = factory_algo.create_object(algo_type);
   auto hier = factory_hier.create_object(hier_type);
   auto mixing = factory_mixing.create_object(mix_type);
-  auto *coll = new MemoryCollector<bayesmix::MarginalState>();
+  auto *coll = new MemoryCollector();
 
   // Set mixing hyperprior
   std::string mix_prior_str = "bayesmix." + mix_type + "Prior";
@@ -86,16 +86,14 @@ int main(int argc, char *argv[]) {
   std::cout << "Successfully wrote density to " << densfile << std::endl;
 
   // Collect mixing and cluster states
-  auto chain = coll->get_chain();
-  Eigen::VectorXd masses(chain.size());
+  Eigen::VectorXd masses(coll->get_size());
   // Eigen::MatrixXd clusterings(chain.size(), data.rows());
-  Eigen::VectorXd num_clust(chain.size());
-  for (int i = 0; i < chain.size(); i++) {
-    // for (int j = 0; j < data.rows(); j++) {
-    //   clusterings(i, j) = chain[i].cluster_allocs(j);
-    // }
-    num_clust(i) = chain[i].cluster_states_size();
-    bayesmix::MixingState mixstate = chain[i].mixing_state();
+  Eigen::VectorXd num_clust(coll->get_size());
+  for (int i = 0; i < coll->get_size(); i++) {
+    bayesmix::MarginalState state;
+    coll->get_next_state(&state);
+    num_clust(i) = state.cluster_states_size();
+    bayesmix::MixingState mixstate = state.mixing_state();
     if (mixstate.has_dp_state()) {
       masses(i) = mixstate.dp_state().totalmass();
     }

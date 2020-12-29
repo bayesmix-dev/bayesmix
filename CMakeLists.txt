@@ -25,7 +25,7 @@ set(INCLUDE_PATHS
   ${BASEPATH}
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/math
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/boost_1.72.0
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/eigen_3.3.7
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/eigen_3.3.9
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/math/lib/tbb_2019_U8/include
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/protobuf/src
 )
