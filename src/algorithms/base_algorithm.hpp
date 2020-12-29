@@ -5,10 +5,10 @@
 #include <memory>
 #include <vector>
 
-#include <marginal_state.pb.h>
 #include "../collectors/base_collector.hpp"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
+#include "marginal_state.pb.h"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
