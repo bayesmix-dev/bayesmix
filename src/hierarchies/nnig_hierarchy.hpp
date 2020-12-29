@@ -7,8 +7,8 @@
 #include <cassert>
 #include <memory>
 
-#include "../../proto/cpp/hierarchy_prior.pb.h"
-#include "../../proto/cpp/marginal_state.pb.h"
+#include "hierarchy_prior.pb.h"
+#include "marginal_state.pb.h"
 #include "base_hierarchy.hpp"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.

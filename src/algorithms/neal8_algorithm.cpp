@@ -4,7 +4,7 @@
 #include <memory>
 #include <stan/math/prim/fun.hpp>
 
-#include "../../proto/cpp/marginal_state.pb.h"
+#include "marginal_state.pb.h"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
 #include "../utils/distributions.hpp"

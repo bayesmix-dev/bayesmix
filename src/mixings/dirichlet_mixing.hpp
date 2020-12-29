@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "../../proto/cpp/mixing_prior.pb.h"
+#include "mixing_prior.pb.h"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "base_mixing.hpp"
 

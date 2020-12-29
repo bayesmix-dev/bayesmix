@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "../proto/cpp/semihdp.pb.h"
+#include "semihdp.pb.h"
 #include "../src/algorithms/semihdp_sampler.hpp"
 #include "../src/includes.hpp"
 #include "../src/utils/eigen_utils.hpp"

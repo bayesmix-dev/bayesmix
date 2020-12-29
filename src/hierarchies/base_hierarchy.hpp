@@ -9,7 +9,7 @@
 #include <set>
 #include <stan/math/prim.hpp>
 
-#include "../../proto/cpp/marginal_state.pb.h"
+#include "marginal_state.pb.h"
 #include "../utils/rng.hpp"
 
 //! Abstract base template class for a hierarchy object.
