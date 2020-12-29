@@ -463,7 +463,8 @@ void SemiHdpSampler::sample_pseudo_prior() {
       Eigen::VectorXd::Ones(pseudo_iter).array() / (1.0 * pseudo_iter);
   int iter = bayesmix::categorical_rng(probas, rng);
   for (int r = 0; r < ngroups; r++) {
-    bayesmix::MarginalState state = pseudoprior_collectors[r].get_state(iter);
+    bayesmix::MarginalState state;
+    pseudoprior_collectors[r].get_state(iter, &state);
     // compute the cardinalities
     int nclus = state.cluster_states_size();
     Eigen::VectorXd cards = Eigen::VectorXd::Zero(nclus);

@@ -29,4 +29,23 @@ void append_by_row(Eigen::MatrixXd *a, const Eigen::MatrixXd &b);
 Eigen::MatrixXd append_by_row(const Eigen::MatrixXd &a,
                               const Eigen::MatrixXd &b);
 
+
+/*
+ * Creates an Eigen::Matrix from a collection of rows
+ * @tparam Container an std-compatible container implementing the square brackets
+ *     access operator
+ * @param rows the rows of the matrix
+ */
+
+template <template <typename...> class Container>
+Eigen::MatrixXd stack_vectors(const Container<Eigen::VectorXd> &rows) {
+  int nrows = rows.size();
+  int ncols = rows[0].size();
+
+  Eigen::MatrixXd out(nrows, ncols);
+  for (int i = 0; i < nrows; i++) out.row(i) = rows[i].transpose();
+
+  return out;
+}
+
 }  // namespace bayesmix

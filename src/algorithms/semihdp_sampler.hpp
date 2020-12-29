@@ -68,7 +68,7 @@ class SemiHdpSampler {
   double semihdp_weight = 0.5;
   double totalmass_rest, totalmass_hdp;
 
-  std::vector<MemoryCollector<bayesmix::MarginalState>> pseudoprior_collectors;
+  std::vector<MemoryCollector> pseudoprior_collectors;
   int pseudo_iter;
 
   bool adapt = false;
@@ -97,10 +97,10 @@ class SemiHdpSampler {
   }
 
   void run(int adapt_iter, int burnin, int iter, int thin,
-           BaseCollector<bayesmix::SemiHdpState> *collector,
-           const std::vector<MemoryCollector<bayesmix::MarginalState>>
-               &pseudoprior_collectors,
+           BaseCollector *collector,
+           const std::vector<MemoryCollector> &pseudoprior_collectors,
            bool display_progress = false, int log_every = 1) {
+    //
     this->pseudoprior_collectors = pseudoprior_collectors;
     std::cout << "Run, number of pseudoprior_collectors: "
               << this->pseudoprior_collectors.size() << std::endl;

@@ -19,6 +19,7 @@ add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   eigen_utils.cpp
   distributions.cpp
   semi_hdp.cpp
+  collectors.cpp
 )
 target_include_directories(test_bayesmix PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(test_bayesmix PUBLIC
