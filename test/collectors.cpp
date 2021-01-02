@@ -3,7 +3,7 @@
 #include <Eigen/Dense>
 #include <vector>
 
-#include "../proto/cpp/matrix.pb.h"
+#include "matrix.pb.h"
 #include "../src/collectors/file_collector.hpp"
 #include "../src/collectors/memory_collector.hpp"
 #include "../src/utils/proto_utils.hpp"

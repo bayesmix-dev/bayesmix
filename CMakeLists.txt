@@ -3,10 +3,6 @@ project(bayesmix)
 
 
 set (CMAKE_CXX_STANDARD 14)
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
-# set(CMAKE_BUILD_TYPE Release)
-
-
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
 
 
@@ -14,8 +10,6 @@ find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
 find_package(Protobuf REQUIRED)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_BUILD_TYPE Debug)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)

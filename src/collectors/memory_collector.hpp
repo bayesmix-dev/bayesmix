@@ -40,9 +40,6 @@ class MemoryCollector : public BaseCollector {
   //! Returns i-th state in the collector
   void get_state(unsigned int i, google::protobuf::Message* out);
 
-  // //! Returns the whole chain in form of a deque of States
-  // std::deque<MsgType> get_chain() override { return chain; }
-
   template <typename MsgType>
   void write_to_file(std::string outfile) {
     // THIS is probabily a HACK: we de-serialize from the chain
