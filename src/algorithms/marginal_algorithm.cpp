@@ -24,6 +24,7 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
     }
     lpdf.push_back(lpdf_from_state(grid));
   }
+  coll->reset();
   return bayesmix::stack_vectors(lpdf);
 }
 

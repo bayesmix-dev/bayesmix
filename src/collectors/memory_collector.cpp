@@ -19,3 +19,5 @@ void MemoryCollector::get_state(unsigned int i,
                                 google::protobuf::Message* out) {
   out->ParseFromString(chain[i]);
 }
+
+void MemoryCollector::reset() { curr_iter = 0; }

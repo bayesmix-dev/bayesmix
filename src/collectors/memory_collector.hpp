@@ -36,6 +36,8 @@ class MemoryCollector : public BaseCollector {
   //! Writes the given state to the collector
   void collect(const google::protobuf::Message& state) override;
 
+  void reset() override;
+
   // GETTERS AND SETTERS
   //! Returns i-th state in the collector
   void get_state(unsigned int i, google::protobuf::Message* out);
