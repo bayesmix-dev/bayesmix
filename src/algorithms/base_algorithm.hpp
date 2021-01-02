@@ -9,6 +9,7 @@
 #include "../hierarchies/base_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
 #include "marginal_state.pb.h"
+#include "lib/progressbar/progressbar.hpp"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -102,14 +103,20 @@ class BaseAlgorithm {
     print_startup_message();
     unsigned int iter = 0;
     collector->start();
+
+    progresscpp::ProgressBar bar(maxiter, 60);
+    
     while (iter < maxiter) {
       step();
       if (iter >= burnin) {
         save_state(collector, iter);
       }
       iter++;
+     ++bar;
+     bar.display();
     }
     collector->finish();
+    bar.done();
     print_ending_message();
   }
 
