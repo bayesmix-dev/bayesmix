@@ -61,3 +61,8 @@ void FileCollector::collect(const google::protobuf::Message &state) {
     std::cout << "Writing in FileCollector failed" << std::endl;
   }
 }
+
+void FileCollector::reset() {
+  curr_iter = 0;
+  close_reading();
+}

@@ -52,6 +52,8 @@ class BaseCollector {
   //! Writes the given state to the collector
   virtual void collect(const google::protobuf::Message& state) = 0;
 
+  //! Resets the collector to the beginning of the chain
+  virtual void reset() = 0;
 
   unsigned int get_size() const { return size; }
 };

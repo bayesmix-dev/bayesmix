@@ -60,6 +60,8 @@ class FileCollector : public BaseCollector {
 
   //! Writes the given state to the collector
   void collect(const google::protobuf::Message &state) override;
+
+  void reset() override;
 };
 
 #endif  // BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_
