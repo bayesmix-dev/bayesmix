@@ -24,7 +24,7 @@ def main():
         run_pe()
 
     colors = ["#000000", "#ff6f31", "#d2d68a", "#474943", "#6f8969", "#d26267", "#227744", "#332255"]
-
+    markers = ["o", "X", "p", "<", ">", 's', '^', '*', 'D']
     data = np.genfromtxt(DATA_PATH, delimiter='\n')
     clusters = np.genfromtxt(CLUSTER_PATH, delimiter=',')
 
@@ -51,7 +51,7 @@ def main():
     for i, cluster_index in enumerate(cluster_indexes):
         ax1.plot([data[i] for i in cluster_index],
                  [0 for i in range(len(cluster_index))],
-                 linestyle='none', marker='o', c=colors[i], markersize=10)
+                 linestyle='none', marker=markers[i], c=colors[i], markersize=10)
 
     fig.show()
     fig.savefig(PLOT_PATH, format='png')
