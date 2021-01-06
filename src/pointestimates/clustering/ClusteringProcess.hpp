@@ -3,6 +3,7 @@
 
 #include "../lossfunction/LossFunction.hpp"
 #include "../lossfunction/BinderLoss.hpp"
+#include "../lossfunction/VariationInformation.hpp"
 #include "../../../lib/math/lib/eigen_3.3.9/Eigen/Dense"
 
 // in case we want to add other minimization methods in the future.
@@ -13,7 +14,7 @@ enum MINIMIZATION_METHOD {
 enum LOSS_FUNCTION {
   BINDER_LOSS,
   VARIATION_INFORMATION,
-  VARIATION_INFORMATION_NORMALIZED,
+  VARIATION_INFORMATION_NORMALIZED
 };
 
 /**

@@ -1,6 +1,6 @@
 #include "ClusteringProcess.hpp"
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace std;
 
@@ -15,12 +15,17 @@ ClusteringProcess::ClusteringProcess(Eigen::MatrixXi &mcmc_sample_,
   T = mcmc_sample.rows();
   N = mcmc_sample.cols();
   switch(loss_type) {
-    case BINDER_LOSS: {
-      loss_function = new BinderLoss(1,1);
+    case BINDER_LOSS: loss_function = new BinderLoss(1,1); break;
+    case VARIATION_INFORMATION: {
+      loss_function = new VariationInformation(false);
       break;
     }
-
-    default: ; // todo
+    case VARIATION_INFORMATION_NORMALIZED: {
+      loss_function = new VariationInformation(true);
+      break;
+    }
+    default:
+      throw std::domain_error("Loss function not recognized");
   }
 }
 
@@ -40,13 +45,11 @@ double ClusteringProcess::expected_posterior_loss(Eigen::VectorXi a)
     epl += loss_function->Loss();
   }
 
-  std::cout << "epl (not normalized)=" << epl << "; T=" << T << std::endl;
   return epl / T;
 }
 
 Eigen::VectorXi ClusteringProcess::cluster_estimate(MINIMIZATION_METHOD method) {
-  Eigen::VectorXi a(5);
-  a << 1, 1, 2, 3, 3;
+  Eigen::VectorXi a = Eigen::VectorXi::LinSpaced(N, 1 ,N);
   switch (method) {
     case GREEDY:
       return greedy_algorithm(a);
@@ -62,11 +65,15 @@ Eigen::VectorXi ClusteringProcess::cluster_estimate(MINIMIZATION_METHOD method) 
  * and then resize
  */
 void delete_ith_element(Eigen::VectorXi &vec, int i) {
-  copy(vec.data() + i + 1, vec.data() + vec.size(), vec.data() + i);
-  cout << "vec copy = " << vec.transpose() << "; ";
-  vec.conservativeResize(vec.size() - 1);
-  cout << "vec resized = " << vec.transpose() << endl;
+  if (vec.size() == 0) {
+    throw std::domain_error("Can't delete an element from empty vector");
+  }
+  if (i >= vec.size() or i < 0) {
+    throw std::domain_error("Wrong index to delete element");
+  }
 
+  copy(vec.data() + i + 1, vec.data() + vec.size(), vec.data() + i);
+  vec.conservativeResize(vec.size() - 1);
 }
 
 /**
@@ -85,6 +92,18 @@ int argmax(Eigen::VectorXd &vec) {
   return argmax;
 }
 
+int argmin(Eigen::VectorXd &vec) {
+  int argmin(0);
+  double min(vec(0));
+  for (int index = 0; index < vec.size(); index++) {
+    if (vec(index) < min) {
+      min = vec(index);
+      argmin = index;
+    }
+  }
+  return argmin;
+}
+
 /**
  * a starting partition
  */
@@ -96,23 +115,17 @@ Eigen::VectorXi ClusteringProcess::greedy_algorithm(Eigen::VectorXi &a) {
   while(!stop) {
     phi_stop = phi_a;
     nu = Eigen::VectorXi::LinSpaced(N, 1 ,N);
-    cout << "initial nu=" << nu.transpose() << endl;
     while(nu.size() != 0) {
-      cout << endl;
       int i = rand() % nu.size(); // random int between 0 and size-1
-      cout << "[i=" << i << "; current Nu=" << nu.transpose() << "]" << endl;
       delete_ith_element(nu, i);
-      for (int s = 1; s < N; s++) {  // Kup = N, could be changed
+      for (int s = 1; s < 5; s++) {  // Kup = N, could be changed
         // ai_r->s means a[i] is now equal to s
-        cout << "    [s=" << s << "]" << endl;
         a_modified = a;
         a_modified(i) = s;
-        cout << "    a_modified=" << a_modified.transpose() << endl;
-        cout << "    ";
-        epl_vec(s) = expected_posterior_loss(a_modified);
+        epl_vec(s-1) = expected_posterior_loss(a_modified);
       }
-      a(i) = argmax(epl_vec);
-      cout << "--> Final ";
+      // todo : determine if it is argmin or argmax
+      a(i) = argmax(epl_vec) + 1;
       phi_a = expected_posterior_loss(a);
 
       if (phi_stop == phi_a) {
