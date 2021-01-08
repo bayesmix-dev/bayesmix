@@ -5,10 +5,12 @@ project(bayesmix)
 set (CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
 
-
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
 find_package(Protobuf REQUIRED)
+
+option(DISABLE_TESTS
+      "If tests should be compiled or no" OFF)
 
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
@@ -24,7 +26,7 @@ set(INCLUDE_PATHS
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-set(LINK_LIBRARIES tbb pthread protobuf)
+set(LINK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so pthread protobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
 file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
@@ -54,5 +56,7 @@ target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
 target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 
 
-# Build test executable
-add_subdirectory(test)
+if (NOT DISABLE_TESTS)
+  # Build test executable
+  add_subdirectory(test)
+endif()
