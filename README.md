@@ -21,7 +21,6 @@ Where P is either the Dirichlet process or the Pitman--Yor process.
 Just clone the repository with
 ```shell
 git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
-
 ```
 
 To run the executable:
