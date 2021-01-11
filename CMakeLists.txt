@@ -15,30 +15,17 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
 
-include(ExternalProject)
-ExternalProject_Add(math
-  GIT_REPOSITORY    https://github.com/bayesmix-dev/math
-  GIT_TAG           master
-  SOURCE_DIR        "${BASEPATH}/lib/math"
-  BINARY_DIR        "${BASEPATH}/lib/math"
-  BUILD_COMMAND     "make -f ${BASEPATH}/lib/math/make/standalone math-libs"
-)
-
-
 set(INCLUDE_PATHS
   ${BASEPATH}
   ${BASEPATH}/proto
   ${CMAKE_CURRENT_LIST_DIR}/lib/math
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.72.0
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2019_U8/include
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/include
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# set(LINK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so pthread protobuf)
-set(LINK_LIBRARIES tbb pthread protobuf)
-
-
+set(LINK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so pthread protobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
 file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
