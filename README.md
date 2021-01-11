@@ -18,9 +18,7 @@ Where P is either the Dirichlet process or the Pitman--Yor process.
 
 ## Installation:
 
-Just clone the repository
-
-After cloning this git repository, run 
+Just clone the repository with
 ```shell
 git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
 
