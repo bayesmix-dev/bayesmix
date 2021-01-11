@@ -18,21 +18,15 @@ Where P is either the Dirichlet process or the Pitman--Yor process.
 
 ## Installation:
 
-After cloning this git repository, run 
+Just clone the repository with
 ```shell
-./bash/install_libs.sh
-```
-
-This will install the [Stan math library](https://github.com/stan-dev/math) and Protocol buffers in `lib`
-
-Compile the proto objects:
-```shell
-./bash/compile_protos.sh
+git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
 ```
 
 To run the executable:
 ```shell
 mkdir build
+cd build
 cmake ..
 make run
 cd ..

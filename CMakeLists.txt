@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 3.13.0)
 project(bayesmix)
 
-
 set (CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
+
+include(FindPythonInterp)
+add_custom_target(
+ build_tbb ALL
+ COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/build_tbb.py
+)
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
@@ -12,17 +17,17 @@ find_package(Protobuf REQUIRED)
 option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
 
-
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
+
 set(INCLUDE_PATHS
   ${BASEPATH}
   ${BASEPATH}/proto
   ${CMAKE_CURRENT_LIST_DIR}/lib/math
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.72.0
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2019_U8/include
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/include
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -40,6 +45,7 @@ set(PROTO_SOURCES ${PROTO_SRCS} PARENT_SCOPE)
 
 # Build library object
 add_library(bayesmix OBJECT)
+add_dependencies(bayesmix build_tbb)
 target_sources(bayesmix PUBLIC ${PROTO_SRCS} ${PROTO_HDRS})
 add_subdirectory(src)    # source files
 target_include_directories(bayesmix PUBLIC ${INCLUDE_PATHS})
@@ -48,6 +54,8 @@ target_compile_options(bayesmix PUBLIC ${COMPILE_OPTIONS})
 
 # Build static library
 add_library(bayesmixlib $<TARGET_OBJECTS:bayesmix>)
+add_dependencies(bayesmixlib build_tbb)
+
 
 # Build run executable
 add_executable(run $<TARGET_OBJECTS:bayesmix> run.cpp)

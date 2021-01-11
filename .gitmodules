@@ -1,0 +1,4 @@
+[submodule "stan-math"]
+    path = lib/math
+    depth = 1
+    url = https://github.com/bayesmix-dev/math.git
