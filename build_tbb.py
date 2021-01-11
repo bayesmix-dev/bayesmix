@@ -1,16 +1,12 @@
-import glob
 import os
 import platform
 import shutil
-import sys
 import subprocess
-
 
 
 def maybe_build_tbb():
     """Build tbb. This function is taken from
     https://github.com/stan-dev/pystan/blob/develop/setup.py"""
-
     
     stan_math_lib = os.path.abspath(os.path.join(os.path.dirname(
         __file__), 'lib', 'math', 'lib'))
