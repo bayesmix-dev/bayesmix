@@ -41,6 +41,14 @@ make test_bayesmix
 ./test/test_bayesmix
 ```
 
+## For Developers
+
+Please install the pre-commit hooks before commiting anything: it clears the output of jupyter notebooks. Just type
+
+```shell
+./bash/setup_pre_commit.sh
+```
+
 ## Future steps (contributors are welcome!)
 
 A Python package is already under development
