@@ -25,7 +25,7 @@ On Linux machine the following will install the library
 sudo apt-get install autoconf automake libtool curl make g++ unzip
 wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protobuf-python-3.14.0.zip
 unizp protobuf-python-3.14.0.zip
-cd cd protobuf-3.14.0/
+cd protobuf-3.14.0/
 ./configure --prefix=/usr
 make check
 sudo make install
