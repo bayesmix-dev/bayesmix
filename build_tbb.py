@@ -3,6 +3,8 @@ import platform
 import shutil
 import subprocess
 
+# If on Linux and this script gives a "busy file" error, please run
+# bash/cleanup_tbb.sh
 
 def maybe_build_tbb():
     """Build tbb. This function is taken from
