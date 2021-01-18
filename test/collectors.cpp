@@ -10,6 +10,7 @@
 
 TEST(collectors, memory) {
   MemoryCollector coll;
+  coll.start();
 
   std::vector<Eigen::VectorXd> chain(5);
   for (int i = 0; i < 5; i++) {
@@ -18,6 +19,7 @@ TEST(collectors, memory) {
     to_proto(chain[i], &curr);
     coll.collect(curr);
   }
+  coll.finish();
 
   int iter = 0;
   bool keep = true;
