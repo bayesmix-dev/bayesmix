@@ -31,7 +31,7 @@ class FileCollector : public BaseCollector {
   //! Flag that indicates if the collector is open in read-mode
   bool is_open_read = false;
   //! Flag that indicates if the collector is open in write-mode
-  bool is_open_write;
+  bool is_open_write = false;
 
   //! Opens collector in reading mode
   void open_for_reading();

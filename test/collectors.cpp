@@ -62,20 +62,18 @@ TEST(collectors, file_reading) {
   coll.finish();
 
   FileCollector coll2("test.recordio");
-  coll2.start();
   int iter = 0;
   bool keep = true;
   while (keep) {
     bayesmix::Vector curr;
     keep = coll2.get_next_state(&curr);
     if (!keep) {
+      iter--;
       break;
     }
     ASSERT_EQ(curr.size(), 3);
     ASSERT_EQ(curr.data(0), iter);
     iter++;
   }
-
   ASSERT_EQ(chain[iter](0), chain[4][0]);
-  coll2.finish();
 }
