@@ -1,11 +1,11 @@
 #include "memory_collector.hpp"
 
 bool MemoryCollector::next_state(google::protobuf::Message* out) {
-  curr_iter++;
-  if (curr_iter == size - 1) {
+  if (curr_iter == size) {
     return false;
   }
   out->ParseFromString(chain[curr_iter]);
+  curr_iter++;
   return true;
 }
 

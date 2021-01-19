@@ -29,7 +29,7 @@ class BaseCollector {
   //! Current size of the chain
   unsigned int size = 0;
   //! Read cursor that indicates the current iteration
-  unsigned int curr_iter = -1;
+  unsigned int curr_iter = 0;
 
   //! Reads the next state, based on the curr_iter curson
   virtual bool next_state(google::protobuf::Message *out) = 0;
