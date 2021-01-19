@@ -6,6 +6,8 @@ resources/
 .vscode
 # SFTP configuration file
 sftp-config.json
+# Sublime Text files
+*.sublime-*
 # Python compilation files
 *.pyc
 # File collectors
