@@ -6,6 +6,7 @@
 #include "marginal_state.pb.h"
 #include "../collectors/base_collector.hpp"
 #include "../utils/eigen_utils.hpp"
+#include "../../lib/progressbar/progressbar.hpp"
 
 //! \param grid Grid of points in matrix form to evaluate the density on
 //! \param coll Collector containing the algorithm chain
@@ -15,6 +16,7 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
  
   std::deque<Eigen::VectorXd> lpdf;
   bool keep = true;
+  progresscpp::ProgressBar bar(coll->get_size(), 60);
 
   // Loop over non-burn-in algorithm iterations
   while(keep) {
@@ -23,8 +25,11 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
       break;
     }
     lpdf.push_back(lpdf_from_state(grid));
+    ++bar;
+    bar.display();
   }
   coll->reset();
+  bar.done();
   return bayesmix::stack_vectors(lpdf);
 }
 
