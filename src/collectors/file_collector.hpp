@@ -54,9 +54,9 @@ class FileCollector : public BaseCollector {
   }
   FileCollector(const std::string &filename_) : filename(filename_) {}
   //! Initializes collector
-  void start() override;
+  void start_collecting() override;
   //! Closes collector
-  void finish() override;
+  void finish_collecting() override;
 
   //! Writes the given state to the collector
   void collect(const google::protobuf::Message &state) override;

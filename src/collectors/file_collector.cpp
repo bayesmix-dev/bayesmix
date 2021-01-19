@@ -38,13 +38,13 @@ bool FileCollector::next_state(google::protobuf::Message *out) {
   return keep;
 }
 
-void FileCollector::start() {
+void FileCollector::start_collecting() {
   int outfd = open(filename.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
   fout = new google::protobuf::io::FileOutputStream(outfd);
   is_open_write = true;
 }
 
-void FileCollector::finish() {
+void FileCollector::finish_collecting() {
   if (is_open_write) {
     fout->Close();
     close(outfd);

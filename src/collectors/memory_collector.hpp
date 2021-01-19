@@ -29,9 +29,9 @@ class MemoryCollector : public BaseCollector {
   MemoryCollector() = default;
 
   //! Initializes collector (here, it does nothing)
-  void start() override { return; }
+  void start_collecting() override { return; }
   //! Closes collector (here, it does nothing)
-  void finish() override { return; }
+  void finish_collecting() override { return; }
 
   //! Writes the given state to the collector
   void collect(const google::protobuf::Message& state) override;

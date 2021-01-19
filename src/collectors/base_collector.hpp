@@ -40,9 +40,9 @@ class BaseCollector {
   BaseCollector() = default;
 
   //! Initializes collector
-  virtual void start() = 0;
+  virtual void start_collecting() = 0;
   //! Closes collector
-  virtual void finish() = 0;
+  virtual void finish_collecting() = 0;
 
   //! Reads the next state and advances the cursor by 1
   bool get_next_state(google::protobuf::Message *out) {
