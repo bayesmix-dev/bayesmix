@@ -10,6 +10,7 @@
 
 TEST(collectors, memory) {
   MemoryCollector coll;
+  coll.start_collecting();
 
   std::vector<Eigen::VectorXd> chain(5);
   for (int i = 0; i < 5; i++) {
@@ -18,6 +19,7 @@ TEST(collectors, memory) {
     to_proto(chain[i], &curr);
     coll.collect(curr);
   }
+  coll.finish_collecting();
 
   int iter = 0;
   bool keep = true;
@@ -37,7 +39,7 @@ TEST(collectors, memory) {
 
 TEST(collectors, file_writing) {
   FileCollector coll("test.recordio");
-  coll.start();
+  coll.start_collecting();
   std::vector<Eigen::VectorXd> chain(5);
   for (int i = 0; i < 5; i++) {
     chain[i] = Eigen::VectorXd::Ones(3) * i;
@@ -45,12 +47,12 @@ TEST(collectors, file_writing) {
     to_proto(chain[i], &curr);
     coll.collect(curr);
   }
-  coll.finish();
+  coll.finish_collecting();
 }
 
 TEST(collectors, file_reading) {
   FileCollector coll("test.recordio");
-  coll.start();
+  coll.start_collecting();
 
   std::vector<Eigen::VectorXd> chain(5);
   for (int i = 0; i < 5; i++) {
@@ -59,23 +61,21 @@ TEST(collectors, file_reading) {
     to_proto(chain[i], &curr);
     coll.collect(curr);
   }
-  coll.finish();
+  coll.finish_collecting();
 
   FileCollector coll2("test.recordio");
-  coll2.start();
   int iter = 0;
   bool keep = true;
   while (keep) {
     bayesmix::Vector curr;
     keep = coll2.get_next_state(&curr);
     if (!keep) {
+      iter--;
       break;
     }
     ASSERT_EQ(curr.size(), 3);
     ASSERT_EQ(curr.data(0), iter);
     iter++;
   }
-
   ASSERT_EQ(chain[iter](0), chain[4][0]);
-  coll2.finish();
 }

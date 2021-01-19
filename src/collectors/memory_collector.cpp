@@ -6,6 +6,7 @@ bool MemoryCollector::next_state(google::protobuf::Message* out) {
     return false;
   }
   out->ParseFromString(chain[curr_iter]);
+  return true;
 }
 
 void MemoryCollector::collect(const google::protobuf::Message& state) {

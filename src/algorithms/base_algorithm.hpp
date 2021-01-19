@@ -102,7 +102,7 @@ class BaseAlgorithm {
     initialize();
     print_startup_message();
     unsigned int iter = 0;
-    collector->start();
+    collector->start_collecting();
 
     progresscpp::ProgressBar bar(maxiter, 60);
     
@@ -115,7 +115,7 @@ class BaseAlgorithm {
      ++bar;
      bar.display();
     }
-    collector->finish();
+    collector->finish_collecting();
     bar.done();
     print_ending_message();
   }
