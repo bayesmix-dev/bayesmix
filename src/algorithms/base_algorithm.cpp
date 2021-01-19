@@ -7,7 +7,7 @@
 #include "mixing_state.pb.h"
 
 void BaseAlgorithm::initialize() {
-  std::cout << "Initializing... ";
+  std::cout << "Initializing... " << std::flush;
 
   // Perform checks
   assert(data.rows() != 0 && "Error: empty data matrix");
