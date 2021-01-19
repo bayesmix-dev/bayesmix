@@ -25,9 +25,6 @@ bool FileCollector::next_state(google::protobuf::Message *out) {
     open_for_reading();
   }
   curr_iter++;
-//  std::cout << "FileCollector::next_state, curr_iter: " << curr_iter
-//            << std::endl;
-
   bool keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(
       out, fin, nullptr);
   if (!keep) {
