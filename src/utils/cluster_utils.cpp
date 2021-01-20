@@ -16,22 +16,16 @@ Eigen::VectorXd bayesmix::cluster_estimate(
   Eigen::MatrixXd mean_diss = Eigen::MatrixXd::Zero(n_data, n_data);
   std::vector<Eigen::SparseMatrix<double> > all_diss;
   progresscpp::ProgressBar bar(n_iter, 60);
-  std::cout << "Computing mean dissimilarity... " << std::flush;
+  std::cout << "(Computing mean dissimilarity... " << std::flush;
 
   // Loop over pairs (i,j) of data points
   for (int i = 0; i < n_data; i++) {
     for (int j = 0; j < i; j++) {
-      // Compute mean dissimilarity for (i,j) by looping over iterations
-      for (int k = 0; k < n_iter; k++) {
-        if (alloc_chain(k, i) == alloc_chain(k, j)) {
-          mean_diss(i, j) += 1.0;
-        }
-      mean_diss(i, j) = mean_diss(i, j) / n_iter;
-      }
+      Eigen::ArrayXd diff = alloc_chain.col(i) - alloc_chain.col(j);
+      mean_diss(i, j) = 1.0 * (diff == 0).count() / n_iter;
     }
   }
-  std::cout << "Done" << std::endl;
-  std::cout << "Computing cluster estimate..." << std::endl;
+  std::cout << "Done)" << std::endl;
 
   // Compute Frobenius norm error of all iterations
   Eigen::VectorXd errors(n_iter);
@@ -51,6 +45,5 @@ Eigen::VectorXd bayesmix::cluster_estimate(
   // Find iteration with the least error
   std::ptrdiff_t ibest;
   unsigned int min_err = errors.minCoeff(&ibest);
-  std::cout << "Done" << std::endl;
   return alloc_chain.row(ibest).transpose();
 }

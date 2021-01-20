@@ -108,7 +108,9 @@ int main(int argc, char *argv[]) {
   std::cout << "Successfully wrote cluster sizes to " << nclufile << std::endl;
 
   // Compute cluster estimate
+  std::cout << "Computing cluster estimate..." << std::endl;
   Eigen::VectorXd clust_est = bayesmix::cluster_estimate(clusterings);
+  std::cout << "Done" << std::endl;
   bayesmix::write_matrix_to_file(clust_est, clusfile);
   std::cout << "Successfully wrote clustering to " << clusfile << std::endl;
 
