@@ -6,6 +6,20 @@
 #include "proto_utils.hpp"
 #include "../../lib/progressbar/progressbar.hpp"
 
+Eigen::MatrixXd bayesmix::posterior_similarity(
+  const Eigen::MatrixXd &alloc_chain) {
+  unsigned int n_data = alloc_chain.cols();
+  Eigen::MatrixXd mean_diss = Eigen::MatrixXd::Zero(n_data, n_data);
+  // Loop over pairs (i,j) of data points
+  for (int i = 0; i < n_data; i++) {
+    for (int j = 0; j < i; j++) {
+      Eigen::ArrayXd diff = alloc_chain.col(i) - alloc_chain.col(j);
+      mean_diss(i, j) = (diff == 0).count();
+    }
+  }
+  return mean_diss / alloc_chain.rows();
+}
+
 //! \param coll Collector containing the algorithm chain
 //! \return     Index of the iteration containing the best estimate
 Eigen::VectorXd bayesmix::cluster_estimate(
@@ -13,18 +27,12 @@ Eigen::VectorXd bayesmix::cluster_estimate(
   // Initialize objects
   unsigned n_iter = alloc_chain.rows();
   unsigned int n_data = alloc_chain.cols();
-  Eigen::MatrixXd mean_diss = Eigen::MatrixXd::Zero(n_data, n_data);
   std::vector<Eigen::SparseMatrix<double> > all_diss;
   progresscpp::ProgressBar bar(n_iter, 60);
-  std::cout << "(Computing mean dissimilarity... " << std::flush;
 
-  // Loop over pairs (i,j) of data points
-  for (int i = 0; i < n_data; i++) {
-    for (int j = 0; j < i; j++) {
-      Eigen::ArrayXd diff = alloc_chain.col(i) - alloc_chain.col(j);
-      mean_diss(i, j) = 1.0 * (diff == 0).count() / n_iter;
-    }
-  }
+  // Compute mean
+  std::cout << "(Computing mean dissimilarity... " << std::flush;
+  Eigen::MatrixXd mean_diss = bayesmix::posterior_similarity(alloc_chain);
   std::cout << "Done)" << std::endl;
 
   // Compute Frobenius norm error of all iterations
