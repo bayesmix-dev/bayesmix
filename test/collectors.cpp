@@ -27,6 +27,7 @@ TEST(collectors, memory) {
     bayesmix::Vector curr;
     keep = coll.get_next_state(&curr);
     if (!keep) {
+      iter--;
       break;
     }
     ASSERT_EQ(curr.size(), 3);

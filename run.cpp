@@ -87,11 +87,14 @@ int main(int argc, char *argv[]) {
 
   // Collect mixing and cluster states
   Eigen::VectorXd masses(coll->get_size());
-  // Eigen::MatrixXd clusterings(chain.size(), data.rows());
+  Eigen::MatrixXd clusterings(coll->get_size(), data.rows());
   Eigen::VectorXd num_clust(coll->get_size());
   for (int i = 0; i < coll->get_size(); i++) {
     bayesmix::MarginalState state;
     coll->get_next_state(&state);
+    for (int j = 0; j < data.rows(); j++){
+      clusterings(i, j) = state.cluster_allocs(j);
+    }
     num_clust(i) = state.cluster_states_size();
     bayesmix::MixingState mixstate = state.mixing_state();
     if (mixstate.has_dp_state()) {
@@ -104,12 +107,12 @@ int main(int argc, char *argv[]) {
   bayesmix::write_matrix_to_file(num_clust, nclufile);
   std::cout << "Successfully wrote cluster sizes to " << nclufile << std::endl;
 
-  // // Compute cluster estimate
-  // std::cout << "Computing cluster estimate..." << std::endl;
-  // Eigen::VectorXd clust_est = bayesmix::cluster_estimate(clusterings);
-  // std::cout << "Done" << std::endl;
-  // bayesmix::write_matrix_to_file(clust_est, clusfile);
-  // std::cout << "Successfully wrote clustering to " << clusfile << std::endl;
+  // Compute cluster estimate
+  std::cout << "Computing cluster estimate..." << std::endl;
+  Eigen::VectorXd clust_est = bayesmix::cluster_estimate(clusterings);
+  std::cout << "Done" << std::endl;
+  bayesmix::write_matrix_to_file(clust_est, clusfile);
+  std::cout << "Successfully wrote clustering to " << clusfile << std::endl;
 
   std::cout << "End of run.cpp" << std::endl;
   delete coll;
