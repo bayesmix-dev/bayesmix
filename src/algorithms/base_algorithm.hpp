@@ -8,8 +8,8 @@
 #include "../collectors/base_collector.hpp"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
-#include "marginal_state.pb.h"
 #include "lib/progressbar/progressbar.hpp"
+#include "marginal_state.pb.h"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -79,8 +79,7 @@ class BaseAlgorithm {
   };
 
   //! Saves the current iteration's state in Protobuf form to a collector
-  void save_state(BaseCollector *collector,
-                  unsigned int iter) {
+  void save_state(BaseCollector *collector, unsigned int iter) {
     collector->collect(get_state_as_proto(iter));
   }
 
@@ -101,15 +100,15 @@ class BaseAlgorithm {
     collector->start_collecting();
 
     progresscpp::ProgressBar bar(maxiter, 60);
-    
+
     while (iter < maxiter) {
       step();
       if (iter >= burnin) {
         save_state(collector, iter);
       }
       iter++;
-     ++bar;
-     bar.display();
+      ++bar;
+      bar.display();
     }
     collector->finish_collecting();
     bar.done();
@@ -118,9 +117,8 @@ class BaseAlgorithm {
 
   // ESTIMATE FUNCTION
   //! Evaluates the logpdf for each single iteration on a given grid of points
-  virtual Eigen::MatrixXd eval_lpdf(
-      const Eigen::MatrixXd &grid,
-      BaseCollector *const collector) = 0;
+  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
+                                    BaseCollector *const collector) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseAlgorithm() = default;

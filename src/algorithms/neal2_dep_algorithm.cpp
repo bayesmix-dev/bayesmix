@@ -24,7 +24,7 @@ void Neal2DepAlgorithm::print_startup_message() const {
 //! \return          Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2DepAlgorithm::lpdf_marginal_component(
     std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid,
-    const Eigen::MatrixXd &covariates) { // TODO anything else?
+    const Eigen::MatrixXd &covariates) {  // TODO anything else?
   // Exploit conjugacy of hierarchy
   return temp_hier->marg_lpdf_grid(grid, covariates);
 }

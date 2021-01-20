@@ -7,9 +7,9 @@
 #include <memory>
 #include <stan/math/prim/fun.hpp>
 
+#include "base_hierarchy.hpp"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
-#include "base_hierarchy.hpp"
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 

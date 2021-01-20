@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < coll->get_size(); i++) {
     bayesmix::MarginalState state;
     coll->get_next_state(&state);
-    for (int j = 0; j < data.rows(); j++){
+    for (int j = 0; j < data.rows(); j++) {
       clusterings(i, j) = state.cluster_allocs(j);
     }
     num_clust(i) = state.cluster_states_size();

@@ -3,11 +3,11 @@
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
-#include "proto_utils.hpp"
 #include "../../lib/progressbar/progressbar.hpp"
+#include "proto_utils.hpp"
 
 Eigen::MatrixXd bayesmix::posterior_similarity(
-  const Eigen::MatrixXd &alloc_chain) {
+    const Eigen::MatrixXd &alloc_chain) {
   unsigned int n_data = alloc_chain.cols();
   Eigen::MatrixXd mean_diss = Eigen::MatrixXd::Zero(n_data, n_data);
   // Loop over pairs (i,j) of data points

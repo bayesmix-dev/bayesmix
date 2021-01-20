@@ -6,13 +6,13 @@
 #include <stan/math/prim/err.hpp>
 #include <stan/math/prim/prob.hpp>
 
+#include "../utils/distributions.hpp"
+#include "../utils/proto_utils.hpp"
+#include "../utils/rng.hpp"
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"
 #include "matrix.pb.h"
-#include "../utils/distributions.hpp"
-#include "../utils/proto_utils.hpp"
-#include "../utils/rng.hpp"
 
 //! \param prec_ Value to set to prec
 void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {

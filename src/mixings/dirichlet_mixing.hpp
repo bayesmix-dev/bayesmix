@@ -3,9 +3,9 @@
 
 #include <memory>
 
-#include "mixing_prior.pb.h"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "base_mixing.hpp"
+#include "mixing_prior.pb.h"
 
 //! Class that represents the Dirichlet process mixture model.
 

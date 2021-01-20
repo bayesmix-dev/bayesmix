@@ -5,11 +5,11 @@
 #include <stan/math/prim/fun.hpp>
 #include <vector>
 
-#include "marginal_state.pb.h"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
 #include "../utils/distributions.hpp"
 #include "../utils/rng.hpp"
+#include "marginal_state.pb.h"
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid

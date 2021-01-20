@@ -3,25 +3,24 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/fun.hpp>
 
-#include "marginal_state.pb.h"
+#include "../../lib/progressbar/progressbar.hpp"
 #include "../collectors/base_collector.hpp"
 #include "../utils/eigen_utils.hpp"
-#include "../../lib/progressbar/progressbar.hpp"
+#include "marginal_state.pb.h"
 
 //! \param grid Grid of points in matrix form to evaluate the density on
 //! \param coll Collector containing the algorithm chain
 //! \return     Matrix whose i-th column is the lpdf at i-th iteration
 Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
                                              BaseCollector *coll) {
- 
   std::deque<Eigen::VectorXd> lpdf;
   bool keep = true;
   progresscpp::ProgressBar bar(coll->get_size(), 60);
 
   // Loop over non-burn-in algorithm iterations
-  while(keep) {
+  while (keep) {
     keep = update_state_from_collector(coll);
-    if (! keep) {
+    if (!keep) {
       break;
     }
     lpdf.push_back(lpdf_from_state(grid));
@@ -35,7 +34,6 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
 
 Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
     const Eigen::MatrixXd &grid) {
-  
   Eigen::VectorXd out(grid.rows());
   unsigned int n_data = curr_state.cluster_allocs_size();
   unsigned int n_clust = curr_state.cluster_states_size();
@@ -58,7 +56,7 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
   lpdf_local.col(n_clust) =
       mixing->mass_new_cluster(n_clust, n_data, true, false) +
       lpdf_marginal_component(temp_hier, grid).array();
-  
+
   for (size_t j = 0; j < grid.rows(); j++) {
     out(j) = stan::math::log_sum_exp(lpdf_local.row(j));
   }
