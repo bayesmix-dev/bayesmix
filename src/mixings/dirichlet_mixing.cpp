@@ -5,8 +5,8 @@
 #include <cassert>
 #include <stan/math/prim/prob.hpp>
 
-#include "../../proto/cpp/mixing_prior.pb.h"
-#include "../../proto/cpp/mixing_state.pb.h"
+#include "mixing_prior.pb.h"
+#include "mixing_state.pb.h"
 #include "../utils/rng.hpp"
 
 void DirichletMixing::initialize() {

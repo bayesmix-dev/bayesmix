@@ -18,21 +18,30 @@ Where P is either the Dirichlet process or the Pitman--Yor process.
 
 ## Installation:
 
-After cloning this git repository, run 
+We heavily depend on Google's [Protocol Buffers](https://github.com/protocolbuffers/protobuf), so make sure to install it beforehand!
+
+On Linux machine the following will install the library
 ```shell
-./bash/install_libs.sh
+sudo apt-get install autoconf automake libtool curl make g++ unzip
+wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protobuf-python-3.14.0.zip
+unizp protobuf-python-3.14.0.zip
+cd protobuf-3.14.0/
+./configure --prefix=/usr
+make check
+sudo make install
+sudo ldconfig # refresh shared library cache.
 ```
+On Mac and Windows machines, follow the official install guide ([link](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md))
 
-This will install the [Stan math library](https://github.com/stan-dev/math) and Protocol buffers in `lib`
-
-Compile the proto objects:
+Finally, to work with `bayesmix` just clone the repository with
 ```shell
-./bash/compile_protos.sh
+git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
 ```
 
 To run the executable:
 ```shell
 mkdir build
+cd build
 cmake ..
 make run
 cd ..
@@ -45,6 +54,14 @@ cd build
 cmake ..
 make test_bayesmix
 ./test/test_bayesmix
+```
+
+## For Developers
+
+Please install the pre-commit hooks before commiting anything: it clears the output of jupyter notebooks. Just type
+
+```shell
+./bash/setup_pre_commit.sh
 ```
 
 ## Future steps (contributors are welcome!)

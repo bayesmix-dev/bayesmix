@@ -5,8 +5,7 @@
 #include <stan/math/prim/fun.hpp>
 #include <vector>
 
-#include "../../proto/cpp/marginal_state.pb.h"
-#include "../collectors/base_collector.hpp"
+#include "marginal_state.pb.h"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
 #include "../utils/distributions.hpp"

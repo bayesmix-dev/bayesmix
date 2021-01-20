@@ -1,0 +1,5 @@
+[submodule "lib/math"]
+	path = lib/math
+    depth = 1
+	url = git@github.com:bayesmix-dev/math.git
+  ignore = dirty

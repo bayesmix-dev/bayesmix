@@ -1,5 +1,2 @@
-# Python cache
-__pycache__
-
-# Protocol Buffers implementation files (version-dependent)
+__pycache__/
 *pb2.py

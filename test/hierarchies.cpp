@@ -2,8 +2,8 @@
 
 #include <Eigen/Dense>
 
-#include "../proto/cpp/ls_state.pb.h"
-#include "../proto/cpp/marginal_state.pb.h"
+#include "ls_state.pb.h"
+#include "marginal_state.pb.h"
 #include "../src/hierarchies/nnig_hierarchy.hpp"
 #include "../src/hierarchies/nnw_hierarchy.hpp"
 #include "../src/utils/proto_utils.hpp"

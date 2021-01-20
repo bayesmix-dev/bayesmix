@@ -5,9 +5,9 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/prob.hpp>
 
-#include "../../proto/cpp/hierarchy_prior.pb.h"
-#include "../../proto/cpp/ls_state.pb.h"
-#include "../../proto/cpp/marginal_state.pb.h"
+#include "hierarchy_prior.pb.h"
+#include "ls_state.pb.h"
+#include "marginal_state.pb.h"
 #include "../utils/rng.hpp"
 
 void NNIGHierarchy::initialize() {

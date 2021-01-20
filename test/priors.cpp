@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "../proto/cpp/marginal_state.pb.h"
+#include "marginal_state.pb.h"
 #include "../src/hierarchies/nnig_hierarchy.hpp"
 #include "../src/hierarchies/nnw_hierarchy.hpp"
 #include "../src/mixings/dirichlet_mixing.hpp"

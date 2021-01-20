@@ -5,10 +5,11 @@
 #include <memory>
 #include <vector>
 
-#include "../../proto/cpp/marginal_state.pb.h"
 #include "../collectors/base_collector.hpp"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
+#include "marginal_state.pb.h"
+#include "lib/progressbar/progressbar.hpp"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -78,7 +79,7 @@ class BaseAlgorithm {
   };
 
   //! Saves the current iteration's state in Protobuf form to a collector
-  void save_state(BaseCollector<bayesmix::MarginalState> *collector,
+  void save_state(BaseCollector *collector,
                   unsigned int iter) {
     collector->collect(get_state_as_proto(iter));
   }
@@ -93,19 +94,25 @@ class BaseAlgorithm {
 
  public:
   //! Runs the algorithm and saves the whole chain to a collector
-  void run(BaseCollector<bayesmix::MarginalState> *collector) {
+  void run(BaseCollector *collector) {
     initialize();
     print_startup_message();
     unsigned int iter = 0;
-    collector->start();
+    collector->start_collecting();
+
+    progresscpp::ProgressBar bar(maxiter, 60);
+    
     while (iter < maxiter) {
       step();
       if (iter >= burnin) {
         save_state(collector, iter);
       }
       iter++;
+     ++bar;
+     bar.display();
     }
-    collector->finish();
+    collector->finish_collecting();
+    bar.done();
     print_ending_message();
   }
 
@@ -113,7 +120,7 @@ class BaseAlgorithm {
   //! Evaluates the logpdf for each single iteration on a given grid of points
   virtual Eigen::MatrixXd eval_lpdf(
       const Eigen::MatrixXd &grid,
-      BaseCollector<bayesmix::MarginalState> *const collector) = 0;
+      BaseCollector *const collector) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseAlgorithm() = default;

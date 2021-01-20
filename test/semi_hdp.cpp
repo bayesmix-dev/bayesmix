@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "../proto/cpp/semihdp.pb.h"
+#include "semihdp.pb.h"
 #include "../src/algorithms/semihdp_sampler.hpp"
 #include "../src/includes.hpp"
 #include "../src/utils/eigen_utils.hpp"
@@ -34,7 +34,7 @@ std::shared_ptr<BaseHierarchy> get_hierarchy() {
   return hier;
 }
 
-TEST(relabel, 1) {
+TEST(semihdp, relabel) {
   std::vector<Eigen::MatrixXd> data(2);
   data[0] = Eigen::MatrixXd::Zero(10, 1);
   data[1] = Eigen::MatrixXd::Zero(10, 1);
@@ -80,7 +80,7 @@ TEST(relabel, 1) {
   ASSERT_EQ(1, 1);
 }
 
-TEST(relabel, 2) {
+TEST(semihdp, relabel2) {
   std::vector<Eigen::MatrixXd> data(2);
   data[0] = Eigen::MatrixXd::Zero(10, 1);
   data[1] = Eigen::MatrixXd::Zero(10, 1);
@@ -143,7 +143,7 @@ TEST(relabel, 2) {
   ASSERT_EQ(1, 1);
 }
 
-TEST(sample_unique_values, 1) {
+TEST(semihdp, sample_unique_values) {
   std::vector<Eigen::MatrixXd> data(2);
 
   data[0] = bayesmix::vstack({Eigen::MatrixXd::Zero(50, 1).array() + 5,
@@ -220,7 +220,7 @@ TEST(sample_unique_values, 1) {
       0);
 }
 
-TEST(sample_unique_values, 2) {
+TEST(semihdp, sample_unique_values2) {
   std::vector<Eigen::MatrixXd> data(2);
 
   data[0] = bayesmix::vstack({Eigen::MatrixXd::Zero(50, 1).array() + 5,
@@ -304,7 +304,7 @@ TEST(sample_unique_values, 2) {
       0);
 }
 
-TEST(sample_allocations, 1) {
+TEST(semihdp, sample_allocations1) {
   std::vector<Eigen::MatrixXd> data(2);
 
   data[0] = bayesmix::vstack({Eigen::MatrixXd::Zero(50, 1).array() + 5,

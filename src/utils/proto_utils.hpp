@@ -3,7 +3,7 @@
 
 #include <Eigen/Dense>
 
-#include "../../proto/cpp/matrix.pb.h"
+#include "matrix.pb.h"
 
 namespace bayesmix {
 void to_proto(const Eigen::MatrixXd &mat, bayesmix::Matrix *out);

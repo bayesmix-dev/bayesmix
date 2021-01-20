@@ -1,8 +1,10 @@
 #ifndef BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
 #define BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
 
-#include "base_collector.hpp"
+#include <google/protobuf/message.h>
+#include <google/protobuf/util/delimited_message_util.h>
 
+#include "base_collector.hpp"
 //! Class for a "virtual" collector which contains all objects of the chain
 
 //! This is a type of collector which includes a deque containing all states of
@@ -13,24 +15,13 @@
 //! is not needed, for instance in a main program that both runes and algorithm
 //! and computes the estimates.
 
-template <typename MsgType>
-class MemoryCollector : public BaseCollector<MsgType> {
+class MemoryCollector : public BaseCollector {
  protected:
   //! Deque that contains all states in Protobuf-object form
-  std::deque<MsgType> chain;
+  std::deque<std::string> chain;
 
   //! Reads the next state, based on the curr_iter curson
-  MsgType next_state() override {
-    if (curr_iter == size - 1) {
-      curr_iter = -1;
-      return chain[size - 1];
-    } else {
-      return chain[curr_iter];
-    }
-  }
-
-  using BaseCollector<MsgType>::size;
-  using BaseCollector<MsgType>::curr_iter;
+  bool next_state(google::protobuf::Message* out);
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -38,28 +29,31 @@ class MemoryCollector : public BaseCollector<MsgType> {
   MemoryCollector() = default;
 
   //! Initializes collector (here, it does nothing)
-  void start() override { return; }
+  void start_collecting() override { return; }
   //! Closes collector (here, it does nothing)
-  void finish() override { return; }
+  void finish_collecting() override { return; }
 
   //! Writes the given state to the collector
-  void collect(MsgType iter_state) override {
-    chain.push_back(iter_state);
-    size++;
-  }
+  void collect(const google::protobuf::Message& state) override;
+
+  void reset() override;
 
   // GETTERS AND SETTERS
   //! Returns i-th state in the collector
-  MsgType get_state(unsigned int i) override { return chain[i]; }
-  //! Returns the whole chain in form of a deque of States
-  std::deque<MsgType> get_chain() override { return chain; }
+  void get_state(unsigned int i, google::protobuf::Message* out);
 
+  template <typename MsgType>
   void write_to_file(std::string outfile) {
+    // THIS is probabily a HACK: we de-serialize from the chain
+    // and re-serialize to file. Still it's a reasonable work-around.
+
     int outfd = open(outfile.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
     google::protobuf::io::FileOutputStream* fout =
         new google::protobuf::io::FileOutputStream(outfd);
 
-    for (MsgType& state: chain) {
+    for (std::string& serialized_state : chain) {
+      MsgType state;
+      state.ParseFromString(serialized_state);
       bool success =
           google::protobuf::util::SerializeDelimitedToZeroCopyStream(state,
                                                                      fout);

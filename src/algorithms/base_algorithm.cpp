@@ -3,11 +3,11 @@
 #include <Eigen/Dense>
 #include <cassert>
 
-#include "../../proto/cpp/marginal_state.pb.h"
-#include "../../proto/cpp/mixing_state.pb.h"
+#include "marginal_state.pb.h"
+#include "mixing_state.pb.h"
 
 void BaseAlgorithm::initialize() {
-  std::cout << "Initializing..." << std::endl;
+  std::cout << "Initializing... " << std::flush;
 
   // Perform checks
   assert(data.rows() != 0 && "Error: empty data matrix");
@@ -46,6 +46,8 @@ void BaseAlgorithm::initialize() {
     allocations.push_back(clust);
     unique_values[clust]->add_datum(i, data.row(i));
   }
+
+  std::cout << "Done" << std::endl;
 }
 
 void BaseAlgorithm::update_hierarchy_hypers() {

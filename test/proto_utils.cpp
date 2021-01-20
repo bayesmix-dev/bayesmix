@@ -4,7 +4,7 @@
 
 #include <Eigen/Dense>
 
-#include "../proto/cpp/matrix.pb.h"
+#include "matrix.pb.h"
 
 TEST(to_proto, vector) {
   Eigen::VectorXd vec = Eigen::VectorXd::Ones(5);

@@ -2,11 +2,17 @@
 build/
 # Resources folder
 resources/
-# Local files
-*.local.*
 # Visual Studio Code folder
 .vscode
-
+# SFTP configuration file
+sftp-config.json
+# Sublime Text files
+*.sublime-*
+# Python compilation files
 *.pyc
+# File collectors
 *.recordio
+# PDF output files
 *.pdf
+# Local files
+*.local.*

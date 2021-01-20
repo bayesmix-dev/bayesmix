@@ -20,8 +20,8 @@ if [ "$1" == "uni" ]; then
 elif [ "$1" == "multi" ]; then
   build/run \
     N2 20201124 0 1000 100 \
-    NNW resources/nnw_ngiw_prior.asciipb \
-    DP resources/dp_gamma_prior.asciipb \
+    NNW resources/asciipb/nnw_ngiw_prior.asciipb \
+    DP resources/asciipb/dp_gamma_prior.asciipb \
     resources/csv/in/data_multi.csv resources/csv/in/grid_multi.csv \
     resources/csv/out/mn_dens.csv resources/csv/out/mn_mass.csv \
     resources/csv/out/mn_nclu.csv resources/csv/out/mn_clus.csv

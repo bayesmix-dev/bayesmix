@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include <fstream>
 
-#include "../../proto/cpp/matrix.pb.h"
+#include "matrix.pb.h"
 
 void bayesmix::to_proto(const Eigen::MatrixXd &mat, bayesmix::Matrix *out) {
   out->set_rows(mat.rows());

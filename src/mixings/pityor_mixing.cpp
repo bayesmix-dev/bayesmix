@@ -4,8 +4,8 @@
 
 #include <cassert>
 
-#include "../../proto/cpp/mixing_prior.pb.h"
-#include "../../proto/cpp/mixing_state.pb.h"
+#include "mixing_prior.pb.h"
+#include "mixing_state.pb.h"
 
 void PitYorMixing::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");
