@@ -4,6 +4,28 @@ void LinDepNormalHierarchy::initialize() {
   state.coefficients = Eigen::VectorXd::Zero(dim);
 }
 
+void LinDepNormalHierarchy::clear_data() {
+  data_sum = 0.0;
+  data_sum_squares = 0.0;
+  card = 0;
+  cluster_data_idx.clear();
+}
+
+void LinDepNormalHierarchy::update_summary_statistics(
+  const Eigen::VectorXd &datum, bool add) {
+  if (add) {
+    data_sum += datum(0);
+    data_sum_squares += datum(0) * datum(0);
+  } else {
+    data_sum -= datum(0);
+    data_sum_squares -= datum(0) * datum(0);
+  }
+}
+
+LinDepNormalHierarchy::Hyperparams LinDepNormalHierarchy::some_update() {
+  return LinDepNormalHierarchy::Hyperparams();  // TODO
+}
+
 double LinDepNormalHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate) const {

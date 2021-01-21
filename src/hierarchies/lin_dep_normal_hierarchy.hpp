@@ -28,27 +28,13 @@ class LinDepNormalHierarchy : public DependentHierarchy {
   // HYPERPRIOR
   std::shared_ptr<bayesmix::NNIGPrior> prior;  // TODO LDNormPrior?
 
-  void clear_data() {
-    data_sum = 0.0;
-    data_sum_squares = 0.0;
-    card = 0;
-    cluster_data_idx.clear();
-  }
-
+  void clear_data();
   void update_summary_statistics(const Eigen::VectorXd &datum,
-                                 bool add) override {
-    if (add) {
-      data_sum += datum(0);
-      data_sum_squares += datum(0) * datum(0);
-    } else {
-      data_sum -= datum(0);
-      data_sum_squares -= datum(0) * datum(0);
-    }
-  }
+                                 bool add);
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams some_update();  // TODO
+  Hyperparams some_update();
 
  public:
   void initialize() override;
