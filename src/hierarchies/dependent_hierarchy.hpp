@@ -6,7 +6,6 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <random>
-#include <set>
 #include <stan/math/prim.hpp>
 
 #include "../../proto/cpp/marginal_state.pb.h"
@@ -38,6 +37,9 @@ class DependentHierarchy : public BaseHierarchy {
     assert(it != cluster_data_idx.end());
     cluster_data_idx.erase(it);
   }
+
+  //! Returns true if the hierarchy has covariates i.e. is a dependent model
+  bool is_dependent() const override { return true; }
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~DependentHierarchy() = default;
@@ -74,8 +76,8 @@ class DependentHierarchy : public BaseHierarchy {
       const Eigen::MatrixXd &covariates) const = 0;
 
   // GETTERS AND SETTERS
-  unsigned int get_dim() { return dim; }
-  void set_dim(const unsigned int dim_) { dim = dim_; }
+  unsigned int get_parameters_dim() { return dim; }
+  void set_parameters_dim(const unsigned int dim_) { dim = dim_; }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_DEPENDENT_HIERARCHY_HPP_

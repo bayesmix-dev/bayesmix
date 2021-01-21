@@ -3,14 +3,17 @@
 
 #include <google/protobuf/message.h>
 
+#include <Eigen/Dense>
 #include <memory>
 
 #include "../hierarchies/base_hierarchy.hpp"
-#include "base_mixing.hpp"
+#include "dependent_mixing.hpp"
 
-class ProbitSBMixing : public BaseMixing {  // TODO all
+class ProbitSBMixing : public DependentMixing {  // TODO all
  public:
-  struct State {};
+  struct State {
+    Eigen::VectorXd coefficients;
+  };
 
  protected:
   State state;
@@ -20,7 +23,7 @@ class ProbitSBMixing : public BaseMixing {  // TODO all
   ~ProbitSBMixing() = default;
   ProbitSBMixing() = default;
 
-  void initialize() override {}
+  void initialize() override;
 
   void update_state(
       const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,

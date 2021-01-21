@@ -70,6 +70,8 @@ class BaseHierarchy {
   virtual void initialize() = 0;
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
+  //! Returns true if the hierarchy has covariates i.e. is a dependent model
+  virtual bool is_dependent() const { return false; }
 
   virtual void update_hypers(
       const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;

@@ -15,12 +15,27 @@ void BaseAlgorithm::initialize() {
   assert(!(unique_values[0]->is_multivariate() == false && data.cols() > 1) &&
          "Error: multivariate data supplied to univariate hierarchy");
   assert(mixing != nullptr && "Error: mixing was not provided");
+  if (hier_covariates.rows() != 0) {
+    assert(unique_values[0]->is_dependent() &&
+      "Error: covariates supplied to non-dependent hierarchy")
+    assert(data.rows() == hier_covariates.rows() &&
+      "Error: data size and covariates size do not match")
+  }
+  if (mix_covariates.rows() != 0) {
+    assert(mixing->is_dependent() &&
+      "Error: covariates supplied to non-dependent mixing")
+    assert(data.rows() == mix_covariates.rows() &&
+      "Error: data size and covariates size do not match")
+  }
 
   if (init_num_clusters == 0) {
     init_num_clusters = data.rows();
   }
 
   // Initialize hierarchies
+  if (unique_values[0]->is_dependent()) {
+    unique_values[0]->set_parameters_dim(hier_covariates.cols());
+  }
   unique_values[0]->initialize();
   for (size_t i = 0; i < init_num_clusters - 1; i++) {
     unique_values.push_back(unique_values[0]->clone());
@@ -28,6 +43,9 @@ void BaseAlgorithm::initialize() {
   }
 
   // Initialize mixing
+  if (mixing->is_dependent()) {
+    mixing->set_parameters_dim(mix_covariates.cols());
+  }
   mixing->initialize();
 
   // Initialize needed objects

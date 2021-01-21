@@ -34,7 +34,7 @@ class Neal2Algorithm : public MarginalAlgorithm {
       std::shared_ptr<BaseHierarchy> temp_hier,
       const Eigen::MatrixXd &grid) override;
   
-  Eigen::VectorXd get_cluster_prior(const unsigned int data_idx) const;
+  Eigen::VectorXd get_cluster_prior_mass(const unsigned int data_idx) const;
   Eigen::VectorXd get_cluster_lpdf(const unsigned int data_idx) const;
 
   // ALGORITHM FUNCTIONS

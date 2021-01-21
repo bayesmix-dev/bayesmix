@@ -1,8 +1,7 @@
 #include "lin_dep_normal_hierarchy.hpp"
 
 void LinDepNormalHierarchy::initialize() {
-  state.coefficients = Eigen::VectorXd::Zero(dim);  // or other starting values
-  // TODO anything else?
+  state.coefficients = Eigen::VectorXd::Zero(dim);
 }
 
 double LinDepNormalHierarchy::like_lpdf(

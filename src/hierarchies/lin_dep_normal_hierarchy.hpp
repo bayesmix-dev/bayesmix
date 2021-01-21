@@ -4,7 +4,6 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
-#include <cassert>
 #include <memory>
 
 #include "../../proto/cpp/hierarchy_prior.pb.h"

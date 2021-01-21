@@ -61,8 +61,12 @@ class BaseAlgorithm {
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
   std::vector<std::shared_ptr<BaseHierarchy>> unique_values;
+  //!
+  Eigen::MatrixXd hier_covariates;
   //! Mixing object
   std::shared_ptr<BaseMixing> mixing;
+  //!
+  Eigen::MatrixXd mix_covariates;
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object

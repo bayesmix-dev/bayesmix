@@ -19,7 +19,7 @@ Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
   return temp_hier->marg_lpdf_grid(grid);
 }
 
-Eigen::VectorXd Neal2Algorithm::get_cluster_prior(
+Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
   const unsigned int data_idx) const {
   unsigned int n_data = data.rows();
   unsigned int n_clust = unique_values.size();
@@ -101,7 +101,8 @@ void Neal2Algorithm::sample_allocations() {
     // Remove datum from cluster
     unique_values[allocations[i]]->remove_datum(i, data.row(i));
     // Compute probabilities of clusters in log-space
-    Eigen::VectorXd logprobas = get_cluster_prior(i) + get_cluster_lpdf(i);
+    Eigen::VectorXd logprobas = get_cluster_prior_mass(i) +
+      get_cluster_lpdf(i);
     // Draw a NEW value for datum allocation
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
