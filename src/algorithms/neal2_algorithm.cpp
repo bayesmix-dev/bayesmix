@@ -1,12 +1,15 @@
 #include "neal2_algorithm.hpp"
 
+#include <cassert>
 #include <Eigen/Dense>
 #include <memory>
 #include <stan/math/prim/fun.hpp>
 #include <vector>
 
 #include "../hierarchies/base_hierarchy.hpp"
+#include "../hierarchies/dependent_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
+#include "../mixings/dependent_mixing.hpp"
 #include "../utils/distributions.hpp"
 #include "../utils/rng.hpp"
 #include "marginal_state.pb.h"
@@ -25,14 +28,15 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
   unsigned int n_clust = unique_values.size();
   Eigen::VectorXd logprior(n_clust + 1);
   if (mixing->is_dependent()) {
+    auto mixcast = std::dynamic_pointer_cast<DependentMixing>(mixing);
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
-      logprior(j) = mixing->mass_existing_cluster(unique_values[j],
-        mixing_covariates[data_idx], n_data - 1, true, true);
+      logprior(j) = mixcast->mass_existing_cluster(unique_values[j],
+        mix_covariates.row(data_idx), n_data - 1, true, true);
     }
     // Further update with marginal component
-    logprior(n_clust) = mixing->mass_new_cluster(n_clust,
-      mixing_covariates[data_idx], n_data - 1, true, true);
+    logprior(n_clust) = mixcast->mass_new_cluster(mix_covariates.row(data_idx),
+      n_clust, n_data - 1, true, true);
   }
   else {
     for (size_t j = 0; j < n_clust; j++) {
@@ -53,14 +57,20 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
   unsigned int n_clust = unique_values.size();
   Eigen::VectorXd loglpdf(n_clust + 1);
   if (unique_values[0]->is_dependent()) {
+    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(
+      unique_values[0]);
+    // Update with marginal component
+    loglpdf(n_clust) = hiercast->marg_lpdf(data.row(data_idx),
+      mix_covariates.row(data_idx));
+
     for (size_t j = 0; j < n_clust; j++) {
+      hiercast = std::dynamic_pointer_cast<DependentHierarchy>(
+        unique_values[j]);
       // Probability of being assigned to an already existing cluster
-      loglpdf(j) = unique_values[j]->like_lpdf(data.row(data_idx),
-        mixing_covariates[data_idx]);
+      loglpdf(j) = hiercast->like_lpdf(data.row(data_idx),
+        mix_covariates.row(data_idx));
     }
-    // Further update with marginal component
-    loglpdf(n_clust) = unique_values[0]->marg_lpdf(data.row(data_idx),
-      mixing_covariates[data_idx]);
+
   }
   else {
     // Loop over clusters

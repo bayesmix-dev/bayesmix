@@ -65,3 +65,8 @@ void LinDepNormalHierarchy::write_hypers_to_proto(
     google::protobuf::Message *out) const {
   return;  // TODO
 }
+
+void LinDepNormalHierarchy::update_hypers(
+  const std::vector<bayesmix::MarginalState::ClusterState> &states) {
+  return;  // TODO
+}

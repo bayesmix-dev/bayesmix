@@ -5,6 +5,8 @@
 
 #include "marginal_state.pb.h"
 #include "mixing_state.pb.h"
+#include "../hierarchies/dependent_hierarchy.hpp"
+#include "../mixings/dependent_mixing.hpp"
 
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;
@@ -17,15 +19,15 @@ void BaseAlgorithm::initialize() {
   assert(mixing != nullptr && "Error: mixing was not provided");
   if (hier_covariates.rows() != 0) {
     assert(unique_values[0]->is_dependent() &&
-      "Error: covariates supplied to non-dependent hierarchy")
+      "Error: covariates supplied to non-dependent hierarchy");
     assert(data.rows() == hier_covariates.rows() &&
-      "Error: data size and covariates size do not match")
+      "Error: data size and covariates size do not match");
   }
   if (mix_covariates.rows() != 0) {
     assert(mixing->is_dependent() &&
-      "Error: covariates supplied to non-dependent mixing")
+      "Error: covariates supplied to non-dependent mixing");
     assert(data.rows() == mix_covariates.rows() &&
-      "Error: data size and covariates size do not match")
+      "Error: data size and covariates size do not match");
   }
 
   if (init_num_clusters == 0) {
@@ -34,7 +36,9 @@ void BaseAlgorithm::initialize() {
 
   // Initialize hierarchies
   if (unique_values[0]->is_dependent()) {
-    unique_values[0]->set_parameters_dim(hier_covariates.cols());
+    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(
+      unique_values[0]);
+    hiercast->set_parameters_dim(hier_covariates.cols());
   }
   unique_values[0]->initialize();
   for (size_t i = 0; i < init_num_clusters - 1; i++) {
@@ -44,7 +48,8 @@ void BaseAlgorithm::initialize() {
 
   // Initialize mixing
   if (mixing->is_dependent()) {
-    mixing->set_parameters_dim(mix_covariates.cols());
+    auto mixcast = std::dynamic_pointer_cast<DependentMixing>(mixing);
+    mixcast->set_parameters_dim(mix_covariates.cols());
   }
   mixing->initialize();
 
