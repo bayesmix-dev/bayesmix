@@ -12,7 +12,54 @@ add_custom_target(
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
-find_package(Protobuf REQUIRED)
+
+
+include(FetchContent)
+set(FETCHCONTENT_QUIET OFF)
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+set(BUILD_SHARED_LIBS OFF)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(BUILD_TESTING OFF)
+
+pkg_check_modules(PROTOBUF REQUIRED protobuf>=3.12 IMPORTED_TARGET GLOBAL)
+add_library(protobuf::libprotobuf ALIAS PkgConfig::PROTOBUF)
+set_target_properties(PkgConfig::PROTOBUF PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${PROTOBUF_INCLUDEDIR}")
+
+
+find_program(PROTOC_EXEC protoc REQUIRED)
+add_executable(protobuf::protoc IMPORTED GLOBAL)
+set_target_properties(protobuf::protoc PROPERTIES
+  IMPORTED_LOCATION ${PROTOC_EXEC}
+)
+
+if (NOT Protobuf_FOUND)
+  message(CHECK_START "Fetching Protobuf")
+  list(APPEND CMAKE_MESSAGE_INDENT "  ")
+  set(protobuf_BUILD_TESTS OFF)
+  set(protobuf_BUILD_EXPORT OFF)
+  set(protobuf_MSVC_STATIC_RUNTIME OFF)
+  # FetchContent_Declare(SOURCE_SUBDIR) was introduced in 3.18
+  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18")
+    FetchContent_Declare(
+      protobuf
+      GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
+      GIT_TAG "v3.14.0"
+      GIT_SUBMODULES ""
+      SOURCE_SUBDIR cmake)
+    FetchContent_MakeAvailable(protobuf)
+  else()
+    fetch_git_dependency(
+      NAME Protobuf
+      REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
+      TAG "v3.14.0"
+      SOURCE_SUBDIR cmake
+      )
+  endif()
+  list(POP_BACK CMAKE_MESSAGE_INDENT)
+  message(CHECK_PASS "fetched")
+endif()
+
 
 option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
@@ -35,12 +82,40 @@ set(LINK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so pthread 
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
 file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
-PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${ProtoFiles})
+
+message(${PROJECT_BINARY_DIR})
+set(PROTO_DIR proto)
+
+foreach(PROTO_FILE IN LISTS ProtoFiles)
+  message(STATUS "protoc proto(cc): ${PROTO_FILE}")
+  get_filename_component(PROTO_DIR ${PROTO_FILE} DIRECTORY)
+  get_filename_component(PROTO_NAME ${PROTO_FILE} NAME_WE)
+  set(PROTO_HDR ${CMAKE_CURRENT_BINARY_DIR}/${PROTO_NAME}.pb.h)
+  set(PROTO_SRC ${CMAKE_CURRENT_BINARY_DIR}/${PROTO_NAME}.pb.cc)
+  message(STATUS "protoc hdr: ${PROTO_HDR}")
+  message(STATUS "protoc src: ${PROTO_SRC}")
+  add_custom_command(
+    OUTPUT ${PROTO_SRC} ${PROTO_HDR}
+    COMMAND protobuf::protoc
+    "--proto_path=${BASEPATH}/proto"
+    ${PROTO_DIRS}
+    "--cpp_out=${PROJECT_BINARY_DIR}"
+    ${PROTO_FILE}
+    DEPENDS ${PROTO_FILE} protobuf::protoc
+    COMMENT "Generate C++ protocol buffer for ${PROTO_FILE}"
+    VERBATIM)
+  list(APPEND PROTO_HDRS ${PROTO_HDR})
+  list(APPEND PROTO_SRCS ${PROTO_SRC})
+endforeach()
+
 SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 
-set(BAYESMIX_INCLUDE_PATHS ${INCLUDE_PATHS} PARENT_SCOPE)
-set(PROTO_HEADERS ${PROTO_HDRS} PARENT_SCOPE)
-set(PROTO_SOURCES ${PROTO_SRCS} PARENT_SCOPE)
+get_directory_property(HAS_PARENT PARENT_DIRECTORY)
+if(HAS_PARENT)
+  set(BAYESMIX_INCLUDE_PATHS ${INCLUDE_PATHS} PARENT_SCOPE)
+  set(PROTO_HEADERS ${PROTO_HDRS} PARENT_SCOPE)
+  set(PROTO_SOURCES ${PROTO_SRCS} PARENT_SCOPE)
+endif()
 
 
 # Build library object
