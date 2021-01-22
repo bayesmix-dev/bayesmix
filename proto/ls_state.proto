@@ -13,3 +13,8 @@ message MultiLSState {
     Vector mean = 1;
     Matrix prec = 2;
 }
+
+message UnivDepLSState {
+    Vector mean = 1;
+    Matrix prec = 2;
+}

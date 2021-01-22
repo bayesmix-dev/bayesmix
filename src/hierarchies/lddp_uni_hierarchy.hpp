@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_HIERARCHIES_LIN_DEP_NORMAL_HIERARCHY_HPP_
-#define BAYESMIX_HIERARCHIES_LIN_DEP_NORMAL_HIERARCHY_HPP_
+#ifndef BAYESMIX_HIERARCHIES_LDDP_UNI_HIERARCHY_HPP_
+#define BAYESMIX_HIERARCHIES_LDDP_UNI_HIERARCHY_HPP_
 
 #include <google/protobuf/stubs/casts.h>
 
@@ -11,12 +11,16 @@
 #include "base_hierarchy.hpp"
 #include "dependent_hierarchy.hpp"
 
-class LinDepNormalHierarchy : public DependentHierarchy {
+class LDDPUniHierarchy : public DependentHierarchy {
  public:
   struct State {
-    Eigen::VectorXd coefficients;
+    Eigen::VectorXd mean;
+    double var;
   };
-  struct Hyperparams {};  // TODO
+  struct Hyperparams {
+    Eigen::VectorXd mean;
+    double var_scaling, shape, scale;
+  };
 
  protected:
   double data_sum = 0.0;
@@ -26,7 +30,7 @@ class LinDepNormalHierarchy : public DependentHierarchy {
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
   // HYPERPRIOR
-  std::shared_ptr<bayesmix::NNIGPrior> prior;  // TODO LDNormPrior?
+  std::shared_ptr<bayesmix::LDDUniPrior> prior;
 
   void clear_data();
   void update_summary_statistics(const Eigen::VectorXd &datum,
@@ -38,18 +42,18 @@ class LinDepNormalHierarchy : public DependentHierarchy {
 
  public:
   void initialize() override;
-  //! Returns true if the hierarchy models multivariate data (here, false)
+  //! Returns true if the hierarchy models multivariate data
   bool is_multivariate() const override { return false; }
 
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
 
   // DESTRUCTOR AND CONSTRUCTORS
-  ~LinDepNormalHierarchy() = default;
-  LinDepNormalHierarchy() = default;
+  ~LDDPUniHierarchy() = default;
+  LDDPUniHierarchy() = default;
 
   std::shared_ptr<BaseHierarchy> clone() const override {
-    auto out = std::make_shared<LinDepNormalHierarchy>(*this);
+    auto out = std::make_shared<LDDPUniHierarchy>(*this);
     out->clear_data();
     return out;
   }
@@ -87,7 +91,7 @@ class LinDepNormalHierarchy : public DependentHierarchy {
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  std::string get_id() const override { return "LDNorm"; }
+  std::string get_id() const override { return "LDDPUni"; }
 };
 
-#endif  // BAYESMIX_HIERARCHIES_LIN_DEP_NORMAL_HIERARCHY_HPP_
+#endif  // BAYESMIX_HIERARCHIES_LDDP_UNI_HIERARCHY_HPP_

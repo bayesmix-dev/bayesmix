@@ -10,8 +10,9 @@ message MarginalState {
     oneof val {
       UnivLSState univ_ls_state = 1;
       MultiLSState multi_ls_state = 2;
+      UnivDepLSSState univ_dep_ls_state = 3;
     }
-    int32 cardinality = 3;
+    int32 cardinality = 4;
   }
 
   repeated ClusterState cluster_states = 1;

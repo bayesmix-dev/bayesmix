@@ -35,11 +35,6 @@ void BaseAlgorithm::initialize() {
   }
 
   // Initialize hierarchies
-  if (unique_values[0]->is_dependent()) {
-    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(
-      unique_values[0]);
-    hiercast->set_parameters_dim(hier_covariates.cols());
-  }
   unique_values[0]->initialize();
   for (size_t i = 0; i < init_num_clusters - 1; i++) {
     unique_values.push_back(unique_values[0]->clone());
@@ -47,10 +42,6 @@ void BaseAlgorithm::initialize() {
   }
 
   // Initialize mixing
-  if (mixing->is_dependent()) {
-    auto mixcast = std::dynamic_pointer_cast<DependentMixing>(mixing);
-    mixcast->set_parameters_dim(mix_covariates.cols());
-  }
   mixing->initialize();
 
   // Initialize needed objects
