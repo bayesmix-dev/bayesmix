@@ -60,7 +60,6 @@ class NNWHierarchy : public BaseHierarchy {
   double prec_logdet;
 
   // AUXILIARY TOOLS
-  void check_spd(const Eigen::MatrixXd &mat);
   //! Special setter for prec and its utilities
   void set_prec_and_utilities(const Eigen::MatrixXd &prec_);
 

@@ -69,3 +69,9 @@ Eigen::MatrixXd bayesmix::append_by_row(const Eigen::MatrixXd &a,
     return out;
   }
 }
+
+void bayesmix::check_spd(const Eigen::MatrixXd &mat) {
+  assert(mat.rows() == mat.cols());
+  assert(mat.isApprox(mat.transpose()) && "Error: matrix is not symmetric");
+  stan::math::check_pos_definite("", "Matrix", mat);
+}

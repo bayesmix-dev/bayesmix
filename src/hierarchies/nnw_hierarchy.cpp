@@ -7,6 +7,7 @@
 #include <stan/math/prim/prob.hpp>
 
 #include "../utils/distributions.hpp"
+#include "../utils/eigen_utils.hpp"
 #include "../utils/proto_utils.hpp"
 #include "../utils/rng.hpp"
 #include "hierarchy_prior.pb.h"
@@ -22,12 +23,6 @@ void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
   prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_).matrixL().transpose();
   Eigen::VectorXd diag = prec_chol.diagonal();
   prec_logdet = 2 * log(diag.array()).sum();
-}
-
-void NNWHierarchy::check_spd(const Eigen::MatrixXd &mat) {
-  assert(mat.rows() == mat.cols());
-  assert(mat.isApprox(mat.transpose()) && "Error: matrix is not symmetric");
-  stan::math::check_pos_definite("", "Matrix", mat);
 }
 
 void NNWHierarchy::initialize() {
@@ -287,9 +282,9 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
            "Error: hyperparameters dimensions are not consistent");
     assert(tau0.rows() == dim &&
            "Error: hyperparameters dimensions are not consistent");
-    check_spd(sigma00);
+    bayesmix::check_spd(sigma00);
     assert(lambda0 > 0);
-    check_spd(tau0);
+    bayesmix::check_spd(tau0);
     assert(nu0 > dim - 1);
     // Set initial values
     hypers->mean = mu00;
@@ -323,13 +318,13 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     assert(tau00.rows() == dim &&
            "Error: hyperparameters dimensions are not consistent");
     // for mu0
-    check_spd(sigma00);
+    bayesmix::check_spd(sigma00);
     // for lambda0
     assert(alpha00 > 0);
     assert(beta00 > 0);
     // for tau0
     assert(nu00 > 0);
-    check_spd(tau00);
+    bayesmix::check_spd(tau00);
     // check nu0
     assert(nu0 > dim - 1);
     // Set initial values

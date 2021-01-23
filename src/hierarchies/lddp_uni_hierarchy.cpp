@@ -1,6 +1,7 @@
 #include "lddp_uni_hierarchy.hpp"
 
 #include <stan/math/prim/prob.hpp>
+#include "../utils/eigen_utils.hpp"
 
 void LDDPUniHierarchy::initialize() {
   state.mean = Eigen::VectorXd::Zero(hypers->mean.size());

@@ -47,4 +47,6 @@ Eigen::MatrixXd stack_vectors(const Container<Eigen::VectorXd> &rows) {
   return out;
 }
 
+//! Checks whether the matrix is symmetric and semi-positive definite
+void check_spd(const Eigen::MatrixXd &mat);
 }  // namespace bayesmix
