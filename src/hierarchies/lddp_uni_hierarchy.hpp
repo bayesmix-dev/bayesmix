@@ -25,6 +25,7 @@ class LDDPUniHierarchy : public DependentHierarchy {
   };
 
  protected:
+  unsigned int dim;
   double data_sum = 0.0;
   double data_sum_squares = 0.0;
   // STATE

@@ -43,7 +43,7 @@ class NNWHierarchy : public BaseHierarchy {
   };
 
  protected:
-  int dim;
+  unsigned int dim;
   Eigen::VectorXd data_sum;
   Eigen::MatrixXd data_sum_squares;
   // STATE

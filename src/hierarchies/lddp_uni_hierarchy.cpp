@@ -2,6 +2,7 @@
 
 #include <stan/math/prim/prob.hpp>
 #include "../utils/eigen_utils.hpp"
+#include "../utils/rng.hpp"
 
 void LDDPUniHierarchy::initialize() {
   state.mean = Eigen::VectorXd::Zero(hypers->mean.size());
@@ -31,7 +32,14 @@ LDDPUniHierarchy::Hyperparams LDDPUniHierarchy::some_update() {
 
 void LDDPUniHierarchy::update_hypers(
   const std::vector<bayesmix::MarginalState::ClusterState> &states) {
-  return;  // TODO
+  auto &rng = bayesmix::Rng::Instance().get();
+  if (prior->has_fixed_values()) {
+    return;
+  }
+
+  else {
+    throw std::invalid_argument("Error: unrecognized prior");
+  }
 }
 
 double LDDPUniHierarchy::like_lpdf(
@@ -51,29 +59,41 @@ Eigen::VectorXd LDDPUniHierarchy::like_lpdf_grid(
   return result;
 }
 
-double LDDPUniHierarchy::marg_lpdf(  // TODO
+
+
+double LDDPUniHierarchy::marg_lpdf(
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate) const {
-  double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
-                      (hypers->shape * hypers->var_scaling));
-  return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape,
-                                    hypers->mean.dot(covariate), sig_n);
+  return Eigen::VectorXd(0,0);  // TODO
+}
+// double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
+//   double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
+//                       (hypers->shape * hypers->var_scaling));
+//   return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape,
+//                                     hypers->mean, sig_n);
+// }
+// double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
+//   double nu_n = 2 * hypers->deg_free - dim + 1;
+//   Eigen::MatrixXd sigma_n = hypers->scale_inv *
+//                             (hypers->deg_free - 0.5 * (dim - 1)) *
+//                             hypers->var_scaling / (hypers->var_scaling + 1);
+//   return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean,
+//                                           sigma_n);
+// }
+
+Eigen::VectorXd LDDPUniHierarchy::marg_lpdf_grid(  
+    const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
+  return Eigen::VectorXd(0,0);  // TODO
 }
 
-Eigen::VectorXd LDDPUniHierarchy::marg_lpdf_grid(  // TODO
-    const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
-  double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
-                      (hypers->shape * hypers->var_scaling));
-  Eigen::VectorXd result(data.rows());
-  for (size_t i = 0; i < data.rows(); i++) {
-    result(i) = stan::math::student_t_lpdf(data(i, 0), 2 * hypers->shape,
-                                           hypers->mean.dot(covariate), sig_n);
-  }
-  return result;
-}
+
 
 void LDDPUniHierarchy::draw() {
-  return;  // TODO
+  // Generate new state values from their prior centering distribution
+  auto &rng = bayesmix::Rng::Instance().get();
+  state.var = stan::math::inv_gamma_rng(hypers->shape, hypers->scale, rng);
+  state.mean = stan::math::multi_normal_prec_rng(
+      hypers->mean, hypers->var_scaling / state.var, rng);
 }
 
 void LDDPUniHierarchy::sample_given_data() {
@@ -102,6 +122,7 @@ void LDDPUniHierarchy::set_prior(const google::protobuf::Message &prior_) {
   if (prior->has_fixed_values()) {
     // Set values
     hypers->mean = bayesmix::to_eigen(prior->fixed_values().mean());
+    dim = hypers->mean.size();
     hypers->var_scaling = bayesmix::to_eigen(
       prior->fixed_values().var_scaling());
     hypers->shape = prior->fixed_values().shape();
