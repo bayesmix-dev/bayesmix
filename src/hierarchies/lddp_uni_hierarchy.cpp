@@ -50,7 +50,7 @@ Eigen::VectorXd LDDPUniHierarchy::like_lpdf_grid(
   return result;
 }
 
-double LDDPUniHierarchy::marg_lpdf(  // TODO check
+double LDDPUniHierarchy::marg_lpdf(  // TODO
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate) const {
   double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
@@ -59,7 +59,7 @@ double LDDPUniHierarchy::marg_lpdf(  // TODO check
                                     hypers->mean.dot(covariate), sig_n);
 }
 
-Eigen::VectorXd LDDPUniHierarchy::marg_lpdf_grid(  // TODO check
+Eigen::VectorXd LDDPUniHierarchy::marg_lpdf_grid(  // TODO
     const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
   double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
                       (hypers->shape * hypers->var_scaling));
@@ -101,11 +101,12 @@ void LDDPUniHierarchy::set_prior(const google::protobuf::Message &prior_) {
   if (prior->has_fixed_values()) {
     // Set values
     hypers->mean = bayesmix::to_eigen(prior->fixed_values().mean());
-    hypers->var_scaling = prior->fixed_values().var_scaling();
+    hypers->var_scaling = bayesmix::to_eigen(
+      prior->fixed_values().var_scaling());
     hypers->shape = prior->fixed_values().shape();
     hypers->scale = prior->fixed_values().scale();
     // Check validity
-    assert(hypers->var_scaling > 0);
+    bayesmix::check_spd(hypers->var_scaling);
     assert(hypers->shape > 0);
     assert(hypers->scale > 0);
   }
@@ -132,7 +133,8 @@ void LDDPUniHierarchy::write_hypers_to_proto(
   bayesmix::LDDUniPrior hypers_;
   bayesmix::to_proto(hypers->mean,
                      hypers_.mutable_fixed_values()->mutable_mean());
-  hypers_.mutable_fixed_values()->set_var_scaling(hypers->var_scaling);
+  bayesmix::to_proto(hypers->var_scaling,
+                     hypers_.mutable_fixed_values()->mutable_var_scaling());
   hypers_.mutable_fixed_values()->set_shape(hypers->shape);
   hypers_.mutable_fixed_values()->set_scale(hypers->scale);
 

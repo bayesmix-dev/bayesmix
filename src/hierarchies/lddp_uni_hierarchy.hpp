@@ -19,7 +19,9 @@ class LDDPUniHierarchy : public DependentHierarchy {
   };
   struct Hyperparams {
     Eigen::VectorXd mean;
-    double var_scaling, shape, scale;
+    Eigen::MatrixXd var_scaling;
+    double shape;
+    double scale;
   };
 
  protected:
