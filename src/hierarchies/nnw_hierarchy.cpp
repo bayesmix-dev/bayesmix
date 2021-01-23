@@ -30,8 +30,7 @@ void NNWHierarchy::initialize() {
   state.mean = hypers->mean;
   set_prec_and_utilities(hypers->var_scaling *
                          Eigen::MatrixXd::Identity(dim, dim));
-  data_sum = Eigen::VectorXd::Zero(dim);
-  data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
+  clear_data();
 }
 
 //! \param data                    Matrix of row-vectorial data points

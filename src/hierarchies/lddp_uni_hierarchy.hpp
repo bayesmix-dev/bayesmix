@@ -26,8 +26,12 @@ class LDDPUniHierarchy : public DependentHierarchy {
 
  protected:
   unsigned int dim;
-  double data_sum = 0.0;
-  double data_sum_squares = 0.0;
+  //! Represents pieces of y^t y
+  double data_sum_squares;
+  //! Represents pieces of X^T X
+  Eigen::MatrixXd covar_sum_squares;
+  //! Represents pieces of X^t y
+  Eigen::VectorXd mixed_prod;
   // STATE
   State state;
   // HYPERPARAMETERS
@@ -41,7 +45,7 @@ class LDDPUniHierarchy : public DependentHierarchy {
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams some_update();
+  Hyperparams normal_invgamma_update();
 
  public:
   void initialize() override;

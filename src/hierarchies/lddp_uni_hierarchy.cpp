@@ -1,33 +1,47 @@
 #include "lddp_uni_hierarchy.hpp"
 
+#include <Eigen/Dense>
 #include <stan/math/prim/prob.hpp>
 #include "../utils/eigen_utils.hpp"
 #include "../utils/rng.hpp"
 
 void LDDPUniHierarchy::initialize() {
-  state.mean = Eigen::VectorXd::Zero(hypers->mean.size());
+  state.mean = Eigen::VectorXd::Zero(dim);
+  clear_data();
 }
 
-void LDDPUniHierarchy::clear_data() {  // TODO
-  data_sum = 0.0;
+void LDDPUniHierarchy::clear_data() {
+  mixed_prod = Eigen::VectorXd::Zero(dim);
   data_sum_squares = 0.0;
+  covar_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
   card = 0;
-  cluster_data_idx.clear();
+  cluster_data_idx = std::set<int>();
 }
 
-void LDDPUniHierarchy::update_summary_statistics(  // TODO
-  const Eigen::VectorXd &datum, bool add) {
-  if (add) {
-    data_sum += datum(0);
+void LDDPUniHierarchy::update_summary_statistics(  // TODO add in DepHier
+  const Eigen::VectorXd &datum, const Eigen::MatrixXd covar, bool add) {
+  if (add) { 
     data_sum_squares += datum(0) * datum(0);
+    covar_sum_squares += covar.row(0).transpose() * covar.row(0);
+    mixed_prod += datum(0) * covar.row(0);
   } else {
-    data_sum -= datum(0);
     data_sum_squares -= datum(0) * datum(0);
+    covar_sum_squares -= covar.row(0).transpose() * covar.row(0);
+    mixed_prod -= datum(0) * covar.row(0);
   }
 }
 
-LDDPUniHierarchy::Hyperparams LDDPUniHierarchy::some_update() {
-  return LDDPUniHierarchy::Hyperparams();  // TODO
+LDDPUniHierarchy::Hyperparams LDDPUniHierarchy::normal_invgamma_update() {
+  Hyperparams post_params;
+
+  post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
+  post_params.mean = stan::math::inverse_spd(post_params.var_scaling) * (
+    mixed_prod + hypers->var_scaling * hypers->mean);
+  post_params.shape = hypers->shape + 0.5 * card;
+  post_params.scale = hypers->scale + 0.5 * (data_sum_squares +
+    hypers->mean.transpose() * hypers->var_scaling * hypers->mean -
+    post_params.mean.transpose() * post_params.var_scaling * post_params.mean);
+  return post_params;
 }
 
 void LDDPUniHierarchy::update_hypers(
@@ -59,34 +73,16 @@ Eigen::VectorXd LDDPUniHierarchy::like_lpdf_grid(
   return result;
 }
 
-
-
 double LDDPUniHierarchy::marg_lpdf(
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate) const {
   return Eigen::VectorXd(0,0);  // TODO
 }
-// double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
-//   double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
-//                       (hypers->shape * hypers->var_scaling));
-//   return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape,
-//                                     hypers->mean, sig_n);
-// }
-// double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
-//   double nu_n = 2 * hypers->deg_free - dim + 1;
-//   Eigen::MatrixXd sigma_n = hypers->scale_inv *
-//                             (hypers->deg_free - 0.5 * (dim - 1)) *
-//                             hypers->var_scaling / (hypers->var_scaling + 1);
-//   return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean,
-//                                           sigma_n);
-// }
 
 Eigen::VectorXd LDDPUniHierarchy::marg_lpdf_grid(  
     const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
   return Eigen::VectorXd(0,0);  // TODO
 }
-
-
 
 void LDDPUniHierarchy::draw() {
   // Generate new state values from their prior centering distribution
@@ -97,11 +93,24 @@ void LDDPUniHierarchy::draw() {
 }
 
 void LDDPUniHierarchy::sample_given_data() {
-  return;  // TODO
+  // Update values
+  Hyperparams params = normal_invgamma_update();
+
+  // Generate new state values from their prior centering distribution
+  auto &rng = bayesmix::Rng::Instance().get();
+  state.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+  state.mean = stan::math::multi_normal_prec_rng(
+      params.mean, params.var_scaling / state.var, rng);
 }
 
-void LDDPUniHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
-  return;  // TODO
+void LDDPUniHierarchy::sample_given_data(const Eigen::MatrixXd &data,
+  const Eigen::MatrixXd &covariates) { // TODO add in DepHier
+  data_sum_squares = data.squaredNorm();
+  covar_sum_squares = covariates.transpose() * covariates;
+  mixed_prod = covariates.transpose() * data;
+  card = data.rows();
+  log_card = std::log(card);
+  sample_given_data();
 }
 
 void NNIGHierarchy::set_state_from_proto(
