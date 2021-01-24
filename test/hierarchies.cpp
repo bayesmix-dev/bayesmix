@@ -4,6 +4,7 @@
 
 #include "../src/hierarchies/nnig_hierarchy.hpp"
 #include "../src/hierarchies/nnw_hierarchy.hpp"
+#include "../src/hierarchies/lddp_uni_hierarchy.hpp"
 #include "../src/utils/proto_utils.hpp"
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"
@@ -128,4 +129,30 @@ TEST(nnwhierarchy, sample_given_data) {
   hier2->write_state_to_proto(clusval2);
 
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+}
+
+TEST(lddp_uni_hierarchy, misc) {
+  int n = 5;
+  int dim = 2;
+  auto beta_true = Eigen::VectorXd(n, 10.0);
+  auto cov = Eigen::MatrixXd::Random(n, dim);
+  auto data = cov * beta_true + Eigen::VectorXd::Random(n);
+  double unif_var = 1.0 / 3;  // variance of a U[-1,1]
+  double true_var = dim * unif_var + unif_var;  // variance of each datum
+  LDDPUniHierarchy hier;
+  bayesmix::LDDUniPrior prior;
+  // TODO set hypers, including beta = *0*
+  hier.set_prior(prior);
+
+  for (int i = 0; i < n; i++) {
+    hier.add_datum(i, data.row(i), cov.row(i));
+  }
+  ASSERT_EQ(hier.covar_sum_squares, cov.transpose() * cov);
+  ASSERT_EQ(hier.mixed_prod, cov.transpose() * data);
+
+  hier.sample_given_data();
+  ASSERT_TRUE(state.regression_coeffs > prior.mean);
+
+  std::cout << "[          ] ----> " << state.var << std::endl;
+  std::cout << "[          ] ----> " << true_var << std::endl;
 }
