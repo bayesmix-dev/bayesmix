@@ -10,8 +10,16 @@ add_custom_target(
  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/build_tbb.py
 )
 
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
+find_package(Protobuf)
+message("Protobuf_FOUND ${Protobuf_FOUND}")
+message("   --> PROTOBUF LIB: ${PROTOBUF_LIBRARIES}")
+message("   --> PROTOBUF INCLUDE: ${PROTOBUF_INCLUDE_DIRS}")
+message("   --> PROTOBUF VERSION: ${Protobuf_VERSION}")
+message("   --> PROTOBUF Found: ${Protobuf_FOUND}")
 
 
 include(FetchContent)
@@ -20,42 +28,23 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(BUILD_TESTING OFF)
+set(protobuf_BUILD_TESTS OFF)
 
-pkg_check_modules(PROTOBUF REQUIRED protobuf>=3.12 IMPORTED_TARGET GLOBAL)
-add_library(protobuf::libprotobuf ALIAS PkgConfig::PROTOBUF)
-set_target_properties(PkgConfig::PROTOBUF PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "${PROTOBUF_INCLUDEDIR}")
-
-
-find_program(PROTOC_EXEC protoc REQUIRED)
-add_executable(protobuf::protoc IMPORTED GLOBAL)
-set_target_properties(protobuf::protoc PROPERTIES
-  IMPORTED_LOCATION ${PROTOC_EXEC}
-)
-
-if (NOT Protobuf_FOUND)
+if (NOT Protobuf_FOUND AND NOT TARGET protobuf::libprotobuf)
   message(CHECK_START "Fetching Protobuf")
   list(APPEND CMAKE_MESSAGE_INDENT "  ")
-  set(protobuf_BUILD_TESTS OFF)
+  
   set(protobuf_BUILD_EXPORT OFF)
   set(protobuf_MSVC_STATIC_RUNTIME OFF)
   # FetchContent_Declare(SOURCE_SUBDIR) was introduced in 3.18
-  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18")
-    FetchContent_Declare(
+  FetchContent_Declare(
       protobuf
       GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
       GIT_TAG "v3.14.0"
       GIT_SUBMODULES ""
       SOURCE_SUBDIR cmake)
-    FetchContent_MakeAvailable(protobuf)
-  else()
-    fetch_git_dependency(
-      NAME Protobuf
-      REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
-      TAG "v3.14.0"
-      SOURCE_SUBDIR cmake
-      )
-  endif()
+  FetchContent_MakeAvailable(protobuf)
+
   list(POP_BACK CMAKE_MESSAGE_INDENT)
   message(CHECK_PASS "fetched")
 endif()
@@ -78,7 +67,7 @@ set(INCLUDE_PATHS
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-set(LINK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so pthread protobuf)
+set(LINK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so pthread protobuf::libprotobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
 file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
