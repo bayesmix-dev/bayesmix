@@ -63,23 +63,10 @@ class NNWHierarchy : public BaseHierarchy {
   //! Special setter for prec and its utilities
   void set_prec_and_utilities(const Eigen::MatrixXd &prec_);
 
-  void clear_data() {
-    data_sum = Eigen::VectorXd::Zero(dim);
-    data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
-    card = 0;
-    cluster_data_idx = std::set<int>();
-  }
+  void clear_data() override;
 
   void update_summary_statistics(const Eigen::VectorXd &datum,
-                                 bool add) override {
-    if (add) {
-      data_sum += datum;
-      data_sum_squares += datum * datum.transpose();
-    } else {
-      data_sum -= datum;
-      data_sum_squares -= datum * datum.transpose();
-    }
-  }
+                                 bool add) override;
 
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_wishart_update();

@@ -46,23 +46,10 @@ class NNIGHierarchy : public BaseHierarchy {
   // HYPERPRIOR
   std::shared_ptr<bayesmix::NNIGPrior> prior;
 
-  void clear_data() {
-    data_sum = 0;
-    data_sum_squares = 0;
-    card = 0;
-    cluster_data_idx = std::set<int>();
-  }
+  void clear_data() override;
 
   void update_summary_statistics(const Eigen::VectorXd &datum,
-                                 bool add) override {
-    if (add) {
-      data_sum += datum(0);
-      data_sum_squares += datum(0) * datum(0);
-    } else {
-      data_sum -= datum(0);
-      data_sum_squares -= datum(0) * datum(0);
-    }
-  }
+                                 bool add) override;
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior

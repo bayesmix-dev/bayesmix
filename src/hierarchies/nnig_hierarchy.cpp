@@ -42,6 +42,24 @@ NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() {
   return post_params;
 }
 
+void NNIGHierarchy::clear_data() {
+  data_sum = 0;
+  data_sum_squares = 0;
+  card = 0;
+  cluster_data_idx = std::set<int>();
+}
+
+void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
+                                              bool add) {
+  if (add) {
+    data_sum += datum(0);
+    data_sum_squares += datum(0) * datum(0);
+  } else {
+    data_sum -= datum(0);
+    data_sum_squares -= datum(0) * datum(0);
+  }
+}
+
 void NNIGHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();

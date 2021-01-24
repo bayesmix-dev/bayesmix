@@ -33,6 +33,24 @@ void NNWHierarchy::initialize() {
   clear_data();
 }
 
+void NNWHierarchy::clear_data() {
+  data_sum = Eigen::VectorXd::Zero(dim);
+  data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
+  card = 0;
+  cluster_data_idx = std::set<int>();
+}
+
+void NNWHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
+                                             bool add) {
+  if (add) {
+    data_sum += datum;
+    data_sum_squares += datum * datum.transpose();
+  } else {
+    data_sum -= datum;
+    data_sum_squares -= datum * datum.transpose();
+  }
+}
+
 //! \param data                    Matrix of row-vectorial data points
 //! \param mu0, lambda0, tau0, nu0 Original values for hyperparameters
 //! \return                        Vector of updated values for hyperparameters
