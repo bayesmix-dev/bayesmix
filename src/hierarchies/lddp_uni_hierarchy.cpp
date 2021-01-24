@@ -6,7 +6,7 @@
 #include "../utils/rng.hpp"
 
 void LDDPUniHierarchy::initialize() {
-  state.mean = Eigen::VectorXd::Zero(dim);
+  state.regression_coeffs = Eigen::VectorXd::Zero(dim);
   clear_data();
 }
 
@@ -59,16 +59,16 @@ void LDDPUniHierarchy::update_hypers(
 double LDDPUniHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate) const {
-  return stan::math::normal_lpdf(datum(0), state.mean.dot(covariate),
-    sqrt(state.var));
+  return stan::math::normal_lpdf(datum(0),
+    state.regression_coeffs.dot(covariate), sqrt(state.var));
 }
 
 Eigen::VectorXd LDDPUniHierarchy::like_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
-    result(i) = stan::math::normal_lpdf(data(i, 0), state.mean.dot(covariate),
-      sqrt(state.var));
+    result(i) = stan::math::normal_lpdf(data(i, 0),
+      state.regression_coeffs.dot(covariate), sqrt(state.var));
   }
   return result;
 }
@@ -88,7 +88,7 @@ void LDDPUniHierarchy::draw() {
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   state.var = stan::math::inv_gamma_rng(hypers->shape, hypers->scale, rng);
-  state.mean = stan::math::multi_normal_prec_rng(
+  state.regression_coeffs = stan::math::multi_normal_prec_rng(
       hypers->mean, hypers->var_scaling / state.var, rng);
 }
 
@@ -99,7 +99,7 @@ void LDDPUniHierarchy::sample_given_data() {
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   state.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
-  state.mean = stan::math::multi_normal_prec_rng(
+  state.regression_coeffs = stan::math::multi_normal_prec_rng(
       params.mean, params.var_scaling / state.var, rng);
 }
 
@@ -117,7 +117,7 @@ void NNIGHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast = google::protobuf::internal::down_cast<
       const bayesmix::MarginalState::ClusterState &>(state_);
-  state.mean = to_eigen(statecast.multi_ls_state().mean());
+  state.regression_coeffs = to_eigen(statecast.multi_ls_state().mean());
   state.var = statecast.univ_ls_state().var();
   set_card(statecast.cardinality());
 }
@@ -150,7 +150,7 @@ void LDDPUniHierarchy::set_prior(const google::protobuf::Message &prior_) {
 void LDDPUniHierarchy::write_state_to_proto(
   google::protobuf::Message *out) const {
   bayesmix::UnivDepLSState state_;
-  bayesmix::to_proto(state.mean, state_.mutable_mean());
+  bayesmix::to_proto(state.regression_coeffs, state_.mutable_mean());
   state_.set_var(state.var);
 
   auto *out_cast = google::protobuf::internal::down_cast<

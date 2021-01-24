@@ -14,7 +14,7 @@
 class LDDPUniHierarchy : public DependentHierarchy {
  public:
   struct State {
-    Eigen::VectorXd mean;
+    Eigen::VectorXd regression_coeffs;
     double var;
   };
   struct Hyperparams {
