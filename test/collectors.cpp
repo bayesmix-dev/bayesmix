@@ -3,10 +3,10 @@
 #include <Eigen/Dense>
 #include <vector>
 
-#include "matrix.pb.h"
 #include "../src/collectors/file_collector.hpp"
 #include "../src/collectors/memory_collector.hpp"
 #include "../src/utils/proto_utils.hpp"
+#include "matrix.pb.h"
 
 TEST(collectors, memory) {
   MemoryCollector coll;

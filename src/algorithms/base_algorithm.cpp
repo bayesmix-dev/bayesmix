@@ -3,10 +3,10 @@
 #include <Eigen/Dense>
 #include <cassert>
 
-#include "marginal_state.pb.h"
-#include "mixing_state.pb.h"
 #include "../hierarchies/dependent_hierarchy.hpp"
 #include "../mixings/dependent_mixing.hpp"
+#include "marginal_state.pb.h"
+#include "mixing_state.pb.h"
 
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;
@@ -19,15 +19,15 @@ void BaseAlgorithm::initialize() {
   assert(mixing != nullptr && "Error: mixing was not provided");
   if (hier_covariates.rows() != 0) {
     assert(unique_values[0]->is_dependent() &&
-      "Error: covariates supplied to non-dependent hierarchy");
+           "Error: covariates supplied to non-dependent hierarchy");
     assert(data.rows() == hier_covariates.rows() &&
-      "Error: data size and covariates size do not match");
+           "Error: data size and covariates size do not match");
   }
   if (mix_covariates.rows() != 0) {
     assert(mixing->is_dependent() &&
-      "Error: covariates supplied to non-dependent mixing");
+           "Error: covariates supplied to non-dependent mixing");
     assert(data.rows() == mix_covariates.rows() &&
-      "Error: data size and covariates size do not match");
+           "Error: data size and covariates size do not match");
   }
 
   if (init_num_clusters == 0) {

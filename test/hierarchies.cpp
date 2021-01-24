@@ -2,11 +2,11 @@
 
 #include <Eigen/Dense>
 
-#include "ls_state.pb.h"
-#include "marginal_state.pb.h"
 #include "../src/hierarchies/nnig_hierarchy.hpp"
 #include "../src/hierarchies/nnw_hierarchy.hpp"
 #include "../src/utils/proto_utils.hpp"
+#include "ls_state.pb.h"
+#include "marginal_state.pb.h"
 
 TEST(nnighierarchy, draw) {
   auto hier = std::make_shared<NNIGHierarchy>();
@@ -118,7 +118,7 @@ TEST(nnwhierarchy, sample_given_data) {
   datum << 4.5, 4.5;
 
   auto hier2 = hier->clone();
-  hier2 -> add_datum(0, datum);
+  hier2->add_datum(0, datum);
   hier2->sample_given_data();
 
   bayesmix::MarginalState out;

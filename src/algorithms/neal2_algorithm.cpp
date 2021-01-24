@@ -1,7 +1,7 @@
 #include "neal2_algorithm.hpp"
 
-#include <cassert>
 #include <Eigen/Dense>
+#include <cassert>
 #include <memory>
 #include <stan/math/prim/fun.hpp>
 #include <vector>
@@ -23,7 +23,7 @@ Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
 }
 
 Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
-  const unsigned int data_idx) const {
+    const unsigned int data_idx) const {
   unsigned int n_data = data.rows();
   unsigned int n_clust = unique_values.size();
   Eigen::VectorXd logprior(n_clust + 1);
@@ -31,18 +31,18 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
     auto mixcast = std::dynamic_pointer_cast<DependentMixing>(mixing);
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
-      logprior(j) = mixcast->mass_existing_cluster(unique_values[j],
-        mix_covariates.row(data_idx), n_data - 1, true, true);
+      logprior(j) = mixcast->mass_existing_cluster(
+          unique_values[j], mix_covariates.row(data_idx), n_data - 1, true,
+          true);
     }
     // Further update with marginal component
-    logprior(n_clust) = mixcast->mass_new_cluster(mix_covariates.row(data_idx),
-      n_clust, n_data - 1, true, true);
-  }
-  else {
+    logprior(n_clust) = mixcast->mass_new_cluster(
+        mix_covariates.row(data_idx), n_clust, n_data - 1, true, true);
+  } else {
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
-      logprior(j) = mixing->mass_existing_cluster(unique_values[j],
-                                                   n_data - 1, true, true);
+      logprior(j) = mixing->mass_existing_cluster(unique_values[j], n_data - 1,
+                                                  true, true);
     }
     // Further update with marginal component
     logprior(n_clust) =
@@ -52,27 +52,26 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
 }
 
 Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
-  const unsigned int data_idx) const {
+    const unsigned int data_idx) const {
   unsigned int n_data = data.rows();
   unsigned int n_clust = unique_values.size();
   Eigen::VectorXd loglpdf(n_clust + 1);
   if (unique_values[0]->is_dependent()) {
-    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(
-      unique_values[0]);
+    auto hiercast =
+        std::dynamic_pointer_cast<DependentHierarchy>(unique_values[0]);
     // Update with marginal component
-    loglpdf(n_clust) = hiercast->marg_lpdf(data.row(data_idx),
-      mix_covariates.row(data_idx));
+    loglpdf(n_clust) =
+        hiercast->marg_lpdf(data.row(data_idx), mix_covariates.row(data_idx));
 
     for (size_t j = 0; j < n_clust; j++) {
-      hiercast = std::dynamic_pointer_cast<DependentHierarchy>(
-        unique_values[j]);
+      hiercast =
+          std::dynamic_pointer_cast<DependentHierarchy>(unique_values[j]);
       // Probability of being assigned to an already existing cluster
       loglpdf(j) = hiercast->like_lpdf(data.row(data_idx),
-        mix_covariates.row(data_idx));
+                                       mix_covariates.row(data_idx));
     }
 
-  }
-  else {
+  } else {
     // Loop over clusters
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
@@ -83,7 +82,6 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
   }
   return loglpdf;
 }
-
 
 void Neal2Algorithm::print_startup_message() const {
   std::string msg = "Running Neal2 algorithm with " +
@@ -111,8 +109,8 @@ void Neal2Algorithm::sample_allocations() {
     // Remove datum from cluster
     unique_values[allocations[i]]->remove_datum(i, data.row(i));
     // Compute probabilities of clusters in log-space
-    Eigen::VectorXd logprobas = get_cluster_prior_mass(i) +
-      get_cluster_lpdf(i);
+    Eigen::VectorXd logprobas =
+        get_cluster_prior_mass(i) + get_cluster_lpdf(i);
     // Draw a NEW value for datum allocation
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);

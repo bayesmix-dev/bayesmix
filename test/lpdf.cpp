@@ -4,9 +4,9 @@
 #include <stan/math/prim/fun.hpp>  // lgamma, lmgamma
 #include <stan/math/prim/prob.hpp>
 
-#include "marginal_state.pb.h"
 #include "../src/hierarchies/nnig_hierarchy.hpp"
 #include "../src/hierarchies/nnw_hierarchy.hpp"
+#include "marginal_state.pb.h"
 
 TEST(lpdf, nnig) {
   NNIGHierarchy hier;
@@ -135,10 +135,6 @@ TEST(lpdf, nnig) {
 //   ASSERT_DOUBLE_EQ(marg, marg_murphy);
 // }
 
-
-
-
-
 // // TEST(lpdf, nnw) {  // TODO
 // //   using namespace stan::math;
 // //   NNWHierarchy hier;
@@ -154,13 +150,13 @@ TEST(lpdf, nnig) {
 // //   hier.check_and_initialize();
 // //   Eigen::VectorXd mu = mu0;
 // //   Eigen::MatrixXd tau = lambda0 * Eigen::Matrix2d::Identity();
-// // 
+// //
 // //   Eigen::RowVectorXd datum(2);
 // //   datum << 4.5, 4.5;
-// // 
+// //
 // //   // Compute prior parameters
 // //   Eigen::MatrixXd tau_pr = lambda0 * tau0;
-// // 
+// //
 // //   // Compute posterior parameters
 // //   double lambda_n = lambda0 + 1;
 // //   double nu_n = nu0 + 0.5;
@@ -172,7 +168,7 @@ TEST(lpdf, nnig) {
 // //                                           (datum - mu0.transpose());
 // //   Eigen::MatrixXd tau_n = stan::math::inverse_spd(tau_temp);
 // //   Eigen::MatrixXd tau_post = lambda_n * tau_n;
-// // 
+// //
 // //   // Compute pieces
 // //   double prior1 = stan::math::wishart_lpdf(tau, nu0, tau0);
 // //   double prior2 = stan::math::multi_normal_prec_lpdf(mu, mu0, tau_pr);
@@ -184,7 +180,7 @@ TEST(lpdf, nnig) {
 // //   // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
 // //   double sum = prior + like - post;
 // //   double marg = hier.marg_lpdf(datum);
-// // 
+// //
 // //   // Compute logdet's
 // //   Eigen::MatrixXd tauchol0 =
 // //       Eigen::LLT<Eigen::MatrixXd>(tau0).matrixL().transpose();
@@ -192,14 +188,15 @@ TEST(lpdf, nnig) {
 // //   Eigen::MatrixXd tauchol_n =
 // //       Eigen::LLT<Eigen::MatrixXd>(tau_n).matrixL().transpose();
 // //   double logdet_n = 2 * log(tauchol_n.diagonal().array()).sum();
-// // 
+// //
 // //   // lmgamma(dim, x)
 // //   int dim = 2;
 // //   double marg_murphy = lmgamma(dim, 0.5 * nu_n) + 0.5 * nu_n * logdet_n +
-// //                        0.5 * dim * log(lambda0) + dim * NEG_LOG_SQRT_TWO_PI -
+// //                        0.5 * dim * log(lambda0) + dim *
+// NEG_LOG_SQRT_TWO_PI -
 // //                        lmgamma(dim, 0.5 * nu0) - 0.5 * nu0 * logdet0 -
 // //                        0.5 * dim * log(lambda_n);
-// // 
+// //
 // //   // std::cout << "prior1=" << prior1 << std::endl;
 // //   // std::cout << "prior2=" << prior2 << std::endl;
 // //   // std::cout << "prior =" << prior << std::endl;
