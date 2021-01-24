@@ -14,29 +14,26 @@
 
 class DependentHierarchy : public BaseHierarchy {
  public:
-  void add_datum(const int id, const Eigen::VectorXd &datum,
-                 const Eigen::VectorXd &covariate) {  // TODO with covariates
-    auto it = cluster_data_idx.find(id);
-    assert(it == cluster_data_idx.end());
-    card += 1;
-    log_card = std::log(card);
-    update_summary_statistics(datum, true);
-    cluster_data_idx.insert(id);
-  }
+  void add_datum(const int id,
+    const Eigen::VectorXd &datum) override { return; }
 
-  void remove_datum(
-      const int id, const Eigen::VectorXd &datum,
-      const Eigen::VectorXd &covariate) {  // TODO with covariates
-    update_summary_statistics(datum, false);
-    card -= 1;
-    log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
-    auto it = cluster_data_idx.find(id);
-    assert(it != cluster_data_idx.end());
-    cluster_data_idx.erase(it);
-  }
+  void remove_datum(const int id,
+    const Eigen::VectorXd &datum) override { return; }
+
+  void add_datum(const int id, const Eigen::VectorXd &datum,
+                 const Eigen::VectorXd &covariate);
+
+  void remove_datum(const int id, const Eigen::VectorXd &datum,
+                    const Eigen::VectorXd &covariate);
 
   //! Returns true if the hierarchy has covariates i.e. is a dependent model
   bool is_dependent() const override { return true; }
+
+  void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 bool add) override { return; }
+
+  virtual void update_summary_statistics(const Eigen::VectorXd &datum,
+    const Eigen::VectorXd &covariate, bool add) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~DependentHierarchy() = default;

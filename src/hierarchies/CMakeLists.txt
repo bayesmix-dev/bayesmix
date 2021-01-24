@@ -1,6 +1,8 @@
 target_sources(bayesmix
   PUBLIC
+    base_hierarchy.cpp
     base_hierarchy.hpp
+    dependent_hierarchy.cpp
     dependent_hierarchy.hpp
     lin_dep_normal_hierarchy.hpp
     lin_dep_normal_hierarchy.cpp
