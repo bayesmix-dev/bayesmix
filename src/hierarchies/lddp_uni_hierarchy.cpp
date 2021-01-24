@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 #include <stan/math/prim/prob.hpp>
+
 #include "../utils/eigen_utils.hpp"
 #include "../utils/rng.hpp"
 
@@ -18,9 +19,10 @@ void LDDPUniHierarchy::clear_data() {
   cluster_data_idx = std::set<int>();
 }
 
-void LDDPUniHierarchy::update_summary_statistics(  // TODO add in DepHier
-  const Eigen::VectorXd &datum, const Eigen::MatrixXd covar, bool add) {
-  if (add) { 
+void LDDPUniHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
+                                                 const Eigen::MatrixXd covar,
+                                                 bool add) {
+  if (add) {
     data_sum_squares += datum(0) * datum(0);
     covar_sum_squares += covar.row(0).transpose() * covar.row(0);
     mixed_prod += datum(0) * covar.row(0);
@@ -35,17 +37,20 @@ LDDPUniHierarchy::Hyperparams LDDPUniHierarchy::normal_invgamma_update() {
   Hyperparams post_params;
 
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
-  post_params.mean = stan::math::inverse_spd(post_params.var_scaling) * (
-    mixed_prod + hypers->var_scaling * hypers->mean);
+  post_params.mean = stan::math::inverse_spd(post_params.var_scaling) *
+                     (mixed_prod + hypers->var_scaling * hypers->mean);
   post_params.shape = hypers->shape + 0.5 * card;
-  post_params.scale = hypers->scale + 0.5 * (data_sum_squares +
-    hypers->mean.transpose() * hypers->var_scaling * hypers->mean -
-    post_params.mean.transpose() * post_params.var_scaling * post_params.mean);
+  post_params.scale =
+      hypers->scale +
+      0.5 * (data_sum_squares +
+             hypers->mean.transpose() * hypers->var_scaling * hypers->mean -
+             post_params.mean.transpose() * post_params.var_scaling *
+                 post_params.mean);
   return post_params;
 }
 
 void LDDPUniHierarchy::update_hypers(
-  const std::vector<bayesmix::MarginalState::ClusterState> &states) {
+    const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();
   if (prior->has_fixed_values()) {
     return;
@@ -56,32 +61,34 @@ void LDDPUniHierarchy::update_hypers(
   }
 }
 
-double LDDPUniHierarchy::like_lpdf(
-    const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate) const {
-  return stan::math::normal_lpdf(datum(0),
-    state.regression_coeffs.dot(covariate), sqrt(state.var));
+double LDDPUniHierarchy::like_lpdf(const Eigen::RowVectorXd &datum,
+                                   const Eigen::RowVectorXd &covariate) const {
+  return stan::math::normal_lpdf(
+      datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
 }
 
 Eigen::VectorXd LDDPUniHierarchy::like_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
-    result(i) = stan::math::normal_lpdf(data(i, 0),
-      state.regression_coeffs.dot(covariate), sqrt(state.var));
+    result(i) = stan::math::normal_lpdf(
+        data(i, 0), state.regression_coeffs.dot(covariate), sqrt(state.var));
   }
   return result;
 }
 
-double LDDPUniHierarchy::marg_lpdf(
-    const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate) const {
-  return Eigen::VectorXd(0,0);  // TODO
+double LDDPUniHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum,
+                                   const Eigen::RowVectorXd &covariate) const {
+  return -1;  // TODO
 }
 
-Eigen::VectorXd LDDPUniHierarchy::marg_lpdf_grid(  
+Eigen::VectorXd LDDPUniHierarchy::marg_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
-  return Eigen::VectorXd(0,0);  // TODO
+  Eigen::VectorXd result(data.rows());
+  for (size_t i = 0; i < data.rows(); i++) {
+    result(i) = -1;  // TODO
+  }
+  return result;
 }
 
 void LDDPUniHierarchy::draw() {
@@ -104,7 +111,7 @@ void LDDPUniHierarchy::sample_given_data() {
 }
 
 void LDDPUniHierarchy::sample_given_data(const Eigen::MatrixXd &data,
-  const Eigen::MatrixXd &covariates) { // TODO add in DepHier
+                                         const Eigen::MatrixXd &covariates) {
   data_sum_squares = data.squaredNorm();
   covar_sum_squares = covariates.transpose() * covariates;
   mixed_prod = covariates.transpose() * data;
@@ -117,8 +124,9 @@ void NNIGHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast = google::protobuf::internal::down_cast<
       const bayesmix::MarginalState::ClusterState &>(state_);
-  state.regression_coeffs = to_eigen(statecast.multi_ls_state().mean());
-  state.var = statecast.univ_ls_state().var();
+  state.regression_coeffs =
+      to_eigen(statecast.univ_dep_ls_state().regression_coeffs());
+  state.var = statecast.univ_dep_ls_state().var();
   set_card(statecast.cardinality());
 }
 
@@ -132,8 +140,8 @@ void LDDPUniHierarchy::set_prior(const google::protobuf::Message &prior_) {
     // Set values
     hypers->mean = bayesmix::to_eigen(prior->fixed_values().mean());
     dim = hypers->mean.size();
-    hypers->var_scaling = bayesmix::to_eigen(
-      prior->fixed_values().var_scaling());
+    hypers->var_scaling =
+        bayesmix::to_eigen(prior->fixed_values().var_scaling());
     hypers->shape = prior->fixed_values().shape();
     hypers->scale = prior->fixed_values().scale();
     // Check validity
@@ -148,9 +156,10 @@ void LDDPUniHierarchy::set_prior(const google::protobuf::Message &prior_) {
 }
 
 void LDDPUniHierarchy::write_state_to_proto(
-  google::protobuf::Message *out) const {
+    google::protobuf::Message *out) const {
   bayesmix::UnivDepLSState state_;
-  bayesmix::to_proto(state.regression_coeffs, state_.mutable_mean());
+  bayesmix::to_proto(state.regression_coeffs,
+                     state_.mutable_regression_coeffs());
   state_.set_var(state.var);
 
   auto *out_cast = google::protobuf::internal::down_cast<
@@ -162,8 +171,9 @@ void LDDPUniHierarchy::write_state_to_proto(
 void LDDPUniHierarchy::write_hypers_to_proto(
     google::protobuf::Message *out) const {
   bayesmix::LDDUniPrior hypers_;
-  bayesmix::to_proto(hypers->mean,
-                     hypers_.mutable_fixed_values()->mutable_mean());
+  bayesmix::to_proto(
+      hypers->mean,
+      hypers_.mutable_fixed_values()->mutable_regression_coeffs());
   bayesmix::to_proto(hypers->var_scaling,
                      hypers_.mutable_fixed_values()->mutable_var_scaling());
   hypers_.mutable_fixed_values()->set_shape(hypers->shape);

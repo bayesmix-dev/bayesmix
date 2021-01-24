@@ -16,7 +16,8 @@ void DependentHierarchy::add_datum(const int id, const Eigen::VectorXd &datum,
 }
 
 void DependentHierarchy::remove_datum(const int id,
-    const Eigen::VectorXd &datum, const Eigen::VectorXd &covariate) {
+                                      const Eigen::VectorXd &datum,
+                                      const Eigen::VectorXd &covariate) {
   update_summary_statistics(datum, covariate, false);
   card -= 1;
   log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);

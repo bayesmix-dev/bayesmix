@@ -40,8 +40,7 @@ class LDDPUniHierarchy : public DependentHierarchy {
   std::shared_ptr<bayesmix::LDDUniPrior> prior;
 
   void clear_data();
-  void update_summary_statistics(const Eigen::VectorXd &datum,
-                                 bool add);
+  void update_summary_statistics(const Eigen::VectorXd &datum, bool add);
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior

@@ -14,11 +14,13 @@
 
 class DependentHierarchy : public BaseHierarchy {
  public:
-  void add_datum(const int id,
-    const Eigen::VectorXd &datum) override { return; }
+  void add_datum(const int id, const Eigen::VectorXd &datum) override {
+    return;
+  }
 
-  void remove_datum(const int id,
-    const Eigen::VectorXd &datum) override { return; }
+  void remove_datum(const int id, const Eigen::VectorXd &datum) override {
+    return;
+  }
 
   void add_datum(const int id, const Eigen::VectorXd &datum,
                  const Eigen::VectorXd &covariate);
@@ -30,10 +32,13 @@ class DependentHierarchy : public BaseHierarchy {
   bool is_dependent() const override { return true; }
 
   void update_summary_statistics(const Eigen::VectorXd &datum,
-                                 bool add) override { return; }
+                                 bool add) override {
+    return;
+  }
 
   virtual void update_summary_statistics(const Eigen::VectorXd &datum,
-    const Eigen::VectorXd &covariate, bool add) = 0;
+                                         const Eigen::VectorXd &covariate,
+                                         bool add) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~DependentHierarchy() = default;

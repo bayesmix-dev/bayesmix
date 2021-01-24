@@ -1,8 +1,9 @@
 #ifndef BAYESMIX_MIXINGS_DEPENDENT_MIXING_HPP_
 #define BAYESMIX_MIXINGS_DEPENDENT_MIXING_HPP_
 
-#include "base_mixing.hpp"
 #include <Eigen/Dense>
+
+#include "base_mixing.hpp"
 
 class DependentMixing : public BaseMixing {
  protected:
