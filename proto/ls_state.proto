@@ -15,6 +15,6 @@ message MultiLSState {
 }
 
 message UnivDepLSState {
-    Vector mean = 1;
-    Matrix prec = 2;
+    Vector regression_coeffs = 1;
+    double var = 2;
 }

@@ -3,7 +3,6 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
-#include <stan/math/prim/err.hpp>
 #include <stan/math/prim/prob.hpp>
 
 #include "../utils/distributions.hpp"

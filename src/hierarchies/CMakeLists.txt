@@ -4,8 +4,8 @@ target_sources(bayesmix
     base_hierarchy.hpp
     dependent_hierarchy.cpp
     dependent_hierarchy.hpp
-    lin_dep_normal_hierarchy.hpp
-    lin_dep_normal_hierarchy.cpp
+    lddp_uni_hierarchy.hpp
+    lddp_uni_hierarchy.cpp
     nnig_hierarchy.hpp
     nnig_hierarchy.cpp
     nnw_hierarchy.hpp

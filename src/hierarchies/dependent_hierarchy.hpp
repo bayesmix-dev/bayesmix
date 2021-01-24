@@ -40,6 +40,10 @@ class DependentHierarchy : public BaseHierarchy {
                                          const Eigen::VectorXd &covariate,
                                          bool add) = 0;
 
+  void sample_given_data(const Eigen::MatrixXd &data) override { return; }
+  virtual void sample_given_data(const Eigen::MatrixXd &data,
+                                 const Eigen::MatrixXd &covariates) = 0;
+
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~DependentHierarchy() = default;
   DependentHierarchy() = default;

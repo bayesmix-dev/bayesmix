@@ -40,11 +40,15 @@ class LDDPUniHierarchy : public DependentHierarchy {
   std::shared_ptr<bayesmix::LDDUniPrior> prior;
 
   void clear_data();
-  void update_summary_statistics(const Eigen::VectorXd &datum, bool add);
+  void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 const Eigen::VectorXd &covariate, bool add);
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update();
+
+  void sample_given_data(const Eigen::MatrixXd &data,
+                         const Eigen::MatrixXd &covariates) override;
 
  public:
   void initialize() override;
@@ -85,7 +89,6 @@ class LDDPUniHierarchy : public DependentHierarchy {
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data() override;
-  void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }
