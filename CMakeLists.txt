@@ -1,9 +1,17 @@
 cmake_minimum_required(VERSION 3.13.0)
+
+find_program(CCACHE_PROGRAM ccache)
+if (CCACHE_PROGRAM)
+	message("FOUND CCACHE")
+	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
+
+
 project(bayesmix)
 
 set (CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
-
+set(protobuf_BUILD_TESTS OFF)
 include(FindPythonInterp)
 add_custom_target(
  build_tbb ALL
@@ -28,7 +36,6 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(BUILD_TESTING OFF)
-set(protobuf_BUILD_TESTS OFF)
 
 if (NOT Protobuf_FOUND AND NOT TARGET protobuf::libprotobuf)
   message(CHECK_START "Fetching Protobuf")
