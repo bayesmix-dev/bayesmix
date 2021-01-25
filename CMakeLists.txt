@@ -58,6 +58,12 @@ if (NOT Protobuf_FOUND AND NOT TARGET protobuf::libprotobuf)
 
   list(POP_BACK CMAKE_MESSAGE_INDENT)
   message(CHECK_PASS "fetched")
+
+  message("   --> PROTOBUF LIB: ${PROTOBUF_LIBRARIES}")
+  message("   --> PROTOBUF SRC: ${protobuf_SOURCE_DIR}")
+  message("   --> PROTOBUF VERSION: ${Protobuf_VERSION}")
+  message("   --> PROTOBUF Found: ${Protobuf_FOUND}")
+
 endif()
 
 
@@ -76,6 +82,7 @@ set(INCLUDE_PATHS
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/include
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${protobuf_SOURCE_DIR}/src
 )
 
 set(LINK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so pthread protobuf::libprotobuf)
@@ -113,6 +120,8 @@ SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRU
 get_directory_property(HAS_PARENT PARENT_DIRECTORY)
 if(HAS_PARENT)
   set(BAYESMIX_INCLUDE_PATHS ${INCLUDE_PATHS} PARENT_SCOPE)
+  set(BAYESMIX_LINK_LIBRARIES ${LINK_LIBRARIES} PARENT_SCOPE)
+  set(BAYESMIX_COMPILE_OPTIONS ${COMPILE_OPTIONS} PARENT_SCOPE)
   set(PROTO_HEADERS ${PROTO_HDRS} PARENT_SCOPE)
   set(PROTO_SOURCES ${PROTO_SRCS} PARENT_SCOPE)
 endif()
