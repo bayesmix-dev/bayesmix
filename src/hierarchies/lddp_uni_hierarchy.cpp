@@ -1,6 +1,7 @@
 #include "lddp_uni_hierarchy.hpp"
 
 #include <Eigen/Dense>
+#include <stan/math/prim/err.hpp>
 
 #include "../utils/eigen_utils.hpp"
 #include "../utils/proto_utils.hpp"
@@ -77,14 +78,19 @@ Eigen::VectorXd LDDPUniHierarchy::like_lpdf_grid(
 
 double LDDPUniHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum,
                                    const Eigen::RowVectorXd &covariate) const {
-  return -1;  // TODO
+  double sig_n =
+      sqrt((1 + covariate.transpose() *
+                    stan::math::inverse_spd(hypers->var_scaling) * covariate) *
+           hypers->scale / hypers->shape);
+  return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape,
+                                    covariate.dot(hypers->mean), sig_n);
 }
 
 Eigen::VectorXd LDDPUniHierarchy::marg_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
-    result(i) = -1;  // TODO
+    result(i) = marg_lpdf(data.row(i), covariates.row(i));
   }
   return result;
 }

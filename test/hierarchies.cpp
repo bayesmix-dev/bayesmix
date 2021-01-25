@@ -2,9 +2,9 @@
 
 #include <Eigen/Dense>
 
+#include "../src/hierarchies/lddp_uni_hierarchy.hpp"
 #include "../src/hierarchies/nnig_hierarchy.hpp"
 #include "../src/hierarchies/nnw_hierarchy.hpp"
-#include "../src/hierarchies/lddp_uni_hierarchy.hpp"
 #include "../src/utils/proto_utils.hpp"
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"
@@ -137,7 +137,7 @@ TEST(lddp_uni_hierarchy, misc) {
   auto beta_true = Eigen::VectorXd(n, 10.0);
   auto cov = Eigen::MatrixXd::Random(n, dim);
   auto data = cov * beta_true + Eigen::VectorXd::Random(n);
-  double unif_var = 1.0 / 3;  // variance of a U[-1,1]
+  double unif_var = 1.0 / 3;                    // variance of a U[-1,1]
   double true_var = dim * unif_var + unif_var;  // variance of each datum
   LDDPUniHierarchy hier;
   bayesmix::LDDUniPrior prior;
