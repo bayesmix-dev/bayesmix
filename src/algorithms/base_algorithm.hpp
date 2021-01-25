@@ -128,6 +128,11 @@ class BaseAlgorithm {
   virtual ~BaseAlgorithm() = default;
   BaseAlgorithm() = default;
 
+  void add_datum_to_hierarchy(const unsigned int datum_idx,
+                              std::shared_ptr<BaseHierarchy> hier);
+  void remove_datum_from_hierarchy(const unsigned int datum_idx,
+                                   std::shared_ptr<BaseHierarchy> hier);
+
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }
   unsigned int get_burnin() const { return burnin; }
