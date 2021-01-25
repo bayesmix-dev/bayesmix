@@ -107,7 +107,13 @@ void Neal2Algorithm::sample_allocations() {
     // Initialize pseudo-flag
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
     // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(i, data.row(i));
+    if (unique_values[allocations[i]]->is_dependent()) {
+      auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(
+          unique_values[allocations[i]]);
+      hiercast->remove_datum(i, data.row(i), hier_covariates.row(i));
+    } else {
+      unique_values[allocations[i]]->remove_datum(i, data.row(i));
+    }
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas =
         get_cluster_prior_mass(i) + get_cluster_lpdf(i);
@@ -118,14 +124,26 @@ void Neal2Algorithm::sample_allocations() {
 
     if (c_new == n_clust) {
       std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
-      new_unique->add_datum(i, data.row(i));
+      if (new_unique->is_dependent()) {
+        auto hiercast =
+            std::dynamic_pointer_cast<DependentHierarchy>(new_unique);
+        hiercast->add_datum(i, data.row(i), hier_covariates.row(i));
+      } else {
+        new_unique->add_datum(i, data.row(i));
+      }
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      unique_values[allocations[i]]->add_datum(i, data.row(i));
+      if (unique_values[c_new]->is_dependent()) {
+        auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(
+            unique_values[c_new]);
+        hiercast->add_datum(i, data.row(i), hier_covariates.row(i));
+      } else {
+        unique_values[c_new]->add_datum(i, data.row(i));
+      }
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers
