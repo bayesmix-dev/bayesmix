@@ -23,7 +23,7 @@
 //! and some minor adjustments in the allocation sampling phase to circumvent
 //! non-conjugacy, it is the same as Neal's algorithm 2.
 
-class Neal8Algorithm : public Neal2Algorithm {  // TODO same changes as Neal2
+class Neal8Algorithm : public Neal2Algorithm {
  protected:
   //! Number of auxiliary blocks
   unsigned int n_aux = 3;
