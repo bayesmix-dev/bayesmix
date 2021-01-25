@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.13.0)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+message("CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}")
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
@@ -11,7 +13,9 @@ project(bayesmix)
 
 set (CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
-set(protobuf_BUILD_TESTS OFF)
+option(protobuf_BUILD_TESTS "" OFF)
+
+
 include(FindPythonInterp)
 add_custom_target(
  build_tbb ALL
