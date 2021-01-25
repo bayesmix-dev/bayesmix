@@ -52,24 +52,20 @@ void Neal8Algorithm::sample_allocations() {
 
   // Loop over data points
   for (size_t i = 0; i < n_data; i++) {
-    // Current i-th datum as row vector
-    Eigen::Matrix<double, 1, Eigen::Dynamic> datum = data.row(i);
     // Initialize current number of clusters
     unsigned int n_clust = unique_values.size();
-    // Initialize pseudo-flag
-    int singleton = int(unique_values[allocations[i]]->get_card() == 1);
+    // Initialize flag
+    bool singleton = (unique_values[allocations[i]]->get_card() == 1);
     if (singleton) {
       // Save unique value in the first auxiliary block
       bayesmix::MarginalState::ClusterState curr_val;
       unique_values[allocations[i]]->write_state_to_proto(&curr_val);
       aux_unique_values[0]->set_state_from_proto(curr_val);
     }
-
     // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(i, datum);
-
+    remove_datum_from_hierarchy(i, unique_values[allocations[i]]);
     // Draw the unique values in the auxiliary blocks from their prior
-    for (size_t j = singleton; j < n_aux; j++) {
+    for (size_t j = singleton; j < n_aux; j++) {  // TODO singleton
       aux_unique_values[j]->draw();
     }
 
@@ -80,7 +76,7 @@ void Neal8Algorithm::sample_allocations() {
       // Probability of being assigned to an already existing cluster
       logprobas(j) = mixing->mass_existing_cluster(unique_values[j],
                                                    n_data - 1, true, true) +
-                     unique_values[j]->like_lpdf(datum);
+                     unique_values[j]->like_lpdf(data.row(i));
       // Note: if datum is a singleton, then, when j = allocations[i],
       // one has card[j] = 0: cluster j will never be chosen
     }
@@ -89,7 +85,7 @@ void Neal8Algorithm::sample_allocations() {
       // Probability of being assigned to a newly generated cluster
       logprobas(n_clust + j) =
           mixing->mass_new_cluster(n_clust, n_data - 1, true, true) +
-          aux_unique_values[j]->like_lpdf(datum) - log(n_aux);
+          aux_unique_values[j]->like_lpdf(data.row(i)) - log(n_aux);
     }
     // Draw a NEW value for datum allocation
     unsigned int c_new =
@@ -103,10 +99,10 @@ void Neal8Algorithm::sample_allocations() {
           aux_unique_values[c_new - n_clust]->clone();
       unique_values.push_back(hier_new);
       allocations[i] = n_clust;
-      unique_values[allocations[i]]->add_datum(i, datum);
+      add_datum_to_hierarchy(i, unique_values[n_clust]);
     } else {
       allocations[i] = c_new;
-      unique_values[allocations[i]]->add_datum(i, datum);
+      add_datum_to_hierarchy(i, unique_values[c_new]);
     }
 
     if (singleton) {
