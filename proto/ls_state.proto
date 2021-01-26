@@ -14,7 +14,7 @@ message MultiLSState {
     Matrix prec = 2;
 }
 
-message UnivDepLSState {
+message LinRegUnivLSState {
     Vector regression_coeffs = 1;
     double var = 2;
 }

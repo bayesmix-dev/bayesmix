@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_HIERARCHIES_LDDP_UNI_HIERARCHY_HPP_
-#define BAYESMIX_HIERARCHIES_LDDP_UNI_HIERARCHY_HPP_
+#ifndef BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_HPP_
+#define BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_HPP_
 
 #include <google/protobuf/stubs/casts.h>
 
@@ -11,7 +11,7 @@
 #include "base_hierarchy.hpp"
 #include "dependent_hierarchy.hpp"
 
-class LDDPUniHierarchy : public DependentHierarchy {
+class LinRegUniHierarchy : public DependentHierarchy {
  public:
   struct State {
     Eigen::VectorXd regression_coeffs;
@@ -37,7 +37,7 @@ class LDDPUniHierarchy : public DependentHierarchy {
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
   // HYPERPRIOR
-  std::shared_ptr<bayesmix::LDDUniPrior> prior;
+  std::shared_ptr<bayesmix::LinRegUnivPrior> prior;
 
   void clear_data();
   void update_summary_statistics(const Eigen::VectorXd &datum,
@@ -59,11 +59,11 @@ class LDDPUniHierarchy : public DependentHierarchy {
                          &states) override;
 
   // DESTRUCTOR AND CONSTRUCTORS
-  ~LDDPUniHierarchy() = default;
-  LDDPUniHierarchy() = default;
+  ~LinRegUniHierarchy() = default;
+  LinRegUniHierarchy() = default;
 
   std::shared_ptr<BaseHierarchy> clone() const override {
-    auto out = std::make_shared<LDDPUniHierarchy>(*this);
+    auto out = std::make_shared<LinRegUniHierarchy>(*this);
     out->clear_data();
     return out;
   }
@@ -94,13 +94,12 @@ class LDDPUniHierarchy : public DependentHierarchy {
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
   //! \param state_ State value to set
-  //! \param check  If true, a state validity check occurs after assignment
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  std::string get_id() const override { return "LDDPUni"; }
+  std::string get_id() const override { return "LinRegUni"; }
 };
 
-#endif  // BAYESMIX_HIERARCHIES_LDDP_UNI_HIERARCHY_HPP_
+#endif  // BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_HPP_
