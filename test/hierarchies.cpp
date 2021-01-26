@@ -2,7 +2,7 @@
 
 #include <Eigen/Dense>
 
-#include "../src/hierarchies/lddp_uni_hierarchy.hpp"
+#include "../src/hierarchies/lin_reg_uni_hierarchy.hpp"
 #include "../src/hierarchies/nnig_hierarchy.hpp"
 #include "../src/hierarchies/nnw_hierarchy.hpp"
 #include "../src/utils/proto_utils.hpp"
@@ -131,28 +131,55 @@ TEST(nnwhierarchy, sample_given_data) {
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
 
-TEST(lddp_uni_hierarchy, misc) {
+TEST(lin_reg_uni_hierarchy, read_and_write) {
+  // TODO
+}
+
+TEST(lin_reg_uni_hierarchy, lpdf) {
+  // TODO marginal_lpdf = posterior_lpdf - prior_lpdf
+}
+
+TEST(lin_reg_uni_hierarchy, misc) {
   int n = 5;
   int dim = 2;
-  auto beta_true = Eigen::VectorXd(n, 10.0);
-  auto cov = Eigen::MatrixXd::Random(n, dim);
-  auto data = cov * beta_true + Eigen::VectorXd::Random(n);
+  Eigen::Vector2d beta_true;
+  beta_true << 10.0, 10.0;
+  auto cov = Eigen::MatrixXd::Random(n, dim);  // random in [-1,1]
+  auto data = cov * beta_true + Eigen::VectorXd::Random(n);  // same
   double unif_var = 1.0 / 3;                    // variance of a U[-1,1]
   double true_var = dim * unif_var + unif_var;  // variance of each datum
-  LDDPUniHierarchy hier;
-  bayesmix::LDDUniPrior prior;
-  // TODO set hypers, including beta = *0*
+  LinRegUniHierarchy hier;
+  bayesmix::LinRegUnivPrior prior;
+
+  Eigen::Vector2d beta0 = 0 * beta_true;
+  bayesmix::Vector beta0_proto;
+  bayesmix::to_proto(beta0, &beta0_proto);
+  auto Lambda0 = Eigen::Matrix2d::Identity();
+  bayesmix::Matrix Lambda0_proto;
+  bayesmix::to_proto(Lambda0, &Lambda0_proto);
+  double a0 = 2.0;
+  double b0 = 1.0;
+  *prior.mutable_fixed_values()->mutable_mean() = beta0_proto;
+  *prior.mutable_fixed_values()->mutable_var_scaling() = Lambda0_proto;
+  prior.mutable_fixed_values()->set_shape(a0);
+  prior.mutable_fixed_values()->set_scale(b0);
   hier.set_prior(prior);
 
   for (int i = 0; i < n; i++) {
     hier.add_datum(i, data.row(i), cov.row(i));
   }
-  ASSERT_EQ(hier.covar_sum_squares, cov.transpose() * cov);
-  ASSERT_EQ(hier.mixed_prod, cov.transpose() * data);
+  // TODO comment/delete
+  ASSERT_EQ(hier.get_covar_sum_squares(), cov.transpose() * cov);
+  ASSERT_EQ(hier.get_mixed_prod(), cov.transpose() * data);
+
+  auto state = hier.get_state();
 
   hier.sample_given_data();
-  ASSERT_TRUE(state.regression_coeffs > prior.mean);
+  for (int i = 0; i < dim; i++) {
+    ASSERT_TRUE(state.regression_coeffs[i] > beta0[i]);
+  }
 
-  std::cout << "[          ] ----> " << state.var << std::endl;
-  std::cout << "[          ] ----> " << true_var << std::endl;
+  std::cout << "[          ] ----> var  = " << state.var << std::endl;
+  std::cout << "[          ] approx. equal to" << std::endl;
+  std::cout << "[          ] ----> true = " << true_var << std::endl;
 }
