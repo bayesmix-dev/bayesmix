@@ -29,6 +29,23 @@ Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
   return lpdf_.array() - log(n_aux);
 }
 
+Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
+    std::shared_ptr<DependentHierarchy> temp_hier, const Eigen::MatrixXd &grid,
+    const Eigen::MatrixXd &covariates) {
+  // TODO will soon become obsolete
+  unsigned int n_grid = grid.rows();
+  Eigen::VectorXd lpdf_(n_grid);
+  Eigen::MatrixXd lpdf_temp(n_grid, n_aux);
+  for (size_t i = 0; i < n_aux; i++) {
+    temp_hier->draw();
+    lpdf_temp.col(i) = temp_hier->like_lpdf_grid(grid, covariates);
+  }
+  for (size_t i = 0; i < n_grid; i++) {
+    lpdf_(i) = stan::math::log_sum_exp(lpdf_temp.row(i));
+  }
+  return lpdf_.array() - log(n_aux);
+}
+
 void Neal8Algorithm::print_startup_message() const {
   std::string msg = "Running Neal8 algorithm (m=" + std::to_string(n_aux) +
                     " aux. blocks) with " + unique_values[0]->get_id() +

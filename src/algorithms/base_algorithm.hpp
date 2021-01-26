@@ -123,6 +123,10 @@ class BaseAlgorithm {
   //! Evaluates the logpdf for each single iteration on a given grid of points
   virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
                                     BaseCollector *const collector) = 0;
+  // TODO will soon become obsolete
+  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
+                                    const Eigen::MatrixXd &covariates,
+                                    BaseCollector *const collector) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseAlgorithm() = default;

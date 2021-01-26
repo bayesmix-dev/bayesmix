@@ -22,6 +22,13 @@ Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
   return temp_hier->marg_lpdf_grid(grid);
 }
 
+Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
+    std::shared_ptr<DependentHierarchy> temp_hier, const Eigen::MatrixXd &grid,
+    const Eigen::MatrixXd &covariates) {
+  // TODO will soon become obsolete
+  return temp_hier->marg_lpdf_grid(grid, covariates);
+}
+
 Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
     const unsigned int data_idx) const {
   unsigned int n_data = data.rows();
