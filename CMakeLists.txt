@@ -30,7 +30,7 @@ find_package(OpenMP REQUIRED)
 find_package(Protobuf)
 
 
-if (NOT Protobuf_FOUND AND NOT TARGET protobuf::libprotobuf)
+if (NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
   include(FetchContent)
   set(FETCHCONTENT_QUIET OFF)
   set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
