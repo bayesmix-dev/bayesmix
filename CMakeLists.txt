@@ -1,10 +1,9 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.18.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 message("CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}")
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
-	message("FOUND CCACHE")
 	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
@@ -13,8 +12,10 @@ project(bayesmix)
 
 set (CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
-option(protobuf_BUILD_TESTS "" OFF)
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
+option(DISABLE_TESTS
+      "If tests should be compiled or no" OFF)
 
 include(FindPythonInterp)
 add_custom_target(
@@ -22,29 +23,24 @@ add_custom_target(
  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/build_tbb.py
 )
 
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
 find_package(Protobuf)
-message("Protobuf_FOUND ${Protobuf_FOUND}")
-message("   --> PROTOBUF LIB: ${PROTOBUF_LIBRARIES}")
-message("   --> PROTOBUF INCLUDE: ${PROTOBUF_INCLUDE_DIRS}")
-message("   --> PROTOBUF VERSION: ${Protobuf_VERSION}")
-message("   --> PROTOBUF Found: ${Protobuf_FOUND}")
 
 
-include(FetchContent)
-set(FETCHCONTENT_QUIET OFF)
-set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
-set(BUILD_SHARED_LIBS OFF)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(BUILD_TESTING OFF)
+if (NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
+  include(FetchContent)
+  set(FETCHCONTENT_QUIET OFF)
+  set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+  set(BUILD_SHARED_LIBS OFF)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  set(BUILD_TESTING OFF)
 
-if (NOT Protobuf_FOUND AND NOT TARGET protobuf::libprotobuf)
   message(CHECK_START "Fetching Protobuf")
   list(APPEND CMAKE_MESSAGE_INDENT "  ")
-  
+
+  option(protobuf_BUILD_TESTS "" OFF)
   set(protobuf_BUILD_EXPORT OFF)
   set(protobuf_MSVC_STATIC_RUNTIME OFF)
   # FetchContent_Declare(SOURCE_SUBDIR) was introduced in 3.18
@@ -58,22 +54,12 @@ if (NOT Protobuf_FOUND AND NOT TARGET protobuf::libprotobuf)
 
   list(POP_BACK CMAKE_MESSAGE_INDENT)
   message(CHECK_PASS "fetched")
-
-  message("   --> PROTOBUF LIB: ${PROTOBUF_LIBRARIES}")
-  message("   --> PROTOBUF SRC: ${protobuf_SOURCE_DIR}")
-  message("   --> PROTOBUF VERSION: ${Protobuf_VERSION}")
-  message("   --> PROTOBUF Found: ${Protobuf_FOUND}")
-
 endif()
 
-
-option(DISABLE_TESTS
-      "If tests should be compiled or no" OFF)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
-
 set(INCLUDE_PATHS
   ${BASEPATH}
   ${BASEPATH}/proto
@@ -85,12 +71,13 @@ set(INCLUDE_PATHS
   ${protobuf_SOURCE_DIR}/src
 )
 
-set(LINK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so pthread protobuf::libprotobuf)
+set(LINK_LIBRARIES 
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so 
+  pthread 
+  protobuf::libprotobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
 file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
-
-message(${PROJECT_BINARY_DIR})
 set(PROTO_DIR proto)
 
 foreach(PROTO_FILE IN LISTS ProtoFiles)
@@ -103,11 +90,8 @@ foreach(PROTO_FILE IN LISTS ProtoFiles)
   message(STATUS "protoc src: ${PROTO_SRC}")
   add_custom_command(
     OUTPUT ${PROTO_SRC} ${PROTO_HDR}
-    COMMAND protobuf::protoc
-    "--proto_path=${BASEPATH}/proto"
-    ${PROTO_DIRS}
-    "--cpp_out=${PROJECT_BINARY_DIR}"
-    ${PROTO_FILE}
+    COMMAND protobuf::protoc "--proto_path=${BASEPATH}/proto"
+    ${PROTO_DIRS} "--cpp_out=${PROJECT_BINARY_DIR}" ${PROTO_FILE}
     DEPENDS ${PROTO_FILE} protobuf::protoc
     COMMENT "Generate C++ protocol buffer for ${PROTO_FILE}"
     VERBATIM)
