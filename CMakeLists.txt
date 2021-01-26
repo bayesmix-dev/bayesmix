@@ -16,6 +16,7 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
+option(BUILD_RUN "" ON)
 
 include(FindPythonInterp)
 add_custom_target(
@@ -29,7 +30,7 @@ find_package(OpenMP REQUIRED)
 find_package(Protobuf)
 
 
-if (NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
+if (NOT Protobuf_FOUND AND NOT TARGET protobuf::libprotobuf)
   include(FetchContent)
   set(FETCHCONTENT_QUIET OFF)
   set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
@@ -47,7 +48,8 @@ if (NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
       protobuf
       GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
       GIT_TAG "v3.14.0"
-      GIT_SUBMODULES "")
+      GIT_SUBMODULES ""
+      SOURCE_SUBDIR cmake)
   FetchContent_MakeAvailable(protobuf)
 
   list(POP_BACK CMAKE_MESSAGE_INDENT)
@@ -112,6 +114,7 @@ if(HAS_PARENT)
   set(BAYESMIX_COMPILE_OPTIONS ${COMPILE_OPTIONS} PARENT_SCOPE)
   set(PROTO_HEADERS ${PROTO_HDRS} PARENT_SCOPE)
   set(PROTO_SOURCES ${PROTO_SRCS} PARENT_SCOPE)
+  set(ProtoFiles ${ProtoFiles} PARENT_SCOPE)
 endif()
 
 
@@ -129,12 +132,13 @@ add_library(bayesmixlib $<TARGET_OBJECTS:bayesmix>)
 add_dependencies(bayesmixlib build_tbb)
 
 
+if (BUILD_RUN)
 # Build run executable
 add_executable(run $<TARGET_OBJECTS:bayesmix> run.cpp)
 target_include_directories(run PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
 target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
-
+endif()
 
 if (NOT DISABLE_TESTS)
   add_subdirectory(test)
