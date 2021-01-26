@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18.0)
+cmake_minimum_required(VERSION 3.14.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 message("CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}")
 
@@ -43,13 +43,11 @@ if (NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
   option(protobuf_BUILD_TESTS "" OFF)
   set(protobuf_BUILD_EXPORT OFF)
   set(protobuf_MSVC_STATIC_RUNTIME OFF)
-  # FetchContent_Declare(SOURCE_SUBDIR) was introduced in 3.18
   FetchContent_Declare(
       protobuf
       GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
       GIT_TAG "v3.14.0"
-      GIT_SUBMODULES ""
-      SOURCE_SUBDIR cmake)
+      GIT_SUBMODULES "")
   FetchContent_MakeAvailable(protobuf)
 
   list(POP_BACK CMAKE_MESSAGE_INDENT)
@@ -133,6 +131,5 @@ target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 
 
 if (NOT DISABLE_TESTS)
-  # Build test executable
   add_subdirectory(test)
 endif()
