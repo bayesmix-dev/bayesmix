@@ -52,6 +52,12 @@ if (NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
 
   list(POP_BACK CMAKE_MESSAGE_INDENT)
   message(CHECK_PASS "fetched")
+message("Protobuf_FOUND ${Protobuf_FOUND}")
+message("   --> PROTOBUF LIB: ${PROTOBUF_LIBRARIES}")
+message("   --> PROTOBUF INCLUDE: ${PROTOBUF_INCLUDE_DIRS}")
+message("   --> PROTOBUF VERSION: ${Protobuf_VERSION}")
+message("   --> PROTOBUF Found: ${Protobuf_FOUND}")
+
 endif()
 
 
