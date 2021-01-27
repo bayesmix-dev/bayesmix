@@ -131,15 +131,35 @@ TEST(nnwhierarchy, sample_given_data) {
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
 
-TEST(lin_reg_uni_hierarchy, read_and_write) {
-  // TODO
+TEST(lin_reg_uni_hierarchy, state_read_write) {
+  Eigen::Vector2d beta;
+  beta << 3, 2;
+  double sigma2 = 9;
+
+  bayesmix::LinRegUnivLSState ls;
+  bayesmix::to_proto(beta, ls.mutable_regression_coeffs());
+  ls.set_var(sigma2);
+
+  bayesmix::MarginalState::ClusterState state;
+  state.mutable_lin_reg_univ_ls_state()->CopyFrom(ls);
+
+  LinRegUniHierarchy hier;
+  hier.set_state_from_proto(state);
+
+  ASSERT_EQ(hier.get_state().regression_coeffs, beta);
+  ASSERT_EQ(hier.get_state().var, sigma2);
+
+  // TODO write_state_to_proto
+  // TODO write_hypers_to_proto
 }
 
-TEST(lin_reg_uni_hierarchy, lpdf) {
-  // TODO marginal_lpdf = posterior_lpdf - prior_lpdf
-}
+// TEST(lin_reg_uni_hierarchy, lpdf) {
+//   TODO marginal_lpdf = posterior_lpdf - prior_lpdf
+// }
 
 TEST(lin_reg_uni_hierarchy, misc) {
+  std::cout << "TODO" << std::endl;
+  return;
   int n = 5;
   int dim = 2;
   Eigen::Vector2d beta_true;
