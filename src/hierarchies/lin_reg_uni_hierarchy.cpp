@@ -24,12 +24,12 @@ void LinRegUniHierarchy::update_summary_statistics(
     const Eigen::VectorXd &datum, const Eigen::VectorXd &covariate, bool add) {
   if (add) {
     data_sum_squares += datum(0) * datum(0);
-    covar_sum_squares += covariate.row(0).transpose() * covariate.row(0);
-    mixed_prod += datum(0) * covariate.row(0);
+    covar_sum_squares += covariate * covariate.transpose();
+    mixed_prod += datum(0) * covariate;
   } else {
     data_sum_squares -= datum(0) * datum(0);
-    covar_sum_squares -= covariate.row(0).transpose() * covariate.row(0);
-    mixed_prod -= datum(0) * covariate.row(0);
+    covar_sum_squares -= covariate * covariate.transpose();
+    mixed_prod -= datum(0) * covariate;
   }
 }
 
