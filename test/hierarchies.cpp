@@ -133,7 +133,7 @@ TEST(nnwhierarchy, sample_given_data) {
 
 TEST(lin_reg_uni_hierarchy, state_read_write) {
   Eigen::Vector2d beta;
-  beta << 3, 2;
+  beta << 2, -1;
   double sigma2 = 9;
 
   bayesmix::LinRegUnivLSState ls;
@@ -149,17 +149,23 @@ TEST(lin_reg_uni_hierarchy, state_read_write) {
   ASSERT_EQ(hier.get_state().regression_coeffs, beta);
   ASSERT_EQ(hier.get_state().var, sigma2);
 
-  // TODO write_state_to_proto
-  // TODO write_hypers_to_proto
+  bayesmix::MarginalState outt;
+  bayesmix::MarginalState::ClusterState* out = outt.add_cluster_states();
+  hier.write_state_to_proto(out);
+  ASSERT_EQ(beta, bayesmix::to_eigen(
+                      out->lin_reg_univ_ls_state().regression_coeffs()));
+  ASSERT_EQ(sigma2, out->lin_reg_univ_ls_state().var());
 }
 
 // TEST(lin_reg_uni_hierarchy, lpdf) {
 //   TODO marginal_lpdf = posterior_lpdf - prior_lpdf
 // }
 
+// TEST(lin_reg_uni_hierarchy, posterior_mean) {
+//   TODO Check that if Lambda0=0, the posterior mean is (X'X)^{-1}X'T y
+// }
+
 TEST(lin_reg_uni_hierarchy, misc) {
-  std::cout << "TODO" << std::endl;
-  return;
   int n = 5;
   int dim = 2;
   Eigen::Vector2d beta_true;
@@ -184,6 +190,14 @@ TEST(lin_reg_uni_hierarchy, misc) {
   prior.mutable_fixed_values()->set_shape(a0);
   prior.mutable_fixed_values()->set_scale(b0);
   hier.set_prior(prior);
+  hier.initialize();
+
+  bayesmix::LinRegUnivPrior out;
+  hier.write_hypers_to_proto(&out);
+  ASSERT_EQ(beta0, bayesmix::to_eigen(out.fixed_values().mean()));
+  ASSERT_EQ(Lambda0, bayesmix::to_eigen(out.fixed_values().var_scaling()));
+  ASSERT_EQ(a0, out.fixed_values().shape());
+  ASSERT_EQ(b0, out.fixed_values().scale());
 
   for (int i = 0; i < n; i++) {
     hier.add_datum(i, data.row(i), cov.row(i));
