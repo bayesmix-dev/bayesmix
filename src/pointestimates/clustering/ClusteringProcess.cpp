@@ -4,8 +4,8 @@
 
 using namespace std;
 
-ClusteringProcess::ClusteringProcess(Eigen::MatrixXi &mcmc_sample_,
-                                     LOSS_FUNCTION loss_type)
+ClusteringProcess::ClusteringProcess(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTION loss_type,
+                  int Kup, Eigen::VectorXi &initial_partition_)
     : loss_function(0)
 {
   std::cout << "[CONSTRUCTORS]" << std::endl;
@@ -14,6 +14,8 @@ ClusteringProcess::ClusteringProcess(Eigen::MatrixXi &mcmc_sample_,
   mcmc_sample = mcmc_sample_;
   T = mcmc_sample.rows();
   N = mcmc_sample.cols();
+  K_up = Kup;
+  initial_partition= initial_partition_;
   switch(loss_type) {
     case BINDER_LOSS: loss_function = new BinderLoss(1,1); break;
     case VARIATION_INFORMATION: {
@@ -49,10 +51,9 @@ double ClusteringProcess::expected_posterior_loss(Eigen::VectorXi a)
 }
 
 Eigen::VectorXi ClusteringProcess::cluster_estimate(MINIMIZATION_METHOD method) {
-  Eigen::VectorXi a = Eigen::VectorXi::LinSpaced(N, 1 ,N);
   switch (method) {
     case GREEDY:
-      return greedy_algorithm(a);
+      return greedy_algorithm(initial_partition);
 
     default:
       throw std::domain_error("Non valid method chosen");
@@ -118,7 +119,7 @@ Eigen::VectorXi ClusteringProcess::greedy_algorithm(Eigen::VectorXi &a) {
     while(nu.size() != 0) {
       int i = rand() % nu.size(); // random int between 0 and size-1
       delete_ith_element(nu, i);
-      for (int s = 1; s < 5; s++) {  // Kup = N, could be changed
+      for (int s = 1; s < K_up; s++) {
         // ai_r->s means a[i] is now equal to s
         a_modified = a;
         a_modified(i) = s;

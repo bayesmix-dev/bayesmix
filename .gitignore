@@ -25,3 +25,4 @@ sftp-config.json
 # To be deleted when we finalize the way to compile files.
 *.o
 src/pointestimates/lossfunction/loss
+proto

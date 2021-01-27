@@ -31,10 +31,14 @@ class ClusteringProcess
   Eigen::MatrixXi mcmc_sample; // T*N matrix
   int T; // total time of the process
   int N;
+  int K_up;
+  Eigen::VectorXi initial_partition;
  public:
-  ClusteringProcess(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTION loss_type);
+  ClusteringProcess(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTION loss_type_,
+                    int K_up, Eigen::VectorXi &initial_partition_);
   ~ClusteringProcess();
   double expected_posterior_loss(Eigen::VectorXi a);
+//  Eigen::VectorXd expected_posterior_loss_for_each_Kup(Eigen::VectorXi a);
   Eigen::VectorXi cluster_estimate(MINIMIZATION_METHOD method);
   Eigen::VectorXi greedy_algorithm(Eigen::VectorXi &a);
 };
