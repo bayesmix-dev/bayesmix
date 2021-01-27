@@ -93,8 +93,8 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
   unsigned int n_clust = curr_state.cluster_states_size();
   mixing->set_state_from_proto(curr_state.mixing_state());
   Eigen::MatrixXd lpdf_local(grid.rows(), n_clust + 1);
-  auto temp_hier = std::dynamic_pointer_cast<DependentHierarchy>(
-   unique_values[0]->clone());
+  auto temp_hier =
+      std::dynamic_pointer_cast<DependentHierarchy>(unique_values[0]->clone());
   Eigen::VectorXd weights(n_clust + 1);
   for (size_t j = 0; j < n_clust; j++) {
     temp_hier->set_state_from_proto(curr_state.cluster_states(j));
