@@ -191,7 +191,7 @@ TEST(lpdf, lin_reg_uni) {
       stan::math::multi_normal_prec_lpdf(mean, mu_n, Lambda_n / var);
   double post = post1 + post2;
 
-  // // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
+  // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
   double sum = pr + like - post;
   double marg = hier.marg_lpdf(datum, cov);
 

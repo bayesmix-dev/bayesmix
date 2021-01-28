@@ -8,7 +8,9 @@
 #include "../utils/rng.hpp"
 
 void LinRegUniHierarchy::initialize() {
-  state.regression_coeffs = Eigen::VectorXd::Zero(dim);
+  assert(prior != nullptr && "Error: prior was not provided");
+  state.regression_coeffs = hypers->mean;
+  state.var = hypers->scale / (hypers->shape + 1);
   clear_data();
 }
 
