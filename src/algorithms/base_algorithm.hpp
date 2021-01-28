@@ -150,14 +150,18 @@ class BaseAlgorithm {
     mixing = mixing_;
   }
   void set_data(const Eigen::MatrixXd &data_) { data = data_; }
-
+  void set_hier_covariates(const Eigen::MatrixXd &cov) {
+    hier_covariates = cov;
+  }
+  void set_mix_covariates(const Eigen::MatrixXd &cov) {
+    mix_covariates = cov;
+  }
   void set_initial_clusters(const std::shared_ptr<BaseHierarchy> hier_,
                             const unsigned int init = 0) {
     unique_values.clear();
     unique_values.push_back(hier_);
     init_num_clusters = init;
   }
-
   virtual std::string get_id() const = 0;
 };
 

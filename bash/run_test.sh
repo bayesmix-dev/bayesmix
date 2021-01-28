@@ -6,7 +6,8 @@
 #   mix_type mix_args \
 #   datafile gridfile \
 #   densfile massfile \
-#   nclufile clusfile
+#   nclufile clusfile \
+#   hier_cov_file grid_cov_file
 
 if [ "$1" == "uni" ]; then
   build/run \
@@ -26,6 +27,17 @@ elif [ "$1" == "multi" ]; then
     resources/csv/out/mn_dens.csv resources/csv/out/mn_mass.csv \
     resources/csv/out/mn_nclu.csv resources/csv/out/mn_clus.csv
 
+elif [ "$1" == "lru" ]; then
+  build/run \
+    N2 20201124 0 1000 100 \
+#   LinRegUni hier_args \
+    DP resources/asciipb/dp_gamma_prior.asciipb \
+#   datafile gridfile \
+    resources/csv/out/lru_dens.csv resources/csv/out/lru_mass.csv \
+    resources/csv/out/lru_nclu.csv resources/csv/out/lru_clus.csv \
+#   hier_cov_file grid_cov_file
+
+
 else
-  echo "Syntax: bash/run_test.sh uni (or multi)"
+  echo "Syntax: bash/run_test.sh followed by one of: uni, multi, lru"
 fi
