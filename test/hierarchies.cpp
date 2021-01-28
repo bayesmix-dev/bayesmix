@@ -159,19 +159,21 @@ TEST(lin_reg_uni_hierarchy, state_read_write) {
 }
 
 TEST(lin_reg_uni_hierarchy, misc) {
+  // Build data
   int n = 5;
   int dim = 2;
   Eigen::Vector2d beta_true;
   beta_true << 10.0, 10.0;
-  Eigen::MatrixXd cov = Eigen::MatrixXd::Random(n, dim);  // random in [-1,1]
+  Eigen::MatrixXd cov = Eigen::MatrixXd::Random(n, dim);  // each in U[-1,1]
   Eigen::VectorXd data = cov * beta_true + Eigen::VectorXd::Random(n);
-  double unif_var = 1.0 / 3;                    // variance of a U[-1,1]
-  double true_var = dim * unif_var + unif_var;  // variance of each datum
-  // auto ols_est =
-  //   stan::math::inverse_spd(cov.transpose() * cov) * cov.transpose() * data;
+  // Compute variances
+  double unif_var = 1.0 / 3;  // variance of an U[-1,1]
+  double true_var = unif_var * beta_true.dot(beta_true) + unif_var;
+    // variance of each data point
+  // Initialize objects
   LinRegUniHierarchy hier;
   bayesmix::LinRegUnivPrior prior;
-
+  // Create prior parameters
   Eigen::Vector2d beta0 = 0 * beta_true;
   bayesmix::Vector beta0_proto;
   bayesmix::to_proto(beta0, &beta0_proto);
@@ -180,24 +182,25 @@ TEST(lin_reg_uni_hierarchy, misc) {
   bayesmix::to_proto(Lambda0, &Lambda0_proto);
   double a0 = 2.0;
   double b0 = 1.0;
+  // Initialize hierarchy
   *prior.mutable_fixed_values()->mutable_mean() = beta0_proto;
   *prior.mutable_fixed_values()->mutable_var_scaling() = Lambda0_proto;
   prior.mutable_fixed_values()->set_shape(a0);
   prior.mutable_fixed_values()->set_scale(b0);
   hier.set_prior(prior);
   hier.initialize();
-
+  // Extract hypers for reading test
   bayesmix::LinRegUnivPrior out;
   hier.write_hypers_to_proto(&out);
   ASSERT_EQ(beta0, bayesmix::to_eigen(out.fixed_values().mean()));
   ASSERT_EQ(Lambda0, bayesmix::to_eigen(out.fixed_values().var_scaling()));
   ASSERT_EQ(a0, out.fixed_values().shape());
   ASSERT_EQ(b0, out.fixed_values().scale());
-
+  // Add data
   for (int i = 0; i < n; i++) {
     hier.add_datum(i, data.row(i), cov.row(i));
   }
-  // TODO comment/delete
+  // Check summary statistics
   // for (int i = 0; i < dim; i++) {
   //   for (int j = 0; j < dim; j++) {
   //     ASSERT_DOUBLE_EQ(hier.get_covar_sum_squares()(i, j),
@@ -205,15 +208,12 @@ TEST(lin_reg_uni_hierarchy, misc) {
   //   }
   //   ASSERT_DOUBLE_EQ(hier.get_mixed_prod()(i), (cov.transpose() * data)(i));
   // }
-
+  // Compute and check posterior values
   hier.sample_given_data();
   auto state = hier.get_state();
-
   for (int i = 0; i < dim; i++) {
     ASSERT_GT(state.regression_coeffs(i), beta0(i));
-    // ASSERT_DOUBLE_EQ(state.regression_coeffs(i), ols_est(i));
   }
-
   std::cout << "             ----> var  = " << state.var << std::endl;
   std::cout << "             approx. equal to" << std::endl;
   std::cout << "             ----> true = " << true_var << std::endl;
