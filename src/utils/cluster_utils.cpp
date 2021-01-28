@@ -3,7 +3,7 @@
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
-#include "../../lib/progressbar/progressbar.hpp"
+#include "lib/progressbar/progressbar.hpp"
 #include "proto_utils.hpp"
 
 Eigen::MatrixXd bayesmix::posterior_similarity(

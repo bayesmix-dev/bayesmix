@@ -8,7 +8,7 @@
 #include <random>
 #include <stan/math/prim.hpp>
 
-#include "../../proto/cpp/marginal_state.pb.h"
+#include "marginal_state.pb.h"
 #include "../utils/rng.hpp"
 #include "base_hierarchy.hpp"
 
