@@ -6,10 +6,10 @@
 #include <Eigen/Dense>
 #include <memory>
 
-#include "hierarchy_prior.pb.h"
-#include "marginal_state.pb.h"
 #include "base_hierarchy.hpp"
 #include "dependent_hierarchy.hpp"
+#include "hierarchy_prior.pb.h"
+#include "marginal_state.pb.h"
 
 class LinRegUniHierarchy : public DependentHierarchy {
  public:

@@ -80,10 +80,10 @@ Eigen::VectorXd LinRegUniHierarchy::like_lpdf_grid(
 double LinRegUniHierarchy::marg_lpdf(
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate) const {
-  double sig_n = sqrt(
-      (1 + (covariate.transpose() *
-            stan::math::inverse_spd(hypers->var_scaling) * covariate)(0)) *
-      hypers->scale / hypers->shape);
+  double sig_n =
+      sqrt((1 + (covariate * stan::math::inverse_spd(hypers->var_scaling) *
+                 covariate.transpose())(0)) *
+           hypers->scale / hypers->shape);
   return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape,
                                     covariate.dot(hypers->mean), sig_n);
 }
