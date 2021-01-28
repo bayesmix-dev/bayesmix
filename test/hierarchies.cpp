@@ -200,10 +200,10 @@ TEST(lin_reg_uni_hierarchy, misc) {
   // TODO comment/delete
   // for (int i = 0; i < dim; i++) {
   //   for (int j = 0; j < dim; j++) {
-  //     ASSERT_FLOAT_EQ(hier.get_covar_sum_squares()(i, j),
+  //     ASSERT_DOUBLE_EQ(hier.get_covar_sum_squares()(i, j),
   //                     (cov.transpose() * cov)(i, j));
   //   }
-  //   ASSERT_FLOAT_EQ(hier.get_mixed_prod()(i), (cov.transpose() * data)(i));
+  //   ASSERT_DOUBLE_EQ(hier.get_mixed_prod()(i), (cov.transpose() * data)(i));
   // }
 
   hier.sample_given_data();
@@ -211,7 +211,7 @@ TEST(lin_reg_uni_hierarchy, misc) {
 
   for (int i = 0; i < dim; i++) {
     ASSERT_GT(state.regression_coeffs(i), beta0(i));
-    // ASSERT_FLOAT_EQ(state.regression_coeffs(i), ols_est(i));
+    // ASSERT_DOUBLE_EQ(state.regression_coeffs(i), ols_est(i));
   }
 
   std::cout << "             ----> var  = " << state.var << std::endl;
