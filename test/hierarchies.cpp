@@ -167,15 +167,15 @@ TEST(lin_reg_uni_hierarchy, misc) {
   Eigen::VectorXd data = cov * beta_true + Eigen::VectorXd::Random(n);
   double unif_var = 1.0 / 3;                    // variance of a U[-1,1]
   double true_var = dim * unif_var + unif_var;  // variance of each datum
-  auto ols_est =
-      stan::math::inverse_spd(cov.transpose() * cov) * cov.transpose() * data;
+  // auto ols_est =
+  //   stan::math::inverse_spd(cov.transpose() * cov) * cov.transpose() * data;
   LinRegUniHierarchy hier;
   bayesmix::LinRegUnivPrior prior;
 
   Eigen::Vector2d beta0 = 0 * beta_true;
   bayesmix::Vector beta0_proto;
   bayesmix::to_proto(beta0, &beta0_proto);
-  auto Lambda0 = Eigen::Matrix2d::Zeros();
+  auto Lambda0 = Eigen::Matrix2d::Identity();
   bayesmix::Matrix Lambda0_proto;
   bayesmix::to_proto(Lambda0, &Lambda0_proto);
   double a0 = 2.0;
@@ -211,10 +211,10 @@ TEST(lin_reg_uni_hierarchy, misc) {
 
   for (int i = 0; i < dim; i++) {
     ASSERT_GT(state.regression_coeffs(i), beta0(i));
-    ASSERT_FLOAT_EQ(state.regression_coeffs(i), ols_est(i));
+    // ASSERT_FLOAT_EQ(state.regression_coeffs(i), ols_est(i));
   }
 
-  std::cout << "[          ] ----> var  = " << state.var << std::endl;
-  std::cout << "[          ] approx. equal to" << std::endl;
-  std::cout << "[          ] ----> true = " << true_var << std::endl;
+  std::cout << "             ----> var  = " << state.var << std::endl;
+  std::cout << "             approx. equal to" << std::endl;
+  std::cout << "             ----> true = " << true_var << std::endl;
 }

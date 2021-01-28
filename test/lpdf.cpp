@@ -4,8 +4,10 @@
 #include <stan/math/prim/fun.hpp>  // lgamma, lmgamma
 #include <stan/math/prim/prob.hpp>
 
+#include "../src/hierarchies/lin_reg_uni_hierarchy.hpp"
 #include "../src/hierarchies/nnig_hierarchy.hpp"
 #include "../src/hierarchies/nnw_hierarchy.hpp"
+#include "../src/utils/proto_utils.hpp"
 #include "marginal_state.pb.h"
 
 TEST(lpdf, nnig) {
@@ -209,3 +211,64 @@ TEST(lpdf, nnig) {
 // //   std::cout << "murphy=" << marg_murphy << std::endl;
 // //   ASSERT_FLOAT_EQ(marg, marg_murphy);
 // // }
+
+TEST(lpdf, lin_reg_uni) {
+  // Create hierarchy objects
+  LinRegUniHierarchy hier;
+  bayesmix::LinRegUnivPrior prior;
+  int dim = 3;
+
+  // Generate data
+  Eigen::VectorXd datum(1);
+  datum << 1.5;
+  Eigen::VectorXd cov = Eigen::VectorXd::Random(dim);
+
+  // Create parameters, both Eigen and proto
+  Eigen::VectorXd mu0(dim);
+  for (int i = 0; i < dim; i++) {
+    mu0(i) = 2 * i;
+  }
+  bayesmix::Vector mu0_proto;
+  bayesmix::to_proto(mu0, &mu0_proto);
+  auto Lambda0 = Eigen::MatrixXd::Identity(dim, dim);
+  bayesmix::Matrix Lambda0_proto;
+  bayesmix::to_proto(Lambda0, &Lambda0_proto);
+  double alpha0 = 2.0;
+  double beta0 = 2.0;
+  // Set parameters
+  *prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
+  *prior.mutable_fixed_values()->mutable_var_scaling() = Lambda0_proto;
+  prior.mutable_fixed_values()->set_shape(alpha0);
+  prior.mutable_fixed_values()->set_scale(beta0);
+  // Initialize hierarchy
+  hier.set_prior(prior);
+  hier.initialize();
+
+  // // TODO
+  // // Compute prior parameters
+  // double mean = mu0;
+  // double var = beta0 / (alpha0 + 1);
+
+  // // Compute posterior parameters
+  // double mu_n = (Lambda0 * mu0 + datum(0)) / (Lambda0 + 1);
+  // double alpha_n = alpha0 + 0.5;
+  // double lambda_n = Lambda0 + 1;
+  // double beta_n = beta0 + (0.5 * Lambda0 / (Lambda0 + 1)) * (datum(0) - mu0) *
+  //                             (datum(0) - mu0);
+  // // equiv.ly: beta0 + 0.5*(mu0^2*Lambda0 + datum^2 - mu_n^2*lambda_n);
+
+  // // Compute pieces
+  // double prior1 = stan::math::inv_gamma_lpdf(var, alpha0, beta0);
+  // double prior2 = stan::math::normal_lpdf(mean, mu0, sqrt(var / Lambda0));
+  // double prior = prior1 + prior2;
+  // double like = hier.like_lpdf(datum);
+  // double post1 = stan::math::inv_gamma_lpdf(var, alpha_n, beta_n);
+  // double post2 = stan::math::normal_lpdf(mean, mu_n, sqrt(var / lambda_n));
+  // double post = post1 + post2;
+
+  // // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
+  // double sum = prior + like - post;
+  // double marg = hier.marg_lpdf(datum);
+
+  // ASSERT_DOUBLE_EQ(sum, marg);
+}
