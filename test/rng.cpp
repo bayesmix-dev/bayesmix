@@ -86,3 +86,9 @@ TEST(rng, test3) {
   ASSERT_NE(m3, m2);
   ASSERT_NE(s3, s2);
 }
+
+TEST(eigen, random) {
+  // doesn't work with auto!
+  Eigen::MatrixXd aa = Eigen::MatrixXd::Random(2, 3);
+  ASSERT_EQ(aa, aa);
+}
