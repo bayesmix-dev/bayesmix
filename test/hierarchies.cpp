@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <Eigen/Dense>
+#include <stan/math/prim/err.hpp>
 
 #include "../src/hierarchies/lin_reg_uni_hierarchy.hpp"
 #include "../src/hierarchies/nnig_hierarchy.hpp"
@@ -157,30 +158,24 @@ TEST(lin_reg_uni_hierarchy, state_read_write) {
   ASSERT_EQ(sigma2, out->lin_reg_univ_ls_state().var());
 }
 
-// TEST(lin_reg_uni_hierarchy, lpdf) {
-//   TODO marginal_lpdf = posterior_lpdf - prior_lpdf
-// }
-
-// TEST(lin_reg_uni_hierarchy, posterior_mean) {
-//   TODO Check that if Lambda0=0, the posterior mean is (X'X)^{-1}X'T y
-// }
-
 TEST(lin_reg_uni_hierarchy, misc) {
   int n = 5;
   int dim = 2;
   Eigen::Vector2d beta_true;
   beta_true << 10.0, 10.0;
-  auto cov = Eigen::MatrixXd::Random(n, dim);  // random in [-1,1]
-  auto data = cov * beta_true + Eigen::VectorXd::Random(n);  // same
+  Eigen::MatrixXd cov = Eigen::MatrixXd::Random(n, dim);  // random in [-1,1]
+  Eigen::VectorXd data = cov * beta_true + Eigen::VectorXd::Random(n);
   double unif_var = 1.0 / 3;                    // variance of a U[-1,1]
   double true_var = dim * unif_var + unif_var;  // variance of each datum
+  auto ols_est =
+      stan::math::inverse_spd(cov.transpose() * cov) * cov.transpose() * data;
   LinRegUniHierarchy hier;
   bayesmix::LinRegUnivPrior prior;
 
   Eigen::Vector2d beta0 = 0 * beta_true;
   bayesmix::Vector beta0_proto;
   bayesmix::to_proto(beta0, &beta0_proto);
-  auto Lambda0 = Eigen::Matrix2d::Identity();
+  auto Lambda0 = Eigen::Matrix2d::Zeros();
   bayesmix::Matrix Lambda0_proto;
   bayesmix::to_proto(Lambda0, &Lambda0_proto);
   double a0 = 2.0;
@@ -203,14 +198,20 @@ TEST(lin_reg_uni_hierarchy, misc) {
     hier.add_datum(i, data.row(i), cov.row(i));
   }
   // TODO comment/delete
-  ASSERT_EQ(hier.get_covar_sum_squares(), cov.transpose() * cov);
-  ASSERT_EQ(hier.get_mixed_prod(), cov.transpose() * data);
-
-  auto state = hier.get_state();
+  // for (int i = 0; i < dim; i++) {
+  //   for (int j = 0; j < dim; j++) {
+  //     ASSERT_FLOAT_EQ(hier.get_covar_sum_squares()(i, j),
+  //                     (cov.transpose() * cov)(i, j));
+  //   }
+  //   ASSERT_FLOAT_EQ(hier.get_mixed_prod()(i), (cov.transpose() * data)(i));
+  // }
 
   hier.sample_given_data();
+  auto state = hier.get_state();
+
   for (int i = 0; i < dim; i++) {
-    ASSERT_TRUE(state.regression_coeffs[i] > beta0[i]);
+    ASSERT_GT(state.regression_coeffs(i), beta0(i));
+    ASSERT_FLOAT_EQ(state.regression_coeffs(i), ols_est(i));
   }
 
   std::cout << "[          ] ----> var  = " << state.var << std::endl;

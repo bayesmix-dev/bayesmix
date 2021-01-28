@@ -101,9 +101,9 @@ class LinRegUniHierarchy : public DependentHierarchy {
   std::string get_id() const override { return "LinRegUni"; }
 
   // TODO temporary, remove:
-  double get_data_sum_squares() const { return data_sum_squares; }
-  Eigen::MatrixXd get_covar_sum_squares() const { return covar_sum_squares; }
-  Eigen::VectorXd get_mixed_prod() const { return mixed_prod; }
+  // double get_data_sum_squares() const { return data_sum_squares; }
+  // Eigen::MatrixXd get_covar_sum_squares() const { return covar_sum_squares;}
+  // Eigen::VectorXd get_mixed_prod() const { return mixed_prod; }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_HPP_
