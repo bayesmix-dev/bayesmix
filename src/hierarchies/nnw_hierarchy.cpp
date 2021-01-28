@@ -240,7 +240,7 @@ void NNWHierarchy::sample_given_data() {
 
 void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   data_sum = Eigen::VectorXd::Zero(data.cols());
-  data_sum_squares = Eigen::VectorXd::Zero(data.cols(), data.cols());
+  data_sum_squares = Eigen::MatrixXd::Zero(data.cols(), data.cols());
 
   for (int i = 0; i < data.rows(); i++) {
     data_sum += data.row(i);
