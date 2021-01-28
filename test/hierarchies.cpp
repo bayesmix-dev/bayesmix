@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
 #include <Eigen/Dense>
-#include <stan/math/prim/err.hpp>
+#include <stan/math/prim.hpp>
 
 #include "../src/hierarchies/lin_reg_uni_hierarchy.hpp"
 #include "../src/hierarchies/nnig_hierarchy.hpp"
 #include "../src/hierarchies/nnw_hierarchy.hpp"
 #include "../src/utils/proto_utils.hpp"
+#include "../src/utils/rng.hpp"
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"
 
@@ -165,11 +166,12 @@ TEST(lin_reg_uni_hierarchy, misc) {
   Eigen::Vector2d beta_true;
   beta_true << 10.0, 10.0;
   Eigen::MatrixXd cov = Eigen::MatrixXd::Random(n, dim);  // each in U[-1,1]
-  Eigen::VectorXd data = cov * beta_true + Eigen::VectorXd::Random(n);
-  // Compute variances
-  double unif_var = 1.0 / 3;  // variance of an U[-1,1]
-  double true_var = unif_var * beta_true.dot(beta_true) + unif_var;
-    // variance of each data point
+  double sigma2 = 1.0;
+  Eigen::VectorXd data(n);
+  auto& rng = bayesmix::Rng::Instance().get();
+  for (int i = 0; i < n; i++) {
+    data(i) = stan::math::normal_rng(cov.row(i).dot(beta_true), sigma2, rng);
+  }
   // Initialize objects
   LinRegUniHierarchy hier;
   bayesmix::LinRegUnivPrior prior;
@@ -214,7 +216,7 @@ TEST(lin_reg_uni_hierarchy, misc) {
   for (int i = 0; i < dim; i++) {
     ASSERT_GT(state.regression_coeffs(i), beta0(i));
   }
-  std::cout << "             ----> var  = " << state.var << std::endl;
+  std::cout << "             ----> state.var = " << state.var << std::endl;
   std::cout << "             approx. equal to" << std::endl;
-  std::cout << "             ----> true = " << true_var << std::endl;
+  std::cout << "             ----> true var  = " << sigma2 << std::endl;
 }
