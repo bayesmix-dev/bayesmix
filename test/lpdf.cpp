@@ -195,5 +195,5 @@ TEST(lpdf, lin_reg_uni) {
   double sum = pr + like - post;
   double marg = hier.marg_lpdf(datum, cov);
 
-  ASSERT_DOUBLE_EQ(sum, marg);
+  ASSERT_FLOAT_EQ(sum, marg);
 }

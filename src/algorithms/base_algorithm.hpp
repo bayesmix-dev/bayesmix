@@ -153,9 +153,7 @@ class BaseAlgorithm {
   void set_hier_covariates(const Eigen::MatrixXd &cov) {
     hier_covariates = cov;
   }
-  void set_mix_covariates(const Eigen::MatrixXd &cov) {
-    mix_covariates = cov;
-  }
+  void set_mix_covariates(const Eigen::MatrixXd &cov) { mix_covariates = cov; }
   void set_initial_clusters(const std::shared_ptr<BaseHierarchy> hier_,
                             const unsigned int init = 0) {
     unique_values.clear();
