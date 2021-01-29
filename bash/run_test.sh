@@ -24,18 +24,18 @@ elif [ "$1" == "multi" ]; then
     NNW resources/asciipb/nnw_ngiw_prior.asciipb \
     DP resources/asciipb/dp_gamma_prior.asciipb \
     resources/csv/in/data_multi.csv resources/csv/in/grid_multi.csv \
-    resources/csv/out/mn_dens.csv resources/csv/out/mn_mass.csv \
-    resources/csv/out/mn_nclu.csv resources/csv/out/mn_clus.csv
+    resources/csv/out/mn_dens.csv   resources/csv/out/mn_mass.csv \
+    resources/csv/out/mn_nclu.csv   resources/csv/out/mn_clus.csv
 
 elif [ "$1" == "lru" ]; then
   build/run \
     N2 20201124 0 1000 100 \
-#   LinRegUni hier_args \
+    LinRegUni resources/asciipb/lin_reg_univ_fixed.asciipb \
     DP resources/asciipb/dp_gamma_prior.asciipb \
-#   datafile gridfile \
+    resources/csv/in/data_lru.csv  resources/csv/in/covs_grid_lru.csv \
     resources/csv/out/lru_dens.csv resources/csv/out/lru_mass.csv \
     resources/csv/out/lru_nclu.csv resources/csv/out/lru_clus.csv \
-#   hier_cov_file grid_cov_file
+    resources/csv/in/covs_lru.csv  resources/csv/in/covs_grid_lru.csv
 
 
 else
