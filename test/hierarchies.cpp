@@ -174,7 +174,7 @@ TEST(lin_reg_uni_hierarchy, misc) {
   }
   // Initialize objects
   LinRegUniHierarchy hier;
-  bayesmix::LinRegUnivPrior prior;
+  bayesmix::LinRegUniPrior prior;
   // Create prior parameters
   Eigen::Vector2d beta0 = 0 * beta_true;
   bayesmix::Vector beta0_proto;
@@ -192,7 +192,7 @@ TEST(lin_reg_uni_hierarchy, misc) {
   hier.set_prior(prior);
   hier.initialize();
   // Extract hypers for reading test
-  bayesmix::LinRegUnivPrior out;
+  bayesmix::LinRegUniPrior out;
   hier.write_hypers_to_proto(&out);
   ASSERT_EQ(beta0, bayesmix::to_eigen(out.fixed_values().mean()));
   ASSERT_EQ(Lambda0, bayesmix::to_eigen(out.fixed_values().var_scaling()));

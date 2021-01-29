@@ -65,7 +65,7 @@ message NNWPrior {
 }
 
 
-message LinRegUnivPrior {
+message LinRegUniPrior {
   message FixedValues {
     Vector mean = 1;
     Matrix var_scaling = 2;

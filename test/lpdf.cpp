@@ -140,7 +140,7 @@ TEST(lpdf, nnig) {
 TEST(lpdf, lin_reg_uni) {
   // Create hierarchy objects
   LinRegUniHierarchy hier;
-  bayesmix::LinRegUnivPrior prior;
+  bayesmix::LinRegUniPrior prior;
   int dim = 3;
 
   // Generate data

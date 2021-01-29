@@ -38,7 +38,7 @@ class LinRegUniHierarchy : public DependentHierarchy {
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
   // HYPERPRIOR
-  std::shared_ptr<bayesmix::LinRegUnivPrior> prior;
+  std::shared_ptr<bayesmix::LinRegUniPrior> prior;
 
   void clear_data();
   void update_summary_statistics(const Eigen::VectorXd &datum,

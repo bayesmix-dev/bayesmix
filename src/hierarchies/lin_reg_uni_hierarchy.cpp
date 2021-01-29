@@ -139,9 +139,9 @@ void LinRegUniHierarchy::set_state_from_proto(
 
 void LinRegUniHierarchy::set_prior(const google::protobuf::Message &prior_) {
   auto &priorcast =
-      google::protobuf::internal::down_cast<const bayesmix::LinRegUnivPrior &>(
+      google::protobuf::internal::down_cast<const bayesmix::LinRegUniPrior &>(
           prior_);
-  prior = std::make_shared<bayesmix::LinRegUnivPrior>(priorcast);
+  prior = std::make_shared<bayesmix::LinRegUniPrior>(priorcast);
   hypers = std::make_shared<Hyperparams>();
   if (prior->has_fixed_values()) {
     // Set values
@@ -178,7 +178,7 @@ void LinRegUniHierarchy::write_state_to_proto(
 
 void LinRegUniHierarchy::write_hypers_to_proto(
     google::protobuf::Message *out) const {
-  bayesmix::LinRegUnivPrior hypers_;
+  bayesmix::LinRegUniPrior hypers_;
   bayesmix::to_proto(hypers->mean,
                      hypers_.mutable_fixed_values()->mutable_mean());
   bayesmix::to_proto(hypers->var_scaling,
@@ -186,7 +186,7 @@ void LinRegUniHierarchy::write_hypers_to_proto(
   hypers_.mutable_fixed_values()->set_shape(hypers->shape);
   hypers_.mutable_fixed_values()->set_scale(hypers->scale);
 
-  google::protobuf::internal::down_cast<bayesmix::LinRegUnivPrior *>(out)
+  google::protobuf::internal::down_cast<bayesmix::LinRegUniPrior *>(out)
       ->mutable_fixed_values()
       ->CopyFrom(hypers_.fixed_values());
 }

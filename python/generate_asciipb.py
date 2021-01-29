@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
 
   # LinRegUni fixed values
-  lru_prior = hierarchy_prior_pb2.LinRegUnivPrior()
+  lru_prior = hierarchy_prior_pb2.LinRegUniPrior()
   dim = 3
   beta0 = dim*[0]
   Lambda0 = [1.0, 0.0, 0.0, 1.0]
