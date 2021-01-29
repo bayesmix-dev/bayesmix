@@ -18,19 +18,20 @@ int main(int argc, char *argv[]) {
   std::string hier_args = argv[7];
   std::string mix_type = argv[8];
   std::string mix_args = argv[9];
-  std::string datafile = argv[10];
-  std::string gridfile = argv[11];
-  std::string densfile = argv[12];
-  std::string massfile = argv[13];
-  std::string nclufile = argv[14];
-  std::string clusfile = argv[15];
+  std::string collname = argv[10];
+  std::string datafile = argv[11];
+  std::string gridfile = argv[12];
+  std::string densfile = argv[13];
+  std::string massfile = argv[14];
+  std::string nclufile = argv[15];
+  std::string clusfile = argv[16];
   std::string hier_cov_file;
   std::string grid_cov_file;
-  if (argc >= 17) {
-    hier_cov_file = argv[16];
-  }
   if (argc >= 18) {
-    grid_cov_file = argv[17];
+    hier_cov_file = argv[17];
+  }
+  if (argc >= 19) {
+    grid_cov_file = argv[18];
   }
 
   // Create factories and objects
@@ -40,7 +41,13 @@ int main(int argc, char *argv[]) {
   auto algo = factory_algo.create_object(algo_type);
   auto hier = factory_hier.create_object(hier_type);
   auto mixing = factory_mixing.create_object(mix_type);
-  auto *coll = new MemoryCollector();
+  BaseCollector *coll;
+  if (collname == "") {
+    coll = new MemoryCollector();
+  }
+  else {
+    coll = new FileCollector(collname);
+  }
 
   // Set mixing hyperprior
   std::string mix_prior_str = "bayesmix." + mix_type + "Prior";
