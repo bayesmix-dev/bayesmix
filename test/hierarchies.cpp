@@ -216,7 +216,4 @@ TEST(lin_reg_uni_hierarchy, misc) {
   for (int i = 0; i < dim; i++) {
     ASSERT_GT(state.regression_coeffs(i), beta0(i));
   }
-  std::cout << "             ----> state.var = " << state.var << std::endl;
-  std::cout << "             approx. equal to" << std::endl;
-  std::cout << "             ----> true var  = " << sigma2 << std::endl;
 }
