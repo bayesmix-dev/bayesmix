@@ -5,6 +5,13 @@ from proto.py import hierarchy_prior_pb2
 
 # Run this from root with python -m python.generate_asciipb
 
+def identity_list(dim):
+  """Returns the list of entries of a dim-dimensional identity matrix."""
+  ide = dim*dim*[0.0]
+  for i in range(0, dim*dim, dim+1):
+    ide[i] = 1.0
+  return ide
+
 if __name__ == "__main__":
   # DP gamma hyperprior
   dp_prior = mixing_prior_pb2.DPPrior()
@@ -46,7 +53,7 @@ if __name__ == "__main__":
   # NNW NGIW hyperprior
   nnw_prior = hierarchy_prior_pb2.NNWPrior()
   mu00 = [5.5, 5.5]
-  mat = [1.0, 0.0, 0.0, 1.0]
+  mat = identity_list(2)
   nu0 = 5.0
   nnw_prior.ngiw_prior.mean_prior.mean.size = len(mu00)
   nnw_prior.ngiw_prior.mean_prior.mean.data[:] = mu00
@@ -72,8 +79,8 @@ if __name__ == "__main__":
   # LinRegUni fixed values
   lru_prior = hierarchy_prior_pb2.LinRegUniPrior()
   dim = 3
-  beta0 = dim*[0]
-  Lambda0 = [1.0, 0.0, 0.0, 1.0]
+  beta0 = dim*[0.0]
+  Lambda0 = identity_list(dim)
   lru_prior.fixed_values.mean.size = len(beta0)
   lru_prior.fixed_values.mean.data[:] = beta0
   lru_prior.fixed_values.var_scaling.rows = int(sqrt(len(Lambda0)))
