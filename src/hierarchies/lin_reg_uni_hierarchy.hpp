@@ -20,6 +20,7 @@ class LinRegUniHierarchy : public DependentHierarchy {
   struct Hyperparams {
     Eigen::VectorXd mean;
     Eigen::MatrixXd var_scaling;
+    Eigen::MatrixXd var_scaling_inv;
     double shape;
     double scale;
   };

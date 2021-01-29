@@ -39,8 +39,8 @@ LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update() {
   Hyperparams post_params;
 
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
-  post_params.mean = stan::math::inverse_spd(post_params.var_scaling) *
-                     (mixed_prod + hypers->var_scaling * hypers->mean);
+  post_params.mean = post_params.var_scaling.llt().solve(
+      mixed_prod + hypers->var_scaling * hypers->mean);
   post_params.shape = hypers->shape + 0.5 * card;
   post_params.scale =
       hypers->scale +
@@ -82,10 +82,9 @@ Eigen::VectorXd LinRegUniHierarchy::like_lpdf_grid(
 double LinRegUniHierarchy::marg_lpdf(
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate) const {
-  double sig_n =
-      sqrt((1 + (covariate * stan::math::inverse_spd(hypers->var_scaling) *
-                 covariate.transpose())(0)) *
-           hypers->scale / hypers->shape);
+  double sig_n = sqrt(
+      (1 + (covariate * hypers->var_scaling_inv * covariate.transpose())(0)) *
+      hypers->scale / hypers->shape);
   return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape,
                                     covariate.dot(hypers->mean), sig_n);
 }
@@ -150,6 +149,7 @@ void LinRegUniHierarchy::set_prior(const google::protobuf::Message &prior_) {
     dim = hypers->mean.size();
     hypers->var_scaling =
         bayesmix::to_eigen(prior->fixed_values().var_scaling());
+    hypers->var_scaling_inv = stan::math::inverse_spd(hypers->var_scaling);
     hypers->shape = prior->fixed_values().shape();
     hypers->scale = prior->fixed_values().scale();
     // Check validity
