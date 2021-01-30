@@ -38,11 +38,6 @@ class BaseHierarchy {
   virtual void update_summary_statistics(const Eigen::VectorXd &datum,
                                          bool add) = 0;
 
-  void set_card(int card_) {
-    card = card_;
-    log_card = std::log(card_);
-  }
-
  public:
   virtual void add_datum(const int id, const Eigen::VectorXd &datum);
 
@@ -92,9 +87,11 @@ class BaseHierarchy {
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
-
   virtual void set_prior(const google::protobuf::Message &prior_) = 0;
-
+  void set_card(const int card_) {
+    card = card_;
+    log_card = std::log(card_);
+  }
   virtual std::string get_id() const = 0;
 };
 

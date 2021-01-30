@@ -32,35 +32,12 @@ class PitYorMixing : public BaseMixing {
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
-
-  //! \param card Cardinality of the cluster
-  //! \param n    Total number of data points
-  //! \return     Probability value
   double mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
                                const unsigned int n, bool log,
-                               bool propto) const override {
-    double out;
-    if (hier->get_card() == 0) {
-      out = 0;
-    } else {
-      out = (hier->get_card() - state.discount) / (n + state.strength);
-    }
-    if (log) out = std::log(out);
-    return out;
-  }
-
+                               bool propto) const override;
   //! Mass probability for choosing a newly created cluster
-
-  //! \param n_clust Number of clusters
-  //! \param n       Total number of data points
-  //! \return        Probability value
   double mass_new_cluster(const unsigned int n_clust, const unsigned int n,
-                          bool log, bool propto) const override {
-    double out =
-        (state.strength + state.discount * n_clust) / (n + state.strength);
-    if (log) out = std::log(out);
-    return out;
-  }
+                          bool log, bool propto) const override;
 
   void initialize() override;
 

@@ -35,41 +35,13 @@ class DirichletMixing : public BaseMixing {
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
-
-  //! \param card Cardinality of the cluster
-  //! \param n    Total number of data points
-  //! \return     Probability value
   double mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
                                const unsigned int n, bool log,
-                               bool propto) const override {
-    double out;
-    if (log) {
-      out = hier->get_log_card();
-      if (!propto) out -= std::log(n + state.totalmass);
-    } else {
-      out = 1.0 * hier->get_card();
-      if (!propto) out /= (n + state.totalmass);
-    }
-    return out;
-  }
+                               bool propto) const override;
 
   //! Mass probability for choosing a newly created cluster
-
-  //! \param n_clust Number of clusters
-  //! \param n       Total number of data points
-  //! \return        Probability value
   double mass_new_cluster(const unsigned int n_clust, const unsigned int n,
-                          bool log, bool propto) const override {
-    double out;
-    if (log) {
-      out = state.logtotmass;
-      if (!propto) out -= std::log(n + state.totalmass);
-    } else {
-      out = state.totalmass;
-      if (!propto) out /= (n + state.totalmass);
-    }
-    return out;
-  }
+                          bool log, bool propto) const override;
 
   void initialize() override;
 

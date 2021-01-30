@@ -13,6 +13,40 @@ void DirichletMixing::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");
 }
 
+//! \param card Cardinality of the cluster
+//! \param n    Total number of data points
+//! \return     Probability value
+double DirichletMixing::mass_existing_cluster(
+    std::shared_ptr<BaseHierarchy> hier, const unsigned int n, bool log,
+    bool propto) const {
+  double out;
+  if (log) {
+    out = hier->get_log_card();
+    if (!propto) out -= std::log(n + state.totalmass);
+  } else {
+    out = 1.0 * hier->get_card();
+    if (!propto) out /= (n + state.totalmass);
+  }
+  return out;
+}
+
+//! \param n_clust Number of clusters
+//! \param n       Total number of data points
+//! \return        Probability value
+double DirichletMixing::mass_new_cluster(const unsigned int n_clust,
+                                         const unsigned int n, bool log,
+                                         bool propto) const {
+  double out;
+  if (log) {
+    out = state.logtotmass;
+    if (!propto) out -= std::log(n + state.totalmass);
+  } else {
+    out = state.totalmass;
+    if (!propto) out /= (n + state.totalmass);
+  }
+  return out;
+}
+
 void DirichletMixing::update_state(
     const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
     unsigned int n) {

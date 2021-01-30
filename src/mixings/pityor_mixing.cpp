@@ -11,6 +11,34 @@ void PitYorMixing::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");
 }
 
+//! \param card Cardinality of the cluster
+//! \param n    Total number of data points
+//! \return     Probability value
+double PitYorMixing::mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
+                                           const unsigned int n, bool log,
+                                           bool propto) const {
+  double out;
+  if (hier->get_card() == 0) {
+    out = 0;
+  } else {
+    out = (hier->get_card() - state.discount) / (n + state.strength);
+  }
+  if (log) out = std::log(out);
+  return out;
+}
+
+//! \param n_clust Number of clusters
+//! \param n       Total number of data points
+//! \return        Probability value
+double PitYorMixing::mass_new_cluster(const unsigned int n_clust,
+                                      const unsigned int n, bool log,
+                                      bool propto) const {
+  double out =
+      (state.strength + state.discount * n_clust) / (n + state.strength);
+  if (log) out = std::log(out);
+  return out;
+}
+
 void PitYorMixing::update_state(
     const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
     unsigned int n) {
