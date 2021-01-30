@@ -91,8 +91,9 @@ int main(int argc, char *argv[]) {
   algo->set_mixing(mixing);
   algo->set_data(data);
   algo->set_initial_clusters(hier, init_num_cl);
-  if (algo_type == "N8") {
-    algo->set_n_aux(3);
+  if (algo_type == "Neal8") {
+    auto algocast = std::dynamic_pointer_cast<Neal8Algorithm>(algo);
+    algocast->set_n_aux(3);
   }
 
   // Read and set covariates

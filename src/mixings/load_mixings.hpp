@@ -20,8 +20,8 @@ __attribute__((constructor)) static void load_mixings() {
   Builder<BaseMixing> PYbuilder = []() {
     return std::make_shared<PitYorMixing>();
   };
-  factory.add_builder("DP", DPbuilder);
-  factory.add_builder("PY", PYbuilder);
+  factory.add_builder(DirichletMixing().get_id(), DPbuilder);
+  factory.add_builder(PitYorMixing().get_id(), PYbuilder);
 }
 
 #endif  // BAYESMIX_MIXINGS_LOAD_MIXINGS_HPP_

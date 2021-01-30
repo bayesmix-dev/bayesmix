@@ -144,8 +144,6 @@ class BaseAlgorithm {
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
-  //! Does nothing except for Neal8
-  virtual void set_n_aux(const unsigned int n_aux_) {}
   void set_mixing(const std::shared_ptr<BaseMixing> mixing_) {
     mixing = mixing_;
   }

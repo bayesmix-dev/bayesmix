@@ -20,8 +20,8 @@ __attribute__((constructor)) static void load_algorithms() {
   Builder<BaseAlgorithm> Neal8builder = []() {
     return std::make_shared<Neal8Algorithm>();
   };
-  factory.add_builder("N2", Neal2builder);
-  factory.add_builder("N8", Neal8builder);
+  factory.add_builder(Neal2Algorithm().get_id(), Neal2builder);
+  factory.add_builder(Neal8Algorithm().get_id(), Neal8builder);
 }
 
 #endif  // BAYESMIX_ALGORITHMS_LOAD_ALGORITHMS_HPP_

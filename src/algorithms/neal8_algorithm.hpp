@@ -53,7 +53,7 @@ class Neal8Algorithm : public Neal2Algorithm {
 
   // GETTERS AND SETTERS
   unsigned int get_n_aux() const { return n_aux; }
-  void set_n_aux(const unsigned int n_aux_) override {
+  void set_n_aux(const unsigned int n_aux_) {
     assert(n_aux_ > 0);
     n_aux = n_aux_;
   }

@@ -24,9 +24,9 @@ __attribute__((constructor)) static void load_hierarchies() {
   Builder<BaseHierarchy> LinRegUnibuilder = []() {
     return std::make_shared<LinRegUniHierarchy>();
   };
-  factory.add_builder("NNIG", NNIGbuilder);
-  factory.add_builder("NNW", NNWbuilder);
-  factory.add_builder("LinRegUni", LinRegUnibuilder);
+  factory.add_builder(NNIGHierarchy().get_id(), NNIGbuilder);
+  factory.add_builder(NNWHierarchy().get_id(), NNWbuilder);
+  factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
 }
 
 #endif  // BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_HPP_
