@@ -44,8 +44,7 @@ int main(int argc, char *argv[]) {
   BaseCollector *coll;
   if (collname == "") {
     coll = new MemoryCollector();
-  }
-  else {
+  } else {
     coll = new FileCollector(collname);
   }
 
