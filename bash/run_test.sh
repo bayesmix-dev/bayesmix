@@ -33,7 +33,7 @@ elif [ "$1" == "multi" ]; then
 elif [ "$1" == "lru" ]; then
   build/run \
     Neal2 20201124 0 1000 100 \
-    LinRegUni resources/asciipb/lin_reg_univ_fixed.asciipb \
+    LinRegUni resources/asciipb/lin_reg_uni_fixed.asciipb \
     DP resources/asciipb/dp_gamma_prior.asciipb \
     "" \
     resources/csv/in/data_lru.csv  resources/csv/in/covs_grid_lru.csv \

@@ -76,8 +76,8 @@ void NNIGHierarchy::update_hypers(
     double prec = 0.0;
     double num = 0.0;
     for (auto &st : states) {
-      double mean = st.univ_ls_state().mean();
-      double var = st.univ_ls_state().var();
+      double mean = st.uni_ls_state().mean();
+      double var = st.uni_ls_state().var();
       prec += 1 / var;
       num += mean / var;
     }
@@ -105,8 +105,8 @@ void NNIGHierarchy::update_hypers(
     double num = 0.0;
     double beta_n = 0.0;
     for (auto &st : states) {
-      double mean = st.univ_ls_state().mean();
-      double var = st.univ_ls_state().var();
+      double mean = st.uni_ls_state().mean();
+      double var = st.uni_ls_state().var();
       b_n += 1 / var;
       num += mean / var;
       beta_n += (hypers->mean - mean) * (hypers->mean - mean) / var;
@@ -176,8 +176,8 @@ void NNIGHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast = google::protobuf::internal::down_cast<
       const bayesmix::MarginalState::ClusterState &>(state_);
-  state.mean = statecast.univ_ls_state().mean();
-  state.var = statecast.univ_ls_state().var();
+  state.mean = statecast.uni_ls_state().mean();
+  state.var = statecast.uni_ls_state().var();
   set_card(statecast.cardinality());
 }
 
@@ -245,13 +245,13 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
 
 void NNIGHierarchy::write_state_to_proto(
     google::protobuf::Message *out) const {
-  bayesmix::UnivLSState state_;
+  bayesmix::UniLSState state_;
   state_.set_mean(state.mean);
   state_.set_var(state.var);
 
   auto *out_cast = google::protobuf::internal::down_cast<
       bayesmix::MarginalState::ClusterState *>(out);
-  out_cast->mutable_univ_ls_state()->CopyFrom(state_);
+  out_cast->mutable_uni_ls_state()->CopyFrom(state_);
   out_cast->set_cardinality(card);
 }
 

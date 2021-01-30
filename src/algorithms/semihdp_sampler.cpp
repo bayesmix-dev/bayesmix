@@ -495,18 +495,18 @@ void SemiHdpSampler::sample_pseudo_prior() {
 
 void SemiHdpSampler::perturb(bayesmix::MarginalState::ClusterState* out) {
   auto& rng = bayesmix::Rng::Instance().get();
-  if (out->has_univ_ls_state()) {
+  if (out->has_uni_ls_state()) {
     double cnt_shared_tables =
-        out->univ_ls_state().mean() +
+        out->uni_ls_state().mean() +
         stan::math::normal_rng(0, params.pseudo_prior().mean_perturb_sd(),
                                rng);
-    double curr_var = out->univ_ls_state().var();
+    double curr_var = out->uni_ls_state().var();
     double var = curr_var +
                  stan::math::uniform_rng(
                      -curr_var / params.pseudo_prior().var_perturb_frac(),
                      curr_var / params.pseudo_prior().var_perturb_frac(), rng);
-    out->mutable_univ_ls_state()->set_mean(cnt_shared_tables);
-    out->mutable_univ_ls_state()->set_var(var);
+    out->mutable_uni_ls_state()->set_mean(cnt_shared_tables);
+    out->mutable_uni_ls_state()->set_var(var);
   } else {
     throw std::invalid_argument("Case not implemented yet!");
   }

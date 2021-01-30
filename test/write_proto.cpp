@@ -6,34 +6,34 @@
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"
 
-TEST(set_state, univ_ls) {
+TEST(set_state, uni_ls) {
   double mean = 5;
   double var = 1.0;
 
-  bayesmix::UnivLSState curr;
+  bayesmix::UniLSState curr;
   curr.set_mean(mean);
   curr.set_var(var);
 
   ASSERT_EQ(curr.mean(), mean);
 
   bayesmix::MarginalState::ClusterState clusval;
-  clusval.mutable_univ_ls_state()->CopyFrom(curr);
+  clusval.mutable_uni_ls_state()->CopyFrom(curr);
   NNIGHierarchy cluster;
   cluster.set_state_from_proto(clusval);
 
   ASSERT_EQ(curr.mean(), cluster.get_state().mean);
 }
 
-TEST(write_proto, univ_ls) {
+TEST(write_proto, uni_ls) {
   double mean = 5;
   double var = 1.0;
 
-  bayesmix::UnivLSState curr;
+  bayesmix::UniLSState curr;
   curr.set_mean(mean);
   curr.set_var(var);
 
   bayesmix::MarginalState::ClusterState clusval_in;
-  clusval_in.mutable_univ_ls_state()->CopyFrom(curr);
+  clusval_in.mutable_uni_ls_state()->CopyFrom(curr);
   NNIGHierarchy cluster;
   cluster.set_state_from_proto(clusval_in);
 
@@ -41,8 +41,8 @@ TEST(write_proto, univ_ls) {
   bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
   cluster.write_state_to_proto(clusval);
 
-  double out_mean = clusval->univ_ls_state().mean();
-  double out_var = clusval->univ_ls_state().var();
+  double out_mean = clusval->uni_ls_state().mean();
+  double out_var = clusval->uni_ls_state().var();
   ASSERT_EQ(mean, out_mean);
   ASSERT_EQ(var, out_var);
 }

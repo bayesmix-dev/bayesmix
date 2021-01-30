@@ -138,12 +138,12 @@ TEST(lin_reg_uni_hierarchy, state_read_write) {
   beta << 2, -1;
   double sigma2 = 9;
 
-  bayesmix::LinRegUnivLSState ls;
+  bayesmix::LinRegUniLSState ls;
   bayesmix::to_proto(beta, ls.mutable_regression_coeffs());
   ls.set_var(sigma2);
 
   bayesmix::MarginalState::ClusterState state;
-  state.mutable_lin_reg_univ_ls_state()->CopyFrom(ls);
+  state.mutable_lin_reg_uni_ls_state()->CopyFrom(ls);
 
   LinRegUniHierarchy hier;
   hier.set_state_from_proto(state);
@@ -155,8 +155,8 @@ TEST(lin_reg_uni_hierarchy, state_read_write) {
   bayesmix::MarginalState::ClusterState* out = outt.add_cluster_states();
   hier.write_state_to_proto(out);
   ASSERT_EQ(beta, bayesmix::to_eigen(
-                      out->lin_reg_univ_ls_state().regression_coeffs()));
-  ASSERT_EQ(sigma2, out->lin_reg_univ_ls_state().var());
+                      out->lin_reg_uni_ls_state().regression_coeffs()));
+  ASSERT_EQ(sigma2, out->lin_reg_uni_ls_state().var());
 }
 
 TEST(lin_reg_uni_hierarchy, misc) {

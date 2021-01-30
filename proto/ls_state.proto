@@ -4,7 +4,7 @@ import "matrix.proto";
 
 package bayesmix;
 
-message UnivLSState {
+message UniLSState {
     double mean = 1;
     double var = 2;
 }
@@ -14,7 +14,7 @@ message MultiLSState {
     Matrix prec = 2;
 }
 
-message LinRegUnivLSState {
+message LinRegUniLSState {
     Vector regression_coeffs = 1;
     double var = 2;
 }

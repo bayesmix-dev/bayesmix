@@ -7,8 +7,9 @@ package bayesmix;
 message SemiHdpState {
   message ClusterState {
     oneof val {
-      UnivLSState univ_ls_state = 1;
+      UniLSState uni_ls_state = 1;
       MultiLSState multi_ls_state = 2;
+      LinRegUniLSState lin_reg_uni_ls_state = 4;
     }
     int32 cardinality = 3;
   }

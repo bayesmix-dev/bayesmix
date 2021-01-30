@@ -14,14 +14,14 @@ message NNIGPrior {
   }
 
   message NormalMeanPrior {
-    UnivNormalDistribution mean_prior = 1;
+    UniNormalDistribution mean_prior = 1;
     double var_scaling = 2;
     double shape = 3;
     double scale = 4;
   }
 
   message NGGPrior {
-    UnivNormalDistribution mean_prior = 1;
+    UniNormalDistribution mean_prior = 1;
     GammaDistribution var_scaling_prior = 2;
     double shape = 3;
     GammaDistribution scale_prior = 4;

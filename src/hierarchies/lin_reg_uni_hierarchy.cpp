@@ -114,8 +114,8 @@ void LinRegUniHierarchy::set_state_from_proto(
   auto &statecast = google::protobuf::internal::down_cast<
       const bayesmix::MarginalState::ClusterState &>(state_);
   state.regression_coeffs = bayesmix::to_eigen(
-      statecast.lin_reg_univ_ls_state().regression_coeffs());
-  state.var = statecast.lin_reg_univ_ls_state().var();
+      statecast.lin_reg_uni_ls_state().regression_coeffs());
+  state.var = statecast.lin_reg_uni_ls_state().var();
   set_card(statecast.cardinality());
 }
 
@@ -147,14 +147,14 @@ void LinRegUniHierarchy::set_prior(const google::protobuf::Message &prior_) {
 
 void LinRegUniHierarchy::write_state_to_proto(
     google::protobuf::Message *out) const {
-  bayesmix::LinRegUnivLSState state_;
+  bayesmix::LinRegUniLSState state_;
   bayesmix::to_proto(state.regression_coeffs,
                      state_.mutable_regression_coeffs());
   state_.set_var(state.var);
 
   auto *out_cast = google::protobuf::internal::down_cast<
       bayesmix::MarginalState::ClusterState *>(out);
-  out_cast->mutable_lin_reg_univ_ls_state()->CopyFrom(state_);
+  out_cast->mutable_lin_reg_uni_ls_state()->CopyFrom(state_);
   out_cast->set_cardinality(card);
 }
 

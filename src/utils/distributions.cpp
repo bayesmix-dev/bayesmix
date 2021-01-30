@@ -110,19 +110,19 @@ double bayesmix::gaussian_mixture_dist(
     Eigen::VectorXd weights2) {
   double out;
 
-  if (clus1[0].has_univ_ls_state()) {
+  if (clus1[0].has_uni_ls_state()) {
     Eigen::VectorXd means1(clus1.size());
     Eigen::VectorXd vars1(clus1.size());
     Eigen::VectorXd means2(clus2.size());
     Eigen::VectorXd vars2(clus2.size());
     for (int i = 0; i < clus1.size(); i++) {
-      means1(i) = clus1[i].univ_ls_state().mean();
-      vars1(i) = clus1[i].univ_ls_state().var();
+      means1(i) = clus1[i].uni_ls_state().mean();
+      vars1(i) = clus1[i].uni_ls_state().var();
     }
 
     for (int i = 0; i < clus2.size(); i++) {
-      means2(i) = clus2[i].univ_ls_state().mean();
-      vars2(i) = clus2[i].univ_ls_state().var();
+      means2(i) = clus2[i].uni_ls_state().mean();
+      vars2(i) = clus2[i].uni_ls_state().var();
     }
 
     out = gaussian_mixture_dist(means1, vars1, weights1, means2, vars2,
