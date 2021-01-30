@@ -137,41 +137,12 @@ double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
 }
 
 //! \param data Column vector of data points
-//! \return     Log-Likehood vector evaluated in data
-Eigen::VectorXd NNIGHierarchy::like_lpdf_grid(
-    const Eigen::MatrixXd &data) const {
-  Eigen::VectorXd result(data.rows());
-  for (size_t i = 0; i < data.rows(); i++) {
-    result(i) =
-        stan::math::normal_lpdf(data(i, 0), state.mean, sqrt(state.var));
-  }
-  return result;
-}
-
-//! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data (log)
 double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
   double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
                       (hypers->shape * hypers->var_scaling));
   return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape, hypers->mean,
                                     sig_n);
-}
-
-//! \param data Column vector of data points
-//! \return     Marginal distribution vector evaluated in data (log)
-Eigen::VectorXd NNIGHierarchy::marg_lpdf_grid(
-    const Eigen::MatrixXd &data) const {
-  // Compute standard deviation of marginal distribution
-  double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
-                      (hypers->shape * hypers->var_scaling));
-
-  Eigen::VectorXd result(data.rows());
-  for (size_t i = 0; i < data.rows(); i++) {
-    // Compute marginal for each data point
-    result(i) = stan::math::student_t_lpdf(data(i, 0), 2 * hypers->shape,
-                                           hypers->mean, sig_n);
-  }
-  return result;
 }
 
 void NNIGHierarchy::draw() {

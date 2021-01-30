@@ -21,3 +21,21 @@ void BaseHierarchy::remove_datum(const int id, const Eigen::VectorXd &datum) {
   assert(it != cluster_data_idx.end());
   cluster_data_idx.erase(it);
 }
+
+Eigen::VectorXd BaseHierarchy::like_lpdf_grid(
+    const Eigen::MatrixXd &data) const {
+  Eigen::VectorXd result(data.rows());
+  for (size_t i = 0; i < data.rows(); i++) {
+    result(i) = like_lpdf(data.row(i));
+  }
+  return result;
+}
+
+Eigen::VectorXd BaseHierarchy::marg_lpdf_grid(
+    const Eigen::MatrixXd &data) const {
+  Eigen::VectorXd result(data.rows());
+  for (size_t i = 0; i < data.rows(); i++) {
+    result(i) = marg_lpdf(data.row(i));
+  }
+  return result;
+}

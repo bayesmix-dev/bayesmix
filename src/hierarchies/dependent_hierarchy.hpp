@@ -68,15 +68,13 @@ class DependentHierarchy : public BaseHierarchy {
                            const Eigen::RowVectorXd &covariate) const = 0;
   //! Evaluates the log-likelihood of data in the given points
   virtual Eigen::VectorXd like_lpdf_grid(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates) const = 0;
+      const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const;
   //! Evaluates the log-marginal distribution of data in a single point
   virtual double marg_lpdf(const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const = 0;
   //! Evaluates the log-marginal distribution of data in the given points
   virtual Eigen::VectorXd marg_lpdf_grid(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates) const = 0;
+      const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_DEPENDENT_HIERARCHY_H_

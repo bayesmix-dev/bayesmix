@@ -70,15 +70,6 @@ double LinRegUniHierarchy::like_lpdf(
       datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
 }
 
-Eigen::VectorXd LinRegUniHierarchy::like_lpdf_grid(
-    const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
-  Eigen::VectorXd result(data.rows());
-  for (size_t i = 0; i < data.rows(); i++) {
-    result(i) = like_lpdf(data.row(i), covariates.row(i));
-  }
-  return result;
-}
-
 double LinRegUniHierarchy::marg_lpdf(
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate) const {
@@ -87,15 +78,6 @@ double LinRegUniHierarchy::marg_lpdf(
       hypers->scale / hypers->shape);
   return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape,
                                     covariate.dot(hypers->mean), sig_n);
-}
-
-Eigen::VectorXd LinRegUniHierarchy::marg_lpdf_grid(
-    const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
-  Eigen::VectorXd result(data.rows());
-  for (size_t i = 0; i < data.rows(); i++) {
-    result(i) = marg_lpdf(data.row(i), covariates.row(i));
-  }
-  return result;
 }
 
 void LinRegUniHierarchy::draw() {

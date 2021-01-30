@@ -159,21 +159,6 @@ double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
                                           prec_logdet);
 }
 
-//! \param data Matrix of row-vectorial data points
-//! \return     Log-Likehood vector evaluated in data
-Eigen::VectorXd NNWHierarchy::like_lpdf_grid(
-    const Eigen::MatrixXd &data) const {
-  // Initialize relevant objects
-  unsigned int n = data.rows();
-  Eigen::VectorXd result(n);
-  // Compute likelihood for each data point
-  for (size_t i = 0; i < n; i++) {
-    result(i) = bayesmix::multi_normal_prec_lpdf(data.row(i), state.mean,
-                                                 prec_chol, prec_logdet);
-  }
-  return result;
-}
-
 //! \param data Matrix of row-vectorial a single data point
 //! \return     Marginal distribution vector evaluated in data
 double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
@@ -185,29 +170,6 @@ double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
 
   // TODO: chec if this is optimized as our bayesmix::multi_normal_prec_lpdf
   return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean, sigma_n);
-}
-
-//! \param data Matrix of row-vectorial data points
-//! \return     Marginal distribution vector evaluated in data
-Eigen::VectorXd NNWHierarchy::marg_lpdf_grid(
-    const Eigen::MatrixXd &data) const {
-  // Initialize relevant objects
-  unsigned int n = data.rows();
-  Eigen::VectorXd result(n);
-
-  // Compute dof and scale of marginal distribution
-  double nu_n = 2 * hypers->deg_free - dim + 1;
-  Eigen::MatrixXd sigma_n = hypers->scale_inv *
-                            (hypers->deg_free - 0.5 * (dim - 1)) *
-                            hypers->var_scaling / (hypers->var_scaling + 1);
-
-  for (size_t i = 0; i < n; i++) {
-    // Compute marginal for each data point
-    Eigen::RowVectorXd datum = data.row(i);
-    result(i) =
-        stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean, sigma_n);
-  }
-  return result;
 }
 
 void NNWHierarchy::draw() {
