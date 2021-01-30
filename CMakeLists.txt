@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.13.0)
 project(bayesmix)
 
 set (CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops
+  -ftree-vectorize -fopenmp")
 
 include(FindPythonInterp)
 add_custom_target(
@@ -31,12 +32,14 @@ set(INCLUDE_PATHS
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-set(LINK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so pthread protobuf)
+set(LINK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so pthread
+  protobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
 file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${ProtoFiles})
-SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
+SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED
+  TRUE)
 
 set(BAYESMIX_INCLUDE_PATHS ${INCLUDE_PATHS} PARENT_SCOPE)
 set(PROTO_HEADERS ${PROTO_HDRS} PARENT_SCOPE)
@@ -62,7 +65,6 @@ add_executable(run $<TARGET_OBJECTS:bayesmix> run.cpp)
 target_include_directories(run PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
 target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
-
 
 if (NOT DISABLE_TESTS)
   # Build test executable

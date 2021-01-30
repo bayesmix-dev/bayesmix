@@ -4,10 +4,10 @@
 #include <memory>
 #include <vector>
 
-#include "semihdp.pb.h"
 #include "../src/algorithms/semihdp_sampler.hpp"
 #include "../src/includes.hpp"
 #include "../src/utils/eigen_utils.hpp"
+#include "semihdp.pb.h"
 
 bayesmix::SemiHdpParams get_params() {
   bayesmix::SemiHdpParams out;
@@ -203,21 +203,18 @@ TEST(semihdp, sample_unique_values) {
           ->get_state()
           .mean);
 
-  ASSERT_GT(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(0, 0))
-          ->get_state()
-          .mean,
-      0);
-  ASSERT_LT(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 0))
-          ->get_state()
-          .mean,
-      0);
-  ASSERT_GT(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 1))
-          ->get_state()
-          .mean,
-      0);
+  ASSERT_GT(std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(0, 0))
+                ->get_state()
+                .mean,
+            0);
+  ASSERT_LT(std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 0))
+                ->get_state()
+                .mean,
+            0);
+  ASSERT_GT(std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 1))
+                ->get_state()
+                .mean,
+            0);
 }
 
 TEST(semihdp, sample_unique_values2) {
@@ -288,20 +285,19 @@ TEST(semihdp, sample_unique_values2) {
           ->get_state()
           .mean);
 
-  ASSERT_GT(std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_shared_table(0))
+  ASSERT_GT(
+      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_shared_table(0))
+          ->get_state()
+          .mean,
+      0);
+  ASSERT_LT(std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 0))
                 ->get_state()
                 .mean,
             0);
-  ASSERT_LT(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 0))
-          ->get_state()
-          .mean,
-      0);
-  ASSERT_GT(
-      std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 1))
-          ->get_state()
-          .mean,
-      0);
+  ASSERT_GT(std::dynamic_pointer_cast<NNIGHierarchy>(sampler.get_table(1, 1))
+                ->get_state()
+                .mean,
+            0);
 }
 
 TEST(semihdp, sample_allocations1) {

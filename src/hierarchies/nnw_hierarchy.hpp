@@ -7,9 +7,9 @@
 #include <memory>
 #include <stan/math/prim/fun.hpp>
 
+#include "base_hierarchy.hpp"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
-#include "base_hierarchy.hpp"
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 
@@ -43,14 +43,14 @@ class NNWHierarchy : public BaseHierarchy {
   };
 
  protected:
-  int dim;
+  unsigned int dim;
   Eigen::VectorXd data_sum;
   Eigen::MatrixXd data_sum_squares;
   // STATE
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-    // HYPERPRIOR
+  // HYPERPRIOR
   std::shared_ptr<bayesmix::NNWPrior> prior;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
@@ -60,26 +60,13 @@ class NNWHierarchy : public BaseHierarchy {
   double prec_logdet;
 
   // AUXILIARY TOOLS
-  void check_spd(const Eigen::MatrixXd &mat);
   //! Special setter for prec and its utilities
   void set_prec_and_utilities(const Eigen::MatrixXd &prec_);
 
-  void clear_data() {
-    data_sum = Eigen::VectorXd::Zero(dim);
-    data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
-    card = 0;
-    cluster_data_idx = std::set<int>();
-  }
+  void clear_data() override;
 
-  void update_summary_statistics(const Eigen::VectorXd &datum, bool add) {
-    if (add) {
-      data_sum += datum;
-      data_sum_squares += datum * datum.transpose();
-    } else {
-      data_sum -= datum;
-      data_sum_squares -= datum * datum.transpose();
-    }
-  }
+  void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 bool add) override;
 
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_wishart_update();
@@ -121,9 +108,6 @@ class NNWHierarchy : public BaseHierarchy {
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
-
-  //! \param state_ State value to set
-  //! \param check  If true, a state validity check occurs after assignment
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;

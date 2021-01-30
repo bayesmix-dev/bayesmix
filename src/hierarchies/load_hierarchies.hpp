@@ -6,6 +6,7 @@
 
 #include "../runtime/factory.hpp"
 #include "base_hierarchy.hpp"
+#include "lin_reg_uni_hierarchy.hpp"
 #include "nnig_hierarchy.hpp"
 #include "nnw_hierarchy.hpp"
 
@@ -20,8 +21,12 @@ __attribute__((constructor)) static void load_hierarchies() {
   Builder<BaseHierarchy> NNWbuilder = []() {
     return std::make_shared<NNWHierarchy>();
   };
+  Builder<BaseHierarchy> LinRegUnibuilder = []() {
+    return std::make_shared<LinRegUniHierarchy>();
+  };
   factory.add_builder("NNIG", NNIGbuilder);
   factory.add_builder("NNW", NNWbuilder);
+  factory.add_builder("LinRegUni", LinRegUnibuilder);
 }
 
 #endif  // BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_HPP_

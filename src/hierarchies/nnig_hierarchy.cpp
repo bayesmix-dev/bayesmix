@@ -5,10 +5,10 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/prob.hpp>
 
+#include "../utils/rng.hpp"
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"
-#include "../utils/rng.hpp"
 
 void NNIGHierarchy::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");
@@ -40,6 +40,24 @@ NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() {
                           (y_bar - hypers->mean) * (y_bar - hypers->mean) /
                           (card + hypers->var_scaling);
   return post_params;
+}
+
+void NNIGHierarchy::clear_data() {
+  data_sum = 0;
+  data_sum_squares = 0;
+  card = 0;
+  cluster_data_idx = std::set<int>();
+}
+
+void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
+                                              bool add) {
+  if (add) {
+    data_sum += datum(0);
+    data_sum_squares += datum(0) * datum(0);
+  } else {
+    data_sum -= datum(0);
+    data_sum_squares -= datum(0) * datum(0);
+  }
 }
 
 void NNIGHierarchy::update_hypers(
@@ -124,7 +142,6 @@ Eigen::VectorXd NNIGHierarchy::like_lpdf_grid(
     const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
-    // Compute likelihood for each data point
     result(i) =
         stan::math::normal_lpdf(data(i, 0), state.mean, sqrt(state.var));
   }
@@ -134,7 +151,6 @@ Eigen::VectorXd NNIGHierarchy::like_lpdf_grid(
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data (log)
 double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
-  // Compute standard deviation of marginal distribution
   double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
                       (hypers->shape * hypers->var_scaling));
   return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape, hypers->mean,

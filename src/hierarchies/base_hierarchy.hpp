@@ -9,8 +9,8 @@
 #include <set>
 #include <stan/math/prim.hpp>
 
-#include "marginal_state.pb.h"
 #include "../utils/rng.hpp"
+#include "marginal_state.pb.h"
 
 //! Abstract base template class for a hierarchy object.
 
@@ -44,33 +44,22 @@ class BaseHierarchy {
   }
 
  public:
-  void add_datum(const int &id, const Eigen::VectorXd &datum) {
-    auto it = cluster_data_idx.find(id);
-    assert(it == cluster_data_idx.end());
-    card += 1;
-    log_card = std::log(card);
-    update_summary_statistics(datum, true);
-    cluster_data_idx.insert(id);
+  virtual void add_datum(const int id, const Eigen::VectorXd &datum);
 
-  }
+  virtual void remove_datum(const int id, const Eigen::VectorXd &datum);
 
-  void remove_datum(const int &id, const Eigen::VectorXd &datum) {
-    update_summary_statistics(datum, false);
-    card -= 1;
-    log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
-    auto it = cluster_data_idx.find(id);
-    assert(it != cluster_data_idx.end());
-    cluster_data_idx.erase(it);
-  }
+  virtual void clear_data() = 0;
 
   int get_card() const { return card; }
   double get_log_card() const { return log_card; }
 
-  std::set<int> get_data_idx() {return cluster_data_idx;}
+  std::set<int> get_data_idx() { return cluster_data_idx; }
 
   virtual void initialize() = 0;
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
+  //! Returns true if the hierarchy has covariates i.e. is a dependent model
+  virtual bool is_dependent() const { return false; }
 
   virtual void update_hypers(
       const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
@@ -97,14 +86,12 @@ class BaseHierarchy {
   virtual void draw() = 0;
   //! Generates new values for state from the centering posterior distribution
   virtual void sample_given_data() = 0;
-  virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;
+  virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;  // TODO
+                                                                    // needed?
 
   // GETTERS AND SETTERS
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
-
-  //! \param state_ State value to set
-  //! \param check  If true, a state validity check occurs after assignment
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 

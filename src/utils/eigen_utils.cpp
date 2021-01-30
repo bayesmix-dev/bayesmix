@@ -4,6 +4,7 @@
 #include <iostream>
 #include <numeric>
 #include <sstream>
+#include <stan/math/prim/err.hpp>
 
 Eigen::MatrixXd bayesmix::vstack(const std::vector<Eigen::MatrixXd> &mats) {
   int ncols = mats[0].cols();
@@ -68,4 +69,10 @@ Eigen::MatrixXd bayesmix::append_by_row(const Eigen::MatrixXd &a,
     out << a, b;
     return out;
   }
+}
+
+void bayesmix::check_spd(const Eigen::MatrixXd &mat) {
+  assert(mat.rows() == mat.cols());
+  assert(mat.isApprox(mat.transpose()) && "Error: matrix is not symmetric");
+  stan::math::check_pos_definite("", "Matrix", mat);
 }

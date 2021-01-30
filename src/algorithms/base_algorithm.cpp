@@ -2,9 +2,35 @@
 
 #include <Eigen/Dense>
 #include <cassert>
+#include <memory>
 
+#include "../hierarchies/base_hierarchy.hpp"
+#include "../hierarchies/dependent_hierarchy.hpp"
+#include "../mixings/dependent_mixing.hpp"
 #include "marginal_state.pb.h"
 #include "mixing_state.pb.h"
+
+void BaseAlgorithm::add_datum_to_hierarchy(
+    const unsigned int datum_idx, std::shared_ptr<BaseHierarchy> hier) {
+  if (hier->is_dependent()) {
+    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(hier);
+    hiercast->add_datum(datum_idx, data.row(datum_idx),
+                        hier_covariates.row(datum_idx));
+  } else {
+    hier->add_datum(datum_idx, data.row(datum_idx));
+  }
+}
+
+void BaseAlgorithm::remove_datum_from_hierarchy(
+    const unsigned int datum_idx, std::shared_ptr<BaseHierarchy> hier) {
+  if (hier->is_dependent()) {
+    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(hier);
+    hiercast->remove_datum(datum_idx, data.row(datum_idx),
+                           hier_covariates.row(datum_idx));
+  } else {
+    hier->remove_datum(datum_idx, data.row(datum_idx));
+  }
+}
 
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;
@@ -15,6 +41,18 @@ void BaseAlgorithm::initialize() {
   assert(!(unique_values[0]->is_multivariate() == false && data.cols() > 1) &&
          "Error: multivariate data supplied to univariate hierarchy");
   assert(mixing != nullptr && "Error: mixing was not provided");
+  if (hier_covariates.rows() != 0) {
+    assert(unique_values[0]->is_dependent() &&
+           "Error: covariates supplied to non-dependent hierarchy");
+    assert(data.rows() == hier_covariates.rows() &&
+           "Error: data size and covariates size do not match");
+  }
+  if (mix_covariates.rows() != 0) {
+    assert(mixing->is_dependent() &&
+           "Error: covariates supplied to non-dependent mixing");
+    assert(data.rows() == mix_covariates.rows() &&
+           "Error: data size and covariates size do not match");
+  }
 
   if (init_num_clusters == 0) {
     init_num_clusters = data.rows();
@@ -38,13 +76,13 @@ void BaseAlgorithm::initialize() {
   allocations.clear();
   for (size_t i = 0; i < init_num_clusters; i++) {
     allocations.push_back(i);
-    unique_values[i]->add_datum(i, data.row(i));
+    add_datum_to_hierarchy(i, unique_values[i]);
   }
   // Randomly allocate all remaining data, and update cardinalities
   for (size_t i = init_num_clusters; i < data.rows(); i++) {
     unsigned int clust = distro(generator);
     allocations.push_back(clust);
-    unique_values[clust]->add_datum(i, data.row(i));
+    add_datum_to_hierarchy(i, unique_values[clust]);
   }
 
   std::cout << "Done" << std::endl;

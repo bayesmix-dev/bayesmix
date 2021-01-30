@@ -3,16 +3,16 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
-#include <stan/math/prim/err.hpp>
 #include <stan/math/prim/prob.hpp>
 
+#include "../utils/distributions.hpp"
+#include "../utils/eigen_utils.hpp"
+#include "../utils/proto_utils.hpp"
+#include "../utils/rng.hpp"
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"
 #include "matrix.pb.h"
-#include "../utils/distributions.hpp"
-#include "../utils/proto_utils.hpp"
-#include "../utils/rng.hpp"
 
 //! \param prec_ Value to set to prec
 void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
@@ -24,19 +24,30 @@ void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
   prec_logdet = 2 * log(diag.array()).sum();
 }
 
-void NNWHierarchy::check_spd(const Eigen::MatrixXd &mat) {
-  assert(mat.rows() == mat.cols());
-  assert(mat.isApprox(mat.transpose()) && "Error: matrix is not symmetric");
-  stan::math::check_pos_definite("", "Matrix", mat);
-}
-
 void NNWHierarchy::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");
   state.mean = hypers->mean;
   set_prec_and_utilities(hypers->var_scaling *
                          Eigen::MatrixXd::Identity(dim, dim));
+  clear_data();
+}
+
+void NNWHierarchy::clear_data() {
   data_sum = Eigen::VectorXd::Zero(dim);
   data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
+  card = 0;
+  cluster_data_idx = std::set<int>();
+}
+
+void NNWHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
+                                             bool add) {
+  if (add) {
+    data_sum += datum;
+    data_sum_squares += datum * datum.transpose();
+  } else {
+    data_sum -= datum;
+    data_sum_squares -= datum * datum.transpose();
+  }
 }
 
 //! \param data                    Matrix of row-vectorial data points
@@ -54,7 +65,8 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update() {
   post_params.mean = (hypers->var_scaling * hypers->mean + card * mubar) /
                      (hypers->var_scaling + card);
   // Compute tau_n
-  Eigen::MatrixXd tau_temp = data_sum_squares - card * mubar * mubar.transpose();
+  Eigen::MatrixXd tau_temp =
+      data_sum_squares - card * mubar * mubar.transpose();
   tau_temp += (card * hypers->var_scaling / (card + hypers->var_scaling)) *
               (mubar - hypers->mean) * (mubar - hypers->mean).transpose();
   tau_temp = 0.5 * tau_temp + hypers->scale_inv;
@@ -167,7 +179,8 @@ Eigen::VectorXd NNWHierarchy::like_lpdf_grid(
 double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * hypers->deg_free - dim + 1;
-  Eigen::MatrixXd sigma_n = hypers->scale_inv * (hypers->deg_free - 0.5 * (dim - 1)) *
+  Eigen::MatrixXd sigma_n = hypers->scale_inv *
+                            (hypers->deg_free - 0.5 * (dim - 1)) *
                             hypers->var_scaling / (hypers->var_scaling + 1);
 
   // TODO: chec if this is optimized as our bayesmix::multi_normal_prec_lpdf
@@ -184,7 +197,8 @@ Eigen::VectorXd NNWHierarchy::marg_lpdf_grid(
 
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * hypers->deg_free - dim + 1;
-  Eigen::MatrixXd sigma_n = hypers->scale_inv * (hypers->deg_free - 0.5 * (dim - 1)) *
+  Eigen::MatrixXd sigma_n = hypers->scale_inv *
+                            (hypers->deg_free - 0.5 * (dim - 1)) *
                             hypers->var_scaling / (hypers->var_scaling + 1);
 
   for (size_t i = 0; i < n; i++) {
@@ -226,11 +240,11 @@ void NNWHierarchy::sample_given_data() {
 
 void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   data_sum = Eigen::VectorXd::Zero(data.cols());
-  data_sum_squares = Eigen::VectorXd::Zero(data.cols(), data.cols());
+  data_sum_squares = Eigen::MatrixXd::Zero(data.cols(), data.cols());
 
-  for (int i=0; i < data.rows(); i++) {
+  for (int i = 0; i < data.rows(); i++) {
     data_sum += data.row(i);
-    data_sum_squares += data.row(i).transpose() * data.row(i); 
+    data_sum_squares += data.row(i).transpose() * data.row(i);
   }
   card = data.rows();
   log_card = std::log(card);
@@ -284,9 +298,9 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
            "Error: hyperparameters dimensions are not consistent");
     assert(tau0.rows() == dim &&
            "Error: hyperparameters dimensions are not consistent");
-    check_spd(sigma00);
+    bayesmix::check_spd(sigma00);
     assert(lambda0 > 0);
-    check_spd(tau0);
+    bayesmix::check_spd(tau0);
     assert(nu0 > dim - 1);
     // Set initial values
     hypers->mean = mu00;
@@ -320,13 +334,13 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     assert(tau00.rows() == dim &&
            "Error: hyperparameters dimensions are not consistent");
     // for mu0
-    check_spd(sigma00);
+    bayesmix::check_spd(sigma00);
     // for lambda0
     assert(alpha00 > 0);
     assert(beta00 > 0);
     // for tau0
     assert(nu00 > 0);
-    check_spd(tau00);
+    bayesmix::check_spd(tau00);
     // check nu0
     assert(nu0 > dim - 1);
     // Set initial values

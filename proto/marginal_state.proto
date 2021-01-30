@@ -10,6 +10,7 @@ message MarginalState {
     oneof val {
       UnivLSState univ_ls_state = 1;
       MultiLSState multi_ls_state = 2;
+      LinRegUnivLSState lin_reg_univ_ls_state = 4;
     }
     int32 cardinality = 3;
   }

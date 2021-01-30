@@ -29,11 +29,10 @@ void append_by_row(Eigen::MatrixXd *a, const Eigen::MatrixXd &b);
 Eigen::MatrixXd append_by_row(const Eigen::MatrixXd &a,
                               const Eigen::MatrixXd &b);
 
-
 /*
  * Creates an Eigen::Matrix from a collection of rows
- * @tparam Container an std-compatible container implementing the square brackets
- *     access operator
+ * @tparam Container an std-compatible container implementing the square
+ * brackets access operator
  * @param rows the rows of the matrix
  */
 
@@ -48,4 +47,6 @@ Eigen::MatrixXd stack_vectors(const Container<Eigen::VectorXd> &rows) {
   return out;
 }
 
+//! Checks whether the matrix is symmetric and semi-positive definite
+void check_spd(const Eigen::MatrixXd &mat);
 }  // namespace bayesmix

@@ -13,3 +13,8 @@ message MultiLSState {
     Vector mean = 1;
     Matrix prec = 2;
 }
+
+message LinRegUnivLSState {
+    Vector regression_coeffs = 1;
+    double var = 2;
+}

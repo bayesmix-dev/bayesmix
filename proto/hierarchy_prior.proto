@@ -63,3 +63,17 @@ message NNWPrior {
     NGIWPrior ngiw_prior = 3;
   }
 }
+
+
+message LinRegUniPrior {
+  message FixedValues {
+    Vector mean = 1;
+    Matrix var_scaling = 2;
+    double shape = 3;
+    double scale = 4;
+  }
+
+  oneof prior {
+    FixedValues fixed_values = 1;
+  }
+}

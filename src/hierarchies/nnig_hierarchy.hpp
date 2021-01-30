@@ -7,9 +7,9 @@
 #include <cassert>
 #include <memory>
 
+#include "base_hierarchy.hpp"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
-#include "base_hierarchy.hpp"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.
 
@@ -46,23 +46,10 @@ class NNIGHierarchy : public BaseHierarchy {
   // HYPERPRIOR
   std::shared_ptr<bayesmix::NNIGPrior> prior;
 
-  void clear_data() {
-    data_sum = 0;
-    data_sum_squares = 0;
-    card = 0;
-    cluster_data_idx = std::set<int>();
-  }
+  void clear_data() override;
 
-  void update_summary_statistics(const Eigen::VectorXd &datum, bool add) {
-    if (add) {
-      data_sum += datum(0);
-      data_sum_squares += datum(0) * datum(0);
-    }
-    else {
-      data_sum -= datum(0);
-      data_sum_squares -= datum(0) * datum(0);
-    }
-  }
+  void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 bool add) override;
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
@@ -106,8 +93,6 @@ class NNIGHierarchy : public BaseHierarchy {
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
-  //! \param state_ State value to set
-  //! \param check  If true, a state validity check occurs after assignment
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;

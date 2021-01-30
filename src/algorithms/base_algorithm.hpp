@@ -8,8 +8,8 @@
 #include "../collectors/base_collector.hpp"
 #include "../hierarchies/base_hierarchy.hpp"
 #include "../mixings/base_mixing.hpp"
-#include "marginal_state.pb.h"
 #include "lib/progressbar/progressbar.hpp"
+#include "marginal_state.pb.h"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -61,16 +61,16 @@ class BaseAlgorithm {
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
   std::vector<std::shared_ptr<BaseHierarchy>> unique_values;
+  //!
+  Eigen::MatrixXd hier_covariates;
   //! Mixing object
   std::shared_ptr<BaseMixing> mixing;
+  //!
+  Eigen::MatrixXd mix_covariates;
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object
   bayesmix::MarginalState get_state_as_proto(unsigned int iter);
-  //! Computes marginal contribution of a given iteration & cluster
-  virtual Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<BaseHierarchy> temp_hier,
-      const Eigen::MatrixXd &grid) = 0;
 
   // ALGORITHM FUNCTIONS
   virtual void print_startup_message() const = 0;
@@ -83,13 +83,12 @@ class BaseAlgorithm {
   };
 
   //! Saves the current iteration's state in Protobuf form to a collector
-  void save_state(BaseCollector *collector,
-                  unsigned int iter) {
+  void save_state(BaseCollector *collector, unsigned int iter) {
     collector->collect(get_state_as_proto(iter));
   }
 
   //! Single step of algorithm
-  void step() {
+  virtual void step() {
     sample_allocations();
     sample_unique_values();
     update_hierarchy_hypers();
@@ -105,15 +104,15 @@ class BaseAlgorithm {
     collector->start_collecting();
 
     progresscpp::ProgressBar bar(maxiter, 60);
-    
+
     while (iter < maxiter) {
       step();
       if (iter >= burnin) {
         save_state(collector, iter);
       }
       iter++;
-     ++bar;
-     bar.display();
+      ++bar;
+      bar.display();
     }
     collector->finish_collecting();
     bar.done();
@@ -122,13 +121,21 @@ class BaseAlgorithm {
 
   // ESTIMATE FUNCTION
   //! Evaluates the logpdf for each single iteration on a given grid of points
-  virtual Eigen::MatrixXd eval_lpdf(
-      const Eigen::MatrixXd &grid,
-      BaseCollector *const collector) = 0;
+  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
+                                    BaseCollector *const collector) = 0;
+  // TODO will soon become obsolete
+  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
+                                    const Eigen::MatrixXd &covariates,
+                                    BaseCollector *const collector) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseAlgorithm() = default;
   BaseAlgorithm() = default;
+
+  void add_datum_to_hierarchy(const unsigned int datum_idx,
+                              std::shared_ptr<BaseHierarchy> hier);
+  void remove_datum_from_hierarchy(const unsigned int datum_idx,
+                                   std::shared_ptr<BaseHierarchy> hier);
 
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }
@@ -143,14 +150,16 @@ class BaseAlgorithm {
     mixing = mixing_;
   }
   void set_data(const Eigen::MatrixXd &data_) { data = data_; }
-
+  void set_hier_covariates(const Eigen::MatrixXd &cov) {
+    hier_covariates = cov;
+  }
+  void set_mix_covariates(const Eigen::MatrixXd &cov) { mix_covariates = cov; }
   void set_initial_clusters(const std::shared_ptr<BaseHierarchy> hier_,
                             const unsigned int init = 0) {
     unique_values.clear();
     unique_values.push_back(hier_);
     init_num_clusters = init;
   }
-
   virtual std::string get_id() const = 0;
 };
 

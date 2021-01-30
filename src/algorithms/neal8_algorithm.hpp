@@ -37,6 +37,10 @@ class Neal8Algorithm : public Neal2Algorithm {
       std::shared_ptr<BaseHierarchy> temp_hier,
       const Eigen::MatrixXd &grid) override;
 
+  Eigen::VectorXd lpdf_marginal_component(
+      std::shared_ptr<DependentHierarchy> temp_hier,
+      const Eigen::MatrixXd &grid, const Eigen::MatrixXd &covariates) override;
+
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;
   void initialize() override;

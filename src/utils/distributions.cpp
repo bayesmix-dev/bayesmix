@@ -4,7 +4,7 @@
 #include <random>
 #include <stan/math/prim.hpp>
 
-#include "../../src/utils/proto_utils.hpp"
+#include "src/utils/proto_utils.hpp"
 
 int bayesmix::categorical_rng(const Eigen::VectorXd &probas,
                               std::mt19937_64 &rng, int start /*= 0*/) {

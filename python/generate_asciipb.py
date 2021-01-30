@@ -3,6 +3,15 @@ from math import sqrt
 from proto.py import mixing_prior_pb2
 from proto.py import hierarchy_prior_pb2
 
+# Run this from root with python -m python.generate_asciipb
+
+def identity_list(dim):
+  """Returns the list of entries of a dim-dimensional identity matrix."""
+  ide = dim*dim*[0.0]
+  for i in range(0, dim*dim, dim+1):
+    ide[i] = 1.0
+  return ide
+
 if __name__ == "__main__":
   # DP gamma hyperprior
   dp_prior = mixing_prior_pb2.DPPrior()
@@ -44,7 +53,7 @@ if __name__ == "__main__":
   # NNW NGIW hyperprior
   nnw_prior = hierarchy_prior_pb2.NNWPrior()
   mu00 = [5.5, 5.5]
-  mat = [1.0, 0.0, 0.0, 1.0]
+  mat = identity_list(2)
   nu0 = 5.0
   nnw_prior.ngiw_prior.mean_prior.mean.size = len(mu00)
   nnw_prior.ngiw_prior.mean_prior.mean.data[:] = mu00
@@ -64,3 +73,21 @@ if __name__ == "__main__":
   nnw_prior.ngiw_prior.scale_prior.scale.rowmajor = False
   with open("resources/asciipb/nnw_ngiw_prior.asciipb", "w") as f:
     PrintMessage(nnw_prior, f)
+
+
+
+  # LinRegUni fixed values
+  lru_prior = hierarchy_prior_pb2.LinRegUniPrior()
+  dim = 3
+  beta0 = dim*[0.0]
+  Lambda0 = identity_list(dim)
+  lru_prior.fixed_values.mean.size = len(beta0)
+  lru_prior.fixed_values.mean.data[:] = beta0
+  lru_prior.fixed_values.var_scaling.rows = int(sqrt(len(Lambda0)))
+  lru_prior.fixed_values.var_scaling.cols = int(sqrt(len(Lambda0)))
+  lru_prior.fixed_values.var_scaling.data[:] = Lambda0
+  lru_prior.fixed_values.var_scaling.rowmajor = False
+  lru_prior.fixed_values.shape = 2.0
+  lru_prior.fixed_values.scale = 2.0
+  with open("resources/asciipb/lin_reg_univ_fixed.asciipb", "w") as f:
+    PrintMessage(lru_prior, f)
