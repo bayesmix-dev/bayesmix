@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_ALGORITHMS_NEAL2_ALGORITHM_HPP_
-#define BAYESMIX_ALGORITHMS_NEAL2_ALGORITHM_HPP_
+#ifndef BAYESMIX_ALGORITHMS_NEAL2_ALGORITHM_H_
+#define BAYESMIX_ALGORITHMS_NEAL2_ALGORITHM_H_
 
 #include <Eigen/Dense>
 #include <memory>
@@ -54,4 +54,4 @@ class Neal2Algorithm : public MarginalAlgorithm {
   std::string get_id() const override { return "Neal2"; }
 };
 
-#endif  // BAYESMIX_ALGORITHMS_NEAL2_ALGORITHM_HPP_
+#endif  // BAYESMIX_ALGORITHMS_NEAL2_ALGORITHM_H_

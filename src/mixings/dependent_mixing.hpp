@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_MIXINGS_DEPENDENT_MIXING_HPP_
-#define BAYESMIX_MIXINGS_DEPENDENT_MIXING_HPP_
+#ifndef BAYESMIX_MIXINGS_DEPENDENT_MIXING_H_
+#define BAYESMIX_MIXINGS_DEPENDENT_MIXING_H_
 
 #include <Eigen/Dense>
 
@@ -30,4 +30,4 @@ class DependentMixing : public BaseMixing {
                                   bool propto) const = 0;
 };
 
-#endif  // BAYESMIX_MIXINGS_DEPENDENT_MIXING_HPP_
+#endif  // BAYESMIX_MIXINGS_DEPENDENT_MIXING_H_

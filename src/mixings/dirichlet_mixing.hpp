@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
-#define BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
+#ifndef BAYESMIX_MIXINGS_DIRICHLET_MIXING_H_
+#define BAYESMIX_MIXINGS_DIRICHLET_MIXING_H_
 
 #include <memory>
 
@@ -85,4 +85,4 @@ class DirichletMixing : public BaseMixing {
   std::string get_id() const override { return "DP"; }
 };
 
-#endif  // BAYESMIX_MIXINGS_DIRICHLET_MIXING_HPP_
+#endif  // BAYESMIX_MIXINGS_DIRICHLET_MIXING_H_

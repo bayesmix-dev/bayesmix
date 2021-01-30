@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_MIXINGS_BASE_MIXING_HPP_
-#define BAYESMIX_MIXINGS_BASE_MIXING_HPP_
+#ifndef BAYESMIX_MIXINGS_BASE_MIXING_H_
+#define BAYESMIX_MIXINGS_BASE_MIXING_H_
 
 #include <google/protobuf/message.h>
 
@@ -61,4 +61,4 @@ class BaseMixing {
   virtual std::string get_id() const = 0;
 };
 
-#endif  // BAYESMIX_MIXINGS_BASE_MIXING_HPP_
+#endif  // BAYESMIX_MIXINGS_BASE_MIXING_H_

@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_ALGORITHMS_MARGINAL_ALGORITHM_HPP_
-#define BAYESMIX_ALGORITHMS_MARGINAL_ALGORITHM_HPP_
+#ifndef BAYESMIX_ALGORITHMS_MARGINAL_ALGORITHM_H_
+#define BAYESMIX_ALGORITHMS_MARGINAL_ALGORITHM_H_
 
 #include <google/protobuf/message.h>
 
@@ -40,4 +40,4 @@ class MarginalAlgorithm : public BaseAlgorithm {
   bool update_state_from_collector(BaseCollector *coll);
 };
 
-#endif  // BAYESMIX_ALGORITHMS_MARGINAL_ALGORITHM_HPP_
+#endif  // BAYESMIX_ALGORITHMS_MARGINAL_ALGORITHM_H_

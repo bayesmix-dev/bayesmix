@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_HPP_
-#define BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_HPP_
+#ifndef BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_H_
+#define BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_H_
 
 #include <google/protobuf/stubs/casts.h>
 
@@ -102,4 +102,4 @@ class LinRegUniHierarchy : public DependentHierarchy {
   std::string get_id() const override { return "LinRegUni"; }
 };
 
-#endif  // BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_HPP_
+#endif  // BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_H_

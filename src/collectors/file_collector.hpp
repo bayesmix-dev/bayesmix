@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_
-#define BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_
+#ifndef BAYESMIX_COLLECTORS_FILE_COLLECTOR_H_
+#define BAYESMIX_COLLECTORS_FILE_COLLECTOR_H_
 
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/message.h>
@@ -64,4 +64,4 @@ class FileCollector : public BaseCollector {
   void reset() override;
 };
 
-#endif  // BAYESMIX_COLLECTORS_FILE_COLLECTOR_HPP_
+#endif  // BAYESMIX_COLLECTORS_FILE_COLLECTOR_H_

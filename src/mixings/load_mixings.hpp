@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_MIXINGS_LOAD_MIXINGS_HPP_
-#define BAYESMIX_MIXINGS_LOAD_MIXINGS_HPP_
+#ifndef BAYESMIX_MIXINGS_LOAD_MIXINGS_H_
+#define BAYESMIX_MIXINGS_LOAD_MIXINGS_H_
 
 #include <functional>
 #include <memory>
@@ -24,4 +24,4 @@ __attribute__((constructor)) static void load_mixings() {
   factory.add_builder(PitYorMixing().get_id(), PYbuilder);
 }
 
-#endif  // BAYESMIX_MIXINGS_LOAD_MIXINGS_HPP_
+#endif  // BAYESMIX_MIXINGS_LOAD_MIXINGS_H_

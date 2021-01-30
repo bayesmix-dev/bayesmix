@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_ALGORITHMS_CONDITIONAL_ALGORITHM_HPP_
-#define BAYESMIX_ALGORITHMS_CONDITIONAL_ALGORITHM_HPP_
+#ifndef BAYESMIX_ALGORITHMS_CONDITIONAL_ALGORITHM_H_
+#define BAYESMIX_ALGORITHMS_CONDITIONAL_ALGORITHM_H_
 
 #include <Eigen/Dense>
 
@@ -14,4 +14,4 @@ class ConditionalAlgorithm : public BaseAlgorithm {
                                     BaseCollector *const coll) override;
 };
 
-#endif  // BAYESMIX_ALGORITHMS_CONDITIONAL_ALGORITHM_HPP_
+#endif  // BAYESMIX_ALGORITHMS_CONDITIONAL_ALGORITHM_H_

@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_HIERARCHIES_DEPENDENT_HIERARCHY_HPP_
-#define BAYESMIX_HIERARCHIES_DEPENDENT_HIERARCHY_HPP_
+#ifndef BAYESMIX_HIERARCHIES_DEPENDENT_HIERARCHY_H_
+#define BAYESMIX_HIERARCHIES_DEPENDENT_HIERARCHY_H_
 
 #include <google/protobuf/message.h>
 
@@ -79,4 +79,4 @@ class DependentHierarchy : public BaseHierarchy {
       const Eigen::MatrixXd &covariates) const = 0;
 };
 
-#endif  // BAYESMIX_HIERARCHIES_DEPENDENT_HIERARCHY_HPP_
+#endif  // BAYESMIX_HIERARCHIES_DEPENDENT_HIERARCHY_H_

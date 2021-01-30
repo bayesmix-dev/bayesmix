@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_UTILS_IO_UTILS_HPP_
-#define BAYESMIX_UTILS_IO_UTILS_HPP_
+#ifndef BAYESMIX_UTILS_IO_UTILS_H_
+#define BAYESMIX_UTILS_IO_UTILS_H_
 
 #include <Eigen/Dense>
 
@@ -11,4 +11,4 @@ Eigen::MatrixXd read_eigen_matrix(const std::string &filename);
 void write_matrix_to_file(const Eigen::MatrixXd &mat, std::string filename);
 }  // namespace bayesmix
 
-#endif  // BAYESMIX_UTILS_IO_UTILS_HPP_
+#endif  // BAYESMIX_UTILS_IO_UTILS_H_

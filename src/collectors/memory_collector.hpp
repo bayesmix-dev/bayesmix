@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
-#define BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
+#ifndef BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_H_
+#define BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_H_
 
 #include <google/protobuf/message.h>
 #include <google/protobuf/util/delimited_message_util.h>
@@ -61,4 +61,4 @@ class MemoryCollector : public BaseCollector {
   }
 };
 
-#endif  // BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_HPP_
+#endif  // BAYESMIX_COLLECTORS_MEMORY_COLLECTOR_H_

@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_UTILS_CLUSTER_UTILS_HPP_
-#define BAYESMIX_UTILS_CLUSTER_UTILS_HPP_
+#ifndef BAYESMIX_UTILS_CLUSTER_UTILS_H_
+#define BAYESMIX_UTILS_CLUSTER_UTILS_H_
 
 #include <Eigen/Dense>
 
@@ -10,4 +10,4 @@ Eigen::MatrixXd posterior_similarity(const Eigen::MatrixXd &alloc_chain);
 Eigen::VectorXd cluster_estimate(const Eigen::MatrixXd &alloc_chain);
 }  // namespace bayesmix
 
-#endif  // BAYESMIX_UTILS_CLUSTER_UTILS_HPP_
+#endif  // BAYESMIX_UTILS_CLUSTER_UTILS_H_

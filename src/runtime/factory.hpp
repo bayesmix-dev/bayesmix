@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_RUNTIME_FACTORY_HPP_
-#define BAYESMIX_RUNTIME_FACTORY_HPP_
+#ifndef BAYESMIX_RUNTIME_FACTORY_H_
+#define BAYESMIX_RUNTIME_FACTORY_H_
 
 #include <functional>
 #include <iostream>
@@ -94,4 +94,4 @@ class Factory {
   }
 };
 
-#endif  // BAYESMIX_RUNTIME_FACTORY_HPP_
+#endif  // BAYESMIX_RUNTIME_FACTORY_H_

@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_HPP_
-#define BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_HPP_
+#ifndef BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_H_
+#define BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_H_
 
 #include <functional>
 #include <memory>
@@ -29,4 +29,4 @@ __attribute__((constructor)) static void load_hierarchies() {
   factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
 }
 
-#endif  // BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_HPP_
+#endif  // BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_H_

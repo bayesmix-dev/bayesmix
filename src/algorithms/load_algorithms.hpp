@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_ALGORITHMS_LOAD_ALGORITHMS_HPP_
-#define BAYESMIX_ALGORITHMS_LOAD_ALGORITHMS_HPP_
+#ifndef BAYESMIX_ALGORITHMS_LOAD_ALGORITHMS_H_
+#define BAYESMIX_ALGORITHMS_LOAD_ALGORITHMS_H_
 
 #include <functional>
 #include <memory>
@@ -24,4 +24,4 @@ __attribute__((constructor)) static void load_algorithms() {
   factory.add_builder(Neal8Algorithm().get_id(), Neal8builder);
 }
 
-#endif  // BAYESMIX_ALGORITHMS_LOAD_ALGORITHMS_HPP_
+#endif  // BAYESMIX_ALGORITHMS_LOAD_ALGORITHMS_H_

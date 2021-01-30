@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_UTILS_DISTRIBUTIONS_HPP_
-#define BAYESMIX_UTILS_DISTRIBUTIONS_HPP_
+#ifndef BAYESMIX_UTILS_DISTRIBUTIONS_H_
+#define BAYESMIX_UTILS_DISTRIBUTIONS_H_
 
 #include <omp.h>
 
@@ -101,4 +101,4 @@ double gaussian_mixture_dist(
 
 }  // namespace bayesmix
 
-#endif  // BAYESMIX_UTILS_DISTRIBUTIONS_HPP_
+#endif  // BAYESMIX_UTILS_DISTRIBUTIONS_H_

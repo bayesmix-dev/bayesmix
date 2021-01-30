@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_UTILS_PROTO_UTILS_HPP_
-#define BAYESMIX_UTILS_PROTO_UTILS_HPP_
+#ifndef BAYESMIX_UTILS_PROTO_UTILS_H_
+#define BAYESMIX_UTILS_PROTO_UTILS_H_
 
 #include <Eigen/Dense>
 
@@ -17,4 +17,4 @@ void read_proto_from_file(const std::string &filename,
 
 }  // namespace bayesmix
 
-#endif  // BAYESMIX_UTILS_PROTO_UTILS_HPP_
+#endif  // BAYESMIX_UTILS_PROTO_UTILS_H_
