@@ -61,7 +61,7 @@ add_dependencies(bayesmixlib build_tbb)
 
 
 # Build run executable
-add_executable(run $<TARGET_OBJECTS:bayesmix> run.cpp)
+add_executable(run $<TARGET_OBJECTS:bayesmix> run.cc)
 target_include_directories(run PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
 target_compile_options(run PUBLIC ${COMPILE_OPTIONS})

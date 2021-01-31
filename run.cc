@@ -3,10 +3,10 @@
 #include <fstream>
 #include <iostream>
 
-#include "src/includes.hpp"
+#include "src/includes.h"
 
 int main(int argc, char *argv[]) {
-  std::cout << "Running run.cpp" << std::endl;
+  std::cout << "Running run.cc" << std::endl;
 
   // Get console parameters
   std::string algo_type = argv[1];
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
   bayesmix::write_matrix_to_file(clust_est, clusfile);
   std::cout << "Successfully wrote clustering to " << clusfile << std::endl;
 
-  std::cout << "End of run.cpp" << std::endl;
+  std::cout << "End of run.cc" << std::endl;
   delete coll;
   return 0;
 }

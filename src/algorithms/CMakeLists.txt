@@ -1,17 +1,17 @@
 target_sources(bayesmix
   PUBLIC
-    base_algorithm.hpp
-    base_algorithm.cpp
-    # conditional_algorithm.hpp
-    # conditional_algorithm.cpp
-    marginal_algorithm.hpp
-    marginal_algorithm.cpp
-    neal2_algorithm.hpp
-    neal2_algorithm.cpp
-    neal8_algorithm.hpp
-    neal8_algorithm.cpp
-    # probit_sb_algorithm.hpp
-    # probit_sb_algorithm.cpp
-    semihdp_sampler.hpp
-    semihdp_sampler.cpp
+    base_algorithm.h
+    base_algorithm.cc
+    # conditional_algorithm.h
+    # conditional_algorithm.cc
+    marginal_algorithm.h
+    marginal_algorithm.cc
+    neal2_algorithm.h
+    neal2_algorithm.cc
+    neal8_algorithm.h
+    neal8_algorithm.cc
+    # probit_sb_algorithm.h
+    # probit_sb_algorithm.cc
+    semihdp_sampler.h
+    semihdp_sampler.cc
 )

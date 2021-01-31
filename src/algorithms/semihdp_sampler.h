@@ -2,17 +2,18 @@
 #define SRC_ALGORITHMS_SEMI_HDP_SAMPLER_HPP
 
 #include <omp.h>
-#include <semihdp.pb.h>
 
 #include <Eigen/Dense>
 #include <numeric>
-#include <src/collectors/memory_collector.hpp>
-#include <src/hierarchies/base_hierarchy.hpp>
-#include <src/utils/distributions.hpp>
-#include <src/utils/rng.hpp>
 #include <stan/math/prim.hpp>
 #include <stdexcept>
 #include <vector>
+
+#include "semihdp.pb.h"
+#include "src/collectors/memory_collector.hpp"
+#include "src/hierarchies/base_hierarchy.hpp"
+#include "src/utils/distributions.hpp"
+#include "src/utils/rng.hpp"
 
 using bayesmix::MarginalState;
 using bayesmix::SemiHdpState;

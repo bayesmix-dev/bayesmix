@@ -3,10 +3,10 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/fun.hpp>
 
-#include "../../lib/progressbar/progressbar.hpp"
 #include "../collectors/base_collector.hpp"
 #include "../hierarchies/dependent_hierarchy.hpp"
 #include "../utils/eigen_utils.hpp"
+#include "lib/progressbar/progressbar.hpp"
 #include "marginal_state.pb.h"
 
 //! \param grid Grid of points in matrix form to evaluate the density on
