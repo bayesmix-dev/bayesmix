@@ -55,6 +55,8 @@ class BaseHierarchy {
   virtual bool is_multivariate() const = 0;
   //! Returns true if the hierarchy has covariates i.e. is a dependent model
   virtual bool is_dependent() const { return false; }
+  //! Returns true if the hierarchy is conjugate i.e. has a marginal lpdf
+  virtual bool is_conjugate() const { return true; }
 
   virtual void update_hypers(
       const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;

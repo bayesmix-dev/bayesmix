@@ -125,7 +125,7 @@ void Neal8Algorithm::print_startup_message() const {
 }
 
 void Neal8Algorithm::initialize() {
-  Neal2Algorithm::initialize();
+  BaseAlgorithm::initialize();
   // Create correct amount of auxiliary blocks
   aux_unique_values.clear();
   for (size_t i = 0; i < n_aux; i++) {

@@ -95,6 +95,12 @@ void Neal2Algorithm::print_startup_message() const {
   std::cout << msg << std::endl;
 }
 
+void Neal2Algorithm::initialize() {
+  BaseAlgorithm::initialize();
+  assert(unique_values[0]->is_conjugate() &&
+    "Error: this algorithm only supports conjugate hierarchies");
+}
+
 void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
