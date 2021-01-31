@@ -5,11 +5,11 @@
 #include <memory>
 #include <vector>
 
+#include "lib/progressbar/progressbar.hpp"
+#include "marginal_state.pb.h"
 #include "src/collectors/base_collector.hpp"
 #include "src/hierarchies/base_hierarchy.hpp"
 #include "src/mixings/base_mixing.hpp"
-#include "lib/progressbar/progressbar.hpp"
-#include "marginal_state.pb.h"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 

@@ -2,8 +2,8 @@
 
 #include <algorithm>
 
-#include "src/utils/distributions.hpp"
 #include "marginal_state.pb.h"
+#include "src/utils/distributions.hpp"
 #include "src/utils/eigen_utils.hpp"
 
 SemiHdpSampler::SemiHdpSampler(const std::vector<Eigen::MatrixXd>& data,

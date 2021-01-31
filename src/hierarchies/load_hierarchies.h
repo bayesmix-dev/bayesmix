@@ -4,11 +4,11 @@
 #include <functional>
 #include <memory>
 
-#include "src/runtime/factory.hpp"
 #include "base_hierarchy.hpp"
 #include "lin_reg_uni_hierarchy.hpp"
 #include "nnig_hierarchy.hpp"
 #include "nnw_hierarchy.hpp"
+#include "src/runtime/factory.hpp"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;

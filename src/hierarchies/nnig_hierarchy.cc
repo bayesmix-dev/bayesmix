@@ -5,10 +5,10 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/prob.hpp>
 
-#include "src/utils/rng.hpp"
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"
+#include "src/utils/rng.hpp"
 
 void NNIGHierarchy::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");

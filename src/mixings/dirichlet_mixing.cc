@@ -5,9 +5,9 @@
 #include <cassert>
 #include <stan/math/prim/prob.hpp>
 
-#include "src/utils/rng.hpp"
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
+#include "src/utils/rng.hpp"
 
 void DirichletMixing::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");

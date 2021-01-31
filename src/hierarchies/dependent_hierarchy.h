@@ -8,9 +8,9 @@
 #include <random>
 #include <stan/math/prim.hpp>
 
-#include "src/utils/rng.hpp"
 #include "base_hierarchy.hpp"
 #include "marginal_state.pb.h"
+#include "src/utils/rng.hpp"
 
 class DependentHierarchy : public BaseHierarchy {
  public:

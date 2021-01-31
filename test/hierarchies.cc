@@ -3,13 +3,13 @@
 #include <Eigen/Dense>
 #include <stan/math/prim.hpp>
 
+#include "ls_state.pb.h"
+#include "marginal_state.pb.h"
 #include "src/hierarchies/lin_reg_uni_hierarchy.hpp"
 #include "src/hierarchies/nnig_hierarchy.hpp"
 #include "src/hierarchies/nnw_hierarchy.hpp"
 #include "src/utils/proto_utils.hpp"
 #include "src/utils/rng.hpp"
-#include "ls_state.pb.h"
-#include "marginal_state.pb.h"
 
 TEST(nnighierarchy, draw) {
   auto hier = std::make_shared<NNIGHierarchy>();

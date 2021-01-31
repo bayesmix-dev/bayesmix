@@ -4,11 +4,11 @@
 #include <cassert>
 #include <memory>
 
+#include "marginal_state.pb.h"
+#include "mixing_state.pb.h"
 #include "src/hierarchies/base_hierarchy.hpp"
 #include "src/hierarchies/dependent_hierarchy.hpp"
 #include "src/mixings/dependent_mixing.hpp"
-#include "marginal_state.pb.h"
-#include "mixing_state.pb.h"
 
 void BaseAlgorithm::add_datum_to_hierarchy(
     const unsigned int datum_idx, std::shared_ptr<BaseHierarchy> hier) {

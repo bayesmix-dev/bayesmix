@@ -6,13 +6,13 @@
 #include <stan/math/prim/fun.hpp>
 #include <vector>
 
+#include "marginal_state.pb.h"
 #include "src/hierarchies/base_hierarchy.hpp"
 #include "src/hierarchies/dependent_hierarchy.hpp"
 #include "src/mixings/base_mixing.hpp"
 #include "src/mixings/dependent_mixing.hpp"
 #include "src/utils/distributions.hpp"
 #include "src/utils/rng.hpp"
-#include "marginal_state.pb.h"
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid

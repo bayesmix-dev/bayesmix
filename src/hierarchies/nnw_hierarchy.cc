@@ -5,14 +5,14 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/prob.hpp>
 
-#include "src/utils/distributions.hpp"
-#include "src/utils/eigen_utils.hpp"
-#include "src/utils/proto_utils.hpp"
-#include "src/utils/rng.hpp"
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"
 #include "matrix.pb.h"
+#include "src/utils/distributions.hpp"
+#include "src/utils/eigen_utils.hpp"
+#include "src/utils/proto_utils.hpp"
+#include "src/utils/rng.hpp"
 
 //! \param prec_ Value to set to prec
 void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {

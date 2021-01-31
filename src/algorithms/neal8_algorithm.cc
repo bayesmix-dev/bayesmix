@@ -4,12 +4,12 @@
 #include <memory>
 #include <stan/math/prim/fun.hpp>
 
+#include "marginal_state.pb.h"
+#include "neal2_algorithm.hpp"
 #include "src/hierarchies/base_hierarchy.hpp"
 #include "src/mixings/base_mixing.hpp"
 #include "src/mixings/dependent_mixing.hpp"
 #include "src/utils/distributions.hpp"
-#include "marginal_state.pb.h"
-#include "neal2_algorithm.hpp"
 
 //! \param temp_hier Temporary hierarchy object
 //! \return          Vector of evaluation of component on the provided grid
