@@ -1,8 +1,9 @@
-#include "base_hierarchy.hpp"
+#include "base_hierarchy.h"
+
+#include <stan/math/prim.hpp>
 
 #include <Eigen/Dense>
 #include <set>
-#include <stan/math/prim.hpp>
 
 void BaseHierarchy::add_datum(const int id, const Eigen::VectorXd &datum) {
   auto it = cluster_data_idx.find(id);

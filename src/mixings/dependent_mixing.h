@@ -3,7 +3,7 @@
 
 #include <Eigen/Dense>
 
-#include "base_mixing.hpp"
+#include "base_mixing.h"
 
 class DependentMixing : public BaseMixing {
  protected:

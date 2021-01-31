@@ -1,4 +1,4 @@
-#include "pityor_mixing.hpp"
+#include "pityor_mixing.h"
 
 #include <google/protobuf/stubs/casts.h>
 

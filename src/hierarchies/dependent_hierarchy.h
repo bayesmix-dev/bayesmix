@@ -2,15 +2,15 @@
 #define BAYESMIX_HIERARCHIES_DEPENDENT_HIERARCHY_H_
 
 #include <google/protobuf/message.h>
+#include <stan/math/prim.hpp>
 
 #include <Eigen/Dense>
 #include <memory>
 #include <random>
-#include <stan/math/prim.hpp>
 
-#include "base_hierarchy.hpp"
+#include "base_hierarchy.h"
 #include "marginal_state.pb.h"
-#include "src/utils/rng.hpp"
+#include "src/utils/rng.h"
 
 class DependentHierarchy : public BaseHierarchy {
  public:

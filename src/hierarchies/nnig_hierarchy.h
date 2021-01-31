@@ -7,7 +7,7 @@
 #include <cassert>
 #include <memory>
 
-#include "base_hierarchy.hpp"
+#include "base_hierarchy.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
 

@@ -2,12 +2,12 @@
 #define BAYESMIX_HIERARCHIES_NNW_HIERARCHY_H_
 
 #include <google/protobuf/stubs/casts.h>
+#include <stan/math/prim/fun.hpp>
 
 #include <Eigen/Dense>
 #include <memory>
-#include <stan/math/prim/fun.hpp>
 
-#include "base_hierarchy.hpp"
+#include "base_hierarchy.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
 

@@ -1,14 +1,14 @@
 target_sources(bayesmix
   PUBLIC
-    cluster_utils.hpp
-    cluster_utils.cpp
-    eigen_utils.hpp
-    eigen_utils.cpp
-    distributions.hpp
-    distributions.cpp
-    io_utils.hpp
-    io_utils.cpp
-    proto_utils.hpp
-    proto_utils.cpp
-    rng.hpp
+    cluster_utils.h
+    cluster_utils.cc
+    eigen_utils.h
+    eigen_utils.cc
+    distributions.h
+    distributions.cc
+    io_utils.h
+    io_utils.cc
+    proto_utils.h
+    proto_utils.cc
+    rng.h
 )

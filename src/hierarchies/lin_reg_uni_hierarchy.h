@@ -6,8 +6,8 @@
 #include <Eigen/Dense>
 #include <memory>
 
-#include "base_hierarchy.hpp"
-#include "dependent_hierarchy.hpp"
+#include "base_hierarchy.h"
+#include "dependent_hierarchy.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
 

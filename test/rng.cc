@@ -1,11 +1,11 @@
-#include "src/utils/rng.hpp"
+#include "src/utils/rng.h"
 
 #include <gtest/gtest.h>
 
 #include <Eigen/Dense>
 
-#include "src/hierarchies/nnig_hierarchy.hpp"
-#include "src/utils/distributions.hpp"
+#include "src/hierarchies/nnig_hierarchy.h"
+#include "src/utils/distributions.h"
 
 TEST(rng, test1) {
   int rounds = 1000;

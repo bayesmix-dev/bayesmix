@@ -1,10 +1,11 @@
-#include "eigen_utils.hpp"
+#include "eigen_utils.h"
+
+#include <stan/math/prim/err.hpp>
 
 #include <algorithm>
 #include <iostream>
 #include <numeric>
 #include <sstream>
-#include <stan/math/prim/err.hpp>
 
 Eigen::MatrixXd bayesmix::vstack(const std::vector<Eigen::MatrixXd> &mats) {
   int ncols = mats[0].cols();

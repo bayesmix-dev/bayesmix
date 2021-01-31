@@ -4,10 +4,10 @@
 #include <functional>
 #include <memory>
 
-#include "base_algorithm.hpp"
-#include "neal2_algorithm.hpp"
-#include "neal8_algorithm.hpp"
-#include "src/runtime/factory.hpp"
+#include "base_algorithm.h"
+#include "neal2_algorithm.h"
+#include "neal8_algorithm.h"
+#include "src/runtime/factory.h"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;

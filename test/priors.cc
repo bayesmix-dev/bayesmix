@@ -4,10 +4,10 @@
 #include <memory>
 
 #include "marginal_state.pb.h"
-#include "src/hierarchies/nnig_hierarchy.hpp"
-#include "src/hierarchies/nnw_hierarchy.hpp"
-#include "src/mixings/dirichlet_mixing.hpp"
-#include "src/utils/proto_utils.hpp"
+#include "src/hierarchies/nnig_hierarchy.h"
+#include "src/hierarchies/nnw_hierarchy.h"
+#include "src/mixings/dirichlet_mixing.h"
+#include "src/utils/proto_utils.h"
 
 TEST(mixing, fixed_value) {
   DirichletMixing mix;

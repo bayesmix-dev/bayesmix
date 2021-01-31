@@ -1,9 +1,10 @@
-#include "dependent_hierarchy.hpp"
+#include "dependent_hierarchy.h"
+
+#include <stan/math/prim.hpp>
 
 #include <Eigen/Dense>
 #include <memory>
 #include <random>
-#include <stan/math/prim.hpp>
 
 void DependentHierarchy::add_datum(const int id, const Eigen::VectorXd &datum,
                                    const Eigen::VectorXd &covariate) {

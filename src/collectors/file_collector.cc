@@ -1,4 +1,4 @@
-#include "file_collector.hpp"
+#include "file_collector.h"
 
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/message.h>

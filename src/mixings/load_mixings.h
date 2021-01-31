@@ -4,10 +4,10 @@
 #include <functional>
 #include <memory>
 
-#include "base_mixing.hpp"
-#include "dirichlet_mixing.hpp"
-#include "pityor_mixing.hpp"
-#include "src/runtime/factory.hpp"
+#include "base_mixing.h"
+#include "dirichlet_mixing.h"
+#include "pityor_mixing.h"
+#include "src/runtime/factory.h"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;

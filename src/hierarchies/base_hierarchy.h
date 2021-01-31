@@ -2,15 +2,15 @@
 #define BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_
 
 #include <google/protobuf/message.h>
+#include <stan/math/prim.hpp>
 
 #include <Eigen/Dense>
 #include <memory>
 #include <random>
 #include <set>
-#include <stan/math/prim.hpp>
 
 #include "marginal_state.pb.h"
-#include "src/utils/rng.hpp"
+#include "src/utils/rng.h"
 
 //! Abstract base template class for a hierarchy object.
 

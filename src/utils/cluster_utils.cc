@@ -1,10 +1,10 @@
-#include "cluster_utils.hpp"
+#include "cluster_utils.h"
 
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
-#include "lib/progressbar/progressbar.hpp"
-#include "proto_utils.hpp"
+#include "lib/progressbar/progressbar.h"
+#include "proto_utils.h"
 
 Eigen::MatrixXd bayesmix::posterior_similarity(
     const Eigen::MatrixXd &alloc_chain) {

@@ -5,7 +5,7 @@
 
 #include <memory>
 
-#include "src/hierarchies/base_hierarchy.hpp"
+#include "src/hierarchies/base_hierarchy.h"
 
 //! Abstract base class for a generic mixture model
 

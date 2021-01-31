@@ -1,10 +1,10 @@
-#include "semihdp_sampler.hpp"
+#include "semihdp_sampler.h"
 
 #include <algorithm>
 
 #include "marginal_state.pb.h"
-#include "src/utils/distributions.hpp"
-#include "src/utils/eigen_utils.hpp"
+#include "src/utils/distributions.h"
+#include "src/utils/eigen_utils.h"
 
 SemiHdpSampler::SemiHdpSampler(const std::vector<Eigen::MatrixXd>& data,
                                std::shared_ptr<BaseHierarchy> hier,

@@ -1,8 +1,8 @@
-#include "conditional_algorithm.hpp"
+#include "conditional_algorithm.h"
 
 #include <Eigen/Dense>
 
-#include "src/collectors/base_collector.hpp"
+#include "src/collectors/base_collector.h"
 
 //! \param grid Grid of points in matrix form to evaluate the density on
 //! \param coll Collector containing the algorithm chain

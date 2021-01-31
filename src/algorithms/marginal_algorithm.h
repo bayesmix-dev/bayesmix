@@ -5,11 +5,11 @@
 
 #include <Eigen/Dense>
 
-#include "base_algorithm.hpp"
+#include "base_algorithm.h"
 #include "marginal_state.pb.h"
-#include "src/collectors/base_collector.hpp"
-#include "src/hierarchies/base_hierarchy.hpp"
-#include "src/hierarchies/dependent_hierarchy.hpp"
+#include "src/collectors/base_collector.h"
+#include "src/hierarchies/base_hierarchy.h"
+#include "src/hierarchies/dependent_hierarchy.h"
 
 class MarginalAlgorithm : public BaseAlgorithm {
  protected:

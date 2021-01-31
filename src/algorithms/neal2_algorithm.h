@@ -4,8 +4,8 @@
 #include <Eigen/Dense>
 #include <memory>
 
-#include "marginal_algorithm.hpp"
-#include "src/hierarchies/base_hierarchy.hpp"
+#include "marginal_algorithm.h"
+#include "src/hierarchies/base_hierarchy.h"
 
 //! Template class for Neal's algorithm 2 for conjugate hierarchies
 

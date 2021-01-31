@@ -4,7 +4,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/util/delimited_message_util.h>
 
-#include "base_collector.hpp"
+#include "base_collector.h"
 //! Class for a "virtual" collector which contains all objects of the chain
 
 //! This is a type of collector which includes a deque containing all states of

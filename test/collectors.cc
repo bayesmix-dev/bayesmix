@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "matrix.pb.h"
-#include "src/collectors/file_collector.hpp"
-#include "src/collectors/memory_collector.hpp"
-#include "src/utils/proto_utils.hpp"
+#include "src/collectors/file_collector.h"
+#include "src/collectors/memory_collector.h"
+#include "src/utils/proto_utils.h"
 
 TEST(collectors, memory) {
   MemoryCollector coll;

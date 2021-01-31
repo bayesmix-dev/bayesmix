@@ -1,7 +1,7 @@
 #ifndef BAYESMIX_MIXINGS_PITYOR_MIXING_H_
 #define BAYESMIX_MIXINGS_PITYOR_MIXING_H_
 
-#include "base_mixing.hpp"
+#include "base_mixing.h"
 #include "mixing_prior.pb.h"
 
 //! Class that represents the Pitman-Yor process mixture model.

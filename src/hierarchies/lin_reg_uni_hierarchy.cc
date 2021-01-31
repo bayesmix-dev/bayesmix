@@ -1,11 +1,12 @@
-#include "lin_reg_uni_hierarchy.hpp"
+#include "lin_reg_uni_hierarchy.h"
 
-#include <Eigen/Dense>
 #include <stan/math/prim/err.hpp>
 
-#include "src/utils/eigen_utils.hpp"
-#include "src/utils/proto_utils.hpp"
-#include "src/utils/rng.hpp"
+#include <Eigen/Dense>
+
+#include "src/utils/eigen_utils.h"
+#include "src/utils/proto_utils.h"
+#include "src/utils/rng.h"
 
 void LinRegUniHierarchy::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");

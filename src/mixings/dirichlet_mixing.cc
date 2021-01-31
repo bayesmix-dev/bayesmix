@@ -1,13 +1,13 @@
-#include "dirichlet_mixing.hpp"
+#include "dirichlet_mixing.h"
 
 #include <google/protobuf/stubs/casts.h>
+#include <stan/math/prim/prob.hpp>
 
 #include <cassert>
-#include <stan/math/prim/prob.hpp>
 
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
-#include "src/utils/rng.hpp"
+#include "src/utils/rng.h"
 
 void DirichletMixing::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");

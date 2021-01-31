@@ -1,4 +1,4 @@
-#include "memory_collector.hpp"
+#include "memory_collector.h"
 
 bool MemoryCollector::next_state(google::protobuf::Message* out) {
   if (curr_iter == size) {

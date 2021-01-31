@@ -4,7 +4,7 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/message.h>
 
-#include "base_collector.hpp"
+#include "base_collector.h"
 
 //! Class for a collector that writes its content to a file.
 

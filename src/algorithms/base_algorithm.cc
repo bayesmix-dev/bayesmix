@@ -1,4 +1,4 @@
-#include "base_algorithm.hpp"
+#include "base_algorithm.h"
 
 #include <Eigen/Dense>
 #include <cassert>
@@ -6,9 +6,9 @@
 
 #include "marginal_state.pb.h"
 #include "mixing_state.pb.h"
-#include "src/hierarchies/base_hierarchy.hpp"
-#include "src/hierarchies/dependent_hierarchy.hpp"
-#include "src/mixings/dependent_mixing.hpp"
+#include "src/hierarchies/base_hierarchy.h"
+#include "src/hierarchies/dependent_hierarchy.h"
+#include "src/mixings/dependent_mixing.h"
 
 void BaseAlgorithm::add_datum_to_hierarchy(
     const unsigned int datum_idx, std::shared_ptr<BaseHierarchy> hier) {
