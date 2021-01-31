@@ -66,7 +66,7 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
   if (unique_values[0]->is_dependent()) {
     auto hiercast =
         std::dynamic_pointer_cast<DependentHierarchy>(unique_values[0]);
-    // Update with marginal component
+    // Probability of being assigned to a newly created cluster
     loglpdf(n_clust) =
         hiercast->marg_lpdf(data.row(data_idx), hier_covariates.row(data_idx));
     for (size_t j = 0; j < n_clust; j++) {
@@ -78,12 +78,11 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
     }
 
   } else {
-    // Loop over clusters
     for (size_t j = 0; j < n_clust; j++) {
       // Probability of being assigned to an already existing cluster
       loglpdf(j) = unique_values[j]->like_lpdf(data.row(data_idx));
     }
-    // Further update with marginal component
+    // Probability of being assigned to a newly created cluster
     loglpdf(n_clust) = unique_values[0]->marg_lpdf(data.row(data_idx));
   }
   return loglpdf;
@@ -120,7 +119,6 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
     unsigned int c_old = allocations[i];
-
     if (c_new == n_clust) {
       std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
       add_datum_to_hierarchy(i, new_unique);
