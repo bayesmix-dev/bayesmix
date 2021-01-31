@@ -1,9 +1,9 @@
 #include "nnig_hierarchy.h"
 
 #include <google/protobuf/stubs/casts.h>
-#include <stan/math/prim/prob.hpp>
 
 #include <Eigen/Dense>
+#include <stan/math/prim/prob.hpp>
 
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"

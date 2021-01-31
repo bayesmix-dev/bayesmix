@@ -1,10 +1,9 @@
 #include "neal2_algorithm.h"
 
-#include <stan/math/prim/fun.hpp>
-
 #include <Eigen/Dense>
 #include <cassert>
 #include <memory>
+#include <stan/math/prim/fun.hpp>
 #include <vector>
 
 #include "marginal_state.pb.h"

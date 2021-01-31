@@ -1,9 +1,8 @@
 #include "neal8_algorithm.h"
 
-#include <stan/math/prim/fun.hpp>
-
 #include <Eigen/Dense>
 #include <memory>
+#include <stan/math/prim/fun.hpp>
 
 #include "marginal_state.pb.h"
 #include "neal2_algorithm.h"

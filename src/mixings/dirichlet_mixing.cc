@@ -1,9 +1,9 @@
 #include "dirichlet_mixing.h"
 
 #include <google/protobuf/stubs/casts.h>
-#include <stan/math/prim/prob.hpp>
 
 #include <cassert>
+#include <stan/math/prim/prob.hpp>
 
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"

@@ -1,8 +1,7 @@
 #include "marginal_algorithm.h"
 
-#include <stan/math/prim/fun.hpp>
-
 #include <Eigen/Dense>
+#include <stan/math/prim/fun.hpp>
 
 #include "lib/progressbar/progressbar.h"
 #include "marginal_state.pb.h"

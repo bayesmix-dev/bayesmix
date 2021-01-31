@@ -2,10 +2,10 @@
 #define SRC_ALGORITHMS_SEMI_HDP_SAMPLER_HPP
 
 #include <omp.h>
-#include <stan/math/prim.hpp>
 
 #include <Eigen/Dense>
 #include <numeric>
+#include <stan/math/prim.hpp>
 #include <stdexcept>
 #include <vector>
 

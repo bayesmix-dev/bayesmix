@@ -1,9 +1,8 @@
 #include "distributions.h"
 
-#include <stan/math/prim.hpp>
-
 #include <Eigen/Dense>
 #include <random>
+#include <stan/math/prim.hpp>
 
 #include "src/utils/proto_utils.h"
 

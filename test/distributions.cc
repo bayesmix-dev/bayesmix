@@ -1,9 +1,9 @@
 #include "src/utils/distributions.h"
 
 #include <gtest/gtest.h>
-#include <stan/math/prim.hpp>
 
 #include <Eigen/Dense>
+#include <stan/math/prim.hpp>
 #include <vector>
 
 #include "src/utils/rng.h"

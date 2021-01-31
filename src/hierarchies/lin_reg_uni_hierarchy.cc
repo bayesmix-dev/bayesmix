@@ -1,8 +1,7 @@
 #include "lin_reg_uni_hierarchy.h"
 
-#include <stan/math/prim/err.hpp>
-
 #include <Eigen/Dense>
+#include <stan/math/prim/err.hpp>
 
 #include "src/utils/eigen_utils.h"
 #include "src/utils/proto_utils.h"

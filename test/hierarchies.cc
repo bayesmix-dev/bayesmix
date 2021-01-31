@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <stan/math/prim.hpp>
 
 #include <Eigen/Dense>
+#include <stan/math/prim.hpp>
 
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"
