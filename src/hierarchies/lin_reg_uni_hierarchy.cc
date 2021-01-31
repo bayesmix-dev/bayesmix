@@ -3,9 +3,9 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/err.hpp>
 
-#include "../utils/eigen_utils.hpp"
-#include "../utils/proto_utils.hpp"
-#include "../utils/rng.hpp"
+#include "src/utils/eigen_utils.hpp"
+#include "src/utils/proto_utils.hpp"
+#include "src/utils/rng.hpp"
 
 void LinRegUniHierarchy::initialize() {
   assert(prior != nullptr && "Error: prior was not provided");

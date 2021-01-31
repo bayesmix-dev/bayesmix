@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "../utils/distributions.hpp"
+#include "src/utils/distributions.hpp"
 #include "marginal_state.pb.h"
 #include "src/utils/eigen_utils.hpp"
 

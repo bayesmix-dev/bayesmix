@@ -5,7 +5,7 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/prob.hpp>
 
-#include "../utils/rng.hpp"
+#include "src/utils/rng.hpp"
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"

@@ -6,12 +6,12 @@
 #include <stan/math/prim/fun.hpp>
 #include <vector>
 
-#include "../hierarchies/base_hierarchy.hpp"
-#include "../hierarchies/dependent_hierarchy.hpp"
-#include "../mixings/base_mixing.hpp"
-#include "../mixings/dependent_mixing.hpp"
-#include "../utils/distributions.hpp"
-#include "../utils/rng.hpp"
+#include "src/hierarchies/base_hierarchy.hpp"
+#include "src/hierarchies/dependent_hierarchy.hpp"
+#include "src/mixings/base_mixing.hpp"
+#include "src/mixings/dependent_mixing.hpp"
+#include "src/utils/distributions.hpp"
+#include "src/utils/rng.hpp"
 #include "marginal_state.pb.h"
 
 //! \param temp_hier Temporary hierarchy object

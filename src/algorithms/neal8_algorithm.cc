@@ -4,10 +4,10 @@
 #include <memory>
 #include <stan/math/prim/fun.hpp>
 
-#include "../hierarchies/base_hierarchy.hpp"
-#include "../mixings/base_mixing.hpp"
-#include "../mixings/dependent_mixing.hpp"
-#include "../utils/distributions.hpp"
+#include "src/hierarchies/base_hierarchy.hpp"
+#include "src/mixings/base_mixing.hpp"
+#include "src/mixings/dependent_mixing.hpp"
+#include "src/utils/distributions.hpp"
 #include "marginal_state.pb.h"
 #include "neal2_algorithm.hpp"
 

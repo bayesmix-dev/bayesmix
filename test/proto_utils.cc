@@ -1,4 +1,4 @@
-#include "../src/utils/proto_utils.hpp"
+#include "src/utils/proto_utils.hpp"
 
 #include <gtest/gtest.h>
 

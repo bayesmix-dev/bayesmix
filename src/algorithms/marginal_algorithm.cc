@@ -3,9 +3,9 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/fun.hpp>
 
-#include "../collectors/base_collector.hpp"
-#include "../hierarchies/dependent_hierarchy.hpp"
-#include "../utils/eigen_utils.hpp"
+#include "src/collectors/base_collector.hpp"
+#include "src/hierarchies/dependent_hierarchy.hpp"
+#include "src/utils/eigen_utils.hpp"
 #include "lib/progressbar/progressbar.hpp"
 #include "marginal_state.pb.h"
 

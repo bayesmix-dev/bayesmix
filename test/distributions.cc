@@ -1,4 +1,4 @@
-#include "../src/utils/distributions.hpp"
+#include "src/utils/distributions.hpp"
 
 #include <gtest/gtest.h>
 
@@ -6,7 +6,7 @@
 #include <stan/math/prim.hpp>
 #include <vector>
 
-#include "../src/utils/rng.hpp"
+#include "src/utils/rng.hpp"
 
 TEST(mix_dist, 1) {
   auto& rng = bayesmix::Rng::Instance().get();

@@ -5,9 +5,9 @@
 #include <memory>
 #include <vector>
 
-#include "../collectors/base_collector.hpp"
-#include "../hierarchies/base_hierarchy.hpp"
-#include "../mixings/base_mixing.hpp"
+#include "src/collectors/base_collector.hpp"
+#include "src/hierarchies/base_hierarchy.hpp"
+#include "src/mixings/base_mixing.hpp"
 #include "lib/progressbar/progressbar.hpp"
 #include "marginal_state.pb.h"
 

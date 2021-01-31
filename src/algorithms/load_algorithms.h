@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 
-#include "../runtime/factory.hpp"
+#include "src/runtime/factory.hpp"
 #include "base_algorithm.hpp"
 #include "neal2_algorithm.hpp"
 #include "neal8_algorithm.hpp"

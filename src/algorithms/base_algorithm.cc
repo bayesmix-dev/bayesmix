@@ -4,9 +4,9 @@
 #include <cassert>
 #include <memory>
 
-#include "../hierarchies/base_hierarchy.hpp"
-#include "../hierarchies/dependent_hierarchy.hpp"
-#include "../mixings/dependent_mixing.hpp"
+#include "src/hierarchies/base_hierarchy.hpp"
+#include "src/hierarchies/dependent_hierarchy.hpp"
+#include "src/mixings/dependent_mixing.hpp"
 #include "marginal_state.pb.h"
 #include "mixing_state.pb.h"
 

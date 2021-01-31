@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 
-#include "../runtime/factory.hpp"
+#include "src/runtime/factory.hpp"
 #include "base_hierarchy.hpp"
 #include "lin_reg_uni_hierarchy.hpp"
 #include "nnig_hierarchy.hpp"

@@ -3,7 +3,7 @@
 
 #include <Eigen/Dense>
 
-#include "../collectors/base_collector.hpp"
+#include "src/collectors/base_collector.hpp"
 #include "base_algorithm.hpp"
 
 class ConditionalAlgorithm : public BaseAlgorithm {

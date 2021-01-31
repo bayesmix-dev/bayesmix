@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "../src/hierarchies/nnig_hierarchy.hpp"
-#include "../src/hierarchies/nnw_hierarchy.hpp"
-#include "../src/utils/proto_utils.hpp"
+#include "src/hierarchies/nnig_hierarchy.hpp"
+#include "src/hierarchies/nnw_hierarchy.hpp"
+#include "src/utils/proto_utils.hpp"
 #include "ls_state.pb.h"
 #include "marginal_state.pb.h"
 

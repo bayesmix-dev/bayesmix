@@ -5,7 +5,7 @@
 #include <cassert>
 #include <stan/math/prim/prob.hpp>
 
-#include "../utils/rng.hpp"
+#include "src/utils/rng.hpp"
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
 

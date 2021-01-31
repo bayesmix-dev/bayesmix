@@ -1,4 +1,4 @@
-#include "../src/utils/eigen_utils.hpp"
+#include "src/utils/eigen_utils.hpp"
 
 #include <gtest/gtest.h>
 

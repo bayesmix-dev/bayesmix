@@ -2,7 +2,7 @@
 
 #include <Eigen/Dense>
 
-#include "../collectors/base_collector.hpp"
+#include "src/collectors/base_collector.hpp"
 
 //! \param grid Grid of points in matrix form to evaluate the density on
 //! \param coll Collector containing the algorithm chain

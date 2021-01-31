@@ -4,9 +4,9 @@
 #include <memory>
 #include <vector>
 
-#include "../src/algorithms/semihdp_sampler.hpp"
-#include "../src/includes.hpp"
-#include "../src/utils/eigen_utils.hpp"
+#include "src/algorithms/semihdp_sampler.hpp"
+#include "src/includes.hpp"
+#include "src/utils/eigen_utils.hpp"
 #include "semihdp.pb.h"
 
 bayesmix::SemiHdpParams get_params() {
