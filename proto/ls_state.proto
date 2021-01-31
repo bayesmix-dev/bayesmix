@@ -5,16 +5,16 @@ import "matrix.proto";
 package bayesmix;
 
 message UniLSState {
-    double mean = 1;
-    double var = 2;
+  double mean = 1;
+  double var = 2;
 }
 
 message MultiLSState {
-    Vector mean = 1;
-    Matrix prec = 2;
+  Vector mean = 1;
+  Matrix prec = 2;
 }
 
 message LinRegUniLSState {
-    Vector regression_coeffs = 1;
-    double var = 2;
+  Vector regression_coeffs = 1;
+  double var = 2;
 }
