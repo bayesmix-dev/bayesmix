@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 
-#include "algorithms.pb.h"
+#include "algorithm_id.pb.h"
 #include "base_algorithm.h"
 #include "neal2_algorithm.h"
 #include "neal8_algorithm.h"
@@ -13,7 +13,7 @@
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
-using AlgorithmFactory = Factory<bayesmix::Algorithm, BaseAlgorithm>;
+using AlgorithmFactory = Factory<bayesmix::AlgorithmId, BaseAlgorithm>;
 
 __attribute__((constructor)) static void load_algorithms() {
   AlgorithmFactory &factory = AlgorithmFactory::Instance();

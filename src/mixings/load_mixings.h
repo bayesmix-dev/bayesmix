@@ -12,7 +12,7 @@
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
-using MixingFactory = Factory<bayesmix::Mixing, BaseMixing>;
+using MixingFactory = Factory<bayesmix::MixingId, BaseMixing>;
 
 __attribute__((constructor)) static void load_mixings() {
   MixingFactory &factory = MixingFactory::Instance();

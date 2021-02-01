@@ -65,8 +65,8 @@ class Neal8Algorithm : public Neal2Algorithm {
     n_aux = n_aux_;
   }
 
-  bayesmix::Algorithm get_id() const override {
-    return bayesmix::Algorithm::Neal8;
+  bayesmix::AlgorithmId get_id() const override {
+    return bayesmix::AlgorithmId::Neal8;
   }
 };
 

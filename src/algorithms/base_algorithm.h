@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-#include "algorithms.pb.h"
+#include "algorithm_id.pb.h"
 #include "marginal_state.pb.h"
 #include "src/collectors/base_collector.h"
 #include "src/hierarchies/base_hierarchy.h"
@@ -162,7 +162,7 @@ class BaseAlgorithm {
     unique_values.push_back(hier_);
     init_num_clusters = init;
   }
-  virtual bayesmix::Algorithm get_id() const = 0;
+  virtual bayesmix::AlgorithmId get_id() const = 0;
 };
 
 #endif  // BAYESMIX_ALGORITHMS_BASE_ALGORITHM_H_

@@ -95,7 +95,7 @@ class BaseHierarchy {
     card = card_;
     log_card = std::log(card_);
   }
-  virtual bayesmix::Hierarchy get_id() const = 0;
+  virtual bayesmix::HierarchyId get_id() const = 0;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package bayesmix;
 
-enum Hierarchy {
+enum HierarchyId {
     UNKNOWN_HIERARCHY = 0;
     NNIG = 1;
     NNW = 2;

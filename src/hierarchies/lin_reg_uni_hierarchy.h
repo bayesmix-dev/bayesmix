@@ -92,8 +92,8 @@ class LinRegUniHierarchy : public DependentHierarchy {
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  bayesmix::Hierarchy get_id() const override {
-    return bayesmix::Hierarchy::LinRegUni;
+  bayesmix::HierarchyId get_id() const override {
+    return bayesmix::HierarchyId::LinRegUni;
   }
 };
 

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package bayesmix;
 
-enum Algorithm {
+enum AlgorithmId {
     UNKNOWN_ALGORITHM = 0;
     Neal2 = 1;
     Neal3 = 2;

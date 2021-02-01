@@ -14,7 +14,7 @@
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
-using HierarchyFactory = Factory<bayesmix::Hierarchy, BaseHierarchy>;
+using HierarchyFactory = Factory<bayesmix::HierarchyId, BaseHierarchy>;
 
 __attribute__((constructor)) static void load_hierarchies() {
   HierarchyFactory &factory = HierarchyFactory::Instance();

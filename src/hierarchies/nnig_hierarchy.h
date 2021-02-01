@@ -94,8 +94,8 @@ class NNIGHierarchy : public BaseHierarchy {
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  bayesmix::Hierarchy get_id() const override {
-      return bayesmix::Hierarchy::NNIG; 
+  bayesmix::HierarchyId get_id() const override {
+      return bayesmix::HierarchyId::NNIG; 
   }
 };
 
