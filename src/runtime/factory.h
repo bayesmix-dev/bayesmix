@@ -56,7 +56,7 @@ class Factory {
       const Identifier &name) const {
     auto f = storage.find(name);
     if (f == storage.end()) {
-      std::string err = "Error: factory identifier \"" + name + "\" not found";
+      std::string err = "Factory identifier \"" + name + "\" not found";
       throw std::invalid_argument(err);
     } else {
       return f->second();

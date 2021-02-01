@@ -699,7 +699,7 @@ void SemiHdpSampler::check() {
     auto it = std::upper_bound(v_sorted.begin(), v_sorted.end(), -1);
     if (it != table_to_private[i].end()) {
       int min_v = *it;
-      assert(min_v == 0);
+      assert(min_v == 0);  // TODO
     }
 
     std::vector<int> t_sorted(table_to_shared[i]);
@@ -711,7 +711,7 @@ void SemiHdpSampler::check() {
       min_t = std::min(min_t, min_t_temp);
     }
   }
-  assert(min_t == 0);
+  assert(min_t == 0);  // TODO
 
   for (int r = 0; r < ngroups; r++) {
     if (n_by_table[r].size() != rest_tables[r].size()) {

@@ -8,7 +8,9 @@
 #include "src/utils/rng.h"
 
 void LinRegUniHierarchy::initialize() {
-  assert(prior != nullptr && "Error: prior was not provided");
+  if (prior == nullptr) {
+    throw std::invalid_argument("Hierarchy prior was not provided");
+  }
   state.regression_coeffs = hypers->mean;
   state.var = hypers->scale / (hypers->shape + 1);
   clear_data();
@@ -59,7 +61,7 @@ void LinRegUniHierarchy::update_hypers(
   }
 
   else {
-    throw std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Unrecognized hierarchy prior");
   }
 }
 
@@ -136,12 +138,16 @@ void LinRegUniHierarchy::set_prior(const google::protobuf::Message &prior_) {
     hypers->scale = prior->fixed_values().scale();
     // Check validity
     bayesmix::check_spd(hypers->var_scaling);
-    assert(hypers->shape > 0);
-    assert(hypers->scale > 0);
+    if (hypers->shape <= 0) {
+      throw std::invalid_argument("Shape parameter must be > 0");
+    }
+    if (hypers->scale <= 0) {
+      throw std::invalid_argument("Scale parameter must be > 0");
+    }
   }
 
   else {
-    throw std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Unrecognized hierarchy prior");
   }
 }
 

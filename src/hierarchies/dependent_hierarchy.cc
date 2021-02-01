@@ -8,7 +8,11 @@
 void DependentHierarchy::add_datum(const int id, const Eigen::VectorXd &datum,
                                    const Eigen::VectorXd &covariate) {
   auto it = cluster_data_idx.find(id);
-  assert(it == cluster_data_idx.end());
+  if (it != cluster_data_idx.end()) {
+    std::cout << "Warning: data index already in hierarchy, no action taken"
+              << std::endl;
+    return;
+  }
   card += 1;
   log_card = std::log(card);
   update_summary_statistics(datum, covariate, true);
@@ -22,7 +26,9 @@ void DependentHierarchy::remove_datum(const int id,
   card -= 1;
   log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
   auto it = cluster_data_idx.find(id);
-  assert(it != cluster_data_idx.end());
+  if (it == cluster_data_idx.end()) {
+    throw std::invalid_argument("Datum index was not found in hierarchy");
+  }
   cluster_data_idx.erase(it);
 }
 

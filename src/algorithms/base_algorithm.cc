@@ -1,7 +1,6 @@
 #include "base_algorithm.h"
 
 #include <Eigen/Dense>
-#include <cassert>
 #include <memory>
 
 #include "marginal_state.pb.h"
@@ -36,22 +35,38 @@ void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;
 
   // Perform checks
-  assert(data.rows() != 0 && "Error: empty data matrix");
-  assert(unique_values.size() != 0 && "Error: hierarchy was not provided");
-  assert(!(unique_values[0]->is_multivariate() == false && data.cols() > 1) &&
-         "Error: multivariate data supplied to univariate hierarchy");
-  assert(mixing != nullptr && "Error: mixing was not provided");
+  if (data.rows() == 0) {
+    throw std::invalid_argument("Data was not provided to algorithm");
+  }
+  if (unique_values.size() == 0) {
+    throw std::invalid_argument("Hierarchy was not provided to algorithm");
+  }
+  if (unique_values[0]->is_multivariate() == false && data.cols() > 1) {
+    throw std::invalid_argument(
+        "Multivariate data supplied to univariate hierarchy");
+  }
+  if (mixing == nullptr) {
+    throw std::invalid_argument("Mixing was not provided to algorithm");
+  }
   if (hier_covariates.rows() != 0) {
-    assert(unique_values[0]->is_dependent() &&
-           "Error: covariates supplied to non-dependent hierarchy");
-    assert(data.rows() == hier_covariates.rows() &&
-           "Error: data size and covariates size do not match");
+    if (unique_values[0]->is_dependent() == false) {
+      throw std::invalid_argument(
+          "Covariates supplied to non-dependent hierarchy");
+    }
+    if (data.rows() != hier_covariates.rows()) {
+      throw std::invalid_argument(
+          "Sizes of data and hierarchy covariates do not match");
+    }
   }
   if (mix_covariates.rows() != 0) {
-    assert(mixing->is_dependent() &&
-           "Error: covariates supplied to non-dependent mixing");
-    assert(data.rows() == mix_covariates.rows() &&
-           "Error: data size and covariates size do not match");
+    if (mixing->is_dependent() == false) {
+      throw std::invalid_argument(
+          "Covariates supplied to non-dependent mixing");
+    }
+    if (data.rows() != mix_covariates.rows()) {
+      throw std::invalid_argument(
+          "Sizes of data and mixing covariates do not match");
+    }
   }
 
   if (init_num_clusters == 0) {

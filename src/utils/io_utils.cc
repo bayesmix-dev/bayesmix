@@ -9,7 +9,7 @@ Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename) {
   double buffer[MAXBUFSIZE];
   std::ifstream istr(filename);
   if (!istr.is_open()) {
-    std::string err = "Error: file " + filename + " does not exist";
+    std::string err = "File " + filename + " does not exist";
     throw std::invalid_argument(err);
   }
 
