@@ -51,6 +51,12 @@ class LinRegUniHierarchy : public DependentHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data,
                          const Eigen::MatrixXd &covariates) override;
 
+  double like_lpdf(const Eigen::RowVectorXd &datum,
+                   const Eigen::RowVectorXd &covariate) const override;
+  //! Evaluates the log-marginal distribution of data in a single point
+  double marg_lpdf(const Eigen::RowVectorXd &datum,
+                   const Eigen::RowVectorXd &covariate) const override;
+
  public:
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data
@@ -68,14 +74,6 @@ class LinRegUniHierarchy : public DependentHierarchy {
     out->clear_data();
     return out;
   }
-
-  // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
-  double like_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate) const override;
-  //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate) const override;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution

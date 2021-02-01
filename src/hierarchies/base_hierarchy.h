@@ -38,11 +38,13 @@ class BaseHierarchy {
   virtual void update_summary_statistics(const Eigen::VectorXd &datum,
                                          bool add) = 0;
 
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const = 0;
+  virtual double marg_prior_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const = 0;
+  virtual double marg_post_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const = 0;
+
  public:
   virtual void add_datum(const int id, const Eigen::VectorXd &datum);
-
   virtual void remove_datum(const int id, const Eigen::VectorXd &datum);
-
   virtual void clear_data() = 0;
 
   int get_card() const { return card; }
@@ -66,23 +68,22 @@ class BaseHierarchy {
   BaseHierarchy() = default;
   virtual std::shared_ptr<BaseHierarchy> clone() const = 0;
 
-  // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
-  //! Evaluates the log-likelihood of data in the given points
-  virtual Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data) const;
-  //! Evaluates the log-marginal distribution of data in a single point
-  virtual double marg_lpdf(const Eigen::RowVectorXd &datum) const = 0;
-  //! Evaluates the log-marginal distribution of data in the given points
-  virtual Eigen::VectorXd marg_lpdf_grid(const Eigen::MatrixXd &data) const;
+  // EVALUATION FUNCTIONS FOR SINGLE POINTS
+  double get_like_lpdf(const Eigen::RowVectorXd &datum,
+                       const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const;
+  double get_marg_prior_lpdf(
+                       const Eigen::RowVectorXd &datum,
+                       const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const;
+  double get_marg_post_lpdf(
+                       const Eigen::RowVectorXd &datum,
+                       const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
   virtual void draw() = 0;
   //! Generates new values for state from the centering posterior distribution
   virtual void sample_given_data() = 0;
-  virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;  // TODO
-                                                                    // needed?
+  virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;
 
   // GETTERS AND SETTERS
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;

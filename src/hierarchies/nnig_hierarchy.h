@@ -54,6 +54,11 @@ class NNIGHierarchy : public BaseHierarchy {
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update();
 
+  //! Evaluates the log-likelihood of data in a single point
+  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
+  //! Evaluates the log-marginal distribution of data in a single point
+  double marg_lpdf(const Eigen::RowVectorXd &datum) const override;
+
  public:
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, false)
@@ -71,12 +76,6 @@ class NNIGHierarchy : public BaseHierarchy {
     out->clear_data();
     return out;
   }
-
-  // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
-  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
-  //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const Eigen::RowVectorXd &datum) const override;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution

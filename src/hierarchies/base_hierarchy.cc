@@ -23,20 +23,25 @@ void BaseHierarchy::remove_datum(const int id, const Eigen::VectorXd &datum) {
   cluster_data_idx.erase(it);
 }
 
-Eigen::VectorXd BaseHierarchy::like_lpdf_grid(
-    const Eigen::MatrixXd &data) const {
-  Eigen::VectorXd result(data.rows());
-  for (size_t i = 0; i < data.rows(); i++) {
-    result(i) = like_lpdf(data.row(i));
+double BaseHierarchy::get_like_lpdf(
+                     const Eigen::RowVectorXd &datum,
+                     const Eigen::RowVectorXd &covariate /*= Eigen::MatrixXd(0, 0)*/) const {
+  if (is_dependent() and covariate.size() == 0) {
+    throw std::invalid_argument("Dependent hierarchy lpdf was not supplied with covariates");
+  } 
+  else if (is_dependent() == false and covariate.size() > 0) {
+    throw std::invalid_argument("Non-dependent hierarchy lpdf was supplied with covariates");
   }
-  return result;
+  return like_lpdf(datum, covariate);
 }
 
-Eigen::VectorXd BaseHierarchy::marg_lpdf_grid(
-    const Eigen::MatrixXd &data) const {
-  Eigen::VectorXd result(data.rows());
-  for (size_t i = 0; i < data.rows(); i++) {
-    result(i) = marg_lpdf(data.row(i));
+double BaseHierarchy::get_marg_prior_lpdf(
+                     const Eigen::RowVectorXd &datum,
+                     const Eigen::RowVectorXd &covariate /*= Eigen::MatrixXd(0, 0)*/) const {
+  return 0;  // TODO
   }
-  return result;
-}
+double BaseHierarchy::get_marg_post_lpdf(
+                     const Eigen::RowVectorXd &datum,
+                     const Eigen::RowVectorXd &covariate /*= Eigen::MatrixXd(0, 0)*/) const {
+  return 0;  // TODO
+  }
