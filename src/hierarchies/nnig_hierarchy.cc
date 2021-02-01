@@ -11,7 +11,9 @@
 #include "src/utils/rng.h"
 
 void NNIGHierarchy::initialize() {
-  assert(prior != nullptr && "Error: prior was not provided");
+  if (prior == nullptr) {
+    throw std::invalid_argument("Hierarchy prior was not provided");
+  }
   state.mean = hypers->mean;
   state.var = hypers->scale / (hypers->shape + 1);
 }
@@ -126,7 +128,7 @@ void NNIGHierarchy::update_hypers(
   }
 
   else {
-    throw std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Unrecognized hierarchy prior");
   }
 }
 
@@ -194,9 +196,15 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
     hypers->shape = prior->fixed_values().shape();
     hypers->scale = prior->fixed_values().scale();
     // Check validity
-    assert(hypers->var_scaling > 0);
-    assert(hypers->shape > 0);
-    assert(hypers->scale > 0);
+    if (hypers->var_scaling <= 0) {
+      throw std::invalid_argument("Variance-scaling parameter must be > 0");
+    }
+    if (hypers->shape <= 0) {
+      throw std::invalid_argument("Shape parameter must be > 0");
+    }
+    if (hypers->scale <= 0) {
+      throw std::invalid_argument("Scale parameter must be > 0");
+    }
   }
 
   else if (prior->has_normal_mean_prior()) {
@@ -206,9 +214,15 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
     hypers->shape = prior->normal_mean_prior().shape();
     hypers->scale = prior->normal_mean_prior().scale();
     // Check validity
-    assert(hypers->var_scaling > 0);
-    assert(hypers->shape > 0);
-    assert(hypers->scale > 0);
+    if (hypers->var_scaling <= 0) {
+      throw std::invalid_argument("Variance-scaling parameter must be > 0");
+    }
+    if (hypers->shape <= 0) {
+      throw std::invalid_argument("Shape parameter must be > 0");
+    }
+    if (hypers->scale <= 0) {
+      throw std::invalid_argument("Scale parameter must be > 0");
+    }
   }
 
   else if (prior->has_ngg_prior()) {
@@ -225,12 +239,24 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
     // for alpha0
     double alpha0 = prior->ngg_prior().shape();
     // Check validity
-    assert(sigma00 > 0);
-    assert(alpha00 > 0);
-    assert(beta00 > 0);
-    assert(a00 > 0);
-    assert(b00 > 0);
-    assert(alpha0 > 0);
+    if (sigma00 <= 0) {
+      throw std::invalid_argument("Variance parameter must be > 0");
+    }
+    if (alpha00 <= 0) {
+      throw std::invalid_argument("Shape parameter must be > 0");
+    }
+    if (beta00 <= 0) {
+      throw std::invalid_argument("Rate parameter must be > 0");
+    }
+    if (a00 <= 0) {
+      throw std::invalid_argument("Shape parameter must be > 0");
+    }
+    if (b00 <= 0) {
+      throw std::invalid_argument("Rate parameter must be > 0");
+    }
+    if (alpha0 <= 0) {
+      throw std::invalid_argument("Shape parameter must be > 0");
+    }
     // Set initial values
     hypers->mean = mu00;
     hypers->var_scaling = alpha00 / beta00;
@@ -239,7 +265,7 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
   }
 
   else {
-    throw std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Unrecognized hierarchy prior");
   }
 }
 

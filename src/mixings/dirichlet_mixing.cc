@@ -2,7 +2,6 @@
 
 #include <google/protobuf/stubs/casts.h>
 
-#include <cassert>
 #include <stan/math/prim/prob.hpp>
 
 #include "mixing_prior.pb.h"
@@ -10,7 +9,9 @@
 #include "src/utils/rng.h"
 
 void DirichletMixing::initialize() {
-  assert(prior != nullptr && "Error: prior was not provided");
+  if (prior == nullptr) {
+    throw std::invalid_argument("Mixing prior was not provided");
+  }
 }
 
 //! \param card Cardinality of the cluster
@@ -74,7 +75,7 @@ void DirichletMixing::update_state(
   }
 
   else {
-    throw std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Unrecognized mixing prior");
   }
 }
 
@@ -92,19 +93,25 @@ void DirichletMixing::set_prior(const google::protobuf::Message &prior_) {
   prior = std::make_shared<bayesmix::DPPrior>(priorcast);
   if (prior->has_fixed_value()) {
     state.totalmass = prior->fixed_value().totalmass();
-    assert(state.totalmass > 0);
+    if (state.totalmass <= 0) {
+      throw std::invalid_argument("Total mass parameter must be > 0");
+    }
   }
 
   else if (prior->has_gamma_prior()) {
     double alpha = prior->gamma_prior().totalmass_prior().shape();
     double beta = prior->gamma_prior().totalmass_prior().rate();
-    assert(alpha > 0);
-    assert(beta > 0);
+    if (alpha <= 0) {
+      throw std::invalid_argument("Shape parameter must be > 0");
+    }
+    if (beta <= 0) {
+      throw std::invalid_argument("Rate parameter must be > 0");
+    }
     state.totalmass = alpha / beta;
   }
 
   else {
-    throw std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Uunrecognized mixing prior");
   }
 }
 
