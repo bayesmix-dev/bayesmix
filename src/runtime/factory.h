@@ -1,6 +1,8 @@
 #ifndef BAYESMIX_RUNTIME_FACTORY_H_
 #define BAYESMIX_RUNTIME_FACTORY_H_
 
+#include <google/protobuf/generated_enum_reflection.h>
+
 #include <functional>
 #include <iostream>
 #include <map>
@@ -22,10 +24,9 @@
 
 //! \param AbstractProduct Class name for the abstract base object
 
-template <class AbstractProduct>
+template <typename Identifier, class AbstractProduct>
 class Factory {
  private:
-  using Identifier = std::string;
   using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
   //! Storage for algorithm builders
@@ -35,6 +36,18 @@ class Factory {
   Factory() = default;
   Factory(const Factory &f) = delete;
   Factory &operator=(const Factory &f) = delete;
+
+  static std::string id_to_name(const Identifier &id) {
+    return google::protobuf::internal::NameOfEnum(
+        google::protobuf::GetEnumDescriptor<Identifier>(), id);
+  }
+
+  static Identifier name_to_id(std::string name) {
+    Identifier id;
+    google::protobuf::internal::ParseNamedEnum<Identifier>(
+        google::protobuf::GetEnumDescriptor<Identifier>(), name, &id);
+    return id;
+  }
 
  public:
   //! Public destructor
@@ -52,15 +65,28 @@ class Factory {
 
   //! \param name Identifier for the object
   //! \return     An shared pointer to the created object
-  std::shared_ptr<AbstractProduct> create_object(
-      const Identifier &name) const {
-    auto f = storage.find(name);
+  std::shared_ptr<AbstractProduct> create_object(const Identifier &id) const {
+    auto f = storage.find(id);
     if (f == storage.end()) {
-      std::string err = "Error: factory identifier \"" + name + "\" not found";
+      std::string err =
+          "Error: factory identifier \"" + id_to_name(id) + "\" not found";
       throw std::invalid_argument(err);
     } else {
       return f->second();
       // return f->second(std::forward<Args>(args)...);
+    }
+  }
+
+  //! \param name Identifier for the object
+  //! \return     An shared pointer to the created object
+  std::shared_ptr<AbstractProduct> create_object(
+      const std::string &name) const {
+    try {
+      return create_object(name_to_id(name));
+    } catch (const std::invalid_argument &e) {
+      std::string err = "Error: no identifier found for name: \"" +
+                         name + "\". \n" + e.what();
+      throw std::invalid_argument(err);
     }
   }
 
