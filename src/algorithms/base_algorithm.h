@@ -98,6 +98,8 @@ class BaseAlgorithm {
   }
 
  public:
+  virtual bool requires_conjugate_hierarchy() = 0;
+
   //! Runs the algorithm and saves the whole chain to a collector
   void run(BaseCollector *collector) {
     initialize();

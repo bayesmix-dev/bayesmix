@@ -53,8 +53,10 @@ class Neal2Algorithm : public MarginalAlgorithm {
   ~Neal2Algorithm() = default;
   Neal2Algorithm() = default;
 
+  bool requires_conjugate_hierarchy() { return true; }
+
   bayesmix::Algorithm get_id() const override {
-    return bayesmix::Algorithm::NEAL2;
+    return bayesmix::Algorithm::Neal2;
   }
 };
 

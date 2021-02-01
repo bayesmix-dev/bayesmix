@@ -55,6 +55,8 @@ class Neal8Algorithm : public Neal2Algorithm {
   ~Neal8Algorithm() = default;
   Neal8Algorithm() = default;
 
+  bool requires_conjugate_hierarchy() { return false; };
+
   // GETTERS AND SETTERS
   unsigned int get_n_aux() const { return n_aux; }
   void set_n_aux(const unsigned int n_aux_) {
@@ -63,7 +65,7 @@ class Neal8Algorithm : public Neal2Algorithm {
   }
 
   bayesmix::Algorithm get_id() const override {
-    return bayesmix::Algorithm::NEAL8;
+    return bayesmix::Algorithm::Neal8;
   }
 };
 

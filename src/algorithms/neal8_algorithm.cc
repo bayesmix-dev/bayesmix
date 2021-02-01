@@ -119,8 +119,11 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_lpdf(
 
 void Neal8Algorithm::print_startup_message() const {
   std::string msg = "Running Neal8 algorithm (m=" + std::to_string(n_aux) +
-                    " aux. blocks) with " + unique_values[0]->get_id() +
-                    " hierarchies, " + mixing->get_id() + " mixing...";
+                    " aux. blocks) with " +
+                    bayesmix::Hierarchy_Name(unique_values[0]->get_id()) +
+                    " hierarchies, " +
+                    bayesmix::Mixing_Name(mixing->get_id()) + " mixing...";
+
   std::cout << msg << std::endl;
 }
 
