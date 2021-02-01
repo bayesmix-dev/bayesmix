@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package bayesmix;
+
+enum Algorithm {
+    UNKNOWN_ALGORITHM = 0;
+    Neal2 = 1;
+    Neal3 = 2;
+    Neal8 = 3;
+    BlockedGibbs = 4;
+    SplitMerge = 5;
+    Slice = 6;
+}
