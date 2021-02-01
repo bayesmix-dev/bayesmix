@@ -8,7 +8,7 @@
 
 #include "base_hierarchy.h"
 #include "dependent_hierarchy.h"
-#include "hierarchies.pb.h"
+#include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
 

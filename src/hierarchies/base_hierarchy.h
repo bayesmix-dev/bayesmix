@@ -11,7 +11,7 @@
 
 #include "marginal_state.pb.h"
 #include "src/utils/rng.h"
-#include "hierarchies.pb.h"
+#include "hierarchy_id.pb.h"
 
 //! Abstract base template class for a hierarchy object.
 

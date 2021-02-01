@@ -9,7 +9,7 @@
 #include "base_hierarchy.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
-#include "hierarchies.pb.h"
+#include "hierarchy_id.pb.h"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.
 

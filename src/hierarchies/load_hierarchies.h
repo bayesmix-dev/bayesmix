@@ -9,7 +9,7 @@
 #include "nnig_hierarchy.h"
 #include "nnw_hierarchy.h"
 #include "src/runtime/factory.h"
-#include "hierarchies.pb.h"
+#include "hierarchy_id.pb.h"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
