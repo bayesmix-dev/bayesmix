@@ -43,7 +43,7 @@ class Factory {
         google::protobuf::GetEnumDescriptor<Identifier>(), id);
   }
 
-  static Identifier name_to_id(std::string name) {
+  static Identifier name_to_id(const std::string& name) {
     Identifier id;
     google::protobuf::internal::ParseNamedEnum<Identifier>(
         google::protobuf::GetEnumDescriptor<Identifier>(), name, &id);
