@@ -18,10 +18,11 @@
 //! the specific objects. The storage must first be filled with the appropriate
 //! builders, which can be as simple as a function returning a smart pointer to
 //! a new instance. This can be done in a main file or in an appropriate
-//! function. This factory is templatized as a variadic template, that allows
-//! passing any number of parameters of any type to the contructors of the
-//! objects.
+//! function.
+//! The Identifier template parameter must be a protobuf 'enum' type
+//! since we use protobuf to pass between ids and strings
 
+//! \param Identifier Protobuf enum type for the indentifier
 //! \param AbstractProduct Class name for the abstract base object
 
 template <typename Identifier, class AbstractProduct>
@@ -63,7 +64,7 @@ class Factory {
 
   //! Creates a specific object based on an identifier
 
-  //! \param name Identifier for the object
+  //! \param id Identifier for the object
   //! \return     An shared pointer to the created object
   std::shared_ptr<AbstractProduct> create_object(const Identifier &id) const {
     auto f = storage.find(id);
@@ -77,7 +78,7 @@ class Factory {
     }
   }
 
-  //! \param name Identifier for the object
+  //! \param name string identifier for the object
   //! \return     An shared pointer to the created object
   std::shared_ptr<AbstractProduct> create_object(
       const std::string &name) const {
@@ -92,10 +93,10 @@ class Factory {
 
   //! Adds a builder function to the storage
 
-  //! \param name    Identifier to associate the builder with
+  //! \param id    Identifier to associate the builder with
   //! \param bulider Builder function for a specific object type
-  void add_builder(const Identifier &name, const Builder &builder) {
-    auto f = storage.insert(std::make_pair(name, builder));
+  void add_builder(const Identifier &id, const Builder &builder) {
+    auto f = storage.insert(std::make_pair(id, builder));
     if (f.second == false) {
       std::cout << "Warning: new duplicate builder \"" << name
                 << "\" was not added to factory" << std::endl;
@@ -112,11 +113,9 @@ class Factory {
     return tmp;
   }
 
-  //! Checks whether the given algorithm is already in the storage
-
-  //! \param algo Id for the algorithm to check
-  bool check_existence(const Identifier &algo) const {
-    return !(storage.find(algo) == storage.end());
+  //! \param id Id for the object to check
+  bool check_existence(const Identifier &id) const {
+    return !(storage.find(id) == storage.end());
   }
 };
 
