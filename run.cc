@@ -35,9 +35,9 @@ int main(int argc, char *argv[]) {
   }
 
   // Create factories and objects
-  auto &factory_algo = Factory<BaseAlgorithm>::Instance();
-  auto &factory_hier = Factory<BaseHierarchy>::Instance();
-  auto &factory_mixing = Factory<BaseMixing>::Instance();
+  auto &factory_algo = AlgorithmFactory::Instance();
+  auto &factory_hier = HierarchyFactory::Instance();
+  auto &factory_mixing = MixingFactory::Instance();
   auto algo = factory_algo.create_object(algo_type);
   auto hier = factory_hier.create_object(hier_type);
   auto mixing = factory_mixing.create_object(mix_type);
