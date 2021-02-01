@@ -52,7 +52,9 @@ int main(int argc, char *argv[]) {
   std::string mix_prior_str = "bayesmix." + mix_type + "Prior";
   auto mix_prior_desc = google::protobuf::DescriptorPool::generated_pool()
                             ->FindMessageTypeByName(mix_prior_str);
-  assert(mix_prior_desc != NULL);
+  if (mix_prior_desc == NULL) {
+    throw std::invalid_argument("Unrecognized mixing prior");
+  }
   auto *mix_prior = google::protobuf::MessageFactory::generated_factory()
                         ->GetPrototype(mix_prior_desc)
                         ->New();
@@ -63,7 +65,9 @@ int main(int argc, char *argv[]) {
   std::string hier_prior_str = "bayesmix." + hier_type + "Prior";
   auto hier_prior_desc = google::protobuf::DescriptorPool::generated_pool()
                              ->FindMessageTypeByName(hier_prior_str);
-  assert(hier_prior_desc != NULL);
+  if (hier_prior_desc == NULL) {
+    throw std::invalid_argument("Unrecognized hierarchy prior");
+  }
   auto *hier_prior = google::protobuf::MessageFactory::generated_factory()
                          ->GetPrototype(hier_prior_desc)
                          ->New();

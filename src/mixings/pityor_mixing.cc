@@ -2,13 +2,13 @@
 
 #include <google/protobuf/stubs/casts.h>
 
-#include <cassert>
-
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
 
 void PitYorMixing::initialize() {
-  assert(prior != nullptr && "Error: prior was not provided");
+  if (prior == nullptr) {
+    throw std::invalid_argument("Mixing prior was not provided");
+  }
 }
 
 //! \param card Cardinality of the cluster
@@ -45,7 +45,7 @@ void PitYorMixing::update_state(
   if (prior->has_fixed_values()) {
     return;
   } else {
-    throw std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Unrecognized mixing prior");
   }
 }
 
@@ -64,11 +64,15 @@ void PitYorMixing::set_prior(const google::protobuf::Message &prior_) {
   if (prior->has_fixed_values()) {
     state.strength = prior->fixed_values().strength();
     state.discount = prior->fixed_values().discount();
-    assert(state.strength > -state.discount);
-    assert(0 <= state.discount && state.discount < 1);
+    if (state.strength <= -state.discount) {
+      throw std::invalid_argument("Mixing parameters are not valid");
+    }
+    if (state.discount < 0 or state.discount >= 1) {
+      throw std::invalid_argument("Discount parameter must be in [0,1)");
+    }
 
   } else {
-    throw std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Unrecognized mixing prior");
   }
 }
 

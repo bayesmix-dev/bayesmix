@@ -25,7 +25,9 @@ void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
 }
 
 void NNWHierarchy::initialize() {
-  assert(prior != nullptr && "Error: prior was not provided");
+  if (prior == nullptr) {
+    throw std::invalid_argument("Hierarchy prior was not provided");
+  }
   state.mean = hypers->mean;
   set_prec_and_utilities(hypers->var_scaling *
                          Eigen::MatrixXd::Identity(dim, dim));
@@ -147,7 +149,7 @@ void NNWHierarchy::update_hypers(
   }
 
   else {
-    throw std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Unrecognized hierarchy prior");
   }
 }
 
@@ -237,10 +239,16 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     hypers->scale_inv = stan::math::inverse_spd(hypers->scale);
     hypers->deg_free = prior->fixed_values().deg_free();
     // Check validity
-    assert(hypers->var_scaling > 0);
-    assert(dim == hypers->scale.rows() &&
-           "Error: hyperparameters dimensions are not consistent");
-    assert(hypers->deg_free > dim - 1);
+    if (hypers->var_scaling <= 0) {
+      throw std::invalid_argument("Variance-scaling parameter must be > 0");
+    }
+    if (dim != hypers->scale.rows()) {
+      throw std::invalid_argument(
+          "Hyperparameters dimensions are not consistent");
+    }
+    if (hypers->deg_free <= dim - 1) {
+      throw std::invalid_argument("Degrees of freedom parameter is not valid");
+    }
   }
 
   else if (prior->has_normal_mean_prior()) {
@@ -256,14 +264,18 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     double nu0 = prior->normal_mean_prior().deg_free();
     // Check validity
     unsigned int dim = mu00.size();
-    assert(sigma00.rows() == dim &&
-           "Error: hyperparameters dimensions are not consistent");
-    assert(tau0.rows() == dim &&
-           "Error: hyperparameters dimensions are not consistent");
+    if (sigma00.rows() != dim or tau0.rows() != dim) {
+      throw std::invalid_argument(
+          "Hyperparameters dimensions are not consistent");
+    }
     bayesmix::check_spd(sigma00);
-    assert(lambda0 > 0);
+    if (lambda0 <= 0) {
+      throw std::invalid_argument("Variance-scaling parameter must be > 0");
+    }
     bayesmix::check_spd(tau0);
-    assert(nu0 > dim - 1);
+    if (nu0 <= dim - 1) {
+      throw std::invalid_argument("Degrees of freedom parameter is not valid");
+    }
     // Set initial values
     hypers->mean = mu00;
     hypers->var_scaling = lambda0;
@@ -291,20 +303,28 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
     double nu0 = prior->ngiw_prior().deg_free();
     // Check validity:
     // dimensionality
-    assert(sigma00.rows() == dim &&
-           "Error: hyperparameters dimensions are not consistent");
-    assert(tau00.rows() == dim &&
-           "Error: hyperparameters dimensions are not consistent");
+    if (sigma00.rows() != dim or tau00.rows() != dim) {
+      throw std::invalid_argument(
+          "Hyperparameters dimensions are not consistent");
+    }
     // for mu0
     bayesmix::check_spd(sigma00);
     // for lambda0
-    assert(alpha00 > 0);
-    assert(beta00 > 0);
+    if (alpha00 <= 0) {
+      throw std::invalid_argument("Shape parameter must be > 0");
+    }
+    if (beta00 <= 0) {
+      throw std::invalid_argument("Rate parameter must be > 0");
+    }
     // for tau0
-    assert(nu00 > 0);
+    if (nu00 <= 0) {
+      throw std::invalid_argument("Degrees of freedom parameter must be > 0");
+    }
     bayesmix::check_spd(tau00);
     // check nu0
-    assert(nu0 > dim - 1);
+    if (nu0 <= dim - 1) {
+      throw std::invalid_argument("Degrees of freedom parameter is not valid");
+    }
     // Set initial values
     hypers->mean = mu00;
     hypers->var_scaling = alpha00 / beta00;
@@ -314,7 +334,7 @@ void NNWHierarchy::set_prior(const google::protobuf::Message &prior_) {
   }
 
   else {
-    throw std::invalid_argument("Error: unrecognized prior");
+    throw std::invalid_argument("Unrecognized hierarchy prior");
   }
 }
 

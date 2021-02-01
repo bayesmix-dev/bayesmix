@@ -1,6 +1,7 @@
 #include "base_hierarchy.h"
 
 #include <Eigen/Dense>
+#include <cassert>
 #include <set>
 #include <stan/math/prim.hpp>
 

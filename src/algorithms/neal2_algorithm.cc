@@ -1,7 +1,6 @@
 #include "neal2_algorithm.h"
 
 #include <Eigen/Dense>
-#include <cassert>
 #include <memory>
 #include <stan/math/prim/fun.hpp>
 #include <vector>
@@ -97,20 +96,15 @@ void Neal2Algorithm::print_startup_message() const {
 
 void Neal2Algorithm::initialize() {
   BaseAlgorithm::initialize();
-  assert(unique_values[0]->is_conjugate() &&
-    "Error: this algorithm only supports conjugate hierarchies");
+  if (unique_values[0]->is_conjugate() == false) {
+    throw std::invalid_argument(
+        "This algorithm only supports conjugate hierarchies");
+  }
 }
 
 void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
-  int ndata_from_hier = 0;
-  // #ifdef DEBUG
-  for (auto &un : unique_values) {
-    ndata_from_hier += un->get_card();
-  }
-  assert(n_data == ndata_from_hier);
-  // #endif
   auto &rng = bayesmix::Rng::Instance().get();
   // Loop over data points
   for (size_t i = 0; i < n_data; i++) {
