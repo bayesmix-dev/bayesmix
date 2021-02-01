@@ -1,5 +1,6 @@
 #include "dependent_hierarchy.h"
 
+#include <cassert>
 #include <Eigen/Dense>
 #include <memory>
 #include <random>
@@ -8,11 +9,7 @@
 void DependentHierarchy::add_datum(const int id, const Eigen::VectorXd &datum,
                                    const Eigen::VectorXd &covariate) {
   auto it = cluster_data_idx.find(id);
-  if (it != cluster_data_idx.end()) {
-    std::cout << "Warning: data index already in hierarchy, no action taken"
-              << std::endl;
-    return;
-  }
+  assert(it == cluster_data_idx.end());
   card += 1;
   log_card = std::log(card);
   update_summary_statistics(datum, covariate, true);
@@ -26,9 +23,7 @@ void DependentHierarchy::remove_datum(const int id,
   card -= 1;
   log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
   auto it = cluster_data_idx.find(id);
-  if (it == cluster_data_idx.end()) {
-    throw std::invalid_argument("Datum index was not found in hierarchy");
-  }
+  assert(it != cluster_data_idx.end());
   cluster_data_idx.erase(it);
 }
 

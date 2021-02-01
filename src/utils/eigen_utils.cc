@@ -77,6 +77,6 @@ void bayesmix::check_spd(const Eigen::MatrixXd &mat) {
   }
   if (mat.isApprox(mat.transpose()) == false) {
     throw std::invalid_argument("Matrix is not symmetric");
-    stan::math::check_pos_definite("", "Matrix", mat);
   }
+  stan::math::check_pos_definite("", "Matrix", mat);
 }
