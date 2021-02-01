@@ -3,6 +3,7 @@
 
 #include "base_mixing.h"
 #include "mixing_prior.pb.h"
+#include "mixings.pb.h"
 
 //! Class that represents the Pitman-Yor process mixture model.
 
@@ -50,7 +51,7 @@ class PitYorMixing : public BaseMixing {
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
-  std::string get_id() const override { return "PY"; }
+  bayesmix::Mixing get_id() const override { return bayesmix::Mixing::PY; }
 };
 
 #endif  // BAYESMIX_MIXINGS_PITYOR_MIXING_H_

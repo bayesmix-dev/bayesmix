@@ -12,8 +12,10 @@
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
+using MixingFactory = Factory<bayesmix::Mixing, BaseMixing>;
+
 __attribute__((constructor)) static void load_mixings() {
-  Factory<BaseMixing> &factory = Factory<BaseMixing>::Instance();
+  MixingFactory &factory = MixingFactory::Instance();
   Builder<BaseMixing> DPbuilder = []() {
     return std::make_shared<DirichletMixing>();
   };
