@@ -1,7 +1,7 @@
 #include "dependent_hierarchy.h"
 
-#include <cassert>
 #include <Eigen/Dense>
+#include <cassert>
 #include <memory>
 #include <random>
 #include <stan/math/prim.hpp>
