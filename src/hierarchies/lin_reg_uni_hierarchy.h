@@ -8,6 +8,7 @@
 
 #include "base_hierarchy.h"
 #include "dependent_hierarchy.h"
+#include "hierarches.pb.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
 
@@ -91,7 +92,9 @@ class LinRegUniHierarchy : public DependentHierarchy {
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  std::string get_id() const override { return "LinRegUni"; }
+  bayesmix::Hierarchy get_id() const override {
+    return bayesmix::Hierarchy::LinRegUni;
+  }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_H_

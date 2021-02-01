@@ -10,6 +10,7 @@
 #include "base_hierarchy.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
+#include "hierarchies.pb.h"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.
 
@@ -94,7 +95,9 @@ class NNIGHierarchy : public BaseHierarchy {
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  std::string get_id() const override { return "NNIG"; }
+  bayesmix::Hierarchy get_id() const override {
+      return bayesmix::Hierarchy::NNIG_Conjugate; 
+  }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_H_

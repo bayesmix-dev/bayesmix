@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package bayesmix;
+
+enum Hierarchy {
+    UNKNOWN_HIERARCHY = 0;
+    NNIG_Conjugate = 1;
+    NNW_Conjugate = 2;
+    LinRegUni = 3;
+}

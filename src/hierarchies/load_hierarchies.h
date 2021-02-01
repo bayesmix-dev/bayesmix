@@ -9,12 +9,15 @@
 #include "nnig_hierarchy.h"
 #include "nnw_hierarchy.h"
 #include "src/runtime/factory.h"
+#include "hierarchies.pb.h"
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
+using HierarchyFactory = Factory<bayesmix::Hierarchy, BaseHierarchy>;
+
 __attribute__((constructor)) static void load_hierarchies() {
-  Factory<BaseHierarchy> &factory = Factory<BaseHierarchy>::Instance();
+  HierarchyFactory &factory = HierarchyFactory::Instance();
   Builder<BaseHierarchy> NNIGbuilder = []() {
     return std::make_shared<NNIGHierarchy>();
   };

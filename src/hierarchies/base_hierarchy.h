@@ -11,6 +11,7 @@
 
 #include "marginal_state.pb.h"
 #include "src/utils/rng.h"
+#include "hierarchies.pb.h"
 
 //! Abstract base template class for a hierarchy object.
 
@@ -94,7 +95,7 @@ class BaseHierarchy {
     card = card_;
     log_card = std::log(card_);
   }
-  virtual std::string get_id() const = 0;
+  virtual bayesmix::Hierarchy get_id() const = 0;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

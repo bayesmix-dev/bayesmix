@@ -10,6 +10,7 @@
 #include "base_hierarchy.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
+#inlcude "hierarchies.pb.h"
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 
@@ -109,7 +110,9 @@ class NNWHierarchy : public BaseHierarchy {
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  std::string get_id() const override { return "NNW"; }
+  bayesmix::Hierarchy get_id() const override {
+    return bayesmix::Hierarchy::NNW_Conjugate;
+  }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_NNW_HIERARCHY_H_
