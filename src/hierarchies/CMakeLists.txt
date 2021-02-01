@@ -1,13 +1,13 @@
 target_sources(bayesmix
   PUBLIC
-    base_hierarchy.cpp
-    base_hierarchy.hpp
-    dependent_hierarchy.cpp
-    dependent_hierarchy.hpp
-    lin_reg_uni_hierarchy.hpp
-    lin_reg_uni_hierarchy.cpp
-    nnig_hierarchy.hpp
-    nnig_hierarchy.cpp
-    nnw_hierarchy.hpp
-    nnw_hierarchy.cpp
+    base_hierarchy.cc
+    base_hierarchy.h
+    dependent_hierarchy.cc
+    dependent_hierarchy.h
+    lin_reg_uni_hierarchy.h
+    lin_reg_uni_hierarchy.cc
+    nnig_hierarchy.h
+    nnig_hierarchy.cc
+    nnw_hierarchy.h
+    nnw_hierarchy.cc
 )

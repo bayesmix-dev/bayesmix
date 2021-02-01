@@ -89,5 +89,5 @@ if __name__ == "__main__":
   lru_prior.fixed_values.var_scaling.rowmajor = False
   lru_prior.fixed_values.shape = 2.0
   lru_prior.fixed_values.scale = 2.0
-  with open("resources/asciipb/lin_reg_univ_fixed.asciipb", "w") as f:
+  with open("resources/asciipb/lin_reg_uni_fixed.asciipb", "w") as f:
     PrintMessage(lru_prior, f)

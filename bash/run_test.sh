@@ -12,7 +12,7 @@
 
 if [ "$1" == "uni" ]; then
   build/run \
-    N2 20201124 0 1000 100 \
+    Neal2 20201124 0 1000 100 \
     NNIG resources/asciipb/nnig_ngg_prior.asciipb \
     DP resources/asciipb/dp_gamma_prior.asciipb \
     "" \
@@ -22,7 +22,7 @@ if [ "$1" == "uni" ]; then
 
 elif [ "$1" == "multi" ]; then
   build/run \
-    N2 20201124 0 1000 100 \
+    Neal2 20201124 0 1000 100 \
     NNW resources/asciipb/nnw_ngiw_prior.asciipb \
     DP resources/asciipb/dp_gamma_prior.asciipb \
     "" \
@@ -32,8 +32,8 @@ elif [ "$1" == "multi" ]; then
 
 elif [ "$1" == "lru" ]; then
   build/run \
-    N2 20201124 0 1000 100 \
-    LinRegUni resources/asciipb/lin_reg_univ_fixed.asciipb \
+    Neal2 20201124 0 1000 100 \
+    LinRegUni resources/asciipb/lin_reg_uni_fixed.asciipb \
     DP resources/asciipb/dp_gamma_prior.asciipb \
     "" \
     resources/csv/in/data_lru.csv  resources/csv/in/covs_grid_lru.csv \
