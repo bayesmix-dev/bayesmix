@@ -111,7 +111,7 @@ class NNWHierarchy : public BaseHierarchy {
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
   bayesmix::Hierarchy get_id() const override {
-    return bayesmix::Hierarchy::NNW_Conjugate;
+    return bayesmix::Hierarchy::NNW;
   }
 };
 

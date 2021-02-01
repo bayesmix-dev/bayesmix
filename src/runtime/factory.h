@@ -98,7 +98,7 @@ class Factory {
   void add_builder(const Identifier &id, const Builder &builder) {
     auto f = storage.insert(std::make_pair(id, builder));
     if (f.second == false) {
-      std::cout << "Warning: new duplicate builder \"" << name
+      std::cout << "Warning: new duplicate builder \"" << id
                 << "\" was not added to factory" << std::endl;
     }
   }
