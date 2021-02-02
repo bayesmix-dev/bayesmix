@@ -7,7 +7,6 @@
 
 #include "marginal_state.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
-#include "src/hierarchies/dependent_hierarchy.h"
 #include "src/mixings/base_mixing.h"
 #include "src/mixings/dependent_mixing.h"
 #include "src/utils/distributions.h"
@@ -16,9 +15,9 @@
 //! \param hier Hierarchy object
 //! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
-    std::shared_ptr<DependentHierarchy> hier, const Eigen::MatrixXd &grid,
+    std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
     const Eigen::MatrixXd &covariates) {
-  return hier->get_marg_lpdf_grid<false>(grid, covariates);
+  return hier->marg_lpdf_grid(false, grid, covariates);
 }
 
 Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
@@ -61,7 +60,7 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
         data.row(data_idx), hier_covariates.row(data_idx));
   }
   // Probability of being assigned to a newly created cluster
-  loglpdf(n_clust) = unique_values[0]->get_marg_lpdf<false>(
+  loglpdf(n_clust) = unique_values[0]->marg_lpdf(false,
       data.row(data_idx), hier_covariates.row(data_idx));
   return loglpdf;
 }
@@ -91,7 +90,7 @@ void Neal2Algorithm::sample_allocations() {
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
     // Remove datum from cluster
     unique_values[allocations[i]]->remove_datum(i, data.row(i),
-                                                covariates.row(i));
+                                                hier_covariates.row(i));
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas =
         get_cluster_prior_mass(i) + get_cluster_lpdf(i);
@@ -101,14 +100,14 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int c_old = allocations[i];
     if (c_new == n_clust) {
       std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
-      new_unique->add_datum(i, data.row(i), covariates.row(i));
+      new_unique->add_datum(i, data.row(i), hier_covariates.row(i));
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      unique_values[c_new]->add_datum(i, data.row(i), covariates.row(i));
+      unique_values[c_new]->add_datum(i, data.row(i), hier_covariates.row(i));
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers

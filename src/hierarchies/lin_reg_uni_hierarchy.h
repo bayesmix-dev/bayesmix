@@ -50,31 +50,24 @@ class LinRegUniHierarchy : public BaseHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data,
                          const Eigen::MatrixXd &covariates) override;
 
-  // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
-  double like_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate) const override;
-  //! Evaluates the log-marginal distribution of data in a single point
-  template <bool posterior>
-  double marg_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate) const override {
-    Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
-    double sig_n = sqrt(
-        (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
-        params.scale / params.shape);
-    return stan::math::student_t_lpdf(datum(0), 2 * params.shape,
-                                      covariate.dot(params.mean), sig_n);
-  }
-
  public:
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data
   bool is_multivariate() const override { return false; }
   //! Returns true if the hierarchy has covariates i.e. is a dependent model
   bool is_dependent() const override { return true; }
-
+  //!
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
+
+  // EVALUATION FUNCTIONS
+  //! Evaluates the log-likelihood of data in a single point
+  double like_lpdf(const Eigen::RowVectorXd &datum,
+                   const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const override;
+  //! Evaluates the log-marginal distribution of data in a single point
+  double marg_lpdf(const Eigen::RowVectorXd &datum,
+                   const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0),
+                   const bool posterior = false) const override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~LinRegUniHierarchy() = default;

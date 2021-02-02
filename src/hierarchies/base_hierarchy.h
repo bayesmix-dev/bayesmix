@@ -34,32 +34,21 @@ class BaseHierarchy {
   std::set<int> cluster_data_idx;
   int card = 0;
   double log_card = stan::math::NEGATIVE_INFTY;
-
+  //!
   virtual void update_summary_statistics(const Eigen::VectorXd &datum,
                                          const Eigen::VectorXd &covariate,
                                          bool add) = 0;
 
-  // EVALUATION FUNCTIONS
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum,
-                           const Eigen::RowVectorXd &covariate) const = 0;
-  template <bool posterior>
-  virtual double marg_lpdf(const Eigen::RowVectorXd &datum,
-                           const Eigen::RowVectorXd &covariate) const = 0;
-
  public:
+  //! Adds a datum and its index to the hierarchy
   void add_datum(const int id, const Eigen::VectorXd &datum,
                  const Eigen::VectorXd &covariate);
-
+  //! Removes a datum and its index from the hierarchy
   void remove_datum(const int id, const Eigen::VectorXd &datum,
                     const Eigen::VectorXd &covariate);
-
+  //! Deletes all data in the hierarchy
   virtual void clear_data() = 0;
-
-  int get_card() const { return card; }
-  double get_log_card() const { return log_card; }
-
-  std::set<int> get_data_idx() { return cluster_data_idx; }
-
+  //!
   virtual void initialize() = 0;
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
@@ -67,7 +56,7 @@ class BaseHierarchy {
   virtual bool is_dependent() const = 0;
   //! Returns true if the hierarchy is conjugate i.e. has a marginal lpdf
   virtual bool is_conjugate() const { return true; }
-
+  //!
   virtual void update_hypers(
       const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
 
@@ -78,47 +67,22 @@ class BaseHierarchy {
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
   //! Evaluates the log-likelihood of data in a single point
-  double get_like_lpdf(
-      const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const;
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const = 0;
   //! Evaluates the log-marginal distribution of data in a single point
-  template <bool posterior>
-  double get_marg_lpdf(
-      const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const {
-    if (is_dependent() and covariate.size() == 0) {
-      throw std::invalid_argument(
-          "Dependent hierarchy lpdf was not supplied with covariates");
-    } else if (is_dependent() == false and covariate.size() > 0) {
-      throw std::invalid_argument(
-          "Non-dependent hierarchy lpdf was supplied with covariates");
-    }
-    return marg_lpdf<posterior>(datum, covariate);
-  }
+  virtual double marg_lpdf(const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0),
+                           const bool posterior = false) const = 0;
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
   //! Evaluates the log-likelihood of data in a grid of points
-  virtual Eigen::VectorXd get_like_lpdf_grid(
+  virtual Eigen::VectorXd like_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const;
+      const Eigen::MatrixXd &covariates) const;
   //! Evaluates the log-marginal of data in a grid of points
-  template <bool posterior>
-  virtual Eigen::VectorXd get_marg_lpdf_grid(
+  virtual Eigen::VectorXd marg_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
-    if (covariates == Eigen::MatrixXd(0, 0)) {
-      Eigen::VectorXd lpdf(data.rows());
-      for (int i = 0; i < data.rows(); i++) {
-        lpdf(i) = get_marg_lpdf<posterior>(data.row(i), Eigen::MatrixXd(0, 0));
-      }
-      return lpdf;
-    } else {
-      Eigen::VectorXd lpdf(data.rows());
-      for (int i = 0; i < data.rows(); i++) {
-        lpdf(i) = get_marg_lpdf<posterior>(data.row(i), covariates.row(i));
-      }
-      return lpdf;
-    }
-  }
+      const Eigen::MatrixXd &covariates,
+      const bool posterior = false) const;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
@@ -139,6 +103,9 @@ class BaseHierarchy {
     log_card = std::log(card_);
   }
   virtual std::string get_id() const = 0;
+  int get_card() const { return card; }
+  double get_log_card() const { return log_card; }
+  std::set<int> get_data_idx() const { return cluster_data_idx; }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

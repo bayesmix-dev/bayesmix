@@ -9,7 +9,6 @@
 #include "marginal_state.pb.h"
 #include "src/collectors/base_collector.h"
 #include "src/hierarchies/base_hierarchy.h"
-#include "src/hierarchies/dependent_hierarchy.h"
 
 class MarginalAlgorithm : public BaseAlgorithm {
  protected:

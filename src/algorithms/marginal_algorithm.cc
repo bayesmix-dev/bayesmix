@@ -6,7 +6,6 @@
 #include "lib/progressbar/progressbar.h"
 #include "marginal_state.pb.h"
 #include "src/collectors/base_collector.h"
-#include "src/hierarchies/dependent_hierarchy.h"
 #include "src/utils/eigen_utils.h"
 
 //! \param grid Grid of points in matrix form to evaluate the density on
@@ -40,7 +39,7 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
   mixing->set_state_from_proto(curr_state.mixing_state());
   Eigen::MatrixXd lpdf_local(grid.rows(), n_clust + 1);
   auto temp_hier =
-      std::dynamic_pointer_cast<DependentHierarchy>(unique_values[0]->clone());
+      std::dynamic_pointer_cast<BaseHierarchy>(unique_values[0]->clone());
   Eigen::VectorXd weights(n_clust + 1);
   for (size_t j = 0; j < n_clust; j++) {
     temp_hier->set_state_from_proto(curr_state.cluster_states(j));

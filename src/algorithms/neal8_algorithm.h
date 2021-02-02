@@ -37,7 +37,7 @@ class Neal8Algorithm : public Neal2Algorithm {
       const Eigen::MatrixXd &grid) override;
 
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<DependentHierarchy> temp_hier,
+      std::shared_ptr<BaseHierarchy> temp_hier,
       const Eigen::MatrixXd &grid, const Eigen::MatrixXd &covariates) override;
 
   Eigen::VectorXd get_cluster_prior_mass(
