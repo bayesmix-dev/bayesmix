@@ -75,6 +75,8 @@ class NNWHierarchy : public BaseHierarchy {
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, true)
   bool is_multivariate() const override { return true; }
+  //! Returns true if the hierarchy has covariates i.e. is a dependent model
+  bool is_dependent() const override { return false; }
 
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;

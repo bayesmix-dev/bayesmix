@@ -36,15 +36,19 @@ class BaseHierarchy {
   double log_card = stan::math::NEGATIVE_INFTY;
 
   virtual void update_summary_statistics(const Eigen::VectorXd &datum,
+                                         const Eigen::VectorXd &covariate,
                                          bool add) = 0;
 
   virtual double like_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const = 0;
-  virtual double marg_prior_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const = 0;
-  virtual double marg_post_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const = 0;
+  virtual double marg_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate, const bool posterior) const = 0;
 
  public:
-  virtual void add_datum(const int id, const Eigen::VectorXd &datum);
-  virtual void remove_datum(const int id, const Eigen::VectorXd &datum);
+  void add_datum(const int id, const Eigen::VectorXd &datum,
+                 const Eigen::VectorXd &covariate);
+
+  void remove_datum(const int id, const Eigen::VectorXd &datum,
+                    const Eigen::VectorXd &covariate);
+
   virtual void clear_data() = 0;
 
   int get_card() const { return card; }
@@ -56,7 +60,7 @@ class BaseHierarchy {
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
   //! Returns true if the hierarchy has covariates i.e. is a dependent model
-  virtual bool is_dependent() const { return false; }
+  virtual bool is_dependent() const = 0;
   //! Returns true if the hierarchy is conjugate i.e. has a marginal lpdf
   virtual bool is_conjugate() const { return true; }
 
@@ -71,19 +75,17 @@ class BaseHierarchy {
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
   double get_like_lpdf(const Eigen::RowVectorXd &datum,
                        const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const;
-  double get_marg_prior_lpdf(
-                       const Eigen::RowVectorXd &datum,
-                       const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const;
-  double get_marg_post_lpdf(
-                       const Eigen::RowVectorXd &datum,
-                       const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const;
+  double get_marg_lpdf(const Eigen::RowVectorXd &datum,
+                       const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0),
+                       const bool posterior) const;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
   virtual void draw() = 0;
   //! Generates new values for state from the centering posterior distribution
   virtual void sample_given_data() = 0;
-  virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;
+  virtual void sample_given_data(const Eigen::MatrixXd &data,
+                                 const Eigen::MatrixXd &covariates) = 0;
 
   // GETTERS AND SETTERS
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;

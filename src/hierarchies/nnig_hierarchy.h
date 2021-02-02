@@ -55,14 +55,16 @@ class NNIGHierarchy : public BaseHierarchy {
   Hyperparams normal_invgamma_update();
 
   //! Evaluates the log-likelihood of data in a single point
-  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
+  double like_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const override;
   //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const Eigen::RowVectorXd &datum) const override;
+  double marg_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const override;
 
  public:
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, false)
   bool is_multivariate() const override { return false; }
+  //! Returns true if the hierarchy has covariates i.e. is a dependent model
+  bool is_dependent() const override { return false; }
 
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;

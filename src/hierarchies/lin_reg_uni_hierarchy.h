@@ -7,11 +7,10 @@
 #include <memory>
 
 #include "base_hierarchy.h"
-#include "dependent_hierarchy.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
 
-class LinRegUniHierarchy : public DependentHierarchy {
+class LinRegUniHierarchy : public BaseHierarchy {
  public:
   struct State {
     Eigen::VectorXd regression_coeffs;
@@ -61,6 +60,8 @@ class LinRegUniHierarchy : public DependentHierarchy {
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data
   bool is_multivariate() const override { return false; }
+  //! Returns true if the hierarchy has covariates i.e. is a dependent model
+  bool is_dependent() const override { return true; }
 
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
