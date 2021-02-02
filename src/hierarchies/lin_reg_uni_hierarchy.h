@@ -50,11 +50,13 @@ class LinRegUniHierarchy : public BaseHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data,
                          const Eigen::MatrixXd &covariates) override;
 
+  // EVALUATION FUNCTIONS
+  //! Evaluates the log-likelihood of data in a single point
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override;
   //! Evaluates the log-marginal distribution of data in a single point
   double marg_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate) const override;
+                   const Eigen::RowVectorXd &covariate, const bool posterior) const override;
 
  public:
   void initialize() override;

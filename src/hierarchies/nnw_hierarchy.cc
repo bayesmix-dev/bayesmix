@@ -17,7 +17,6 @@
 //! \param prec_ Value to set to prec
 void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
   state.prec = prec_;
-
   // Update prec utilities
   prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_).matrixL().transpose();
   Eigen::VectorXd diag = prec_chol.diagonal();
@@ -56,13 +55,10 @@ void NNWHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
 //! \param mu0, lambda0, tau0, nu0 Original values for hyperparameters
 //! \return                        Vector of updated values for hyperparameters
 NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update() {
-  // Initialize relevant objects
   Hyperparams post_params;
-
   // Compute updated hyperparameters
   post_params.var_scaling = hypers->var_scaling + card;
   post_params.deg_free = hypers->deg_free + 0.5 * card;
-
   Eigen::VectorXd mubar = data_sum.array() / card;  // sample mean
   post_params.mean = (hypers->var_scaling * hypers->mean + card * mubar) /
                      (hypers->var_scaling + card);
@@ -155,7 +151,7 @@ void NNWHierarchy::update_hypers(
 
 //! \param data Matrix of row-vectorial single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
+double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const {
   // Initialize relevant objects
   return bayesmix::multi_normal_prec_lpdf(datum, state.mean, prec_chol,
                                           prec_logdet);
@@ -163,12 +159,13 @@ double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
 
 //! \param data Matrix of row-vectorial a single data point
 //! \return     Marginal distribution vector evaluated in data
-double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
+double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate, const bool posterior) const {
+  Hyperparams params = posterior ? normal_wishart_update() : *hypers;
   // Compute dof and scale of marginal distribution
-  double nu_n = 2 * hypers->deg_free - dim + 1;
-  Eigen::MatrixXd sigma_n = hypers->scale_inv *
-                            (hypers->deg_free - 0.5 * (dim - 1)) *
-                            hypers->var_scaling / (hypers->var_scaling + 1);
+  double nu_n = 2 * params.deg_free - dim + 1;
+  Eigen::MatrixXd sigma_n = params.scale_inv *
+                            (params.deg_free - 0.5 * (dim - 1)) *
+                            params.var_scaling / (params.var_scaling + 1);
 
   // TODO: chec if this is optimized as our bayesmix::multi_normal_prec_lpdf
   return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean, sigma_n);
@@ -179,7 +176,6 @@ void NNWHierarchy::draw() {
   auto &rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new =
       stan::math::wishart_rng(hypers->deg_free, hypers->scale, rng);
-
   // Update state
   state.mean = stan::math::multi_normal_prec_rng(
       hypers->mean, tau_new * hypers->var_scaling, rng);
@@ -190,14 +186,12 @@ void NNWHierarchy::draw() {
 void NNWHierarchy::sample_given_data() {
   // Update values
   Hyperparams params = normal_wishart_update();
-
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new =
       stan::math::wishart_rng(params.deg_free, params.scale, rng);
   state.mean = stan::math::multi_normal_prec_rng(
       params.mean, tau_new * params.var_scaling, rng);
-
   // Update state
   set_prec_and_utilities(tau_new);
 }
@@ -205,7 +199,6 @@ void NNWHierarchy::sample_given_data() {
 void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
   data_sum = Eigen::VectorXd::Zero(data.cols());
   data_sum_squares = Eigen::MatrixXd::Zero(data.cols(), data.cols());
-
   for (int i = 0; i < data.rows(); i++) {
     data_sum += data.row(i);
     data_sum_squares += data.row(i).transpose() * data.row(i);

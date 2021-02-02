@@ -74,12 +74,13 @@ double LinRegUniHierarchy::like_lpdf(
 
 double LinRegUniHierarchy::marg_lpdf(
     const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate) const {
+    const Eigen::RowVectorXd &covariate, const bool posterior) const {
+  Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
   double sig_n = sqrt(
-      (1 + (covariate * hypers->var_scaling_inv * covariate.transpose())(0)) *
-      hypers->scale / hypers->shape);
-  return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape,
-                                    covariate.dot(hypers->mean), sig_n);
+      (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
+      params.scale / params.shape);
+  return stan::math::student_t_lpdf(datum(0), 2 * params.shape,
+                                    covariate.dot(params.mean), sig_n);
 }
 
 void LinRegUniHierarchy::draw() {

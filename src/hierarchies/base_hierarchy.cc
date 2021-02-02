@@ -26,7 +26,6 @@ void BaseHierarchy::remove_datum(const int id,
   cluster_data_idx.erase(it);
 }
 
-
 double BaseHierarchy::get_like_lpdf(
                      const Eigen::RowVectorXd &datum,
                      const Eigen::RowVectorXd &covariate /*= Eigen::MatrixXd(0, 0)*/) const {

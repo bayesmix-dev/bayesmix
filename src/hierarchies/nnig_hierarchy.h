@@ -54,10 +54,11 @@ class NNIGHierarchy : public BaseHierarchy {
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update();
 
+  // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
   double like_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const override;
   //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const override;
+  double marg_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate, const bool posterior) const override;
 
  public:
   void initialize() override;

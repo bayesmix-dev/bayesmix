@@ -22,14 +22,11 @@ void NNIGHierarchy::initialize() {
 //! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
 //! \return                            Vector of updated values for hyperpar.s
 NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() {
-  // Initialize relevant variables
   Hyperparams post_params;
-
   if (card == 0) {  // no update possible
     post_params = *hypers;
     return post_params;
   }
-
   // Compute updated hyperparameters
   double y_bar = data_sum / (1.0 * card);  // sample mean
   double ss = data_sum_squares - card * y_bar * y_bar;
@@ -134,16 +131,17 @@ void NNIGHierarchy::update_hypers(
 
 //! \param data Column vector containing a single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
+double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const {
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
 //! \param data Column vector of data points
 //! \return     Marginal distribution vector evaluated in data (log)
-double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
-  double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
-                      (hypers->shape * hypers->var_scaling));
-  return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape, hypers->mean,
+double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const {
+  Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
+  double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
+                      (params.shape * params.var_scaling));
+  return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
                                     sig_n);
 }
 

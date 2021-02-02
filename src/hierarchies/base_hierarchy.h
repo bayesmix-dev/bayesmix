@@ -39,6 +39,7 @@ class BaseHierarchy {
                                          const Eigen::VectorXd &covariate,
                                          bool add) = 0;
 
+  // EVALUATION FUNCTIONS
   virtual double like_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const = 0;
   virtual double marg_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate, const bool posterior) const = 0;
 
