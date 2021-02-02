@@ -16,8 +16,8 @@ class MarginalAlgorithm : public BaseAlgorithm {
   bayesmix::MarginalState curr_state;
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<BaseHierarchy> temp_hier,
-      const Eigen::MatrixXd &grid, const Eigen::MatrixXd &covariates) = 0;
+      std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid,
+      const Eigen::MatrixXd &covariates) = 0;
   //!
   Eigen::VectorXd lpdf_from_state(const Eigen::MatrixXd &grid,
                                   const Eigen::MatrixXd &covariates);

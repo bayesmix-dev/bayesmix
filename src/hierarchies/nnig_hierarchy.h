@@ -59,7 +59,7 @@ class NNIGHierarchy : public BaseHierarchy {
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override;
   //! Evaluates the log-marginal distribution of data in a single point
-  template<bool posterior>
+  template <bool posterior>
   double marg_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override {
     Hyperparams params = posterior ? normal_invgamma_update() : *hypers;

@@ -69,14 +69,15 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_lpdf(
   Eigen::VectorXd loglpdf(n_clust + n_aux);
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    loglpdf(j) = unique_values[j]->get_like_lpdf(data.row(data_idx),
-                                     hier_covariates.row(data_idx));
+    loglpdf(j) = unique_values[j]->get_like_lpdf(
+        data.row(data_idx), hier_covariates.row(data_idx));
   }
   for (size_t j = 0; j < n_aux; j++) {
     // Probability of being assigned to a newly created cluster
     loglpdf(n_clust + j) =
         aux_unique_values[j]->get_like_lpdf(data.row(data_idx),
-                            hier_covariates.row(data_idx)) - log(n_aux);
+                                            hier_covariates.row(data_idx)) -
+        log(n_aux);
   }
   return loglpdf;
 }
@@ -113,7 +114,8 @@ void Neal8Algorithm::sample_allocations() {
       aux_unique_values[0]->set_state_from_proto(curr_val);
     }
     // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(i, data.row(i), covariates.row(i));
+    unique_values[allocations[i]]->remove_datum(i, data.row(i),
+                                                covariates.row(i));
     // Draw the unique values in the auxiliary blocks from their prior
     for (size_t j = singleton; j < n_aux; j++) {
       aux_unique_values[j]->draw();

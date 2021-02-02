@@ -18,7 +18,7 @@
 Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
     std::shared_ptr<DependentHierarchy> hier, const Eigen::MatrixXd &grid,
     const Eigen::MatrixXd &covariates) {
-  return hier->marg_lpdf_grid(grid, covariates);
+  return hier->get_marg_lpdf_grid<false>(grid, covariates);
 }
 
 Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
@@ -57,12 +57,12 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
   Eigen::VectorXd loglpdf(n_clust + 1);
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    loglpdf(j) = unique_values[j]->get_like_lpdf(data.row(data_idx),
-                                             hier_covariates.row(data_idx));
+    loglpdf(j) = unique_values[j]->get_like_lpdf(
+        data.row(data_idx), hier_covariates.row(data_idx));
   }
   // Probability of being assigned to a newly created cluster
-  loglpdf(n_clust) = unique_values[0]->get_marg_lpdf(data.row(data_idx),
-                                                 hier_covariates.row(data_idx));
+  loglpdf(n_clust) = unique_values[0]->get_marg_lpdf<false>(
+      data.row(data_idx), hier_covariates.row(data_idx));
   return loglpdf;
 }
 
@@ -90,7 +90,8 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int n_clust = unique_values.size();
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
     // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(i, data.row(i), covariates.row(i));
+    unique_values[allocations[i]]->remove_datum(i, data.row(i),
+                                                covariates.row(i));
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas =
         get_cluster_prior_mass(i) + get_cluster_lpdf(i);

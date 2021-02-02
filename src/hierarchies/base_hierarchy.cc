@@ -47,8 +47,7 @@ Eigen::VectorXd get_like_lpdf_grid(
       lpdf(i) = get_like_lpdf(data.row(i), Eigen::MatrixXd(0, 0));
     }
     return lpdf;
-  }
-  else {
+  } else {
     Eigen::VectorXd lpdf(data.rows());
     for (int i = 0; i < data.rows(); i++) {
       lpdf(i) = get_like_lpdf(data.row(i), covariates.row(i));

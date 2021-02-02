@@ -32,8 +32,7 @@ void BaseAlgorithm::initialize() {
       throw std::invalid_argument(
           "Sizes of data and hierarchy covariates do not match");
     }
-  }
-  else {
+  } else {
     // Create empty covariates vector
     hier_covariates = Eigen::MatrixXd::Zero(data.rows(), 0);
   }
@@ -50,8 +49,7 @@ void BaseAlgorithm::initialize() {
       throw std::invalid_argument(
           "Sizes of data and mixing covariates do not match");
     }
-  }
-  else {
+  } else {
     // Create empty covariates vector
     mix_covariates = Eigen::MatrixXd::Zero(data.rows(), 0);
   }

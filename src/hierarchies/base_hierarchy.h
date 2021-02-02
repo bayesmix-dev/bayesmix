@@ -42,7 +42,7 @@ class BaseHierarchy {
   // EVALUATION FUNCTIONS
   virtual double like_lpdf(const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const = 0;
-  template<bool posterior>
+  template <bool posterior>
   virtual double marg_lpdf(const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const = 0;
 
@@ -82,7 +82,7 @@ class BaseHierarchy {
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const;
   //! Evaluates the log-marginal distribution of data in a single point
-  template<bool posterior>
+  template <bool posterior>
   double get_marg_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const {
@@ -101,7 +101,7 @@ class BaseHierarchy {
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const;
   //! Evaluates the log-marginal of data in a grid of points
-  template<bool posterior>
+  template <bool posterior>
   virtual Eigen::VectorXd get_marg_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
@@ -111,8 +111,7 @@ class BaseHierarchy {
         lpdf(i) = get_marg_lpdf<posterior>(data.row(i), Eigen::MatrixXd(0, 0));
       }
       return lpdf;
-    }
-    else {
+    } else {
       Eigen::VectorXd lpdf(data.rows());
       for (int i = 0; i < data.rows(); i++) {
         lpdf(i) = get_marg_lpdf<posterior>(data.row(i), covariates.row(i));

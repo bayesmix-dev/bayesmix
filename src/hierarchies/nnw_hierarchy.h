@@ -76,7 +76,7 @@ class NNWHierarchy : public BaseHierarchy {
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override;
   //! Evaluates the log-marginal distribution of data in a single point
-  template<bool posterior>
+  template <bool posterior>
   double marg_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override {
     Hyperparams params = posterior ? normal_wishart_update() : *hypers;
@@ -87,7 +87,8 @@ class NNWHierarchy : public BaseHierarchy {
                               params.var_scaling / (params.var_scaling + 1);
 
     // TODO: chec if this is optimized as our bayesmix::multi_normal_prec_lpdf
-    return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean, sigma_n);
+    return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean,
+                                            sigma_n);
   }
 
  public:
