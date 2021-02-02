@@ -26,8 +26,7 @@ void BaseHierarchy::remove_datum(const int id, const Eigen::VectorXd &datum,
 }
 
 Eigen::VectorXd BaseHierarchy::like_lpdf_grid(
-    const Eigen::MatrixXd &data,
-    const Eigen::MatrixXd &covariates) const {
+    const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
   Eigen::VectorXd lpdf(data.rows());
   for (int i = 0; i < data.rows(); i++) {
     lpdf(i) = like_lpdf(data.row(i), covariates.row(i));
@@ -36,8 +35,7 @@ Eigen::VectorXd BaseHierarchy::like_lpdf_grid(
 }
 
 Eigen::VectorXd BaseHierarchy::marg_lpdf_grid(
-    const Eigen::MatrixXd &data,
-    const Eigen::MatrixXd &covariates,
+    const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates,
     const bool posterior = false) const {
   Eigen::VectorXd lpdf(data.rows());
   for (int i = 0; i < data.rows(); i++) {

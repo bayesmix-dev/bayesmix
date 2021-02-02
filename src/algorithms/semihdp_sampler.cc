@@ -185,7 +185,7 @@ void SemiHdpSampler::update_table_allocs() {
       }
 
       double margG0 =
-          logw + G0_master_hierarchy->get_marg_lpdf<false>(data[i].row(j));
+          logw + G0_master_hierarchy->marg_lpdf(false, data[i].row(j));
 
       Eigen::VectorXd hdp_contribs(shared_tables.size() + 1);
 #pragma omp parallel for
@@ -197,7 +197,7 @@ void SemiHdpSampler::update_table_allocs() {
 
       hdp_contribs[shared_tables.size()] =
           loggamma - logmsum +
-          G00_master_hierarchy->get_marg_lpdf<false>(data[i].row(j));
+          G00_master_hierarchy->marg_lpdf(false, data[i].row(j));
       double margHDP = log1mw + stan::math::log_sum_exp(hdp_contribs);
       Eigen::VectorXd marg(2);
       marg << margG0, margHDP;
@@ -280,8 +280,7 @@ void SemiHdpSampler::update_to_shared() {
 
         probas(shared_tables.size()) =
             std::log(totalmass_hdp) +
-            G00_master_hierarchy
-                ->get_marg_lpdf_grid<false>(data_by_theta_star[l])
+            G00_master_hierarchy->marg_lpdf_grid(false, data_by_theta_star[l])
                 .sum();
 
         probas = stan::math::softmax(probas);

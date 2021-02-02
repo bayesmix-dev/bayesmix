@@ -136,15 +136,15 @@ double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum,
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
-double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum,
-                 const Eigen::RowVectorXd &covariate /*= Eigen::MatrixXd(0, 0)*/,
-                 const bool posterior /*= false*/) const {
-    Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
-    double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
-                        (params.shape * params.var_scaling));
-    return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
-                                      sig_n);
-  }
+double NNIGHierarchy::marg_lpdf(
+    const bool posterior, const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::MatrixXd(0, 0)*/) const {
+  Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
+  double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
+                      (params.shape * params.var_scaling));
+  return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
+                                    sig_n);
+}
 
 void NNIGHierarchy::draw() {
   // Update state values from their prior centering distribution

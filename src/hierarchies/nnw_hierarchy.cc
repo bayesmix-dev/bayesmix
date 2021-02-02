@@ -158,20 +158,18 @@ double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum,
                                           prec_logdet);
 }
 
-double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum,
-                 const Eigen::RowVectorXd &covariate /*= Eigen::MatrixXd(0, 0)*/,
-                 const bool posterior /*= false*/) const {
-    Hyperparams params = posterior ? normal_wishart_update() : *hypers;
-    // Compute dof and scale of marginal distribution
-    double nu_n = 2 * params.deg_free - dim + 1;
-    Eigen::MatrixXd sigma_n = params.scale_inv *
-                              (params.deg_free - 0.5 * (dim - 1)) *
-                              params.var_scaling / (params.var_scaling + 1);
-    // TODO: chec if this is optimized as our bayesmix::multi_normal_prec_lpdf
-    return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean,
-                                            sigma_n);
-  }
-
+double NNWHierarchy::marg_lpdf(
+    const bool posterior, const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::MatrixXd(0, 0)*/) const {
+  Hyperparams params = posterior ? normal_wishart_update() : *hypers;
+  // Compute dof and scale of marginal distribution
+  double nu_n = 2 * params.deg_free - dim + 1;
+  Eigen::MatrixXd sigma_n = params.scale_inv *
+                            (params.deg_free - 0.5 * (dim - 1)) *
+                            params.var_scaling / (params.var_scaling + 1);
+  // TODO: chec if this is optimized as our bayesmix::multi_normal_prec_lpdf
+  return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean, sigma_n);
+}
 
 void NNWHierarchy::draw() {
   // Generate new state values from their prior centering distribution

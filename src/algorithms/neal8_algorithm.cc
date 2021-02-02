@@ -69,14 +69,14 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_lpdf(
   Eigen::VectorXd loglpdf(n_clust + n_aux);
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    loglpdf(j) = unique_values[j]->get_like_lpdf(
-        data.row(data_idx), hier_covariates.row(data_idx));
+    loglpdf(j) = unique_values[j]->like_lpdf(data.row(data_idx),
+                                             hier_covariates.row(data_idx));
   }
   for (size_t j = 0; j < n_aux; j++) {
     // Probability of being assigned to a newly created cluster
     loglpdf(n_clust + j) =
-        aux_unique_values[j]->get_like_lpdf(data.row(data_idx),
-                                            hier_covariates.row(data_idx)) -
+        aux_unique_values[j]->like_lpdf(data.row(data_idx),
+                                        hier_covariates.row(data_idx)) -
         log(n_aux);
   }
   return loglpdf;

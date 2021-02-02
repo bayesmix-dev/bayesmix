@@ -59,9 +59,9 @@ class NNIGHierarchy : public BaseHierarchy {
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override;
   //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0),
-                   const bool posterior = false) const override;
+  double marg_lpdf(const bool posterior, const Eigen::RowVectorXd &datum,
+                   const Eigen::RowVectorXd &covariate =
+                       Eigen::MatrixXd(0, 0)) const override;
 
  public:
   void initialize() override;

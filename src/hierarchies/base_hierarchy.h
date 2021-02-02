@@ -67,22 +67,21 @@ class BaseHierarchy {
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
   //! Evaluates the log-likelihood of data in a single point
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum,
-                           const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const = 0;
+  virtual double like_lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const = 0;
   //! Evaluates the log-marginal distribution of data in a single point
-  virtual double marg_lpdf(const Eigen::RowVectorXd &datum,
-                           const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0),
-                           const bool posterior = false) const = 0;
+  virtual double marg_lpdf(
+      const bool posterior, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const = 0;
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
   //! Evaluates the log-likelihood of data in a grid of points
   virtual Eigen::VectorXd like_lpdf_grid(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates) const;
+      const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const;
   //! Evaluates the log-marginal of data in a grid of points
   virtual Eigen::VectorXd marg_lpdf_grid(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates,
-      const bool posterior = false) const;
+      const bool posterior, const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates) const;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
