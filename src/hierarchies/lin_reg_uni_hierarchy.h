@@ -47,8 +47,9 @@ class LinRegUniHierarchy : public BaseHierarchy {
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update() const;
 
-  void sample_given_data(const Eigen::MatrixXd &data,
-                         const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
+  void sample_given_data(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
 
  public:
   void initialize() override;
@@ -62,13 +63,13 @@ class LinRegUniHierarchy : public BaseHierarchy {
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
-  double like_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate =
-                       Eigen::MatrixXd(0, 0)) const override;
+  double like_lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
   //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const bool posterior, const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate =
-                       Eigen::MatrixXd(0, 0)) const override;
+  double marg_lpdf(
+      const bool posterior, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~LinRegUniHierarchy() = default;

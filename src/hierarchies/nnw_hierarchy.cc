@@ -152,8 +152,9 @@ void NNWHierarchy::update_hypers(
 
 //! \param data Matrix of row-vectorial single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum,
-                               const Eigen::RowVectorXd &covariate) const {
+double NNWHierarchy::like_lpdf(
+    const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   // Initialize relevant objects
   return bayesmix::multi_normal_prec_lpdf(datum, state.mean, prec_chol,
                                           prec_logdet);
@@ -161,7 +162,7 @@ double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum,
 
 double NNWHierarchy::marg_lpdf(
     const bool posterior, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::MatrixXd(0, 0)*/) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   Hyperparams params = posterior ? normal_wishart_update() : *hypers;
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * params.deg_free - dim + 1;
@@ -197,7 +198,9 @@ void NNWHierarchy::sample_given_data() {
   set_prec_and_utilities(tau_new);
 }
 
-void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
+void NNWHierarchy::sample_given_data(
+    const Eigen::MatrixXd &data,
+    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
   data_sum = Eigen::VectorXd::Zero(data.cols());
   data_sum_squares = Eigen::MatrixXd::Zero(data.cols(), data.cols());
   for (int i = 0; i < data.rows(); i++) {

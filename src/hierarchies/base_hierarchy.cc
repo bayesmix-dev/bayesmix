@@ -5,8 +5,9 @@
 #include <set>
 #include <stan/math/prim.hpp>
 
-void BaseHierarchy::add_datum(const int id, const Eigen::VectorXd &datum,
-                              const Eigen::VectorXd &covariate) {
+void BaseHierarchy::add_datum(
+    const int id, const Eigen::VectorXd &datum,
+    const Eigen::VectorXd &covariate /*= Eigen::VectorXd(0)*/) {
   auto it = cluster_data_idx.find(id);
   assert(it == cluster_data_idx.end());
   card += 1;
@@ -15,8 +16,9 @@ void BaseHierarchy::add_datum(const int id, const Eigen::VectorXd &datum,
   cluster_data_idx.insert(id);
 }
 
-void BaseHierarchy::remove_datum(const int id, const Eigen::VectorXd &datum,
-                                 const Eigen::VectorXd &covariate) {
+void BaseHierarchy::remove_datum(
+    const int id, const Eigen::VectorXd &datum,
+    const Eigen::VectorXd &covariate /* = Eigen::VectorXd(0)*/) {
   update_summary_statistics(datum, covariate, false);
   card -= 1;
   log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
@@ -34,8 +36,9 @@ Eigen::VectorXd BaseHierarchy::like_lpdf_grid(
   return lpdf;
 }
 
-Eigen::VectorXd BaseHierarchy::marg_lpdf_grid(const bool posterior,
-    const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
+Eigen::VectorXd BaseHierarchy::marg_lpdf_grid(
+    const bool posterior, const Eigen::MatrixXd &data,
+    const Eigen::MatrixXd &covariates) const {
   Eigen::VectorXd lpdf(data.rows());
   for (int i = 0; i < data.rows(); i++) {
     lpdf(i) = marg_lpdf(posterior, data.row(i), covariates.row(i));

@@ -271,13 +271,17 @@ void SemiHdpSampler::update_to_shared() {
         Eigen::VectorXd probas(shared_tables.size() + 1);
         cnt_shared_tables[table_to_shared[r][l]] -= 1;
         for (int k = 0; k < shared_tables.size(); k++) {
-          probas(k) =
-              std::log(cnt_shared_tables[k]) +
-              shared_tables[k]->like_lpdf_grid(data_by_theta_star[l], Eigen::MatrixXd(0, 0)).sum();  // TODO
+          probas(k) = std::log(cnt_shared_tables[k]) +
+                      shared_tables[k]
+                          ->like_lpdf_grid(data_by_theta_star[l],
+                                           Eigen::MatrixXd(0, 0))
+                          .sum();  // TODO
         }
         probas(shared_tables.size()) =
             std::log(totalmass_hdp) +
-            G00_master_hierarchy->marg_lpdf_grid(false, Eigen::MatrixXd(0, 0), data_by_theta_star[l])
+            G00_master_hierarchy
+                ->marg_lpdf_grid(false, Eigen::MatrixXd(0, 0),
+                                 data_by_theta_star[l])
                 .sum();  // TODO
 
         probas = stan::math::softmax(probas);
@@ -520,7 +524,9 @@ double SemiHdpSampler::lpdf_for_group(int i, int r) {
     lpdf_local.resize(n_by_group[i], rest_tables[r].size());
     for (int h = 0; h < rest_tables[r].size(); h++) {
       lpdf_local.col(h) = log(1.0 * n_by_table[r][h] / (totalmass_rest + nr)) +
-                          rest_tables[r][h]->like_lpdf_grid(data[i], Eigen::MatrixXd(0, 0)).array();  // TODO
+                          rest_tables[r][h]
+                              ->like_lpdf_grid(data[i], Eigen::MatrixXd(0, 0))
+                              .array();  // TODO
     }
 
   } else {
@@ -530,7 +536,9 @@ double SemiHdpSampler::lpdf_for_group(int i, int r) {
     for (int h = 0; h < rest_tables_pseudo[r].size(); h++) {
       lpdf_local.col(h) =
           log(1.0 * n_by_table_pseudo[r][h] / (totalmass_rest + nr)) +
-          rest_tables_pseudo[r][h]->like_lpdf_grid(data[i], Eigen::MatrixXd(0, 0)).array();  // TODO
+          rest_tables_pseudo[r][h]
+              ->like_lpdf_grid(data[i], Eigen::MatrixXd(0, 0))
+              .array();  // TODO
     }
   }
   for (int j = 0; j < n_by_group[i]; j++)

@@ -42,10 +42,10 @@ class BaseHierarchy {
  public:
   //! Adds a datum and its index to the hierarchy
   void add_datum(const int id, const Eigen::VectorXd &datum,
-                 const Eigen::VectorXd &covariate);
+                 const Eigen::VectorXd &covariate = Eigen::VectorXd(0));
   //! Removes a datum and its index from the hierarchy
   void remove_datum(const int id, const Eigen::VectorXd &datum,
-                    const Eigen::VectorXd &covariate);
+                    const Eigen::VectorXd &covariate = Eigen::VectorXd(0));
   //! Deletes all data in the hierarchy
   virtual void clear_data() = 0;
   //!
@@ -69,11 +69,11 @@ class BaseHierarchy {
   //! Evaluates the log-likelihood of data in a single point
   virtual double like_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
   //! Evaluates the log-marginal distribution of data in a single point
   virtual double marg_lpdf(
       const bool posterior, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
   //! Evaluates the log-likelihood of data in a grid of points
   virtual Eigen::VectorXd like_lpdf_grid(
@@ -88,8 +88,9 @@ class BaseHierarchy {
   virtual void draw() = 0;
   //! Generates new values for state from the centering posterior distribution
   virtual void sample_given_data() = 0;
-  virtual void sample_given_data(const Eigen::MatrixXd &data,
-                                 const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
+  virtual void sample_given_data(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
 
   // GETTERS AND SETTERS
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;

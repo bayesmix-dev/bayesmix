@@ -134,7 +134,8 @@ void Neal8Algorithm::sample_allocations() {
           aux_unique_values[c_new - n_clust]->clone();
       unique_values.push_back(hier_new);
       allocations[i] = n_clust;
-      unique_values[n_clust]->add_datum(i, data.row(i), hier_covariates.row(i));
+      unique_values[n_clust]->add_datum(i, data.row(i),
+                                        hier_covariates.row(i));
     } else {
       allocations[i] = c_new;
       unique_values[c_new]->add_datum(i, data.row(i), hier_covariates.row(i));

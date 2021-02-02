@@ -55,15 +55,6 @@ class NNIGHierarchy : public BaseHierarchy {
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update() const;
 
-  // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
-  double like_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate) const override;
-  //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const bool posterior, const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate =
-                       Eigen::MatrixXd(0, 0)) const override;
-
  public:
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, false)
@@ -73,6 +64,16 @@ class NNIGHierarchy : public BaseHierarchy {
 
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
+
+  // EVALUATION FUNCTIONS
+  //! Evaluates the log-likelihood of data in a single point
+  double like_lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
+  //! Evaluates the log-marginal distribution of data in a single point
+  double marg_lpdf(
+      const bool posterior, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNIGHierarchy() = default;
@@ -89,7 +90,9 @@ class NNIGHierarchy : public BaseHierarchy {
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data() override;
-  void sample_given_data(const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
+  void sample_given_data(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }

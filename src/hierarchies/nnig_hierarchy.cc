@@ -132,14 +132,15 @@ void NNIGHierarchy::update_hypers(
 
 //! \param data Column vector containing a single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum,
-                                const Eigen::RowVectorXd &covariate) const {
+double NNIGHierarchy::like_lpdf(
+    const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
 double NNIGHierarchy::marg_lpdf(
     const bool posterior, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::MatrixXd(0, 0)*/) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
   double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
                       (params.shape * params.var_scaling));
@@ -166,7 +167,9 @@ void NNIGHierarchy::sample_given_data() {
       params.mean, sqrt(state.var / params.var_scaling), rng);
 }
 
-void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
+void NNIGHierarchy::sample_given_data(
+    const Eigen::MatrixXd &data,
+    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
   data_sum = data.sum();
   data_sum_squares = data.squaredNorm();
   card = data.rows();

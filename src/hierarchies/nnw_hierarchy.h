@@ -62,24 +62,14 @@ class NNWHierarchy : public BaseHierarchy {
   // AUXILIARY TOOLS
   //! Special setter for prec and its utilities
   void set_prec_and_utilities(const Eigen::MatrixXd &prec_);
-
+  //!
   void clear_data() override;
-
+  //!
   void update_summary_statistics(const Eigen::VectorXd &datum,
                                  const Eigen::VectorXd &covariate,
                                  bool add) override;
-
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_wishart_update() const;
-
-  // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
-  double like_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate) const override;
-  //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const bool posterior, const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate =
-                       Eigen::MatrixXd(0, 0)) const override;
 
  public:
   void initialize() override;
@@ -90,6 +80,16 @@ class NNWHierarchy : public BaseHierarchy {
 
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
+
+  // EVALUATION FUNCTIONS
+  //! Evaluates the log-likelihood of data in a single point
+  double like_lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
+  //! Evaluates the log-marginal distribution of data in a single point
+  double marg_lpdf(
+      const bool posterior, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNWHierarchy() = default;
@@ -105,7 +105,9 @@ class NNWHierarchy : public BaseHierarchy {
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data() override;
-  void sample_given_data(const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
+  void sample_given_data(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }
