@@ -18,6 +18,22 @@ void NNIGHierarchy::initialize() {
   state.var = hypers->scale / (hypers->shape + 1);
 }
 
+void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
+                                              const Eigen::VectorXd &covariate,
+                                              bool add) {
+  if (add) {
+    data_sum += datum(0);
+    data_sum_squares += datum(0) * datum(0);
+  } else {
+    data_sum -= datum(0);
+    data_sum_squares -= datum(0) * datum(0);
+  }
+}
+
+void NNIGHierarchy::save_posterior_hypers() {
+  *posterior_hypers = normal_invgamma_update();
+}
+
 //! \param data                        Column vector of data points
 //! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
 //! \return                            Vector of updated values for hyperpar.s
@@ -46,18 +62,6 @@ void NNIGHierarchy::clear_data() {
   data_sum_squares = 0;
   card = 0;
   cluster_data_idx = std::set<int>();
-}
-
-void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
-                                              const Eigen::VectorXd &covariate,
-                                              bool add) {
-  if (add) {
-    data_sum += datum(0);
-    data_sum_squares += datum(0) * datum(0);
-  } else {
-    data_sum -= datum(0);
-    data_sum_squares -= datum(0) * datum(0);
-  }
 }
 
 void NNIGHierarchy::update_hypers(

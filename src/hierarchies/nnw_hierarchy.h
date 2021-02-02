@@ -50,6 +50,7 @@ class NNWHierarchy : public BaseHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
+  std::shared_ptr<Hyperparams> posterior_hypers;
   // HYPERPRIOR
   std::shared_ptr<bayesmix::NNWPrior> prior;
 
@@ -68,6 +69,8 @@ class NNWHierarchy : public BaseHierarchy {
   void update_summary_statistics(const Eigen::VectorXd &datum,
                                  const Eigen::VectorXd &covariate,
                                  bool add) override;
+  //!
+  void save_posterior_hypers() override;
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_wishart_update() const;
 

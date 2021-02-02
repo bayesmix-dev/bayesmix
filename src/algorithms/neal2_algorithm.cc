@@ -89,7 +89,7 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int n_clust = unique_values.size();
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
     // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(i, data.row(i),
+    unique_values[allocations[i]]->remove_datum(i, false, data.row(i),
                                                 hier_covariates.row(i));
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas =
@@ -100,14 +100,15 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int c_old = allocations[i];
     if (c_new == n_clust) {
       std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
-      new_unique->add_datum(i, data.row(i), hier_covariates.row(i));
+      new_unique->add_datum(i, false, data.row(i), hier_covariates.row(i));
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      unique_values[c_new]->add_datum(i, data.row(i), hier_covariates.row(i));
+      unique_values[c_new]->add_datum(i, false, data.row(i),
+                                      hier_covariates.row(i));
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers

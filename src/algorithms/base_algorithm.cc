@@ -71,13 +71,14 @@ void BaseAlgorithm::initialize() {
   allocations.clear();
   for (size_t i = 0; i < init_num_clusters; i++) {
     allocations.push_back(i);
-    unique_values[i]->add_datum(i, data.row(i), hier_covariates.row(i));
+    unique_values[i]->add_datum(i, false, data.row(i), hier_covariates.row(i));
   }
   // Randomly allocate all remaining data, and update cardinalities
   for (size_t i = init_num_clusters; i < data.rows(); i++) {
     unsigned int clust = distro(generator);
     allocations.push_back(clust);
-    unique_values[clust]->add_datum(i, data.row(i), hier_covariates.row(i));
+    unique_values[clust]->add_datum(i, false, data.row(i),
+                                    hier_covariates.row(i));
   }
   std::cout << "Done" << std::endl;
 }

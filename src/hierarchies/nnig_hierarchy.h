@@ -42,14 +42,17 @@ class NNIGHierarchy : public BaseHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
+  std::shared_ptr<Hyperparams> posterior_hypers;
   // HYPERPRIOR
   std::shared_ptr<bayesmix::NNIGPrior> prior;
-
+  //!
   void clear_data() override;
-
+  //!
   void update_summary_statistics(const Eigen::VectorXd &datum,
                                  const Eigen::VectorXd &covariate,
                                  bool add) override;
+  //!
+  void save_posterior_hypers() override;
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior

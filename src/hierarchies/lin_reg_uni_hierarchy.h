@@ -36,14 +36,16 @@ class LinRegUniHierarchy : public BaseHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
+  std::shared_ptr<Hyperparams> posterior_hypers;
   // HYPERPRIOR
   std::shared_ptr<bayesmix::LinRegUniPrior> prior;
-
+  //!
   void clear_data();
+  //!
   void update_summary_statistics(const Eigen::VectorXd &datum,
                                  const Eigen::VectorXd &covariate, bool add);
-
-  // AUXILIARY TOOLS
+  //!
+  void save_posterior_hypers() override;
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update() const;
 

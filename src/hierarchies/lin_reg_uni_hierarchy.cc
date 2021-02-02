@@ -37,6 +37,10 @@ void LinRegUniHierarchy::update_summary_statistics(
   }
 }
 
+void LinRegUniHierarchy::save_posterior_hypers() {
+  *posterior_hypers = normal_invgamma_update();
+}
+
 LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update()
     const {
   Hyperparams post_params;

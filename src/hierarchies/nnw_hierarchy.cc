@@ -52,6 +52,10 @@ void NNWHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
   }
 }
 
+void NNWHierarchy::save_posterior_hypers() {
+  *posterior_hypers = normal_wishart_update();
+}
+
 //! \param data                    Matrix of row-vectorial data points
 //! \param mu0, lambda0, tau0, nu0 Original values for hyperparameters
 //! \return                        Vector of updated values for hyperparameters
