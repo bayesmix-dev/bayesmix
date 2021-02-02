@@ -72,17 +72,6 @@ double LinRegUniHierarchy::like_lpdf(
       datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
 }
 
-double LinRegUniHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum,
-                                     const Eigen::RowVectorXd &covariate,
-                                     const bool posterior) const {
-  Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
-  double sig_n = sqrt(
-      (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
-      params.scale / params.shape);
-  return stan::math::student_t_lpdf(datum(0), 2 * params.shape,
-                                    covariate.dot(params.mean), sig_n);
-}
-
 void LinRegUniHierarchy::draw() {
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();

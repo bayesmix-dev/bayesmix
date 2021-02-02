@@ -55,9 +55,16 @@ class LinRegUniHierarchy : public BaseHierarchy {
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override;
   //! Evaluates the log-marginal distribution of data in a single point
+  template<bool posterior>
   double marg_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate,
-                   const bool posterior) const override;
+                   const Eigen::RowVectorXd &covariate) const override {
+    Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
+    double sig_n = sqrt(
+        (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
+        params.scale / params.shape);
+    return stan::math::student_t_lpdf(datum(0), 2 * params.shape,
+                                      covariate.dot(params.mean), sig_n);
+  }
 
  public:
   void initialize() override;

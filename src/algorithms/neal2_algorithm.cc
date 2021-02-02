@@ -62,28 +62,14 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
   unsigned int n_data = data.rows();
   unsigned int n_clust = unique_values.size();
   Eigen::VectorXd loglpdf(n_clust + 1);
-  if (unique_values[0]->is_dependent()) {
-    auto hiercast =
-        std::dynamic_pointer_cast<DependentHierarchy>(unique_values[0]);
-    // Probability of being assigned to a newly created cluster
-    loglpdf(n_clust) =
-        hiercast->marg_lpdf(data.row(data_idx), hier_covariates.row(data_idx));
-    for (size_t j = 0; j < n_clust; j++) {
-      hiercast =
-          std::dynamic_pointer_cast<DependentHierarchy>(unique_values[j]);
-      // Probability of being assigned to an already existing cluster
-      loglpdf(j) = hiercast->like_lpdf(data.row(data_idx),
-                                       hier_covariates.row(data_idx));
-    }
-
-  } else {
-    for (size_t j = 0; j < n_clust; j++) {
-      // Probability of being assigned to an already existing cluster
-      loglpdf(j) = unique_values[j]->like_lpdf(data.row(data_idx));
-    }
-    // Probability of being assigned to a newly created cluster
-    loglpdf(n_clust) = unique_values[0]->marg_lpdf(data.row(data_idx));
+  for (size_t j = 0; j < n_clust; j++) {
+    // Probability of being assigned to an already existing cluster
+    loglpdf(j) = unique_values[j]->get_like_lpdf(data.row(data_idx),
+                                             hier_covariates.row(data_idx));
   }
+  // Probability of being assigned to a newly created cluster
+  loglpdf(n_clust) = unique_values[0]->get_marg_lpdf(data.row(data_idx),
+                                                 hier_covariates.row(data_idx));
   return loglpdf;
 }
 

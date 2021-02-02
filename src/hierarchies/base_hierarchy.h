@@ -42,9 +42,9 @@ class BaseHierarchy {
   // EVALUATION FUNCTIONS
   virtual double like_lpdf(const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const = 0;
+  template<bool posterior>
   virtual double marg_lpdf(const Eigen::RowVectorXd &datum,
-                           const Eigen::RowVectorXd &covariate,
-                           const bool posterior) const = 0;
+                           const Eigen::RowVectorXd &covariate) const = 0;
 
  public:
   void add_datum(const int id, const Eigen::VectorXd &datum,
@@ -77,13 +77,25 @@ class BaseHierarchy {
   virtual std::shared_ptr<BaseHierarchy> clone() const = 0;
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
+  //! Evaluates the log-likelihood of data in a single point
   double get_like_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const;
+  //! Evaluates the log-marginal distribution of data in a single point
+  template<bool posterior>
   double get_marg_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0),
-      const bool posterior) const;
+      const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const {
+    if (is_dependent() and covariate.size() == 0) {
+      throw std::invalid_argument(
+          "Dependent hierarchy lpdf was not supplied with covariates");
+    } else if (is_dependent() == false and covariate.size() > 0) {
+      throw std::invalid_argument(
+          "Non-dependent hierarchy lpdf was supplied with covariates");
+    }
+    return marg_lpdf<posterior>(datum, covariate);
+  }
+
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution

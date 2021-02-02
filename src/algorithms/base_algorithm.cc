@@ -33,20 +33,17 @@ void BaseAlgorithm::remove_datum_from_hierarchy(
 
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;
-
-  // Perform checks
+  // Data check
   if (data.rows() == 0) {
     throw std::invalid_argument("Data was not provided to algorithm");
   }
+  // Hierarchy checks
   if (unique_values.size() == 0) {
     throw std::invalid_argument("Hierarchy was not provided to algorithm");
   }
   if (unique_values[0]->is_multivariate() == false && data.cols() > 1) {
     throw std::invalid_argument(
         "Multivariate data supplied to univariate hierarchy");
-  }
-  if (mixing == nullptr) {
-    throw std::invalid_argument("Mixing was not provided to algorithm");
   }
   if (hier_covariates.rows() != 0) {
     if (unique_values[0]->is_dependent() == false) {
@@ -58,6 +55,14 @@ void BaseAlgorithm::initialize() {
           "Sizes of data and hierarchy covariates do not match");
     }
   }
+  else {
+    // Create empty covariates vector
+    hier_covariates = Eigen::MatrixXd::Zero(data.rows(), 0);
+  }
+  // Mixing checks
+  if (mixing == nullptr) {
+    throw std::invalid_argument("Mixing was not provided to algorithm");
+  }
   if (mix_covariates.rows() != 0) {
     if (mixing->is_dependent() == false) {
       throw std::invalid_argument(
@@ -68,24 +73,24 @@ void BaseAlgorithm::initialize() {
           "Sizes of data and mixing covariates do not match");
     }
   }
-
+  else {
+    // Create empty covariates vector
+    mix_covariates = Eigen::MatrixXd::Zero(data.rows(), 0);
+  }
+  // Interpet default number of clusters
   if (init_num_clusters == 0) {
     init_num_clusters = data.rows();
   }
-
   // Initialize hierarchies
   unique_values[0]->initialize();
   for (size_t i = 0; i < init_num_clusters - 1; i++) {
     unique_values.push_back(unique_values[0]->clone());
     unique_values[i]->draw();
   }
-
   // Initialize mixing
   mixing->initialize();
-
-  // Initialize needed objects
-  std::default_random_engine generator;
   // Build uniform probability on clusters, given their initial number
+  std::default_random_engine generator;
   std::uniform_int_distribution<int> distro(0, init_num_clusters - 1);
   // Allocate one datum per cluster first, and update cardinalities
   allocations.clear();
@@ -99,7 +104,6 @@ void BaseAlgorithm::initialize() {
     allocations.push_back(clust);
     add_datum_to_hierarchy(i, unique_values[clust]);
   }
-
   std::cout << "Done" << std::endl;
 }
 
