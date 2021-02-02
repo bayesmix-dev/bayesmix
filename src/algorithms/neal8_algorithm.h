@@ -33,13 +33,9 @@ class Neal8Algorithm : public Neal2Algorithm {
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<BaseHierarchy> temp_hier,
-      const Eigen::MatrixXd &grid) override;
-
-  Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid,
+      std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
       const Eigen::MatrixXd &covariates) override;
-
+  //!
   Eigen::VectorXd get_cluster_prior_mass(
       const unsigned int data_idx) const override;
   Eigen::VectorXd get_cluster_lpdf(const unsigned int data_idx) const override;

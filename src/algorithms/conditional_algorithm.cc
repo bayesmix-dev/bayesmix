@@ -8,6 +8,6 @@
 //! \param coll Collector containing the algorithm chain
 Eigen::MatrixXd ConditionalAlgorithm::eval_lpdf(
     const Eigen::MatrixXd &grid, const Eigen::MatrixXd &covariates,
-    BaseCollector *const coll) {
+    BaseCollector *const coll) const {
   return Eigen::MatrixXd::Zero(1, 1);
 }

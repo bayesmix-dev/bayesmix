@@ -13,7 +13,7 @@
 //! \return     Matrix whose i-th column is the lpdf at i-th iteration
 Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(const Eigen::MatrixXd &grid,
                                              const Eigen::MatrixXd &covariates,
-                                             BaseCollector *coll) {
+                                             BaseCollector *coll) const {
   std::deque<Eigen::VectorXd> lpdf;
   bool keep = true;
   progresscpp::ProgressBar bar(coll->get_size(), 60);

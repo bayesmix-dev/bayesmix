@@ -66,10 +66,11 @@ class NNWHierarchy : public BaseHierarchy {
   void clear_data() override;
 
   void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 const Eigen::VectorXd &covariate,
                                  bool add) override;
 
   //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams normal_wishart_update();
+  Hyperparams normal_wishart_update() const;
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
@@ -104,7 +105,7 @@ class NNWHierarchy : public BaseHierarchy {
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data() override;
-  void sample_given_data(const Eigen::MatrixXd &data) override;
+  void sample_given_data(const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }

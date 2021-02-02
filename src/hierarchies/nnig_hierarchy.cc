@@ -21,7 +21,7 @@ void NNIGHierarchy::initialize() {
 //! \param data                        Column vector of data points
 //! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
 //! \return                            Vector of updated values for hyperpar.s
-NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() {
+NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() const {
   Hyperparams post_params;
   if (card == 0) {  // no update possible
     post_params = *hypers;
@@ -49,6 +49,7 @@ void NNIGHierarchy::clear_data() {
 }
 
 void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
+                                              const Eigen::VectorXd &covariate,
                                               bool add) {
   if (add) {
     data_sum += datum(0);
@@ -165,7 +166,7 @@ void NNIGHierarchy::sample_given_data() {
       params.mean, sqrt(state.var / params.var_scaling), rng);
 }
 
-void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
+void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
   data_sum = data.sum();
   data_sum_squares = data.squaredNorm();
   card = data.rows();

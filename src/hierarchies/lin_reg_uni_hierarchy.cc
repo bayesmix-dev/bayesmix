@@ -37,7 +37,7 @@ void LinRegUniHierarchy::update_summary_statistics(
   }
 }
 
-LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update() {
+LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update() const {
   Hyperparams post_params;
 
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
@@ -94,7 +94,6 @@ void LinRegUniHierarchy::draw() {
 void LinRegUniHierarchy::sample_given_data() {
   // Update values
   Hyperparams params = normal_invgamma_update();
-
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   state.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
@@ -103,7 +102,7 @@ void LinRegUniHierarchy::sample_given_data() {
 }
 
 void LinRegUniHierarchy::sample_given_data(const Eigen::MatrixXd &data,
-                                           const Eigen::MatrixXd &covariates) {
+                                           const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
   data_sum_squares = data.squaredNorm();
   covar_sum_squares = covariates.transpose() * covariates;
   mixed_prod = covariates.transpose() * data;

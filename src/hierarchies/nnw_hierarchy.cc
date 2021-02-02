@@ -41,6 +41,7 @@ void NNWHierarchy::clear_data() {
 }
 
 void NNWHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
+                                             const Eigen::VectorXd &covariate,
                                              bool add) {
   if (add) {
     data_sum += datum;
@@ -54,7 +55,7 @@ void NNWHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
 //! \param data                    Matrix of row-vectorial data points
 //! \param mu0, lambda0, tau0, nu0 Original values for hyperparameters
 //! \return                        Vector of updated values for hyperparameters
-NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update() {
+NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update() const {
   Hyperparams post_params;
   // Compute updated hyperparameters
   post_params.var_scaling = hypers->var_scaling + card;
@@ -196,7 +197,7 @@ void NNWHierarchy::sample_given_data() {
   set_prec_and_utilities(tau_new);
 }
 
-void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
+void NNWHierarchy::sample_given_data(const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
   data_sum = Eigen::VectorXd::Zero(data.cols());
   data_sum_squares = Eigen::MatrixXd::Zero(data.cols(), data.cols());
   for (int i = 0; i < data.rows(); i++) {

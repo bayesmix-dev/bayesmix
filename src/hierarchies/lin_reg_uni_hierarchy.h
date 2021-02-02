@@ -45,10 +45,10 @@ class LinRegUniHierarchy : public BaseHierarchy {
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams normal_invgamma_update();
+  Hyperparams normal_invgamma_update() const;
 
   void sample_given_data(const Eigen::MatrixXd &data,
-                         const Eigen::MatrixXd &covariates) override;
+                         const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
 
  public:
   void initialize() override;
