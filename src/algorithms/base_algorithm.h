@@ -122,20 +122,16 @@ class BaseAlgorithm {
   // ESTIMATE FUNCTION
   //! Evaluates the logpdf for each single iteration on a given grid of points
   virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                                    BaseCollector *const collector) = 0;
-  // TODO will soon become obsolete
-  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
                                     const Eigen::MatrixXd &covariates,
                                     BaseCollector *const collector) = 0;
+  Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
+                            BaseCollector *const collector) const {
+    return eval_lpdf(grid, Eigen::MatrixXd::Zero(grid.rows(), 0), collector);
+  }
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseAlgorithm() = default;
   BaseAlgorithm() = default;
-
-  void add_datum_to_hierarchy(const unsigned int datum_idx,
-                              std::shared_ptr<BaseHierarchy> hier);
-  void remove_datum_from_hierarchy(const unsigned int datum_idx,
-                                   std::shared_ptr<BaseHierarchy> hier);
 
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }

@@ -9,28 +9,6 @@
 #include "src/hierarchies/dependent_hierarchy.h"
 #include "src/mixings/dependent_mixing.h"
 
-void BaseAlgorithm::add_datum_to_hierarchy(
-    const unsigned int datum_idx, std::shared_ptr<BaseHierarchy> hier) {
-  if (hier->is_dependent()) {
-    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(hier);
-    hiercast->add_datum(datum_idx, data.row(datum_idx),
-                        hier_covariates.row(datum_idx));
-  } else {
-    hier->add_datum(datum_idx, data.row(datum_idx));
-  }
-}
-
-void BaseAlgorithm::remove_datum_from_hierarchy(
-    const unsigned int datum_idx, std::shared_ptr<BaseHierarchy> hier) {
-  if (hier->is_dependent()) {
-    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(hier);
-    hiercast->remove_datum(datum_idx, data.row(datum_idx),
-                           hier_covariates.row(datum_idx));
-  } else {
-    hier->remove_datum(datum_idx, data.row(datum_idx));
-  }
-}
-
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;
   // Data check
@@ -96,13 +74,13 @@ void BaseAlgorithm::initialize() {
   allocations.clear();
   for (size_t i = 0; i < init_num_clusters; i++) {
     allocations.push_back(i);
-    add_datum_to_hierarchy(i, unique_values[i]);
+    unique_values[i]->add_datum(i, data.row(i), covariates.row(i));
   }
   // Randomly allocate all remaining data, and update cardinalities
   for (size_t i = init_num_clusters; i < data.rows(); i++) {
     unsigned int clust = distro(generator);
     allocations.push_back(clust);
-    add_datum_to_hierarchy(i, unique_values[clust]);
+    unique_values[clust]->add_datum(i, data.row(i), covariates.row(i));
   }
   std::cout << "Done" << std::endl;
 }

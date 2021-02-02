@@ -13,19 +13,12 @@
 #include "src/utils/distributions.h"
 #include "src/utils/rng.h"
 
-//! \param temp_hier Temporary hierarchy object
-//! \return          Vector of evaluation of component on the provided grid
+//! \param hier Hierarchy object
+//! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
-    std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid) {
-  // Exploit conjugacy of hierarchy
-  return temp_hier->marg_lpdf_grid(grid);
-}
-
-Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
-    std::shared_ptr<DependentHierarchy> temp_hier, const Eigen::MatrixXd &grid,
+    std::shared_ptr<DependentHierarchy> hier, const Eigen::MatrixXd &grid,
     const Eigen::MatrixXd &covariates) {
-  // TODO will soon become obsolete
-  return temp_hier->marg_lpdf_grid(grid, covariates);
+  return hier->marg_lpdf_grid(grid, covariates);
 }
 
 Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
@@ -97,7 +90,7 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int n_clust = unique_values.size();
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
     // Remove datum from cluster
-    remove_datum_from_hierarchy(i, unique_values[allocations[i]]);
+    unique_values[allocations[i]]->remove_datum(i, data.row(i), covariates.row(i));
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas =
         get_cluster_prior_mass(i) + get_cluster_lpdf(i);
@@ -107,14 +100,14 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int c_old = allocations[i];
     if (c_new == n_clust) {
       std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
-      add_datum_to_hierarchy(i, new_unique);
+      new_unique->add_datum(i, data.row(i), covariates.row(i));
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      add_datum_to_hierarchy(i, unique_values[c_new]);
+      unique_values[c_new]->add_datum(i, data.row(i), covariates.row(i));
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers

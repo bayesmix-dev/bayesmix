@@ -95,7 +95,31 @@ class BaseHierarchy {
     }
     return marg_lpdf<posterior>(datum, covariate);
   }
-
+  // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
+  //! Evaluates the log-likelihood of data in a grid of points
+  virtual Eigen::VectorXd get_like_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const;
+  //! Evaluates the log-marginal of data in a grid of points
+  template<bool posterior>
+  virtual Eigen::VectorXd get_marg_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
+    if (covariates == Eigen::MatrixXd(0, 0)) {
+      Eigen::VectorXd lpdf(data.rows());
+      for (int i = 0; i < data.rows(); i++) {
+        lpdf(i) = get_marg_lpdf<posterior>(data.row(i), Eigen::MatrixXd(0, 0));
+      }
+      return lpdf;
+    }
+    else {
+      Eigen::VectorXd lpdf(data.rows());
+      for (int i = 0; i < data.rows(); i++) {
+        lpdf(i) = get_marg_lpdf<posterior>(data.row(i), covariates.row(i));
+      }
+      return lpdf;
+    }
+  }
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution

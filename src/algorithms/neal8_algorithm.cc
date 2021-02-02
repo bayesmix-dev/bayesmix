@@ -11,35 +11,17 @@
 #include "src/mixings/dependent_mixing.h"
 #include "src/utils/distributions.h"
 
-//! \param temp_hier Temporary hierarchy object
-//! \return          Vector of evaluation of component on the provided grid
+//! \param hier Hierarchy object
+//! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
-    std::shared_ptr<BaseHierarchy> temp_hier, const Eigen::MatrixXd &grid) {
-  unsigned int n_grid = grid.rows();
-  Eigen::VectorXd lpdf_(n_grid);
-  Eigen::MatrixXd lpdf_temp(n_grid, n_aux);
-  // Loop over unique values for a "sample mean" of the marginal
-  for (size_t i = 0; i < n_aux; i++) {
-    // Generate unique values from their prior centering distribution
-    temp_hier->draw();
-    lpdf_temp.col(i) = temp_hier->like_lpdf_grid(grid);
-  }
-  for (size_t i = 0; i < n_grid; i++) {
-    lpdf_(i) = stan::math::log_sum_exp(lpdf_temp.row(i));
-  }
-  return lpdf_.array() - log(n_aux);
-}
-
-Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
-    std::shared_ptr<DependentHierarchy> temp_hier, const Eigen::MatrixXd &grid,
+    std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
     const Eigen::MatrixXd &covariates) {
-  // TODO will soon become obsolete
   unsigned int n_grid = grid.rows();
   Eigen::VectorXd lpdf_(n_grid);
   Eigen::MatrixXd lpdf_temp(n_grid, n_aux);
   for (size_t i = 0; i < n_aux; i++) {
-    temp_hier->draw();
-    lpdf_temp.col(i) = temp_hier->like_lpdf_grid(grid, covariates);
+    hier->draw();
+    lpdf_temp.col(i) = hier->like_lpdf_grid(grid, covariates);
   }
   for (size_t i = 0; i < n_grid; i++) {
     lpdf_(i) = stan::math::log_sum_exp(lpdf_temp.row(i));
@@ -131,7 +113,7 @@ void Neal8Algorithm::sample_allocations() {
       aux_unique_values[0]->set_state_from_proto(curr_val);
     }
     // Remove datum from cluster
-    remove_datum_from_hierarchy(i, unique_values[allocations[i]]);
+    unique_values[allocations[i]]->remove_datum(i, data.row(i), covariates.row(i));
     // Draw the unique values in the auxiliary blocks from their prior
     for (size_t j = singleton; j < n_aux; j++) {
       aux_unique_values[j]->draw();
@@ -150,10 +132,10 @@ void Neal8Algorithm::sample_allocations() {
           aux_unique_values[c_new - n_clust]->clone();
       unique_values.push_back(hier_new);
       allocations[i] = n_clust;
-      add_datum_to_hierarchy(i, unique_values[n_clust]);
+      unique_values[n_clust]->add_datum(i, data.row(i), covariates.row(i));
     } else {
       allocations[i] = c_new;
-      add_datum_to_hierarchy(i, unique_values[c_new]);
+      unique_values[c_new]->add_datum(i, data.row(i), covariates.row(i));
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers

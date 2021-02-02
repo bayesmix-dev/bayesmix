@@ -11,6 +11,7 @@ class ConditionalAlgorithm : public BaseAlgorithm {
   ~ConditionalAlgorithm() = default;
   ConditionalAlgorithm() = default;
   virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
+                                    const Eigen::MatrixXd &covariates,
                                     BaseCollector *const coll) override;
 };
 

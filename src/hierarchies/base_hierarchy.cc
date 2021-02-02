@@ -37,3 +37,22 @@ double BaseHierarchy::get_like_lpdf(
   }
   return like_lpdf(datum, covariate);
 }
+
+Eigen::VectorXd get_like_lpdf_grid(
+    const Eigen::MatrixXd &data,
+    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
+  if (covariates == Eigen::MatrixXd(0, 0)) {
+    Eigen::VectorXd lpdf(data.rows());
+    for (int i = 0; i < data.rows(); i++) {
+      lpdf(i) = get_like_lpdf(data.row(i), Eigen::MatrixXd(0, 0));
+    }
+    return lpdf;
+  }
+  else {
+    Eigen::VectorXd lpdf(data.rows());
+    for (int i = 0; i < data.rows(); i++) {
+      lpdf(i) = get_like_lpdf(data.row(i), covariates.row(i));
+    }
+    return lpdf;
+  }
+}
