@@ -56,7 +56,8 @@ class LinRegUniHierarchy : public BaseHierarchy {
                    const Eigen::RowVectorXd &covariate) const override;
   //! Evaluates the log-marginal distribution of data in a single point
   double marg_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate, const bool posterior) const override;
+                   const Eigen::RowVectorXd &covariate,
+                   const bool posterior) const override;
 
  public:
   void initialize() override;

@@ -151,7 +151,8 @@ void NNWHierarchy::update_hypers(
 
 //! \param data Matrix of row-vectorial single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const {
+double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum,
+                               const Eigen::RowVectorXd &covariate) const {
   // Initialize relevant objects
   return bayesmix::multi_normal_prec_lpdf(datum, state.mean, prec_chol,
                                           prec_logdet);
@@ -159,7 +160,9 @@ double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum, const Eigen::Row
 
 //! \param data Matrix of row-vectorial a single data point
 //! \return     Marginal distribution vector evaluated in data
-double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate, const bool posterior) const {
+double NNWHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum,
+                               const Eigen::RowVectorXd &covariate,
+                               const bool posterior) const {
   Hyperparams params = posterior ? normal_wishart_update() : *hypers;
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * params.deg_free - dim + 1;

@@ -72,9 +72,9 @@ double LinRegUniHierarchy::like_lpdf(
       datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
 }
 
-double LinRegUniHierarchy::marg_lpdf(
-    const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate, const bool posterior) const {
+double LinRegUniHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum,
+                                     const Eigen::RowVectorXd &covariate,
+                                     const bool posterior) const {
   Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
   double sig_n = sqrt(
       (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *

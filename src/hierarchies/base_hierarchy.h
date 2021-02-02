@@ -40,8 +40,11 @@ class BaseHierarchy {
                                          bool add) = 0;
 
   // EVALUATION FUNCTIONS
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate) const = 0;
-  virtual double marg_lpdf(const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate, const bool posterior) const = 0;
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate) const = 0;
+  virtual double marg_lpdf(const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate,
+                           const bool posterior) const = 0;
 
  public:
   void add_datum(const int id, const Eigen::VectorXd &datum,
@@ -74,11 +77,13 @@ class BaseHierarchy {
   virtual std::shared_ptr<BaseHierarchy> clone() const = 0;
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
-  double get_like_lpdf(const Eigen::RowVectorXd &datum,
-                       const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const;
-  double get_marg_lpdf(const Eigen::RowVectorXd &datum,
-                       const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0),
-                       const bool posterior) const;
+  double get_like_lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0)) const;
+  double get_marg_lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::MatrixXd(0, 0),
+      const bool posterior) const;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
