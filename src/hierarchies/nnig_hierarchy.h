@@ -62,9 +62,7 @@ class NNIGHierarchy : public BaseHierarchy {
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, false)
   bool is_multivariate() const override { return false; }
-  //! Returns true if the hierarchy has covariates i.e. is a dependent model
-  bool is_dependent() const override { return false; }
-
+  //!
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
 
@@ -104,7 +102,6 @@ class NNIGHierarchy : public BaseHierarchy {
   void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
-
   std::string get_id() const override { return "NNIG"; }
 };
 

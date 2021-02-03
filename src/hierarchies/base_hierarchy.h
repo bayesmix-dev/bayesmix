@@ -57,7 +57,7 @@ class BaseHierarchy {
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
   //! Returns true if the hierarchy has covariates i.e. is a dependent model
-  virtual bool is_dependent() const = 0;
+  virtual bool is_dependent() const { return false; }
   //! Returns true if the hierarchy is conjugate i.e. has a marginal lpdf
   virtual bool is_conjugate() const { return true; }
   //!

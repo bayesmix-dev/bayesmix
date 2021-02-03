@@ -5,7 +5,6 @@
 
 #include <Eigen/Dense>
 #include <memory>
-#include <stan/math/prim/fun.hpp>
 
 #include "base_hierarchy.h"
 #include "hierarchy_prior.pb.h"
@@ -78,9 +77,7 @@ class NNWHierarchy : public BaseHierarchy {
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, true)
   bool is_multivariate() const override { return true; }
-  //! Returns true if the hierarchy has covariates i.e. is a dependent model
-  bool is_dependent() const override { return false; }
-
+  //!
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
 
@@ -119,7 +116,6 @@ class NNWHierarchy : public BaseHierarchy {
   void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
-
   std::string get_id() const override { return "NNW"; }
 };
 

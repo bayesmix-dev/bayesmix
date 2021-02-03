@@ -3,7 +3,7 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
-#include <stan/math/prim/prob.hpp>
+#include <stan/math/prim.hpp>
 
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"

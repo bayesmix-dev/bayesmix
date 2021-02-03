@@ -7,10 +7,11 @@
 #include <memory>
 
 #include "base_hierarchy.h"
+#include "dependent_hierarchy.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
 
-class LinRegUniHierarchy : public BaseHierarchy {
+class LinRegUniHierarchy : public DependentHierarchy {
  public:
   struct State {
     Eigen::VectorXd regression_coeffs;
@@ -25,7 +26,6 @@ class LinRegUniHierarchy : public BaseHierarchy {
   };
 
  protected:
-  unsigned int dim;
   //! Represents pieces of y^t y
   double data_sum_squares;
   //! Represents pieces of X^T X
@@ -49,16 +49,10 @@ class LinRegUniHierarchy : public BaseHierarchy {
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update() const;
 
-  void sample_given_data(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
-
  public:
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data
   bool is_multivariate() const override { return false; }
-  //! Returns true if the hierarchy has covariates i.e. is a dependent model
-  bool is_dependent() const override { return true; }
   //!
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
@@ -88,6 +82,9 @@ class LinRegUniHierarchy : public BaseHierarchy {
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data() override;
+  void sample_given_data(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }
@@ -96,7 +93,6 @@ class LinRegUniHierarchy : public BaseHierarchy {
   void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
-
   std::string get_id() const override { return "LinRegUni"; }
 };
 
