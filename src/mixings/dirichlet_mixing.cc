@@ -18,7 +18,7 @@ void DirichletMixing::initialize() {
 //! \param n    Total number of data points
 //! \return     Probability value
 double DirichletMixing::mass_existing_cluster(
-    std::shared_ptr<BaseHierarchy> hier, const unsigned int n, bool log,
+    std::shared_ptr<AbstractHierarchy> hier, const unsigned int n, bool log,
     bool propto) const {
   double out;
   if (log) {
@@ -49,7 +49,7 @@ double DirichletMixing::mass_new_cluster(const unsigned int n_clust,
 }
 
 void DirichletMixing::update_state(
-    const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+    const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     unsigned int n) {
   auto &rng = bayesmix::Rng::Instance().get();
   if (prior->has_fixed_value()) {

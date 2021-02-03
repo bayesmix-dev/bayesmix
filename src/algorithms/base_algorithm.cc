@@ -6,29 +6,31 @@
 #include "marginal_state.pb.h"
 #include "mixing_state.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
-#include "src/hierarchies/dependent_hierarchy.h"
-#include "src/mixings/dependent_mixing.h"
+// #include "src/hierarchies/dependent_hierarchy.h"
+// #include "src/mixings/dependent_mixing.h"
 
 void BaseAlgorithm::add_datum_to_hierarchy(
-    const unsigned int datum_idx, std::shared_ptr<BaseHierarchy> hier) {
-  if (hier->is_dependent()) {
-    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(hier);
-    hiercast->add_datum(datum_idx, data.row(datum_idx),
-                        hier_covariates.row(datum_idx));
-  } else {
-    hier->add_datum(datum_idx, data.row(datum_idx));
-  }
+    const unsigned int datum_idx, std::shared_ptr<AbstractHierarchy> hier) {
+  // if (hier->is_dependent()) {
+  //   auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(hier);
+  //   hiercast->add_datum(datum_idx, data.row(datum_idx),
+  //                       hier_covariates.row(datum_idx));
+  // } else {
+  //   hier->add_datum(datum_idx, data.row(datum_idx));
+  // }
+  hier->add_datum(datum_idx, data.row(datum_idx));
 }
 
 void BaseAlgorithm::remove_datum_from_hierarchy(
-    const unsigned int datum_idx, std::shared_ptr<BaseHierarchy> hier) {
-  if (hier->is_dependent()) {
-    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(hier);
-    hiercast->remove_datum(datum_idx, data.row(datum_idx),
-                           hier_covariates.row(datum_idx));
-  } else {
+    const unsigned int datum_idx, std::shared_ptr<AbstractHierarchy> hier) {
+  // if (hier->is_dependent()) {
+  //   auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(hier);
+  //   hiercast->remove_datum(datum_idx, data.row(datum_idx),
+  //                          hier_covariates.row(datum_idx));
+  // } else {
+  //   hier->remove_datum(datum_idx, data.row(datum_idx));
+  // }
     hier->remove_datum(datum_idx, data.row(datum_idx));
-  }
 }
 
 void BaseAlgorithm::initialize() {

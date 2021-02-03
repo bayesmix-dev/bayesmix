@@ -27,24 +27,28 @@
 //! thus the marginal and the posterior distribution are available in closed
 //! form and Neal's algorithm 2 may be used with it.
 
-class NNIGHierarchy : public BaseHierarchy {
+namespace NNIG {
+struct State {
+  double mean, var;
+};
+
+struct Hyperparams {
+  double mean, var_scaling, shape, scale;
+};
+
+};  // namespace NNIG
+
+class NNIGHierarchy
+    : public BaseHierarchy<NNIGHierarchy, NNIG::State, NNIG::Hyperparams,
+                           bayesmix::NNIGPrior> {
  public:
-  struct State {
-    double mean, var;
-  };
-  struct Hyperparams {
-    double mean, var_scaling, shape, scale;
-  };
+  void clear_data() override;
 
  protected:
   double data_sum = 0;
   double data_sum_squares = 0;
   // STATE
-  State state;
-  // HYPERPARAMETERS
-  std::shared_ptr<Hyperparams> hypers;
 
-  void clear_data() override;
 
   void update_summary_statistics(const Eigen::VectorXd &datum,
                                  bool add) override;
@@ -53,7 +57,7 @@ class NNIGHierarchy : public BaseHierarchy {
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams normal_invgamma_update();
+  NNIG::Hyperparams get_posterior_parameters() override;
 
   std::shared_ptr<bayesmix::NNIGPrior> cast_prior_proto() {
     return std::dynamic_pointer_cast<bayesmix::NNIGPrior>(prior);
@@ -72,12 +76,6 @@ class NNIGHierarchy : public BaseHierarchy {
   ~NNIGHierarchy() = default;
   NNIGHierarchy() = default;
 
-  std::shared_ptr<BaseHierarchy> clone() const override {
-    auto out = std::make_shared<NNIGHierarchy>(*this);
-    out->clear_data();
-    return out;
-  }
-
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
   double like_lpdf(const Eigen::RowVectorXd &datum) const override;
@@ -92,11 +90,7 @@ class NNIGHierarchy : public BaseHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
-  State get_state() const { return state; }
-  Hyperparams get_hypers() const { return *hypers; }
-  void create_empty_prior() override { prior.reset(new bayesmix::NNIGPrior); }
 
-  
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;

@@ -33,7 +33,7 @@ class BaseMixing {
   //! \param card Cardinality of the cluster
   //! \param n    Total number of data points
   //! \return     Probability value
-  virtual double mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
+  virtual double mass_existing_cluster(std::shared_ptr<AbstractHierarchy> hier,
                                        const unsigned int n, bool log,
                                        bool propto) const = 0;
 
@@ -51,7 +51,7 @@ class BaseMixing {
   virtual bool is_dependent() const { return false; }
 
   virtual void update_state(
-      const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+      const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       unsigned int n) = 0;
 
   // GETTERS AND SETTERS

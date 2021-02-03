@@ -36,7 +36,7 @@ class DirichletMixing : public BaseMixing {
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
-  double mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
+  double mass_existing_cluster(std::shared_ptr<AbstractHierarchy> hier,
                                const unsigned int n, bool log,
                                bool propto) const override;
 
@@ -47,7 +47,7 @@ class DirichletMixing : public BaseMixing {
   void initialize() override;
 
   void update_state(
-      const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+      const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       unsigned int n) override;
 
   // GETTERS AND SETTERS

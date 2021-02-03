@@ -62,7 +62,7 @@ class BaseAlgorithm {
   //! Allocation for each datum, i.e. label of the cluster it belongs to
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
-  std::vector<std::shared_ptr<BaseHierarchy>> unique_values;
+  std::vector<std::shared_ptr<AbstractHierarchy>> unique_values;
   //!
   Eigen::MatrixXd hier_covariates;
   //! Mixing object
@@ -137,9 +137,9 @@ class BaseAlgorithm {
   BaseAlgorithm() = default;
 
   void add_datum_to_hierarchy(const unsigned int datum_idx,
-                              std::shared_ptr<BaseHierarchy> hier);
+                              std::shared_ptr<AbstractHierarchy> hier);
   void remove_datum_from_hierarchy(const unsigned int datum_idx,
-                                   std::shared_ptr<BaseHierarchy> hier);
+                                   std::shared_ptr<AbstractHierarchy> hier);
 
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }
@@ -156,7 +156,7 @@ class BaseAlgorithm {
     hier_covariates = cov;
   }
   void set_mix_covariates(const Eigen::MatrixXd &cov) { mix_covariates = cov; }
-  void set_initial_clusters(const std::shared_ptr<BaseHierarchy> hier_,
+  void set_initial_clusters(const std::shared_ptr<AbstractHierarchy> hier_,
                             const unsigned int init = 0) {
     unique_values.clear();
     unique_values.push_back(hier_);

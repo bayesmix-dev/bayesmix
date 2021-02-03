@@ -5,7 +5,7 @@
 #include <set>
 #include <stan/math/prim.hpp>
 
-void BaseHierarchy::add_datum(const int id, const Eigen::VectorXd &datum) {
+void AbstractHierarchy::add_datum(const int id, const Eigen::VectorXd &datum) {
   auto it = cluster_data_idx.find(id);
   assert(it == cluster_data_idx.end());
   card += 1;
@@ -14,7 +14,7 @@ void BaseHierarchy::add_datum(const int id, const Eigen::VectorXd &datum) {
   cluster_data_idx.insert(id);
 }
 
-void BaseHierarchy::remove_datum(const int id, const Eigen::VectorXd &datum) {
+void AbstractHierarchy::remove_datum(const int id, const Eigen::VectorXd &datum) {
   update_summary_statistics(datum, false);
   card -= 1;
   log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
@@ -23,13 +23,13 @@ void BaseHierarchy::remove_datum(const int id, const Eigen::VectorXd &datum) {
   cluster_data_idx.erase(it);
 }
 
-void BaseHierarchy::check_prior_is_set() {
+void AbstractHierarchy::check_prior_is_set() {
   if (prior == nullptr) {
     throw std::invalid_argument("Hierarchy prior was not provided");
   }
 }
 
-Eigen::VectorXd BaseHierarchy::like_lpdf_grid(
+Eigen::VectorXd AbstractHierarchy::like_lpdf_grid(
     const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {
@@ -38,7 +38,7 @@ Eigen::VectorXd BaseHierarchy::like_lpdf_grid(
   return result;
 }
 
-Eigen::VectorXd BaseHierarchy::marg_lpdf_grid(
+Eigen::VectorXd AbstractHierarchy::marg_lpdf_grid(
     const Eigen::MatrixXd &data) const {
   Eigen::VectorXd result(data.rows());
   for (size_t i = 0; i < data.rows(); i++) {

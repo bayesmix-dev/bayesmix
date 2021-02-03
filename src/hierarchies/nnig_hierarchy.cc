@@ -11,7 +11,7 @@
 #include "src/utils/rng.h"
 
 void NNIGHierarchy::initialize() {
-  hypers = std::make_shared<Hyperparams>();
+  hypers = std::make_shared<NNIG::Hyperparams>();
   check_prior_is_set();
   initialize_hypers();
   state.mean = hypers->mean;
@@ -21,9 +21,9 @@ void NNIGHierarchy::initialize() {
 //! \param data                        Column vector of data points
 //! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
 //! \return                            Vector of updated values for hyperpar.s
-NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() {
+NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
   // Initialize relevant variables
-  Hyperparams post_params;
+  NNIG::Hyperparams post_params;
 
   if (card == 0) {  // no update possible
     post_params = *hypers;
@@ -160,7 +160,7 @@ void NNIGHierarchy::draw() {
 
 //! \param data Column vector of data points
 void NNIGHierarchy::sample_given_data() {
-  Hyperparams params = normal_invgamma_update();
+  NNIG::Hyperparams params = get_posterior_parameters();
 
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
@@ -183,7 +183,8 @@ void NNIGHierarchy::set_state_from_proto(
       const bayesmix::MarginalState::ClusterState &>(state_);
   state.mean = statecast.uni_ls_state().mean();
   state.var = statecast.uni_ls_state().var();
-  set_card(statecast.cardinality());
+  // set_card(statecast.cardinality());
+  card = statecast.cardinality();
 }
 
 void NNIGHierarchy::initialize_hypers() {

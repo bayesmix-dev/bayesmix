@@ -9,7 +9,7 @@
 #include "marginal_state.pb.h"
 #include "src/collectors/base_collector.h"
 #include "src/hierarchies/base_hierarchy.h"
-#include "src/hierarchies/dependent_hierarchy.h"
+// #include "src/hierarchies/dependent_hierarchy.h"
 
 class MarginalAlgorithm : public BaseAlgorithm {
  protected:
@@ -17,12 +17,12 @@ class MarginalAlgorithm : public BaseAlgorithm {
 
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<BaseHierarchy> temp_hier,
+      std::shared_ptr<AbstractHierarchy> temp_hier,
       const Eigen::MatrixXd &grid) = 0;
 
-  virtual Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<DependentHierarchy> temp_hier,
-      const Eigen::MatrixXd &grid, const Eigen::MatrixXd &covariates) = 0;
+//   virtual Eigen::VectorXd lpdf_marginal_component(
+//       std::shared_ptr<DependentHierarchy> temp_hier,
+//       const Eigen::MatrixXd &grid, const Eigen::MatrixXd &covariates) = 0;
 
  public:
   ~MarginalAlgorithm() = default;
