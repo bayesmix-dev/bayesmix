@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Running run_pe.cpp" << std::endl;
 
   if (argc != 5) {
-    throw domain_error("Syntax : ./run_ce filename_in filename_out loss Kup");
+    throw domain_error("Syntax : ./run_pe filename_in filename_out loss Kup");
   }
 
   std::string filename_in = argv[1];
@@ -37,15 +37,18 @@ int main(int argc, char *argv[]) {
   if (Kup == -1) {
     cout << "Computation of epl for each K" << endl;
     bayesmix::write_matrix_to_file(epl_for_each_Kup(mcmc, loss_type).transpose(),
-                                   filename_out);
+                                      filename_out);
   }
 
   else if (Kup > 0) {
     Eigen::VectorXi initial_partition =  Eigen::VectorXi::LinSpaced(mcmc.cols(), 1 ,mcmc.cols());
-    ClusteringProcess cp(mcmc, static_cast<LOSS_FUNCTION>(loss_type),
-                         Kup,initial_partition);
-    Eigen::VectorXi result = cp.cluster_estimate(GREEDY);
-    bayesmix::write_matrix_to_file(result.transpose(),  filename_out);
+    //ClusteringProcess cp(mcmc, static_cast<LOSS_FUNCTION>(loss_type),
+//                         Kup,initial_partition);
+    //Eigen::VectorXi result = cp.cluster_estimate(GREEDY);
+    //bayesmix::write_matrix_to_file(result.transpose(),  filename_out);
+
+    Eigen::VectorXd true_result = bayesmix::cluster_estimate(mcmc);
+    cout << "True result : " << true_result.transpose() << endl;
   }
 
 }

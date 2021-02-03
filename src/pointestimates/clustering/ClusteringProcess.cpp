@@ -1,6 +1,7 @@
 #include "ClusteringProcess.hpp"
 #include <iostream>
 #include <cstdlib>
+#include <map>
 
 using namespace std;
 
@@ -8,9 +9,6 @@ ClusteringProcess::ClusteringProcess(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTIO
                   int Kup, Eigen::VectorXi &initial_partition_)
     : loss_function(0)
 {
-  std::cout << "[CONSTRUCTORS]" << std::endl;
-  std::cout << "ClusteringProcess Constructor" << std::endl;
-
   mcmc_sample = mcmc_sample_;
   T = mcmc_sample.rows();
   N = mcmc_sample.cols();
@@ -32,8 +30,6 @@ ClusteringProcess::ClusteringProcess(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTIO
 }
 
 ClusteringProcess::~ClusteringProcess() {
-  std::cout << std::endl << "[DESTRUCTORS]" << std::endl;
-  std::cout << "Clustering Process destructor" << std::endl;
   delete loss_function;
 }
 
@@ -106,36 +102,74 @@ int argmin(Eigen::VectorXd &vec) {
 }
 
 /**
+ * The output of the greedy algorithm is an estimate with random cluster labels
+ * This function aims to reordonning and renaming these labels to have a
+ * more readable result.
+ *
+ * @param cluster
+ *
+ * Example : cluster = [5, 5, 5, 17, 23, 5, 17]
+ * should be modified to give : cluster = [1, 1, 1, 2, 3, 1, 2]
+ */
+void rename_labels(Eigen::VectorXi &cluster) {
+  map<int, int> m;
+  int current_index(1);
+  for (int i = 0; i < cluster.size(); i ++) {
+    if (m[cluster(i)] == 0) {
+      m[cluster(i)] = current_index;
+      cluster(i) = current_index;
+      current_index++;
+    } else {
+      cluster(i) = m[cluster(i)];
+    }
+  }
+}
+
+
+/**
  * a starting partition
  */
 Eigen::VectorXi ClusteringProcess::greedy_algorithm(Eigen::VectorXi &a) {
+//  cout << "Initial partition a="  << a.transpose() << endl;
   double phi_a(expected_posterior_loss(a)), phi_stop;
   Eigen::VectorXi nu, a_modified;
-  Eigen::VectorXd epl_vec(N);
+  Eigen::VectorXd epl_vec(K_up  );
   bool stop = false;
   while(!stop) {
     phi_stop = phi_a;
     nu = Eigen::VectorXi::LinSpaced(N, 1 ,N);
     while(nu.size() != 0) {
-      int i = rand() % nu.size(); // random int between 0 and size-1
+      int i = rand() % nu.size();  // random int between 0 and size-1
+      int nu_i = nu(i);
       delete_ith_element(nu, i);
-      for (int s = 1; s < K_up; s++) {
+//      cout << "  i=" << i << endl;
+//      cout << "  nu=" << nu.transpose() << endl;
+//      cout << "  element supprimé=" << nu_i << endl;
+      for (int s = 1; s <= K_up; s++) {
         // ai_r->s means a[i] is now equal to s
         a_modified = a;
-        a_modified(i) = s;
-        epl_vec(s-1) = expected_posterior_loss(a_modified);
-      }
-      // todo : determine if it is argmin or argmax
-      a(i) = argmax(epl_vec) + 1;
-      phi_a = expected_posterior_loss(a);
+        a_modified(nu_i - 1) = s;
 
-      if (phi_stop == phi_a) {
-        stop = true;
+//        cout << "      s=" << s << endl;
+//        cout << "      a modified=" << a_modified.transpose() << endl << endl;
+
+        epl_vec(s - 1) = expected_posterior_loss(a_modified);
       }
+//      cout << "   epl_vec=" << epl_vec.transpose() << endl << endl;
+//      cout << "   " << nu_i << " replace with s=" <<  argmax(epl_vec) + 1 << endl;
+      a(nu_i - 1) = argmin(epl_vec) + 1;
+      phi_a = expected_posterior_loss(a);
+    }
+//    cout << endl << endl << "NEW LOOP a=" << a << endl << endl;
+    if (phi_stop == phi_a) {
+      stop = true;
     }
   }
 
   cout << endl << "FINAL CLUSTER : " << a.transpose() << endl;
+  rename_labels(a);
+  cout << endl << "FINAL CLUSTER with relabelling : " << a.transpose() << endl;
+
   return a;
 }
 
