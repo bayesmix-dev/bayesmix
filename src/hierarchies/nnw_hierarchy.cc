@@ -27,6 +27,7 @@ void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_) {
 void NNWHierarchy::initialize() {
   hypers = std::make_shared<Hyperparams>();
   check_prior_is_set();
+  initialize_hypers();
   state.mean = hypers->mean;
   set_prec_and_utilities(hypers->var_scaling *
                          Eigen::MatrixXd::Identity(dim, dim));

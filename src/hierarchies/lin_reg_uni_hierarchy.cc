@@ -10,6 +10,7 @@
 void LinRegUniHierarchy::initialize() {
   hypers = std::make_shared<Hyperparams>();
   check_prior_is_set();
+  initialize_hypers();
   state.regression_coeffs = hypers->mean;
   state.var = hypers->scale / (hypers->shape + 1);
   clear_data();
