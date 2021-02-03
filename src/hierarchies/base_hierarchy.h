@@ -81,11 +81,12 @@ class BaseHierarchy {
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
   //! Evaluates the log-likelihood of data in a grid of points
   virtual Eigen::VectorXd like_lpdf_grid(
-      const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const;
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const;
   //! Evaluates the log-marginal of data in a grid of points
   virtual Eigen::VectorXd marg_lpdf_grid(
       const bool posterior, const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates) const;
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
