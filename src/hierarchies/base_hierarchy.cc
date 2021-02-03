@@ -38,10 +38,9 @@ Eigen::VectorXd BaseHierarchy::like_lpdf_grid(
     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
   Eigen::VectorXd lpdf(data.rows());
   if (covariates.cols() == 0) {
-    // Pass null value as covariate
-    Eigen::RowVectorXd nullcov(data.cols());
     for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = like_lpdf(data.row(i), nullcov);
+      // Pass null value as covariate
+      lpdf(i) = like_lpdf(data.row(i), Eigen::RowVectorXd(0));
     }
   } else {
     for (int i = 0; i < data.rows(); i++) {
@@ -56,10 +55,9 @@ Eigen::VectorXd BaseHierarchy::marg_lpdf_grid(
     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
   Eigen::VectorXd lpdf(data.rows());
   if (covariates.cols() == 0) {
-    // Pass null value as covariate
-    Eigen::RowVectorXd nullcov(data.cols());
     for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = marg_lpdf(posterior, data.row(i), nullcov);
+      // Pass null value as covariate
+      lpdf(i) = marg_lpdf(posterior, data.row(i), Eigen::RowVectorXd(0));
     }
   } else {
     for (int i = 0; i < data.rows(); i++) {
