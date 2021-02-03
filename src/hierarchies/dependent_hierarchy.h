@@ -9,10 +9,10 @@ class DependentHierarchy {
 
  public:
   //! Returns true if the hierarchy has covariates i.e. is a dependent model
-  virtual bool is_dependent() const { return true; }
+  bool is_dependent() const override { return true; }
 
   // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~DependentHierarchy() = default;
+  ~DependentHierarchy() = default;
   DependentHierarchy() = default;
 
   // GETTERS AND SETTERS
