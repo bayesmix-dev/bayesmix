@@ -8,4 +8,4 @@ target_sources(bayesmix
         VariationInformation.hpp
 )
 
-add_executable(loss $<TARGET_OBJECTS:bayesmix> loss.cpp)
+add_executable(loss $<TARGET_OBJECTS:bayesmix> test_loss.cpp)

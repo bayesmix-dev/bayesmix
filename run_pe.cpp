@@ -8,7 +8,7 @@ Eigen::VectorXd epl_for_each_Kup(Eigen::MatrixXi &mcmc, int loss_type) {
   Eigen::VectorXi initial_partition =  Eigen::VectorXi::LinSpaced(N, 1 ,N);
 
   for (int K = 1; K < N; K++) {
-    ClusteringProcess cp(mcmc,  static_cast<LOSS_FUNCTION>(loss_type),
+    ClusterEstimator cp(mcmc,  static_cast<LOSS_FUNCTION>(loss_type),
                          K, initial_partition);
     epl_vec(K) = cp.expected_posterior_loss(
         cp.cluster_estimate(GREEDY));
@@ -42,10 +42,10 @@ int main(int argc, char *argv[]) {
 
   else if (Kup > 0) {
     Eigen::VectorXi initial_partition =  Eigen::VectorXi::LinSpaced(mcmc.cols(), 1 ,mcmc.cols());
-    //ClusteringProcess cp(mcmc, static_cast<LOSS_FUNCTION>(loss_type),
-//                         Kup,initial_partition);
-    //Eigen::VectorXi result = cp.cluster_estimate(GREEDY);
-    //bayesmix::write_matrix_to_file(result.transpose(),  filename_out);
+    ClusterEstimator cp(mcmc, static_cast<LOSS_FUNCTION>(loss_type),
+                         Kup,initial_partition);
+    Eigen::VectorXi result = cp.cluster_estimate(GREEDY);
+    bayesmix::write_matrix_to_file(result.transpose(),  filename_out);
 
     Eigen::VectorXd true_result = bayesmix::cluster_estimate(mcmc);
     cout << "True result : " << true_result.transpose() << endl;

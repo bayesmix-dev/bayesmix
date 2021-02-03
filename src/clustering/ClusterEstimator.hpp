@@ -1,10 +1,14 @@
-#ifndef BAYESMIX_CLUSTERINGPROCESS_HPP
-#define BAYESMIX_CLUSTERINGPROCESS_HPP
+#ifndef BAYESMIX_CLUSTERESTIMATOR_HPP
+#define BAYESMIX_CLUSTERESTIMATOR_HPP
 
-#include "../lossfunction/LossFunction.hpp"
-#include "../lossfunction/BinderLoss.hpp"
-#include "../lossfunction/VariationInformation.hpp"
-#include "../../../lib/math/lib/eigen_3.3.9/Eigen/Dense"
+#include "lossfunction/LossFunction.hpp"
+#include "lossfunction/BinderLoss.hpp"
+#include "lossfunction/VariationInformation.hpp"
+#include <Eigen/Dense>
+#include <iostream>
+#include <cstdlib>
+#include <map>
+
 
 // in case we want to add other minimization methods in the future.
 enum MINIMIZATION_METHOD {
@@ -24,8 +28,7 @@ enum LOSS_FUNCTION {
  *      - computation of cluster estimate through cluster_estimate method.
  */
 
-class ClusteringProcess
-{
+class ClusterEstimator {
  private:
   LossFunction* loss_function;
   Eigen::MatrixXi mcmc_sample; // T*N matrix
@@ -34,13 +37,13 @@ class ClusteringProcess
   int K_up;
   Eigen::VectorXi initial_partition;
  public:
-  ClusteringProcess(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTION loss_type_,
+  ClusterEstimator(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTION loss_type_,
                     int K_up, Eigen::VectorXi &initial_partition_);
-  ~ClusteringProcess();
+  ~ClusterEstimator();
   double expected_posterior_loss(Eigen::VectorXi a);
 //  Eigen::VectorXd expected_posterior_loss_for_each_Kup(Eigen::VectorXi a);
   Eigen::VectorXi cluster_estimate(MINIMIZATION_METHOD method);
   Eigen::VectorXi greedy_algorithm(Eigen::VectorXi &a);
 };
 
-#endif  // BAYESMIX_CLUSTERINGPROCESS_HPP
+#endif  // BAYESMIX_CLUSTERESTIMATOR_HPP

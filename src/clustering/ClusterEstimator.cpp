@@ -1,11 +1,7 @@
-#include "ClusteringProcess.hpp"
-#include <iostream>
-#include <cstdlib>
-#include <map>
-
+#include "ClusterEstimator.hpp"
 using namespace std;
 
-ClusteringProcess::ClusteringProcess(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTION loss_type,
+ClusterEstimator::ClusterEstimator(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTION loss_type,
                   int Kup, Eigen::VectorXi &initial_partition_)
     : loss_function(0)
 {
@@ -29,11 +25,11 @@ ClusteringProcess::ClusteringProcess(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTIO
   }
 }
 
-ClusteringProcess::~ClusteringProcess() {
+ClusterEstimator::~ClusterEstimator() {
   delete loss_function;
 }
 
-double ClusteringProcess::expected_posterior_loss(Eigen::VectorXi a)
+double ClusterEstimator::expected_posterior_loss(Eigen::VectorXi a)
 {
   double epl = 0;
   loss_function->SetFirstCluster(a);
@@ -46,7 +42,7 @@ double ClusteringProcess::expected_posterior_loss(Eigen::VectorXi a)
   return epl / T;
 }
 
-Eigen::VectorXi ClusteringProcess::cluster_estimate(MINIMIZATION_METHOD method) {
+Eigen::VectorXi ClusterEstimator::cluster_estimate(MINIMIZATION_METHOD method) {
   switch (method) {
     case GREEDY:
       return greedy_algorithm(initial_partition);
@@ -129,7 +125,7 @@ void rename_labels(Eigen::VectorXi &cluster) {
 /**
  * a starting partition
  */
-Eigen::VectorXi ClusteringProcess::greedy_algorithm(Eigen::VectorXi &a) {
+Eigen::VectorXi ClusterEstimator::greedy_algorithm(Eigen::VectorXi &a) {
 //  cout << "Initial partition a="  << a.transpose() << endl;
   double phi_a(expected_posterior_loss(a)), phi_stop;
   Eigen::VectorXi nu, a_modified;
