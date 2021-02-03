@@ -7,9 +7,9 @@
 #include <memory>
 
 #include "base_hierarchy.h"
+#include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
-#include "hierarchy_id.pb.h"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.
 
@@ -43,13 +43,13 @@ class NNIGHierarchy : public BaseHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-  // HYPERPRIOR
-  std::shared_ptr<bayesmix::NNIGPrior> prior;
 
   void clear_data() override;
 
   void update_summary_statistics(const Eigen::VectorXd &datum,
                                  bool add) override;
+
+  void initialize_hypers() override;
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
@@ -57,6 +57,7 @@ class NNIGHierarchy : public BaseHierarchy {
 
  public:
   void initialize() override;
+
   //! Returns true if the hierarchy models multivariate data (here, false)
   bool is_multivariate() const override { return false; }
 
@@ -89,13 +90,22 @@ class NNIGHierarchy : public BaseHierarchy {
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
+  google::protobuf::Message *prior_proto() override {
+    if (prior == nullptr) {
+      prior.reset(new bayesmix::NNIGPrior);
+    }
+
+    return prior.get();
+  }
+  std::shared_ptr<bayesmix::NNIGPrior> cast_prior_proto() {
+    return std::dynamic_pointer_cast<bayesmix::NNIGPrior>(prior);
+  }
   void set_state_from_proto(const google::protobuf::Message &state_) override;
-  void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
   bayesmix::HierarchyId get_id() const override {
-      return bayesmix::HierarchyId::NNIG; 
+    return bayesmix::HierarchyId::NNIG;
   }
 };
 

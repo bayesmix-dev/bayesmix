@@ -35,9 +35,12 @@ class BaseHierarchy {
   std::set<int> cluster_data_idx;
   int card = 0;
   double log_card = stan::math::NEGATIVE_INFTY;
+  // HYPERPRIOR
+  std::shared_ptr<google::protobuf::Message> prior;
 
   virtual void update_summary_statistics(const Eigen::VectorXd &datum,
                                          bool add) = 0;
+  virtual void initialize_hypers() = 0;
 
  public:
   virtual void add_datum(const int id, const Eigen::VectorXd &datum);
@@ -52,6 +55,7 @@ class BaseHierarchy {
   std::set<int> get_data_idx() { return cluster_data_idx; }
 
   virtual void initialize() = 0;
+  void check_prior_is_set();
   //! Returns true if the hierarchy models multivariate data
   virtual bool is_multivariate() const = 0;
   //! Returns true if the hierarchy has covariates i.e. is a dependent model
@@ -86,11 +90,11 @@ class BaseHierarchy {
                                                                     // needed?
 
   // GETTERS AND SETTERS
+  virtual google::protobuf::Message* prior_proto() = 0;
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
-  virtual void set_prior(const google::protobuf::Message &prior_) = 0;
   void set_card(const int card_) {
     card = card_;
     log_card = std::log(card_);

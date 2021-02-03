@@ -11,9 +11,9 @@
 #include "src/utils/rng.h"
 
 void NNIGHierarchy::initialize() {
-  if (prior == nullptr) {
-    throw std::invalid_argument("Hierarchy prior was not provided");
-  }
+  hypers = std::make_shared<Hyperparams>();
+  check_prior_is_set();
+  initialize_hypers();
   state.mean = hypers->mean;
   state.var = hypers->scale / (hypers->shape + 1);
 }
@@ -65,15 +65,18 @@ void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
 void NNIGHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();
-  if (prior->has_fixed_values()) {
+
+  auto priorcast = cast_prior_proto();
+
+  if (priorcast->has_fixed_values()) {
     return;
   }
 
-  else if (prior->has_normal_mean_prior()) {
+  else if (priorcast->has_normal_mean_prior()) {
     // Get hyperparameters
-    double mu00 = prior->normal_mean_prior().mean_prior().mean();
-    double sig200 = prior->normal_mean_prior().mean_prior().var();
-    double lambda0 = prior->normal_mean_prior().var_scaling();
+    double mu00 = priorcast->normal_mean_prior().mean_prior().mean();
+    double sig200 = priorcast->normal_mean_prior().mean_prior().var();
+    double lambda0 = priorcast->normal_mean_prior().var_scaling();
     // Compute posterior hyperparameters
     double prec = 0.0;
     double num = 0.0;
@@ -91,17 +94,17 @@ void NNIGHierarchy::update_hypers(
     hypers->mean = stan::math::normal_rng(mu_n, sqrt(sig2_n), rng);
   }
 
-  else if (prior->has_ngg_prior()) {
+  else if (priorcast->has_ngg_prior()) {
     // Get hyperparameters:
     // for mu0
-    double mu00 = prior->ngg_prior().mean_prior().mean();
-    double sig200 = prior->ngg_prior().mean_prior().var();
+    double mu00 = priorcast->ngg_prior().mean_prior().mean();
+    double sig200 = priorcast->ngg_prior().mean_prior().var();
     // for lambda0
-    double alpha00 = prior->ngg_prior().var_scaling_prior().shape();
-    double beta00 = prior->ngg_prior().var_scaling_prior().rate();
+    double alpha00 = priorcast->ngg_prior().var_scaling_prior().shape();
+    double beta00 = priorcast->ngg_prior().var_scaling_prior().rate();
     // for tau0
-    double a00 = prior->ngg_prior().scale_prior().shape();
-    double b00 = prior->ngg_prior().scale_prior().rate();
+    double a00 = priorcast->ngg_prior().scale_prior().shape();
+    double b00 = priorcast->ngg_prior().scale_prior().rate();
     // Compute posterior hyperparameters
     double b_n = 0.0;
     double num = 0.0;
@@ -183,18 +186,16 @@ void NNIGHierarchy::set_state_from_proto(
   set_card(statecast.cardinality());
 }
 
-void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
-  auto &priorcast =
-      google::protobuf::internal::down_cast<const bayesmix::NNIGPrior &>(
-          prior_);
-  prior = std::make_shared<bayesmix::NNIGPrior>(priorcast);
-  hypers = std::make_shared<Hyperparams>();
-  if (prior->has_fixed_values()) {
+void NNIGHierarchy::initialize_hypers() {
+
+  auto priorcast = cast_prior_proto();
+
+  if (priorcast->has_fixed_values()) {
     // Set values
-    hypers->mean = prior->fixed_values().mean();
-    hypers->var_scaling = prior->fixed_values().var_scaling();
-    hypers->shape = prior->fixed_values().shape();
-    hypers->scale = prior->fixed_values().scale();
+    hypers->mean = priorcast->fixed_values().mean();
+    hypers->var_scaling = priorcast->fixed_values().var_scaling();
+    hypers->shape = priorcast->fixed_values().shape();
+    hypers->scale = priorcast->fixed_values().scale();
     // Check validity
     if (hypers->var_scaling <= 0) {
       throw std::invalid_argument("Variance-scaling parameter must be > 0");
@@ -205,14 +206,15 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
     if (hypers->scale <= 0) {
       throw std::invalid_argument("Scale parameter must be > 0");
     }
+    std::cout << "done" << std::endl;
   }
 
-  else if (prior->has_normal_mean_prior()) {
+  else if (priorcast->has_normal_mean_prior()) {
     // Set initial values
-    hypers->mean = prior->normal_mean_prior().mean_prior().mean();
-    hypers->var_scaling = prior->normal_mean_prior().var_scaling();
-    hypers->shape = prior->normal_mean_prior().shape();
-    hypers->scale = prior->normal_mean_prior().scale();
+    hypers->mean = priorcast->normal_mean_prior().mean_prior().mean();
+    hypers->var_scaling = priorcast->normal_mean_prior().var_scaling();
+    hypers->shape = priorcast->normal_mean_prior().shape();
+    hypers->scale = priorcast->normal_mean_prior().scale();
     // Check validity
     if (hypers->var_scaling <= 0) {
       throw std::invalid_argument("Variance-scaling parameter must be > 0");
@@ -225,19 +227,19 @@ void NNIGHierarchy::set_prior(const google::protobuf::Message &prior_) {
     }
   }
 
-  else if (prior->has_ngg_prior()) {
+  else if (priorcast->has_ngg_prior()) {
     // Get hyperparameters:
     // for mu0
-    double mu00 = prior->ngg_prior().mean_prior().mean();
-    double sigma00 = prior->ngg_prior().mean_prior().var();
+    double mu00 = priorcast->ngg_prior().mean_prior().mean();
+    double sigma00 = priorcast->ngg_prior().mean_prior().var();
     // for lambda0
-    double alpha00 = prior->ngg_prior().var_scaling_prior().shape();
-    double beta00 = prior->ngg_prior().var_scaling_prior().rate();
+    double alpha00 = priorcast->ngg_prior().var_scaling_prior().shape();
+    double beta00 = priorcast->ngg_prior().var_scaling_prior().rate();
     // for beta0
-    double a00 = prior->ngg_prior().scale_prior().shape();
-    double b00 = prior->ngg_prior().scale_prior().rate();
+    double a00 = priorcast->ngg_prior().scale_prior().shape();
+    double b00 = priorcast->ngg_prior().scale_prior().rate();
     // for alpha0
-    double alpha0 = prior->ngg_prior().shape();
+    double alpha0 = priorcast->ngg_prior().shape();
     // Check validity
     if (sigma00 <= 0) {
       throw std::invalid_argument("Variance parameter must be > 0");

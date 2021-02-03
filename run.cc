@@ -61,19 +61,7 @@ int main(int argc, char *argv[]) {
   bayesmix::read_proto_from_file(mix_args, mix_prior);
   mixing->set_prior(*mix_prior);
 
-  // Set hierarchies hyperprior
-  std::string hier_prior_str = "bayesmix." + hier_type + "Prior";
-  auto hier_prior_desc = google::protobuf::DescriptorPool::generated_pool()
-                             ->FindMessageTypeByName(hier_prior_str);
-  if (hier_prior_desc == NULL) {
-    throw std::invalid_argument("Unrecognized hierarchy prior");
-  }
-  auto *hier_prior = google::protobuf::MessageFactory::generated_factory()
-                         ->GetPrototype(hier_prior_desc)
-                         ->New();
-  bayesmix::read_proto_from_file(hier_args, hier_prior);
-  hier->set_prior(*hier_prior);
-  hier->initialize();
+  bayesmix::read_proto_from_file(hier_args, hier->prior_proto());
 
   // Initialize RNG object
   auto &rng = bayesmix::Rng::Instance().get();
@@ -94,6 +82,7 @@ int main(int argc, char *argv[]) {
   // Allocate objects in algorithm
   algo->set_mixing(mixing);
   algo->set_data(data);
+
   algo->set_initial_clusters(hier, init_num_cl);
   if (algo_type == "Neal8") {
     auto algocast = std::dynamic_pointer_cast<Neal8Algorithm>(algo);
