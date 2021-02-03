@@ -55,6 +55,10 @@ class NNIGHierarchy : public BaseHierarchy {
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update();
 
+  std::shared_ptr<bayesmix::NNIGPrior> cast_prior_proto() {
+    return std::dynamic_pointer_cast<bayesmix::NNIGPrior>(prior);
+  }
+
  public:
   void initialize() override;
 
@@ -90,16 +94,9 @@ class NNIGHierarchy : public BaseHierarchy {
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
-  google::protobuf::Message *prior_proto() override {
-    if (prior == nullptr) {
-      prior.reset(new bayesmix::NNIGPrior);
-    }
+  void create_empty_prior() override { prior.reset(new bayesmix::NNIGPrior); }
 
-    return prior.get();
-  }
-  std::shared_ptr<bayesmix::NNIGPrior> cast_prior_proto() {
-    return std::dynamic_pointer_cast<bayesmix::NNIGPrior>(prior);
-  }
+  
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;

@@ -51,8 +51,6 @@ class NNWHierarchy : public BaseHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-  // HYPERPRIOR
-  std::shared_ptr<bayesmix::NNWPrior> prior;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
   //! Lower factor of the Cholesky decomposition of prec
@@ -69,8 +67,14 @@ class NNWHierarchy : public BaseHierarchy {
   void update_summary_statistics(const Eigen::VectorXd &datum,
                                  bool add) override;
 
+  void initialize_hypers() override;
+
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_wishart_update();
+
+  std::shared_ptr<bayesmix::NNWPrior> cast_prior_proto() {
+    return std::dynamic_pointer_cast<bayesmix::NNWPrior>(prior);
+  }
 
  public:
   void initialize() override;
@@ -105,8 +109,10 @@ class NNWHierarchy : public BaseHierarchy {
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
+
+  void create_empty_prior() override { prior.reset(new bayesmix::NNWPrior); }
+
   void set_state_from_proto(const google::protobuf::Message &state_) override;
-  void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 

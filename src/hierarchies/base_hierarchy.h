@@ -89,8 +89,13 @@ class BaseHierarchy {
   virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;  // TODO
                                                                     // needed?
 
+  virtual void create_empty_prior() = 0;
   // GETTERS AND SETTERS
-  virtual google::protobuf::Message* prior_proto() = 0;
+  google::protobuf::Message *prior_proto() {
+    if (prior == nullptr) create_empty_prior();
+    
+    return prior.get();
+  }
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
   virtual void set_state_from_proto(
