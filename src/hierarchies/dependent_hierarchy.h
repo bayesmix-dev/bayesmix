@@ -3,7 +3,7 @@
 
 #include "base_hierarchy.h"
 
-class DependentHierarchy {
+class DependentHierarchy : public BaseHierarchy {
  protected:
   unsigned int dim;
 

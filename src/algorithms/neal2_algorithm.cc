@@ -25,27 +25,15 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
   unsigned int n_data = data.rows();
   unsigned int n_clust = unique_values.size();
   Eigen::VectorXd logprior(n_clust + 1);
-  if (mixing->is_dependent()) {
-    auto mixcast = std::dynamic_pointer_cast<DependentMixing>(mixing);
-    for (size_t j = 0; j < n_clust; j++) {
-      // Probability of being assigned to an already existing cluster
-      logprior(j) = mixcast->mass_existing_cluster(
-          unique_values[j], mix_covariates.row(data_idx), n_data - 1, true,
-          true);
-    }
-    // Further update with marginal component
-    logprior(n_clust) = mixcast->mass_new_cluster(
-        mix_covariates.row(data_idx), n_clust, n_data - 1, true, true);
-  } else {
-    for (size_t j = 0; j < n_clust; j++) {
-      // Probability of being assigned to an already existing cluster
-      logprior(j) = mixing->mass_existing_cluster(unique_values[j], n_data - 1,
-                                                  true, true);
-    }
-    // Further update with marginal component
-    logprior(n_clust) =
-        mixing->mass_new_cluster(n_clust, n_data - 1, true, true);
+  for (size_t j = 0; j < n_clust; j++) {
+    // Probability of being assigned to an already existing cluster
+    logprior(j) =
+        mixing->mass_existing_cluster(n_data - 1, true, true, unique_values[j],
+                                      mix_covariates.row(data_idx));
   }
+  // Further update with marginal component
+  logprior(n_clust) = mixing->mass_new_cluster(n_data - 1, true, true, n_clust,
+                                               mix_covariates.row(data_idx));
   return logprior;
 }
 
