@@ -34,6 +34,13 @@ void BaseAlgorithm::remove_datum_from_hierarchy(
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;
 
+  if (unique_values[0]->is_conjugate() == false and
+      requires_conjugate_hierarchy()) {
+    std::string msg = "Algorithm \"" + bayesmix::AlgorithmId_Name(get_id()) +
+                      "\"  only supports conjugate hierarchies";
+    throw std::invalid_argument(msg);
+  }
+
   // Perform checks
   if (data.rows() == 0) {
     throw std::invalid_argument("Data was not provided to algorithm");

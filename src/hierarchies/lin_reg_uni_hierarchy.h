@@ -8,6 +8,7 @@
 
 #include "base_hierarchy.h"
 #include "dependent_hierarchy.h"
+#include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
 
@@ -37,19 +38,26 @@ class LinRegUniHierarchy : public DependentHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-  // HYPERPRIOR
-  std::shared_ptr<bayesmix::LinRegUniPrior> prior;
 
   void clear_data();
   void update_summary_statistics(const Eigen::VectorXd &datum,
                                  const Eigen::VectorXd &covariate, bool add);
 
+  void initialize_hypers() override;
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update();
 
   void sample_given_data(const Eigen::MatrixXd &data,
                          const Eigen::MatrixXd &covariates) override;
+
+  std::shared_ptr<bayesmix::LinRegUniPrior> cast_prior() {
+    return std::dynamic_pointer_cast<bayesmix::LinRegUniPrior>(prior);
+  }
+
+  void create_empty_prior() override {
+    prior.reset(new bayesmix::LinRegUniPrior);
+  }
 
  public:
   void initialize() override;
@@ -87,11 +95,12 @@ class LinRegUniHierarchy : public DependentHierarchy {
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
   void set_state_from_proto(const google::protobuf::Message &state_) override;
-  void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  std::string get_id() const override { return "LinRegUni"; }
+  bayesmix::HierarchyId get_id() const override {
+    return bayesmix::HierarchyId::LinRegUni;
+  }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_H_

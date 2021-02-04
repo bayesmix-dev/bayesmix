@@ -8,9 +8,9 @@
 #include "src/utils/rng.h"
 
 void LinRegUniHierarchy::initialize() {
-  if (prior == nullptr) {
-    throw std::invalid_argument("Hierarchy prior was not provided");
-  }
+  hypers = std::make_shared<Hyperparams>();
+  check_prior_is_set();
+  initialize_hypers();
   state.regression_coeffs = hypers->mean;
   state.var = hypers->scale / (hypers->shape + 1);
   clear_data();
@@ -56,7 +56,9 @@ LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update() {
 void LinRegUniHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();
-  if (prior->has_fixed_values()) {
+  auto priorcast = cast_prior();
+
+  if (priorcast->has_fixed_values()) {
     return;
   }
 
@@ -121,21 +123,18 @@ void LinRegUniHierarchy::set_state_from_proto(
   set_card(statecast.cardinality());
 }
 
-void LinRegUniHierarchy::set_prior(const google::protobuf::Message &prior_) {
-  auto &priorcast =
-      google::protobuf::internal::down_cast<const bayesmix::LinRegUniPrior &>(
-          prior_);
-  prior = std::make_shared<bayesmix::LinRegUniPrior>(priorcast);
-  hypers = std::make_shared<Hyperparams>();
-  if (prior->has_fixed_values()) {
+void LinRegUniHierarchy::initialize_hypers() {
+  auto priorcast = cast_prior();
+
+  if (priorcast->has_fixed_values()) {
     // Set values
-    hypers->mean = bayesmix::to_eigen(prior->fixed_values().mean());
+    hypers->mean = bayesmix::to_eigen(priorcast->fixed_values().mean());
     dim = hypers->mean.size();
     hypers->var_scaling =
-        bayesmix::to_eigen(prior->fixed_values().var_scaling());
+        bayesmix::to_eigen(priorcast->fixed_values().var_scaling());
     hypers->var_scaling_inv = stan::math::inverse_spd(hypers->var_scaling);
-    hypers->shape = prior->fixed_values().shape();
-    hypers->scale = prior->fixed_values().scale();
+    hypers->shape = priorcast->fixed_values().shape();
+    hypers->scale = priorcast->fixed_values().scale();
     // Check validity
     bayesmix::check_spd(hypers->var_scaling);
     if (hypers->shape <= 0) {

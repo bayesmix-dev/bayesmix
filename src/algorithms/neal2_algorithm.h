@@ -53,7 +53,11 @@ class Neal2Algorithm : public MarginalAlgorithm {
   ~Neal2Algorithm() = default;
   Neal2Algorithm() = default;
 
-  std::string get_id() const override { return "Neal2"; }
+  bool requires_conjugate_hierarchy() override { return true; }
+
+  bayesmix::AlgorithmId get_id() const override {
+    return bayesmix::AlgorithmId::Neal2;
+  }
 };
 
 #endif  // BAYESMIX_ALGORITHMS_NEAL2_ALGORITHM_H_

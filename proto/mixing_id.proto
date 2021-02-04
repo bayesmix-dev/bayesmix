@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package bayesmix;
+
+enum MixingId {
+    UNKNOWN_MIXING = 0;
+    DP = 1;
+    PY = 2;
+}

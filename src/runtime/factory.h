@@ -1,6 +1,8 @@
 #ifndef BAYESMIX_RUNTIME_FACTORY_H_
 #define BAYESMIX_RUNTIME_FACTORY_H_
 
+#include <google/protobuf/generated_enum_reflection.h>
+
 #include <functional>
 #include <iostream>
 #include <map>
@@ -16,16 +18,16 @@
 //! the specific objects. The storage must first be filled with the appropriate
 //! builders, which can be as simple as a function returning a smart pointer to
 //! a new instance. This can be done in a main file or in an appropriate
-//! function. This factory is templatized as a variadic template, that allows
-//! passing any number of parameters of any type to the contructors of the
-//! objects.
+//! function.
+//! The Identifier template parameter must be a protobuf 'enum' type
+//! since we use protobuf to pass between ids and strings
 
+//! \param Identifier Protobuf enum type for the indentifier
 //! \param AbstractProduct Class name for the abstract base object
 
-template <class AbstractProduct>
+template <typename Identifier, class AbstractProduct>
 class Factory {
  private:
-  using Identifier = std::string;
   using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
   //! Storage for algorithm builders
@@ -35,6 +37,18 @@ class Factory {
   Factory() = default;
   Factory(const Factory &f) = delete;
   Factory &operator=(const Factory &f) = delete;
+
+  static std::string id_to_name(const Identifier &id) {
+    return google::protobuf::internal::NameOfEnum(
+        google::protobuf::GetEnumDescriptor<Identifier>(), id);
+  }
+
+  static Identifier name_to_id(const std::string& name) {
+    Identifier id;
+    google::protobuf::internal::ParseNamedEnum<Identifier>(
+        google::protobuf::GetEnumDescriptor<Identifier>(), name, &id);
+    return id;
+  }
 
  public:
   //! Public destructor
@@ -50,13 +64,13 @@ class Factory {
 
   //! Creates a specific object based on an identifier
 
-  //! \param name Identifier for the object
+  //! \param id Identifier for the object
   //! \return     An shared pointer to the created object
-  std::shared_ptr<AbstractProduct> create_object(
-      const Identifier &name) const {
-    auto f = storage.find(name);
+  std::shared_ptr<AbstractProduct> create_object(const Identifier &id) const {
+    auto f = storage.find(id);
     if (f == storage.end()) {
-      std::string err = "Factory identifier \"" + name + "\" not found";
+      std::string err =
+          "Error: factory identifier \"" + id_to_name(id) + "\" not found";
       throw std::invalid_argument(err);
     } else {
       return f->second();
@@ -64,14 +78,27 @@ class Factory {
     }
   }
 
+  //! \param name string identifier for the object
+  //! \return     An shared pointer to the created object
+  std::shared_ptr<AbstractProduct> create_object(
+      const std::string &name) const {
+    try {
+      return create_object(name_to_id(name));
+    } catch (const std::invalid_argument &e) {
+      std::string err = "Error: no identifier found for name: \"" +
+                         name + "\". \n" + e.what();
+      throw std::invalid_argument(err);
+    }
+  }
+
   //! Adds a builder function to the storage
 
-  //! \param name    Identifier to associate the builder with
+  //! \param id    Identifier to associate the builder with
   //! \param bulider Builder function for a specific object type
-  void add_builder(const Identifier &name, const Builder &builder) {
-    auto f = storage.insert(std::make_pair(name, builder));
+  void add_builder(const Identifier &id, const Builder &builder) {
+    auto f = storage.insert(std::make_pair(id, builder));
     if (f.second == false) {
-      std::cout << "Warning: new duplicate builder \"" << name
+      std::cout << "Warning: new duplicate builder \"" << id
                 << "\" was not added to factory" << std::endl;
     }
   }
@@ -86,11 +113,9 @@ class Factory {
     return tmp;
   }
 
-  //! Checks whether the given algorithm is already in the storage
-
-  //! \param algo Id for the algorithm to check
-  bool check_existence(const Identifier &algo) const {
-    return !(storage.find(algo) == storage.end());
+  //! \param id Id for the object to check
+  bool check_existence(const Identifier &id) const {
+    return !(storage.find(id) == storage.end());
   }
 };
 

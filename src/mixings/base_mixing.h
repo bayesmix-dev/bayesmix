@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "mixing_id.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
 
 //! Abstract base class for a generic mixture model
@@ -21,6 +22,12 @@
 //! maybe even prior distributions on them.
 
 class BaseMixing {
+ protected:
+  std::shared_ptr<google::protobuf::Message> prior;
+
+  virtual void create_empty_prior() = 0;
+  virtual void initialize_state() = 0;
+
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseMixing() = default;
@@ -54,11 +61,16 @@ class BaseMixing {
       unsigned int n) = 0;
 
   // GETTERS AND SETTERS
+  google::protobuf::Message *get_mutable_prior() {
+    if (prior == nullptr) create_empty_prior();
+
+    return prior.get();
+  }
+
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
-  virtual void set_prior(const google::protobuf::Message &prior_) = 0;
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
-  virtual std::string get_id() const = 0;
+  virtual bayesmix::MixingId get_id() const = 0;
 };
 
 #endif  // BAYESMIX_MIXINGS_BASE_MIXING_H_
