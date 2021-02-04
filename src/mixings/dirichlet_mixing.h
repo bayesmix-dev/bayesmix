@@ -1,6 +1,8 @@
 #ifndef BAYESMIX_MIXINGS_DIRICHLET_MIXING_H_
 #define BAYESMIX_MIXINGS_DIRICHLET_MIXING_H_
 
+#include <Eigen/Dense>
+#include <google/protobuf/message.h>
 #include <memory>
 
 #include "base_mixing.h"
@@ -28,8 +30,9 @@ class DirichletMixing : public BaseMixing {
  protected:
   State state;
 
+  //!
   void create_empty_prior() override { prior.reset(new bayesmix::DPPrior); }
-
+  //!
   std::shared_ptr<bayesmix::DPPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::DPPrior>(prior);
   }
@@ -40,6 +43,10 @@ class DirichletMixing : public BaseMixing {
   // DESTRUCTOR AND CONSTRUCTORS
   ~DirichletMixing() = default;
   DirichletMixing() = default;
+
+  std::shared_ptr<BaseMixing> clone() const override {
+    return std::make_shared<DirichletMixing>(*this);
+  }
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
@@ -54,9 +61,9 @@ class DirichletMixing : public BaseMixing {
                           const bool propto, const unsigned int n_clust,
                           const Eigen::RowVectorXd &covariate =
                               Eigen::RowVectorXd(0)) const override;
-
+  //!
   void initialize() override;
-
+  //!
   void update_state(
       const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
       unsigned int n) override;
