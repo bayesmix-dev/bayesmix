@@ -17,7 +17,7 @@
 //! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
     std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
-    const Eigen::MatrixXd &covariates) {
+    const Eigen::MatrixXd &covariates) const {
   return hier->marg_lpdf_grid(false, grid, covariates);
 }
 

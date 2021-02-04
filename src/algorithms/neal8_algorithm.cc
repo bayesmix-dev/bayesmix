@@ -16,7 +16,7 @@
 //! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
     std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
-    const Eigen::MatrixXd &covariates) {
+    const Eigen::MatrixXd &covariates) const {
   unsigned int n_grid = grid.rows();
   Eigen::VectorXd lpdf_(n_grid);
   Eigen::MatrixXd lpdf_temp(n_grid, n_aux);

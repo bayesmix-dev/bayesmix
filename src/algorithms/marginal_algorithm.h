@@ -16,7 +16,7 @@ class MarginalAlgorithm : public BaseAlgorithm {
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd lpdf_marginal_component(
       std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
-      const Eigen::MatrixXd &covariates) = 0;
+      const Eigen::MatrixXd &covariates) const = 0;
   //!
   Eigen::VectorXd lpdf_from_state(const Eigen::MatrixXd &grid,
                                   const Eigen::MatrixXd &hier_covariates,
