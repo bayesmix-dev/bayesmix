@@ -100,7 +100,7 @@ void Neal8Algorithm::sample_allocations() {
       aux_unique_values[0]->set_state_from_proto(curr_val);
     }
     // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(i, false, data.row(i),
+    unique_values[allocations[i]]->remove_datum(i, data.row(i), false,
                                                 hier_covariates.row(i));
     // Draw the unique values in the auxiliary blocks from their prior
     for (size_t j = singleton; j < n_aux; j++) {
@@ -120,11 +120,11 @@ void Neal8Algorithm::sample_allocations() {
           aux_unique_values[c_new - n_clust]->clone();
       unique_values.push_back(hier_new);
       allocations[i] = n_clust;
-      unique_values[n_clust]->add_datum(i, false, data.row(i),
+      unique_values[n_clust]->add_datum(i, data.row(i), false,
                                         hier_covariates.row(i));
     } else {
       allocations[i] = c_new;
-      unique_values[c_new]->add_datum(i, false, data.row(i),
+      unique_values[c_new]->add_datum(i, data.row(i), false,
                                       hier_covariates.row(i));
     }
     if (singleton) {

@@ -5,8 +5,15 @@
 #include <set>
 #include <stan/math/prim.hpp>
 
+//! \param id            Index of the given data point
+//! \param datum         Data point
+//! \param update_params If true, updates the stored posterior hyperparameters
+//!                      (for algorithms such as Neal3)
+//! \param covariate     Covariate value for dependent hierarchies, leave the
+//!                      default value otherwise
 void BaseHierarchy::add_datum(
-    const int id, const bool save_params, const Eigen::VectorXd &datum,
+    const int id, const Eigen::VectorXd &datum,
+    const bool update_params /*= false*/,
     const Eigen::VectorXd &covariate /*= Eigen::VectorXd(0)*/) {
   auto it = cluster_data_idx.find(id);
   assert(it == cluster_data_idx.end());
@@ -14,13 +21,20 @@ void BaseHierarchy::add_datum(
   log_card = std::log(card);
   update_summary_statistics(datum, covariate, true);
   cluster_data_idx.insert(id);
-  if (save_params) {
+  if (update_params) {
     save_posterior_hypers();
   }
 }
 
+//! \param id            Index of the given data point
+//! \param datum         Data point
+//! \param update_params If true, updates the stored posterior hyperparameters
+//!                      (for algorithms such as Neal3)
+//! \param covariate     Covariate value for dependent hierarchies, leave the
+//!                      default value otherwise
 void BaseHierarchy::remove_datum(
-    const int id, const bool save_params, const Eigen::VectorXd &datum,
+    const int id, const Eigen::VectorXd &datum,
+    const bool update_params /*= false*/,
     const Eigen::VectorXd &covariate /* = Eigen::VectorXd(0)*/) {
   update_summary_statistics(datum, covariate, false);
   card -= 1;
@@ -28,7 +42,7 @@ void BaseHierarchy::remove_datum(
   auto it = cluster_data_idx.find(id);
   assert(it != cluster_data_idx.end());
   cluster_data_idx.erase(it);
-  if (save_params) {
+  if (update_params) {
     save_posterior_hypers();
   }
 }

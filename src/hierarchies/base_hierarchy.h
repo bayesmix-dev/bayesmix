@@ -43,12 +43,14 @@ class BaseHierarchy {
 
  public:
   //! Adds a datum and its index to the hierarchy
-  void add_datum(const int id, const bool save_params,
+  void add_datum(const int id,
                  const Eigen::VectorXd &datum,
+                 const bool update_params = false,
                  const Eigen::VectorXd &covariate = Eigen::VectorXd(0));
   //! Removes a datum and its index from the hierarchy
-  void remove_datum(const int id, const bool save_params,
+  void remove_datum(const int id,
                     const Eigen::VectorXd &datum,
+                    const bool update_params = false,
                     const Eigen::VectorXd &covariate = Eigen::VectorXd(0));
   //! Deletes all data in the hierarchy
   virtual void clear_data() = 0;

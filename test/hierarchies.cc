@@ -55,7 +55,7 @@ TEST(nnighierarchy, sample_given_data) {
   datum << 4.5;
 
   auto hier2 = hier->clone();
-  hier2->add_datum(0, false, datum);
+  hier2->add_datum(0, datum, false);
   hier2->sample_given_data();
 
   bayesmix::MarginalState out;
@@ -121,7 +121,7 @@ TEST(nnwhierarchy, sample_given_data) {
   datum << 4.5, 4.5;
 
   auto hier2 = hier->clone();
-  hier2->add_datum(0, false, datum);
+  hier2->add_datum(0, datum, false);
   hier2->sample_given_data();
 
   bayesmix::MarginalState out;
@@ -200,7 +200,7 @@ TEST(lin_reg_uni_hierarchy, misc) {
   ASSERT_EQ(b0, out.fixed_values().scale());
   // Add data
   for (int i = 0; i < n; i++) {
-    hier.add_datum(i, false, data.row(i), cov.row(i));
+    hier.add_datum(i, data.row(i), false, cov.row(i));
   }
   // Check summary statistics
   // for (int i = 0; i < dim; i++) {
