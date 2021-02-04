@@ -75,6 +75,8 @@ class SemiHdpSampler {
   bool adapt = false;
 
  public:
+  virtual bool requires_conjugate_hierarchy() { return true; }
+
   SemiHdpSampler() {}
   ~SemiHdpSampler() {}
 
