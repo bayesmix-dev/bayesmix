@@ -20,7 +20,9 @@ add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   distributions.cc
   semi_hdp.cc
   collectors.cc
+  runtime.cc
 )
+
 target_include_directories(test_bayesmix PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(test_bayesmix PUBLIC
   ${LINK_LIBRARIES} ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY}

@@ -12,6 +12,7 @@ void DirichletMixing::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
   }
+  initialize_state();
 }
 
 //! \param card Cardinality of the cluster
@@ -54,15 +55,18 @@ void DirichletMixing::update_state(
     const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
     unsigned int n) {
   auto &rng = bayesmix::Rng::Instance().get();
-  if (prior->has_fixed_value()) {
+
+  auto priorcast = cast_prior();
+
+  if (priorcast->has_fixed_value()) {
     return;
   }
 
-  else if (prior->has_gamma_prior()) {
+  else if (priorcast->has_gamma_prior()) {
     // Recover parameters
     unsigned int k = unique_values.size();
-    double alpha = prior->gamma_prior().totalmass_prior().shape();
-    double beta = prior->gamma_prior().totalmass_prior().rate();
+    double alpha = priorcast->gamma_prior().totalmass_prior().shape();
+    double beta = priorcast->gamma_prior().totalmass_prior().rate();
 
     double phi = stan::math::gamma_rng(state.totalmass + 1, n, rng);
     double odds = (alpha + k - 1) / (n * (beta - log(phi)));
@@ -89,20 +93,18 @@ void DirichletMixing::set_state_from_proto(
   state.logtotmass = std::log(state.totalmass);
 }
 
-void DirichletMixing::set_prior(const google::protobuf::Message &prior_) {
-  auto &priorcast =
-      google::protobuf::internal::down_cast<const bayesmix::DPPrior &>(prior_);
-  prior = std::make_shared<bayesmix::DPPrior>(priorcast);
-  if (prior->has_fixed_value()) {
-    state.totalmass = prior->fixed_value().totalmass();
+void DirichletMixing::initialize_state() {
+  auto priorcast = cast_prior();
+  if (priorcast->has_fixed_value()) {
+    state.totalmass = priorcast->fixed_value().totalmass();
     if (state.totalmass <= 0) {
       throw std::invalid_argument("Total mass parameter must be > 0");
     }
   }
 
-  else if (prior->has_gamma_prior()) {
-    double alpha = prior->gamma_prior().totalmass_prior().shape();
-    double beta = prior->gamma_prior().totalmass_prior().rate();
+  else if (priorcast->has_gamma_prior()) {
+    double alpha = priorcast->gamma_prior().totalmass_prior().shape();
+    double beta = priorcast->gamma_prior().totalmass_prior().rate();
     if (alpha <= 0) {
       throw std::invalid_argument("Shape parameter must be > 0");
     }

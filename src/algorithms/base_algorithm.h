@@ -1,11 +1,13 @@
 #ifndef BAYESMIX_ALGORITHMS_BASE_ALGORITHM_H_
 #define BAYESMIX_ALGORITHMS_BASE_ALGORITHM_H_
 
+#include <lib/progressbar/progressbar.h>
+
 #include <Eigen/Dense>
 #include <memory>
 #include <vector>
 
-#include "lib/progressbar/progressbar.h"
+#include "algorithm_id.pb.h"
 #include "marginal_state.pb.h"
 #include "src/collectors/base_collector.h"
 #include "src/hierarchies/base_hierarchy.h"
@@ -96,6 +98,8 @@ class BaseAlgorithm {
   }
 
  public:
+  virtual bool requires_conjugate_hierarchy() { return false; }
+
   //! Runs the algorithm and saves the whole chain to a collector
   void run(BaseCollector *collector) {
     initialize();
@@ -151,7 +155,7 @@ class BaseAlgorithm {
     unique_values.push_back(hier_);
     init_num_clusters = init;
   }
-  virtual std::string get_id() const = 0;
+  virtual bayesmix::AlgorithmId get_id() const = 0;
 };
 
 #endif  // BAYESMIX_ALGORITHMS_BASE_ALGORITHM_H_

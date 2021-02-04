@@ -36,9 +36,9 @@ int main(int argc, char *argv[]) {
   }
 
   // Create factories and objects
-  auto &factory_algo = Factory<BaseAlgorithm>::Instance();
-  auto &factory_hier = Factory<BaseHierarchy>::Instance();
-  auto &factory_mixing = Factory<BaseMixing>::Instance();
+  auto &factory_algo = AlgorithmFactory::Instance();
+  auto &factory_hier = HierarchyFactory::Instance();
+  auto &factory_mixing = MixingFactory::Instance();
   auto algo = factory_algo.create_object(algo_type);
   auto hier = factory_hier.create_object(hier_type);
   auto mixing = factory_mixing.create_object(mix_type);
@@ -49,32 +49,8 @@ int main(int argc, char *argv[]) {
     coll = new FileCollector(collname);
   }
 
-  // Set mixing hyperprior
-  std::string mix_prior_str = "bayesmix." + mix_type + "Prior";
-  auto mix_prior_desc = google::protobuf::DescriptorPool::generated_pool()
-                            ->FindMessageTypeByName(mix_prior_str);
-  if (mix_prior_desc == NULL) {
-    throw std::invalid_argument("Unrecognized mixing prior");
-  }
-  auto *mix_prior = google::protobuf::MessageFactory::generated_factory()
-                        ->GetPrototype(mix_prior_desc)
-                        ->New();
-  bayesmix::read_proto_from_file(mix_args, mix_prior);
-  mixing->set_prior(*mix_prior);
-
-  // Set hierarchies hyperprior
-  std::string hier_prior_str = "bayesmix." + hier_type + "Prior";
-  auto hier_prior_desc = google::protobuf::DescriptorPool::generated_pool()
-                             ->FindMessageTypeByName(hier_prior_str);
-  if (hier_prior_desc == NULL) {
-    throw std::invalid_argument("Unrecognized hierarchy prior");
-  }
-  auto *hier_prior = google::protobuf::MessageFactory::generated_factory()
-                         ->GetPrototype(hier_prior_desc)
-                         ->New();
-  bayesmix::read_proto_from_file(hier_args, hier_prior);
-  hier->set_prior(*hier_prior);
-  hier->initialize();
+  bayesmix::read_proto_from_file(mix_args, mixing->get_mutable_prior());
+  bayesmix::read_proto_from_file(hier_args, hier->get_mutable_prior());
 
   // Initialize RNG object
   auto &rng = bayesmix::Rng::Instance().get();
@@ -103,8 +79,9 @@ int main(int argc, char *argv[]) {
   // Allocate objects in algorithm
   algo->set_mixing(mixing);
   algo->set_data(data);
+
   algo->set_initial_clusters(hier, init_num_cl);
-  if (algo_type == "Neal8") {
+  if (algo->get_id() == bayesmix::AlgorithmId::Neal8) {
     auto algocast = std::dynamic_pointer_cast<Neal8Algorithm>(algo);
     algocast->set_n_aux(3);
   }

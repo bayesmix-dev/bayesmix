@@ -55,17 +55,14 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
 
 void Neal2Algorithm::print_startup_message() const {
   std::string msg = "Running Neal2 algorithm with " +
-                    unique_values[0]->get_id() + " hierarchies, " +
-                    mixing->get_id() + " mixing...";
+                    bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
+                    " hierarchies, " +
+                    bayesmix::MixingId_Name(mixing->get_id()) + " mixing...";
   std::cout << msg << std::endl;
 }
 
 void Neal2Algorithm::initialize() {
   BaseAlgorithm::initialize();
-  if (unique_values[0]->is_conjugate() == false) {
-    throw std::invalid_argument(
-        "This algorithm only supports conjugate hierarchies");
-  }
 }
 
 void Neal2Algorithm::sample_allocations() {

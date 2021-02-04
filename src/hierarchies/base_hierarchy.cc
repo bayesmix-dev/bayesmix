@@ -47,6 +47,12 @@ void BaseHierarchy::remove_datum(
   }
 }
 
+void BaseHierarchy::check_prior_is_set() {
+  if (prior == nullptr) {
+    throw std::invalid_argument("Hierarchy prior was not provided");
+  }
+}
+
 Eigen::VectorXd BaseHierarchy::like_lpdf_grid(
     const Eigen::MatrixXd &data,
     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {

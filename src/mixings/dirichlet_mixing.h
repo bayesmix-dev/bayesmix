@@ -5,6 +5,7 @@
 
 #include "base_mixing.h"
 #include "mixing_prior.pb.h"
+#include "mixing_id.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
 
 //! Class that represents the Dirichlet process mixture model.
@@ -26,7 +27,14 @@ class DirichletMixing : public BaseMixing {
 
  protected:
   State state;
-  std::shared_ptr<bayesmix::DPPrior> prior;
+
+  void create_empty_prior() override { prior.reset(new bayesmix::DPPrior); }
+
+  std::shared_ptr<bayesmix::DPPrior> cast_prior() {
+    return std::dynamic_pointer_cast<bayesmix::DPPrior>(prior);
+  }
+
+  void initialize_state();
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -56,9 +64,8 @@ class DirichletMixing : public BaseMixing {
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   void set_state_from_proto(const google::protobuf::Message &state_) override;
-  void set_prior(const google::protobuf::Message &prior_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
-  std::string get_id() const override { return "DP"; }
+  bayesmix::MixingId get_id() const override { return bayesmix::MixingId::DP; }
 };
 
 #endif  // BAYESMIX_MIXINGS_DIRICHLET_MIXING_H_
