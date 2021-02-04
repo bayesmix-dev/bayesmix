@@ -92,6 +92,5 @@ void BaseHierarchy::sample_given_data(
     for (int i = 0; i < data.rows(); i++)
       add_datum(i, data.row(i), false, covariates.row(i));
   }
-  update_summary_statistics();
   sample_given_data();
 }

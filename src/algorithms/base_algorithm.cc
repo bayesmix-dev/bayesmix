@@ -77,8 +77,8 @@ void BaseAlgorithm::initialize() {
   for (size_t i = init_num_clusters; i < data.rows(); i++) {
     unsigned int clust = distro(generator);
     allocations.push_back(clust);
-    unique_values[clust]->add_datum(i, data.row(i),
-                                    false hier_covariates.row(i));
+    unique_values[clust]->add_datum(i, data.row(i), false,
+                                    hier_covariates.row(i));
   }
   std::cout << "Done" << std::endl;
 }

@@ -22,7 +22,7 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
     if (!keep) {
       break;
     }
-    lpdf.push_back(lpdf_from_state(grid, covariates));
+    lpdf.push_back(lpdf_from_state(grid, hier_covariates, mix_covariates));
     ++bar;
     bar.display();
   }
@@ -32,7 +32,8 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
 }
 
 Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
-    const Eigen::MatrixXd &grid, const Eigen::MatrixXd &covariates) {
+    const Eigen::MatrixXd &grid, const Eigen::MatrixXd &hier_covariates,
+    const Eigen::MatrixXd &mix_covariates) {
   Eigen::VectorXd out(grid.rows());
   unsigned int n_data = curr_state.cluster_allocs_size();
   unsigned int n_clust = curr_state.cluster_states_size();
@@ -44,12 +45,12 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
     temp_hier->set_state_from_proto(curr_state.cluster_states(j));
     lpdf_local.col(j) =
         mixing->mass_existing_cluster(n_data, true, false, temp_hier) +
-        temp_hier->like_lpdf_grid(grid, covariates).array();
+        temp_hier->like_lpdf_grid(grid, hier_covariates).array();
     // TODO add mixing covariate
   }
   lpdf_local.col(n_clust) =
       mixing->mass_new_cluster(n_data, true, false, n_clust) +
-      lpdf_marginal_component(temp_hier, grid, covariates).array();
+      lpdf_marginal_component(temp_hier, grid, hier_covariates).array();
   // TODO add mixing covariate
 
   for (size_t j = 0; j < grid.rows(); j++) {

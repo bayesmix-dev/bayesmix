@@ -19,7 +19,8 @@ class MarginalAlgorithm : public BaseAlgorithm {
       const Eigen::MatrixXd &covariates) = 0;
   //!
   Eigen::VectorXd lpdf_from_state(const Eigen::MatrixXd &grid,
-                                  const Eigen::MatrixXd &covariates);
+                                  const Eigen::MatrixXd &hier_covariates,
+                                  const Eigen::MatrixXd &mix_covariates);
   //!
   bool update_state_from_collector(BaseCollector *coll);
 
