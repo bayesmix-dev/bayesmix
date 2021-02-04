@@ -67,29 +67,15 @@ class AbstractHierarchy {
   virtual bool is_multivariate() const = 0;
   virtual bool is_dependent() const { return false; }
   virtual bool is_conjugate() const { return true; }
-<<<<<<< HEAD
-  virtual void update_hypers(
-      const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
-
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
-  //! Evaluates the log-likelihood of data in the given points
-  virtual Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data) const;
-=======
   //!
   virtual void update_hypers(
       const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
-
-  // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~BaseHierarchy() = default;
-  BaseHierarchy() = default;
-  virtual std::shared_ptr<BaseHierarchy> clone() const = 0;
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
   //! Evaluates the log-likelihood of data in a single point
   virtual double like_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
->>>>>>> 47f73be5600e7c2e15af17c23bca0287a8296400
   //! Evaluates the log-marginal distribution of data in a single point
   virtual double marg_lpdf(
       const bool posterior, const Eigen::RowVectorXd &datum,
@@ -109,32 +95,26 @@ class AbstractHierarchy {
   virtual void draw() = 0;
   //! Generates new values for state from the centering posterior distribution
   virtual void sample_given_data() = 0;
-  virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
-  virtual void create_empty_prior() = 0;
-
   void check_prior_is_set();
+
+  // GETTERS AND SETTERS
   int get_card() const { return card; }
   double get_log_card() const { return log_card; }
   std::set<int> get_data_idx() { return cluster_data_idx; }
-  google::protobuf::Message *prior_proto() {
-  //! Overloaded version of sample_given_data(), mainly used for debugging
-  void sample_given_data(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0));
-
-  // GETTERS AND SETTERS
   google::protobuf::Message *get_mutable_prior() {
     if (prior == nullptr) create_empty_prior();
     
     return prior.get();
   }
-
-  virtual void clear_data() = 0;
+  //! Overloaded version of sample_given_data(), mainly used for debugging
+  void sample_given_data(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0));
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
@@ -143,9 +123,10 @@ class BaseHierarchy : public AbstractHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
+  Hyperparams posterior_hypers;
 
-  virtual Hyperparams get_posterior_parameters() = 0;
-  void create_empty_prior() { prior.reset(new Prior); }
+  virtual Hyperparams get_posterior_parameters() const = 0;
+  void create_empty_prior() override { prior.reset(new Prior); }
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -156,16 +137,9 @@ class BaseHierarchy : public AbstractHierarchy {
     out->clear_data();
     return out;
   }
-<<<<<<< HEAD
 
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
-=======
-  virtual bayesmix::HierarchyId get_id() const = 0;
-  int get_card() const { return card; }
-  double get_log_card() const { return log_card; }
-  std::set<int> get_data_idx() const { return cluster_data_idx; }
->>>>>>> 47f73be5600e7c2e15af17c23bca0287a8296400
 };
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

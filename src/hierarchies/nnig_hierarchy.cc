@@ -31,13 +31,13 @@ void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
 }
 
 void NNIGHierarchy::save_posterior_hypers() {
-  *posterior_hypers = normal_invgamma_update();
+  posterior_hypers = get_posterior_parameters();
 }
 
 //! \param data                        Column vector of data points
 //! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
 //! \return                            Vector of updated values for hyperpar.s
-NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
+NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() const {
   // Initialize relevant variables
   NNIG::Hyperparams post_params;
 
@@ -150,7 +150,7 @@ double NNIGHierarchy::like_lpdf(
 double NNIGHierarchy::marg_lpdf(
     const bool posterior, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
-  Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
+  NNIG::Hyperparams params = posterior ? get_posterior_parameters() : *hypers;
   double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
                       (params.shape * params.var_scaling));
   return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
