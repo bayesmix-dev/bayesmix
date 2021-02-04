@@ -3,6 +3,7 @@
 
 #include <google/protobuf/message.h>
 
+#include <Eigen/Dense>
 #include <memory>
 
 #include "mixing_id.pb.h"
@@ -22,6 +23,12 @@
 //! maybe even prior distributions on them.
 
 class BaseMixing {
+ protected:
+  std::shared_ptr<google::protobuf::Message> prior;
+
+  virtual void create_empty_prior() = 0;
+  virtual void initialize_state() = 0;
+
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseMixing() = default;
@@ -33,18 +40,20 @@ class BaseMixing {
   //! \param card Cardinality of the cluster
   //! \param n    Total number of data points
   //! \return     Probability value
-  virtual double mass_existing_cluster(std::shared_ptr<AbstractHierarchy> hier,
-                                       const unsigned int n, bool log,
-                                       bool propto) const = 0;
+  virtual double mass_existing_cluster(
+      const unsigned int n, const bool log, const bool propto,
+      std::shared_ptr<AbstractHierarchy> hier,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const = 0;
 
   //! Mass probability for choosing a newly created cluster
 
   //! \param n_clust Number of clusters
   //! \param n       Total number of data points
   //! \return        Probability value
-  virtual double mass_new_cluster(const unsigned int n_clust,
-                                  const unsigned int n, bool log,
-                                  bool propto) const = 0;
+  virtual double mass_new_cluster(
+      const unsigned int n, const bool log, const bool propto,
+      const unsigned int n_clust,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const = 0;
 
   virtual void initialize() = 0;
   //! Returns true if the mixing has covariates i.e. is a dependent model
@@ -55,9 +64,14 @@ class BaseMixing {
       unsigned int n) = 0;
 
   // GETTERS AND SETTERS
+  google::protobuf::Message *get_mutable_prior() {
+    if (prior == nullptr) create_empty_prior();
+
+    return prior.get();
+  }
+
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
-  virtual void set_prior(const google::protobuf::Message &prior_) = 0;
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
   virtual bayesmix::MixingId get_id() const = 0;
 };

@@ -98,7 +98,7 @@ class BaseAlgorithm {
   }
 
  public:
-  virtual bool requires_conjugate_hierarchy() = 0;
+  virtual bool requires_conjugate_hierarchy() { return false; }
 
   //! Runs the algorithm and saves the whole chain to a collector
   void run(BaseCollector *collector) {
@@ -125,21 +125,14 @@ class BaseAlgorithm {
 
   // ESTIMATE FUNCTION
   //! Evaluates the logpdf for each single iteration on a given grid of points
-  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                                    BaseCollector *const collector) = 0;
-  // TODO will soon become obsolete
-  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                                    const Eigen::MatrixXd &covariates,
-                                    BaseCollector *const collector) = 0;
+  virtual Eigen::MatrixXd eval_lpdf(
+      BaseCollector *const collector, const Eigen::MatrixXd &grid,
+      const Eigen::MatrixXd &hier_covariates = Eigen::MatrixXd(0, 0),
+      const Eigen::MatrixXd &mix_covariates = Eigen::MatrixXd(0, 0)) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseAlgorithm() = default;
   BaseAlgorithm() = default;
-
-  void add_datum_to_hierarchy(const unsigned int datum_idx,
-                              std::shared_ptr<AbstractHierarchy> hier);
-  void remove_datum_from_hierarchy(const unsigned int datum_idx,
-                                   std::shared_ptr<AbstractHierarchy> hier);
 
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }

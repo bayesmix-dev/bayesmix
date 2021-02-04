@@ -7,63 +7,33 @@
 
 #include "marginal_state.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
-// #include "src/hierarchies/dependent_hierarchy.h"
 #include "src/mixings/base_mixing.h"
 // #include "src/mixings/dependent_mixing.h"
 #include "src/utils/distributions.h"
 #include "src/utils/rng.h"
 
-//! \param temp_hier Temporary hierarchy object
-//! \return          Vector of evaluation of component on the provided grid
+//! \param hier Hierarchy object
+//! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
-    std::shared_ptr<AbstractHierarchy> temp_hier,
-    const Eigen::MatrixXd &grid) {
-  // Exploit conjugacy of hierarchy
-  return temp_hier->marg_lpdf_grid(grid);
+    std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+    const Eigen::MatrixXd &covariates) {
+  return hier->marg_lpdf_grid(false, grid, covariates);
 }
-
-// Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
-//     std::shared_ptr<DependentHierarchy> temp_hier, const Eigen::MatrixXd
-//     &grid, const Eigen::MatrixXd &covariates) {
-//   // TODO will soon become obsolete
-//   return temp_hier->marg_lpdf_grid(grid, covariates);
-// }
 
 Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
     const unsigned int data_idx) const {
   unsigned int n_data = data.rows();
   unsigned int n_clust = unique_values.size();
   Eigen::VectorXd logprior(n_clust + 1);
-  // if (mixing->is_dependent()) {
-  //   auto mixcast = std::dynamic_pointer_cast<DependentMixing>(mixing);
-  //   for (size_t j = 0; j < n_clust; j++) {
-  //     // Probability of being assigned to an already existing cluster
-  //     logprior(j) = mixcast->mass_existing_cluster(
-  //         unique_values[j], mix_covariates.row(data_idx), n_data - 1, true,
-  //         true);
-  //   }
-  //   // Further update with marginal component
-  //   logprior(n_clust) = mixcast->mass_new_cluster(
-  //       mix_covariates.row(data_idx), n_clust, n_data - 1, true, true);
-  // } else {
-  //   for (size_t j = 0; j < n_clust; j++) {
-  //     // Probability of being assigned to an already existing cluster
-  //     logprior(j) = mixing->mass_existing_cluster(unique_values[j], n_data -
-  //     1,
-  //                                                 true, true);
-  //   }
-  //   // Further update with marginal component
-  //   logprior(n_clust) =
-  //       mixing->mass_new_cluster(n_clust, n_data - 1, true, true);
-  // }
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    logprior(j) = mixing->mass_existing_cluster(unique_values[j], n_data - 1,
-                                                true, true);
+    logprior(j) =
+        mixing->mass_existing_cluster(n_data - 1, true, true, unique_values[j],
+                                      mix_covariates.row(data_idx));
   }
   // Further update with marginal component
-  logprior(n_clust) =
-      mixing->mass_new_cluster(n_clust, n_data - 1, true, true);
+  logprior(n_clust) = mixing->mass_new_cluster(n_data - 1, true, true, n_clust,
+                                               mix_covariates.row(data_idx));
   return logprior;
 }
 
@@ -72,35 +42,14 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
   unsigned int n_data = data.rows();
   unsigned int n_clust = unique_values.size();
   Eigen::VectorXd loglpdf(n_clust + 1);
-  // if (unique_values[0]->is_dependent()) {
-  //   auto hiercast =
-  //       std::dynamic_pointer_cast<DependentHierarchy>(unique_values[0]);
-  //   // Probability of being assigned to a newly created cluster
-  //   loglpdf(n_clust) =
-  //       hiercast->marg_lpdf(data.row(data_idx),
-  //       hier_covariates.row(data_idx));
-  //   for (size_t j = 0; j < n_clust; j++) {
-  //     hiercast =
-  //         std::dynamic_pointer_cast<DependentHierarchy>(unique_values[j]);
-  //     // Probability of being assigned to an already existing cluster
-  //     loglpdf(j) = hiercast->like_lpdf(data.row(data_idx),
-  //                                      hier_covariates.row(data_idx));
-  //   }
-
-  // } else {
-  //   for (size_t j = 0; j < n_clust; j++) {
-  //     // Probability of being assigned to an already existing cluster
-  //     loglpdf(j) = unique_values[j]->like_lpdf(data.row(data_idx));
-  //   }
-  //   // Probability of being assigned to a newly created cluster
-  //   loglpdf(n_clust) = unique_values[0]->marg_lpdf(data.row(data_idx));
-  // }
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    loglpdf(j) = unique_values[j]->like_lpdf(data.row(data_idx));
+    loglpdf(j) = unique_values[j]->like_lpdf(data.row(data_idx),
+                                             hier_covariates.row(data_idx));
   }
   // Probability of being assigned to a newly created cluster
-  loglpdf(n_clust) = unique_values[0]->marg_lpdf(data.row(data_idx));
+  loglpdf(n_clust) = unique_values[0]->marg_lpdf(
+      false, data.row(data_idx), hier_covariates.row(data_idx));
   return loglpdf;
 }
 
@@ -123,7 +72,8 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int n_clust = unique_values.size();
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
     // Remove datum from cluster
-    remove_datum_from_hierarchy(i, unique_values[allocations[i]]);
+    unique_values[allocations[i]]->remove_datum(i, data.row(i), false,
+                                                hier_covariates.row(i));
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas =
         get_cluster_prior_mass(i) + get_cluster_lpdf(i);
@@ -132,15 +82,17 @@ void Neal2Algorithm::sample_allocations() {
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
     unsigned int c_old = allocations[i];
     if (c_new == n_clust) {
-      std::shared_ptr<AbstractHierarchy> new_unique = unique_values[0]->clone();
-      add_datum_to_hierarchy(i, new_unique);
+      std::shared_ptr<AbstractHierarchy> new_unique =
+          unique_values[0]->clone();
+      new_unique->add_datum(i, data.row(i), false, hier_covariates.row(i));
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      add_datum_to_hierarchy(i, unique_values[c_new]);
+      unique_values[c_new]->add_datum(i, data.row(i), false,
+                                      hier_covariates.row(i));
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers

@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
   std::string nclufile = argv[15];
   std::string clusfile = argv[16];
   std::string hier_cov_file;
+  // TODO mix_cov_file
   std::string grid_cov_file;
   if (argc >= 18) {
     hier_cov_file = argv[17];
@@ -48,20 +49,8 @@ int main(int argc, char *argv[]) {
     coll = new FileCollector(collname);
   }
 
-  // Set mixing hyperprior
-  std::string mix_prior_str = "bayesmix." + mix_type + "Prior";
-  auto mix_prior_desc = google::protobuf::DescriptorPool::generated_pool()
-                            ->FindMessageTypeByName(mix_prior_str);
-  if (mix_prior_desc == NULL) {
-    throw std::invalid_argument("Unrecognized mixing prior");
-  }
-  auto *mix_prior = google::protobuf::MessageFactory::generated_factory()
-                        ->GetPrototype(mix_prior_desc)
-                        ->New();
-  bayesmix::read_proto_from_file(mix_args, mix_prior);
-  mixing->set_prior(*mix_prior);
-
-  bayesmix::read_proto_from_file(hier_args, hier->prior_proto());
+  bayesmix::read_proto_from_file(mix_args, mixing->get_mutable_prior());
+  bayesmix::read_proto_from_file(hier_args, hier->get_mutable_prior());
 
   // Initialize RNG object
   auto &rng = bayesmix::Rng::Instance().get();
@@ -70,9 +59,17 @@ int main(int argc, char *argv[]) {
   // Read data matrices
   Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
   Eigen::MatrixXd grid = bayesmix::read_eigen_matrix(gridfile);
-  Eigen::MatrixXd cov_grid(0, 0);
+  Eigen::MatrixXd hier_cov_grid(0, 0);
+  Eigen::MatrixXd mix_cov_grid(0, 0);
   if (hier->is_dependent()) {
-    cov_grid = bayesmix::read_eigen_matrix(grid_cov_file);
+    hier_cov_grid = bayesmix::read_eigen_matrix(grid_cov_file);
+  } else {
+    hier_cov_grid = Eigen::MatrixXd(grid.rows(), 0);
+  }
+  if (mixing->is_dependent()) {
+    mix_cov_grid = bayesmix::read_eigen_matrix("");  // TODO
+  } else {
+    mix_cov_grid = Eigen::MatrixXd(grid.rows(), 0);
   }
 
   // Set algorithm parameters
@@ -84,7 +81,7 @@ int main(int argc, char *argv[]) {
   algo->set_data(data);
 
   algo->set_initial_clusters(hier, init_num_cl);
-  if (algo_type == "Neal8") {
+  if (algo->get_id() == bayesmix::AlgorithmId::Neal8) {
     auto algocast = std::dynamic_pointer_cast<Neal8Algorithm>(algo);
     algocast->set_n_aux(3);
   }
@@ -98,12 +95,8 @@ int main(int argc, char *argv[]) {
   // Run algorithm and density evaluation
   algo->run(coll);
   std::cout << "Computing log-density..." << std::endl;
-  Eigen::MatrixXd dens;
-  if (hier->is_dependent()) {
-    dens = algo->eval_lpdf(grid, cov_grid, coll);
-  } else {
-    dens = algo->eval_lpdf(grid, coll);
-  }
+  Eigen::MatrixXd dens =
+      algo->eval_lpdf(coll, grid, hier_cov_grid, mix_cov_grid);
   std::cout << "Done" << std::endl;
   bayesmix::write_matrix_to_file(dens, densfile);
   std::cout << "Successfully wrote density to " << densfile << std::endl;

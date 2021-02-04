@@ -51,7 +51,10 @@ class NNIGHierarchy
 
 
   void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 const Eigen::VectorXd &covariate,
                                  bool add) override;
+  //!
+  void save_posterior_hypers() override;
 
   void initialize_hypers() override;
 
@@ -59,18 +62,30 @@ class NNIGHierarchy
   //! Returns updated values of the prior hyperparameters via their posterior
   NNIG::Hyperparams get_posterior_parameters() override;
 
-  std::shared_ptr<bayesmix::NNIGPrior> cast_prior_proto() {
+  std::shared_ptr<bayesmix::NNIGPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::NNIGPrior>(prior);
   }
+
+  void create_empty_prior() override { prior.reset(new bayesmix::NNIGPrior); }
 
  public:
   void initialize() override;
 
   //! Returns true if the hierarchy models multivariate data (here, false)
   bool is_multivariate() const override { return false; }
-
+  //!
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
+
+  // EVALUATION FUNCTIONS
+  //! Evaluates the log-likelihood of data in a single point
+  double like_lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
+  //! Evaluates the log-marginal distribution of data in a single point
+  double marg_lpdf(
+      const bool posterior, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNIGHierarchy() = default;
@@ -81,20 +96,26 @@ class NNIGHierarchy
   double like_lpdf(const Eigen::RowVectorXd &datum) const override;
   //! Evaluates the log-marginal distribution of data in a single point
   double marg_lpdf(const Eigen::RowVectorXd &datum) const override;
+  
+  std::shared_ptr<BaseHierarchy> clone() const override {
+    auto out = std::make_shared<NNIGHierarchy>(*this);
+    out->clear_data();
+    return out;
+  }
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data() override;
-  void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
+  State get_state() const { return state; }
+  Hyperparams get_hypers() const { return *hypers; }
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
-
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNIG;
   }

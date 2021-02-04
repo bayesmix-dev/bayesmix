@@ -31,15 +31,12 @@ class Neal2Algorithm : public MarginalAlgorithm {
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<AbstractHierarchy> temp_hier,
-      const Eigen::MatrixXd &grid) override;
-
-  // Eigen::VectorXd lpdf_marginal_component(
-  //     std::shared_ptr<DependentHierarchy> temp_hier,
-  //     const Eigen::MatrixXd &grid, const Eigen::MatrixXd &covariates) override;
-
+      std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+      const Eigen::MatrixXd &covariates) override;
+  //!
   virtual Eigen::VectorXd get_cluster_prior_mass(
       const unsigned int data_idx) const;
+  //!
   virtual Eigen::VectorXd get_cluster_lpdf(const unsigned int data_idx) const;
 
   // ALGORITHM FUNCTIONS
@@ -53,7 +50,7 @@ class Neal2Algorithm : public MarginalAlgorithm {
   ~Neal2Algorithm() = default;
   Neal2Algorithm() = default;
 
-  bool requires_conjugate_hierarchy() { return true; }
+  bool requires_conjugate_hierarchy() override { return true; }
 
   bayesmix::AlgorithmId get_id() const override {
     return bayesmix::AlgorithmId::Neal2;

@@ -9,14 +9,16 @@ void PitYorMixing::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
   }
+  initialize_state();
 }
 
 //! \param card Cardinality of the cluster
 //! \param n    Total number of data points
 //! \return     Probability value
-double PitYorMixing::mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
-                                           const unsigned int n, bool log,
-                                           bool propto) const {
+double PitYorMixing::mass_existing_cluster(
+    const unsigned int n, const bool log, const bool propto,
+    std::shared_ptr<BaseHierarchy> hier,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   double out;
   if (hier->get_card() == 0) {
     out = 0;
@@ -30,9 +32,10 @@ double PitYorMixing::mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
 //! \param n_clust Number of clusters
 //! \param n       Total number of data points
 //! \return        Probability value
-double PitYorMixing::mass_new_cluster(const unsigned int n_clust,
-                                      const unsigned int n, bool log,
-                                      bool propto) const {
+double PitYorMixing::mass_new_cluster(
+    const unsigned int n, const bool log, const bool propto,
+    const unsigned int n_clust,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   double out =
       (state.strength + state.discount * n_clust) / (n + state.strength);
   if (log) out = std::log(out);
@@ -42,7 +45,8 @@ double PitYorMixing::mass_new_cluster(const unsigned int n_clust,
 void PitYorMixing::update_state(
     const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
     unsigned int n) {
-  if (prior->has_fixed_values()) {
+  auto priorcast = cast_prior();
+  if (priorcast->has_fixed_values()) {
     return;
   } else {
     throw std::invalid_argument("Unrecognized mixing prior");
@@ -57,13 +61,11 @@ void PitYorMixing::set_state_from_proto(
   state.discount = statecast.discount();
 }
 
-void PitYorMixing::set_prior(const google::protobuf::Message &prior_) {
-  auto &priorcast =
-      google::protobuf::internal::down_cast<const bayesmix::PYPrior &>(prior_);
-  prior = std::make_shared<bayesmix::PYPrior>(priorcast);
-  if (prior->has_fixed_values()) {
-    state.strength = prior->fixed_values().strength();
-    state.discount = prior->fixed_values().discount();
+void PitYorMixing::initialize_state() {
+  auto priorcast = cast_prior();
+  if (priorcast->has_fixed_values()) {
+    state.strength = priorcast->fixed_values().strength();
+    state.discount = priorcast->fixed_values().discount();
     if (state.strength <= -state.discount) {
       throw std::invalid_argument("Mixing parameters are not valid");
     }

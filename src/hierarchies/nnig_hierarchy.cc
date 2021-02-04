@@ -18,6 +18,22 @@ void NNIGHierarchy::initialize() {
   state.var = hypers->scale / (hypers->shape + 1);
 }
 
+void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
+                                              const Eigen::VectorXd &covariate,
+                                              bool add) {
+  if (add) {
+    data_sum += datum(0);
+    data_sum_squares += datum(0) * datum(0);
+  } else {
+    data_sum -= datum(0);
+    data_sum_squares -= datum(0) * datum(0);
+  }
+}
+
+void NNIGHierarchy::save_posterior_hypers() {
+  *posterior_hypers = normal_invgamma_update();
+}
+
 //! \param data                        Column vector of data points
 //! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
 //! \return                            Vector of updated values for hyperpar.s
@@ -29,7 +45,6 @@ NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
     post_params = *hypers;
     return post_params;
   }
-
   // Compute updated hyperparameters
   double y_bar = data_sum / (1.0 * card);  // sample mean
   double ss = data_sum_squares - card * y_bar * y_bar;
@@ -51,22 +66,11 @@ void NNIGHierarchy::clear_data() {
   cluster_data_idx = std::set<int>();
 }
 
-void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
-                                              bool add) {
-  if (add) {
-    data_sum += datum(0);
-    data_sum_squares += datum(0) * datum(0);
-  } else {
-    data_sum -= datum(0);
-    data_sum_squares -= datum(0) * datum(0);
-  }
-}
-
 void NNIGHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();
 
-  auto priorcast = cast_prior_proto();
+  auto priorcast = cast_prior();
 
   if (priorcast->has_fixed_values()) {
     return;
@@ -137,16 +141,19 @@ void NNIGHierarchy::update_hypers(
 
 //! \param data Column vector containing a single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
+double NNIGHierarchy::like_lpdf(
+    const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
-//! \param data Column vector of data points
-//! \return     Marginal distribution vector evaluated in data (log)
-double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
-  double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
-                      (hypers->shape * hypers->var_scaling));
-  return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape, hypers->mean,
+double NNIGHierarchy::marg_lpdf(
+    const bool posterior, const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+  Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
+  double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
+                      (params.shape * params.var_scaling));
+  return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
                                     sig_n);
 }
 
@@ -169,14 +176,6 @@ void NNIGHierarchy::sample_given_data() {
       params.mean, sqrt(state.var / params.var_scaling), rng);
 }
 
-void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
-  data_sum = data.sum();
-  data_sum_squares = data.squaredNorm();
-  card = data.rows();
-  log_card = std::log(card);
-  sample_given_data();
-}
-
 void NNIGHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast = google::protobuf::internal::down_cast<
@@ -189,7 +188,7 @@ void NNIGHierarchy::set_state_from_proto(
 
 void NNIGHierarchy::initialize_hypers() {
 
-  auto priorcast = cast_prior_proto();
+  auto priorcast = cast_prior();
 
   if (priorcast->has_fixed_values()) {
     // Set values
@@ -207,7 +206,6 @@ void NNIGHierarchy::initialize_hypers() {
     if (hypers->scale <= 0) {
       throw std::invalid_argument("Scale parameter must be > 0");
     }
-    std::cout << "done" << std::endl;
   }
 
   else if (priorcast->has_normal_mean_prior()) {

@@ -35,31 +35,74 @@ class AbstractHierarchy {
   int card = 0;
   double log_card = stan::math::NEGATIVE_INFTY;
   std::shared_ptr<google::protobuf::Message> prior;
-
+  //!
   virtual void update_summary_statistics(const Eigen::VectorXd &datum,
+                                         const Eigen::VectorXd &covariate,
                                          bool add) = 0;
+  //!
+  virtual void save_posterior_hypers() = 0;
+  //!
   virtual void initialize_hypers() = 0;
+  //!
+  virtual void create_empty_prior() = 0;
 
  public:
   virtual ~AbstractHierarchy() = default;
   virtual std::shared_ptr<AbstractHierarchy> clone() const = 0;
   virtual bayesmix::HierarchyId get_id() const = 0;
 
+  //! Adds a datum and its index to the hierarchy
+  void add_datum(const int id, const Eigen::VectorXd &datum,
+                 const bool update_params = false,
+                 const Eigen::VectorXd &covariate = Eigen::VectorXd(0));
+  //! Removes a datum and its index from the hierarchy
+  void remove_datum(const int id, const Eigen::VectorXd &datum,
+                    const bool update_params = false,
+                    const Eigen::VectorXd &covariate = Eigen::VectorXd(0));
+  //! Deletes all data in the hierarchy
+  virtual void clear_data() = 0;
+  //!
   virtual void initialize() = 0;
 
   virtual bool is_multivariate() const = 0;
   virtual bool is_dependent() const { return false; }
   virtual bool is_conjugate() const { return true; }
+<<<<<<< HEAD
   virtual void update_hypers(
       const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
 
   virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
   //! Evaluates the log-likelihood of data in the given points
   virtual Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data) const;
+=======
+  //!
+  virtual void update_hypers(
+      const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
+
+  // DESTRUCTOR AND CONSTRUCTORS
+  virtual ~BaseHierarchy() = default;
+  BaseHierarchy() = default;
+  virtual std::shared_ptr<BaseHierarchy> clone() const = 0;
+
+  // EVALUATION FUNCTIONS FOR SINGLE POINTS
+  //! Evaluates the log-likelihood of data in a single point
+  virtual double like_lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
+>>>>>>> 47f73be5600e7c2e15af17c23bca0287a8296400
   //! Evaluates the log-marginal distribution of data in a single point
-  virtual double marg_lpdf(const Eigen::RowVectorXd &datum) const = 0;
-  //! Evaluates the log-marginal distribution of data in the given points
-  virtual Eigen::VectorXd marg_lpdf_grid(const Eigen::MatrixXd &data) const;
+  virtual double marg_lpdf(
+      const bool posterior, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
+  // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
+  //! Evaluates the log-likelihood of data in a grid of points
+  virtual Eigen::VectorXd like_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const;
+  //! Evaluates the log-marginal of data in a grid of points
+  virtual Eigen::VectorXd marg_lpdf_grid(
+      const bool posterior, const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
@@ -79,14 +122,19 @@ class AbstractHierarchy {
   double get_log_card() const { return log_card; }
   std::set<int> get_data_idx() { return cluster_data_idx; }
   google::protobuf::Message *prior_proto() {
+  //! Overloaded version of sample_given_data(), mainly used for debugging
+  void sample_given_data(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0));
+
+  // GETTERS AND SETTERS
+  google::protobuf::Message *get_mutable_prior() {
     if (prior == nullptr) create_empty_prior();
     
     return prior.get();
   }
 
   virtual void clear_data() = 0;
-  virtual void add_datum(const int id, const Eigen::VectorXd &datum);
-  virtual void remove_datum(const int id, const Eigen::VectorXd &datum);
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
@@ -108,9 +156,16 @@ class BaseHierarchy : public AbstractHierarchy {
     out->clear_data();
     return out;
   }
+<<<<<<< HEAD
 
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
+=======
+  virtual bayesmix::HierarchyId get_id() const = 0;
+  int get_card() const { return card; }
+  double get_log_card() const { return log_card; }
+  std::set<int> get_data_idx() const { return cluster_data_idx; }
+>>>>>>> 47f73be5600e7c2e15af17c23bca0287a8296400
 };
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

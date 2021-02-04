@@ -12,14 +12,16 @@ void DirichletMixing::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
   }
+  initialize_state();
 }
 
 //! \param card Cardinality of the cluster
 //! \param n    Total number of data points
 //! \return     Probability value
 double DirichletMixing::mass_existing_cluster(
-    std::shared_ptr<AbstractHierarchy> hier, const unsigned int n, bool log,
-    bool propto) const {
+    const unsigned int n, const bool log, const bool propto,
+    std::shared_ptr<AbstractHierarchy> hier,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   double out;
   if (log) {
     out = hier->get_log_card();
@@ -29,14 +31,15 @@ double DirichletMixing::mass_existing_cluster(
     if (!propto) out /= (n + state.totalmass);
   }
   return out;
-}
+    }
 
 //! \param n_clust Number of clusters
 //! \param n       Total number of data points
 //! \return        Probability value
-double DirichletMixing::mass_new_cluster(const unsigned int n_clust,
-                                         const unsigned int n, bool log,
-                                         bool propto) const {
+double DirichletMixing::mass_new_cluster(
+    const unsigned int n, const bool log, const bool propto,
+    const unsigned int n_clust,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   double out;
   if (log) {
     out = state.logtotmass;
@@ -52,15 +55,18 @@ void DirichletMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     unsigned int n) {
   auto &rng = bayesmix::Rng::Instance().get();
-  if (prior->has_fixed_value()) {
+
+  auto priorcast = cast_prior();
+
+  if (priorcast->has_fixed_value()) {
     return;
   }
 
-  else if (prior->has_gamma_prior()) {
+  else if (priorcast->has_gamma_prior()) {
     // Recover parameters
     unsigned int k = unique_values.size();
-    double alpha = prior->gamma_prior().totalmass_prior().shape();
-    double beta = prior->gamma_prior().totalmass_prior().rate();
+    double alpha = priorcast->gamma_prior().totalmass_prior().shape();
+    double beta = priorcast->gamma_prior().totalmass_prior().rate();
 
     double phi = stan::math::gamma_rng(state.totalmass + 1, n, rng);
     double odds = (alpha + k - 1) / (n * (beta - log(phi)));
@@ -87,20 +93,18 @@ void DirichletMixing::set_state_from_proto(
   state.logtotmass = std::log(state.totalmass);
 }
 
-void DirichletMixing::set_prior(const google::protobuf::Message &prior_) {
-  auto &priorcast =
-      google::protobuf::internal::down_cast<const bayesmix::DPPrior &>(prior_);
-  prior = std::make_shared<bayesmix::DPPrior>(priorcast);
-  if (prior->has_fixed_value()) {
-    state.totalmass = prior->fixed_value().totalmass();
+void DirichletMixing::initialize_state() {
+  auto priorcast = cast_prior();
+  if (priorcast->has_fixed_value()) {
+    state.totalmass = priorcast->fixed_value().totalmass();
     if (state.totalmass <= 0) {
       throw std::invalid_argument("Total mass parameter must be > 0");
     }
   }
 
-  else if (prior->has_gamma_prior()) {
-    double alpha = prior->gamma_prior().totalmass_prior().shape();
-    double beta = prior->gamma_prior().totalmass_prior().rate();
+  else if (priorcast->has_gamma_prior()) {
+    double alpha = priorcast->gamma_prior().totalmass_prior().shape();
+    double beta = priorcast->gamma_prior().totalmass_prior().rate();
     if (alpha <= 0) {
       throw std::invalid_argument("Shape parameter must be > 0");
     }

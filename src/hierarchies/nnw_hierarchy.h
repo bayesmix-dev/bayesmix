@@ -5,7 +5,6 @@
 
 #include <Eigen/Dense>
 #include <memory>
-#include <stan/math/prim/fun.hpp>
 
 #include "base_hierarchy.h"
 #include "hierarchy_id.pb.h"
@@ -51,6 +50,7 @@ class NNWHierarchy : public BaseHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
+  std::shared_ptr<Hyperparams> posterior_hypers;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
   //! Lower factor of the Cholesky decomposition of prec
@@ -61,28 +61,42 @@ class NNWHierarchy : public BaseHierarchy {
   // AUXILIARY TOOLS
   //! Special setter for prec and its utilities
   void set_prec_and_utilities(const Eigen::MatrixXd &prec_);
-
+  //!
   void clear_data() override;
-
+  //!
   void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 const Eigen::VectorXd &covariate,
                                  bool add) override;
-
+  //!
+  void save_posterior_hypers() override;
+  //!
   void initialize_hypers() override;
-
   //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams normal_wishart_update();
-
-  std::shared_ptr<bayesmix::NNWPrior> cast_prior_proto() {
+  Hyperparams normal_wishart_update() const;
+  //!
+  std::shared_ptr<bayesmix::NNWPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::NNWPrior>(prior);
   }
+  //!
+  void create_empty_prior() override { prior.reset(new bayesmix::NNWPrior); }
 
  public:
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, true)
   bool is_multivariate() const override { return true; }
-
+  //!
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
+
+  // EVALUATION FUNCTIONS
+  //! Evaluates the log-likelihood of data in a single point
+  double like_lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
+  //! Evaluates the log-marginal distribution of data in a single point
+  double marg_lpdf(
+      const bool posterior, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNWHierarchy() = default;
@@ -93,29 +107,20 @@ class NNWHierarchy : public BaseHierarchy {
     return out;
   }
 
-  // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
-  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
-  //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const Eigen::RowVectorXd &datum) const override;
-
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
   void sample_given_data() override;
-  void sample_given_data(const Eigen::MatrixXd &data) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
 
-  void create_empty_prior() override { prior.reset(new bayesmix::NNWPrior); }
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
-
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNW;
   }
