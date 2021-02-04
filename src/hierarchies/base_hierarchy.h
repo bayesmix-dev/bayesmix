@@ -42,6 +42,8 @@ class BaseHierarchy {
                                          const Eigen::VectorXd &covariate,
                                          bool add) = 0;
   //!
+  virtual void save_posterior_hypers() = 0;
+  //!
   virtual void initialize_hypers() = 0;
   //!
   virtual void create_empty_prior() = 0;
