@@ -42,6 +42,8 @@ class BaseHierarchy {
                                          bool add) = 0;
   virtual void initialize_hypers() = 0;
 
+  virtual void create_empty_prior() = 0;
+
  public:
   virtual void add_datum(const int id, const Eigen::VectorXd &datum);
 
@@ -89,9 +91,8 @@ class BaseHierarchy {
   virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;  // TODO
                                                                     // needed?
 
-  virtual void create_empty_prior() = 0;
   // GETTERS AND SETTERS
-  google::protobuf::Message *prior_proto() {
+  google::protobuf::Message *get_mutable_prior() {
     if (prior == nullptr) create_empty_prior();
     
     return prior.get();

@@ -59,6 +59,8 @@ class NNIGHierarchy : public BaseHierarchy {
     return std::dynamic_pointer_cast<bayesmix::NNIGPrior>(prior);
   }
 
+  void create_empty_prior() override { prior.reset(new bayesmix::NNIGPrior); }
+
  public:
   void initialize() override;
 
@@ -94,7 +96,6 @@ class NNIGHierarchy : public BaseHierarchy {
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
-  void create_empty_prior() override { prior.reset(new bayesmix::NNIGPrior); }
 
   
   void set_state_from_proto(const google::protobuf::Message &state_) override;

@@ -76,6 +76,8 @@ class NNWHierarchy : public BaseHierarchy {
     return std::dynamic_pointer_cast<bayesmix::NNWPrior>(prior);
   }
 
+  void create_empty_prior() override { prior.reset(new bayesmix::NNWPrior); }
+
  public:
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data (here, true)
@@ -110,7 +112,6 @@ class NNWHierarchy : public BaseHierarchy {
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
 
-  void create_empty_prior() override { prior.reset(new bayesmix::NNWPrior); }
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
