@@ -80,3 +80,18 @@ Eigen::VectorXd BaseHierarchy::marg_lpdf_grid(
   }
   return lpdf;
 }
+
+void BaseHierarchy::sample_given_data(
+    const Eigen::MatrixXd &data,
+    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
+  clear_data();
+  if (covariates == Eigen::MatrixXd(0, 0)) {
+    for (int i = 0; i < data.rows(); i++)
+      add_datum(i, data.row(i), false, Eigen::RowVectorXd(0));
+  } else {
+    for (int i = 0; i < data.rows(); i++)
+      add_datum(i, data.row(i), false, covariates.row(i));
+  }
+  update_summary_statistics();
+  sample_given_data();
+}

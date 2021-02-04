@@ -171,16 +171,6 @@ void NNIGHierarchy::sample_given_data() {
       params.mean, sqrt(state.var / params.var_scaling), rng);
 }
 
-void NNIGHierarchy::sample_given_data(
-    const Eigen::MatrixXd &data,
-    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
-  data_sum = data.sum();
-  data_sum_squares = data.squaredNorm();
-  card = data.rows();
-  log_card = std::log(card);
-  sample_given_data();
-}
-
 void NNIGHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast = google::protobuf::internal::down_cast<

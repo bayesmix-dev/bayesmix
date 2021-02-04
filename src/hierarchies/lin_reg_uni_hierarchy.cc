@@ -106,17 +106,6 @@ void LinRegUniHierarchy::sample_given_data() {
       params.mean, params.var_scaling / state.var, rng);
 }
 
-void LinRegUniHierarchy::sample_given_data(
-    const Eigen::MatrixXd &data,
-    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
-  data_sum_squares = data.squaredNorm();
-  covar_sum_squares = covariates.transpose() * covariates;
-  mixed_prod = covariates.transpose() * data;
-  card = data.rows();
-  log_card = std::log(card);
-  sample_given_data();
-}
-
 void LinRegUniHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast = google::protobuf::internal::down_cast<

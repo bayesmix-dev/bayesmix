@@ -202,20 +202,6 @@ void NNWHierarchy::sample_given_data() {
   set_prec_and_utilities(tau_new);
 }
 
-void NNWHierarchy::sample_given_data(
-    const Eigen::MatrixXd &data,
-    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
-  data_sum = Eigen::VectorXd::Zero(data.cols());
-  data_sum_squares = Eigen::MatrixXd::Zero(data.cols(), data.cols());
-  for (int i = 0; i < data.rows(); i++) {
-    data_sum += data.row(i);
-    data_sum_squares += data.row(i).transpose() * data.row(i);
-  }
-  card = data.rows();
-  log_card = std::log(card);
-  sample_given_data();
-}
-
 void NNWHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast = google::protobuf::internal::down_cast<
