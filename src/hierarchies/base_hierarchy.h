@@ -9,9 +9,9 @@
 #include <set>
 #include <stan/math/prim.hpp>
 
+#include "hierarchy_id.pb.h"
 #include "marginal_state.pb.h"
 #include "src/utils/rng.h"
-#include "hierarchy_id.pb.h"
 
 //! Abstract base template class for a hierarchy object.
 
@@ -109,7 +109,7 @@ class BaseHierarchy {
   // GETTERS AND SETTERS
   google::protobuf::Message *get_mutable_prior() {
     if (prior == nullptr) create_empty_prior();
-    
+
     return prior.get();
   }
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;

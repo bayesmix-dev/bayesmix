@@ -4,6 +4,7 @@
 #include <memory>
 #include <stan/math/prim/fun.hpp>
 
+#include "algorithm_id.pb.h"
 #include "marginal_state.pb.h"
 #include "neal2_algorithm.h"
 #include "src/hierarchies/base_hierarchy.h"

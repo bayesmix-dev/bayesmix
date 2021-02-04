@@ -184,7 +184,6 @@ void NNIGHierarchy::set_state_from_proto(
 }
 
 void NNIGHierarchy::initialize_hypers() {
-
   auto priorcast = cast_prior();
 
   if (priorcast->has_fixed_values()) {

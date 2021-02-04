@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <memory>
 
+#include "algorithm_id.pb.h"
 #include "marginal_algorithm.h"
 #include "src/hierarchies/base_hierarchy.h"
 

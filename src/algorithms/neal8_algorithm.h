@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+#include "algorithm_id.pb.h"
 #include "neal2_algorithm.h"
 
 //! Template class for Neal's algorithm 8 for conjugate hierarchies

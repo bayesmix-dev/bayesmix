@@ -213,7 +213,7 @@ void NNWHierarchy::set_state_from_proto(
 }
 
 void NNWHierarchy::initialize_hypers() {
-   auto priorcast = cast_prior();
+  auto priorcast = cast_prior();
 
   if (priorcast->has_fixed_values()) {
     // Set values

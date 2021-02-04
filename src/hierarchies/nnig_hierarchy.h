@@ -104,7 +104,6 @@ class NNIGHierarchy : public BaseHierarchy {
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
 
-  
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
