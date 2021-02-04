@@ -55,7 +55,7 @@ class NNIGHierarchy : public BaseHierarchy {
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update();
 
-  std::shared_ptr<bayesmix::NNIGPrior> cast_prior_proto() {
+  std::shared_ptr<bayesmix::NNIGPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::NNIGPrior>(prior);
   }
 

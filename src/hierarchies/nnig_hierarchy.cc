@@ -66,7 +66,7 @@ void NNIGHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();
 
-  auto priorcast = cast_prior_proto();
+  auto priorcast = cast_prior();
 
   if (priorcast->has_fixed_values()) {
     return;
@@ -188,7 +188,7 @@ void NNIGHierarchy::set_state_from_proto(
 
 void NNIGHierarchy::initialize_hypers() {
 
-  auto priorcast = cast_prior_proto();
+  auto priorcast = cast_prior();
 
   if (priorcast->has_fixed_values()) {
     // Set values

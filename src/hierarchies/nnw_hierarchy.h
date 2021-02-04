@@ -72,7 +72,7 @@ class NNWHierarchy : public BaseHierarchy {
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_wishart_update();
 
-  std::shared_ptr<bayesmix::NNWPrior> cast_prior_proto() {
+  std::shared_ptr<bayesmix::NNWPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::NNWPrior>(prior);
   }
 

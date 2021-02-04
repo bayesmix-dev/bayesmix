@@ -26,7 +26,7 @@ class PitYorMixing : public BaseMixing {
   State state;
   void create_empty_prior() override { prior.reset(new bayesmix::PYPrior); }
 
-  std::shared_ptr<bayesmix::PYPrior> cast_prior_proto() {
+  std::shared_ptr<bayesmix::PYPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::PYPrior>(prior);
   }
 

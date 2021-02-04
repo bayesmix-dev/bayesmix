@@ -30,7 +30,7 @@ class DirichletMixing : public BaseMixing {
 
   void create_empty_prior() override { prior.reset(new bayesmix::DPPrior); }
 
-  std::shared_ptr<bayesmix::DPPrior> cast_prior_proto() {
+  std::shared_ptr<bayesmix::DPPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::DPPrior>(prior);
   }
 

@@ -54,7 +54,7 @@ void DirichletMixing::update_state(
     unsigned int n) {
   auto &rng = bayesmix::Rng::Instance().get();
 
-  auto priorcast = cast_prior_proto();
+  auto priorcast = cast_prior();
 
   if (priorcast->has_fixed_value()) {
     return;
@@ -92,7 +92,7 @@ void DirichletMixing::set_state_from_proto(
 }
 
 void DirichletMixing::initialize_state() {
-  auto priorcast = cast_prior_proto();
+  auto priorcast = cast_prior();
   if (priorcast->has_fixed_value()) {
     state.totalmass = priorcast->fixed_value().totalmass();
     if (state.totalmass <= 0) {

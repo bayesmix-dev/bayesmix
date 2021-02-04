@@ -79,7 +79,7 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update() {
 void NNWHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();
-  auto priorcast = cast_prior_proto();
+  auto priorcast = cast_prior();
   if (priorcast->has_fixed_values()) {
     return;
   }
@@ -226,7 +226,7 @@ void NNWHierarchy::set_state_from_proto(
 }
 
 void NNWHierarchy::initialize_hypers() {
-   auto priorcast = cast_prior_proto();
+   auto priorcast = cast_prior();
 
   if (priorcast->has_fixed_values()) {
     // Set values

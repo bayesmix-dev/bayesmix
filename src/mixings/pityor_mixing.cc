@@ -43,7 +43,7 @@ double PitYorMixing::mass_new_cluster(const unsigned int n_clust,
 void PitYorMixing::update_state(
     const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
     unsigned int n) {
-  auto priorcast = cast_prior_proto();
+  auto priorcast = cast_prior();
   if (priorcast->has_fixed_values()) {
     return;
   } else {
@@ -60,7 +60,7 @@ void PitYorMixing::set_state_from_proto(
 }
 
 void PitYorMixing::initialize_state() {
-  auto priorcast = cast_prior_proto();
+  auto priorcast = cast_prior();
   if (priorcast->has_fixed_values()) {
     state.strength = priorcast->fixed_values().strength();
     state.discount = priorcast->fixed_values().discount();

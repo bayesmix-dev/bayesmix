@@ -51,7 +51,7 @@ class LinRegUniHierarchy : public DependentHierarchy {
   void sample_given_data(const Eigen::MatrixXd &data,
                          const Eigen::MatrixXd &covariates) override;
 
-  std::shared_ptr<bayesmix::LinRegUniPrior> cast_prior_proto() {
+  std::shared_ptr<bayesmix::LinRegUniPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::LinRegUniPrior>(prior);
   }
 

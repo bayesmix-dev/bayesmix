@@ -56,7 +56,7 @@ LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update() {
 void LinRegUniHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();
-  auto priorcast = cast_prior_proto();
+  auto priorcast = cast_prior();
 
   if (priorcast->has_fixed_values()) {
     return;
@@ -124,7 +124,7 @@ void LinRegUniHierarchy::set_state_from_proto(
 }
 
 void LinRegUniHierarchy::initialize_hypers() {
-  auto priorcast = cast_prior_proto();
+  auto priorcast = cast_prior();
 
   if (priorcast->has_fixed_values()) {
     // Set values
