@@ -12,7 +12,6 @@ include_directories(${GTEST_INCLUDE_DIR})
 add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   write_proto.cc
   proto_utils.cc
-  rng.cc
   hierarchies.cc
   lpdf.cc
   priors.cc
@@ -21,6 +20,7 @@ add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   semi_hdp.cc
   collectors.cc
   runtime.cc
+  rng.cc
 )
 
 target_include_directories(test_bayesmix PUBLIC ${INCLUDE_PATHS})
