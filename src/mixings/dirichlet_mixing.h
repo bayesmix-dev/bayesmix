@@ -1,8 +1,9 @@
 #ifndef BAYESMIX_MIXINGS_DIRICHLET_MIXING_H_
 #define BAYESMIX_MIXINGS_DIRICHLET_MIXING_H_
 
-#include <Eigen/Dense>
 #include <google/protobuf/message.h>
+
+#include <Eigen/Dense>
 #include <memory>
 
 #include "base_mixing.h"
