@@ -53,9 +53,9 @@ class NNWHierarchy : public BaseHierarchy {
   std::shared_ptr<Hyperparams> posterior_hypers;
 
   // UTILITIES FOR LIKELIHOOD COMPUTATION
-  //! Lower factor of the Cholesky decomposition of prec
+  //! Lower factor of the Cholesky decomposition of state.prec
   Eigen::MatrixXd prec_chol;
-  //! Determinant of prec in logarithmic scale
+  //! Determinant of state.prec in logarithmic scale
   double prec_logdet;
 
   // AUXILIARY TOOLS
@@ -116,7 +116,6 @@ class NNWHierarchy : public BaseHierarchy {
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
-
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
