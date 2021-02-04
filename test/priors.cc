@@ -16,7 +16,8 @@ TEST(mixing, fixed_value) {
   prior.mutable_fixed_value()->set_totalmass(m);
   double m_state = prior.fixed_value().totalmass();
   ASSERT_DOUBLE_EQ(m, m_state);
-  mix.set_prior(prior);
+  mix.get_mutable_prior()->CopyFrom(prior);
+  mix.initialize();
   double m_mix = mix.get_state().totalmass;
   ASSERT_DOUBLE_EQ(m, m_mix);
 
@@ -35,7 +36,8 @@ TEST(mixing, gamma_prior) {
   double m_prior = alpha / beta;
   prior.mutable_gamma_prior()->mutable_totalmass_prior()->set_shape(alpha);
   prior.mutable_gamma_prior()->mutable_totalmass_prior()->set_rate(beta);
-  mix.set_prior(prior);
+  mix.get_mutable_prior()->CopyFrom(prior);
+  mix.initialize();
   double m_mix = mix.get_state().totalmass;
   ASSERT_DOUBLE_EQ(m_prior, m_mix);
 
@@ -57,7 +59,7 @@ TEST(hierarchies, fixed_values) {
   prior.mutable_fixed_values()->set_scale(2.0);
 
   auto hier = std::make_shared<NNIGHierarchy>();
-  hier->set_prior(prior);
+  hier->get_mutable_prior()->CopyFrom(prior);
   hier->initialize();
 
   std::vector<std::shared_ptr<BaseHierarchy>> unique_values;
@@ -110,7 +112,7 @@ TEST(hierarchies, normal_mean_prior) {
   }
 
   NNWHierarchy hier;
-  hier.set_prior(prior);
+  hier.get_mutable_prior()->CopyFrom(prior);
   hier.initialize();
 
   hier.update_hypers(states);

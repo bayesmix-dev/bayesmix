@@ -61,7 +61,8 @@ TEST(rng, test3) {
   hier_prior.mutable_fixed_values()->set_var_scaling(0.1);
   hier_prior.mutable_fixed_values()->set_shape(2.0);
   hier_prior.mutable_fixed_values()->set_scale(2.0);
-  hierarchy.set_prior(hier_prior);
+  hierarchy.get_mutable_prior()->CopyFrom(hier_prior);
+  hierarchy.initialize();
 
   hierarchy.draw();
   double m1 = hierarchy.get_state().mean;
