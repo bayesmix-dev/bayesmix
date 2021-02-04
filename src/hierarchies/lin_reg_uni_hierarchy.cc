@@ -46,6 +46,8 @@ LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update()
   Hyperparams post_params;
 
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
+  post_params.var_scaling_inv =
+      stan::math::inverse_spd(post_params.var_scaling);
   post_params.mean = post_params.var_scaling.llt().solve(
       mixed_prod + hypers->var_scaling * hypers->mean);
   post_params.shape = hypers->shape + 0.5 * card;

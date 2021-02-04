@@ -72,8 +72,8 @@ NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update() const {
       data_sum_squares - card * mubar * mubar.transpose();
   tau_temp += (card * hypers->var_scaling / (card + hypers->var_scaling)) *
               (mubar - hypers->mean) * (mubar - hypers->mean).transpose();
-  tau_temp = 0.5 * tau_temp + hypers->scale_inv;
-  post_params.scale = stan::math::inverse_spd(tau_temp);
+  post_params.scale_inv = 0.5 * tau_temp + hypers->scale_inv;
+  post_params.scale = stan::math::inverse_spd(post_params.scale_inv);
   return post_params;
 }
 
