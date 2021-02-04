@@ -121,10 +121,10 @@ class BaseAlgorithm {
 
   // ESTIMATE FUNCTION
   //! Evaluates the logpdf for each single iteration on a given grid of points
-  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                                    const Eigen::MatrixXd &hier_covariates,
-                                    const Eigen::MatrixXd &mix_covariates,
-                                    BaseCollector *const collector) = 0;
+  virtual Eigen::MatrixXd eval_lpdf(
+      BaseCollector *const collector, const Eigen::MatrixXd &grid,
+      const Eigen::MatrixXd &hier_covariates = Eigen::MatrixXd(0, 0),
+      const Eigen::MatrixXd &mix_covariates = Eigen::MatrixXd(0, 0)) = 0;
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseAlgorithm() = default;

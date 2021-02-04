@@ -8,17 +8,18 @@
 #include "src/collectors/base_collector.h"
 #include "src/utils/eigen_utils.h"
 
-//! \param grid Grid of points in matrix form to evaluate the density on
-//! \param coll Collector containing the algorithm chain
-//! \return     Matrix whose i-th column is the lpdf at i-th iteration
+//! \param grid      Grid of points in matrix form to evaluate the density on
+//! \param collector Collector containing the algorithm chain
+//! \return          Matrix whose i-th column is the lpdf at i-th iteration
 Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
-    const Eigen::MatrixXd &grid, const Eigen::MatrixXd &hier_covariates,
-    const Eigen::MatrixXd &mix_covariates, BaseCollector *coll) {
+    BaseCollector *const collector, const Eigen::MatrixXd &grid,
+    const Eigen::MatrixXd &hier_covariates /*= Eigen::MatrixXd(0, 0)*/,
+    const Eigen::MatrixXd &mix_covariates /*= Eigen::MatrixXd(0, 0)*/) {
   std::deque<Eigen::VectorXd> lpdf;
   bool keep = true;
-  progresscpp::ProgressBar bar(coll->get_size(), 60);
+  progresscpp::ProgressBar bar(collector->get_size(), 60);
   while (keep) {
-    keep = update_state_from_collector(coll);
+    keep = update_state_from_collector(collector);
     if (!keep) {
       break;
     }
@@ -26,7 +27,7 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
     ++bar;
     bar.display();
   }
-  coll->reset();
+  collector->reset();
   bar.done();
   return bayesmix::stack_vectors(lpdf);
 }
