@@ -38,20 +38,19 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
   Eigen::VectorXd lpdf(grid.rows());
   unsigned int n_data = curr_state.cluster_allocs_size();
   unsigned int n_clust = curr_state.cluster_states_size();
-  auto temp_mixing = mixing->clone();
-  temp_mixing->set_state_from_proto(curr_state.mixing_state());
+  mixing->set_state_from_proto(curr_state.mixing_state());
   Eigen::MatrixXd lpdf_local(grid.rows(), n_clust + 1);
   auto temp_hier = unique_values[0]->clone();
   Eigen::VectorXd weights(n_clust + 1);
   for (size_t j = 0; j < n_clust; j++) {
     temp_hier->set_state_from_proto(curr_state.cluster_states(j));
     lpdf_local.col(j) =
-        temp_mixing->mass_existing_cluster(n_data, true, false, temp_hier) +
+        mixing->mass_existing_cluster(n_data, true, false, temp_hier) +
         temp_hier->like_lpdf_grid(grid, hier_covariates).array();
     // TODO add mixing covariate
   }
   lpdf_local.col(n_clust) =
-      temp_mixing->mass_new_cluster(n_data, true, false, n_clust) +
+      mixing->mass_new_cluster(n_data, true, false, n_clust) +
       lpdf_marginal_component(temp_hier, grid, hier_covariates).array();
   // TODO add mixing covariate
 
