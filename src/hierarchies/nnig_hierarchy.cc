@@ -38,12 +38,11 @@ void NNIGHierarchy::save_posterior_hypers() {
 //! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
 //! \return                            Vector of updated values for hyperpar.s
 NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() const {
-  Hyperparams post_params;
   if (card == 0) {  // no update possible
-    post_params = *hypers;
-    return post_params;
+    return *hypers;
   }
-  // Compute updated hyperparameters
+  // Compute posterior hyperparameters
+  Hyperparams post_params;
   double y_bar = data_sum / (1.0 * card);  // sample mean
   double ss = data_sum_squares - card * y_bar * y_bar;
   post_params.mean = (hypers->var_scaling * hypers->mean + data_sum) /

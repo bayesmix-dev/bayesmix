@@ -60,8 +60,11 @@ void NNWHierarchy::save_posterior_hypers() {
 //! \param mu0, lambda0, tau0, nu0 Original values for hyperparameters
 //! \return                        Vector of updated values for hyperparameters
 NNWHierarchy::Hyperparams NNWHierarchy::normal_wishart_update() const {
+  if (card == 0) {  // no update possible
+    return *hypers;
+  }
+  // Compute posterior hyperparameters
   Hyperparams post_params;
-  // Compute updated hyperparameters
   post_params.var_scaling = hypers->var_scaling + card;
   post_params.deg_free = hypers->deg_free + 0.5 * card;
   Eigen::VectorXd mubar = data_sum.array() / card;  // sample mean

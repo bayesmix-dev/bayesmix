@@ -43,8 +43,11 @@ void LinRegUniHierarchy::save_posterior_hypers() {
 
 LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update()
     const {
+  if (card == 0) {  // no update possible
+    return *hypers;
+  }
+  // Compute posterior hyperparameters
   Hyperparams post_params;
-
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
   post_params.var_scaling_inv =
       stan::math::inverse_spd(post_params.var_scaling);
