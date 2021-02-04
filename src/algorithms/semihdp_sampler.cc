@@ -184,7 +184,8 @@ void SemiHdpSampler::update_table_allocs() {
         probas[l] = log_n + rest_tables[r][l]->like_lpdf(data[i].row(j));
       }
 
-      double margG0 = logw + G0_master_hierarchy->marg_lpdf(data[i].row(j));
+      double margG0 =
+          logw + G0_master_hierarchy->marg_lpdf(false, data[i].row(j));
 
       Eigen::VectorXd hdp_contribs(shared_tables.size() + 1);
 #pragma omp parallel for
@@ -195,7 +196,8 @@ void SemiHdpSampler::update_table_allocs() {
       }
 
       hdp_contribs[shared_tables.size()] =
-          loggamma - logmsum + G00_master_hierarchy->marg_lpdf(data[i].row(j));
+          loggamma - logmsum +
+          G00_master_hierarchy->marg_lpdf(false, data[i].row(j));
       double margHDP = log1mw + stan::math::log_sum_exp(hdp_contribs);
       Eigen::VectorXd marg(2);
       marg << margG0, margHDP;
@@ -255,7 +257,6 @@ void SemiHdpSampler::update_to_shared() {
     for (int l = 0; l < rest_tables[r].size(); l++) {
       data_by_theta_star.push_back(Eigen::MatrixXd::Zero(0, 0));
     }
-
     for (int i = 0; i < ngroups; i++) {
       if (rest_allocs[i] == r) {
         for (int j = 0; j < n_by_group[i]; j++) {
@@ -264,21 +265,24 @@ void SemiHdpSampler::update_to_shared() {
         }
       }
     }
-
     // compute logprobas
     for (int l = 0; l < rest_tables[r].size(); l++) {
       if ((table_to_shared[r][l] >= 0) && (data_by_theta_star[l].size() > 0)) {
         Eigen::VectorXd probas(shared_tables.size() + 1);
         cnt_shared_tables[table_to_shared[r][l]] -= 1;
         for (int k = 0; k < shared_tables.size(); k++) {
-          probas(k) =
-              std::log(cnt_shared_tables[k]) +
-              shared_tables[k]->like_lpdf_grid(data_by_theta_star[l]).sum();
+          probas(k) = std::log(cnt_shared_tables[k]) +
+                      shared_tables[k]
+                          ->like_lpdf_grid(data_by_theta_star[l],
+                                           Eigen::MatrixXd(0, 0))
+                          .sum();
         }
-
         probas(shared_tables.size()) =
             std::log(totalmass_hdp) +
-            G00_master_hierarchy->marg_lpdf_grid(data_by_theta_star[l]).sum();
+            G00_master_hierarchy
+                ->marg_lpdf_grid(false, Eigen::MatrixXd(0, 0),
+                                 data_by_theta_star[l])
+                .sum();
 
         probas = stan::math::softmax(probas);
 
@@ -520,7 +524,9 @@ double SemiHdpSampler::lpdf_for_group(int i, int r) {
     lpdf_local.resize(n_by_group[i], rest_tables[r].size());
     for (int h = 0; h < rest_tables[r].size(); h++) {
       lpdf_local.col(h) = log(1.0 * n_by_table[r][h] / (totalmass_rest + nr)) +
-                          rest_tables[r][h]->like_lpdf_grid(data[i]).array();
+                          rest_tables[r][h]
+                              ->like_lpdf_grid(data[i], Eigen::MatrixXd(0, 0))
+                              .array();
     }
 
   } else {
@@ -530,7 +536,9 @@ double SemiHdpSampler::lpdf_for_group(int i, int r) {
     for (int h = 0; h < rest_tables_pseudo[r].size(); h++) {
       lpdf_local.col(h) =
           log(1.0 * n_by_table_pseudo[r][h] / (totalmass_rest + nr)) +
-          rest_tables_pseudo[r][h]->like_lpdf_grid(data[i]).array();
+          rest_tables_pseudo[r][h]
+              ->like_lpdf_grid(data[i], Eigen::MatrixXd(0, 0))
+              .array();
     }
   }
   for (int j = 0; j < n_by_group[i]; j++)

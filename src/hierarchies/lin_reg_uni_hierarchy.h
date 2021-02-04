@@ -27,7 +27,6 @@ class LinRegUniHierarchy : public DependentHierarchy {
   };
 
  protected:
-  unsigned int dim;
   //! Represents pieces of y^t y
   double data_sum_squares;
   //! Represents pieces of X^T X
@@ -38,18 +37,19 @@ class LinRegUniHierarchy : public DependentHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-
+  std::shared_ptr<Hyperparams> posterior_hypers;
+  //!
   void clear_data();
+  //!
   void update_summary_statistics(const Eigen::VectorXd &datum,
                                  const Eigen::VectorXd &covariate, bool add);
-
+  //!
+  void save_posterior_hypers() override;
+  //!
   void initialize_hypers() override;
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams normal_invgamma_update();
-
-  void sample_given_data(const Eigen::MatrixXd &data,
-                         const Eigen::MatrixXd &covariates) override;
+  Hyperparams normal_invgamma_update() const;
 
   std::shared_ptr<bayesmix::LinRegUniPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::LinRegUniPrior>(prior);
@@ -63,9 +63,19 @@ class LinRegUniHierarchy : public DependentHierarchy {
   void initialize() override;
   //! Returns true if the hierarchy models multivariate data
   bool is_multivariate() const override { return false; }
-
+  //!
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
+
+  // EVALUATION FUNCTIONS
+  //! Evaluates the log-likelihood of data in a single point
+  double like_lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
+  //! Evaluates the log-marginal distribution of data in a single point
+  double marg_lpdf(
+      const bool posterior, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
 
   // DESTRUCTOR AND CONSTRUCTORS
   ~LinRegUniHierarchy() = default;
@@ -76,14 +86,6 @@ class LinRegUniHierarchy : public DependentHierarchy {
     out->clear_data();
     return out;
   }
-
-  // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
-  double like_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate) const override;
-  //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate) const override;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
@@ -97,7 +99,6 @@ class LinRegUniHierarchy : public DependentHierarchy {
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
-
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::LinRegUni;
   }

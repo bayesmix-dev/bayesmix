@@ -37,7 +37,12 @@ void LinRegUniHierarchy::update_summary_statistics(
   }
 }
 
-LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update() {
+void LinRegUniHierarchy::save_posterior_hypers() {
+  *posterior_hypers = normal_invgamma_update();
+}
+
+LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update()
+    const {
   Hyperparams post_params;
 
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
@@ -69,19 +74,20 @@ void LinRegUniHierarchy::update_hypers(
 
 double LinRegUniHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   return stan::math::normal_lpdf(
       datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
 }
 
 double LinRegUniHierarchy::marg_lpdf(
-    const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate) const {
+    const bool posterior, const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+  Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
   double sig_n = sqrt(
-      (1 + (covariate * hypers->var_scaling_inv * covariate.transpose())(0)) *
-      hypers->scale / hypers->shape);
-  return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape,
-                                    covariate.dot(hypers->mean), sig_n);
+      (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
+      params.scale / params.shape);
+  return stan::math::student_t_lpdf(datum(0), 2 * params.shape,
+                                    covariate.dot(params.mean), sig_n);
 }
 
 void LinRegUniHierarchy::draw() {
@@ -95,22 +101,11 @@ void LinRegUniHierarchy::draw() {
 void LinRegUniHierarchy::sample_given_data() {
   // Update values
   Hyperparams params = normal_invgamma_update();
-
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   state.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
   state.regression_coeffs = stan::math::multi_normal_prec_rng(
       params.mean, params.var_scaling / state.var, rng);
-}
-
-void LinRegUniHierarchy::sample_given_data(const Eigen::MatrixXd &data,
-                                           const Eigen::MatrixXd &covariates) {
-  data_sum_squares = data.squaredNorm();
-  covar_sum_squares = covariates.transpose() * covariates;
-  mixed_prod = covariates.transpose() * data;
-  card = data.rows();
-  log_card = std::log(card);
-  sample_given_data();
 }
 
 void LinRegUniHierarchy::set_state_from_proto(

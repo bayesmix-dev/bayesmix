@@ -15,9 +15,10 @@ void PitYorMixing::initialize() {
 //! \param card Cardinality of the cluster
 //! \param n    Total number of data points
 //! \return     Probability value
-double PitYorMixing::mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
-                                           const unsigned int n, bool log,
-                                           bool propto) const {
+double PitYorMixing::mass_existing_cluster(
+    const unsigned int n, const bool log, const bool propto,
+    std::shared_ptr<BaseHierarchy> hier,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   double out;
   if (hier->get_card() == 0) {
     out = 0;
@@ -31,9 +32,10 @@ double PitYorMixing::mass_existing_cluster(std::shared_ptr<BaseHierarchy> hier,
 //! \param n_clust Number of clusters
 //! \param n       Total number of data points
 //! \return        Probability value
-double PitYorMixing::mass_new_cluster(const unsigned int n_clust,
-                                      const unsigned int n, bool log,
-                                      bool propto) const {
+double PitYorMixing::mass_new_cluster(
+    const unsigned int n, const bool log, const bool propto,
+    const unsigned int n_clust,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   double out =
       (state.strength + state.discount * n_clust) / (n + state.strength);
   if (log) out = std::log(out);

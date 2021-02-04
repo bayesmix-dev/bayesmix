@@ -19,8 +19,9 @@ void DirichletMixing::initialize() {
 //! \param n    Total number of data points
 //! \return     Probability value
 double DirichletMixing::mass_existing_cluster(
-    std::shared_ptr<BaseHierarchy> hier, const unsigned int n, bool log,
-    bool propto) const {
+    const unsigned int n, const bool log, const bool propto,
+    std::shared_ptr<BaseHierarchy> hier,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   double out;
   if (log) {
     out = hier->get_log_card();
@@ -35,9 +36,10 @@ double DirichletMixing::mass_existing_cluster(
 //! \param n_clust Number of clusters
 //! \param n       Total number of data points
 //! \return        Probability value
-double DirichletMixing::mass_new_cluster(const unsigned int n_clust,
-                                         const unsigned int n, bool log,
-                                         bool propto) const {
+double DirichletMixing::mass_new_cluster(
+    const unsigned int n, const bool log, const bool propto,
+    const unsigned int n_clust,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   double out;
   if (log) {
     out = state.logtotmass;

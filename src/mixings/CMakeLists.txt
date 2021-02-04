@@ -1,6 +1,7 @@
 target_sources(bayesmix
   PUBLIC
     base_mixing.h
+    dependent_mixing.h
     dirichlet_mixing.h
     dirichlet_mixing.cc
     pityor_mixing.h

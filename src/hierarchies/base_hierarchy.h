@@ -37,25 +37,27 @@ class BaseHierarchy {
   double log_card = stan::math::NEGATIVE_INFTY;
   // HYPERPRIOR
   std::shared_ptr<google::protobuf::Message> prior;
-
+  //!
   virtual void update_summary_statistics(const Eigen::VectorXd &datum,
+                                         const Eigen::VectorXd &covariate,
                                          bool add) = 0;
+  //!
   virtual void initialize_hypers() = 0;
-
+  //!
   virtual void create_empty_prior() = 0;
 
  public:
-  virtual void add_datum(const int id, const Eigen::VectorXd &datum);
-
-  virtual void remove_datum(const int id, const Eigen::VectorXd &datum);
-
+  //! Adds a datum and its index to the hierarchy
+  void add_datum(const int id, const Eigen::VectorXd &datum,
+                 const bool update_params = false,
+                 const Eigen::VectorXd &covariate = Eigen::VectorXd(0));
+  //! Removes a datum and its index from the hierarchy
+  void remove_datum(const int id, const Eigen::VectorXd &datum,
+                    const bool update_params = false,
+                    const Eigen::VectorXd &covariate = Eigen::VectorXd(0));
+  //! Deletes all data in the hierarchy
   virtual void clear_data() = 0;
-
-  int get_card() const { return card; }
-  double get_log_card() const { return log_card; }
-
-  std::set<int> get_data_idx() { return cluster_data_idx; }
-
+  //!
   virtual void initialize() = 0;
   void check_prior_is_set();
   //! Returns true if the hierarchy models multivariate data
@@ -64,7 +66,7 @@ class BaseHierarchy {
   virtual bool is_dependent() const { return false; }
   //! Returns true if the hierarchy is conjugate i.e. has a marginal lpdf
   virtual bool is_conjugate() const { return true; }
-
+  //!
   virtual void update_hypers(
       const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
 
@@ -73,23 +75,34 @@ class BaseHierarchy {
   BaseHierarchy() = default;
   virtual std::shared_ptr<BaseHierarchy> clone() const = 0;
 
-  // EVALUATION FUNCTIONS
+  // EVALUATION FUNCTIONS FOR SINGLE POINTS
   //! Evaluates the log-likelihood of data in a single point
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
-  //! Evaluates the log-likelihood of data in the given points
-  virtual Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data) const;
+  virtual double like_lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
   //! Evaluates the log-marginal distribution of data in a single point
-  virtual double marg_lpdf(const Eigen::RowVectorXd &datum) const = 0;
-  //! Evaluates the log-marginal distribution of data in the given points
-  virtual Eigen::VectorXd marg_lpdf_grid(const Eigen::MatrixXd &data) const;
+  virtual double marg_lpdf(
+      const bool posterior, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
+  // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
+  //! Evaluates the log-likelihood of data in a grid of points
+  virtual Eigen::VectorXd like_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const;
+  //! Evaluates the log-marginal of data in a grid of points
+  virtual Eigen::VectorXd marg_lpdf_grid(
+      const bool posterior, const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
   virtual void draw() = 0;
   //! Generates new values for state from the centering posterior distribution
   virtual void sample_given_data() = 0;
-  virtual void sample_given_data(const Eigen::MatrixXd &data) = 0;  // TODO
-                                                                    // needed?
+  //! Overloaded version of sample_given_data(), mainly used for debugging
+  void sample_given_data(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0));
 
   // GETTERS AND SETTERS
   google::protobuf::Message *get_mutable_prior() {
@@ -106,6 +119,9 @@ class BaseHierarchy {
     log_card = std::log(card_);
   }
   virtual bayesmix::HierarchyId get_id() const = 0;
+  int get_card() const { return card; }
+  double get_log_card() const { return log_card; }
+  std::set<int> get_data_idx() const { return cluster_data_idx; }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

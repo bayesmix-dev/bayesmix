@@ -6,54 +6,27 @@
 #include "marginal_state.pb.h"
 #include "mixing_state.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
-#include "src/hierarchies/dependent_hierarchy.h"
 #include "src/mixings/dependent_mixing.h"
-
-void BaseAlgorithm::add_datum_to_hierarchy(
-    const unsigned int datum_idx, std::shared_ptr<BaseHierarchy> hier) {
-  if (hier->is_dependent()) {
-    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(hier);
-    hiercast->add_datum(datum_idx, data.row(datum_idx),
-                        hier_covariates.row(datum_idx));
-  } else {
-    hier->add_datum(datum_idx, data.row(datum_idx));
-  }
-}
-
-void BaseAlgorithm::remove_datum_from_hierarchy(
-    const unsigned int datum_idx, std::shared_ptr<BaseHierarchy> hier) {
-  if (hier->is_dependent()) {
-    auto hiercast = std::dynamic_pointer_cast<DependentHierarchy>(hier);
-    hiercast->remove_datum(datum_idx, data.row(datum_idx),
-                           hier_covariates.row(datum_idx));
-  } else {
-    hier->remove_datum(datum_idx, data.row(datum_idx));
-  }
-}
 
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;
-
   if (unique_values[0]->is_conjugate() == false and
       requires_conjugate_hierarchy()) {
     std::string msg = "Algorithm \"" + bayesmix::AlgorithmId_Name(get_id()) +
                       "\"  only supports conjugate hierarchies";
     throw std::invalid_argument(msg);
   }
-
   // Perform checks
   if (data.rows() == 0) {
     throw std::invalid_argument("Data was not provided to algorithm");
   }
+  // Hierarchy checks
   if (unique_values.size() == 0) {
     throw std::invalid_argument("Hierarchy was not provided to algorithm");
   }
   if (unique_values[0]->is_multivariate() == false && data.cols() > 1) {
     throw std::invalid_argument(
         "Multivariate data supplied to univariate hierarchy");
-  }
-  if (mixing == nullptr) {
-    throw std::invalid_argument("Mixing was not provided to algorithm");
   }
   if (hier_covariates.rows() != 0) {
     if (unique_values[0]->is_dependent() == false) {
@@ -64,6 +37,13 @@ void BaseAlgorithm::initialize() {
       throw std::invalid_argument(
           "Sizes of data and hierarchy covariates do not match");
     }
+  } else {
+    // Create empty covariates vector
+    hier_covariates = Eigen::MatrixXd::Zero(data.rows(), 0);
+  }
+  // Mixing checks
+  if (mixing == nullptr) {
+    throw std::invalid_argument("Mixing was not provided to algorithm");
   }
   if (mix_covariates.rows() != 0) {
     if (mixing->is_dependent() == false) {
@@ -74,39 +54,38 @@ void BaseAlgorithm::initialize() {
       throw std::invalid_argument(
           "Sizes of data and mixing covariates do not match");
     }
+  } else {
+    // Create empty covariates vector
+    mix_covariates = Eigen::MatrixXd::Zero(data.rows(), 0);
   }
-
+  // Interpet default number of clusters
   if (init_num_clusters == 0) {
     init_num_clusters = data.rows();
   }
-
   // Initialize hierarchies
   unique_values[0]->initialize();
   for (size_t i = 0; i < init_num_clusters - 1; i++) {
     unique_values.push_back(unique_values[0]->clone());
     unique_values[i]->draw();
   }
-
   // Initialize mixing
   mixing->initialize();
-
-  // Initialize needed objects
-  std::default_random_engine generator;
   // Build uniform probability on clusters, given their initial number
+  std::default_random_engine generator;
   std::uniform_int_distribution<int> distro(0, init_num_clusters - 1);
   // Allocate one datum per cluster first, and update cardinalities
   allocations.clear();
   for (size_t i = 0; i < init_num_clusters; i++) {
     allocations.push_back(i);
-    add_datum_to_hierarchy(i, unique_values[i]);
+    unique_values[i]->add_datum(i, data.row(i), false, hier_covariates.row(i));
   }
   // Randomly allocate all remaining data, and update cardinalities
   for (size_t i = init_num_clusters; i < data.rows(); i++) {
     unsigned int clust = distro(generator);
     allocations.push_back(clust);
-    add_datum_to_hierarchy(i, unique_values[clust]);
+    unique_values[clust]->add_datum(i, data.row(i), false,
+                                    hier_covariates.row(i));
   }
-
   std::cout << "Done" << std::endl;
 }
 

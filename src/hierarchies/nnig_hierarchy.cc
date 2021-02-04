@@ -18,18 +18,31 @@ void NNIGHierarchy::initialize() {
   state.var = hypers->scale / (hypers->shape + 1);
 }
 
+void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
+                                              const Eigen::VectorXd &covariate,
+                                              bool add) {
+  if (add) {
+    data_sum += datum(0);
+    data_sum_squares += datum(0) * datum(0);
+  } else {
+    data_sum -= datum(0);
+    data_sum_squares -= datum(0) * datum(0);
+  }
+}
+
+void NNIGHierarchy::save_posterior_hypers() {
+  *posterior_hypers = normal_invgamma_update();
+}
+
 //! \param data                        Column vector of data points
 //! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
 //! \return                            Vector of updated values for hyperpar.s
-NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() {
-  // Initialize relevant variables
+NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() const {
   Hyperparams post_params;
-
   if (card == 0) {  // no update possible
     post_params = *hypers;
     return post_params;
   }
-
   // Compute updated hyperparameters
   double y_bar = data_sum / (1.0 * card);  // sample mean
   double ss = data_sum_squares - card * y_bar * y_bar;
@@ -49,17 +62,6 @@ void NNIGHierarchy::clear_data() {
   data_sum_squares = 0;
   card = 0;
   cluster_data_idx = std::set<int>();
-}
-
-void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
-                                              bool add) {
-  if (add) {
-    data_sum += datum(0);
-    data_sum_squares += datum(0) * datum(0);
-  } else {
-    data_sum -= datum(0);
-    data_sum_squares -= datum(0) * datum(0);
-  }
 }
 
 void NNIGHierarchy::update_hypers(
@@ -137,16 +139,19 @@ void NNIGHierarchy::update_hypers(
 
 //! \param data Column vector containing a single data point
 //! \return     Log-Likehood vector evaluated in data
-double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
+double NNIGHierarchy::like_lpdf(
+    const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
-//! \param data Column vector of data points
-//! \return     Marginal distribution vector evaluated in data (log)
-double NNIGHierarchy::marg_lpdf(const Eigen::RowVectorXd &datum) const {
-  double sig_n = sqrt(hypers->scale * (hypers->var_scaling + 1) /
-                      (hypers->shape * hypers->var_scaling));
-  return stan::math::student_t_lpdf(datum(0), 2 * hypers->shape, hypers->mean,
+double NNIGHierarchy::marg_lpdf(
+    const bool posterior, const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+  Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
+  double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
+                      (params.shape * params.var_scaling));
+  return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
                                     sig_n);
 }
 
@@ -167,14 +172,6 @@ void NNIGHierarchy::sample_given_data() {
   state.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
   state.mean = stan::math::normal_rng(
       params.mean, sqrt(state.var / params.var_scaling), rng);
-}
-
-void NNIGHierarchy::sample_given_data(const Eigen::MatrixXd &data) {
-  data_sum = data.sum();
-  data_sum_squares = data.squaredNorm();
-  card = data.rows();
-  log_card = std::log(card);
-  sample_given_data();
 }
 
 void NNIGHierarchy::set_state_from_proto(

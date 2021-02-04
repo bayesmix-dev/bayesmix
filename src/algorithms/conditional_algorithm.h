@@ -10,8 +10,11 @@ class ConditionalAlgorithm : public BaseAlgorithm {
  public:
   ~ConditionalAlgorithm() = default;
   ConditionalAlgorithm() = default;
-  virtual Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                                    BaseCollector *const coll) override;
+  virtual Eigen::MatrixXd eval_lpdf(
+      BaseCollector *const collector, const Eigen::MatrixXd &grid,
+      const Eigen::MatrixXd &hier_covariates = Eigen::MatrixXd(0, 0),
+      const Eigen::MatrixXd &mix_covariates =
+          Eigen::MatrixXd(0, 0)) const override;
 };
 
 #endif  // BAYESMIX_ALGORITHMS_CONDITIONAL_ALGORITHM_H_
