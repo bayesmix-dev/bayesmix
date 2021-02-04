@@ -107,5 +107,7 @@ void Neal2Algorithm::sample_allocations() {
 }
 
 void Neal2Algorithm::sample_unique_values() {
-  for (auto &clus : unique_values) clus->sample_given_data();
+  for (auto &un : unique_values) {
+    un->sample_given_data();
+  }
 }
