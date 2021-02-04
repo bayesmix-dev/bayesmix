@@ -206,7 +206,6 @@ void NNIGHierarchy::initialize_hypers() {
     if (hypers->scale <= 0) {
       throw std::invalid_argument("Scale parameter must be > 0");
     }
-    std::cout << "done" << std::endl;
   }
 
   else if (priorcast->has_normal_mean_prior()) {
