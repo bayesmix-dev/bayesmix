@@ -27,7 +27,8 @@ class MarginalAlgorithm : public BaseAlgorithm {
   ~MarginalAlgorithm() = default;
   MarginalAlgorithm() = default;
   Eigen::MatrixXd eval_lpdf(const Eigen::MatrixXd &grid,
-                            const Eigen::MatrixXd &covariates,
+                            const Eigen::MatrixXd &hier_covariates,
+                            const Eigen::MatrixXd &mix_covariates,
                             BaseCollector *coll) override;
 };
 
