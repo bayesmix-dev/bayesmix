@@ -41,22 +41,17 @@ struct Hyperparams {
 class NNIGHierarchy
     : public BaseHierarchy<NNIGHierarchy, NNIG::State, NNIG::Hyperparams,
                            bayesmix::NNIGPrior> {
- public:
-  void clear_data() override;
-
  protected:
   double data_sum = 0;
   double data_sum_squares = 0;
-  // STATE
-
 
   void update_summary_statistics(const Eigen::VectorXd &datum,
                                  const Eigen::VectorXd &covariate,
                                  bool add) override;
-  //!
-  void save_posterior_hypers() override;
 
   void initialize_hypers() override;
+
+  void initialize_state() override;
 
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
@@ -66,7 +61,7 @@ class NNIGHierarchy
     return std::dynamic_pointer_cast<bayesmix::NNIGPrior>(prior);
   }
 
-  void create_empty_prior() override { prior.reset(new bayesmix::NNIGPrior); }
+  NNIG::State draw(const NNIG::Hyperparams &params) override;
 
  public:
 
@@ -74,13 +69,8 @@ class NNIGHierarchy
   ~NNIGHierarchy() = default;
   NNIGHierarchy() = default;
 
-  void initialize() override;
-
   //! Returns true if the hierarchy models multivariate data (here, false)
   bool is_multivariate() const override { return false; }
-  //!
-  void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
-                         &states) override;
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
@@ -92,18 +82,9 @@ class NNIGHierarchy
       const bool posterior, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
 
-  std::shared_ptr<AbstractHierarchy> clone() const override {
-    auto out = std::make_shared<NNIGHierarchy>(*this);
-    out->clear_data();
-    return out;
-  }
-
-  // SAMPLING FUNCTIONS
-  //! Generates new values for state from the centering prior distribution
-  void draw() override;
-  //! Generates new values for state from the centering posterior distribution
-  void sample_given_data() override;
-
+  void clear_data() override;
+  void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
+                         &states) override;
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;

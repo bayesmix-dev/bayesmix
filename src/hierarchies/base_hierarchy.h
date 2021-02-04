@@ -92,7 +92,7 @@ class AbstractHierarchy {
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
-  virtual void draw() = 0;
+  virtual void sample_prior() = 0;
   //! Generates new values for state from the centering posterior distribution
   virtual void sample_given_data() = 0;
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
@@ -108,7 +108,7 @@ class AbstractHierarchy {
   std::set<int> get_data_idx() { return cluster_data_idx; }
   google::protobuf::Message *get_mutable_prior() {
     if (prior == nullptr) create_empty_prior();
-    
+
     return prior.get();
   }
   //! Overloaded version of sample_given_data(), mainly used for debugging
@@ -127,6 +127,8 @@ class BaseHierarchy : public AbstractHierarchy {
 
   virtual Hyperparams get_posterior_parameters() const = 0;
   void create_empty_prior() override { prior.reset(new Prior); }
+  virtual State draw(const Hyperparams &params) = 0;
+  virtual void initialize_state() = 0;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -140,6 +142,21 @@ class BaseHierarchy : public AbstractHierarchy {
 
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
+
+  void sample_prior() override { state = draw(*hypers); };
+  //! Generates new values for state from the centering posterior distribution
+  void sample_given_data() { state = draw(get_posterior_parameters()); }
+
+  void initialize() override {
+    hypers = std::make_shared<Hyperparams>();
+    check_prior_is_set();
+    initialize_hypers();
+    initialize_state();
+  }
+
+  void save_posterior_hypers() override {
+    posterior_hypers = get_posterior_parameters();
+  }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

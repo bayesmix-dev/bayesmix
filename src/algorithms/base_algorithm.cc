@@ -66,7 +66,7 @@ void BaseAlgorithm::initialize() {
   unique_values[0]->initialize();
   for (size_t i = 0; i < init_num_clusters - 1; i++) {
     unique_values.push_back(unique_values[0]->clone());
-    unique_values[i]->draw();
+    unique_values[i]->sample_prior();
   }
   // Initialize mixing
   mixing->initialize();

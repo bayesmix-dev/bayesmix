@@ -10,12 +10,30 @@
 #include "marginal_state.pb.h"
 #include "src/utils/rng.h"
 
-void NNIGHierarchy::initialize() {
-  hypers = std::make_shared<NNIG::Hyperparams>();
-  check_prior_is_set();
-  initialize_hypers();
-  state.mean = hypers->mean;
-  state.var = hypers->scale / (hypers->shape + 1);
+double NNIGHierarchy::like_lpdf(
+    const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+  return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
+}
+
+double NNIGHierarchy::marg_lpdf(
+    const bool posterior, const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+  NNIG::Hyperparams params = posterior ? get_posterior_parameters() : *hypers;
+  double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
+                      (params.shape * params.var_scaling));
+  return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
+                                    sig_n);
+}
+
+NNIG::State NNIGHierarchy::draw(const NNIG::Hyperparams &params) {
+  // Update state values from their prior centering distribution
+  auto &rng = bayesmix::Rng::Instance().get();
+  NNIG::State out;
+  out.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+  out.mean = stan::math::normal_rng(params.mean,
+                                    sqrt(state.var / params.var_scaling), rng);
+  return out;
 }
 
 void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
@@ -30,13 +48,6 @@ void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
   }
 }
 
-void NNIGHierarchy::save_posterior_hypers() {
-  posterior_hypers = get_posterior_parameters();
-}
-
-//! \param data                        Column vector of data points
-//! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
-//! \return                            Vector of updated values for hyperpar.s
 NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() const {
   // Initialize relevant variables
   NNIG::Hyperparams post_params;
@@ -66,130 +77,13 @@ void NNIGHierarchy::clear_data() {
   cluster_data_idx = std::set<int>();
 }
 
-void NNIGHierarchy::update_hypers(
-    const std::vector<bayesmix::MarginalState::ClusterState> &states) {
-  auto &rng = bayesmix::Rng::Instance().get();
-
-  auto priorcast = cast_prior();
-
-  if (priorcast->has_fixed_values()) {
-    return;
-  }
-
-  else if (priorcast->has_normal_mean_prior()) {
-    // Get hyperparameters
-    double mu00 = priorcast->normal_mean_prior().mean_prior().mean();
-    double sig200 = priorcast->normal_mean_prior().mean_prior().var();
-    double lambda0 = priorcast->normal_mean_prior().var_scaling();
-    // Compute posterior hyperparameters
-    double prec = 0.0;
-    double num = 0.0;
-    for (auto &st : states) {
-      double mean = st.uni_ls_state().mean();
-      double var = st.uni_ls_state().var();
-      prec += 1 / var;
-      num += mean / var;
-    }
-    prec = 1 / sig200 + lambda0 * prec;
-    num = mu00 / sig200 + lambda0 * num;
-    double mu_n = num / prec;
-    double sig2_n = 1 / prec;
-    // Update hyperparameters with posterior random sampling
-    hypers->mean = stan::math::normal_rng(mu_n, sqrt(sig2_n), rng);
-  }
-
-  else if (priorcast->has_ngg_prior()) {
-    // Get hyperparameters:
-    // for mu0
-    double mu00 = priorcast->ngg_prior().mean_prior().mean();
-    double sig200 = priorcast->ngg_prior().mean_prior().var();
-    // for lambda0
-    double alpha00 = priorcast->ngg_prior().var_scaling_prior().shape();
-    double beta00 = priorcast->ngg_prior().var_scaling_prior().rate();
-    // for tau0
-    double a00 = priorcast->ngg_prior().scale_prior().shape();
-    double b00 = priorcast->ngg_prior().scale_prior().rate();
-    // Compute posterior hyperparameters
-    double b_n = 0.0;
-    double num = 0.0;
-    double beta_n = 0.0;
-    for (auto &st : states) {
-      double mean = st.uni_ls_state().mean();
-      double var = st.uni_ls_state().var();
-      b_n += 1 / var;
-      num += mean / var;
-      beta_n += (hypers->mean - mean) * (hypers->mean - mean) / var;
-    }
-    double var = hypers->var_scaling * b_n + 1 / sig200;
-    b_n += b00;
-    num = hypers->var_scaling * num + mu00 / sig200;
-    beta_n = beta00 + 0.5 * beta_n;
-    double sig_n = 1 / var;
-    double mu_n = num / var;
-    double alpha_n = alpha00 + 0.5 * states.size();
-    double a_n = a00 + states.size() * hypers->shape;
-    // Update hyperparameters with posterior random Gibbs sampling
-    hypers->mean = stan::math::normal_rng(mu_n, sig_n, rng);
-    hypers->var_scaling = stan::math::gamma_rng(alpha_n, beta_n, rng);
-    hypers->scale = stan::math::gamma_rng(a_n, b_n, rng);
-  }
-
-  else {
-    throw std::invalid_argument("Unrecognized hierarchy prior");
-  }
-}
-
-//! \param data Column vector containing a single data point
-//! \return     Log-Likehood vector evaluated in data
-double NNIGHierarchy::like_lpdf(
-    const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
-  return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
-}
-
-double NNIGHierarchy::marg_lpdf(
-    const bool posterior, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
-  NNIG::Hyperparams params = posterior ? get_posterior_parameters() : *hypers;
-  double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
-                      (params.shape * params.var_scaling));
-  return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
-                                    sig_n);
-}
-
-void NNIGHierarchy::draw() {
-  // Update state values from their prior centering distribution
-  auto &rng = bayesmix::Rng::Instance().get();
-  state.var = stan::math::inv_gamma_rng(hypers->shape, hypers->scale, rng);
-  state.mean = stan::math::normal_rng(
-      hypers->mean, sqrt(state.var / hypers->var_scaling), rng);
-}
-
-//! \param data Column vector of data points
-void NNIGHierarchy::sample_given_data() {
-  NNIG::Hyperparams params = get_posterior_parameters();
-
-  // Update state values from their prior centering distribution
-  auto &rng = bayesmix::Rng::Instance().get();
-  state.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
-  state.mean = stan::math::normal_rng(
-      params.mean, sqrt(state.var / params.var_scaling), rng);
-}
-
-void NNIGHierarchy::set_state_from_proto(
-    const google::protobuf::Message &state_) {
-  auto &statecast = google::protobuf::internal::down_cast<
-      const bayesmix::MarginalState::ClusterState &>(state_);
-  state.mean = statecast.uni_ls_state().mean();
-  state.var = statecast.uni_ls_state().var();
-  // set_card(statecast.cardinality());
-  card = statecast.cardinality();
+void NNIGHierarchy::initialize_state() {
+  state.mean = hypers->mean;
+  state.var = hypers->scale / (hypers->shape + 1);
 }
 
 void NNIGHierarchy::initialize_hypers() {
-
   auto priorcast = cast_prior();
-
   if (priorcast->has_fixed_values()) {
     // Set values
     hypers->mean = priorcast->fixed_values().mean();
@@ -268,6 +162,90 @@ void NNIGHierarchy::initialize_hypers() {
   else {
     throw std::invalid_argument("Unrecognized hierarchy prior");
   }
+}
+
+void NNIGHierarchy::update_hypers(
+    const std::vector<bayesmix::MarginalState::ClusterState> &states) {
+  auto &rng = bayesmix::Rng::Instance().get();
+
+  auto priorcast = cast_prior();
+
+  if (priorcast->has_fixed_values()) {
+    return;
+  }
+
+  else if (priorcast->has_normal_mean_prior()) {
+    // Get hyperparameters
+    double mu00 = priorcast->normal_mean_prior().mean_prior().mean();
+    double sig200 = priorcast->normal_mean_prior().mean_prior().var();
+    double lambda0 = priorcast->normal_mean_prior().var_scaling();
+    // Compute posterior hyperparameters
+    double prec = 0.0;
+    double num = 0.0;
+    for (auto &st : states) {
+      double mean = st.uni_ls_state().mean();
+      double var = st.uni_ls_state().var();
+      prec += 1 / var;
+      num += mean / var;
+    }
+    prec = 1 / sig200 + lambda0 * prec;
+    num = mu00 / sig200 + lambda0 * num;
+    double mu_n = num / prec;
+    double sig2_n = 1 / prec;
+    // Update hyperparameters with posterior random sampling
+    hypers->mean = stan::math::normal_rng(mu_n, sqrt(sig2_n), rng);
+  }
+
+  else if (priorcast->has_ngg_prior()) {
+    // Get hyperparameters:
+    // for mu0
+    double mu00 = priorcast->ngg_prior().mean_prior().mean();
+    double sig200 = priorcast->ngg_prior().mean_prior().var();
+    // for lambda0
+    double alpha00 = priorcast->ngg_prior().var_scaling_prior().shape();
+    double beta00 = priorcast->ngg_prior().var_scaling_prior().rate();
+    // for tau0
+    double a00 = priorcast->ngg_prior().scale_prior().shape();
+    double b00 = priorcast->ngg_prior().scale_prior().rate();
+    // Compute posterior hyperparameters
+    double b_n = 0.0;
+    double num = 0.0;
+    double beta_n = 0.0;
+    for (auto &st : states) {
+      double mean = st.uni_ls_state().mean();
+      double var = st.uni_ls_state().var();
+      b_n += 1 / var;
+      num += mean / var;
+      beta_n += (hypers->mean - mean) * (hypers->mean - mean) / var;
+    }
+    double var = hypers->var_scaling * b_n + 1 / sig200;
+    b_n += b00;
+    num = hypers->var_scaling * num + mu00 / sig200;
+    beta_n = beta00 + 0.5 * beta_n;
+    double sig_n = 1 / var;
+    double mu_n = num / var;
+    double alpha_n = alpha00 + 0.5 * states.size();
+    double a_n = a00 + states.size() * hypers->shape;
+    // Update hyperparameters with posterior random Gibbs sampling
+    hypers->mean = stan::math::normal_rng(mu_n, sig_n, rng);
+    hypers->var_scaling = stan::math::gamma_rng(alpha_n, beta_n, rng);
+    hypers->scale = stan::math::gamma_rng(a_n, b_n, rng);
+  }
+
+  else {
+    throw std::invalid_argument("Unrecognized hierarchy prior");
+  }
+}
+
+
+void NNIGHierarchy::set_state_from_proto(
+    const google::protobuf::Message &state_) {
+  auto &statecast = google::protobuf::internal::down_cast<
+      const bayesmix::MarginalState::ClusterState &>(state_);
+  state.mean = statecast.uni_ls_state().mean();
+  state.var = statecast.uni_ls_state().var();
+  // set_card(statecast.cardinality());
+  card = statecast.cardinality();
 }
 
 void NNIGHierarchy::write_state_to_proto(
