@@ -100,7 +100,7 @@ class BaseHierarchy {
   //! Generates new values for state from the centering prior distribution
   virtual void draw() = 0;
   //! Generates new values for state from the centering posterior distribution
-  virtual void sample_given_data() = 0;
+  virtual void sample_given_data(bool update_params = true) = 0;
   //! Overloaded version of sample_given_data(), mainly used for debugging
   void sample_given_data(
       const Eigen::MatrixXd &data,

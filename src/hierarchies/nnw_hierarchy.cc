@@ -53,7 +53,7 @@ void NNWHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
 }
 
 void NNWHierarchy::save_posterior_hypers() {
-  *posterior_hypers = normal_wishart_update();
+  posterior_hypers = normal_wishart_update();
 }
 
 //! \param data                    Matrix of row-vectorial data points
@@ -193,15 +193,16 @@ void NNWHierarchy::draw() {
 }
 
 //! \param data Matrix of row-vectorial data points
-void NNWHierarchy::sample_given_data() {
-  // Update values
-  Hyperparams params = normal_wishart_update();
+void NNWHierarchy::sample_given_data(bool update_params /*= true*/) {
+  if (update_params) {
+    save_posterior_hypers();
+  }
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   Eigen::MatrixXd tau_new =
-      stan::math::wishart_rng(params.deg_free, params.scale, rng);
+      stan::math::wishart_rng(posterior_hypers.deg_free, posterior_hypers.scale, rng);
   state.mean = stan::math::multi_normal_prec_rng(
-      params.mean, tau_new * params.var_scaling, rng);
+      posterior_hypers.mean, tau_new * posterior_hypers.var_scaling, rng);
   // Update state
   set_prec_and_utilities(tau_new);
 }

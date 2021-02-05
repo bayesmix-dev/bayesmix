@@ -69,6 +69,8 @@ class BaseAlgorithm {
   std::shared_ptr<BaseMixing> mixing;
   //!
   Eigen::MatrixXd mix_covariates;
+  //!
+  bool update_hierarchy_params = false;
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object

@@ -43,7 +43,7 @@ class NNIGHierarchy : public BaseHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-  std::shared_ptr<Hyperparams> posterior_hypers;
+  Hyperparams posterior_hypers;
   //!
   void clear_data() override;
   //!
@@ -98,7 +98,7 @@ class NNIGHierarchy : public BaseHierarchy {
   //! Generates new values for state from the centering prior distribution
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
-  void sample_given_data() override;
+  void sample_given_data(bool update_params = true) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }

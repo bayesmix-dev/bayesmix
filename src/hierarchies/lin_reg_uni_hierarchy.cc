@@ -38,7 +38,7 @@ void LinRegUniHierarchy::update_summary_statistics(
 }
 
 void LinRegUniHierarchy::save_posterior_hypers() {
-  *posterior_hypers = normal_invgamma_update();
+  posterior_hypers = normal_invgamma_update();
 }
 
 LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update()
@@ -102,14 +102,15 @@ void LinRegUniHierarchy::draw() {
       hypers->mean, hypers->var_scaling / state.var, rng);
 }
 
-void LinRegUniHierarchy::sample_given_data() {
-  // Update values
-  Hyperparams params = normal_invgamma_update();
+void LinRegUniHierarchy::sample_given_data(bool update_params /*= true*/) {
+  if (update_params) {
+    save_posterior_hypers();
+  }
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  state.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+  state.var = stan::math::inv_gamma_rng(posterior_hypers.shape, posterior_hypers.scale, rng);
   state.regression_coeffs = stan::math::multi_normal_prec_rng(
-      params.mean, params.var_scaling / state.var, rng);
+      posterior_hypers.mean, posterior_hypers.var_scaling / state.var, rng);
 }
 
 void LinRegUniHierarchy::set_state_from_proto(

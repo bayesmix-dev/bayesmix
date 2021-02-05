@@ -31,7 +31,7 @@ void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
 }
 
 void NNIGHierarchy::save_posterior_hypers() {
-  *posterior_hypers = normal_invgamma_update();
+  posterior_hypers = normal_invgamma_update();
 }
 
 //! \param data                        Column vector of data points
@@ -163,14 +163,15 @@ void NNIGHierarchy::draw() {
 }
 
 //! \param data Column vector of data points
-void NNIGHierarchy::sample_given_data() {
-  Hyperparams params = normal_invgamma_update();
-
+void NNIGHierarchy::sample_given_data(bool update_params /*= true*/) {
+  if (update_params) {
+    save_posterior_hypers();
+  }
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  state.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+  state.var = stan::math::inv_gamma_rng(posterior_hypers.shape, posterior_hypers.scale, rng);
   state.mean = stan::math::normal_rng(
-      params.mean, sqrt(state.var / params.var_scaling), rng);
+      posterior_hypers.mean, sqrt(state.var / posterior_hypers.var_scaling), rng);
 }
 
 void NNIGHierarchy::set_state_from_proto(

@@ -84,7 +84,7 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int c_old = allocations[i];
     if (c_new == n_clust) {
       std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
-      new_unique->add_datum(i, data.row(i), false, hier_covariates.row(i));
+      new_unique->add_datum(i, data.row(i), update_hierarchy_params, hier_covariates.row(i));
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
       unique_values.push_back(new_unique);
@@ -108,6 +108,6 @@ void Neal2Algorithm::sample_allocations() {
 
 void Neal2Algorithm::sample_unique_values() {
   for (auto &un : unique_values) {
-    un->sample_given_data();
+    un->sample_given_data(! update_hierarchy_params);
   }
 }
