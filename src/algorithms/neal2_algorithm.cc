@@ -62,8 +62,6 @@ void Neal2Algorithm::print_startup_message() const {
   std::cout << msg << std::endl;
 }
 
-void Neal2Algorithm::initialize() { BaseAlgorithm::initialize(); }
-
 void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();

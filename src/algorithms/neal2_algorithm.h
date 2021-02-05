@@ -42,7 +42,6 @@ class Neal2Algorithm : public MarginalAlgorithm {
 
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;
-  void initialize() override;
   void sample_allocations() override;
   void sample_unique_values() override;
 
