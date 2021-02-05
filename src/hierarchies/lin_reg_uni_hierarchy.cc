@@ -49,10 +49,9 @@ LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update()
   // Compute posterior hyperparameters
   Hyperparams post_params;
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
-  post_params.var_scaling_inv =
-      stan::math::inverse_spd(post_params.var_scaling);
-  post_params.mean = post_params.var_scaling.llt().solve(
-      mixed_prod + hypers->var_scaling * hypers->mean);
+  auto llt = post_params.var_scaling.llt();
+  post_params.var_scaling_inv = llt.solve(Eigen::MatrixXd::Identity(dim, dim));
+  post_params.mean = llt.solve(mixed_prod + hypers->var_scaling * hypers->mean);
   post_params.shape = hypers->shape + 0.5 * card;
   post_params.scale =
       hypers->scale +
@@ -136,6 +135,10 @@ void LinRegUniHierarchy::initialize_hypers() {
     hypers->shape = priorcast->fixed_values().shape();
     hypers->scale = priorcast->fixed_values().scale();
     // Check validity
+    if (dim != hypers->var_scaling.rows()) {
+      throw std::invalid_argument(
+          "Hyperparameters dimensions are not consistent");
+    }
     bayesmix::check_spd(hypers->var_scaling);
     if (hypers->shape <= 0) {
       throw std::invalid_argument("Shape parameter must be > 0");
