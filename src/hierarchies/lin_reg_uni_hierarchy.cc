@@ -51,7 +51,8 @@ LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update()
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
   auto llt = post_params.var_scaling.llt();
   post_params.var_scaling_inv = llt.solve(Eigen::MatrixXd::Identity(dim, dim));
-  post_params.mean = llt.solve(mixed_prod + hypers->var_scaling * hypers->mean);
+  post_params.mean =
+      llt.solve(mixed_prod + hypers->var_scaling * hypers->mean);
   post_params.shape = hypers->shape + 0.5 * card;
   post_params.scale =
       hypers->scale +
@@ -108,7 +109,8 @@ void LinRegUniHierarchy::sample_given_data(bool update_params /*= true*/) {
   }
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  state.var = stan::math::inv_gamma_rng(posterior_hypers.shape, posterior_hypers.scale, rng);
+  state.var = stan::math::inv_gamma_rng(posterior_hypers.shape,
+                                        posterior_hypers.scale, rng);
   state.regression_coeffs = stan::math::multi_normal_prec_rng(
       posterior_hypers.mean, posterior_hypers.var_scaling / state.var, rng);
 }

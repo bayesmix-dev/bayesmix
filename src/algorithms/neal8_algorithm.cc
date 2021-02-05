@@ -75,7 +75,6 @@ void Neal8Algorithm::print_startup_message() const {
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
                     " hierarchies, " +
                     bayesmix::MixingId_Name(mixing->get_id()) + " mixing...";
-
   std::cout << msg << std::endl;
 }
 

@@ -199,8 +199,8 @@ void NNWHierarchy::sample_given_data(bool update_params /*= true*/) {
   }
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  Eigen::MatrixXd tau_new =
-      stan::math::wishart_rng(posterior_hypers.deg_free, posterior_hypers.scale, rng);
+  Eigen::MatrixXd tau_new = stan::math::wishart_rng(
+      posterior_hypers.deg_free, posterior_hypers.scale, rng);
   state.mean = stan::math::multi_normal_prec_rng(
       posterior_hypers.mean, tau_new * posterior_hypers.var_scaling, rng);
   // Update state

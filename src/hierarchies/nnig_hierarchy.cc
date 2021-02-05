@@ -169,9 +169,11 @@ void NNIGHierarchy::sample_given_data(bool update_params /*= true*/) {
   }
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  state.var = stan::math::inv_gamma_rng(posterior_hypers.shape, posterior_hypers.scale, rng);
+  state.var = stan::math::inv_gamma_rng(posterior_hypers.shape,
+                                        posterior_hypers.scale, rng);
   state.mean = stan::math::normal_rng(
-      posterior_hypers.mean, sqrt(state.var / posterior_hypers.var_scaling), rng);
+      posterior_hypers.mean, sqrt(state.var / posterior_hypers.var_scaling),
+      rng);
 }
 
 void NNIGHierarchy::set_state_from_proto(
