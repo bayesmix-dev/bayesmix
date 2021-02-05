@@ -45,23 +45,9 @@ class NNIGHierarchy
   double data_sum = 0;
   double data_sum_squares = 0;
 
-  void update_summary_statistics(const Eigen::VectorXd &datum,
-                                 const Eigen::VectorXd &covariate,
-                                 bool add) override;
-
-  void initialize_hypers() override;
-
-  void initialize_state() override;
-
-  // AUXILIARY TOOLS
-  //! Returns updated values of the prior hyperparameters via their posterior
-  NNIG::Hyperparams get_posterior_parameters() const override;
-
-  std::shared_ptr<bayesmix::NNIGPrior> cast_prior() {
+   std::shared_ptr<bayesmix::NNIGPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::NNIGPrior>(prior);
   }
-
-  NNIG::State draw(const NNIG::Hyperparams &params) override;
 
  public:
 
@@ -76,15 +62,24 @@ class NNIGHierarchy
   //! Evaluates the log-likelihood of data in a single point
   double like_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) override;
   //! Evaluates the log-marginal distribution of data in a single point
   double marg_lpdf(
       const bool posterior, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) override;
 
-  void clear_data() override;
+  NNIG::State draw(const NNIG::Hyperparams &params);
+
+  void clear_data();
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
                          &states) override;
+  void initialize_state();
+  void initialize_hypers();
+  void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 const Eigen::VectorXd &covariate,
+                                 bool add);
+  NNIG::Hyperparams get_posterior_parameters();
+  
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;

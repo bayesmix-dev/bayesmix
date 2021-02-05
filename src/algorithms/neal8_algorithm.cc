@@ -20,7 +20,7 @@ Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
   Eigen::VectorXd lpdf_(n_grid);
   Eigen::MatrixXd lpdf_temp(n_grid, n_aux);
   for (size_t i = 0; i < n_aux; i++) {
-    hier->draw();
+    hier->sample_prior();
     lpdf_temp.col(i) = hier->like_lpdf_grid(grid, covariates);
   }
   for (size_t i = 0; i < n_grid; i++) {
@@ -107,7 +107,7 @@ void Neal8Algorithm::sample_allocations() {
                                                 hier_covariates.row(i));
     // Draw the unique values in the auxiliary blocks from their prior
     for (size_t j = singleton; j < n_aux; j++) {
-      aux_unique_values[j]->draw();
+      aux_unique_values[j]->sample_prior();
     }
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas =

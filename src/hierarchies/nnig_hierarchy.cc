@@ -12,13 +12,13 @@
 
 double NNIGHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
 double NNIGHierarchy::marg_lpdf(
     const bool posterior, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
   NNIG::Hyperparams params = posterior ? get_posterior_parameters() : *hypers;
   double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
                       (params.shape * params.var_scaling));
@@ -48,7 +48,7 @@ void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
   }
 }
 
-NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() const {
+NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
   // Initialize relevant variables
   NNIG::Hyperparams post_params;
 

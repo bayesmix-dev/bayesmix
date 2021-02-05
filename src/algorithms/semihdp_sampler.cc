@@ -40,7 +40,7 @@ void SemiHdpSampler::initialize() {
 
   for (int l = 0; l < INIT_N_CLUS; l++) {
     std::shared_ptr<BaseHierarchy> hierarchy = G00_master_hierarchy->clone();
-    hierarchy->draw();
+    hierarchy->sample_prior();
     shared_tables.push_back(hierarchy);
   }
 
@@ -59,7 +59,7 @@ void SemiHdpSampler::initialize() {
 
     for (int l = 0; l < INIT_N_CLUS; l++) {
       std::shared_ptr<BaseHierarchy> hierarchy = G0_master_hierarchy->clone();
-      hierarchy->draw();
+      hierarchy->sample_prior();
       private_tables[i].push_back(hierarchy);
       rest_tables[i].push_back(hierarchy);
       table_to_private[i][l] = l;
@@ -109,7 +109,7 @@ void SemiHdpSampler::update_unique_vals() {
           private_tables[r][table_to_private[r][l]]->sample_given_data(
               data_by_theta_star[l]);
         else
-          private_tables[r][table_to_private[r][l]]->draw();
+          private_tables[r][table_to_private[r][l]]->sample_prior();
         rest_tables[r][l] = private_tables[r][table_to_private[r][l]];
       } else {
         bayesmix::append_by_row(&data_by_shared[table_to_shared[r][l]],
@@ -122,7 +122,7 @@ void SemiHdpSampler::update_unique_vals() {
     if (data_by_shared[h].rows() > 0)
       shared_tables[h]->sample_given_data(data_by_shared[h]);
     else
-      shared_tables[h]->draw();
+      shared_tables[h]->sample_prior();
   }
 
   // reassign stuff to teta_stars

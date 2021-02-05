@@ -35,15 +35,6 @@ class AbstractHierarchy {
   int card = 0;
   double log_card = stan::math::NEGATIVE_INFTY;
   std::shared_ptr<google::protobuf::Message> prior;
-  //!
-  virtual void update_summary_statistics(const Eigen::VectorXd &datum,
-                                         const Eigen::VectorXd &covariate,
-                                         bool add) = 0;
-  //!
-  virtual void save_posterior_hypers() = 0;
-  //!
-  virtual void initialize_hypers() = 0;
-  //!
   virtual void create_empty_prior() = 0;
 
  public:
@@ -52,16 +43,16 @@ class AbstractHierarchy {
   virtual bayesmix::HierarchyId get_id() const = 0;
 
   //! Adds a datum and its index to the hierarchy
-  void add_datum(const int id, const Eigen::VectorXd &datum,
-                 const bool update_params = false,
-                 const Eigen::VectorXd &covariate = Eigen::VectorXd(0));
+  virtual void add_datum(
+      const int id, const Eigen::VectorXd &datum,
+      const bool update_params = false,
+      const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) = 0;
   //! Removes a datum and its index from the hierarchy
-  void remove_datum(const int id, const Eigen::VectorXd &datum,
-                    const bool update_params = false,
-                    const Eigen::VectorXd &covariate = Eigen::VectorXd(0));
+  virtual void remove_datum(
+      const int id, const Eigen::VectorXd &datum,
+      const bool update_params = false,
+      const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) = 0;
   //! Deletes all data in the hierarchy
-  virtual void clear_data() = 0;
-  //!
   virtual void initialize() = 0;
 
   virtual bool is_multivariate() const = 0;
@@ -75,20 +66,20 @@ class AbstractHierarchy {
   //! Evaluates the log-likelihood of data in a single point
   virtual double like_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) = 0;
   //! Evaluates the log-marginal distribution of data in a single point
   virtual double marg_lpdf(
       const bool posterior, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) = 0;
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
   //! Evaluates the log-likelihood of data in a grid of points
   virtual Eigen::VectorXd like_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const;
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
   //! Evaluates the log-marginal of data in a grid of points
   virtual Eigen::VectorXd marg_lpdf_grid(
       const bool posterior, const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const;
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
@@ -100,7 +91,7 @@ class AbstractHierarchy {
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
-  void check_prior_is_set();
+  virtual void check_prior_is_set() = 0;
 
   // GETTERS AND SETTERS
   int get_card() const { return card; }
@@ -112,9 +103,9 @@ class AbstractHierarchy {
     return prior.get();
   }
   //! Overloaded version of sample_given_data(), mainly used for debugging
-  void sample_given_data(
+  virtual void sample_given_data(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0));
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
@@ -125,9 +116,8 @@ class BaseHierarchy : public AbstractHierarchy {
   std::shared_ptr<Hyperparams> hypers;
   Hyperparams posterior_hypers;
 
-  virtual Hyperparams get_posterior_parameters() const = 0;
+  virtual Hyperparams get_posterior_parameters() = 0;
   void create_empty_prior() override { prior.reset(new Prior); }
-  virtual State draw(const Hyperparams &params) = 0;
   virtual void initialize_state() = 0;
 
  public:
@@ -143,20 +133,149 @@ class BaseHierarchy : public AbstractHierarchy {
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
 
-  void sample_prior() override { state = draw(*hypers); };
+  void sample_prior() override {
+    state = static_cast<Derived *>(this)->draw(*hypers);
+  };
   //! Generates new values for state from the centering posterior distribution
-  void sample_given_data() { state = draw(get_posterior_parameters()); }
+  void sample_given_data() {
+    state = static_cast<Derived *>(this)->draw(
+        static_cast<Derived *>(this)->get_posterior_parameters());
+  }
 
   void initialize() override {
     hypers = std::make_shared<Hyperparams>();
     check_prior_is_set();
-    initialize_hypers();
-    initialize_state();
+    static_cast<Derived *>(this)->initialize_hypers();
+    static_cast<Derived *>(this)->initialize_state();
   }
 
-  void save_posterior_hypers() override {
-    posterior_hypers = get_posterior_parameters();
+  void save_posterior_hypers() {
+    posterior_hypers =
+        static_cast<Derived *>(this)->get_posterior_parameters();
   }
+
+  void add_datum(
+      const int id, const Eigen::VectorXd &datum,
+      const bool update_params = false,
+      const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) override;
+  //! Removes a datum and its index from the hierarchy
+  void remove_datum(
+      const int id, const Eigen::VectorXd &datum,
+      const bool update_params = false,
+      const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) override;
+
+  void check_prior_is_set();
+
+  virtual Eigen::VectorXd like_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
+  //! Evaluates the log-marginal of data in a grid of points
+  virtual Eigen::VectorXd marg_lpdf_grid(
+      const bool posterior, const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
+
+  virtual void sample_given_data(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
 };
+
+template <class Derived, typename State, typename Hyperparams, typename Prior>
+void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
+    const int id, const Eigen::VectorXd &datum,
+    const bool update_params /*= false*/,
+    const Eigen::VectorXd &covariate /*= Eigen::VectorXd(0)*/) {
+  assert(cluster_data_idx.find(id) == cluster_data_idx.end());
+  card += 1;
+  log_card = std::log(card);
+  static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
+                                                          true);
+  cluster_data_idx.insert(id);
+  if (update_params) {
+    static_cast<Derived *>(this)->save_posterior_hypers();
+  }
+}
+
+template <class Derived, typename State, typename Hyperparams, typename Prior>
+void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
+    const int id, const Eigen::VectorXd &datum,
+    const bool update_params /*= false*/,
+    const Eigen::VectorXd &covariate /* = Eigen::VectorXd(0)*/) {
+  static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
+                                                          false);
+  card -= 1;
+  log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
+  auto it = cluster_data_idx.find(id);
+  assert(it != cluster_data_idx.end());
+  cluster_data_idx.erase(it);
+  if (update_params) {
+    static_cast<Derived *>(this)->save_posterior_hypers();
+  }
+}
+
+template <class Derived, typename State, typename Hyperparams, typename Prior>
+void BaseHierarchy<Derived, State, Hyperparams, Prior>::check_prior_is_set() {
+  if (prior == nullptr) {
+    throw std::invalid_argument("Hierarchy prior was not provided");
+  }
+}
+
+template <class Derived, typename State, typename Hyperparams, typename Prior>
+Eigen::VectorXd
+BaseHierarchy<Derived, State, Hyperparams, Prior>::like_lpdf_grid(
+    const Eigen::MatrixXd &data,
+    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
+  Eigen::VectorXd lpdf(data.rows());
+  if (covariates.cols() == 0) {
+    for (int i = 0; i < data.rows(); i++) {
+      // Pass null value as covariate
+      lpdf(i) = static_cast<Derived *>(this)->like_lpdf(data.row(i),
+                                                        Eigen::RowVectorXd(0));
+    }
+  } else {
+    for (int i = 0; i < data.rows(); i++) {
+      lpdf(i) = static_cast<Derived *>(this)->like_lpdf(data.row(i),
+                                                        covariates.row(i));
+    }
+  }
+  return lpdf;
+}
+
+template <class Derived, typename State, typename Hyperparams, typename Prior>
+Eigen::VectorXd
+BaseHierarchy<Derived, State, Hyperparams, Prior>::marg_lpdf_grid(
+    const bool posterior, const Eigen::MatrixXd &data,
+    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
+  Eigen::VectorXd lpdf(data.rows());
+  if (covariates.cols() == 0) {
+    for (int i = 0; i < data.rows(); i++) {
+      // Pass null value as covariate
+      lpdf(i) = static_cast<Derived *>(this)->marg_lpdf(posterior, data.row(i),
+                                                        Eigen::RowVectorXd(0));
+    }
+  } else {
+    for (int i = 0; i < data.rows(); i++) {
+      lpdf(i) = static_cast<Derived *>(this)->marg_lpdf(posterior, data.row(i),
+                                                        covariates.row(i));
+    }
+  }
+  return lpdf;
+}
+
+template <class Derived, typename State, typename Hyperparams, typename Prior>
+void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_given_data(
+    const Eigen::MatrixXd &data,
+    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
+  static_cast<Derived *>(this)->clear_data();
+  if (covariates == Eigen::MatrixXd(0, 0)) {
+    for (int i = 0; i < data.rows(); i++)
+      static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
+                                              Eigen::RowVectorXd(0));
+  } else {
+    for (int i = 0; i < data.rows(); i++)
+      static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
+                                              covariates.row(i));
+  }
+  static_cast<Derived *>(this)->sample_given_data();
+}
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

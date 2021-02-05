@@ -26,7 +26,7 @@ TEST(nnighierarchy, draw) {
   hier->initialize();
 
   auto hier2 = hier->clone();
-  hier2->draw();
+  hier2->sample_prior();
 
   bayesmix::MarginalState out;
   bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
@@ -87,7 +87,7 @@ TEST(nnwhierarchy, draw) {
   hier->initialize();
 
   auto hier2 = hier->clone();
-  hier2->draw();
+  hier2->sample_prior();
 
   bayesmix::MarginalState out;
   bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
