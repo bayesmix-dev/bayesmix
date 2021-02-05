@@ -11,6 +11,7 @@ void LinRegUniHierarchy::initialize() {
   hypers = std::make_shared<Hyperparams>();
   check_prior_is_set();
   initialize_hypers();
+  posterior_hypers = *hypers;
   state.regression_coeffs = hypers->mean;
   state.var = hypers->scale / (hypers->shape + 1);
   clear_data();
@@ -87,7 +88,7 @@ double LinRegUniHierarchy::like_lpdf(
 double LinRegUniHierarchy::marg_lpdf(
     const bool posterior, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
-  Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
+  Hyperparams params = posterior ? posterior_hypers : *hypers;
   double sig_n = sqrt(
       (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
       params.scale / params.shape);

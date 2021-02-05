@@ -27,6 +27,7 @@ void NNWHierarchy::initialize() {
   hypers = std::make_shared<Hyperparams>();
   check_prior_is_set();
   initialize_hypers();
+  posterior_hypers = *hypers;
   state.mean = hypers->mean;
   set_prec_and_utilities(hypers->var_scaling *
                          Eigen::MatrixXd::Identity(dim, dim));
@@ -171,7 +172,7 @@ double NNWHierarchy::like_lpdf(
 double NNWHierarchy::marg_lpdf(
     const bool posterior, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
-  Hyperparams params = posterior ? normal_wishart_update() : *hypers;
+  Hyperparams params = posterior ? posterior_hypers : *hypers;
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * params.deg_free - dim + 1;
   Eigen::MatrixXd sigma_n = params.scale_inv *
