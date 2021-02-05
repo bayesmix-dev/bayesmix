@@ -3,6 +3,7 @@
 
 #include "algorithms/load_algorithms.h"
 #include "algorithms/neal2_algorithm.h"
+#include "algorithms/neal3_algorithm.h"
 #include "algorithms/neal8_algorithm.h"
 #include "collectors/file_collector.h"
 #include "collectors/memory_collector.h"

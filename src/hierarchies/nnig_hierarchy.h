@@ -43,7 +43,7 @@ class NNIGHierarchy : public BaseHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-  std::shared_ptr<Hyperparams> posterior_hypers;
+  Hyperparams posterior_hypers;
   //!
   void clear_data() override;
   //!
@@ -52,7 +52,7 @@ class NNIGHierarchy : public BaseHierarchy {
                                  bool add) override;
   //!
   void save_posterior_hypers() override;
-
+  //!
   void initialize_hypers() override;
 
   // AUXILIARY TOOLS
@@ -66,8 +66,8 @@ class NNIGHierarchy : public BaseHierarchy {
   void create_empty_prior() override { prior.reset(new bayesmix::NNIGPrior); }
 
  public:
+  //!
   void initialize() override;
-
   //! Returns true if the hierarchy models multivariate data (here, false)
   bool is_multivariate() const override { return false; }
   //!
@@ -98,13 +98,11 @@ class NNIGHierarchy : public BaseHierarchy {
   //! Generates new values for state from the centering prior distribution
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
-  void sample_given_data() override;
+  void sample_given_data(bool update_params = true) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
-
-  
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;

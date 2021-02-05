@@ -75,7 +75,7 @@ class SemiHdpSampler {
   bool adapt = false;
 
  public:
-  virtual bool requires_conjugate_hierarchy() { return true; }
+  virtual bool requires_conjugate_hierarchy() const { return true; }
 
   SemiHdpSampler() {}
   ~SemiHdpSampler() {}
@@ -205,14 +205,14 @@ class SemiHdpSampler {
   std::shared_ptr<BaseHierarchy> get_table(int r, int l) const {
     return rest_tables[r][l];
   }
-  std::shared_ptr<BaseHierarchy> get_shared_table(int h) {
+  std::shared_ptr<BaseHierarchy> get_shared_table(int h) const {
     return shared_tables[h];
   }
-  std::shared_ptr<BaseHierarchy> get_private_table(int r, int l) {
+  std::shared_ptr<BaseHierarchy> get_private_table(int r, int l) const {
     return private_tables[r][l];
   }
 
-  void print_debug_string();
+  void print_debug_string() const;
 
   void check();
 };

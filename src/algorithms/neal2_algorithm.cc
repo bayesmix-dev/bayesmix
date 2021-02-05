@@ -5,6 +5,7 @@
 #include <stan/math/prim/fun.hpp>
 #include <vector>
 
+#include "algorithm_id.pb.h"
 #include "marginal_state.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
 #include "src/mixings/base_mixing.h"
@@ -16,7 +17,7 @@
 //! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
     std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
-    const Eigen::MatrixXd &covariates) {
+    const Eigen::MatrixXd &covariates) const {
   return hier->marg_lpdf_grid(false, grid, covariates);
 }
 
@@ -61,10 +62,6 @@ void Neal2Algorithm::print_startup_message() const {
   std::cout << msg << std::endl;
 }
 
-void Neal2Algorithm::initialize() {
-  BaseAlgorithm::initialize();
-}
-
 void Neal2Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
@@ -74,8 +71,8 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int n_clust = unique_values.size();
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
     // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(i, data.row(i), false,
-                                                hier_covariates.row(i));
+    unique_values[allocations[i]]->remove_datum(
+        i, data.row(i), update_hierarchy_params, hier_covariates.row(i));
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas =
         get_cluster_prior_mass(i) + get_cluster_lpdf(i);
@@ -85,14 +82,15 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int c_old = allocations[i];
     if (c_new == n_clust) {
       std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
-      new_unique->add_datum(i, data.row(i), false, hier_covariates.row(i));
+      new_unique->add_datum(i, data.row(i), update_hierarchy_params,
+                            hier_covariates.row(i));
       // Generate new unique values with posterior sampling
       new_unique->sample_given_data();
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      unique_values[c_new]->add_datum(i, data.row(i), false,
+      unique_values[c_new]->add_datum(i, data.row(i), update_hierarchy_params,
                                       hier_covariates.row(i));
     }
     if (singleton) {
@@ -108,5 +106,7 @@ void Neal2Algorithm::sample_allocations() {
 }
 
 void Neal2Algorithm::sample_unique_values() {
-  for (auto &clus : unique_values) clus->sample_given_data();
+  for (auto &un : unique_values) {
+    un->sample_given_data(!update_hierarchy_params);
+  }
 }

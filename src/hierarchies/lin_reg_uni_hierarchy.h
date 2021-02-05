@@ -37,7 +37,7 @@ class LinRegUniHierarchy : public DependentHierarchy {
   State state;
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
-  std::shared_ptr<Hyperparams> posterior_hypers;
+  Hyperparams posterior_hypers;
   //!
   void clear_data();
   //!
@@ -50,11 +50,11 @@ class LinRegUniHierarchy : public DependentHierarchy {
   // AUXILIARY TOOLS
   //! Returns updated values of the prior hyperparameters via their posterior
   Hyperparams normal_invgamma_update() const;
-
+  //!
   std::shared_ptr<bayesmix::LinRegUniPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::LinRegUniPrior>(prior);
   }
-
+  //!
   void create_empty_prior() override {
     prior.reset(new bayesmix::LinRegUniPrior);
   }
@@ -80,7 +80,6 @@ class LinRegUniHierarchy : public DependentHierarchy {
   // DESTRUCTOR AND CONSTRUCTORS
   ~LinRegUniHierarchy() = default;
   LinRegUniHierarchy() = default;
-
   std::shared_ptr<BaseHierarchy> clone() const override {
     auto out = std::make_shared<LinRegUniHierarchy>(*this);
     out->clear_data();
@@ -91,7 +90,7 @@ class LinRegUniHierarchy : public DependentHierarchy {
   //! Generates new values for state from the centering prior distribution
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
-  void sample_given_data() override;
+  void sample_given_data(bool update_params = true) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }

@@ -11,6 +11,7 @@ void LinRegUniHierarchy::initialize() {
   hypers = std::make_shared<Hyperparams>();
   check_prior_is_set();
   initialize_hypers();
+  posterior_hypers = *hypers;
   state.regression_coeffs = hypers->mean;
   state.var = hypers->scale / (hypers->shape + 1);
   clear_data();
@@ -38,16 +39,21 @@ void LinRegUniHierarchy::update_summary_statistics(
 }
 
 void LinRegUniHierarchy::save_posterior_hypers() {
-  *posterior_hypers = normal_invgamma_update();
+  posterior_hypers = normal_invgamma_update();
 }
 
 LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update()
     const {
+  if (card == 0) {  // no update possible
+    return *hypers;
+  }
+  // Compute posterior hyperparameters
   Hyperparams post_params;
-
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
-  post_params.mean = post_params.var_scaling.llt().solve(
-      mixed_prod + hypers->var_scaling * hypers->mean);
+  auto llt = post_params.var_scaling.llt();
+  post_params.var_scaling_inv = llt.solve(Eigen::MatrixXd::Identity(dim, dim));
+  post_params.mean =
+      llt.solve(mixed_prod + hypers->var_scaling * hypers->mean);
   post_params.shape = hypers->shape + 0.5 * card;
   post_params.scale =
       hypers->scale +
@@ -82,7 +88,7 @@ double LinRegUniHierarchy::like_lpdf(
 double LinRegUniHierarchy::marg_lpdf(
     const bool posterior, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
-  Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
+  Hyperparams params = posterior ? posterior_hypers : *hypers;
   double sig_n = sqrt(
       (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
       params.scale / params.shape);
@@ -98,14 +104,16 @@ void LinRegUniHierarchy::draw() {
       hypers->mean, hypers->var_scaling / state.var, rng);
 }
 
-void LinRegUniHierarchy::sample_given_data() {
-  // Update values
-  Hyperparams params = normal_invgamma_update();
+void LinRegUniHierarchy::sample_given_data(bool update_params /*= true*/) {
+  if (update_params) {
+    save_posterior_hypers();
+  }
   // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  state.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+  state.var = stan::math::inv_gamma_rng(posterior_hypers.shape,
+                                        posterior_hypers.scale, rng);
   state.regression_coeffs = stan::math::multi_normal_prec_rng(
-      params.mean, params.var_scaling / state.var, rng);
+      posterior_hypers.mean, posterior_hypers.var_scaling / state.var, rng);
 }
 
 void LinRegUniHierarchy::set_state_from_proto(
@@ -131,6 +139,10 @@ void LinRegUniHierarchy::initialize_hypers() {
     hypers->shape = priorcast->fixed_values().shape();
     hypers->scale = priorcast->fixed_values().scale();
     // Check validity
+    if (dim != hypers->var_scaling.rows()) {
+      throw std::invalid_argument(
+          "Hyperparameters dimensions are not consistent");
+    }
     bayesmix::check_spd(hypers->var_scaling);
     if (hypers->shape <= 0) {
       throw std::invalid_argument("Shape parameter must be > 0");

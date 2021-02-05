@@ -14,6 +14,7 @@ void NNIGHierarchy::initialize() {
   hypers = std::make_shared<Hyperparams>();
   check_prior_is_set();
   initialize_hypers();
+  posterior_hypers = *hypers;
   state.mean = hypers->mean;
   state.var = hypers->scale / (hypers->shape + 1);
 }
@@ -31,19 +32,18 @@ void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
 }
 
 void NNIGHierarchy::save_posterior_hypers() {
-  *posterior_hypers = normal_invgamma_update();
+  posterior_hypers = normal_invgamma_update();
 }
 
 //! \param data                        Column vector of data points
 //! \param mu0, alpha0, beta0, lambda0 Original values for hyperparameters
 //! \return                            Vector of updated values for hyperpar.s
 NNIGHierarchy::Hyperparams NNIGHierarchy::normal_invgamma_update() const {
-  Hyperparams post_params;
   if (card == 0) {  // no update possible
-    post_params = *hypers;
-    return post_params;
+    return *hypers;
   }
-  // Compute updated hyperparameters
+  // Compute posterior hyperparameters
+  Hyperparams post_params;
   double y_bar = data_sum / (1.0 * card);  // sample mean
   double ss = data_sum_squares - card * y_bar * y_bar;
   post_params.mean = (hypers->var_scaling * hypers->mean + data_sum) /
@@ -148,7 +148,7 @@ double NNIGHierarchy::like_lpdf(
 double NNIGHierarchy::marg_lpdf(
     const bool posterior, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
-  Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
+  Hyperparams params = posterior ? posterior_hypers : *hypers;
   double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
                       (params.shape * params.var_scaling));
   return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
@@ -164,14 +164,17 @@ void NNIGHierarchy::draw() {
 }
 
 //! \param data Column vector of data points
-void NNIGHierarchy::sample_given_data() {
-  Hyperparams params = normal_invgamma_update();
-
+void NNIGHierarchy::sample_given_data(bool update_params /*= true*/) {
+  if (update_params) {
+    save_posterior_hypers();
+  }
   // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
-  state.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+  state.var = stan::math::inv_gamma_rng(posterior_hypers.shape,
+                                        posterior_hypers.scale, rng);
   state.mean = stan::math::normal_rng(
-      params.mean, sqrt(state.var / params.var_scaling), rng);
+      posterior_hypers.mean, sqrt(state.var / posterior_hypers.var_scaling),
+      rng);
 }
 
 void NNIGHierarchy::set_state_from_proto(
@@ -184,7 +187,6 @@ void NNIGHierarchy::set_state_from_proto(
 }
 
 void NNIGHierarchy::initialize_hypers() {
-
   auto priorcast = cast_prior();
 
   if (priorcast->has_fixed_values()) {

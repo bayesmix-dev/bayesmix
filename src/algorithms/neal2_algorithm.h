@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <memory>
 
+#include "algorithm_id.pb.h"
 #include "marginal_algorithm.h"
 #include "src/hierarchies/base_hierarchy.h"
 
@@ -32,7 +33,7 @@ class Neal2Algorithm : public MarginalAlgorithm {
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd lpdf_marginal_component(
       std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
-      const Eigen::MatrixXd &covariates) override;
+      const Eigen::MatrixXd &covariates) const override;
   //!
   virtual Eigen::VectorXd get_cluster_prior_mass(
       const unsigned int data_idx) const;
@@ -41,7 +42,6 @@ class Neal2Algorithm : public MarginalAlgorithm {
 
   // ALGORITHM FUNCTIONS
   void print_startup_message() const override;
-  void initialize() override;
   void sample_allocations() override;
   void sample_unique_values() override;
 
@@ -50,7 +50,7 @@ class Neal2Algorithm : public MarginalAlgorithm {
   ~Neal2Algorithm() = default;
   Neal2Algorithm() = default;
 
-  bool requires_conjugate_hierarchy() override { return true; }
+  bool requires_conjugate_hierarchy() const override { return true; }
 
   bayesmix::AlgorithmId get_id() const override {
     return bayesmix::AlgorithmId::Neal2;

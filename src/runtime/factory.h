@@ -43,7 +43,7 @@ class Factory {
         google::protobuf::GetEnumDescriptor<Identifier>(), id);
   }
 
-  static Identifier name_to_id(const std::string& name) {
+  static Identifier name_to_id(const std::string &name) {
     Identifier id;
     google::protobuf::internal::ParseNamedEnum<Identifier>(
         google::protobuf::GetEnumDescriptor<Identifier>(), name, &id);
@@ -70,7 +70,7 @@ class Factory {
     auto f = storage.find(id);
     if (f == storage.end()) {
       std::string err =
-          "Error: factory identifier \"" + id_to_name(id) + "\" not found";
+          "Factory identifier \"" + id_to_name(id) + "\" not found";
       throw std::invalid_argument(err);
     } else {
       return f->second();
@@ -85,8 +85,8 @@ class Factory {
     try {
       return create_object(name_to_id(name));
     } catch (const std::invalid_argument &e) {
-      std::string err = "Error: no identifier found for name: \"" +
-                         name + "\". \n" + e.what();
+      std::string err = "No identifier found for name: \"" + name +
+                        "\". \n" + e.what();
       throw std::invalid_argument(err);
     }
   }

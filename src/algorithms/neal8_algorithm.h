@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+#include "algorithm_id.pb.h"
 #include "neal2_algorithm.h"
 
 //! Template class for Neal's algorithm 8 for conjugate hierarchies
@@ -26,7 +27,6 @@ class Neal8Algorithm : public Neal2Algorithm {
  protected:
   //! Number of auxiliary blocks
   unsigned int n_aux = 3;
-
   //! Vector of auxiliary blocks
   std::vector<std::shared_ptr<BaseHierarchy>> aux_unique_values;
 
@@ -34,7 +34,7 @@ class Neal8Algorithm : public Neal2Algorithm {
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd lpdf_marginal_component(
       std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
-      const Eigen::MatrixXd &covariates) override;
+      const Eigen::MatrixXd &covariates) const override;
   //!
   Eigen::VectorXd get_cluster_prior_mass(
       const unsigned int data_idx) const override;
@@ -58,7 +58,6 @@ class Neal8Algorithm : public Neal2Algorithm {
     }
     n_aux = n_aux_;
   }
-
   bayesmix::AlgorithmId get_id() const override {
     return bayesmix::AlgorithmId::Neal8;
   }
