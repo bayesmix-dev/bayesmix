@@ -1,9 +1,15 @@
 #ifndef BAYESMIX_MIXINGS_PITYOR_MIXING_H_
 #define BAYESMIX_MIXINGS_PITYOR_MIXING_H_
 
+#include <google/protobuf/message.h>
+
+#include <Eigen/Dense>
+#include <memory>
+
 #include "base_mixing.h"
-#include "mixing_prior.pb.h"
 #include "mixing_id.pb.h"
+#include "mixing_prior.pb.h"
+#include "src/hierarchies/base_hierarchy.h"
 
 //! Class that represents the Pitman-Yor process mixture model.
 
@@ -24,18 +30,24 @@ class PitYorMixing : public BaseMixing {
 
  protected:
   State state;
-  void create_empty_prior() override { prior.reset(new bayesmix::PYPrior); }
 
+  //!
+  void create_empty_prior() override { prior.reset(new bayesmix::PYPrior); }
+  //!
   std::shared_ptr<bayesmix::PYPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::PYPrior>(prior);
   }
-
+  //!
   void initialize_state();
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   ~PitYorMixing() = default;
   PitYorMixing() = default;
+
+  std::shared_ptr<BaseMixing> clone() const override {
+    return std::make_shared<PitYorMixing>(*this);
+  }
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
@@ -49,9 +61,9 @@ class PitYorMixing : public BaseMixing {
                           const bool propto, const unsigned int n_clust,
                           const Eigen::RowVectorXd &covariate =
                               Eigen::RowVectorXd(0)) const override;
-
+  //!
   void initialize() override;
-
+  //!
   void update_state(
       const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
       unsigned int n) override;

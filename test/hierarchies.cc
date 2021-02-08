@@ -22,7 +22,7 @@ TEST(nnighierarchy, draw) {
   prior.mutable_fixed_values()->set_var_scaling(lambda0);
   prior.mutable_fixed_values()->set_shape(alpha0);
   prior.mutable_fixed_values()->set_scale(beta0);
-  hier->set_prior(prior);
+  hier->get_mutable_prior()->CopyFrom(prior);
   hier->initialize();
 
   auto hier2 = hier->clone();
@@ -48,7 +48,8 @@ TEST(nnighierarchy, sample_given_data) {
   prior.mutable_fixed_values()->set_var_scaling(lambda0);
   prior.mutable_fixed_values()->set_shape(alpha0);
   prior.mutable_fixed_values()->set_scale(beta0);
-  hier->set_prior(prior);
+  hier->get_mutable_prior()->CopyFrom(prior);
+
   hier->initialize();
 
   Eigen::VectorXd datum(1);
@@ -83,7 +84,7 @@ TEST(nnwhierarchy, draw) {
   prior.mutable_fixed_values()->set_var_scaling(lambda0);
   prior.mutable_fixed_values()->set_deg_free(nu0);
   *prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
-  hier->set_prior(prior);
+  hier->get_mutable_prior()->CopyFrom(prior);
   hier->initialize();
 
   auto hier2 = hier->clone();
@@ -114,7 +115,7 @@ TEST(nnwhierarchy, sample_given_data) {
   prior.mutable_fixed_values()->set_var_scaling(lambda0);
   prior.mutable_fixed_values()->set_deg_free(nu0);
   *prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
-  hier->set_prior(prior);
+  hier->get_mutable_prior()->CopyFrom(prior);
   hier->initialize();
 
   Eigen::RowVectorXd datum(2);
@@ -189,7 +190,7 @@ TEST(lin_reg_uni_hierarchy, misc) {
   *prior.mutable_fixed_values()->mutable_var_scaling() = Lambda0_proto;
   prior.mutable_fixed_values()->set_shape(a0);
   prior.mutable_fixed_values()->set_scale(b0);
-  hier.set_prior(prior);
+  hier.get_mutable_prior()->CopyFrom(prior);
   hier.initialize();
   // Extract hypers for reading test
   bayesmix::LinRegUniPrior out;

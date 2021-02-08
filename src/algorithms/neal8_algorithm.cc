@@ -4,6 +4,7 @@
 #include <memory>
 #include <stan/math/prim/fun.hpp>
 
+#include "algorithm_id.pb.h"
 #include "marginal_state.pb.h"
 #include "neal2_algorithm.h"
 #include "src/hierarchies/base_hierarchy.h"
@@ -15,7 +16,7 @@
 //! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
     std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
-    const Eigen::MatrixXd &covariates) {
+    const Eigen::MatrixXd &covariates) const {
   unsigned int n_grid = grid.rows();
   Eigen::VectorXd lpdf_(n_grid);
   Eigen::MatrixXd lpdf_temp(n_grid, n_aux);
@@ -74,7 +75,6 @@ void Neal8Algorithm::print_startup_message() const {
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
                     " hierarchies, " +
                     bayesmix::MixingId_Name(mixing->get_id()) + " mixing...";
-
   std::cout << msg << std::endl;
 }
 
@@ -103,8 +103,8 @@ void Neal8Algorithm::sample_allocations() {
       aux_unique_values[0]->set_state_from_proto(curr_val);
     }
     // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(i, data.row(i), false,
-                                                hier_covariates.row(i));
+    unique_values[allocations[i]]->remove_datum(
+        i, data.row(i), update_hierarchy_params, hier_covariates.row(i));
     // Draw the unique values in the auxiliary blocks from their prior
     for (size_t j = singleton; j < n_aux; j++) {
       aux_unique_values[j]->sample_prior();
@@ -123,11 +123,11 @@ void Neal8Algorithm::sample_allocations() {
           aux_unique_values[c_new - n_clust]->clone();
       unique_values.push_back(hier_new);
       allocations[i] = n_clust;
-      unique_values[n_clust]->add_datum(i, data.row(i), false,
-                                        hier_covariates.row(i));
+      unique_values[n_clust]->add_datum(
+          i, data.row(i), update_hierarchy_params, hier_covariates.row(i));
     } else {
       allocations[i] = c_new;
-      unique_values[c_new]->add_datum(i, data.row(i), false,
+      unique_values[c_new]->add_datum(i, data.row(i), update_hierarchy_params,
                                       hier_covariates.row(i));
     }
     if (singleton) {

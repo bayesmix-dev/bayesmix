@@ -113,7 +113,6 @@ bayesmix::MarginalState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
     unique_values[i]->write_state_to_proto(&clusval);
     iter_out.add_cluster_states()->CopyFrom(clusval);
   }
-
   // Transcribe mixing state
   bayesmix::MixingState mixstate;
   mixing->write_state_to_proto(&mixstate);

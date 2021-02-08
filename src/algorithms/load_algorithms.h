@@ -7,6 +7,7 @@
 #include "algorithm_id.pb.h"
 #include "base_algorithm.h"
 #include "neal2_algorithm.h"
+#include "neal3_algorithm.h"
 #include "neal8_algorithm.h"
 #include "src/runtime/factory.h"
 
@@ -20,10 +21,14 @@ __attribute__((constructor)) static void load_algorithms() {
   Builder<BaseAlgorithm> Neal2builder = []() {
     return std::make_shared<Neal2Algorithm>();
   };
+  Builder<BaseAlgorithm> Neal3builder = []() {
+    return std::make_shared<Neal3Algorithm>();
+  };
   Builder<BaseAlgorithm> Neal8builder = []() {
     return std::make_shared<Neal8Algorithm>();
   };
   factory.add_builder(Neal2Algorithm().get_id(), Neal2builder);
+  factory.add_builder(Neal3Algorithm().get_id(), Neal3builder);
   factory.add_builder(Neal8Algorithm().get_id(), Neal8builder);
 }
 

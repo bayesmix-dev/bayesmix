@@ -95,7 +95,7 @@ class AbstractHierarchy {
   //! Generates new values for state from the centering prior distribution
   virtual void sample_prior() = 0;
   //! Generates new values for state from the centering posterior distribution
-  virtual void sample_full_cond() = 0;
+  virtual void sample_full_cond(bool update_params=false) = 0;
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
   virtual void set_state_from_proto(
@@ -147,9 +147,12 @@ class BaseHierarchy : public AbstractHierarchy {
     state = static_cast<Derived *>(this)->draw(*hypers);
   };
   //! Generates new values for state from the centering posterior distribution
-  void sample_full_cond() {
-    state = static_cast<Derived *>(this)->draw(
-        static_cast<Derived *>(this)->get_posterior_parameters());
+  void sample_full_cond(bool update_params = false) {
+    Hyperparams params =
+        update_params
+            ? static_cast<Derived *>(this)->get_posterior_parameters()
+            : posterior_hypers;
+    state = static_cast<Derived *>(this)->draw(params);
   }
 
   void initialize() override {

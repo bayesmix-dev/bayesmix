@@ -69,6 +69,8 @@ class BaseAlgorithm {
   std::shared_ptr<BaseMixing> mixing;
   //!
   Eigen::MatrixXd mix_covariates;
+  //!
+  bool update_hierarchy_params = false;
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object
@@ -98,7 +100,8 @@ class BaseAlgorithm {
   }
 
  public:
-  virtual bool requires_conjugate_hierarchy() { return false; }
+  //!
+  virtual bool requires_conjugate_hierarchy() const { return false; }
 
   //! Runs the algorithm and saves the whole chain to a collector
   void run(BaseCollector *collector) {
@@ -106,7 +109,6 @@ class BaseAlgorithm {
     print_startup_message();
     unsigned int iter = 0;
     collector->start_collecting();
-
     progresscpp::ProgressBar bar(maxiter, 60);
 
     while (iter < maxiter) {

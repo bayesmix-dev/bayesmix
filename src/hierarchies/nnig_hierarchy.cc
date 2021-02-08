@@ -52,10 +52,10 @@ NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
   NNIG::Hyperparams post_params;
 
   if (card == 0) {  // no update possible
-    post_params = *hypers;
-    return post_params;
+    return *hypers;
   }
-  // Compute updated hyperparameters
+  // Compute posterior hyperparameters
+  Hyperparams post_params;
   double y_bar = data_sum / (1.0 * card);  // sample mean
   double ss = data_sum_squares - card * y_bar * y_bar;
   post_params.mean = (hypers->var_scaling * hypers->mean + data_sum) /

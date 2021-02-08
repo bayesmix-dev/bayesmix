@@ -35,7 +35,7 @@ Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
 Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
     const Eigen::MatrixXd &grid, const Eigen::MatrixXd &hier_covariates,
     const Eigen::MatrixXd &mix_covariates) {
-  Eigen::VectorXd out(grid.rows());
+  Eigen::VectorXd lpdf(grid.rows());
   unsigned int n_data = curr_state.cluster_allocs_size();
   unsigned int n_clust = curr_state.cluster_states_size();
   mixing->set_state_from_proto(curr_state.mixing_state());
@@ -55,9 +55,9 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
   // TODO add mixing covariate
 
   for (size_t j = 0; j < grid.rows(); j++) {
-    out(j) = stan::math::log_sum_exp(lpdf_local.row(j));
+    lpdf(j) = stan::math::log_sum_exp(lpdf_local.row(j));
   }
-  return out;
+  return lpdf;
 }
 
 bool MarginalAlgorithm::update_state_from_collector(BaseCollector *coll) {

@@ -26,13 +26,16 @@ class BaseMixing {
  protected:
   std::shared_ptr<google::protobuf::Message> prior;
 
+  //!
   virtual void create_empty_prior() = 0;
+  //!
   virtual void initialize_state() = 0;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseMixing() = default;
   BaseMixing() = default;
+  virtual std::shared_ptr<BaseMixing> clone() const = 0;
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
@@ -65,11 +68,11 @@ class BaseMixing {
 
   // GETTERS AND SETTERS
   google::protobuf::Message *get_mutable_prior() {
-    if (prior == nullptr) create_empty_prior();
-
+    if (prior == nullptr) {
+      create_empty_prior();
+    }
     return prior.get();
   }
-
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;

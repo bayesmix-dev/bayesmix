@@ -670,7 +670,7 @@ bayesmix::SemiHdpState SemiHdpSampler::get_state_as_proto() {
   return state;
 }
 
-void SemiHdpSampler::print_debug_string() {
+void SemiHdpSampler::print_debug_string() const {
   std::cout << "rest_allocs: ";
   for (auto& k : rest_allocs) std::cout << k << ", ";
   std::cout << std::endl << std::endl;
