@@ -160,7 +160,9 @@ class BaseHierarchy : public AbstractHierarchy {
     check_prior_is_set();
     static_cast<Derived *>(this)->initialize_hypers();
     static_cast<Derived *>(this)->initialize_state();
-  }
+    posterior_hypers = *hypers;
+    static_cast<Derived *>(this)->clear_data();
+    }
 
   void save_posterior_hypers() {
     posterior_hypers =
