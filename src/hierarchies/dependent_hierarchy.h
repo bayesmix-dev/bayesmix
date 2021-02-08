@@ -3,7 +3,9 @@
 
 #include "base_hierarchy.h"
 
-class DependentHierarchy : public BaseHierarchy {
+template <class Derived, typename State, typename Hyperparams, typename Prior>
+class DependentHierarchy
+    : public BaseHierarchy<Derived, State, Hyperparams, Prior> {
  protected:
   unsigned int dim;
 

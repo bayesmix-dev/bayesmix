@@ -7,22 +7,31 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-void LinRegUniHierarchy::initialize() {
-  hypers = std::make_shared<Hyperparams>();
-  check_prior_is_set();
-  initialize_hypers();
-  posterior_hypers = *hypers;
-  state.regression_coeffs = hypers->mean;
-  state.var = hypers->scale / (hypers->shape + 1);
-  clear_data();
+double LinRegUniHierarchy::like_lpdf(
+    const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
+  return stan::math::normal_lpdf(
+      datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
 }
 
-void LinRegUniHierarchy::clear_data() {
-  mixed_prod = Eigen::VectorXd::Zero(dim);
-  data_sum_squares = 0.0;
-  covar_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
-  card = 0;
-  cluster_data_idx = std::set<int>();
+double LinRegUniHierarchy::marg_lpdf(
+    const LinReg::Hyperparams &params, const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
+  double sig_n = sqrt(
+      (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
+      params.scale / params.shape);
+  return stan::math::student_t_lpdf(datum(0), 2 * params.shape,
+                                    covariate.dot(params.mean), sig_n);
+}
+
+LinReg::State LinRegUniHierarchy::draw(const LinReg::Hyperparams &params) {
+  // Generate new state values from their prior centering distribution
+  auto &rng = bayesmix::Rng::Instance().get();
+  LinReg::State out;
+  out.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+  out.regression_coeffs = stan::math::multi_normal_prec_rng(
+      params.mean, params.var_scaling / out.var, rng);
+  return out;
 }
 
 void LinRegUniHierarchy::update_summary_statistics(
@@ -38,17 +47,12 @@ void LinRegUniHierarchy::update_summary_statistics(
   }
 }
 
-void LinRegUniHierarchy::save_posterior_hypers() {
-  posterior_hypers = normal_invgamma_update();
-}
-
-LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update()
-    const {
+LinReg::Hyperparams LinRegUniHierarchy::get_posterior_parameters() {
   if (card == 0) {  // no update possible
     return *hypers;
   }
   // Compute posterior hyperparameters
-  Hyperparams post_params;
+  LinReg::Hyperparams post_params;
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
   auto llt = post_params.var_scaling.llt();
   post_params.var_scaling_inv = llt.solve(Eigen::MatrixXd::Identity(dim, dim));
@@ -64,72 +68,17 @@ LinRegUniHierarchy::Hyperparams LinRegUniHierarchy::normal_invgamma_update()
   return post_params;
 }
 
-void LinRegUniHierarchy::update_hypers(
-    const std::vector<bayesmix::MarginalState::ClusterState> &states) {
-  auto &rng = bayesmix::Rng::Instance().get();
-  auto priorcast = cast_prior();
-
-  if (priorcast->has_fixed_values()) {
-    return;
-  }
-
-  else {
-    throw std::invalid_argument("Unrecognized hierarchy prior");
-  }
+void LinRegUniHierarchy::clear_data() {
+  mixed_prod = Eigen::VectorXd::Zero(dim);
+  data_sum_squares = 0.0;
+  covar_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
+  card = 0;
+  cluster_data_idx = std::set<int>();
 }
 
-double LinRegUniHierarchy::like_lpdf(
-    const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
-  return stan::math::normal_lpdf(
-      datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
-}
-
-double LinRegUniHierarchy::prior_pred_lpdf(
-    const bool posterior, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
-  Hyperparams params = posterior ? posterior_hypers : *hypers;
-  double sig_n = sqrt(
-      (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
-      params.scale / params.shape);
-  return stan::math::student_t_lpdf(datum(0), 2 * params.shape,
-                                    covariate.dot(params.mean), sig_n);
-}
-
-void LinRegUniHierarchy::draw() {
-  // Generate new state values from their prior centering distribution
-  auto &rng = bayesmix::Rng::Instance().get();
-  state.var = stan::math::inv_gamma_rng(hypers->shape, hypers->scale, rng);
-  state.regression_coeffs = stan::math::multi_normal_prec_rng(
-      hypers->mean, hypers->var_scaling / state.var, rng);
-}
-
-<<<<<<< HEAD
-void LinRegUniHierarchy::sample_full_cond() {
-  // Update values
-  Hyperparams params = normal_invgamma_update();
-=======
-void LinRegUniHierarchy::sample_given_data(bool update_params /*= true*/) {
-  if (update_params) {
-    save_posterior_hypers();
-  }
->>>>>>> 236709ad37b203e4c85cfcc618173658efcddffe
-  // Generate new state values from their prior centering distribution
-  auto &rng = bayesmix::Rng::Instance().get();
-  state.var = stan::math::inv_gamma_rng(posterior_hypers.shape,
-                                        posterior_hypers.scale, rng);
-  state.regression_coeffs = stan::math::multi_normal_prec_rng(
-      posterior_hypers.mean, posterior_hypers.var_scaling / state.var, rng);
-}
-
-void LinRegUniHierarchy::set_state_from_proto(
-    const google::protobuf::Message &state_) {
-  auto &statecast = google::protobuf::internal::down_cast<
-      const bayesmix::MarginalState::ClusterState &>(state_);
-  state.regression_coeffs =
-      bayesmix::to_eigen(statecast.lin_reg_uni_ls_state().regression_coeffs());
-  state.var = statecast.lin_reg_uni_ls_state().var();
-  set_card(statecast.cardinality());
+void LinRegUniHierarchy::initialize_state() {
+  state.regression_coeffs = hypers->mean;
+  state.var = hypers->scale / (hypers->shape + 1);
 }
 
 void LinRegUniHierarchy::initialize_hypers() {
@@ -161,6 +110,30 @@ void LinRegUniHierarchy::initialize_hypers() {
   else {
     throw std::invalid_argument("Unrecognized hierarchy prior");
   }
+}
+
+void LinRegUniHierarchy::update_hypers(
+    const std::vector<bayesmix::MarginalState::ClusterState> &states) {
+  auto &rng = bayesmix::Rng::Instance().get();
+  auto priorcast = cast_prior();
+
+  if (priorcast->has_fixed_values()) {
+    return;
+  }
+
+  else {
+    throw std::invalid_argument("Unrecognized hierarchy prior");
+  }
+}
+
+void LinRegUniHierarchy::set_state_from_proto(
+    const google::protobuf::Message &state_) {
+  auto &statecast = google::protobuf::internal::down_cast<
+      const bayesmix::MarginalState::ClusterState &>(state_);
+  state.regression_coeffs =
+      bayesmix::to_eigen(statecast.lin_reg_uni_ls_state().regression_coeffs());
+  state.var = statecast.lin_reg_uni_ls_state().var();
+  card = statecast.cardinality();
 }
 
 void LinRegUniHierarchy::write_state_to_proto(

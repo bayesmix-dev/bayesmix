@@ -240,7 +240,6 @@ void NNIGHierarchy::set_state_from_proto(
       const bayesmix::MarginalState::ClusterState &>(state_);
   state.mean = statecast.uni_ls_state().mean();
   state.var = statecast.uni_ls_state().var();
-  // set_card(statecast.cardinality());
   card = statecast.cardinality();
 }
 

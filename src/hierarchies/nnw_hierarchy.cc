@@ -54,7 +54,7 @@ NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
   // Update state
   NNW::State out;
   out.mean = stan::math::multi_normal_prec_rng(
-      hypers->mean, tau_new * hypers->var_scaling, rng);
+      params.mean, tau_new * params.var_scaling, rng);
   set_prec_and_utilities(tau_new, &out);
   return out;
 }
