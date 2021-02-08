@@ -80,7 +80,7 @@ class LinRegUniHierarchy : public DependentHierarchy {
   // DESTRUCTOR AND CONSTRUCTORS
   ~LinRegUniHierarchy() = default;
   LinRegUniHierarchy() = default;
-  std::shared_ptr<BaseHierarchy> clone() const override {
+  std::shared_ptr<AbstractHierarchy> clone() const override {
     auto out = std::make_shared<LinRegUniHierarchy>(*this);
     out->clear_data();
     return out;

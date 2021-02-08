@@ -17,7 +17,7 @@
 //! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
     std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
-    const Eigen::MatrixXd &covariates) {
+    const Eigen::MatrixXd &covariates) const {
   return hier->prior_pred_lpdf_grid(grid, covariates);
 }
 
@@ -81,11 +81,11 @@ void Neal2Algorithm::sample_allocations() {
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
     unsigned int c_old = allocations[i];
     if (c_new == n_clust) {
-      std::shared_ptr<BaseHierarchy> new_unique = unique_values[0]->clone();
+      std::shared_ptr<AbstractHierarchy> new_unique = unique_values[0]->clone();
       new_unique->add_datum(i, data.row(i), update_hierarchy_params,
                             hier_covariates.row(i));
       // Generate new unique values with posterior sampling
-      new_unique->sample_full_cond();
+      new_unique->sample_full_cond(!update_hierarchy_params);
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
     } else {

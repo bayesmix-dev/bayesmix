@@ -17,7 +17,7 @@ void PitYorMixing::initialize() {
 //! \return     Probability value
 double PitYorMixing::mass_existing_cluster(
     const unsigned int n, const bool log, const bool propto,
-    std::shared_ptr<BaseHierarchy> hier,
+    std::shared_ptr<AbstractHierarchy> hier,
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   double out;
   if (hier->get_card() == 0) {
@@ -43,7 +43,7 @@ double PitYorMixing::mass_new_cluster(
 }
 
 void PitYorMixing::update_state(
-    const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+    const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     unsigned int n) {
   auto priorcast = cast_prior();
   if (priorcast->has_fixed_values()) {

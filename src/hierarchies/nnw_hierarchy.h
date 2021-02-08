@@ -101,7 +101,7 @@ class NNWHierarchy : public BaseHierarchy {
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNWHierarchy() = default;
   NNWHierarchy() = default;
-  std::shared_ptr<BaseHierarchy> clone() const override {
+  std::shared_ptr<AbstractHierarchy> clone() const override {
     auto out = std::make_shared<NNWHierarchy>(*this);
     out->clear_data();
     return out;

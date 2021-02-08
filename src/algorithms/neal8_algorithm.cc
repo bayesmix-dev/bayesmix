@@ -15,7 +15,7 @@
 //! \param hier Hierarchy object
 //! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
-    std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
+    std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
     const Eigen::MatrixXd &covariates) const {
   unsigned int n_grid = grid.rows();
   Eigen::VectorXd lpdf_(n_grid);
@@ -119,7 +119,7 @@ void Neal8Algorithm::sample_allocations() {
     if (c_new >= n_clust) {
       // datum moves to a new cluster
       // Copy one of the auxiliary block as the new cluster
-      std::shared_ptr<BaseHierarchy> hier_new =
+      std::shared_ptr<AbstractHierarchy> hier_new =
           aux_unique_values[c_new - n_clust]->clone();
       unique_values.push_back(hier_new);
       allocations[i] = n_clust;

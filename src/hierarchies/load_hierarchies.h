@@ -18,13 +18,13 @@ using HierarchyFactory = Factory<bayesmix::HierarchyId, BaseHierarchy>;
 
 __attribute__((constructor)) static void load_hierarchies() {
   HierarchyFactory &factory = HierarchyFactory::Instance();
-  Builder<BaseHierarchy> NNIGbuilder = []() {
+  Builder<AbstractHierarchy> NNIGbuilder = []() {
     return std::make_shared<NNIGHierarchy>();
   };
-  Builder<BaseHierarchy> NNWbuilder = []() {
+  Builder<AbstractHierarchy> NNWbuilder = []() {
     return std::make_shared<NNWHierarchy>();
   };
-  Builder<BaseHierarchy> LinRegUnibuilder = []() {
+  Builder<AbstractHierarchy> LinRegUnibuilder = []() {
     return std::make_shared<LinRegUniHierarchy>();
   };
   factory.add_builder(NNIGHierarchy().get_id(), NNIGbuilder);

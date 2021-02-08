@@ -147,7 +147,7 @@ class BaseHierarchy : public AbstractHierarchy {
     state = static_cast<Derived *>(this)->draw(*hypers);
   };
   //! Generates new values for state from the centering posterior distribution
-  void sample_full_cond(bool update_params = false) {
+  void sample_full_cond(bool update_params = true) {
     Hyperparams params =
         update_params
             ? static_cast<Derived *>(this)->get_posterior_parameters()

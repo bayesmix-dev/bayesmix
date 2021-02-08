@@ -17,7 +17,7 @@ double NNIGHierarchy::like_lpdf(
 }
 
 double NNIGHierarchy::marg_lpdf(
-    const NNIG::Hyperparams& params, const Eigen::RowVectorXd &datum,
+    const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
   double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
                       (params.shape * params.var_scaling));
@@ -49,13 +49,11 @@ void NNIGHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
 
 NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
   // Initialize relevant variables
-  NNIG::Hyperparams post_params;
-
   if (card == 0) {  // no update possible
     return *hypers;
   }
   // Compute posterior hyperparameters
-  Hyperparams post_params;
+  NNIG::Hyperparams post_params;
   double y_bar = data_sum / (1.0 * card);  // sample mean
   double ss = data_sum_squares - card * y_bar * y_bar;
   post_params.mean = (hypers->var_scaling * hypers->mean + data_sum) /
@@ -235,7 +233,6 @@ void NNIGHierarchy::update_hypers(
     throw std::invalid_argument("Unrecognized hierarchy prior");
   }
 }
-
 
 void NNIGHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {

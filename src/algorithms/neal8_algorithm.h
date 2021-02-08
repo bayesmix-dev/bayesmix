@@ -28,12 +28,12 @@ class Neal8Algorithm : public Neal2Algorithm {
   //! Number of auxiliary blocks
   unsigned int n_aux = 3;
   //! Vector of auxiliary blocks
-  std::vector<std::shared_ptr<BaseHierarchy>> aux_unique_values;
+  std::vector<std::shared_ptr<AbstractHierarchy>> aux_unique_values;
 
   // AUXILIARY TOOLS
   //! Computes marginal contribution of a given iteration & cluster
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
+      std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
       const Eigen::MatrixXd &covariates) const override;
   //!
   Eigen::VectorXd get_cluster_prior_mass(

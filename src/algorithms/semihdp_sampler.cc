@@ -7,7 +7,7 @@
 #include "src/utils/eigen_utils.h"
 
 SemiHdpSampler::SemiHdpSampler(const std::vector<Eigen::MatrixXd>& data,
-                               std::shared_ptr<BaseHierarchy> hier,
+                               std::shared_ptr<AbstractHierarchy> hier,
                                bayesmix::SemiHdpParams params)
     : data(data), params(params) {
   ngroups = data.size();
@@ -39,7 +39,7 @@ void SemiHdpSampler::initialize() {
   n_by_table_pseudo.resize(ngroups);
 
   for (int l = 0; l < INIT_N_CLUS; l++) {
-    std::shared_ptr<BaseHierarchy> hierarchy = G00_master_hierarchy->clone();
+    std::shared_ptr<AbstractHierarchy> hierarchy = G00_master_hierarchy->clone();
     hierarchy->sample_prior();
     shared_tables.push_back(hierarchy);
   }
@@ -58,7 +58,7 @@ void SemiHdpSampler::initialize() {
     table_to_shared[i].resize(2 * INIT_N_CLUS);
 
     for (int l = 0; l < INIT_N_CLUS; l++) {
-      std::shared_ptr<BaseHierarchy> hierarchy = G0_master_hierarchy->clone();
+      std::shared_ptr<AbstractHierarchy> hierarchy = G0_master_hierarchy->clone();
       hierarchy->sample_prior();
       private_tables[i].push_back(hierarchy);
       rest_tables[i].push_back(hierarchy);
@@ -214,7 +214,7 @@ void SemiHdpSampler::update_table_allocs() {
         if (stan::math::uniform_rng(0, 1, rng) < semihdp_weight) {
           // sample from G0, add it to rest_tables and private_tables and
           // adjust counts and stuff
-          std::shared_ptr<BaseHierarchy> hierarchy =
+          std::shared_ptr<AbstractHierarchy> hierarchy =
               G0_master_hierarchy->clone();
           hierarchy->sample_full_cond(data[i].row(j));
           private_tables[r].push_back(hierarchy);
@@ -234,7 +234,7 @@ void SemiHdpSampler::update_table_allocs() {
             cnt_shared_tables[tnew] += 1;
           } else {
             // std::cout << "creating new tau!" << std::endl;
-            std::shared_ptr<BaseHierarchy> hierarchy =
+            std::shared_ptr<AbstractHierarchy> hierarchy =
                 G00_master_hierarchy->clone();
             hierarchy->sample_full_cond(data[i].row(j));
             shared_tables.push_back(hierarchy);
@@ -294,7 +294,7 @@ void SemiHdpSampler::update_to_shared() {
         } else {
           cnt_shared_tables.push_back(1);
           table_to_shared[r][l] = newt;
-          std::shared_ptr<BaseHierarchy> hier = G00_master_hierarchy->clone();
+          std::shared_ptr<AbstractHierarchy> hier = G00_master_hierarchy->clone();
           hier->sample_full_cond(data_by_theta_star[l]);
           shared_tables.push_back(hier);
         }
@@ -490,7 +490,7 @@ void SemiHdpSampler::sample_pseudo_prior() {
     for (int l = 0; l < state.cluster_states_size(); l++) {
       bayesmix::MarginalState::ClusterState clusval = state.cluster_states(l);
       // perturb(&clusval);
-      std::shared_ptr<BaseHierarchy> curr_clus = G0_master_hierarchy->clone();
+      std::shared_ptr<AbstractHierarchy> curr_clus = G0_master_hierarchy->clone();
       curr_clus->set_state_from_proto(clusval);
       rest_tables_pseudo[r].push_back(curr_clus);
     }
