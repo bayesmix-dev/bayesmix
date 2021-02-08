@@ -7,7 +7,7 @@
 class Neal3Algorithm : public Neal2Algorithm {
  protected:
   //!
-  bool update_hierarchy_params = true;
+  bool update_hierarchy_params() override { return true; }
   // AUXILIARY TOOLS
   //!
   Eigen::VectorXd get_cluster_lpdf(const unsigned int data_idx) const override;

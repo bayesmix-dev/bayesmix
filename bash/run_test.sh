@@ -16,7 +16,7 @@
 
 
 if (( $# == 1 )); then
-  algo='Neal2'
+  algo='Neal3'
 else
   algo="$2"
 fi

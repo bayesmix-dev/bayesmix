@@ -4,6 +4,6 @@ target_sources(bayesmix
     dependent_mixing.h
     dirichlet_mixing.h
     dirichlet_mixing.cc
-    # pityor_mixing.h
-    # pityor_mixing.cc
+    pityor_mixing.h
+    pityor_mixing.cc
 )

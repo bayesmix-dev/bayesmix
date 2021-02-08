@@ -12,12 +12,12 @@ Eigen::VectorXd Neal3Algorithm::get_cluster_lpdf(
   Eigen::VectorXd loglpdf(n_clust + 1);
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    loglpdf(j) = unique_values[j]->marg_lpdf(true, data.row(data_idx),
-                                             hier_covariates.row(data_idx));
+    loglpdf(j) = unique_values[j]->conditional_pred_lpdf(
+        data.row(data_idx), hier_covariates.row(data_idx));
   }
   // Probability of being assigned to a newly created cluster
-  loglpdf(n_clust) = unique_values[0]->marg_lpdf(
-      false, data.row(data_idx), hier_covariates.row(data_idx));
+  loglpdf(n_clust) = unique_values[0]->prior_pred_lpdf(
+      data.row(data_idx), hier_covariates.row(data_idx));
   return loglpdf;
 }
 
