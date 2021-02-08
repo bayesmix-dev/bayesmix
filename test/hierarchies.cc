@@ -56,7 +56,7 @@ TEST(nnighierarchy, sample_given_data) {
 
   auto hier2 = hier->clone();
   hier2->add_datum(0, datum, false);
-  hier2->sample_given_data();
+  hier2->sample_full_cond();
 
   bayesmix::MarginalState out;
   bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
@@ -122,7 +122,7 @@ TEST(nnwhierarchy, sample_given_data) {
 
   auto hier2 = hier->clone();
   hier2->add_datum(0, datum, false);
-  hier2->sample_given_data();
+  hier2->sample_full_cond();
 
   bayesmix::MarginalState out;
   bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
@@ -211,7 +211,7 @@ TEST(lin_reg_uni_hierarchy, misc) {
   //   ASSERT_DOUBLE_EQ(hier.get_mixed_prod()(i), (cov.transpose() * data)(i));
   // }
   // Compute and check posterior values
-  hier.sample_given_data();
+  hier.sample_full_cond();
   auto state = hier.get_state();
   for (int i = 0; i < dim; i++) {
     ASSERT_GT(state.regression_coeffs(i), beta0(i));

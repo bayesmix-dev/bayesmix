@@ -79,7 +79,7 @@ double LinRegUniHierarchy::like_lpdf(
       datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
 }
 
-double LinRegUniHierarchy::marg_lpdf(
+double LinRegUniHierarchy::prior_pred_lpdf(
     const bool posterior, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   Hyperparams params = posterior ? normal_invgamma_update() : *hypers;
@@ -98,7 +98,7 @@ void LinRegUniHierarchy::draw() {
       hypers->mean, hypers->var_scaling / state.var, rng);
 }
 
-void LinRegUniHierarchy::sample_given_data() {
+void LinRegUniHierarchy::sample_full_cond() {
   // Update values
   Hyperparams params = normal_invgamma_update();
   // Generate new state values from their prior centering distribution

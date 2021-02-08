@@ -49,7 +49,7 @@ TEST(lpdf, nnig) {
 
   // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
   double sum = prior + like - post;
-  double marg = hier.marg_lpdf(false, datum);
+  double marg = hier.prior_pred_lpdf(datum);
 
   ASSERT_DOUBLE_EQ(sum, marg);
 }
@@ -107,7 +107,7 @@ TEST(lpdf, nnig) {
 //
 //   // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
 //   double sum = prior + like - post;
-//   double marg = hier.marg_lpdf(false, datum);
+//   double marg = hier.prior_pred_lpdf(false, datum);
 //
 //   // Compute logdet's
 //   Eigen::MatrixXd tauchol0 =
@@ -193,7 +193,7 @@ TEST(lpdf, lin_reg_uni) {
 
   // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
   double sum = pr + like - post;
-  double marg = hier.marg_lpdf(false, datum, cov);
+  double marg = hier.prior_pred_lpdf(false, datum, cov);
 
   ASSERT_FLOAT_EQ(sum, marg);
 }

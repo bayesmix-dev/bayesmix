@@ -65,8 +65,8 @@ class NNIGHierarchy
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) override;
   //! Evaluates the log-marginal distribution of data in a single point
   double marg_lpdf(
-      const bool posterior, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) override;
+      const NNIG::Hyperparams& params, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0));
 
   NNIG::State draw(const NNIG::Hyperparams &params);
 

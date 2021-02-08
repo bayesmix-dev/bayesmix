@@ -42,12 +42,12 @@ int main(int argc, char *argv[]) {
   auto algo = factory_algo.create_object(algo_type);
   auto hier = factory_hier.create_object(hier_type);
   auto mixing = factory_mixing.create_object(mix_type);
-  BaseCollector *coll;
-  if (collname == "") {
-    coll = new MemoryCollector();
-  } else {
-    coll = new FileCollector(collname);
-  }
+  MemoryCollector *coll = new MemoryCollector();
+  // if (collname == "") {
+  //   coll = new MemoryCollector();
+  // } else {
+  //   coll = new FileCollector(collname);
+  // }
 
   bayesmix::read_proto_from_file(mix_args, mixing->get_mutable_prior());
   bayesmix::read_proto_from_file(hier_args, hier->get_mutable_prior());
@@ -130,7 +130,11 @@ int main(int argc, char *argv[]) {
   bayesmix::write_matrix_to_file(clust_est, clusfile);
   std::cout << "Successfully wrote clustering to " << clusfile << std::endl;
 
+  if (collname != "") {
+    coll->write_to_file<bayesmix::MarginalState>(collname);
+  }
   std::cout << "End of run.cc" << std::endl;
+
   delete coll;
   return 0;
 }

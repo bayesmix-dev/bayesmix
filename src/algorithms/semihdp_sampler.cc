@@ -106,7 +106,7 @@ void SemiHdpSampler::update_unique_vals() {
     for (int l = 0; l < rest_tables[r].size(); l++) {
       if (table_to_private[r][l] >= 0) {
         if (data_by_theta_star[l].rows() > 0)
-          private_tables[r][table_to_private[r][l]]->sample_given_data(
+          private_tables[r][table_to_private[r][l]]->sample_full_cond(
               data_by_theta_star[l]);
         else
           private_tables[r][table_to_private[r][l]]->sample_prior();
@@ -120,7 +120,7 @@ void SemiHdpSampler::update_unique_vals() {
 
   for (int h = 0; h < shared_tables.size(); h++) {
     if (data_by_shared[h].rows() > 0)
-      shared_tables[h]->sample_given_data(data_by_shared[h]);
+      shared_tables[h]->sample_full_cond(data_by_shared[h]);
     else
       shared_tables[h]->sample_prior();
   }
@@ -185,7 +185,7 @@ void SemiHdpSampler::update_table_allocs() {
       }
 
       double margG0 =
-          logw + G0_master_hierarchy->marg_lpdf(false, data[i].row(j));
+          logw + G0_master_hierarchy->prior_pred_lpdf(data[i].row(j));
 
       Eigen::VectorXd hdp_contribs(shared_tables.size() + 1);
 #pragma omp parallel for
@@ -197,7 +197,7 @@ void SemiHdpSampler::update_table_allocs() {
 
       hdp_contribs[shared_tables.size()] =
           loggamma - logmsum +
-          G00_master_hierarchy->marg_lpdf(false, data[i].row(j));
+          G00_master_hierarchy->prior_pred_lpdf(data[i].row(j));
       double margHDP = log1mw + stan::math::log_sum_exp(hdp_contribs);
       Eigen::VectorXd marg(2);
       marg << margG0, margHDP;
@@ -216,7 +216,7 @@ void SemiHdpSampler::update_table_allocs() {
           // adjust counts and stuff
           std::shared_ptr<BaseHierarchy> hierarchy =
               G0_master_hierarchy->clone();
-          hierarchy->sample_given_data(data[i].row(j));
+          hierarchy->sample_full_cond(data[i].row(j));
           private_tables[r].push_back(hierarchy);
           rest_tables[r].push_back(hierarchy);
           table_to_shared[r].push_back(-1);
@@ -236,7 +236,7 @@ void SemiHdpSampler::update_table_allocs() {
             // std::cout << "creating new tau!" << std::endl;
             std::shared_ptr<BaseHierarchy> hierarchy =
                 G00_master_hierarchy->clone();
-            hierarchy->sample_given_data(data[i].row(j));
+            hierarchy->sample_full_cond(data[i].row(j));
             shared_tables.push_back(hierarchy);
             cnt_shared_tables.push_back(1);
             log_m.push_back(0);
@@ -280,8 +280,8 @@ void SemiHdpSampler::update_to_shared() {
         probas(shared_tables.size()) =
             std::log(totalmass_hdp) +
             G00_master_hierarchy
-                ->marg_lpdf_grid(false, Eigen::MatrixXd(0, 0),
-                                 data_by_theta_star[l])
+                ->prior_pred_lpdf_grid(Eigen::MatrixXd(0, 0),
+                                       data_by_theta_star[l])
                 .sum();
 
         probas = stan::math::softmax(probas);
@@ -295,7 +295,7 @@ void SemiHdpSampler::update_to_shared() {
           cnt_shared_tables.push_back(1);
           table_to_shared[r][l] = newt;
           std::shared_ptr<BaseHierarchy> hier = G00_master_hierarchy->clone();
-          hier->sample_given_data(data_by_theta_star[l]);
+          hier->sample_full_cond(data_by_theta_star[l]);
           shared_tables.push_back(hier);
         }
       }

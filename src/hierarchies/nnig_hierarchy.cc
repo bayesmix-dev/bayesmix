@@ -17,9 +17,8 @@ double NNIGHierarchy::like_lpdf(
 }
 
 double NNIGHierarchy::marg_lpdf(
-    const bool posterior, const Eigen::RowVectorXd &datum,
+    const NNIG::Hyperparams& params, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
-  NNIG::Hyperparams params = posterior ? get_posterior_parameters() : *hypers;
   double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
                       (params.shape * params.var_scaling));
   return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,

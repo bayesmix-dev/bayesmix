@@ -165,7 +165,7 @@ double NNWHierarchy::like_lpdf(
                                           prec_logdet);
 }
 
-double NNWHierarchy::marg_lpdf(
+double NNWHierarchy::prior_pred_lpdf(
     const bool posterior, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   Hyperparams params = posterior ? normal_wishart_update() : *hypers;
@@ -190,7 +190,7 @@ void NNWHierarchy::draw() {
 }
 
 //! \param data Matrix of row-vectorial data points
-void NNWHierarchy::sample_given_data() {
+void NNWHierarchy::sample_full_cond() {
   // Update values
   Hyperparams params = normal_wishart_update();
   // Generate new state values from their prior centering distribution

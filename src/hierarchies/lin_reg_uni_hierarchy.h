@@ -73,7 +73,7 @@ class LinRegUniHierarchy : public DependentHierarchy {
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
   //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(
+  double prior_pred_lpdf(
       const bool posterior, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
 
@@ -91,7 +91,7 @@ class LinRegUniHierarchy : public DependentHierarchy {
   //! Generates new values for state from the centering prior distribution
   void draw() override;
   //! Generates new values for state from the centering posterior distribution
-  void sample_given_data() override;
+  void sample_full_cond() override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }

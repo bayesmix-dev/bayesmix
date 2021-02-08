@@ -70,24 +70,24 @@
 //   return lpdf;
 // }
 
-// Eigen::VectorXd AbstractHierarchy::marg_lpdf_grid(
+// Eigen::VectorXd AbstractHierarchy::prior_pred_lpdf_grid(
 //     const bool posterior, const Eigen::MatrixXd &data,
 //     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
 //   Eigen::VectorXd lpdf(data.rows());
 //   if (covariates.cols() == 0) {
 //     for (int i = 0; i < data.rows(); i++) {
 //       // Pass null value as covariate
-//       lpdf(i) = marg_lpdf(posterior, data.row(i), Eigen::RowVectorXd(0));
+//       lpdf(i) = prior_pred_lpdf(posterior, data.row(i), Eigen::RowVectorXd(0));
 //     }
 //   } else {
 //     for (int i = 0; i < data.rows(); i++) {
-//       lpdf(i) = marg_lpdf(posterior, data.row(i), covariates.row(i));
+//       lpdf(i) = prior_pred_lpdf(posterior, data.row(i), covariates.row(i));
 //     }
 //   }
 //   return lpdf;
 // }
 
-// void AbstractHierarchy::sample_given_data(
+// void AbstractHierarchy::sample_full_cond(
 //     const Eigen::MatrixXd &data,
 //     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
 //   clear_data();
@@ -98,5 +98,5 @@
 //     for (int i = 0; i < data.rows(); i++)
 //       add_datum(i, data.row(i), false, covariates.row(i));
 //   }
-//   sample_given_data();
+//   sample_full_cond();
 // }

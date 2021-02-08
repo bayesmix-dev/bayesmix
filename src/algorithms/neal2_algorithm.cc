@@ -17,7 +17,7 @@
 Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
     std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
     const Eigen::MatrixXd &covariates) {
-  return hier->marg_lpdf_grid(false, grid, covariates);
+  return hier->prior_pred_lpdf_grid(grid, covariates);
 }
 
 Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
@@ -48,8 +48,8 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
                                              hier_covariates.row(data_idx));
   }
   // Probability of being assigned to a newly created cluster
-  loglpdf(n_clust) = unique_values[0]->marg_lpdf(
-      false, data.row(data_idx), hier_covariates.row(data_idx));
+  loglpdf(n_clust) = unique_values[0]->prior_pred_lpdf(
+      data.row(data_idx), hier_covariates.row(data_idx));
   return loglpdf;
 }
 
@@ -86,7 +86,7 @@ void Neal2Algorithm::sample_allocations() {
           unique_values[0]->clone();
       new_unique->add_datum(i, data.row(i), false, hier_covariates.row(i));
       // Generate new unique values with posterior sampling
-      new_unique->sample_given_data();
+      new_unique->sample_full_cond();
       unique_values.push_back(new_unique);
       allocations[i] = unique_values.size() - 1;
     } else {
@@ -107,5 +107,5 @@ void Neal2Algorithm::sample_allocations() {
 }
 
 void Neal2Algorithm::sample_unique_values() {
-  for (auto &clus : unique_values) clus->sample_given_data();
+  for (auto &clus : unique_values) clus->sample_full_cond();
 }
