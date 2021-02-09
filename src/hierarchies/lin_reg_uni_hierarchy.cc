@@ -133,7 +133,7 @@ void LinRegUniHierarchy::set_state_from_proto(
   state.regression_coeffs =
       bayesmix::to_eigen(statecast.lin_reg_uni_ls_state().regression_coeffs());
   state.var = statecast.lin_reg_uni_ls_state().var();
-  card = statecast.cardinality();
+  set_card(statecast.cardinality());
 }
 
 void LinRegUniHierarchy::write_state_to_proto(

@@ -129,6 +129,11 @@ class BaseHierarchy : public AbstractHierarchy {
   virtual Hyperparams get_posterior_parameters() = 0;
   void create_empty_prior() override { prior.reset(new Prior); }
   virtual void initialize_state() = 0;
+  
+  void set_card(const int card_) {
+    card = card_;
+    log_card = std::log(card_);
+  }
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS

@@ -193,7 +193,7 @@ TEST(lpdf, lin_reg_uni) {
 
   // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
   double sum = pr + like - post;
-  double marg = hier.prior_pred_lpdf(false, datum, cov);
+  double marg = hier.prior_pred_lpdf(datum, cov);
 
   ASSERT_FLOAT_EQ(sum, marg);
 }

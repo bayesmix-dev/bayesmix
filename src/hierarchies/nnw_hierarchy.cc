@@ -303,7 +303,7 @@ void NNWHierarchy::set_state_from_proto(
       const bayesmix::MarginalState::ClusterState &>(state_);
   state.mean = to_eigen(statecast.multi_ls_state().mean());
   set_prec_and_utilities(to_eigen(statecast.multi_ls_state().prec()), &state);
-  card = statecast.cardinality();
+  set_card(statecast.cardinality());
 }
 
 void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
