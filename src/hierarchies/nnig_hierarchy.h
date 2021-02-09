@@ -46,7 +46,6 @@ class NNIGHierarchy
   double data_sum_squares = 0;
 
  public:
-
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNIGHierarchy() = default;
   NNIGHierarchy() = default;
@@ -60,9 +59,9 @@ class NNIGHierarchy
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) override;
   //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(
-      const NNIG::Hyperparams& params, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0));
+  double marg_lpdf(const NNIG::Hyperparams &params,
+                   const Eigen::RowVectorXd &datum,
+                   const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0));
 
   NNIG::State draw(const NNIG::Hyperparams &params);
 
@@ -72,10 +71,9 @@ class NNIGHierarchy
   void initialize_state();
   void initialize_hypers();
   void update_summary_statistics(const Eigen::VectorXd &datum,
-                                 const Eigen::VectorXd &covariate,
-                                 bool add);
+                                 const Eigen::VectorXd &covariate, bool add);
   NNIG::Hyperparams get_posterior_parameters();
-  
+
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;

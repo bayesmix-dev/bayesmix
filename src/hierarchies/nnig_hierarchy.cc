@@ -240,8 +240,7 @@ void NNIGHierarchy::set_state_from_proto(
   set_card(statecast.cardinality());
 }
 
-void NNIGHierarchy::write_state_to_proto(
-    google::protobuf::Message *out) const {
+void NNIGHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   bayesmix::UniLSState state_;
   state_.set_mean(state.mean);
   state_.set_var(state.var);

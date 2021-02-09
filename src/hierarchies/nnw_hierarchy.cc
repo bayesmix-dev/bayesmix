@@ -313,8 +313,7 @@ void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   out_cast->set_cardinality(card);
 }
 
-void NNWHierarchy::write_hypers_to_proto(
-    google::protobuf::Message *out) const {
+void NNWHierarchy::write_hypers_to_proto(google::protobuf::Message *out) const {
   bayesmix::NNWPrior hypers_;
   bayesmix::to_proto(hypers->mean,
                      hypers_.mutable_fixed_values()->mutable_mean());

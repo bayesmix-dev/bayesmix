@@ -93,7 +93,7 @@ class AbstractHierarchy {
   //! Generates new values for state from the centering prior distribution
   virtual void sample_prior() = 0;
   //! Generates new values for state from the centering posterior distribution
-  virtual void sample_full_cond(bool update_params=false) = 0;
+  virtual void sample_full_cond(bool update_params = false) = 0;
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
   virtual void set_state_from_proto(
@@ -106,7 +106,7 @@ class AbstractHierarchy {
   double get_log_card() const { return log_card; }
   std::set<int> get_data_idx() { return cluster_data_idx; }
   virtual google::protobuf::Message *get_mutable_prior() = 0;
-  
+
   //! Overloaded version of sample_full_cond(), mainly used for debugging
   virtual void sample_full_cond(
       const Eigen::MatrixXd &data,
@@ -125,7 +125,7 @@ class BaseHierarchy : public AbstractHierarchy {
   virtual Hyperparams get_posterior_parameters() = 0;
   virtual void initialize_state() = 0;
   void create_empty_prior() { prior.reset(new Prior); }
-  
+
   void set_card(const int card_) {
     card = card_;
     log_card = std::log(card_);
@@ -150,9 +150,8 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Generates new values for state from the centering posterior distribution
   void sample_full_cond(bool update_params = true) {
     Hyperparams params =
-        update_params
-            ? static_cast<Derived *>(this)->get_posterior_parameters()
-            : posterior_hypers;
+        update_params ? static_cast<Derived *>(this)->get_posterior_parameters()
+                      : posterior_hypers;
     state = static_cast<Derived *>(this)->draw(params);
   }
 
@@ -166,8 +165,7 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   void save_posterior_hypers() {
-    posterior_hypers =
-        static_cast<Derived *>(this)->get_posterior_parameters();
+    posterior_hypers = static_cast<Derived *>(this)->get_posterior_parameters();
   }
 
   void add_datum(
@@ -242,7 +240,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
     const Eigen::VectorXd &covariate /* = Eigen::VectorXd(0)*/) {
   static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
                                                           false);
-   card -= 1;
+  card -= 1;
   log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
   auto it = cluster_data_idx.find(id);
   assert(it != cluster_data_idx.end());

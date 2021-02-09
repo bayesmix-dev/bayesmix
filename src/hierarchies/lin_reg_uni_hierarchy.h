@@ -28,10 +28,8 @@ struct Hyperparams {
 
 class LinRegUniHierarchy
     : public DependentHierarchy<LinRegUniHierarchy, LinReg::State,
-                                LinReg::Hyperparams,
-                                bayesmix::LinRegUniPrior> {
+                                LinReg::Hyperparams, bayesmix::LinRegUniPrior> {
  public:
-
  protected:
   //! Represents pieces of y^t y
   double data_sum_squares;
@@ -53,11 +51,11 @@ class LinRegUniHierarchy
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) override;
 
-  double marg_lpdf(
-      const LinReg::Hyperparams & params, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0));
+  double marg_lpdf(const LinReg::Hyperparams &params,
+                   const Eigen::RowVectorXd &datum,
+                   const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0));
 
-  LinReg::State draw(const LinReg::Hyperparams & params);
+  LinReg::State draw(const LinReg::Hyperparams &params);
 
   void clear_data();
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>

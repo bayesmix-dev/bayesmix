@@ -52,7 +52,8 @@ class SemiHdpSampler {
   std::vector<std::vector<int>> n_by_table;
 
   // stuff for pseudoprior
-  std::vector<std::vector<std::shared_ptr<AbstractHierarchy>>> rest_tables_pseudo;
+  std::vector<std::vector<std::shared_ptr<AbstractHierarchy>>>
+      rest_tables_pseudo;
   std::vector<std::vector<int>> n_by_table_pseudo;
 
   // theta_{ij} = theta_{c_i, s_{ij}}

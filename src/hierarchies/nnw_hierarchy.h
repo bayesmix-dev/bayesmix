@@ -47,7 +47,6 @@ struct Hyperparams {
 class NNWHierarchy
     : public BaseHierarchy<NNWHierarchy, NNW::State, NNW::Hyperparams,
                            bayesmix::NNWPrior> {
-
  protected:
   unsigned int dim;
   Eigen::VectorXd data_sum;
@@ -70,12 +69,12 @@ class NNWHierarchy
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) override;
 
-  double marg_lpdf(
-      const NNW::Hyperparams& params, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0));
+  double marg_lpdf(const NNW::Hyperparams &params,
+                   const Eigen::RowVectorXd &datum,
+                   const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0));
 
   // SAMPLING FUNCTIONS
-  NNW::State draw(const NNW::Hyperparams& params);
+  NNW::State draw(const NNW::Hyperparams &params);
 
   void clear_data();
   void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
@@ -84,8 +83,7 @@ class NNWHierarchy
   void initialize_state();
   void initialize_hypers();
   void update_summary_statistics(const Eigen::VectorXd &datum,
-                                 const Eigen::VectorXd &covariate,
-                                 bool add);
+                                 const Eigen::VectorXd &covariate, bool add);
   NNW::Hyperparams get_posterior_parameters();
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;

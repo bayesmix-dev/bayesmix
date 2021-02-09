@@ -85,8 +85,8 @@ class Factory {
     try {
       return create_object(name_to_id(name));
     } catch (const std::invalid_argument &e) {
-      std::string err = "No identifier found for name: \"" + name +
-                        "\". \n" + e.what();
+      std::string err =
+          "No identifier found for name: \"" + name + "\". \n" + e.what();
       throw std::invalid_argument(err);
     }
   }

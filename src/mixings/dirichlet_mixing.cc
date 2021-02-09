@@ -31,7 +31,7 @@ double DirichletMixing::mass_existing_cluster(
     if (!propto) out /= (n + state.totalmass);
   }
   return out;
-    }
+}
 
 //! \param n_clust Number of clusters
 //! \param n       Total number of data points
