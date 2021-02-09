@@ -79,9 +79,3 @@ if (NOT DISABLE_TESTS)
   # Build test executable
   add_subdirectory(test)
 endif()
-
-
-add_executable(runtest $<TARGET_OBJECTS:bayesmix> run_test.cc)
-target_include_directories(runtest PUBLIC ${INCLUDE_PATHS})
-target_link_libraries(runtest PUBLIC ${LINK_LIBRARIES})
-target_compile_options(runtest PUBLIC ${COMPILE_OPTIONS})

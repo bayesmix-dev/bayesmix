@@ -163,7 +163,7 @@ class BaseHierarchy : public AbstractHierarchy {
     static_cast<Derived *>(this)->initialize_state();
     posterior_hypers = *hypers;
     static_cast<Derived *>(this)->clear_data();
-    }
+  }
 
   void save_posterior_hypers() {
     posterior_hypers =

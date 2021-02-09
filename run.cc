@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
   auto algo = factory_algo.create_object(algo_type);
   auto hier = factory_hier.create_object(hier_type);
   auto mixing = factory_mixing.create_object(mix_type);
-  BaseCollector *coll = new MemoryCollector();
+  BaseCollector *coll;
   if (collname == "") {
     coll = new MemoryCollector();
   } else {

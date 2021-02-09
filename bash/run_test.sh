@@ -23,7 +23,7 @@ fi
 
 if [ "$1" == 'uni' ]; then
   build/run \
-    $algo 20201124 5 1000 1 \
+    $algo 20201124 0 1000 100 \
     NNIG resources/asciipb/nnig_ngg_prior.asciipb \
     DP   resources/asciipb/dp_gamma_prior.asciipb \
     "" \
