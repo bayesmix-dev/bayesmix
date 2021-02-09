@@ -36,38 +36,44 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
     const Eigen::MatrixXd &grid, const Eigen::MatrixXd &hier_covariates,
     const Eigen::MatrixXd &mix_covariates) {
   Eigen::VectorXd lpdf(grid.rows());
+  Eigen::VectorXd pdf = Eigen::VectorXd::Zero(grid.rows());
   unsigned int n_data = curr_state.cluster_allocs_size();
   unsigned int n_clust = curr_state.cluster_states_size();
   mixing->set_state_from_proto(curr_state.mixing_state());
   Eigen::MatrixXd lpdf_local(grid.rows(), n_clust + 1);
+
   auto temp_hier = unique_values[0]->clone();
   Eigen::VectorXd weights(n_clust + 1);
 
-  int ndata_in_clus = 0;
-  double prior = 0;
+  double delta = grid(1, 0) - grid(0, 0);
 
   for (size_t j = 0; j < n_clust; j++) {
     temp_hier->set_state_from_proto(curr_state.cluster_states(j));
     lpdf_local.col(j) =
         mixing->mass_existing_cluster(n_data, true, false, temp_hier) +
         temp_hier->like_lpdf_grid(grid, hier_covariates).array();
-    ndata_in_clus += temp_hier->get_card();
-    prior += mixing->mass_existing_cluster(n_data, false, false, temp_hier);
+    Eigen::VectorXd temp =
+        mixing->mass_existing_cluster(n_data, false, false, temp_hier) *
+        temp_hier->like_lpdf_grid(grid, hier_covariates).array().exp();
+    pdf += temp;
     // TODO add mixing covariate
   }
-  assert(ndata_in_clus == n_data);
   lpdf_local.col(n_clust) =
       mixing->mass_new_cluster(n_data, true, false, n_clust) +
       lpdf_marginal_component(temp_hier, grid, hier_covariates).array();
-  prior += mixing->mass_new_cluster(n_data, false, false, n_clust);
-  assert(prior == 1.0);
-
-  // TODO add mixing covariate
+  Eigen::VectorXd temp =
+      mixing->mass_new_cluster(n_data, false, false, n_clust) *
+      lpdf_marginal_component(temp_hier, grid, hier_covariates).array().exp();
+  pdf += temp;
 
   for (size_t j = 0; j < grid.rows(); j++) {
     lpdf(j) = stan::math::log_sum_exp(lpdf_local.row(j));
   }
-  return lpdf;
+  std::cout << "mixture_dens integrates: " << lpdf.array().exp().sum() * delta
+            << std::endl;
+  std::cout << "pdf integrates: " << pdf.sum() * delta << std::endl;
+  return pdf.array().log();
+  // return lpdf;
 }
 
 bool MarginalAlgorithm::update_state_from_collector(BaseCollector *coll) {
