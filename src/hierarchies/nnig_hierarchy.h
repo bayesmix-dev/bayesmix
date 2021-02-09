@@ -45,10 +45,6 @@ class NNIGHierarchy
   double data_sum = 0;
   double data_sum_squares = 0;
 
-   std::shared_ptr<bayesmix::NNIGPrior> cast_prior() {
-    return std::dynamic_pointer_cast<bayesmix::NNIGPrior>(prior);
-  }
-
  public:
 
   // DESTRUCTOR AND CONSTRUCTORS

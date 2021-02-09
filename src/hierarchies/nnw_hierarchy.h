@@ -56,13 +56,6 @@ class NNWHierarchy
   // AUXILIARY TOOLS
   //! Special setter for prec and its utilities
   void set_prec_and_utilities(const Eigen::MatrixXd &prec_, NNW::State *out);
-  
-
-  std::shared_ptr<bayesmix::NNWPrior> cast_prior() {
-    return std::dynamic_pointer_cast<bayesmix::NNWPrior>(prior);
-  }
-  //!
-  void create_empty_prior() override { prior.reset(new bayesmix::NNWPrior); }
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS

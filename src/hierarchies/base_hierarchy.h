@@ -34,8 +34,6 @@ class AbstractHierarchy {
   std::set<int> cluster_data_idx;
   int card = 0;
   double log_card = stan::math::NEGATIVE_INFTY;
-  std::shared_ptr<google::protobuf::Message> prior;
-  virtual void create_empty_prior() = 0;
 
  public:
   virtual ~AbstractHierarchy() = default;
@@ -107,11 +105,8 @@ class AbstractHierarchy {
   int get_card() const { return card; }
   double get_log_card() const { return log_card; }
   std::set<int> get_data_idx() { return cluster_data_idx; }
-  google::protobuf::Message *get_mutable_prior() {
-    if (prior == nullptr) create_empty_prior();
-
-    return prior.get();
-  }
+  virtual google::protobuf::Message *get_mutable_prior() = 0;
+  
   //! Overloaded version of sample_full_cond(), mainly used for debugging
   virtual void sample_full_cond(
       const Eigen::MatrixXd &data,
@@ -125,10 +120,11 @@ class BaseHierarchy : public AbstractHierarchy {
   // HYPERPARAMETERS
   std::shared_ptr<Hyperparams> hypers;
   Hyperparams posterior_hypers;
+  std::shared_ptr<Prior> prior;
 
   virtual Hyperparams get_posterior_parameters() = 0;
-  void create_empty_prior() override { prior.reset(new Prior); }
   virtual void initialize_state() = 0;
+  void create_empty_prior() { prior.reset(new Prior); }
   
   void set_card(const int card_) {
     card = card_;
@@ -199,6 +195,12 @@ class BaseHierarchy : public AbstractHierarchy {
                                                    covariate);
   }
 
+  virtual google::protobuf::Message *get_mutable_prior() override {
+    if (prior == nullptr) create_empty_prior();
+
+    return prior.get();
+  }
+
   virtual Eigen::VectorXd like_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
@@ -231,11 +233,6 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
   if (update_params) {
     static_cast<Derived *>(this)->save_posterior_hypers();
   }
-  // std::cout << "add_datum, id: " << id << ", card: " << card + 1 << std::endl;
-  // std::cout << "cluster_data_idx: ";
-  // for (auto &c : cluster_data_idx)
-  //   std::cout << c << ", ";
-  // std::cout << std::endl;
 }
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
@@ -245,12 +242,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
     const Eigen::VectorXd &covariate /* = Eigen::VectorXd(0)*/) {
   static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
                                                           false);
-  // std::cout << "remove_datum, id: " << id << std::endl;
-  // std::cout << "cluster_data_idx: ";
-  // for (auto & c: cluster_data_idx) std::cout << c << ", ";
-  // std::cout << std::endl;
-
-  card -= 1;
+   card -= 1;
   log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
   auto it = cluster_data_idx.find(id);
   assert(it != cluster_data_idx.end());

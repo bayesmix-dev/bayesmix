@@ -25,7 +25,6 @@ double LinRegUniHierarchy::marg_lpdf(
 }
 
 LinReg::State LinRegUniHierarchy::draw(const LinReg::Hyperparams &params) {
-  // Generate new state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   LinReg::State out;
   out.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
@@ -82,17 +81,15 @@ void LinRegUniHierarchy::initialize_state() {
 }
 
 void LinRegUniHierarchy::initialize_hypers() {
-  auto priorcast = cast_prior();
-
-  if (priorcast->has_fixed_values()) {
+  if (prior->has_fixed_values()) {
     // Set values
-    hypers->mean = bayesmix::to_eigen(priorcast->fixed_values().mean());
+    hypers->mean = bayesmix::to_eigen(prior->fixed_values().mean());
     dim = hypers->mean.size();
     hypers->var_scaling =
-        bayesmix::to_eigen(priorcast->fixed_values().var_scaling());
+        bayesmix::to_eigen(prior->fixed_values().var_scaling());
     hypers->var_scaling_inv = stan::math::inverse_spd(hypers->var_scaling);
-    hypers->shape = priorcast->fixed_values().shape();
-    hypers->scale = priorcast->fixed_values().scale();
+    hypers->shape = prior->fixed_values().shape();
+    hypers->scale = prior->fixed_values().scale();
     // Check validity
     if (dim != hypers->var_scaling.rows()) {
       throw std::invalid_argument(
@@ -115,9 +112,7 @@ void LinRegUniHierarchy::initialize_hypers() {
 void LinRegUniHierarchy::update_hypers(
     const std::vector<bayesmix::MarginalState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();
-  auto priorcast = cast_prior();
-
-  if (priorcast->has_fixed_values()) {
+  if (prior->has_fixed_values()) {
     return;
   }
 

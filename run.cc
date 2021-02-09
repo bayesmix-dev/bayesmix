@@ -42,12 +42,12 @@ int main(int argc, char *argv[]) {
   auto algo = factory_algo.create_object(algo_type);
   auto hier = factory_hier.create_object(hier_type);
   auto mixing = factory_mixing.create_object(mix_type);
-  MemoryCollector *coll = new MemoryCollector();
-  // if (collname == "") {
-  //   coll = new MemoryCollector();
-  // } else {
-  //   coll = new FileCollector(collname);
-  // }
+  BaseCollector *coll = new MemoryCollector();
+  if (collname == "") {
+    coll = new MemoryCollector();
+  } else {
+    coll = new FileCollector(collname);
+  }
 
   bayesmix::read_proto_from_file(mix_args, mixing->get_mutable_prior());
   bayesmix::read_proto_from_file(hier_args, hier->get_mutable_prior());
@@ -81,10 +81,10 @@ int main(int argc, char *argv[]) {
   algo->set_data(data);
 
   algo->set_initial_clusters(hier, init_num_cl);
-  // if (algo->get_id() == bayesmix::AlgorithmId::Neal8) {
-  //   auto algocast = std::dynamic_pointer_cast<Neal8Algorithm>(algo);
-  //   algocast->set_n_aux(3);
-  // }
+  if (algo->get_id() == bayesmix::AlgorithmId::Neal8) {
+    auto algocast = std::dynamic_pointer_cast<Neal8Algorithm>(algo);
+    algocast->set_n_aux(3);
+  }
 
   // Read and set covariates
   if (hier->is_dependent()) {
@@ -130,11 +130,7 @@ int main(int argc, char *argv[]) {
   bayesmix::write_matrix_to_file(clust_est, clusfile);
   std::cout << "Successfully wrote clustering to " << clusfile << std::endl;
 
-  if (collname != "") {
-    coll->write_to_file<bayesmix::MarginalState>(collname);
-  }
   std::cout << "End of run.cc" << std::endl;
-
   delete coll;
   return 0;
 }

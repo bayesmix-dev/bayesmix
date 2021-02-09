@@ -40,10 +40,6 @@ class LinRegUniHierarchy
   //! Represents pieces of X^t y
   Eigen::VectorXd mixed_prod;
 
-  std::shared_ptr<bayesmix::LinRegUniPrior> cast_prior() {
-    return std::dynamic_pointer_cast<bayesmix::LinRegUniPrior>(prior);
-  }
-
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   ~LinRegUniHierarchy() = default;
