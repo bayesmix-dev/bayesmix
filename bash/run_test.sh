@@ -16,14 +16,14 @@
 
 
 if (( $# == 1 )); then
-  algo='Neal3'
+  algo='Neal2'
 else
   algo="$2"
 fi
 
 if [ "$1" == 'uni' ]; then
   build/run \
-    $algo 20201124 0 1000 100 \
+    $algo 20201124 5 15 1 \
     NNIG resources/asciipb/nnig_ngg_prior.asciipb \
     DP   resources/asciipb/dp_gamma_prior.asciipb \
     "" \

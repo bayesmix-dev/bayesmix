@@ -226,6 +226,11 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
   if (update_params) {
     static_cast<Derived *>(this)->save_posterior_hypers();
   }
+  // std::cout << "add_datum, id: " << id << ", card: " << card + 1 << std::endl;
+  // std::cout << "cluster_data_idx: ";
+  // for (auto &c : cluster_data_idx)
+  //   std::cout << c << ", ";
+  // std::cout << std::endl;
 }
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
@@ -235,6 +240,11 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
     const Eigen::VectorXd &covariate /* = Eigen::VectorXd(0)*/) {
   static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
                                                           false);
+  // std::cout << "remove_datum, id: " << id << std::endl;
+  // std::cout << "cluster_data_idx: ";
+  // for (auto & c: cluster_data_idx) std::cout << c << ", ";
+  // std::cout << std::endl;
+
   card -= 1;
   log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
   auto it = cluster_data_idx.find(id);

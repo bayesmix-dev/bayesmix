@@ -28,13 +28,14 @@ Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
   Eigen::VectorXd logprior(n_clust + 1);
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    logprior(j) =
-        mixing->mass_existing_cluster(n_data - 1, true, true, unique_values[j],
-                                      mix_covariates.row(data_idx));
+    logprior(j) = mixing->mass_existing_cluster(n_data - 1, true, true,
+                                                unique_values[j],
+                                                mix_covariates.row(data_idx));
   }
   // Further update with marginal component
-  logprior(n_clust) = mixing->mass_new_cluster(n_data - 1, true, true, n_clust,
-                                               mix_covariates.row(data_idx));
+  logprior(n_clust) = mixing->mass_new_cluster(
+      n_data - 1, true, true, n_clust, mix_covariates.row(data_idx));
+
   return logprior;
 }
 
@@ -80,8 +81,11 @@ void Neal2Algorithm::sample_allocations() {
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
     unsigned int c_old = allocations[i];
+
+
     if (c_new == n_clust) {
-      std::shared_ptr<AbstractHierarchy> new_unique = unique_values[0]->clone();
+      std::shared_ptr<AbstractHierarchy> new_unique =
+          unique_values[0]->clone();
       new_unique->add_datum(i, data.row(i), update_hierarchy_params(),
                             hier_covariates.row(i));
       // Generate new unique values with posterior sampling
@@ -90,8 +94,8 @@ void Neal2Algorithm::sample_allocations() {
       allocations[i] = unique_values.size() - 1;
     } else {
       allocations[i] = c_new;
-      unique_values[c_new]->add_datum(i, data.row(i), update_hierarchy_params(),
-                                      hier_covariates.row(i));
+      unique_values[c_new]->add_datum(
+          i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers
