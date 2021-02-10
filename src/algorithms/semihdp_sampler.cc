@@ -21,8 +21,8 @@ SemiHdpSampler::SemiHdpSampler(const std::vector<Eigen::MatrixXd>& data,
 
 void SemiHdpSampler::initialize() {
   auto& rng = bayesmix::Rng::Instance().get();
-  dirichlet_concentration =
-      Eigen::VectorXd::Ones(ngroups).array() * params.dirichlet_concentration();
+  dirichlet_concentration = Eigen::VectorXd::Ones(ngroups).array() *
+                            params.dirichlet_concentration();
 
   int INIT_N_CLUS = 5;
   Eigen::VectorXd probas = Eigen::VectorXd::Ones(INIT_N_CLUS);
@@ -178,7 +178,8 @@ void SemiHdpSampler::update_table_allocs() {
         log_m[table_to_shared[r][s_old]] = std::log(table_to_shared[r][s_old]);
       }
 
-      Eigen::VectorXd probas = Eigen::VectorXd::Zero(rest_tables[r].size() + 1);
+      Eigen::VectorXd probas =
+          Eigen::VectorXd::Zero(rest_tables[r].size() + 1);
 #pragma omp parallel for
       for (int l = 0; l < rest_tables[r].size(); l++) {
         double log_n = log_n_by_table[r][l];
@@ -227,8 +228,8 @@ void SemiHdpSampler::update_table_allocs() {
         } else {
           // sample from Gtilde
           table_to_private[r].push_back(-1);
-          int tnew =
-              bayesmix::categorical_rng(stan::math::softmax(hdp_contribs), rng);
+          int tnew = bayesmix::categorical_rng(
+              stan::math::softmax(hdp_contribs), rng);
           table_to_shared[r].push_back(tnew);
           if (tnew < shared_tables.size()) {
             rest_tables[r].push_back(shared_tables[tnew]);
@@ -272,11 +273,11 @@ void SemiHdpSampler::update_to_shared() {
         Eigen::VectorXd probas(shared_tables.size() + 1);
         cnt_shared_tables[table_to_shared[r][l]] -= 1;
         for (int k = 0; k < shared_tables.size(); k++) {
-          probas(k) =
-              std::log(cnt_shared_tables[k]) +
-              shared_tables[k]
-                  ->like_lpdf_grid(data_by_theta_star[l], Eigen::MatrixXd(0, 0))
-                  .sum();
+          probas(k) = std::log(cnt_shared_tables[k]) +
+                      shared_tables[k]
+                          ->like_lpdf_grid(data_by_theta_star[l],
+                                           Eigen::MatrixXd(0, 0))
+                          .sum();
         }
         probas(shared_tables.size()) =
             std::log(totalmass_hdp) +
@@ -316,7 +317,8 @@ void SemiHdpSampler::update_rest_allocs() {
 // Compute probability for group change
 #pragma omp parallel for
       for (int r = 0; r < ngroups; r++)
-        probas(r) = lpdf_for_group(i, r) + std::log(dirichlet_concentration(r));
+        probas(r) =
+            lpdf_for_group(i, r) + std::log(dirichlet_concentration(r));
       probas = stan::math::softmax(probas);
       new_r = bayesmix::categorical_rng(probas, rng);
     } else {
@@ -333,10 +335,10 @@ void SemiHdpSampler::update_rest_allocs() {
         prop_r = bayesmix::categorical_rng(proposal_weights, rng);
       }
 
-      double num =
-          lpdf_for_group(i, prop_r) + std::log(dirichlet_concentration(prop_r));
-      double den =
-          lpdf_for_group(i, curr_r) + std::log(dirichlet_concentration(curr_r));
+      double num = lpdf_for_group(i, prop_r) +
+                   std::log(dirichlet_concentration(prop_r));
+      double den = lpdf_for_group(i, curr_r) +
+                   std::log(dirichlet_concentration(curr_r));
 
       if (std::log(stan::math::uniform_rng(0, 1, rng)) < num - den) {
         new_r = prop_r;
@@ -374,9 +376,9 @@ void SemiHdpSampler::update_dirichlet_concentration() {
     cnts[rest_allocs[i]] += 1;
   }
 
-  dirichlet_concentration =
-      stan::math::dirichlet_rng(cnts.array() + params.dirichlet_concentration(),
-                                bayesmix::Rng::Instance().get());
+  dirichlet_concentration = stan::math::dirichlet_rng(
+      cnts.array() + params.dirichlet_concentration(),
+      bayesmix::Rng::Instance().get());
 }
 
 void SemiHdpSampler::relabel() {
@@ -423,8 +425,8 @@ void SemiHdpSampler::relabel() {
               table_allocs[i][j] -= 1;
             }
           }
-          int max_s =
-              *std::max_element(table_allocs[i].begin(), table_allocs[i].end());
+          int max_s = *std::max_element(table_allocs[i].begin(),
+                                        table_allocs[i].end());
           if (max_s >= rest_tables[r].size()) {
             throw std::invalid_argument(
                 "max table_allocs greater than rest_tables size");
@@ -504,7 +506,8 @@ void SemiHdpSampler::perturb(bayesmix::MarginalState::ClusterState* out) {
   if (out->has_uni_ls_state()) {
     double cnt_shared_tables =
         out->uni_ls_state().mean() +
-        stan::math::normal_rng(0, params.pseudo_prior().mean_perturb_sd(), rng);
+        stan::math::normal_rng(0, params.pseudo_prior().mean_perturb_sd(),
+                               rng);
     double curr_var = out->uni_ls_state().var();
     double var = curr_var +
                  stan::math::uniform_rng(
@@ -692,7 +695,8 @@ void SemiHdpSampler::print_debug_string() const {
       }
     }
     for (int l = 0; l < rest_tables[r].size(); l++) {
-      std::cout << ", DATA: " << data_by_theta_star[l].transpose() << std::endl;
+      std::cout << ", DATA: " << data_by_theta_star[l].transpose()
+                << std::endl;
     }
   }
 }

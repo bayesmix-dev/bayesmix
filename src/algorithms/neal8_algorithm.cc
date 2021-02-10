@@ -37,8 +37,9 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_prior_mass(
   Eigen::VectorXd logprior(n_clust + n_aux);
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    logprior(j) = mixing->mass_existing_cluster(
-        n_data - 1, true, true, unique_values[j], mix_covariates.row(data_idx));
+    logprior(j) =
+        mixing->mass_existing_cluster(n_data - 1, true, true, unique_values[j],
+                                      mix_covariates.row(data_idx));
   }
   // Further update with marginal components
   for (size_t j = 0; j < n_aux; j++) {
@@ -109,7 +110,8 @@ void Neal8Algorithm::sample_allocations() {
       aux_unique_values[j]->sample_prior();
     }
     // Compute probabilities of clusters in log-space
-    Eigen::VectorXd logprobas = get_cluster_prior_mass(i) + get_cluster_lpdf(i);
+    Eigen::VectorXd logprobas =
+        get_cluster_prior_mass(i) + get_cluster_lpdf(i);
     // Draw a NEW value for datum allocation
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
@@ -125,8 +127,8 @@ void Neal8Algorithm::sample_allocations() {
           i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     } else {
       allocations[i] = c_new;
-      unique_values[c_new]->add_datum(i, data.row(i), update_hierarchy_params(),
-                                      hier_covariates.row(i));
+      unique_values[c_new]->add_datum(
+          i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     }
     if (singleton) {
       // Relabel allocations so that they are consecutive numbers

@@ -37,9 +37,9 @@ Eigen::MatrixXd bayesmix::to_eigen(const bayesmix::Matrix &mat) {
   if (nrow > 0 & ncol > 0) {
     const double *p = &(mat.data())[0];
     if (mat.rowmajor()) {
-      out =
-          Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                         Eigen::RowMajor> >(p, nrow, ncol);
+      out = Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic,
+                                           Eigen::Dynamic, Eigen::RowMajor> >(
+          p, nrow, ncol);
     } else {
       out = Eigen::Map<const Eigen::MatrixXd>(p, nrow, ncol);
     }
@@ -53,6 +53,7 @@ void bayesmix::read_proto_from_file(const std::string &filename,
   google::protobuf::io::IstreamInputStream iis(&ifs);
   auto success = google::protobuf::TextFormat::Parse(&iis, out);
   if (!success) {
-    std::cout << "Error " << success << " in read_proto_from_file" << std::endl;
+    std::cout << "Error " << success << " in read_proto_from_file"
+              << std::endl;
   }
 }
