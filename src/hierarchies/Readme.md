@@ -85,12 +85,5 @@ The BaseHierarchy class takes 4 template parameters:
 3. `Hyperparams` is usually a struct representing the parameters in P_0
 4. `Prior` must be a protobuf object encoding the prior parameters.
 
-### Limitations
+Finally, a ConjugateHierarchy takes care of the implementation of some methods that are specific to conjugate models.
 
-Right now, we don't support nonconjugate hierarchies. In fact, the method `sample_full_cond` in `BaseHierarchy` does:
-1. performs the update of the parameters in the full conditional
-2. calls the method `draw` with the correct values of the parameters.
-
-Of course, this is valid only in P_0 and k are conjugate, since the posterior distribution will belong to the same family of P_0. In nonconjugate hierarchies a different update must be performed.
-
-A possibility is to derive a `ConjugateHierarchy` class from the `BaseHierarchy` one, that overrides `sample_full_cond` (performing what it does now in `BaseHierarchy`) and leave the possibility to override `sample_full_cond` with specific updates in the nonconjugate hierarchies.
