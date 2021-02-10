@@ -11,7 +11,7 @@
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
 
-namespace LinReg {
+namespace LinRegUni {
 struct State {
   Eigen::VectorXd regression_coeffs;
   double var;
@@ -23,11 +23,11 @@ struct Hyperparams {
   double shape;
   double scale;
 };
-}  // namespace LinReg
+}  // namespace LinRegUni
 
 class LinRegUniHierarchy
-    : public ConjugateHierarchy<LinRegUniHierarchy, LinReg::State,
-                                LinReg::Hyperparams,
+    : public ConjugateHierarchy<LinRegUniHierarchy, LinRegUni::State,
+                                LinRegUni::Hyperparams,
                                 bayesmix::LinRegUniPrior> {
  public:
  protected:
@@ -55,10 +55,10 @@ class LinRegUniHierarchy
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
 
   double marg_lpdf(
-      const LinReg::Hyperparams &params, const Eigen::RowVectorXd &datum,
+      const LinRegUni::Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const;
 
-  LinReg::State draw(const LinReg::Hyperparams &params);
+  LinRegUni::State draw(const LinRegUni::Hyperparams &params);
 
   void clear_data();
   void update_hypers(
@@ -68,7 +68,7 @@ class LinRegUniHierarchy
   void initialize_hypers();
   void update_summary_statistics(const Eigen::VectorXd &datum,
                                  const Eigen::VectorXd &covariate, bool add);
-  LinReg::Hyperparams get_posterior_parameters();
+  LinRegUni::Hyperparams get_posterior_parameters();
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;

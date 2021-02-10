@@ -15,7 +15,7 @@ double LinRegUniHierarchy::like_lpdf(
 }
 
 double LinRegUniHierarchy::marg_lpdf(
-    const LinReg::Hyperparams &params, const Eigen::RowVectorXd &datum,
+    const LinRegUni::Hyperparams &params, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   double sig_n = sqrt(
       (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
@@ -24,9 +24,10 @@ double LinRegUniHierarchy::marg_lpdf(
                                     covariate.dot(params.mean), sig_n);
 }
 
-LinReg::State LinRegUniHierarchy::draw(const LinReg::Hyperparams &params) {
+LinRegUni::State LinRegUniHierarchy::draw(
+    const LinRegUni::Hyperparams &params) {
   auto &rng = bayesmix::Rng::Instance().get();
-  LinReg::State out;
+  LinRegUni::State out;
   out.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
   out.regression_coeffs = stan::math::multi_normal_prec_rng(
       params.mean, params.var_scaling / out.var, rng);
@@ -46,12 +47,12 @@ void LinRegUniHierarchy::update_summary_statistics(
   }
 }
 
-LinReg::Hyperparams LinRegUniHierarchy::get_posterior_parameters() {
+LinRegUni::Hyperparams LinRegUniHierarchy::get_posterior_parameters() {
   if (card == 0) {  // no update possible
     return *hypers;
   }
   // Compute posterior hyperparameters
-  LinReg::Hyperparams post_params;
+  LinRegUni::Hyperparams post_params;
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
   auto llt = post_params.var_scaling.llt();
   post_params.var_scaling_inv = llt.solve(Eigen::MatrixXd::Identity(dim, dim));
