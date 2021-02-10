@@ -71,7 +71,7 @@ class BaseHierarchy : public AbstractHierarchy {
       const bool update_params = false,
       const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) override;
 
-  void check_prior_is_set();
+  void check_prior_is_set() const;
 
   virtual google::protobuf::Message *get_mutable_prior() override {
     if (prior == nullptr) create_empty_prior();
@@ -81,11 +81,12 @@ class BaseHierarchy : public AbstractHierarchy {
 
   int get_card() const override { return card; }
   double get_log_card() const override { return log_card; }
-  std::set<int> get_data_idx() override { return cluster_data_idx; }
+  std::set<int> get_data_idx() const override { return cluster_data_idx; }
 
   virtual Eigen::VectorXd like_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
+                                                          0)) const override;
 
   virtual void sample_full_cond(
       const Eigen::MatrixXd &data,
@@ -126,7 +127,8 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
 }
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
-void BaseHierarchy<Derived, State, Hyperparams, Prior>::check_prior_is_set() {
+void BaseHierarchy<Derived, State, Hyperparams, Prior>::check_prior_is_set()
+    const {
   if (prior == nullptr) {
     throw std::invalid_argument("Hierarchy prior was not provided");
   }
@@ -136,18 +138,18 @@ template <class Derived, typename State, typename Hyperparams, typename Prior>
 Eigen::VectorXd
 BaseHierarchy<Derived, State, Hyperparams, Prior>::like_lpdf_grid(
     const Eigen::MatrixXd &data,
-    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
+    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
   Eigen::VectorXd lpdf(data.rows());
   if (covariates.cols() == 0) {
     for (int i = 0; i < data.rows(); i++) {
       // Pass null value as covariate
-      lpdf(i) = static_cast<Derived *>(this)->like_lpdf(data.row(i),
-                                                        Eigen::RowVectorXd(0));
+      lpdf(i) = static_cast<Derived const *>(this)->like_lpdf(
+          data.row(i), Eigen::RowVectorXd(0));
     }
   } else {
     for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived *>(this)->like_lpdf(data.row(i),
-                                                        covariates.row(i));
+      lpdf(i) = static_cast<Derived const *>(this)->like_lpdf(
+          data.row(i), covariates.row(i));
     }
   }
   return lpdf;

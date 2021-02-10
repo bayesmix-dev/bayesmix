@@ -45,12 +45,13 @@ class AbstractHierarchy {
       const int id, const Eigen::VectorXd &datum,
       const bool update_params = false,
       const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) = 0;
-  //! Deletes all data in the hierarchy
+
   virtual void initialize() = 0;
 
   virtual bool is_multivariate() const = 0;
   virtual bool is_dependent() const { return false; }
   virtual bool is_conjugate() const { return false; }
+
   //!
   virtual void update_hypers(
       const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
@@ -59,19 +60,19 @@ class AbstractHierarchy {
   //! Evaluates the log-likelihood of data in a single point
   virtual double like_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
 
   //! Evaluates the log-marginal distribution of data in a single point
   virtual double prior_pred_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) {
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const {
     throw std::runtime_error(
         "You are callign 'prior_pred_lpdf' from a non conjugate hieararchy");
   }
 
   virtual double conditional_pred_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) {
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const {
     throw std::runtime_error(
         "You are callign 'conditional_pred_lpdf' from a non conjugate "
         "hieararchy");
@@ -81,11 +82,11 @@ class AbstractHierarchy {
   //! Evaluates the log-likelihood of data in a grid of points
   virtual Eigen::VectorXd like_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const = 0;
   //! Evaluates the log-marginal of data in a grid of points
   virtual Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) {
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     throw std::runtime_error(
         "You are callign 'prior_pred_lpdf_grid' from a non conjugate "
         "hieararchy");
@@ -93,7 +94,7 @@ class AbstractHierarchy {
 
   virtual Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) {
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     throw std::runtime_error(
         "You are callign 'conditional_pred_lpdf_grid' from a non conjugate "
         "hieararchy");
@@ -109,12 +110,10 @@ class AbstractHierarchy {
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
-  virtual void check_prior_is_set() = 0;
-
   // GETTERS AND SETTERS
   virtual int get_card() const = 0;
   virtual double get_log_card() const = 0;
-  virtual std::set<int> get_data_idx() = 0;
+  virtual std::set<int> get_data_idx() const = 0;
   virtual google::protobuf::Message *get_mutable_prior() = 0;
 
   //! Overloaded version of sample_full_cond(), mainly used for debugging

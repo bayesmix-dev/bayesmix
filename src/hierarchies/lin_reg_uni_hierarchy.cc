@@ -9,14 +9,14 @@
 
 double LinRegUniHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   return stan::math::normal_lpdf(
       datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
 }
 
 double LinRegUniHierarchy::marg_lpdf(
     const LinReg::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   double sig_n = sqrt(
       (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
       params.scale / params.shape);
@@ -55,7 +55,8 @@ LinReg::Hyperparams LinRegUniHierarchy::get_posterior_parameters() {
   post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
   auto llt = post_params.var_scaling.llt();
   post_params.var_scaling_inv = llt.solve(Eigen::MatrixXd::Identity(dim, dim));
-  post_params.mean = llt.solve(mixed_prod + hypers->var_scaling * hypers->mean);
+  post_params.mean =
+      llt.solve(mixed_prod + hypers->var_scaling * hypers->mean);
   post_params.shape = hypers->shape + 0.5 * card;
   post_params.scale =
       hypers->scale +

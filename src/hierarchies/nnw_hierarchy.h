@@ -46,7 +46,7 @@ struct Hyperparams {
 
 class NNWHierarchy
     : public ConjugateHierarchy<NNWHierarchy, NNW::State, NNW::Hyperparams,
-                           bayesmix::NNWPrior> {
+                                bayesmix::NNWPrior> {
  protected:
   unsigned int dim;
   Eigen::VectorXd data_sum;
@@ -67,18 +67,18 @@ class NNWHierarchy
   //! Evaluates the log-likelihood of data in a single point
   double like_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) override;
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
 
-  double marg_lpdf(const NNW::Hyperparams &params,
-                   const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0));
+  double marg_lpdf(
+      const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const;
 
   // SAMPLING FUNCTIONS
   NNW::State draw(const NNW::Hyperparams &params);
 
   void clear_data();
-  void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
-                         &states) override;
+  void update_hypers(
+      const std::vector<bayesmix::MarginalState::ClusterState> &states);
 
   void initialize_state();
   void initialize_hypers();

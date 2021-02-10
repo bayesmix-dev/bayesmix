@@ -12,13 +12,13 @@
 
 double NNIGHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
 double NNIGHierarchy::marg_lpdf(
     const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
                       (params.shape * params.var_scaling));
   return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
@@ -240,7 +240,8 @@ void NNIGHierarchy::set_state_from_proto(
   set_card(statecast.cardinality());
 }
 
-void NNIGHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
+void NNIGHierarchy::write_state_to_proto(
+    google::protobuf::Message *out) const {
   bayesmix::UniLSState state_;
   state_.set_mean(state.mean);
   state_.set_var(state.var);

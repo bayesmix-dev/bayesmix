@@ -28,7 +28,7 @@ void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_,
 //! \return     Log-Likehood vector evaluated in data
 double NNWHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   // Initialize relevant objects
   return bayesmix::multi_normal_prec_lpdf(datum, state.mean, state.prec_chol,
                                           state.prec_logdet);
@@ -36,7 +36,7 @@ double NNWHierarchy::like_lpdf(
 
 double NNWHierarchy::marg_lpdf(
     const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) {
+    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * params.deg_free - dim + 1;
   Eigen::MatrixXd sigma_n = params.scale_inv *
@@ -313,7 +313,8 @@ void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   out_cast->set_cardinality(card);
 }
 
-void NNWHierarchy::write_hypers_to_proto(google::protobuf::Message *out) const {
+void NNWHierarchy::write_hypers_to_proto(
+    google::protobuf::Message *out) const {
   bayesmix::NNWPrior hypers_;
   bayesmix::to_proto(hypers->mean,
                      hypers_.mutable_fixed_values()->mutable_mean());

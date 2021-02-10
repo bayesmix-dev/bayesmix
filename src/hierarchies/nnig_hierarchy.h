@@ -40,7 +40,7 @@ struct Hyperparams {
 
 class NNIGHierarchy
     : public ConjugateHierarchy<NNIGHierarchy, NNIG::State, NNIG::Hyperparams,
-                           bayesmix::NNIGPrior> {
+                                bayesmix::NNIGPrior> {
  protected:
   double data_sum = 0;
   double data_sum_squares = 0;
@@ -57,17 +57,17 @@ class NNIGHierarchy
   //! Evaluates the log-likelihood of data in a single point
   double like_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) override;
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
   //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(const NNIG::Hyperparams &params,
-                   const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0));
+  double marg_lpdf(
+      const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const;
 
   NNIG::State draw(const NNIG::Hyperparams &params);
 
   void clear_data();
-  void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
-                         &states) override;
+  void update_hypers(
+      const std::vector<bayesmix::MarginalState::ClusterState> &states);
   void initialize_state();
   void initialize_hypers();
   void update_summary_statistics(const Eigen::VectorXd &datum,
