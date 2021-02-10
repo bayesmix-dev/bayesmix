@@ -7,7 +7,7 @@
 #include "src/utils/eigen_utils.h"
 
 SemiHdpSampler::SemiHdpSampler(const std::vector<Eigen::MatrixXd>& data,
-                               std::shared_ptr<BaseHierarchy> hier,
+                               std::shared_ptr<AbstractHierarchy> hier,
                                bayesmix::SemiHdpParams params)
     : data(data), params(params) {
   ngroups = data.size();
@@ -21,8 +21,8 @@ SemiHdpSampler::SemiHdpSampler(const std::vector<Eigen::MatrixXd>& data,
 
 void SemiHdpSampler::initialize() {
   auto& rng = bayesmix::Rng::Instance().get();
-  dirichlet_concentration = Eigen::VectorXd::Ones(ngroups).array() *
-                            params.dirichlet_concentration();
+  dirichlet_concentration =
+      Eigen::VectorXd::Ones(ngroups).array() * params.dirichlet_concentration();
 
   int INIT_N_CLUS = 5;
   Eigen::VectorXd probas = Eigen::VectorXd::Ones(INIT_N_CLUS);
@@ -39,8 +39,9 @@ void SemiHdpSampler::initialize() {
   n_by_table_pseudo.resize(ngroups);
 
   for (int l = 0; l < INIT_N_CLUS; l++) {
-    std::shared_ptr<BaseHierarchy> hierarchy = G00_master_hierarchy->clone();
-    hierarchy->draw();
+    std::shared_ptr<AbstractHierarchy> hierarchy =
+        G00_master_hierarchy->clone();
+    hierarchy->sample_prior();
     shared_tables.push_back(hierarchy);
   }
 
@@ -58,8 +59,9 @@ void SemiHdpSampler::initialize() {
     table_to_shared[i].resize(2 * INIT_N_CLUS);
 
     for (int l = 0; l < INIT_N_CLUS; l++) {
-      std::shared_ptr<BaseHierarchy> hierarchy = G0_master_hierarchy->clone();
-      hierarchy->draw();
+      std::shared_ptr<AbstractHierarchy> hierarchy =
+          G0_master_hierarchy->clone();
+      hierarchy->sample_prior();
       private_tables[i].push_back(hierarchy);
       rest_tables[i].push_back(hierarchy);
       table_to_private[i][l] = l;
@@ -106,10 +108,10 @@ void SemiHdpSampler::update_unique_vals() {
     for (int l = 0; l < rest_tables[r].size(); l++) {
       if (table_to_private[r][l] >= 0) {
         if (data_by_theta_star[l].rows() > 0)
-          private_tables[r][table_to_private[r][l]]->sample_given_data(
+          private_tables[r][table_to_private[r][l]]->sample_full_cond(
               data_by_theta_star[l]);
         else
-          private_tables[r][table_to_private[r][l]]->draw();
+          private_tables[r][table_to_private[r][l]]->sample_prior();
         rest_tables[r][l] = private_tables[r][table_to_private[r][l]];
       } else {
         bayesmix::append_by_row(&data_by_shared[table_to_shared[r][l]],
@@ -120,9 +122,9 @@ void SemiHdpSampler::update_unique_vals() {
 
   for (int h = 0; h < shared_tables.size(); h++) {
     if (data_by_shared[h].rows() > 0)
-      shared_tables[h]->sample_given_data(data_by_shared[h]);
+      shared_tables[h]->sample_full_cond(data_by_shared[h]);
     else
-      shared_tables[h]->draw();
+      shared_tables[h]->sample_prior();
   }
 
   // reassign stuff to teta_stars
@@ -176,8 +178,7 @@ void SemiHdpSampler::update_table_allocs() {
         log_m[table_to_shared[r][s_old]] = std::log(table_to_shared[r][s_old]);
       }
 
-      Eigen::VectorXd probas =
-          Eigen::VectorXd::Zero(rest_tables[r].size() + 1);
+      Eigen::VectorXd probas = Eigen::VectorXd::Zero(rest_tables[r].size() + 1);
 #pragma omp parallel for
       for (int l = 0; l < rest_tables[r].size(); l++) {
         double log_n = log_n_by_table[r][l];
@@ -185,7 +186,7 @@ void SemiHdpSampler::update_table_allocs() {
       }
 
       double margG0 =
-          logw + G0_master_hierarchy->marg_lpdf(false, data[i].row(j));
+          logw + G0_master_hierarchy->prior_pred_lpdf(data[i].row(j));
 
       Eigen::VectorXd hdp_contribs(shared_tables.size() + 1);
 #pragma omp parallel for
@@ -197,7 +198,7 @@ void SemiHdpSampler::update_table_allocs() {
 
       hdp_contribs[shared_tables.size()] =
           loggamma - logmsum +
-          G00_master_hierarchy->marg_lpdf(false, data[i].row(j));
+          G00_master_hierarchy->prior_pred_lpdf(data[i].row(j));
       double margHDP = log1mw + stan::math::log_sum_exp(hdp_contribs);
       Eigen::VectorXd marg(2);
       marg << margG0, margHDP;
@@ -214,9 +215,9 @@ void SemiHdpSampler::update_table_allocs() {
         if (stan::math::uniform_rng(0, 1, rng) < semihdp_weight) {
           // sample from G0, add it to rest_tables and private_tables and
           // adjust counts and stuff
-          std::shared_ptr<BaseHierarchy> hierarchy =
+          std::shared_ptr<AbstractHierarchy> hierarchy =
               G0_master_hierarchy->clone();
-          hierarchy->sample_given_data(data[i].row(j));
+          hierarchy->sample_full_cond(data[i].row(j));
           private_tables[r].push_back(hierarchy);
           rest_tables[r].push_back(hierarchy);
           table_to_shared[r].push_back(-1);
@@ -226,17 +227,17 @@ void SemiHdpSampler::update_table_allocs() {
         } else {
           // sample from Gtilde
           table_to_private[r].push_back(-1);
-          int tnew = bayesmix::categorical_rng(
-              stan::math::softmax(hdp_contribs), rng);
+          int tnew =
+              bayesmix::categorical_rng(stan::math::softmax(hdp_contribs), rng);
           table_to_shared[r].push_back(tnew);
           if (tnew < shared_tables.size()) {
             rest_tables[r].push_back(shared_tables[tnew]);
             cnt_shared_tables[tnew] += 1;
           } else {
             // std::cout << "creating new tau!" << std::endl;
-            std::shared_ptr<BaseHierarchy> hierarchy =
+            std::shared_ptr<AbstractHierarchy> hierarchy =
                 G00_master_hierarchy->clone();
-            hierarchy->sample_given_data(data[i].row(j));
+            hierarchy->sample_full_cond(data[i].row(j));
             shared_tables.push_back(hierarchy);
             cnt_shared_tables.push_back(1);
             log_m.push_back(0);
@@ -271,17 +272,17 @@ void SemiHdpSampler::update_to_shared() {
         Eigen::VectorXd probas(shared_tables.size() + 1);
         cnt_shared_tables[table_to_shared[r][l]] -= 1;
         for (int k = 0; k < shared_tables.size(); k++) {
-          probas(k) = std::log(cnt_shared_tables[k]) +
-                      shared_tables[k]
-                          ->like_lpdf_grid(data_by_theta_star[l],
-                                           Eigen::MatrixXd(0, 0))
-                          .sum();
+          probas(k) =
+              std::log(cnt_shared_tables[k]) +
+              shared_tables[k]
+                  ->like_lpdf_grid(data_by_theta_star[l], Eigen::MatrixXd(0, 0))
+                  .sum();
         }
         probas(shared_tables.size()) =
             std::log(totalmass_hdp) +
             G00_master_hierarchy
-                ->marg_lpdf_grid(false, Eigen::MatrixXd(0, 0),
-                                 data_by_theta_star[l])
+                ->prior_pred_lpdf_grid(Eigen::MatrixXd(0, 0),
+                                       data_by_theta_star[l])
                 .sum();
 
         probas = stan::math::softmax(probas);
@@ -294,8 +295,9 @@ void SemiHdpSampler::update_to_shared() {
         } else {
           cnt_shared_tables.push_back(1);
           table_to_shared[r][l] = newt;
-          std::shared_ptr<BaseHierarchy> hier = G00_master_hierarchy->clone();
-          hier->sample_given_data(data_by_theta_star[l]);
+          std::shared_ptr<AbstractHierarchy> hier =
+              G00_master_hierarchy->clone();
+          hier->sample_full_cond(data_by_theta_star[l]);
           shared_tables.push_back(hier);
         }
       }
@@ -314,8 +316,7 @@ void SemiHdpSampler::update_rest_allocs() {
 // Compute probability for group change
 #pragma omp parallel for
       for (int r = 0; r < ngroups; r++)
-        probas(r) =
-            lpdf_for_group(i, r) + std::log(dirichlet_concentration(r));
+        probas(r) = lpdf_for_group(i, r) + std::log(dirichlet_concentration(r));
       probas = stan::math::softmax(probas);
       new_r = bayesmix::categorical_rng(probas, rng);
     } else {
@@ -332,10 +333,10 @@ void SemiHdpSampler::update_rest_allocs() {
         prop_r = bayesmix::categorical_rng(proposal_weights, rng);
       }
 
-      double num = lpdf_for_group(i, prop_r) +
-                   std::log(dirichlet_concentration(prop_r));
-      double den = lpdf_for_group(i, curr_r) +
-                   std::log(dirichlet_concentration(curr_r));
+      double num =
+          lpdf_for_group(i, prop_r) + std::log(dirichlet_concentration(prop_r));
+      double den =
+          lpdf_for_group(i, curr_r) + std::log(dirichlet_concentration(curr_r));
 
       if (std::log(stan::math::uniform_rng(0, 1, rng)) < num - den) {
         new_r = prop_r;
@@ -373,9 +374,9 @@ void SemiHdpSampler::update_dirichlet_concentration() {
     cnts[rest_allocs[i]] += 1;
   }
 
-  dirichlet_concentration = stan::math::dirichlet_rng(
-      cnts.array() + params.dirichlet_concentration(),
-      bayesmix::Rng::Instance().get());
+  dirichlet_concentration =
+      stan::math::dirichlet_rng(cnts.array() + params.dirichlet_concentration(),
+                                bayesmix::Rng::Instance().get());
 }
 
 void SemiHdpSampler::relabel() {
@@ -422,8 +423,8 @@ void SemiHdpSampler::relabel() {
               table_allocs[i][j] -= 1;
             }
           }
-          int max_s = *std::max_element(table_allocs[i].begin(),
-                                        table_allocs[i].end());
+          int max_s =
+              *std::max_element(table_allocs[i].begin(), table_allocs[i].end());
           if (max_s >= rest_tables[r].size()) {
             throw std::invalid_argument(
                 "max table_allocs greater than rest_tables size");
@@ -490,7 +491,8 @@ void SemiHdpSampler::sample_pseudo_prior() {
     for (int l = 0; l < state.cluster_states_size(); l++) {
       bayesmix::MarginalState::ClusterState clusval = state.cluster_states(l);
       // perturb(&clusval);
-      std::shared_ptr<BaseHierarchy> curr_clus = G0_master_hierarchy->clone();
+      std::shared_ptr<AbstractHierarchy> curr_clus =
+          G0_master_hierarchy->clone();
       curr_clus->set_state_from_proto(clusval);
       rest_tables_pseudo[r].push_back(curr_clus);
     }
@@ -502,8 +504,7 @@ void SemiHdpSampler::perturb(bayesmix::MarginalState::ClusterState* out) {
   if (out->has_uni_ls_state()) {
     double cnt_shared_tables =
         out->uni_ls_state().mean() +
-        stan::math::normal_rng(0, params.pseudo_prior().mean_perturb_sd(),
-                               rng);
+        stan::math::normal_rng(0, params.pseudo_prior().mean_perturb_sd(), rng);
     double curr_var = out->uni_ls_state().var();
     double var = curr_var +
                  stan::math::uniform_rng(
@@ -691,8 +692,7 @@ void SemiHdpSampler::print_debug_string() const {
       }
     }
     for (int l = 0; l < rest_tables[r].size(); l++) {
-      std::cout << ", DATA: " << data_by_theta_star[l].transpose()
-                << std::endl;
+      std::cout << ", DATA: " << data_by_theta_star[l].transpose() << std::endl;
     }
   }
 }

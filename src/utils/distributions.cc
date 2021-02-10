@@ -74,9 +74,9 @@ double bayesmix::gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
   for (int i = 0; i < means1.size(); i++) {
     for (int j = 0; j < means1.size(); j++) {
       Eigen::MatrixXd var_ij = vars1[i] + vars1[j];
-      mix1 += weights1(i) * weights1(j) *
-              std::exp(
-                  stan::math::multi_normal_lpdf(means1[i], means1[j], var_ij));
+      mix1 +=
+          weights1(i) * weights1(j) *
+          std::exp(stan::math::multi_normal_lpdf(means1[i], means1[j], var_ij));
     }
   }
 
@@ -84,9 +84,9 @@ double bayesmix::gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
   for (int i = 0; i < means2.size(); i++) {
     for (int j = 0; j < means2.size(); j++) {
       Eigen::MatrixXd var_ij = vars2[i] + vars2[j];
-      mix2 += weights2(i) * weights2(j) *
-              std::exp(
-                  stan::math::multi_normal_lpdf(means2[i], means2[j], var_ij));
+      mix2 +=
+          weights2(i) * weights2(j) *
+          std::exp(stan::math::multi_normal_lpdf(means2[i], means2[j], var_ij));
     }
   }
 
@@ -94,9 +94,9 @@ double bayesmix::gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
   for (int i = 0; i < means1.size(); i++) {
     for (int j = 0; j < means2.size(); j++) {
       Eigen::MatrixXd var_ij = vars1[i] + vars2[j];
-      inter += weights1(i) * weights2(j) *
-               std::exp(stan::math::multi_normal_lpdf(means1[i], means2[j],
-                                                      var_ij));
+      inter +=
+          weights1(i) * weights2(j) *
+          std::exp(stan::math::multi_normal_lpdf(means1[i], means2[j], var_ij));
     }
   }
 
@@ -125,8 +125,8 @@ double bayesmix::gaussian_mixture_dist(
       vars2(i) = clus2[i].uni_ls_state().var();
     }
 
-    out = gaussian_mixture_dist(means1, vars1, weights1, means2, vars2,
-                                weights2);
+    out =
+        gaussian_mixture_dist(means1, vars1, weights1, means2, vars2, weights2);
   } else if (clus1[0].has_multi_ls_state()) {
     std::vector<Eigen::VectorXd> means1, means2;
     std::vector<Eigen::MatrixXd> precs1, precs2;

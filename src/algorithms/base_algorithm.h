@@ -62,7 +62,7 @@ class BaseAlgorithm {
   //! Allocation for each datum, i.e. label of the cluster it belongs to
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
-  std::vector<std::shared_ptr<BaseHierarchy>> unique_values;
+  std::vector<std::shared_ptr<AbstractHierarchy>> unique_values;
   //!
   Eigen::MatrixXd hier_covariates;
   //! Mixing object
@@ -70,7 +70,7 @@ class BaseAlgorithm {
   //!
   Eigen::MatrixXd mix_covariates;
   //!
-  bool update_hierarchy_params = false;
+  virtual bool update_hierarchy_params() { return false; }
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object
@@ -151,7 +151,7 @@ class BaseAlgorithm {
     hier_covariates = cov;
   }
   void set_mix_covariates(const Eigen::MatrixXd &cov) { mix_covariates = cov; }
-  void set_initial_clusters(const std::shared_ptr<BaseHierarchy> hier_,
+  void set_initial_clusters(const std::shared_ptr<AbstractHierarchy> hier_,
                             const unsigned int init = 0) {
     unique_values.clear();
     unique_values.push_back(hier_);

@@ -23,7 +23,7 @@ bayesmix::SemiHdpParams get_params() {
   return out;
 }
 
-std::shared_ptr<BaseHierarchy> get_hierarchy() {
+std::shared_ptr<AbstractHierarchy> get_hierarchy() {
   auto hier = std::make_shared<NNIGHierarchy>();
   bayesmix::NNIGPrior hier_prior;
   hier_prior.mutable_fixed_values()->set_mean(0.0);

@@ -15,13 +15,13 @@
 //! \param hier Hierarchy object
 //! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
-    std::shared_ptr<BaseHierarchy> hier, const Eigen::MatrixXd &grid,
+    std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
     const Eigen::MatrixXd &covariates) const {
   unsigned int n_grid = grid.rows();
   Eigen::VectorXd lpdf_(n_grid);
   Eigen::MatrixXd lpdf_temp(n_grid, n_aux);
   for (size_t i = 0; i < n_aux; i++) {
-    hier->draw();
+    hier->sample_prior();
     lpdf_temp.col(i) = hier->like_lpdf_grid(grid, covariates);
   }
   for (size_t i = 0; i < n_grid; i++) {
@@ -37,9 +37,8 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_prior_mass(
   Eigen::VectorXd logprior(n_clust + n_aux);
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    logprior(j) =
-        mixing->mass_existing_cluster(n_data - 1, true, true, unique_values[j],
-                                      mix_covariates.row(data_idx));
+    logprior(j) = mixing->mass_existing_cluster(
+        n_data - 1, true, true, unique_values[j], mix_covariates.row(data_idx));
   }
   // Further update with marginal components
   for (size_t j = 0; j < n_aux; j++) {
@@ -104,14 +103,13 @@ void Neal8Algorithm::sample_allocations() {
     }
     // Remove datum from cluster
     unique_values[allocations[i]]->remove_datum(
-        i, data.row(i), update_hierarchy_params, hier_covariates.row(i));
+        i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     // Draw the unique values in the auxiliary blocks from their prior
     for (size_t j = singleton; j < n_aux; j++) {
-      aux_unique_values[j]->draw();
+      aux_unique_values[j]->sample_prior();
     }
     // Compute probabilities of clusters in log-space
-    Eigen::VectorXd logprobas =
-        get_cluster_prior_mass(i) + get_cluster_lpdf(i);
+    Eigen::VectorXd logprobas = get_cluster_prior_mass(i) + get_cluster_lpdf(i);
     // Draw a NEW value for datum allocation
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
@@ -119,15 +117,15 @@ void Neal8Algorithm::sample_allocations() {
     if (c_new >= n_clust) {
       // datum moves to a new cluster
       // Copy one of the auxiliary block as the new cluster
-      std::shared_ptr<BaseHierarchy> hier_new =
+      std::shared_ptr<AbstractHierarchy> hier_new =
           aux_unique_values[c_new - n_clust]->clone();
       unique_values.push_back(hier_new);
       allocations[i] = n_clust;
       unique_values[n_clust]->add_datum(
-          i, data.row(i), update_hierarchy_params, hier_covariates.row(i));
+          i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     } else {
       allocations[i] = c_new;
-      unique_values[c_new]->add_datum(i, data.row(i), update_hierarchy_params,
+      unique_values[c_new]->add_datum(i, data.row(i), update_hierarchy_params(),
                                       hier_covariates.row(i));
     }
     if (singleton) {

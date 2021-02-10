@@ -39,20 +39,21 @@ class SemiHdpSampler {
   int ngroups;
   std::vector<int> n_by_group;
 
-  std::shared_ptr<BaseHierarchy> G0_master_hierarchy;
-  std::shared_ptr<BaseHierarchy> G00_master_hierarchy;
+  std::shared_ptr<AbstractHierarchy> G0_master_hierarchy;
+  std::shared_ptr<AbstractHierarchy> G00_master_hierarchy;
 
   // these should be just copies
-  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> rest_tables;
+  std::vector<std::vector<std::shared_ptr<AbstractHierarchy>>> rest_tables;
   // idiosincratic tables
-  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> private_tables;
+  std::vector<std::vector<std::shared_ptr<AbstractHierarchy>>> private_tables;
   // shared tables
-  std::vector<std::shared_ptr<BaseHierarchy>> shared_tables;
+  std::vector<std::shared_ptr<AbstractHierarchy>> shared_tables;
   // counts
   std::vector<std::vector<int>> n_by_table;
 
   // stuff for pseudoprior
-  std::vector<std::vector<std::shared_ptr<BaseHierarchy>>> rest_tables_pseudo;
+  std::vector<std::vector<std::shared_ptr<AbstractHierarchy>>>
+      rest_tables_pseudo;
   std::vector<std::vector<int>> n_by_table_pseudo;
 
   // theta_{ij} = theta_{c_i, s_{ij}}
@@ -81,7 +82,7 @@ class SemiHdpSampler {
   ~SemiHdpSampler() {}
 
   SemiHdpSampler(const std::vector<Eigen::MatrixXd> &data,
-                 std::shared_ptr<BaseHierarchy> hier,
+                 std::shared_ptr<AbstractHierarchy> hier,
                  bayesmix::SemiHdpParams params);
 
   void initialize();
@@ -202,13 +203,13 @@ class SemiHdpSampler {
 
   void set_shared_tables_debug(int size) { shared_tables.resize(size); }
 
-  std::shared_ptr<BaseHierarchy> get_table(int r, int l) const {
+  std::shared_ptr<AbstractHierarchy> get_table(int r, int l) const {
     return rest_tables[r][l];
   }
-  std::shared_ptr<BaseHierarchy> get_shared_table(int h) const {
+  std::shared_ptr<AbstractHierarchy> get_shared_table(int h) const {
     return shared_tables[h];
   }
-  std::shared_ptr<BaseHierarchy> get_private_table(int r, int l) const {
+  std::shared_ptr<AbstractHierarchy> get_private_table(int r, int l) const {
     return private_tables[r][l];
   }
 

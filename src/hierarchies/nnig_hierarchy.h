@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 
-#include "base_hierarchy.h"
+#include "conjugate_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
@@ -27,52 +27,31 @@
 //! thus the marginal and the posterior distribution are available in closed
 //! form and Neal's algorithm 2 may be used with it.
 
-class NNIGHierarchy : public BaseHierarchy {
- public:
-  struct State {
-    double mean, var;
-  };
-  struct Hyperparams {
-    double mean, var_scaling, shape, scale;
-  };
+namespace NNIG {
+struct State {
+  double mean, var;
+};
 
+struct Hyperparams {
+  double mean, var_scaling, shape, scale;
+};
+
+};  // namespace NNIG
+
+class NNIGHierarchy
+    : public ConjugateHierarchy<NNIGHierarchy, NNIG::State, NNIG::Hyperparams,
+                                bayesmix::NNIGPrior> {
  protected:
   double data_sum = 0;
   double data_sum_squares = 0;
-  // STATE
-  State state;
-  // HYPERPARAMETERS
-  std::shared_ptr<Hyperparams> hypers;
-  Hyperparams posterior_hypers;
-  //!
-  void clear_data() override;
-  //!
-  void update_summary_statistics(const Eigen::VectorXd &datum,
-                                 const Eigen::VectorXd &covariate,
-                                 bool add) override;
-  //!
-  void save_posterior_hypers() override;
-  //!
-  void initialize_hypers() override;
-
-  // AUXILIARY TOOLS
-  //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams normal_invgamma_update() const;
-
-  std::shared_ptr<bayesmix::NNIGPrior> cast_prior() {
-    return std::dynamic_pointer_cast<bayesmix::NNIGPrior>(prior);
-  }
-
-  void create_empty_prior() override { prior.reset(new bayesmix::NNIGPrior); }
 
  public:
-  //!
-  void initialize() override;
+  // DESTRUCTOR AND CONSTRUCTORS
+  ~NNIGHierarchy() = default;
+  NNIGHierarchy() = default;
+
   //! Returns true if the hierarchy models multivariate data (here, false)
   bool is_multivariate() const override { return false; }
-  //!
-  void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
-                         &states) override;
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
@@ -81,28 +60,20 @@ class NNIGHierarchy : public BaseHierarchy {
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
   //! Evaluates the log-marginal distribution of data in a single point
   double marg_lpdf(
-      const bool posterior, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
+      const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const;
 
-  // DESTRUCTOR AND CONSTRUCTORS
-  ~NNIGHierarchy() = default;
-  NNIGHierarchy() = default;
+  NNIG::State draw(const NNIG::Hyperparams &params);
 
-  std::shared_ptr<BaseHierarchy> clone() const override {
-    auto out = std::make_shared<NNIGHierarchy>(*this);
-    out->clear_data();
-    return out;
-  }
+  void clear_data();
+  void update_hypers(
+      const std::vector<bayesmix::MarginalState::ClusterState> &states);
+  void initialize_state();
+  void initialize_hypers();
+  void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 const Eigen::VectorXd &covariate, bool add);
+  NNIG::Hyperparams get_posterior_parameters();
 
-  // SAMPLING FUNCTIONS
-  //! Generates new values for state from the centering prior distribution
-  void draw() override;
-  //! Generates new values for state from the centering posterior distribution
-  void sample_given_data(bool update_params = true) override;
-
-  // GETTERS AND SETTERS
-  State get_state() const { return state; }
-  Hyperparams get_hypers() const { return *hypers; }
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;

@@ -64,11 +64,11 @@ TEST(rng, test3) {
   hierarchy.get_mutable_prior()->CopyFrom(hier_prior);
   hierarchy.initialize();
 
-  hierarchy.draw();
+  hierarchy.sample_prior();
   double m1 = hierarchy.get_state().mean;
   double s1 = hierarchy.get_state().var;
 
-  hierarchy.draw();
+  hierarchy.sample_prior();
   double m2 = hierarchy.get_state().mean;
   double s2 = hierarchy.get_state().var;
 
@@ -76,7 +76,7 @@ TEST(rng, test3) {
   ASSERT_NE(s1, s2);
 
   NNIGHierarchy hierarchy2 = hierarchy;
-  hierarchy2.draw();
+  hierarchy2.sample_prior();
 
   double m3 = hierarchy2.get_state().mean;
   double s3 = hierarchy2.get_state().var;

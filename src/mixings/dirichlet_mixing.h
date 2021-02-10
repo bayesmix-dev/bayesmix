@@ -53,7 +53,7 @@ class DirichletMixing : public BaseMixing {
   //! Mass probability for choosing an already existing cluster
   double mass_existing_cluster(const unsigned int n, const bool log,
                                const bool propto,
-                               std::shared_ptr<BaseHierarchy> hier,
+                               std::shared_ptr<AbstractHierarchy> hier,
                                const Eigen::RowVectorXd &covariate =
                                    Eigen::RowVectorXd(0)) const override;
 
@@ -66,7 +66,7 @@ class DirichletMixing : public BaseMixing {
   void initialize() override;
   //!
   void update_state(
-      const std::vector<std::shared_ptr<BaseHierarchy>> &unique_values,
+      const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       unsigned int n) override;
 
   // GETTERS AND SETTERS

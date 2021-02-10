@@ -54,9 +54,8 @@ class MemoryCollector : public BaseCollector {
     for (std::string& serialized_state : chain) {
       MsgType state;
       state.ParseFromString(serialized_state);
-      bool success =
-          google::protobuf::util::SerializeDelimitedToZeroCopyStream(state,
-                                                                     fout);
+      bool success = google::protobuf::util::SerializeDelimitedToZeroCopyStream(
+          state, fout);
     }
   }
 };

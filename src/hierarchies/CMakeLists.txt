@@ -1,8 +1,8 @@
 target_sources(bayesmix
   PUBLIC
-    base_hierarchy.cc
+    abstract_hierarchy.h
     base_hierarchy.h
-    dependent_hierarchy.h
+    conjugate_hierarchy.h
     lin_reg_uni_hierarchy.h
     lin_reg_uni_hierarchy.cc
     nnig_hierarchy.h

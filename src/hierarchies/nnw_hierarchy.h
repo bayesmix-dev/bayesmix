@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 
-#include "base_hierarchy.h"
+#include "conjugate_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
@@ -28,94 +28,64 @@
 //! posterior distribution are available in closed form and Neal's algorithm 2
 //! may be used with it.
 
-class NNWHierarchy : public BaseHierarchy {
- public:
-  struct State {
-    Eigen::VectorXd mean;
-    Eigen::MatrixXd prec;
-  };
-  struct Hyperparams {
-    Eigen::VectorXd mean;
-    double var_scaling;
-    double deg_free;
-    Eigen::MatrixXd scale;
-    Eigen::MatrixXd scale_inv;
-  };
+namespace NNW {
+struct State {
+  Eigen::VectorXd mean;
+  Eigen::MatrixXd prec;
+  Eigen::MatrixXd prec_chol;
+  double prec_logdet;
+};
+struct Hyperparams {
+  Eigen::VectorXd mean;
+  double var_scaling;
+  double deg_free;
+  Eigen::MatrixXd scale;
+  Eigen::MatrixXd scale_inv;
+};
+}  // namespace NNW
 
+class NNWHierarchy
+    : public ConjugateHierarchy<NNWHierarchy, NNW::State, NNW::Hyperparams,
+                                bayesmix::NNWPrior> {
  protected:
   unsigned int dim;
   Eigen::VectorXd data_sum;
   Eigen::MatrixXd data_sum_squares;
-  // STATE
-  State state;
-  // HYPERPARAMETERS
-  std::shared_ptr<Hyperparams> hypers;
-  Hyperparams posterior_hypers;
-
-  // UTILITIES FOR LIKELIHOOD COMPUTATION
-  //! Lower factor of the Cholesky decomposition of state.prec
-  Eigen::MatrixXd prec_chol;
-  //! Determinant of state.prec in logarithmic scale
-  double prec_logdet;
 
   // AUXILIARY TOOLS
   //! Special setter for prec and its utilities
-  void set_prec_and_utilities(const Eigen::MatrixXd &prec_);
-  //!
-  void clear_data() override;
-  //!
-  void update_summary_statistics(const Eigen::VectorXd &datum,
-                                 const Eigen::VectorXd &covariate,
-                                 bool add) override;
-  //!
-  void save_posterior_hypers() override;
-  //!
-  void initialize_hypers() override;
-  //! Returns updated values of the prior hyperparameters via their posterior
-  Hyperparams normal_wishart_update() const;
-  //!
-  std::shared_ptr<bayesmix::NNWPrior> cast_prior() {
-    return std::dynamic_pointer_cast<bayesmix::NNWPrior>(prior);
-  }
-  //!
-  void create_empty_prior() override { prior.reset(new bayesmix::NNWPrior); }
+  void wite_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);
 
  public:
-  void initialize() override;
-  //! Returns true if the hierarchy models multivariate data (here, true)
+  // DESTRUCTOR AND CONSTRUCTORS
+  ~NNWHierarchy() = default;
+  NNWHierarchy() = default;
+
   bool is_multivariate() const override { return true; }
-  //!
-  void update_hypers(const std::vector<bayesmix::MarginalState::ClusterState>
-                         &states) override;
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
   double like_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
-  //! Evaluates the log-marginal distribution of data in a single point
-  double marg_lpdf(
-      const bool posterior, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
 
-  // DESTRUCTOR AND CONSTRUCTORS
-  ~NNWHierarchy() = default;
-  NNWHierarchy() = default;
-  std::shared_ptr<BaseHierarchy> clone() const override {
-    auto out = std::make_shared<NNWHierarchy>(*this);
-    out->clear_data();
-    return out;
-  }
+  double marg_lpdf(
+      const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const;
 
   // SAMPLING FUNCTIONS
-  //! Generates new values for state from the centering prior distribution
-  void draw() override;
-  //! Generates new values for state from the centering posterior distribution
-  void sample_given_data(bool update_params = true) override;
+  NNW::State draw(const NNW::Hyperparams &params);
 
-  // GETTERS AND SETTERS
-  State get_state() const { return state; }
-  Hyperparams get_hypers() const { return *hypers; }
+  void clear_data();
+  void update_hypers(
+      const std::vector<bayesmix::MarginalState::ClusterState> &states);
+
+  void initialize_state();
+  void initialize_hypers();
+  void update_summary_statistics(const Eigen::VectorXd &datum,
+                                 const Eigen::VectorXd &covariate, bool add);
+  NNW::Hyperparams get_posterior_parameters();
+
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   void write_hypers_to_proto(google::protobuf::Message *out) const override;

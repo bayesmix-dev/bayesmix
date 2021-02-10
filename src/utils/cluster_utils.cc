@@ -22,8 +22,7 @@ Eigen::MatrixXd bayesmix::posterior_similarity(
 
 //! \param coll Collector containing the algorithm chain
 //! \return     Index of the iteration containing the best estimate
-Eigen::VectorXd bayesmix::cluster_estimate(
-    const Eigen::MatrixXd &alloc_chain) {
+Eigen::VectorXd bayesmix::cluster_estimate(const Eigen::MatrixXd &alloc_chain) {
   // Initialize objects
   unsigned n_iter = alloc_chain.rows();
   unsigned int n_data = alloc_chain.cols();

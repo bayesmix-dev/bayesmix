@@ -66,7 +66,7 @@ void BaseAlgorithm::initialize() {
   unique_values[0]->initialize();
   for (size_t i = 0; i < init_num_clusters - 1; i++) {
     unique_values.push_back(unique_values[0]->clone());
-    unique_values[i]->draw();
+    unique_values[i]->sample_prior();
   }
   // Initialize mixing
   mixing->initialize();
@@ -77,13 +77,14 @@ void BaseAlgorithm::initialize() {
   allocations.clear();
   for (size_t i = 0; i < init_num_clusters; i++) {
     allocations.push_back(i);
-    unique_values[i]->add_datum(i, data.row(i), false, hier_covariates.row(i));
+    unique_values[i]->add_datum(i, data.row(i), update_hierarchy_params(),
+                                hier_covariates.row(i));
   }
   // Randomly allocate all remaining data, and update cardinalities
   for (size_t i = init_num_clusters; i < data.rows(); i++) {
     unsigned int clust = distro(generator);
     allocations.push_back(clust);
-    unique_values[clust]->add_datum(i, data.row(i), false,
+    unique_values[clust]->add_datum(i, data.row(i), update_hierarchy_params(),
                                     hier_covariates.row(i));
   }
   std::cout << "Done" << std::endl;
@@ -105,8 +106,7 @@ bayesmix::MarginalState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
   bayesmix::MarginalState iter_out;
   // Transcribe iteration number, allocations, and cardinalities
   iter_out.set_iteration_num(iter);
-  *iter_out.mutable_cluster_allocs() = {allocations.begin(),
-                                        allocations.end()};
+  *iter_out.mutable_cluster_allocs() = {allocations.begin(), allocations.end()};
   // Transcribe unique values vector
   for (size_t i = 0; i < unique_values.size(); i++) {
     bayesmix::MarginalState::ClusterState clusval;

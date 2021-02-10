@@ -21,7 +21,7 @@ TEST(mixing, fixed_value) {
   double m_mix = mix.get_state().totalmass;
   ASSERT_DOUBLE_EQ(m, m_mix);
 
-  std::vector<std::shared_ptr<BaseHierarchy>> hiers(100);
+  std::vector<std::shared_ptr<AbstractHierarchy>> hiers(100);
   unsigned int n_data = 1000;
   mix.update_state(hiers, n_data);
   double m_mix_after = mix.get_state().totalmass;
@@ -41,7 +41,7 @@ TEST(mixing, gamma_prior) {
   double m_mix = mix.get_state().totalmass;
   ASSERT_DOUBLE_EQ(m_prior, m_mix);
 
-  std::vector<std::shared_ptr<BaseHierarchy>> hiers(100);
+  std::vector<std::shared_ptr<AbstractHierarchy>> hiers(100);
   unsigned int n_data = 1000;
   mix.update_state(hiers, n_data);
   double m_mix_after = mix.get_state().totalmass;
@@ -62,7 +62,7 @@ TEST(hierarchies, fixed_values) {
   hier->get_mutable_prior()->CopyFrom(prior);
   hier->initialize();
 
-  std::vector<std::shared_ptr<BaseHierarchy>> unique_values;
+  std::vector<std::shared_ptr<AbstractHierarchy>> unique_values;
   std::vector<bayesmix::MarginalState::ClusterState> states;
 
   // Check equality before update
