@@ -15,8 +15,8 @@
 #include "src/utils/rng.h"
 
 //! \param prec_ Value to set to prec
-void NNWHierarchy::set_prec_and_utilities(const Eigen::MatrixXd &prec_,
-                                          NNW::State *out) {
+void NNWHierarchy::wite_prec_to_state(const Eigen::MatrixXd &prec_,
+                                      NNW::State *out) {
   out->prec = prec_;
   // Update prec utilities
   out->prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_).matrixL().transpose();
@@ -55,7 +55,7 @@ NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
   NNW::State out;
   out.mean = stan::math::multi_normal_prec_rng(
       params.mean, tau_new * params.var_scaling, rng);
-  set_prec_and_utilities(tau_new, &out);
+  wite_prec_to_state(tau_new, &out);
   return out;
 }
 
@@ -104,8 +104,8 @@ void NNWHierarchy::clear_data() {
 
 void NNWHierarchy::initialize_state() {
   state.mean = hypers->mean;
-  set_prec_and_utilities(
-      hypers->var_scaling * Eigen::MatrixXd::Identity(dim, dim), &state);
+  wite_prec_to_state(hypers->var_scaling * Eigen::MatrixXd::Identity(dim, dim),
+                     &state);
 }
 
 void NNWHierarchy::initialize_hypers() {
@@ -299,7 +299,7 @@ void NNWHierarchy::set_state_from_proto(
   auto &statecast = google::protobuf::internal::down_cast<
       const bayesmix::MarginalState::ClusterState &>(state_);
   state.mean = to_eigen(statecast.multi_ls_state().mean());
-  set_prec_and_utilities(to_eigen(statecast.multi_ls_state().prec()), &state);
+  wite_prec_to_state(to_eigen(statecast.multi_ls_state().prec()), &state);
   set_card(statecast.cardinality());
 }
 

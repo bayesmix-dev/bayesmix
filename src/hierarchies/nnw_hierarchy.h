@@ -54,7 +54,7 @@ class NNWHierarchy
 
   // AUXILIARY TOOLS
   //! Special setter for prec and its utilities
-  void set_prec_and_utilities(const Eigen::MatrixXd &prec_, NNW::State *out);
+  void wite_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
