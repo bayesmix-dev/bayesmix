@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 
-#include "base_hierarchy.h"
+#include "conjugate_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
@@ -45,7 +45,7 @@ struct Hyperparams {
 }  // namespace NNW
 
 class NNWHierarchy
-    : public BaseHierarchy<NNWHierarchy, NNW::State, NNW::Hyperparams,
+    : public ConjugateHierarchy<NNWHierarchy, NNW::State, NNW::Hyperparams,
                            bayesmix::NNWPrior> {
  protected:
   unsigned int dim;

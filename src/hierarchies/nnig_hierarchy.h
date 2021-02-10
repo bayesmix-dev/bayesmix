@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 
-#include "base_hierarchy.h"
+#include "conjugate_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
@@ -39,7 +39,7 @@ struct Hyperparams {
 };  // namespace NNIG
 
 class NNIGHierarchy
-    : public BaseHierarchy<NNIGHierarchy, NNIG::State, NNIG::Hyperparams,
+    : public ConjugateHierarchy<NNIGHierarchy, NNIG::State, NNIG::Hyperparams,
                            bayesmix::NNIGPrior> {
  protected:
   double data_sum = 0;

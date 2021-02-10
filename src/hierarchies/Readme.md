@@ -10,6 +10,8 @@ coupled with a prior on the parameters:
 <a href="https://www.codecogs.com/eqnedit.php?latex=\theta_i&space;\sim&space;P_0" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\theta_i&space;\sim&space;P_0" title="\theta_i \sim P_0" /></a>
 
 the two quantities k (i.e. the component 'likelihood')  and P_0 define what we call a 'hierarchy'.
+In our code, we use the terms 'hierarchy', 'unique value' and 'cluster' interchangeably 
+when referring to the hierarchies.
 
 This is a basic building block of all MCMC algorithms form mixture models. Moreover, P_0 and k cannot be handled separately, since the update of parameters theta_h depends on both k and P_0.
 
@@ -40,6 +42,7 @@ and the conditional predictive distribution:
 [`prior_pred_lpdf`, `conditional_pred_lpdf`]
 
 Moreover, the following utilities are needed:
+
 6. write the current state (theta_h) into a appropriately defined Protobuf message [`write_state_to_proto`]
 7. restore theta_h from a given Protobuf message [`set_state_from_proto`]
 8. write the values of the hyperparameters in P_0 to a Protobuf message [`write_hypers_to_proto`]

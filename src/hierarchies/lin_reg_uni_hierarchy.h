@@ -6,8 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 
-#include "base_hierarchy.h"
-#include "dependent_hierarchy.h"
+#include "conjugate_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 #include "marginal_state.pb.h"
@@ -27,10 +26,12 @@ struct Hyperparams {
 }  // namespace LinReg
 
 class LinRegUniHierarchy
-    : public DependentHierarchy<LinRegUniHierarchy, LinReg::State,
-                                LinReg::Hyperparams, bayesmix::LinRegUniPrior> {
+    : public ConjugateHierarchy<LinRegUniHierarchy, LinReg::State,
+                                LinReg::Hyperparams,
+                                bayesmix::LinRegUniPrior> {
  public:
  protected:
+  unsigned int dim;
   //! Represents pieces of y^t y
   double data_sum_squares;
   //! Represents pieces of X^T X
@@ -44,6 +45,8 @@ class LinRegUniHierarchy
   LinRegUniHierarchy() = default;
 
   bool is_multivariate() const override { return false; }
+  bool is_dependent() const override { return true; }
+  unsigned int get_dim() const { return dim; }
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
