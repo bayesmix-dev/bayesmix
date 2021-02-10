@@ -73,19 +73,6 @@ class BaseHierarchy : public AbstractHierarchy {
 
   void check_prior_is_set();
 
-  double prior_pred_lpdf(
-      const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) {
-    return static_cast<Derived *>(this)->marg_lpdf(*hypers, datum, covariate);
-  }
-
-  double conditional_pred_lpdf(
-      const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) {
-    return static_cast<Derived *>(this)->marg_lpdf(posterior_hypers, datum,
-                                                   covariate);
-  }
-
   virtual google::protobuf::Message *get_mutable_prior() override {
     if (prior == nullptr) create_empty_prior();
 
@@ -97,15 +84,6 @@ class BaseHierarchy : public AbstractHierarchy {
   std::set<int> get_data_idx() override { return cluster_data_idx; }
 
   virtual Eigen::VectorXd like_lpdf_grid(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
-
-  //! Evaluates the log-marginal of data in a grid of points
-  virtual Eigen::VectorXd prior_pred_lpdf_grid(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
-
-  virtual Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
 
@@ -170,48 +148,6 @@ BaseHierarchy<Derived, State, Hyperparams, Prior>::like_lpdf_grid(
     for (int i = 0; i < data.rows(); i++) {
       lpdf(i) = static_cast<Derived *>(this)->like_lpdf(data.row(i),
                                                         covariates.row(i));
-    }
-  }
-  return lpdf;
-}
-
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-Eigen::VectorXd
-BaseHierarchy<Derived, State, Hyperparams, Prior>::prior_pred_lpdf_grid(
-    const Eigen::MatrixXd &data,
-    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
-  Eigen::VectorXd lpdf(data.rows());
-  if (covariates.cols() == 0) {
-    for (int i = 0; i < data.rows(); i++) {
-      // Pass null value as covariate
-      lpdf(i) = static_cast<Derived *>(this)->prior_pred_lpdf(
-          data.row(i), Eigen::RowVectorXd(0));
-    }
-  } else {
-    for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived *>(this)->prior_pred_lpdf(
-          data.row(i), covariates.row(i));
-    }
-  }
-  return lpdf;
-}
-
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-Eigen::VectorXd
-BaseHierarchy<Derived, State, Hyperparams, Prior>::conditional_pred_lpdf_grid(
-    const Eigen::MatrixXd &data,
-    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
-  Eigen::VectorXd lpdf(data.rows());
-  if (covariates.cols() == 0) {
-    for (int i = 0; i < data.rows(); i++) {
-      // Pass null value as covariate
-      lpdf(i) = static_cast<Derived *>(this)->conditional_pred_lpdf(
-          data.row(i), Eigen::RowVectorXd(0));
-    }
-  } else {
-    for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived *>(this)->conditional_pred_lpdf(
-          data.row(i), covariates.row(i));
     }
   }
   return lpdf;

@@ -50,7 +50,7 @@ class AbstractHierarchy {
 
   virtual bool is_multivariate() const = 0;
   virtual bool is_dependent() const { return false; }
-  virtual bool is_conjugate() const { return true; }
+  virtual bool is_conjugate() const { return false; }
   //!
   virtual void update_hypers(
       const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
@@ -64,11 +64,18 @@ class AbstractHierarchy {
   //! Evaluates the log-marginal distribution of data in a single point
   virtual double prior_pred_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) {
+    throw std::runtime_error(
+        "You are callign 'prior_pred_lpdf' from a non conjugate hieararchy");
+  }
 
   virtual double conditional_pred_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) {
+    throw std::runtime_error(
+        "You are callign 'conditional_pred_lpdf' from a non conjugate "
+        "hieararchy");
+  }
 
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
   //! Evaluates the log-likelihood of data in a grid of points
@@ -78,11 +85,19 @@ class AbstractHierarchy {
   //! Evaluates the log-marginal of data in a grid of points
   virtual Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) {
+    throw std::runtime_error(
+        "You are callign 'prior_pred_lpdf_grid' from a non conjugate "
+        "hieararchy");
+  }
 
   virtual Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) {
+    throw std::runtime_error(
+        "You are callign 'conditional_pred_lpdf_grid' from a non conjugate "
+        "hieararchy");
+  }
 
   // SAMPLING FUNCTIONS
   //! Generates new values for state from the centering prior distribution
