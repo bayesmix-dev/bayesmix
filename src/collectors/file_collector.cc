@@ -14,9 +14,11 @@ void FileCollector::open_for_reading() {
 }
 
 void FileCollector::close_reading() {
-  fin->Close();
-  close(infd);
-  is_open_read = false;
+  if (is_open_read) {
+    fin->Close();
+    close(infd);
+    is_open_read = false;
+  }
 }
 
 // \return Chain state in Protobuf-object form
