@@ -5,7 +5,6 @@ using namespace std;
 
 VariationInformation::VariationInformation(bool normalise_)
 {
-  cout << "VariationInformation Constructor" << endl;
   normalise = normalise_;
 }
 
@@ -34,7 +33,7 @@ double VariationInformation::Entropy(Eigen::VectorXi &cluster)
   for (int i = 0; i < nbr; i++)
   {
     int n = ClassCounter(cluster, i + 1);
-    double p = (double)n / nbr;
+    double p = ((double) n) / nbr;
 
     // x*log(x) = 0, if x = 0
     if (fabs(p) != 0) // ie p != 0
@@ -56,7 +55,7 @@ double VariationInformation::JointEntropy()
     double tmp = 0;
     for (int h = 0; h < K2; h++)
     {
-      double p = (double)ClassCounterExtended(*cluster1, *cluster2, 1 + g, 1 + h) / N;
+      double p = ((double)ClassCounterExtended(*cluster1, *cluster2, 1 + g, 1 + h)) / N;
       // x*log(x) = 0, if x = 0
       if (fabs(p) != 0) // ie p != 0
       {

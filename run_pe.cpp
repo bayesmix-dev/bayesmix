@@ -18,7 +18,7 @@ Eigen::VectorXd epl_for_each_Kup(Eigen::MatrixXi &mcmc, int loss_type) {
 }
 
 int main(int argc, char *argv[]) {
-  std::cout << "Running run_pe.cpp" << std::endl;
+  //std::cout << "Running run_pe.cpp" << std::endl;
 
   if (argc != 5) {
     throw domain_error("Syntax : ./run_pe filename_in filename_out loss Kup");
@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
   int Kup = std::stoi(argv[4]);
   Eigen::MatrixXi mcmc;
   mcmc = bayesmix::read_eigen_matrix(filename_in);
+//  std::cout << "Matrix with dimensions : " << mcmc.rows()
   std::cout << "Matrix with dimensions : " << mcmc.rows()
             << "*" << mcmc.cols() << " found." << std::endl;
 
@@ -47,8 +48,8 @@ int main(int argc, char *argv[]) {
     Eigen::VectorXi result = cp.cluster_estimate(GREEDY);
     bayesmix::write_matrix_to_file(result.transpose(),  filename_out);
 
-    Eigen::VectorXd true_result = bayesmix::cluster_estimate(mcmc);
-    cout << "True result : " << true_result.transpose() << endl;
+//    Eigen::VectorXd true_result = bayesmix::cluster_estimate(mcmc);
+//    cout << "True result : " << true_result.transpose() << endl;
   }
 
 }

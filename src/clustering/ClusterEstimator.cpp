@@ -42,6 +42,7 @@ double ClusterEstimator::expected_posterior_loss(Eigen::VectorXi a)
   return epl / T;
 }
 
+
 Eigen::VectorXi ClusterEstimator::cluster_estimate(MINIMIZATION_METHOD method) {
   switch (method) {
     case GREEDY:
@@ -126,11 +127,12 @@ void rename_labels(Eigen::VectorXi &cluster) {
  * a starting partition
  */
 Eigen::VectorXi ClusterEstimator::greedy_algorithm(Eigen::VectorXi &a) {
-//  cout << "Initial partition a="  << a.transpose() << endl;
   double phi_a(expected_posterior_loss(a)), phi_stop;
   Eigen::VectorXi nu, a_modified;
   Eigen::VectorXd epl_vec(K_up  );
   bool stop = false;
+  int cmpt = 0;
+
   while(!stop) {
     phi_stop = phi_a;
     nu = Eigen::VectorXi::LinSpaced(N, 1 ,N);
@@ -138,34 +140,24 @@ Eigen::VectorXi ClusterEstimator::greedy_algorithm(Eigen::VectorXi &a) {
       int i = rand() % nu.size();  // random int between 0 and size-1
       int nu_i = nu(i);
       delete_ith_element(nu, i);
-//      cout << "  i=" << i << endl;
-//      cout << "  nu=" << nu.transpose() << endl;
-//      cout << "  element supprimé=" << nu_i << endl;
       for (int s = 1; s <= K_up; s++) {
         // ai_r->s means a[i] is now equal to s
         a_modified = a;
         a_modified(nu_i - 1) = s;
-
-//        cout << "      s=" << s << endl;
-//        cout << "      a modified=" << a_modified.transpose() << endl << endl;
-
         epl_vec(s - 1) = expected_posterior_loss(a_modified);
       }
-//      cout << "   epl_vec=" << epl_vec.transpose() << endl << endl;
-//      cout << "   " << nu_i << " replace with s=" <<  argmax(epl_vec) + 1 << endl;
       a(nu_i - 1) = argmin(epl_vec) + 1;
       phi_a = expected_posterior_loss(a);
     }
-//    cout << endl << endl << "NEW LOOP a=" << a << endl << endl;
     if (phi_stop == phi_a) {
       stop = true;
     }
+    cmpt++;
   }
 
-  cout << endl << "FINAL CLUSTER : " << a.transpose() << endl;
   rename_labels(a);
-  cout << endl << "FINAL CLUSTER with relabelling : " << a.transpose() << endl;
-
+//  cout << endl << "FINAL CLUSTER : " << a.transpose() << endl;
+  cout << mcmc_sample.rows() << ":" << mcmc_sample.cols() << " --> " << cmpt << " while loops." << endl;
   return a;
 }
 

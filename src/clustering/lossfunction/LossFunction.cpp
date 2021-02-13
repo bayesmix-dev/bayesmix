@@ -2,13 +2,11 @@
 #include <iostream>
 
 LossFunction::LossFunction() : cluster1(0), cluster2(0) {
-  std::cout << "Loss Function Constructor" << std::endl;
   cluster1 = new Eigen::VectorXi();
   cluster2 = new Eigen::VectorXi();
 }
 
 LossFunction::~LossFunction() {
-  std::cout << "Loss Function virtual destructor" << std::endl;
   delete cluster1;
   delete cluster2;
 }

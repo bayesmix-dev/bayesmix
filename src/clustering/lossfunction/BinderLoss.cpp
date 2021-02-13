@@ -7,13 +7,11 @@ int indicator(bool exp);
 
 BinderLoss::BinderLoss(double l1_, double l2_) : LossFunction()
 {
-  cout << "Binder Loss constructor" << endl;
   l1 = l1_;
   l2 = l2_;
 }
 
 BinderLoss::~BinderLoss() {
-  cout << "BinderLoss Destructor" << endl  ;
 }
 
 double BinderLoss::Loss()
@@ -32,6 +30,7 @@ double BinderLoss::Loss()
 
   return var;
 }
+
 
 int indicator(bool exp)
 {
