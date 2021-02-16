@@ -44,6 +44,8 @@ def measure_times_col_constant():
             times.append((rows, time))
 
     times = sorted(times, key=lambda t: t[0])
+    print("col constant")
+    print(times)
     return times
 
 
@@ -60,20 +62,22 @@ def measure_times_row_constant():
     return times
 
 
-def plot_times(times):
+def plot_times(time_binder, time_vi, time_vin):
     fig = plt.figure(figsize=(21, 7))
     ax1 = fig.add_subplot()
     # ax1.set_title("posterior loss  with " + LOSS_TYPE + " Loss")
-    ax1.plot([times[i][0] for i in range(len(times))],
-             [times[i][1] for i in range(len(times))])
+    ax1.plot([time_binder[i][0] for i in range(len(times))],
+             [time_binder[i][1] for i in range(len(times))], 'r')
+
+    ax1.plot()
     fig.show()
     fig.savefig(PLOT_PATH, format='png')
 
 
 def main():
-    times = measure_times_col_constant()
+    time_binder = measure_times_col_constant()
     #times = measure_times_row_constant()
-    plot_times(times)
+    plot_times(time_binder, time_binder, time_binder)
 
 
 if __name__ == "__main__":

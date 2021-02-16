@@ -3,9 +3,9 @@ import numpy as np
 
 
 # paths needed
-DATA_PATH = "../resources/csv/in/multivar/data_1000_80.csv"
-CLUSTER_PATH = "../resources/csv/out/multivar/nclusters_binder_1000_80.csv"
-FIG_PATH = "../resources/csv/out/multivar/plot_1000_80.png"
+DATA_PATH = "../resources/csv/in/multivar/data_1000_80_v2.csv"
+CLUSTER_PATH = "../resources/csv/out/multivar/nclusters_binder_1000_80_v2.csv"
+FIG_PATH = "../resources/csv/out/multivar/plot_1000_80_v2.png"
 COLOR = ['r', 'g', 'b', 'c', 'm', 'y']
 
 def main():
@@ -25,7 +25,7 @@ def main():
 
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.title('Cluster estimate for a multivariate case\n')
+    plt.title('Cluster estimate for a multivariate case\nBinder Loss, Kup = 7')
     fig.show()
     fig.savefig(FIG_PATH, format='png')
 
