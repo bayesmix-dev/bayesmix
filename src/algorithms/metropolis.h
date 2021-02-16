@@ -62,7 +62,7 @@ class Metropolis {
   void run(const bool use_mala_) {
     use_mala = use_mala_;
     state = Eigen::VectorXd::Zero(dim);  // TODO?
-    while(iter < maxiter) {
+    while (iter < maxiter) {
       metropolis_hastings_step();
       output();
       iter++;
@@ -70,4 +70,4 @@ class Metropolis {
   }
 };
 
-#endif // SRC_ALGORITHMS_METROPOLIS_H
+#endif  // SRC_ALGORITHMS_METROPOLIS_H
