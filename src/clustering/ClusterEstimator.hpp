@@ -15,11 +15,6 @@ enum MINIMIZATION_METHOD {
   GREEDY
 };
 
-enum LOSS_FUNCTION {
-  BINDER_LOSS,
-  VARIATION_INFORMATION,
-  VARIATION_INFORMATION_NORMALIZED
-};
 
 /**
  * Describe the full process of clustering :

@@ -7,38 +7,6 @@ VariationInformation::VariationInformation(bool normalise_) {
   normalise = normalise_;
 }
 
-double VariationInformation::Entropy(Eigen::VectorXi &cluster) {
-  double H = 0.0;
-  // int K = GetNumberOfGroups(cluster);
-  int nbr = cluster.size();
-  set<int, greater<int>> classes = getClasses(cluster);
-
-  /*for (auto i : classes) { // Possible optimization --> TODO: test it
-    int n = ClassCounter(cluster, i + 1);
-
-    double p = (double)n / nbr;
-
-    // x*log(x) = 0, if x = 0
-    if (fabs(p) >= 1.0e-9)  // ie p != 0
-    {
-      H += p * log2(p);
-    }
-  }*/
-  for (int i = 0; i < nbr; i++) {
-    int n = ClassCounter(cluster, i + 1);
-
-    double p = (double)n / nbr;
-
-    // x*log(x) = 0, if x = 0
-    if (fabs(p) >= 1.0e-9)  // ie p != 0
-    {
-      H += p * log2(p);
-    }
-  }
-
-  return -H;
-}
-
 set<int, greater<int>> getClasses(Eigen::VectorXi &partition) {
   set<int, greater<int>> s;
   int size = partition.size();
@@ -49,6 +17,40 @@ set<int, greater<int>> getClasses(Eigen::VectorXi &partition) {
 
   return s;
 }
+
+double VariationInformation::Entropy(Eigen::VectorXi &cluster) {
+  double H = 0.0;
+  // int K = GetNumberOfGroups(cluster);
+  int nbr = cluster.size();
+  set<int, greater<int>> classes = getClasses(cluster);
+
+  for (auto i : classes) { // Possible optimization --> TODO: test it
+    int n = ClassCounter(cluster, i + 1);
+
+    double p = (double)n / nbr;
+
+    // x*log(x) = 0, if x = 0
+    if (fabs(p) >= 1.0e-9)  // ie p != 0
+    {
+      H += p * log2(p);
+    }
+  }
+//  for (int i = 0; i < nbr; i++) {
+//    int n = ClassCounter(cluster, i + 1);
+//
+//    double p = (double)n / nbr;
+//
+//    // x*log(x) = 0, if x = 0
+//    if (fabs(p) >= 1.0e-9)  // ie p != 0
+//    {
+//      H += p * log2(p);
+//    }
+//  }
+
+  return -H;
+}
+
+
 
 double VariationInformation::JointEntropy() {
   double H = 0.0;

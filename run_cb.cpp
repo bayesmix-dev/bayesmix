@@ -4,10 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "../../../lib/math/lib/eigen_3.3.9/Eigen/Dense"
-#include "../../utils/cluster_utils.hpp"
-#include "../../utils/io_utils.hpp"
-#include "CredibleBall.hpp"
+#include <Eigen/Dense>
+#include "src/includes.hpp"
 
 using namespace std;
 using namespace Eigen;

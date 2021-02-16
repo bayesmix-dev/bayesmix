@@ -11,6 +11,12 @@ using namespace std;
 // !This class implements a Loss Function for two partitions (clusters).
 // !This is the base class. The common information for Loss functions is implemented here.
 
+enum LOSS_FUNCTION {
+  BINDER_LOSS,
+  VARIATION_INFORMATION,
+  VARIATION_INFORMATION_NORMALIZED
+};
+
 class LossFunction
 {
  protected:

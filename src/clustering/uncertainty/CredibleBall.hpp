@@ -6,16 +6,11 @@
 #include <set>
 #include <vector>
 
-#include "../../../lib/math/lib/eigen_3.3.9/Eigen/Dense"
-#include "BinderLoss.hpp"
-#include "LossFunction.hpp"
-#include "VariationInformation.hpp"
+#include <Eigen/Dense>
+#include "../lossfunction/LossFunction.hpp"
+#include "../lossfunction/BinderLoss.hpp"
+#include "../lossfunction/VariationInformation.hpp"
 
-enum LOSS_FUNCTION {
-  BINDER_LOSS,
-  VARIATION_INFORMATION,
-  VARIATION_INFORMATION_NORMALIZED
-};
 
 class CredibleBall {
  private:

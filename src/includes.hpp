@@ -7,6 +7,8 @@
 #include "clustering/ClusterEstimator.hpp"
 #include "clustering/lossfunction/BinderLoss.hpp"
 #include "clustering/lossfunction/LossFunction.hpp"
+#include "clustering/lossfunction/VariationInformation.hpp"
+#include "clustering/uncertainty/CredibleBall.hpp"
 #include "collectors/file_collector.h"
 #include "collectors/memory_collector.h"
 #include "hierarchies/load_hierarchies.h"

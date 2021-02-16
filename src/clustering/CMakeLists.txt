@@ -1,4 +1,5 @@
 add_subdirectory(lossfunction)
+add_subdirectory(uncertainty)
 
 target_sources(bayesmix
         PUBLIC
