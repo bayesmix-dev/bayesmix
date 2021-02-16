@@ -2,30 +2,6 @@
 
 using namespace std;
 
-void transform_row2vec(Eigen::MatrixXi matrix, int row, Eigen::VectorXi vec) {
-  // we save the specified row of matrix in vec
-  if (row > matrix.rows()) {
-    cout << "Error, row out of bounds!" << endl;
-  }
-  for (int j = 0; j < matrix.cols(); j++) {
-    vec(j) = matrix(row, j);
-  }
-
-  return;
-}
-
-void add_row2matrix(Eigen::MatrixXi trg, int row, Eigen::MatrixXi src,
-                    int index) {
-  // we save in trg(row) the row src(index)
-  int col = src.cols();
-
-  for (int i = 0; i < col; i++) {
-    trg(row, i) = src(index, i);
-  }
-
-  return;
-}
-
 CredibleBall::CredibleBall(LOSS_FUNCTION loss_type,
                            Eigen::MatrixXi& mcmc_sample_, double alpha_,
                            Eigen::VectorXi& point_estimate_)
@@ -61,6 +37,10 @@ CredibleBall::~CredibleBall() {
 }
 
 double CredibleBall::calculateRegion(double rate) {
+  // rate controls how fast the steps on the updates in the estimate of the
+  // radius of the region will behave it stops updating when the probability is
+  // greater than the the confidence level (1 - alpha)
+
   double epsilon = 1.0;
   double probability = 0.0;
   double steps = 1;
@@ -77,6 +57,7 @@ double CredibleBall::calculateRegion(double rate) {
       vec = mcmc_sample.row(i);
       loss_function->SetSecondCluster(vec);
       double loss = loss_function->Loss();
+
       if (loss <= epsilon) {
         probability += 1;
       }
@@ -88,6 +69,7 @@ double CredibleBall::calculateRegion(double rate) {
       cout << "Probability: " << probability << endl;
       cout << "Radius estimated: " << epsilon << endl;
       radius = epsilon;
+      prob = probability;
       populateCredibleSet();
       break;
     }
@@ -100,18 +82,15 @@ double CredibleBall::calculateRegion(double rate) {
 }
 
 void CredibleBall::populateCredibleSet() {
+  // save the indexes of the clusters belonging to the credible-ball
   loss_function->SetFirstCluster(point_estimate);
-  // int count = 0;
 
   for (int i = 0; i < T; i++) {
     Eigen::VectorXi vec;
     vec = mcmc_sample.row(i);
-    //  transform_row2vec(mcmc_sample.cast<int>(), i, vec);
     loss_function->SetSecondCluster(vec);
 
     if (loss_function->Loss() <= radius) {
-      // cout << "populateCredibleSet1" << endl;
-      // save the index of cluster belonging to the credible-ball
       credibleBall.insert(i);
     }
   }
@@ -179,6 +158,7 @@ Eigen::VectorXi CredibleBall::VerticalUpperBound() {
       max_distance = loss;
     }
   }
+  vub_distance = max_distance;
 
   // save the clusters that are "max_distance" far away from the point estimate
   for (auto i : vec1) {
@@ -210,8 +190,6 @@ Eigen::VectorXi CredibleBall::VerticalLowerBound() {
   // vec1 has the indexes of the clusters with maximum cardinality in the ball
   // vec2 is an auxiliary vector
   set<int, greater<int>> vlb;
-
-  // int rows = credibleBall.size();
   int tmp1;
   int max = -1;
 
@@ -243,6 +221,7 @@ Eigen::VectorXi CredibleBall::VerticalLowerBound() {
       max_distance = loss;
     }
   }
+  vlb_distance = max_distance;
 
   // save the clusters that are "max_distance" far away from the point estimate
   for (auto i : vec1) {
@@ -262,6 +241,7 @@ Eigen::VectorXi CredibleBall::VerticalLowerBound() {
     VLB(aux) = i;
     aux++;
   }
+
   return VLB;
 }
 
@@ -282,12 +262,13 @@ Eigen::VectorXi CredibleBall::HorizontalBound() {
       max_distance = loss;
     }
   }
+  hb_distance = max_distance;
 
   // select the clusters with that distance
   for (auto i : credibleBall) {
     loss_function->SetFirstCluster(point_estimate);
     vec = mcmc_sample.row(i);
-    // transform_row2vec(credibleBall, i, vec);
+
     loss_function->SetSecondCluster(vec);
     double loss = loss_function->Loss();
 
@@ -303,4 +284,60 @@ Eigen::VectorXi CredibleBall::HorizontalBound() {
     aux++;
   }
   return HB;
+}
+
+//* Writes in an external file the summary of the credible ball computation
+void CredibleBall::sumary(Eigen::VectorXi HB, Eigen::VectorXi VUB,
+                          Eigen::VectorXi VLB, string filename) {
+  ofstream outfile;
+
+  outfile.open(filename, ios_base::app);
+  outfile << "Summary Credible Balls\n";
+  outfile << "------------------------------------------------------\n";
+  outfile << "Center:";
+  for (int i = 0; i < point_estimate.size(); i++) {
+    outfile << point_estimate(i) << " ";
+  }
+  outfile << "\n";
+  outfile << "Radius: " << radius << "\n";
+  outfile << "Level (alpha): " << alpha << " (1 - alpha = " << 1 - alpha << ")"
+          << "\n";
+  outfile << "Cardinality of the Credible Ball: " << credibleBall.size()
+          << "\n";
+
+  outfile << "------------------------------------------------------\n";
+  outfile << "Vertical Lower Bound\n";
+  outfile << "Cardinality: " << VLB.size() << "\n";
+  outfile << "Distance: " << vlb_distance << "\n";
+  outfile << "Members:\n";
+  for (int i = 0; i < VLB.size(); i++) {
+    for (int j = 0; j < N; j++) {
+      outfile << mcmc_sample(VLB(i), j) << " ";
+    }
+    outfile << "\n";
+  }
+  outfile << "------------------------------------------------------\n";
+  outfile << "Vertical Upper Bound\n";
+  outfile << "Cardinality: " << VUB.size() << "\n";
+  outfile << "Distance: " << vub_distance << "\n";
+  outfile << "Members:\n";
+  for (int i = 0; i < VUB.size(); i++) {
+    for (int j = 0; j < N; j++) {
+      outfile << mcmc_sample(VUB(i), j) << " ";
+    }
+    outfile << "\n";
+  }
+  outfile << "------------------------------------------------------\n";
+  outfile << "Horizontal Bound\n";
+  outfile << "Cardinality: " << HB.size() << "\n";
+  outfile << "Distance: " << hb_distance << "\n";
+  outfile << "Members:\n";
+  for (int i = 0; i < HB.size(); i++) {
+    for (int j = 0; j < N; j++) {
+      outfile << mcmc_sample(HB(i), j) << " ";
+    }
+    outfile << "\n";
+  }
+
+  return;
 }
