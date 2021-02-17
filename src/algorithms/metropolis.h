@@ -13,7 +13,7 @@
 class Metropolis {
  protected:
   unsigned int iter;
-  unsigned int maxiter = 1000;
+  unsigned int maxiter = 5;
 
   // DESIGN PARAMETERS
   //! Penalization parameter aka tau
