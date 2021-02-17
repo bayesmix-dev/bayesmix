@@ -41,8 +41,8 @@ void Metropolis::metropolis_hastings_step() {
   }
   // Third term
   double ratio3 =
-      std::exp((-0.5 / prop_var) * ((mean - proposed).dot(mean - proposed) -
-                                    (mean - state).dot(mean - state)));
+      std::exp((-0.5 / prop_var) * ((mean - state).dot(mean - state) -
+                                    (mean - proposed).dot(mean - proposed)));
   ratio = ratio1 * ratio2 * ratio3;
   // Accept with probability ratio
   double p = stan::math::uniform_rng(0.0, 1.0, rng);
