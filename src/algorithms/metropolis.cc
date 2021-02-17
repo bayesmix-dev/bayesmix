@@ -43,17 +43,17 @@ void Metropolis::metropolis_hastings_step() {
   double ratio3 =
       std::exp((-0.5 / prop_var) * ((mean - proposed).dot(mean - proposed) -
                                     (mean - state).dot(mean - state)));
-  double ratio = ratio1 * ratio2 * ratio3;
+  ratio = ratio1 * ratio2 * ratio3;
   // Accept with probability ratio
   double p = stan::math::uniform_rng(0.0, 1.0, rng);
-  std::cout << ratio << std::endl;
   if (p <= ratio) {
     state = proposed;
   }
+  output();
 }
 
 void Metropolis::output() {
-  std::cout << "#" << iter << ":\t";
+  std::cout << "#" << iter << ":\tp=" << ratio << ",\tstate=";
   for (int i = 0; i < dim; i++) {
     std::cout << state(i) << " ";
   }
