@@ -3,8 +3,6 @@
 
 #include <Eigen/Dense>
 
-#include "src/utils/rng.h"
-
 // Model: y_i | alpha ~ Bern( logit^-1(x'_i alpha) )
 //              alpha ~ N(0, Lambda^-1)
 //          Lambda^-1 = sig2 * I
@@ -14,9 +12,8 @@
 
 class Metropolis {
  protected:
-  unsigned int iter = 0;
-  unsigned int maxiter = 5000;
-  auto &rng = bayesmix::Rng::Instance().get();
+  unsigned int iter;
+  unsigned int maxiter = 1000;
 
   // DESIGN PARAMETERS
   //! Penalization parameter aka tau
@@ -60,11 +57,13 @@ class Metropolis {
   void set_covariates(const Eigen::MatrixXd &covar_) { covariates = covar_; }
 
   void run(const bool use_mala_) {
+    iter = 0;
     use_mala = use_mala_;
+    dim = covariates.cols();
     state = Eigen::VectorXd::Zero(dim);  // TODO?
     while (iter < maxiter) {
       metropolis_hastings_step();
-      output();
+      // output();
       iter++;
     }
   }
