@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "distribution.proto";
+import "matrix.proto";
 
 package bayesmix;
 
@@ -26,6 +27,16 @@ message PYPrior {
   }
 
   oneof totalmass {
+    FixedValues fixed_values = 1;
+  }
+}
+
+message LogSBPrior {
+  message FixedValues {
+    Vector coefficients = 1;
+  }
+
+  oneof coeff {
     FixedValues fixed_values = 1;
   }
 }

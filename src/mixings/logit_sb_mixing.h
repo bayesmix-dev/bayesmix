@@ -29,7 +29,7 @@ class LogitSBMixing : public ConditionalMixing {
     return std::dynamic_pointer_cast<bayesmix::LogSBPrior>(prior);
   }
 
-  void initialize_state();
+  void initialize_state() override;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
