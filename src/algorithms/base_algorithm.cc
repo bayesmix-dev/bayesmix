@@ -6,7 +6,6 @@
 #include "marginal_state.pb.h"
 #include "mixing_state.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
-#include "src/mixings/dependent_mixing.h"
 
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;

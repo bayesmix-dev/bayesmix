@@ -9,7 +9,6 @@
 #include "marginal_state.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
 #include "src/mixings/base_mixing.h"
-#include "src/mixings/dependent_mixing.h"
 #include "src/utils/distributions.h"
 #include "src/utils/rng.h"
 

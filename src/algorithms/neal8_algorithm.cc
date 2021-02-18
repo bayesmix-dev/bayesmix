@@ -9,7 +9,6 @@
 #include "neal2_algorithm.h"
 #include "src/hierarchies/base_hierarchy.h"
 #include "src/mixings/base_mixing.h"
-#include "src/mixings/dependent_mixing.h"
 #include "src/utils/distributions.h"
 
 //! \param hier Hierarchy object
