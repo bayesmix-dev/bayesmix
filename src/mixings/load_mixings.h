@@ -6,6 +6,7 @@
 
 #include "base_mixing.h"
 #include "dirichlet_mixing.h"
+#include "logit_sb_mixing.h"
 #include "pityor_mixing.h"
 #include "src/runtime/factory.h"
 
@@ -19,10 +20,14 @@ __attribute__((constructor)) static void load_mixings() {
   Builder<BaseMixing> DPbuilder = []() {
     return std::make_shared<DirichletMixing>();
   };
+  Builder<BaseMixing> LogSBbuilder = []() {
+    return std::make_shared<LogitSBMixing>();
+  };
   Builder<BaseMixing> PYbuilder = []() {
     return std::make_shared<PitYorMixing>();
   };
   factory.add_builder(DirichletMixing().get_id(), DPbuilder);
+  factory.add_builder(LogitSBMixing().get_id(), LogSBbuilder);
   factory.add_builder(PitYorMixing().get_id(), PYbuilder);
 }
 

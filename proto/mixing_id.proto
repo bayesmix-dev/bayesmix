@@ -6,4 +6,5 @@ enum MixingId {
     UNKNOWN_MIXING = 0;
     DP = 1;
     PY = 2;
+    LogSB = 3;
 }

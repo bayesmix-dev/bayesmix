@@ -61,6 +61,8 @@ class BaseMixing {
   virtual void initialize() = 0;
   //! Returns true if the mixing has covariates i.e. is a dependent model
   virtual bool is_dependent() const { return false; }
+  //!
+  virtual bool is_conditional() const { return false; }
 
   virtual void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
