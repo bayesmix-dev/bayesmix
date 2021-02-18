@@ -10,15 +10,12 @@
 
 void Metropolis::generate_data() {
   int n_data = 500;
+  // Initialize true coefficients
   dim = 3;
-  covariates = Eigen::MatrixXd::Random(n_data, dim);
   Eigen::VectorXd alpha_true(dim);
-  if (dim == 2) {
-    alpha_true << -5.0, 5.0;
-  } else if (dim == 3) {
-    alpha_true << -5.0, 5.0, 0.0;
-  }
-
+  alpha_true << -5.0, 5.0, 0.0;
+  // Generate data
+  covariates = Eigen::MatrixXd::Random(n_data, dim);
   Eigen::VectorXd y(n_data);
   auto &rng = bayesmix::Rng::Instance().get();
   for (int i = 0; i < n_data; i++) {
@@ -28,19 +25,27 @@ void Metropolis::generate_data() {
   data = y;
 }
 
-Eigen::VectorXd Metropolis::mala_mean() const {
-  Eigen::VectorXd grad = (-1.0 / true_var) * state;
+Eigen::VectorXd Metropolis::gradient(const Eigen::VectorXd &alpha) const {
+  Eigen::VectorXd grad = (-1.0 / true_var) * alpha;
   for (int i = 0; i < data.rows(); i++) {
     grad +=
-        (data(i) - sigmoid(state.dot(covariates.row(i)))) * covariates.row(i);
+        (data(i) - sigmoid(alpha.dot(covariates.row(i)))) * covariates.row(i);
   }
-  return state + step * grad;
+  return grad;
 }
 
 Eigen::VectorXd Metropolis::draw_proposal() const {
   auto &rng = bayesmix::Rng::Instance().get();
-  auto covar = prop_var * Eigen::MatrixXd::Identity(dim, dim);
-  return stan::math::multi_normal_rng(state, covar, rng);
+  Eigen::VectorXd mean;
+  Eigen::MatrixXd covar;
+  if (use_mala) {
+    mean = state + step * gradient(state);
+    covar = std::sqrt(2.0 * step) * Eigen::MatrixXd::Identity(dim, dim);
+  } else {
+    mean = state;
+    covar = prop_var * Eigen::MatrixXd::Identity(dim, dim);
+  }
+  return stan::math::multi_normal_rng(mean, covar, rng);
 }
 
 double Metropolis::like_lpdf(const Eigen::VectorXd &alpha) const {
@@ -58,6 +63,12 @@ double Metropolis::prior_lpdf(const Eigen::VectorXd &alpha) const {
   return stan::math::multi_normal_lpdf(alpha, mean, covar);
 }
 
+double Metropolis::proposal_lpdf(const Eigen::VectorXd &alpha) const {
+  Eigen::VectorXd mean = alpha + step * gradient(alpha);
+  auto covar = std::sqrt(2.0 * step) * Eigen::MatrixXd::Identity(dim, dim);
+  return stan::math::multi_normal_lpdf(alpha, mean, covar);
+}
+
 void Metropolis::metropolis_hastings_step() {
   auto &rng = bayesmix::Rng::Instance().get();
   // Create proposed state
@@ -65,17 +76,26 @@ void Metropolis::metropolis_hastings_step() {
   // Compute acceptance ratio
   double like_ratio = like_lpdf(state_prop) - like_lpdf(state);
   double prior_ratio = prior_lpdf(state_prop) - prior_lpdf(state);
-  // double proposal_ratio = h(alpha) - h(alpha*)
-  logratio = like_ratio + prior_ratio;
+  double proposal_ratio = 0.0;
+  if (use_mala) {
+    proposal_ratio = proposal_lpdf(state_prop) - proposal_lpdf(state);
+  }
+  logratio = like_ratio + prior_ratio - proposal_ratio;
   // Accept with probability ratio
   double p = stan::math::uniform_rng(0.0, 1.0, rng);
   if (p < std::exp(logratio)) {
+    accepted = true;
     state = state_prop;
+  } else {
+    accepted = false;
   }
   output();
 }
 
 void Metropolis::output() {
-  std::cout << "#" << iter << ":\tp=" << std::exp(logratio)
-            << ",\tstate=" << state.transpose() << std::endl;
+  std::cout << "#" << iter << ":\tp=" << std::exp(logratio);
+  if (accepted) {
+    std::cout << ",\tstate=" << state.transpose();
+  }
+  std::cout << std::endl;
 }

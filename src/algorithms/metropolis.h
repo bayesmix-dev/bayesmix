@@ -12,7 +12,7 @@
 class Metropolis {
  protected:
   unsigned int iter;
-  unsigned int maxiter = 1000;
+  unsigned int maxiter = 500;
 
   // DESIGN PARAMETERS
   //! Step size parameter for MALA aka tau
@@ -34,12 +34,15 @@ class Metropolis {
   Eigen::VectorXd state;
   //! Acceptance probability ratio
   double logratio;
+  //! Stores whether the proposal was accepted or not
+  bool accepted;
 
   // UTILITIES
-  Eigen::VectorXd mala_mean() const;
+  Eigen::VectorXd gradient(const Eigen::VectorXd &alpha) const;
   Eigen::VectorXd draw_proposal() const;
   double like_lpdf(const Eigen::VectorXd &alpha) const;
   double prior_lpdf(const Eigen::VectorXd &alpha) const;
+  double proposal_lpdf(const Eigen::VectorXd &alpha) const;
   void metropolis_hastings_step();
   void output();
 
