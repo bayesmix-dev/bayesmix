@@ -16,9 +16,9 @@ class Metropolis {
 
   // DESIGN PARAMETERS
   //! Step size parameter aka tau
-  double step = 0.5;
+  double step = 0.05;
   //! Proposed variance aka eta
-  double prop_var = 2.0;
+  double prop_var = 0.5;
   //!
   bool use_mala;
 
@@ -27,7 +27,7 @@ class Metropolis {
   Eigen::MatrixXd covariates;
   unsigned int dim;
   //! True variance aka sig2
-  double true_var = 1.0;
+  double true_var = 5.0;
   //! State aka alpha
   Eigen::VectorXd state;
   //! Acceptance probability ratio
@@ -46,6 +46,8 @@ class Metropolis {
   ~Metropolis() = default;
 
   double sigmoid(const double x) const { return 1.0 / (1.0 + std::exp(-x)); }
+
+  void generate_data();
 
   void set_prop_var(const double var_) { prop_var = var_; }
   void set_true_var(const double var_) { true_var = var_; }

@@ -1,11 +1,27 @@
 #include "metropolis.h"
 
 #include <iostream>
+#include <stan/math/prim/prob/bernoulli_rng.hpp>
 #include <stan/math/prim/prob/multi_normal_lpdf.hpp>
 #include <stan/math/prim/prob/multi_normal_rng.hpp>
 #include <stan/math/prim/prob/uniform_rng.hpp>
 
 #include "src/utils/rng.h"
+
+void Metropolis::generate_data() {
+  int ndata = 500;
+  covariates = Eigen::MatrixXd::Random(ndata, 2);
+  Eigen::VectorXd alpha_true(2);
+  alpha_true << -10, 10;
+
+  Eigen::VectorXd y(ndata);
+  auto &rng = bayesmix::Rng::Instance().get();
+  for (int i = 0; i < ndata; i++) {
+    double prob = sigmoid(covariates.row(i) * alpha_true);
+    y(i) = stan::math::bernoulli_rng(prob, rng);
+  }
+  data = y;
+}
 
 Eigen::VectorXd Metropolis::mala_mean() const {
   Eigen::VectorXd grad = (-1.0 / true_var) * state;
