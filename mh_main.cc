@@ -22,8 +22,8 @@ int main(int argc, char *argv[]) {
   std::cout << "With normal MH:" << std::endl;
   metro.run(false);
 
-  std::cout << std::endl << "With MALA:" << std::endl;
-  metro.run(true);
+  // std::cout << std::endl << "With MALA:" << std::endl;
+  // metro.run(true);
 
   std::cout << "End of mh_run.cc" << std::endl;
   return 0;

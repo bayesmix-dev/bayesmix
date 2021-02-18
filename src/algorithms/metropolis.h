@@ -12,11 +12,11 @@
 class Metropolis {
  protected:
   unsigned int iter;
-  unsigned int maxiter = 5;
+  unsigned int maxiter = 1000;
 
   // DESIGN PARAMETERS
-  //! Penalization parameter aka tau
-  double penal = 0.1;
+  //! Step size parameter aka tau
+  double step = 0.5;
   //! Proposed variance aka eta
   double prop_var = 2.0;
   //!
@@ -34,8 +34,10 @@ class Metropolis {
   double logratio;
 
   // UTILITIES
-  Eigen::VectorXd standard_mean() const;
   Eigen::VectorXd mala_mean() const;
+  Eigen::VectorXd draw_proposal() const;
+  double like_lpdf(const Eigen::VectorXd &alpha) const;
+  double prior_lpdf(const Eigen::VectorXd &alpha) const;
   void metropolis_hastings_step();
   void output();
 
@@ -43,13 +45,11 @@ class Metropolis {
   Metropolis() = default;
   ~Metropolis() = default;
 
-  double sigmoid(const double x) const {
-    return 1.0 / (1.0 + std::exp(-x));
-  }
+  double sigmoid(const double x) const { return 1.0 / (1.0 + std::exp(-x)); }
 
   void set_prop_var(const double var_) { prop_var = var_; }
   void set_true_var(const double var_) { true_var = var_; }
-  void set_penal(const double penal_) { penal = penal_; }
+  void set_step(const double step_) { step = step_; }
   void set_data(const Eigen::VectorXd &data_) { data = data_; }
   void set_covariates(const Eigen::MatrixXd &covar_) { covariates = covar_; }
 
