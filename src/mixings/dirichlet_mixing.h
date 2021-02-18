@@ -38,7 +38,7 @@ class DirichletMixing : public BaseMixing {
     return std::dynamic_pointer_cast<bayesmix::DPPrior>(prior);
   }
 
-  void initialize_state();
+  void initialize_state() override;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS

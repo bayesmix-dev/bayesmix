@@ -38,7 +38,7 @@ class PitYorMixing : public BaseMixing {
     return std::dynamic_pointer_cast<bayesmix::PYPrior>(prior);
   }
   //!
-  void initialize_state();
+  void initialize_state() override;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
