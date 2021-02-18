@@ -15,7 +15,7 @@ class Metropolis {
   unsigned int maxiter = 1000;
 
   // DESIGN PARAMETERS
-  //! Step size parameter aka tau
+  //! Step size parameter for MALA aka tau
   double step = 0.05;
   //! Proposed variance aka eta
   double prop_var = 0.5;
@@ -28,6 +28,8 @@ class Metropolis {
   unsigned int dim;
   //! True variance aka sig2
   double true_var = 5.0;
+
+  // STATE
   //! State aka alpha
   Eigen::VectorXd state;
   //! Acceptance probability ratio

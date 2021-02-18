@@ -9,14 +9,19 @@
 #include "src/utils/rng.h"
 
 void Metropolis::generate_data() {
-  int ndata = 500;
-  covariates = Eigen::MatrixXd::Random(ndata, 2);
-  Eigen::VectorXd alpha_true(2);
-  alpha_true << -10, 10;
+  int n_data = 500;
+  dim = 3;
+  covariates = Eigen::MatrixXd::Random(n_data, dim);
+  Eigen::VectorXd alpha_true(dim);
+  if (dim == 2) {
+    alpha_true << -5.0, 5.0;
+  } else if (dim == 3) {
+    alpha_true << -5.0, 5.0, 0.0;
+  }
 
-  Eigen::VectorXd y(ndata);
+  Eigen::VectorXd y(n_data);
   auto &rng = bayesmix::Rng::Instance().get();
-  for (int i = 0; i < ndata; i++) {
+  for (int i = 0; i < n_data; i++) {
     double prob = sigmoid(covariates.row(i) * alpha_true);
     y(i) = stan::math::bernoulli_rng(prob, rng);
   }
