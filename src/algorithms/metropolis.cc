@@ -1,6 +1,7 @@
 #include "metropolis.h"
 
 #include <iostream>
+#include <stan/math/prim/prob/multi_normal_lpdf.hpp>
 #include <stan/math/prim/prob/multi_normal_rng.hpp>
 #include <stan/math/prim/prob/uniform_rng.hpp>
 
@@ -11,51 +12,51 @@ Eigen::VectorXd Metropolis::standard_mean() const { return state; }
 Eigen::VectorXd Metropolis::mala_mean() const {
   Eigen::VectorXd grad = (-1.0 / true_var) * state;
   for (int i = 0; i < data.rows(); i++) {
-    grad += (data(i) - inv_logit(state.dot(covariates.row(i)))) *
+    grad += (data(i) - sigmoid(state.dot(covariates.row(i)))) *
             covariates.row(i);
   }
   return state + penal * grad;
 }
 
+double Metropolis::like_lpdf(const Eigen::VectorXd &alpha) {
+  double lpdf = 0.0;
+  for (int i = 0; i < data.size(); i++) {
+    double sig = sigmoid(covariates.row(i).dot(alpha));
+    lpdf += data(i) * std::log(sig) + (1.0 - data(i)) * std::log(1 - sig);
+  }
+  return lpdf;
+}
+
+double Metropolis::prior_lpdf(const Eigen::VectorXd &alpha) {
+  auto mean = Eigen::VectorXd::Zero(dim);
+  auto covar = true_var * Eigen::MatrixXd::Identity(dim, dim);
+  return stan::math::multi_normal_lpdf(alpha, mean, covar);
+}
+
+Eigen::VectorXd Metropolis::draw_proposal() {
+  auto &rng = bayesmix::Rng::Instance().get();
+  auto covar = prop_var * Eigen::MatrixXd::Identity(dim, dim);
+  return stan::math::multi_normal_rng(state, covar, rng);
+}
+
 void Metropolis::metropolis_hastings_step() {
   // Draw proposed state from proposal
-  auto &rng = bayesmix::Rng::Instance().get();
-  Eigen::VectorXd mean = use_mala ? mala_mean() : standard_mean();
-  auto covar = prop_var * Eigen::MatrixXd::Identity(dim, dim);
-  Eigen::VectorXd proposed = stan::math::multi_normal_rng(mean, covar, rng);
-  // First term of acceptance probability
-  double exp1 =
-      (-0.5 / true_var) * (proposed.dot(proposed) - state.dot(state));
-  double ratio1 = std::exp(exp1);
-  // Second term
-  double ratio2 = 1.0;
-  for (int i = 0; i < data.rows(); i++) {
-    // Proposed state ratio
-    double dot_num = covariates.row(i).dot(proposed);
-    double ratio_num = std::exp(data(i) * dot_num) / (1 + std::exp(dot_num));
-    // Current state ratio
-    double dot_den = covariates.row(i).dot(state);
-    double ratio_den = std::exp(data(i) * dot_den) / (1 + std::exp(dot_den));
-    // Full ratio
-    ratio2 *= ratio_num / ratio_den;
-  }
-  // Third term
-  double ratio3 =
-      std::exp((-0.5 / prop_var) * ((mean - state).dot(mean - state) -
-                                    (mean - proposed).dot(mean - proposed)));
-  ratio = ratio1 * ratio2 * ratio3;
+  state_prop = draw_proposal();
+  // Eigen::VectorXd state_prop = 
+  double like_ratio = like_lpdf(state_prop) - like_lpdf(state);
+  double prior_ratio = prior_lpdf(state_prop) - prior_lpdf(state);
+  // double proposal_ratio = h(alpha) - h(alpha*)
+  logratio = like_ratio + prior_ratio;
   // Accept with probability ratio
   double p = stan::math::uniform_rng(0.0, 1.0, rng);
-  if (p <= ratio) {
-    state = proposed;
+  if (p <= std::exp(logratio)) {
+    state = state_prop;
   }
   output();
 }
 
 void Metropolis::output() {
-  std::cout << "#" << iter << ":\tp=" << ratio << ",\tstate=";
-  for (int i = 0; i < dim; i++) {
-    std::cout << state(i) << " ";
-  }
-  std::cout << std::endl;
+  std::cout << "#" << iter << ":\tp=" << ratio
+            << ",\tstate=" << state.transpose()
+            << std::endl;
 }

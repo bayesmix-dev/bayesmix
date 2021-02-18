@@ -4,8 +4,7 @@
 #include <Eigen/Dense>
 
 // Model: y_i | alpha ~ Bern( logit^-1(x'_i alpha) )
-//              alpha ~ N(0, Lambda^-1)
-//          Lambda^-1 = sig2 * I
+//              alpha ~ N(0, sig2 * I)
 // MALA proposal density: h(x) = N(a_M, eta * I) with
 //                         a_M = alpha + tau * grad(log(f(alpha|rest)))
 // Here grad(...) = -Lambda alpha + sum_i (y_i logit^-1(x'_i alpha)) x_i
@@ -13,7 +12,7 @@
 class Metropolis {
  protected:
   unsigned int iter;
-  unsigned int maxiter = 1000;
+  unsigned int maxiter = 5;
 
   // DESIGN PARAMETERS
   //! Penalization parameter aka tau
@@ -32,7 +31,7 @@ class Metropolis {
   //! State aka alpha
   Eigen::VectorXd state;
   //! Acceptance probability ratio
-  double ratio;
+  double logratio;
 
   // UTILITIES
   Eigen::VectorXd standard_mean() const;
@@ -44,8 +43,8 @@ class Metropolis {
   Metropolis() = default;
   ~Metropolis() = default;
 
-  double inv_logit(const double x) const {
-    return std::exp(x) / (1 + std::exp(x));
+  double sigmoid(const double x) const {
+    return 1.0 / (1.0 + std::exp(-x));
   }
 
   void set_prop_var(const double var_) { prop_var = var_; }
