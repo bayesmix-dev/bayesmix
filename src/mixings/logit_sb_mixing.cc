@@ -1,6 +1,10 @@
 #include "dirichlet_mixing.h"
 
 #include <Eigen/Dense>
+#include <google/protobuf/stubs/casts.h>
+
+#include "mixing_prior.pb.h"
+#include "mixing_state.pb.h"
 
 void LogitSBMixing::initialize() {
   if (prior == nullptr) {
@@ -29,11 +33,18 @@ void LogitSBMixing::update_state(
 
 void LogitSBMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  return;  // TODO
+  auto &statecast = google::protobuf::internal::down_cast<
+      const bayesmix::LogSBState &>(state_);
+  state.regression_coeffs = bayesmix::to_eigen(statecast.regression_coeffs());
 }
+
 void LogitSBMixing::write_state_to_proto(
     google::protobuf::Message *out) const {
-  return;  // TODO
+  bayesmix::LogSBState state_;
+  bayesmix::to_proto(state.regression_coeffs,
+                     state_.mutable_regression_coeffs());
+  google::protobuf::internal::down_cast<bayesmix::LogSBState *>(out)->CopyFrom(
+      state_);
 }
 
 Eigen::VectorXd get_weights(const Eigen::VectorXd &covariate) const {
