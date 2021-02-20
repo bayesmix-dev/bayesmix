@@ -8,8 +8,7 @@
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
 #include "src/utils/proto_utils.h"
-
-// TODO priorcast->proposal_var() or step_size()
+#include "src/utils/rng.h"
 
 void LogitSBMixing::initialize(const unsigned int n_clust /*= 1*/) {
   if (prior == nullptr) {
@@ -50,8 +49,38 @@ void LogitSBMixing::initialize_state() {
 
 void LogitSBMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-    unsigned int n) {
-  return;  // TODO stuff with MH
+    const unsigned int n) {
+  // Langevin-Adjusted Metropolis-Hastings step
+  auto &rng = bayesmix::Rng::Instance().get();
+  Eigen::VectorXd state_c = state.regression_coeffs;
+  auto priorcast = cast_prior();
+  Eigen::VectorXd prior_mean = bayesmix::to_eigen(
+      priorcast->normal_prior().mean());
+  double prop_var = priorcast->proposal_var();
+  double step = priorcast->step_size();
+  // Rebuild allocations vector
+  std::vector<unsigned int> allocations;  // TODO
+  // Loop over clusters
+  for (int h = 0; h < unique_values.size(); h++) {
+    // ...
+    Eigen::VectorXd prop_mean;  // TODO
+    Eigen::VectorXd state_prop;  // TODO
+    double prior_ratio = -0.5 * (
+      (state_prop - prior_mean).transpose() * precision * (state_prop - prior_mean) -
+      (state_c - prior_mean).transpose() * precision * (state_c - prior_mean)
+    );
+    double like_ratio;  // TODO
+    double prop_ratio = (-0.5 / prop_var) * (
+      (state_prop - prop_mean).dot(state_prop - prop_mean) -
+      (state_c - prop_mean).dot(state_c - prop_mean)
+    );
+    double accept_ratio = prior_ratio + like_ratio - prop_ratio;
+    // Accept with probability ratio
+    double p = stan::math::uniform_rng(0.0, 1.0, rng);
+    if (p < std::exp(logratio)) {
+      state.regression_coeffs = state_prop;
+    }
+  }
 }
 
 void LogitSBMixing::set_state_from_proto(
