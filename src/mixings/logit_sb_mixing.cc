@@ -47,6 +47,19 @@ void LogitSBMixing::initialize_state() {
   }
 }
 
+double LogitSBMixing::log_like(const unsigned int clust_idx,
+                               const Eigen::VectorXd &alpha,
+                               const std::vector<unsigned int> allocations) {
+  double like = 0.0;
+  for (int i = 0; i < allocations.size(); i++) {
+    bool is_curr_clus = (allocations[i] == clust_idx);
+    bool is_prev_clus = (allocations[i] < clust_idx);
+    double prod = covariates_ptr->row(i).dot(alpha);
+    like += -is_curr_clus * prod + (1.0 - is_prev_clus) * sigmoid(prod);
+  }
+  return like;
+}
+
 void LogitSBMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     const std::vector<unsigned int> &allocations,
@@ -68,7 +81,8 @@ void LogitSBMixing::update_state(
       (state_prop - prior_mean).transpose() * precision * (state_prop - prior_mean) -
       (state_c - prior_mean).transpose() * precision * (state_c - prior_mean)
     );
-    double like_ratio;  // TODO
+    double like_ratio = log_like(h, state_prop, allocations)
+                      - log_like(h, state_c, allocations);
     double prop_ratio = (-0.5 / prop_var) * (
       (state_prop - prop_mean).dot(state_prop - prop_mean) -
       (state_c - prop_mean).dot(state_c - prop_mean)

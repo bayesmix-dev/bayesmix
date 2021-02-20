@@ -34,6 +34,10 @@ class LogitSBMixing : public ConditionalMixing {
   void initialize_state() override;
   //!
   double sigmoid(const double x) const { return 1.0 / (1.0 + std::exp(-x)); }
+  //!
+  double log_like(const unsigned int clust_idx,
+                  const Eigen::VectorXd &alpha,
+                  const std::vector<unsigned int> allocations);
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
