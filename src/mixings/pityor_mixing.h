@@ -66,6 +66,7 @@ class PitYorMixing : public MarginalMixing {
   //!
   void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
+      const std::vector<unsigned int> &allocations,
       const unsigned int n) override;
 
   // GETTERS AND SETTERS

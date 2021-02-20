@@ -49,6 +49,7 @@ void LogitSBMixing::initialize_state() {
 
 void LogitSBMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
+    const std::vector<unsigned int> &allocations,
     const unsigned int n) {
   // Langevin-Adjusted Metropolis-Hastings step
   auto &rng = bayesmix::Rng::Instance().get();
@@ -58,8 +59,6 @@ void LogitSBMixing::update_state(
       priorcast->normal_prior().mean());
   double prop_var = priorcast->proposal_var();
   double step = priorcast->step_size();
-  // Rebuild allocations vector
-  std::vector<unsigned int> allocations;  // TODO
   // Loop over clusters
   for (int h = 0; h < unique_values.size(); h++) {
     // ...
