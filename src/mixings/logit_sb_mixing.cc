@@ -3,16 +3,22 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
+#include <stan/math/prim.hpp>
 
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
 #include "src/utils/proto_utils.h"
+
+// TODO priorcast->proposal_var() or step_size()
 
 void LogitSBMixing::initialize(const unsigned int n_clust /*= 1*/) {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
   }
   num_clusters = n_clust;
+  auto priorcast = cast_prior();
+  precision = stan::math::inverse_spd(
+    bayesmix::to_eigen(priorcast->normal_prior().var()));
   initialize_state();
 }
 
@@ -22,6 +28,16 @@ void LogitSBMixing::initialize_state() {
     Eigen::VectorXd prior_vec =
         bayesmix::to_eigen(priorcast->normal_prior().mean());
     dim = prior_vec.size();
+    if (dim != precision.cols()) {
+      throw std::invalid_argument(
+        "Hyperparameters dimensions are not consisent");
+    }
+    if (priorcast->proposal_var() <= 0) {
+      throw std::invalid_argument("Proposal variance parameter must be > 0");
+    }
+    if (priorcast->step_size() <= 0) {
+      throw std::invalid_argument("Step size parameter must be > 0");
+    }
     state.regression_coeffs = Eigen::MatrixXd(dim, num_clusters);
     for (int i = 0; i < num_clusters; i++) {
       state.regression_coeffs.col(i) = prior_vec;
