@@ -18,13 +18,13 @@ void LogitSBMixing::initialize(const unsigned int n_clust /*= 1*/) {
 
 void LogitSBMixing::initialize_state() {
   auto priorcast = cast_prior();
-  if (priorcast->has_fixed_values()) {
+  if (priorcast->has_normal_prior()) {
     Eigen::VectorXd prior_vec =
-        bayesmix::to_eigen(priorcast->fixed_values().coefficients());
-    dim = state.regression_coeffs.size();
+        bayesmix::to_eigen(priorcast->normal_prior().mean());
+    dim = prior_vec.size();
     state.regression_coeffs = Eigen::MatrixXd(dim, num_clusters);
     for (int i = 0; i < num_clusters; i++) {
-      state.regression_coeffs << prior_vec;
+      state.regression_coeffs.col(i) = prior_vec;
     }
 
   } else {
