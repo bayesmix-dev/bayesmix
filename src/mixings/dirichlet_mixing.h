@@ -63,7 +63,7 @@ class DirichletMixing : public MarginalMixing {
                           const Eigen::RowVectorXd &covariate =
                               Eigen::RowVectorXd(0)) const override;
   //!
-  void initialize() override;
+  void initialize(const unsigned int n_clust = 1) override;
   //!
   void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,

@@ -6,19 +6,24 @@
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
 
-void LogitSBMixing::initialize() {
+void LogitSBMixing::initialize(const unsigned int n_clust /*= 1*/) {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
   }
+  num_clusters = n_clust;
   initialize_state();
 }
 
 void LogitSBMixing::initialize_state() {
   auto priorcast = cast_prior();
   if (priorcast->has_fixed_values()) {
-    state.regression_coeffs = bayesmix::to_eigen(
-                              priorcast->fixed_values().coefficients());
+    Eigen::VectorXd prior_vec = bayesmix::to_eigen(
+                                priorcast->fixed_values().coefficients());
     dim = state.regression_coeffs.size();
+    state.regression_coeffs = Eigen::MatrixXd(dim, num_clusters);
+    for (int i = 0; i < num_clusters; i++) {
+      state.regression_coeffs << prior_vec;
+    }
 
   } else {
     throw std::invalid_argument("Unrecognized mixing prior");
@@ -48,7 +53,6 @@ void LogitSBMixing::write_state_to_proto(
 }
 
 Eigen::VectorXd get_weights(const Eigen::VectorXd &covariate) const {
-  // TODO set n_clust aka regr_coeffs.rows() somehow!
   Eigen::VectorXd eta(n_clust);
   Eigen::VectorXd weights(n_clust);
   for (int h = 0; h < n_clust; h++) {

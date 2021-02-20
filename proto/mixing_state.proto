@@ -14,7 +14,7 @@ message PYState {
 }
 
 message LogSBState {
-  Vector regression_coeffs = 1;
+  Matrix regression_coeffs = 1;
 }
 
 message MixingState {

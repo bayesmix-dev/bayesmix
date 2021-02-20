@@ -19,7 +19,7 @@ class LogitSBMixing : public ConditionalMixing {
   };
 
  protected:
-  unsigned int n_clust;
+  unsigned int num_clusters;
   unsigned int dim;
   State state;
 
@@ -49,7 +49,7 @@ class LogitSBMixing : public ConditionalMixing {
   bool is_dependent() const override { return true; }
 
   //!
-  void initialize() override;
+  void initialize(const unsigned int n_clust = 1) override;
   //!
   void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
