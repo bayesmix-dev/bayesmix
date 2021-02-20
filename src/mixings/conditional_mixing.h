@@ -14,6 +14,6 @@ class ConditionalMixing : public BaseMixing {
   //!
   virtual Eigen::VectorXd get_weights(
       const Eigen::VectorXd &covariate) const = 0;  // TODO default value?
-}
+};
 
 #endif  // BAYESMIX_MIXINGS_CONDITIONAL_MIXING_H_

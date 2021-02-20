@@ -11,8 +11,8 @@ class BlockedGibbsAlgorithm : public ConditionalAlgorithm {
   void print_startup_message() const override;
 
  public:
-  ~ConditionalAlgorithm() = default;
-  ConditionalAlgorithm() = default;
+  ~BlockedGibbsAlgorithm() = default;
+  BlockedGibbsAlgorithm() = default;
   //!
   bayesmix::AlgorithmId get_id() const override {
     return bayesmix::AlgorithmId::BlockedGibbs;

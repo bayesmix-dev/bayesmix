@@ -4,6 +4,7 @@
 #include <google/protobuf/message.h>
 
 #include <Eigen/Dense>
+#include <memory>
 
 #include "base_algorithm.h"
 #include "marginal_state.pb.h"
@@ -14,7 +15,7 @@
 class MarginalAlgorithm : public BaseAlgorithm {
  protected:
   //! Points at the same object as BaseAlgorithm::mixing
-  MarginalMixing marg_mixing;
+  std::shared_ptr<MarginalMixing> marg_mixing;
   //!
   bayesmix::MarginalState curr_state;
   //!

@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
   std::string hier_cov_file;
   std::string hier_grid_cov_file;
   std::string mix_cov_file;
-  std::string mix_grid_cov_file;  
+  std::string mix_grid_cov_file;
   if (argc >= 19) {
     hier_cov_file = argv[17];
     hier_grid_cov_file = argv[18];

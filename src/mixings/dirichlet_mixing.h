@@ -37,7 +37,7 @@ class DirichletMixing : public MarginalMixing {
   std::shared_ptr<bayesmix::DPPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::DPPrior>(prior);
   }
-
+  //!
   void initialize_state() override;
 
  public:

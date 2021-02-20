@@ -43,6 +43,6 @@ class MarginalMixing : public BaseMixing {
       const unsigned int n, const bool log, const bool propto,
       const unsigned int n_clust,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const = 0;
-}
+};
 
 #endif  // BAYESMIX_MIXINGS_MARGINAL_MIXING_H_

@@ -1,10 +1,12 @@
+#include "logit_sb_mixing.h"
+
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
 
-#include "dirichlet_mixing.h"
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
+#include "src/utils/proto_utils.h"
 
 void LogitSBMixing::initialize(const unsigned int n_clust /*= 1*/) {
   if (prior == nullptr) {
@@ -53,10 +55,11 @@ void LogitSBMixing::write_state_to_proto(
       state_);
 }
 
-Eigen::VectorXd get_weights(const Eigen::VectorXd &covariate) const {
-  Eigen::VectorXd eta(n_clust);
-  Eigen::VectorXd weights(n_clust);
-  for (int h = 0; h < n_clust; h++) {
+Eigen::VectorXd LogitSBMixing::get_weights(
+    const Eigen::VectorXd &covariate) const {
+  Eigen::VectorXd eta(num_clusters);
+  Eigen::VectorXd weights(num_clusters);
+  for (int h = 0; h < num_clusters; h++) {
     eta(h) = covariate.dot(state.regression_coeffs.col(h));
     weights(h) = sigmoid(eta(h));
     for (int k = 0; k < h - 1; k++) {

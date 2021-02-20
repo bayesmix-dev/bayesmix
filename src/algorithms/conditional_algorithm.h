@@ -2,6 +2,7 @@
 #define BAYESMIX_ALGORITHMS_CONDITIONAL_ALGORITHM_H_
 
 #include <Eigen/Dense>
+#include <memory>
 
 #include "base_algorithm.h"
 #include "src/collectors/base_collector.h"
@@ -12,7 +13,7 @@ class ConditionalAlgorithm : public BaseAlgorithm {
   //! Weights of clusters
   Eigen::VectorXd weights;
   //! Points at the same object as BaseAlgorithm::mixing
-  ConditionalMixing cond_mixing;
+  std::shared_ptr<ConditionalMixing> cond_mixing;
 
  public:
   ~ConditionalAlgorithm() = default;
@@ -25,11 +26,10 @@ class ConditionalAlgorithm : public BaseAlgorithm {
     cond_mixing->update_state(unique_values, data.size());
   }
   //!
-  virtual Eigen::MatrixXd eval_lpdf(
+  Eigen::MatrixXd eval_lpdf(
       BaseCollector *const collector, const Eigen::MatrixXd &grid,
       const Eigen::MatrixXd &hier_covariates = Eigen::MatrixXd(0, 0),
-      const Eigen::MatrixXd &mix_covariates =
-          Eigen::MatrixXd(0, 0)) const override;
+      const Eigen::MatrixXd &mix_covariates = Eigen::MatrixXd(0, 0)) override;
 };
 
 #endif  // BAYESMIX_ALGORITHMS_CONDITIONAL_ALGORITHM_H_

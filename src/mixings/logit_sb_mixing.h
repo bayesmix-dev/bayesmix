@@ -26,7 +26,7 @@ class LogitSBMixing : public ConditionalMixing {
   //!
   void create_empty_prior() override { prior.reset(new bayesmix::LogSBPrior); }
   //!
-  std::shared_ptr<bayesmix::DPPrior> cast_prior() {
+  std::shared_ptr<bayesmix::LogSBPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::LogSBPrior>(prior);
   }
   //!
