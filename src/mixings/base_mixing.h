@@ -12,15 +12,7 @@
 //! Abstract base class for a generic mixture model
 
 //! This class represents a mixture model object to be used in a BNP iterative
-//! algorithm. By definition, a mixture is a probability distribution that
-//! integrates over a density kernel to generate the actual distribution for
-//! the data. However, in the context of this library, where a clustering
-//! structure is generated on the data, a certain mixture translates to a
-//! certain way of weighing the insertion of data in old clusters vs the
-//! creation of new clusters. Therefore any mixture object inheriting from the
-//! class must have methods that provide the probabilities for the two
-//! aforementioned events. The class will then have its own parameters, and
-//! maybe even prior distributions on them.
+//! algorithm.
 
 class BaseMixing {
  protected:

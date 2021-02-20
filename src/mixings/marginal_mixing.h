@@ -5,6 +5,17 @@
 
 #include "base_mixing.h"
 
+//! Abstract base class for a marginal mixture model
+
+//! This class represents a marginal mixture model object to be used in a BNP
+//! iterative algorithm. In the context of this library, where a clustering
+//! structure is generated on the data, a marginal mixture translates to a
+//! certain way of weighing the insertion of data in old clusters vs the
+//! creation of new clusters. Therefore any mixture object inheriting from the
+//! class must have methods that provide the probabilities for the two
+//! aforementioned events. The class will then have its own parameters, and
+//! maybe even prior distributions on them.
+
 class MarginalMixing : public BaseMixing {
  public:
   ~MarginalMixing() = default;
