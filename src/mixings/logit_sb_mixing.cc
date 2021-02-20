@@ -1,5 +1,7 @@
 #include "dirichlet_mixing.h"
 
+#include <Eigen/Dense>
+
 void LogitSBMixing::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
@@ -32,4 +34,8 @@ void LogitSBMixing::set_state_from_proto(
 void LogitSBMixing::write_state_to_proto(
     google::protobuf::Message *out) const {
   return;  // TODO
+}
+
+Eigen::VectorXd get_weights(const Eigen::MatrixXd &covariates) const {
+  return Eigen::VectorXd(0);  // TODO
 }

@@ -15,7 +15,7 @@
 class LogitSBMixing : public ConditionalMixing {
  public:
   struct State {
-    Eigen::VectorXd regression_coeffs;
+    Eigen::MatrixXd regression_coeffs;
   };
 
  protected:
@@ -35,6 +35,8 @@ class LogitSBMixing : public ConditionalMixing {
   // DESTRUCTOR AND CONSTRUCTORS
   ~LogitSBMixing() = default;
   LogitSBMixing() = default;
+
+  Eigen::VectorXd get_weights(const Eigen::MatrixXd &covariates) const override;
 
   std::shared_ptr<BaseMixing> clone() const override {
     return std::make_shared<LogitSBMixing>(*this);
