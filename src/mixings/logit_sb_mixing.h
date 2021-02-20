@@ -19,6 +19,7 @@ class LogitSBMixing : public ConditionalMixing {
   };
 
  protected:
+  unsigned int n_clust;
   unsigned int dim;
   State state;
 
@@ -28,15 +29,17 @@ class LogitSBMixing : public ConditionalMixing {
   std::shared_ptr<bayesmix::DPPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::LogSBPrior>(prior);
   }
-
+  //!
   void initialize_state() override;
+  //!
+  double sigmoid(const double x) const { return 1.0 / (1.0 + std::exp(-x)); }
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   ~LogitSBMixing() = default;
   LogitSBMixing() = default;
 
-  Eigen::VectorXd get_weights(const Eigen::MatrixXd &covariates) const override;
+  Eigen::VectorXd get_weights(const Eigen::VectorXd &covariate) const override;
 
   std::shared_ptr<BaseMixing> clone() const override {
     return std::make_shared<LogitSBMixing>(*this);
