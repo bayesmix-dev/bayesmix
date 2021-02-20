@@ -3,7 +3,10 @@
 #include <Eigen/Dense>
 #include <memory>
 
+#include "hierarchy_id.pb.h"
+#include "mixing_id.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
+#include "src/mixings/base_mixing.h"
 
 Eigen::VectorXd Neal3Algorithm::get_cluster_lpdf(
     const unsigned int data_idx) const {

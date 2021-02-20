@@ -6,7 +6,9 @@
 #include <vector>
 
 #include "algorithm_id.pb.h"
+#include "hierarchy_id.pb.h"
 #include "marginal_state.pb.h"
+#include "mixing_id.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
 #include "src/mixings/base_mixing.h"
 #include "src/utils/distributions.h"
