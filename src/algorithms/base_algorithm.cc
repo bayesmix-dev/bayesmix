@@ -57,6 +57,7 @@ void BaseAlgorithm::initialize() {
     // Create empty covariates vector
     mix_covariates = Eigen::MatrixXd::Zero(data.rows(), 0);
   }
+  mixing->set_covariates(&mix_covariates);
   // Interpet default number of clusters
   if (init_num_clusters == 0) {
     init_num_clusters = data.rows();

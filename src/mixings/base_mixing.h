@@ -16,7 +16,10 @@
 
 class BaseMixing {
  protected:
+  //!
   std::shared_ptr<google::protobuf::Message> prior;
+  //!
+  std::shared_ptr<Eigen::MatrixXd> covariates_ptr;
 
   //!
   virtual void create_empty_prior() = 0;
@@ -47,6 +50,7 @@ class BaseMixing {
     }
     return prior.get();
   }
+  void set_covariates(Eigen::MatrixXd* covar) { covariates_ptr = covar; }
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
