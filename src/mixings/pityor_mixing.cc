@@ -44,8 +44,7 @@ double PitYorMixing::mass_new_cluster(
 
 void PitYorMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-    const std::vector<unsigned int> &allocations,
-    const unsigned int n) {
+    const std::vector<unsigned int> &allocations, const unsigned int n) {
   auto priorcast = cast_prior();
   if (priorcast->has_fixed_values()) {
     return;
