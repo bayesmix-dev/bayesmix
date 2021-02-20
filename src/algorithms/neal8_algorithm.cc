@@ -39,9 +39,9 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_prior_mass(
   Eigen::VectorXd logprior(n_clust + n_aux);
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    logprior(j) =
-        marg_mixing->mass_existing_cluster(n_data - 1, true, true, unique_values[j],
-                                      mix_covariates.row(data_idx));
+    logprior(j) = marg_mixing->mass_existing_cluster(
+        n_data - 1, true, true, unique_values[j],
+        mix_covariates.row(data_idx));
   }
   // Further update with marginal components
   for (size_t j = 0; j < n_aux; j++) {
@@ -76,7 +76,8 @@ void Neal8Algorithm::print_startup_message() const {
                     " aux. blocks) with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
                     " hierarchies, " +
-                    bayesmix::MixingId_Name(marg_mixing->get_id()) + " mixing...";
+                    bayesmix::MixingId_Name(marg_mixing->get_id()) +
+                    " mixing...";
   std::cout << msg << std::endl;
 }
 

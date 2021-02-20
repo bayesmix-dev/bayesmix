@@ -1,8 +1,8 @@
-#include "dirichlet_mixing.h"
-
-#include <Eigen/Dense>
 #include <google/protobuf/stubs/casts.h>
 
+#include <Eigen/Dense>
+
+#include "dirichlet_mixing.h"
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
 
@@ -17,8 +17,8 @@ void LogitSBMixing::initialize(const unsigned int n_clust /*= 1*/) {
 void LogitSBMixing::initialize_state() {
   auto priorcast = cast_prior();
   if (priorcast->has_fixed_values()) {
-    Eigen::VectorXd prior_vec = bayesmix::to_eigen(
-                                priorcast->fixed_values().coefficients());
+    Eigen::VectorXd prior_vec =
+        bayesmix::to_eigen(priorcast->fixed_values().coefficients());
     dim = state.regression_coeffs.size();
     state.regression_coeffs = Eigen::MatrixXd(dim, num_clusters);
     for (int i = 0; i < num_clusters; i++) {
@@ -31,15 +31,16 @@ void LogitSBMixing::initialize_state() {
 }
 
 void LogitSBMixing::update_state(
-      const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-      unsigned int n) {
+    const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
+    unsigned int n) {
   return;  // TODO stuff with MH
 }
 
 void LogitSBMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  auto &statecast = google::protobuf::internal::down_cast<
-      const bayesmix::LogSBState &>(state_);
+  auto &statecast =
+      google::protobuf::internal::down_cast<const bayesmix::LogSBState &>(
+          state_);
   state.regression_coeffs = bayesmix::to_eigen(statecast.regression_coeffs());
 }
 
