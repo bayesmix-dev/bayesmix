@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 
-#include "base_mixing.h"
+#include "marginal_mixing.h"
 #include "mixing_id.pb.h"
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
@@ -21,7 +21,7 @@
 //! creation of a new cluster, and weights of already existing clusters are
 //! proportional to their cardinalities.
 
-class DirichletMixing : public BaseMixing {
+class DirichletMixing : public MarginalMixing {
  public:
   struct State {
     double totalmass;

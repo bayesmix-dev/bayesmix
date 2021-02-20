@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 
-#include "base_mixing.h"
+#include "marginal_mixing.h"
 #include "mixing_id.pb.h"
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
@@ -22,7 +22,7 @@
 //! factor, while the weight for a newly created cluster is the remaining
 //! one counting the total amount as the sample size increased by the strength.
 
-class PitYorMixing : public BaseMixing {
+class PitYorMixing : public MarginalMixing {
  public:
   struct State {
     double strength, discount;

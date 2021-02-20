@@ -37,32 +37,11 @@ class BaseMixing {
   BaseMixing() = default;
   virtual std::shared_ptr<BaseMixing> clone() const = 0;
 
-  // PROBABILITIES FUNCTIONS
-  //! Mass probability for choosing an already existing cluster
-
-  //! \param card Cardinality of the cluster
-  //! \param n    Total number of data points
-  //! \return     Probability value
-  virtual double mass_existing_cluster(
-      const unsigned int n, const bool log, const bool propto,
-      std::shared_ptr<AbstractHierarchy> hier,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const = 0;
-
-  //! Mass probability for choosing a newly created cluster
-
-  //! \param n_clust Number of clusters
-  //! \param n       Total number of data points
-  //! \return        Probability value
-  virtual double mass_new_cluster(
-      const unsigned int n, const bool log, const bool propto,
-      const unsigned int n_clust,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const = 0;
-
   virtual void initialize() = 0;
   //! Returns true if the mixing has covariates i.e. is a dependent model
   virtual bool is_dependent() const { return false; }
   //!
-  virtual bool is_conditional() const { return false; }
+  virtual bool is_conditional() const = 0;
 
   virtual void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,

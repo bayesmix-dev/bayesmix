@@ -6,6 +6,7 @@ target_sources(bayesmix
     dirichlet_mixing.cc
     logit_sb_mixing.cc
     logit_sb_mixing.h
+    marginal_mixing.h
     pityor_mixing.h
     pityor_mixing.cc
 )
