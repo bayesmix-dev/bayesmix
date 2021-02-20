@@ -19,7 +19,7 @@ class BaseMixing {
   //!
   std::shared_ptr<google::protobuf::Message> prior;
   //!
-  std::shared_ptr<Eigen::MatrixXd> covariates_ptr;
+  Eigen::MatrixXd *covariates_ptr;
 
   //!
   virtual void create_empty_prior() = 0;

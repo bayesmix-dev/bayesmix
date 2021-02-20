@@ -91,9 +91,9 @@ void LogitSBMixing::update_state(
     std::vector<bool> is_prev_clus(n);
     for (int i = 0; i < n; i++) {
       if (allocations[i] == h) {
-        is_curr_clus = true;
+        is_curr_clus[i] = true;
       } else if (allocations[i] < h) {
-        is_prev_clus = true;
+        is_prev_clus[i] = true;
       }
     }
     // Draw proposed state from its distribution
@@ -107,16 +107,16 @@ void LogitSBMixing::update_state(
     double prior_ratio = -0.5 * ((state_prop - prior_mean).transpose() *
                                      precision * (state_prop - prior_mean) -
                                  (state_c - prior_mean).transpose() *
-                                     precision * (state_c - prior_mean));
+                                     precision * (state_c - prior_mean))(0);
     double like_ratio = log_like(state_prop, is_curr_clus, is_prev_clus) -
                         log_like(state_c, is_curr_clus, is_prev_clus);
     double prop_ratio = (-0.5 / prop_var) *
                         ((state_prop - prop_mean).dot(state_prop - prop_mean) -
                          (state_c - prop_mean).dot(state_c - prop_mean));
-    double accept_ratio = prior_ratio + like_ratio - prop_ratio;
+    double log_accept_ratio = prior_ratio + like_ratio - prop_ratio;
     // Accept with probability ratio
     double p = stan::math::uniform_rng(0.0, 1.0, rng);
-    if (p < std::exp(logratio)) {
+    if (p < std::exp(log_accept_ratio)) {
       state.regression_coeffs = state_prop;
     }
   }
