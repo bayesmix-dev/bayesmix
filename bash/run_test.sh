@@ -12,8 +12,9 @@
 #   nclufile \
 #   clusfile \
 #   [hier_cov_file] \
-#   [grid_cov_file]
-
+#   [hier_grid_cov_file] \
+#   [mix_cov_file] \
+#   [mix_grid_cov_file]
 
 if (( $# == 1 )); then
   algo='Neal2'

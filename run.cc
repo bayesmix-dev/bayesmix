@@ -26,13 +26,16 @@ int main(int argc, char *argv[]) {
   std::string nclufile = argv[15];
   std::string clusfile = argv[16];
   std::string hier_cov_file;
-  // TODO mix_cov_file
-  std::string grid_cov_file;
-  if (argc >= 18) {
-    hier_cov_file = argv[17];
-  }
+  std::string hier_grid_cov_file;
+  std::string mix_cov_file;
+  std::string mix_grid_cov_file;  
   if (argc >= 19) {
-    grid_cov_file = argv[18];
+    hier_cov_file = argv[17];
+    hier_grid_cov_file = argv[18];
+  }
+  if (argc >= 21) {
+    mix_cov_file = argv[19];
+    mix_grid_cov_file = argv[20];
   }
 
   // Create factories and objects
@@ -62,12 +65,12 @@ int main(int argc, char *argv[]) {
   Eigen::MatrixXd hier_cov_grid(0, 0);
   Eigen::MatrixXd mix_cov_grid(0, 0);
   if (hier->is_dependent()) {
-    hier_cov_grid = bayesmix::read_eigen_matrix(grid_cov_file);
+    hier_cov_grid = bayesmix::read_eigen_matrix(hier_grid_cov_file);
   } else {
     hier_cov_grid = Eigen::MatrixXd(grid.rows(), 0);
   }
   if (mixing->is_dependent()) {
-    mix_cov_grid = bayesmix::read_eigen_matrix("");  // TODO
+    mix_cov_grid = bayesmix::read_eigen_matrix(mix_grid_cov_file);
   } else {
     mix_cov_grid = Eigen::MatrixXd(grid.rows(), 0);
   }
@@ -90,6 +93,10 @@ int main(int argc, char *argv[]) {
   if (hier->is_dependent()) {
     Eigen::MatrixXd hier_cov = bayesmix::read_eigen_matrix(hier_cov_file);
     algo->set_hier_covariates(hier_cov);
+  }
+  if (mixing->is_dependent()) {
+    Eigen::MatrixXd mix_cov = bayesmix::read_eigen_matrix(mix_cov_file);
+    algo->set_mix_covariates(mix_cov);
   }
 
   // Run algorithm and density evaluation
