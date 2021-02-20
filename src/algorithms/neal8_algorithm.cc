@@ -9,8 +9,9 @@
 #include "marginal_state.pb.h"
 #include "mixing_id.pb.h"
 #include "neal2_algorithm.h"
+#include "src/algorithms/marginal_algorithm.h"
 #include "src/hierarchies/base_hierarchy.h"
-#include "src/mixings/base_mixing.h"
+#include "src/mixings/marginal_mixing.h"
 #include "src/utils/distributions.h"
 
 //! \param hier Hierarchy object
@@ -39,12 +40,12 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_prior_mass(
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
     logprior(j) =
-        mixing->mass_existing_cluster(n_data - 1, true, true, unique_values[j],
+        marg_mixing->mass_existing_cluster(n_data - 1, true, true, unique_values[j],
                                       mix_covariates.row(data_idx));
   }
   // Further update with marginal components
   for (size_t j = 0; j < n_aux; j++) {
-    logprior(n_clust + j) = mixing->mass_new_cluster(
+    logprior(n_clust + j) = marg_mixing->mass_new_cluster(
         n_data - 1, true, true, n_clust, mix_covariates.row(data_idx));
   }
   return logprior;
@@ -75,12 +76,12 @@ void Neal8Algorithm::print_startup_message() const {
                     " aux. blocks) with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
                     " hierarchies, " +
-                    bayesmix::MixingId_Name(mixing->get_id()) + " mixing...";
+                    bayesmix::MixingId_Name(marg_mixing->get_id()) + " mixing...";
   std::cout << msg << std::endl;
 }
 
 void Neal8Algorithm::initialize() {
-  BaseAlgorithm::initialize();
+  MarginalAlgorithm::initialize();
   // Create correct amount of auxiliary blocks
   aux_unique_values.clear();
   for (size_t i = 0; i < n_aux; i++) {

@@ -5,8 +5,14 @@
 
 #include "lib/progressbar/progressbar.h"
 #include "marginal_state.pb.h"
+#include "src/algorithms/base_algorithm.h"
 #include "src/collectors/base_collector.h"
 #include "src/utils/eigen_utils.h"
+
+void MarginalAlgorithm::initialize() {
+  BaseAlgorithm::initialize();
+  marg_mixing = mixing;
+}
 
 //! \param grid      Grid of points in matrix form to evaluate the density on
 //! \param collector Collector containing the algorithm chain

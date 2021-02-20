@@ -7,6 +7,7 @@
 
 void ConditionalAlgorithm::initialize() {
   BaseAlgorithm::initialize();
+  cond_mixing = mixing;
   weights = VectorXd::Ones(init_num_clusters) / init_num_clusters;
 }
 
