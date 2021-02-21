@@ -10,8 +10,6 @@
 
 class ConditionalAlgorithm : public BaseAlgorithm {
  protected:
-  //! Weights of clusters
-  Eigen::VectorXd weights;
   //! Points at the same object as BaseAlgorithm::mixing
   std::shared_ptr<ConditionalMixing> cond_mixing;
 
