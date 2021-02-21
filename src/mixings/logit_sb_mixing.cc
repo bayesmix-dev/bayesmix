@@ -138,14 +138,20 @@ void LogitSBMixing::write_state_to_proto(
 
 Eigen::VectorXd LogitSBMixing::get_weights(
     const Eigen::VectorXd &covariate) const {
-  Eigen::VectorXd eta(num_clusters);
+  // Compute eta
+  std::vector<double> eta(num_clusters);
+  for (int h = 0; h < num_clusters; h++) {
+    eta[h] = covariate.dot(state.regression_coeffs.col(h));
+  }
+  // Compute cumulative products
+  std::vector<double> cumprod(num_clusters + 1, 1.0);
+  for (int h = 1; h < num_clusters + 1; h++) {
+    cumprod[h] = cumprod[h - 1] * sigmoid(-eta[h - 1]);
+  }
+  // Compute weights
   Eigen::VectorXd weights(num_clusters);
   for (int h = 0; h < num_clusters; h++) {
-    eta(h) = covariate.dot(state.regression_coeffs.col(h));
-    weights(h) = sigmoid(eta(h));
-    for (int k = 0; k < h - 1; k++) {
-      weights(h) *= sigmoid(-eta(k));
-    }
+    weights(h) = sigmoid(eta[h]) * cumprod[h];
   }
   return weights;
 }
