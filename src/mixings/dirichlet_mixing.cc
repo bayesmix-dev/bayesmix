@@ -8,7 +8,7 @@
 #include "mixing_state.pb.h"
 #include "src/utils/rng.h"
 
-void DirichletMixing::initialize(const unsigned int n_clust /*= 1*/) {
+void DirichletMixing::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
   }

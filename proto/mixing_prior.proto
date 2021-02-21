@@ -35,4 +35,5 @@ message LogSBPrior {
     MultiNormalDistribution normal_prior = 1;
   }
   double step_size = 2;
+  uint32 num_clusters = 3;
 }

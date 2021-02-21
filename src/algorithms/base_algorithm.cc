@@ -69,7 +69,7 @@ void BaseAlgorithm::initialize() {
     unique_values[i]->sample_prior();
   }
   // Initialize mixing
-  mixing->initialize(init_num_clusters);
+  mixing->initialize();
   // Build uniform probability on clusters, given their initial number
   std::default_random_engine generator;
   std::uniform_int_distribution<int> distro(0, init_num_clusters - 1);

@@ -32,7 +32,7 @@ class BaseMixing {
   BaseMixing() = default;
   virtual std::shared_ptr<BaseMixing> clone() const = 0;
 
-  virtual void initialize(const unsigned int n_clust = 1) = 0;
+  virtual void initialize() = 0;
   //! Returns true if the mixing has covariates i.e. is a dependent model
   virtual bool is_dependent() const { return false; }
   //!

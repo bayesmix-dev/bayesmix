@@ -5,7 +5,7 @@
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
 
-void PitYorMixing::initialize(const unsigned int n_clust /*= 1*/) {
+void PitYorMixing::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
   }

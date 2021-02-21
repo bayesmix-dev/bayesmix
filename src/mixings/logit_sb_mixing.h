@@ -58,7 +58,7 @@ class LogitSBMixing : public ConditionalMixing {
   bool is_dependent() const override { return true; }
 
   //!
-  void initialize(const unsigned int n_clust = 1) override;
+  void initialize() override;
   //!
   void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
