@@ -31,9 +31,6 @@ void LogitSBMixing::initialize_state() {
       throw std::invalid_argument(
           "Hyperparameters dimensions are not consisent");
     }
-    if (priorcast->proposal_var() <= 0) {
-      throw std::invalid_argument("Proposal variance parameter must be > 0");
-    }
     if (priorcast->step_size() <= 0) {
       throw std::invalid_argument("Step size parameter must be > 0");
     }
@@ -82,8 +79,8 @@ void LogitSBMixing::update_state(
   auto priorcast = cast_prior();
   Eigen::VectorXd prior_mean =
       bayesmix::to_eigen(priorcast->normal_prior().mean());
-  double prop_var = priorcast->proposal_var();
   double step = priorcast->step_size();
+  double prop_var = std::sqrt(2.0 * step);
   // Loop over clusters
   for (int h = 0; h < unique_values.size(); h++) {
     // Compute allocation indicators

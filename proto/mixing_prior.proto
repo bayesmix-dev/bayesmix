@@ -34,6 +34,5 @@ message LogSBPrior {
   oneof coeff {
     MultiNormalDistribution normal_prior = 1;
   }
-  double proposal_var = 2;
-  double step_size = 3;
+  double step_size = 2;
 }
