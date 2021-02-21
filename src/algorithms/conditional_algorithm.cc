@@ -9,7 +9,6 @@
 void ConditionalAlgorithm::initialize() {
   BaseAlgorithm::initialize();
   cond_mixing = std::dynamic_pointer_cast<ConditionalMixing>(mixing);
-  weights = Eigen::VectorXd::Ones(init_num_clusters) / init_num_clusters;
 }
 
 //! \param grid Grid of points in matrix form to evaluate the density on
