@@ -5,7 +5,6 @@
 
 #include "marginal_state.pb.h"
 #include "mixing_state.pb.h"
-#include "src/hierarchies/base_hierarchy.h"
 
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;
@@ -94,8 +93,10 @@ void BaseAlgorithm::update_hierarchy_hypers() {
   bayesmix::MarginalState::ClusterState clust;
   std::vector<bayesmix::MarginalState::ClusterState> states;
   for (auto &un : unique_values) {
-    un->write_state_to_proto(&clust);
-    states.push_back(clust);
+    if (un->get_card() > 0) {
+      un->write_state_to_proto(&clust);
+      states.push_back(clust);
+    }
   }
   unique_values[0]->update_hypers(states);
 }
