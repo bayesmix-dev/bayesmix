@@ -36,7 +36,7 @@ CredibleBall::~CredibleBall() {
   delete loss_function;
 }
 
-double CredibleBall::calculateRegion(double rate) {
+void CredibleBall::calculateRegion(double rate) {
   // rate controls how fast the steps on the updates in the estimate of the
   // radius of the region will behave it stops updating when the probability is
   // greater than the the confidence level (1 - alpha)
@@ -49,7 +49,9 @@ double CredibleBall::calculateRegion(double rate) {
        << "\n";
 
   while (1) {
-    epsilon = epsilon + rate * steps;
+    // we update the current radius, ie epsilon, with the specified "rate"
+    // until the estimated probability reaches the desired level
+    epsilon += rate * steps;
     cout << "Epsilon: " << epsilon << endl;
 
     for (int i = 0; i < T; i++) {
@@ -78,8 +80,10 @@ double CredibleBall::calculateRegion(double rate) {
     probability = 0;
   }
 
-  return epsilon;
+  return;
 }
+
+double CredibleBall::getRadius() { return radius; }
 
 void CredibleBall::populateCredibleSet() {
   // save the indexes of the clusters belonging to the credible-ball
@@ -118,16 +122,9 @@ int CredibleBall::count_cluster_row(int row) {
   return s.size();
 }
 
-//* clusters with min cardinality that are as distant as possible from the
-//* center
-Eigen::VectorXi CredibleBall::VerticalUpperBound() {
-  set<int, greater<int>> vec1;  // vec1 is for saving the indexes of clusters
-                                // that have min cardinality
-  Eigen::VectorXi vec2;         // vec2 is an auxiliary vector
-  set<int, greater<int>> vub;
-  int tmp1;
+int CredibleBall::getMinimalCrdinality() {
   int min = INT_MAX;
-
+  int tmp1;
   // find the minimal cardinality among the clusters
   for (auto i : credibleBall) {
     tmp1 = count_cluster_row(i);
@@ -136,19 +133,14 @@ Eigen::VectorXi CredibleBall::VerticalUpperBound() {
     }
   }
 
-  // save the indexes of the clusters with min cardinality
-  for (auto i : credibleBall) {
-    if (count_cluster_row(i) == min) {
-      vec1.insert(i);
-    }
-  }
+  return min;
+}
 
-  // among the clusters with min cardinality find the max distance
-  // from the point_estimate
+double CredibleBall::getMaxDistance(set<int, greater<int>> vec1) {
   double max_distance = -1.0;
+  Eigen::VectorXi vec2;
+
   for (auto i : vec1) {
-    // we save the row "vec(i)" of the credibleBall in vec2
-    // compute the distance, ie the loss for the corresponding row
     loss_function->SetFirstCluster(point_estimate);
     vec2 = mcmc_sample.row(i);
     loss_function->SetSecondCluster(vec2);
@@ -158,19 +150,62 @@ Eigen::VectorXi CredibleBall::VerticalUpperBound() {
       max_distance = loss;
     }
   }
-  vub_distance = max_distance;
 
-  // save the clusters that are "max_distance" far away from the point estimate
-  for (auto i : vec1) {
+  return max_distance;
+}
+
+int CredibleBall::getMaximalCardinality() {
+  int max = -1;
+  int tmp1;
+  // find the maximal cardinality among the clusters
+  for (auto i : credibleBall) {
+    tmp1 = count_cluster_row(i);
+    if (tmp1 >= max) {
+      max = tmp1;
+    }
+  }
+
+  return max;
+}
+
+void CredibleBall::saveSelectedClusters(set<int, greater<int>>& indexes,
+                                        double& distance,
+                                        set<int, greater<int>>& output) {
+  Eigen::VectorXi vec2;
+
+  for (auto i : indexes) {
     loss_function->SetFirstCluster(point_estimate);
     vec2 = mcmc_sample.row(i);
     loss_function->SetSecondCluster(vec2);
     double loss = loss_function->Loss();
 
-    if (loss == max_distance) {
-      vub.insert(i);
+    if (loss == distance) {
+      output.insert(i);
     }
   }
+}
+//* clusters with min cardinality that are as distant as possible from the
+//* center
+Eigen::VectorXi CredibleBall::VerticalUpperBound() {
+  set<int, greater<int>> vec1;  // vec1 is for saving the indexes of clusters
+                                // that have min cardinality
+  Eigen::VectorXi vec2;         // vec2 is an auxiliary vector
+  set<int, greater<int>> vub;
+  int min = getMinimalCrdinality();
+
+  // save the indexes of the clusters with min cardinality
+  for (auto i : credibleBall) {
+    if (count_cluster_row(i) == min) {
+      vec1.insert(i);
+    }
+  }
+  // among the clusters with min cardinality find the max distance
+  // from the point_estimate
+  double max_distance = getMaxDistance(vec1);
+  vub_distance = max_distance;
+
+  // save the clusters that are "max_distance" far away from the point estimate
+  saveSelectedClusters(vec1, max_distance, vub);
 
   Eigen::VectorXi VUB(vub.size());  // the output
   int aux = 0;
@@ -190,16 +225,7 @@ Eigen::VectorXi CredibleBall::VerticalLowerBound() {
   // vec1 has the indexes of the clusters with maximum cardinality in the ball
   // vec2 is an auxiliary vector
   set<int, greater<int>> vlb;
-  int tmp1;
-  int max = -1;
-
-  // find the maximal cardinality among the clusters
-  for (auto i : credibleBall) {
-    tmp1 = count_cluster_row(i);
-    if (tmp1 >= max) {
-      max = tmp1;
-    }
-  }
+  int max = getMaximalCardinality();
 
   // save the indexes of the clusters with max cardinality
   for (auto i : credibleBall) {
@@ -210,30 +236,11 @@ Eigen::VectorXi CredibleBall::VerticalLowerBound() {
 
   // among the clusters with max cardinality find the max distance
   // from the point_estimate
-  double max_distance = -1.0;
-  for (auto i : vec1) {
-    loss_function->SetFirstCluster(point_estimate);
-    vec2 = mcmc_sample.row(i);
-    loss_function->SetSecondCluster(vec2);
-    double loss = loss_function->Loss();
-
-    if (loss > max_distance) {
-      max_distance = loss;
-    }
-  }
+  double max_distance = getMaxDistance(vec1);
   vlb_distance = max_distance;
 
   // save the clusters that are "max_distance" far away from the point estimate
-  for (auto i : vec1) {
-    loss_function->SetFirstCluster(point_estimate);
-    vec2 = mcmc_sample.row(i);
-    loss_function->SetSecondCluster(vec2);
-    double loss = loss_function->Loss();
-
-    if (loss == max_distance) {
-      vlb.insert(i);
-    }
-  }
+  saveSelectedClusters(vec1, max_distance, vlb);
 
   Eigen::VectorXi VLB(vlb.size());
   int aux = 0;
