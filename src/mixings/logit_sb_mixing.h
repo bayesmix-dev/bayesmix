@@ -48,7 +48,8 @@ class LogitSBMixing : public ConditionalMixing {
   ~LogitSBMixing() = default;
   LogitSBMixing() = default;
 
-  Eigen::VectorXd get_weights(const Eigen::VectorXd &covariate) const override;
+  Eigen::VectorXd get_weights(
+      const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) const override;
 
   std::shared_ptr<BaseMixing> clone() const override {
     return std::make_shared<LogitSBMixing>(*this);
