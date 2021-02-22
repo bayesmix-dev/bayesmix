@@ -60,10 +60,12 @@ int main(int argc, char const *argv[]) {
         "Syntax : ./run_cb filename_mcmc filename_pe filename_out loss rate");
   }
 
-  string filename_mcmc = argv[1];
-  string filename_pe = argv[2];
-  string filename_out = argv[3];
-  int loss_type = std::stoi(argv[4]);
+  string filename_mcmc =
+      argv[1];  // name of the file containing the mcmc samples
+  string filename_pe = argv[2];   // name of the file with the point estimate
+  string filename_out = argv[3];  // name of the file to save the output
+  int loss_type =
+      std::stoi(argv[4]);  // 0: BinderLoss, 1: VI, 2: Normalized VI
   double learning_rate =
       stoi(argv[5]);  // a good choice for "learning_rate" is 1 to 5
   cout << "Learning rate: " << learning_rate << endl;
@@ -82,7 +84,8 @@ int main(int argc, char const *argv[]) {
 
   CredibleBall CB =
       CredibleBall(static_cast<LOSS_FUNCTION>(loss_type), mcmc, 0.05, pe);
-  double r = CB.calculateRegion(learning_rate);
+  CB.calculateRegion(learning_rate);
+  double r = CB.getRadius();
   cout << "radius: " << r << "\n";
 
   cout << "Vertical Upper Bound\n";
@@ -111,3 +114,4 @@ int main(int argc, char const *argv[]) {
 
   return 0;
 }
+
