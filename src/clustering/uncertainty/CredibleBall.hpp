@@ -32,15 +32,24 @@ class CredibleBall {
                double alpha_, Eigen::VectorXi& point_estimate_);
   ~CredibleBall();
 
-  double calculateRegion(double rate);   // calculate the radius
+  void calculateRegion(
+      double rate);    // calculate the points in the credible region
+  double getRadius();  // returns the calculated radius
   Eigen::VectorXi VerticalUpperBound();  // index of cluusters of the VUB
   Eigen::VectorXi VerticalLowerBound();  // index of the clusters of the VLB
   Eigen::VectorXi HorizontalBound();     // index of the clusters of the HB
-
-  void populateCredibleSet();  // populate the credibleBall
-  int count_cluster_row(int index);
   void sumary(
       Eigen::VectorXi HB, Eigen::VectorXi VUB, Eigen::VectorXi VLB,
       string filename);  // generates a file with the bounds information
+
+ protected:
+  void populateCredibleSet();  // populate the credibleBall
+  int count_cluster_row(int index);
+  int getMinimalCrdinality();
+  int getMaximalCardinality();
+  double getMaxDistance(set<int, greater<int>> vec1);
+  double getMinDistance();
+  void saveSelectedClusters(set<int, greater<int>>& vec1, double& max_distance,
+                            set<int, greater<int>>& vlb);
 };
 #endif  // CREDIBLE_BALL_HPP
