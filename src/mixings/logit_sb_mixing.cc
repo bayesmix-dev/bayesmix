@@ -16,8 +16,6 @@ void LogitSBMixing::initialize() {
   }
   auto priorcast = cast_prior();
   num_clusters = priorcast->num_clusters();
-  precision = stan::math::inverse_spd(
-      bayesmix::to_eigen(priorcast->normal_prior().var()));
   initialize_state();
 }
 
@@ -27,7 +25,9 @@ void LogitSBMixing::initialize_state() {
     Eigen::VectorXd prior_vec =
         bayesmix::to_eigen(priorcast->normal_prior().mean());
     dim = prior_vec.size();
-    if (dim != precision.cols()) {
+    state.precision = stan::math::inverse_spd(
+        bayesmix::to_eigen(priorcast->normal_prior().var()));
+    if (dim != state.precision.cols()) {
       throw std::invalid_argument(
           "Hyperparameters dimensions are not consisent");
     }
@@ -51,7 +51,7 @@ Eigen::VectorXd LogitSBMixing::grad_log_full_cond(
   auto priorcast = cast_prior();
   Eigen::VectorXd prior_mean =
       bayesmix::to_eigen(priorcast->normal_prior().mean());
-  Eigen::VectorXd grad = precision * (prior_mean - alpha);
+  Eigen::VectorXd grad = state.precision * (prior_mean - alpha);
   for (int i = 0; i < is_curr_clus.size(); i++) {
     double prod = covariates_ptr->row(i).dot(alpha);
     grad += -(is_curr_clus[i] + (1.0 - is_prev_clus[i]) * sigmoid(-prod)) *
@@ -102,10 +102,11 @@ void LogitSBMixing::update_state(
     Eigen::VectorXd state_prop =
         stan::math::multi_normal_rng(prop_mean, prop_covar, rng);
     // Compute acceptance ratio
-    double prior_ratio = -0.5 * ((state_prop - prior_mean).transpose() *
-                                     precision * (state_prop - prior_mean) -
-                                 (state_c - prior_mean).transpose() *
-                                     precision * (state_c - prior_mean))(0);
+    double prior_ratio =
+        -0.5 * ((state_prop - prior_mean).transpose() * state.precision *
+                    (state_prop - prior_mean) -
+                (state_c - prior_mean).transpose() * state.precision *
+                    (state_c - prior_mean))(0);
     double like_ratio = log_like(state_prop, is_curr_clus, is_prev_clus) -
                         log_like(state_c, is_curr_clus, is_prev_clus);
     double prop_ratio = (-0.5 / prop_var) *

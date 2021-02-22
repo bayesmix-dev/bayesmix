@@ -16,13 +16,13 @@ class LogitSBMixing : public ConditionalMixing {
  public:
   struct State {
     Eigen::MatrixXd regression_coeffs;
+    Eigen::MatrixXd precision;
   };
 
  protected:
   unsigned int num_clusters;
   unsigned int dim;
   State state;
-  Eigen::MatrixXd precision;  // TODO should this be in the state?
 
   //!
   void create_empty_prior() override { prior.reset(new bayesmix::LogSBPrior); }
