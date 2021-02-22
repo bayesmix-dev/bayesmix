@@ -3,9 +3,9 @@
 #include <Eigen/Dense>
 
 #include "src/mixings/logit_sb_mixing.h"
-#include "src/utils/rng.h"
 #include "src/utils/io_utils.h"
 #include "src/utils/proto_utils.h"
+#include "src/utils/rng.h"
 
 TEST(logit_sb, read_write) {
   LogitSBMixing mix;
@@ -24,6 +24,19 @@ TEST(logit_sb, read_write) {
 
   mix.get_mutable_prior()->CopyFrom(prior);
   mix.initialize();
+
+  google::protobuf::Message *prior_out = mix.get_mutable_prior();
+  ASSERT_EQ(prior.DebugString(), prior_out->DebugString());
+
+  bayesmix::LogSBState state;
+  mix.write_state_to_proto(&state);
+  Eigen::MatrixXd coeffs = bayesmix::to_eigen(state.regression_coeffs());
+  for (int i = 0; i < coeffs.cols(); i++) {
+    // Check equality of i-th column, element-by-element
+    for (int j = 0; j < mu.size(); j++) {
+      ASSERT_DOUBLE_EQ(mu(j), coeffs(j, i));
+    }
+  }
 
   // double m_mix = mix.get_state().totalmass;
   // ASSERT_DOUBLE_EQ(m_prior, m_mix);
