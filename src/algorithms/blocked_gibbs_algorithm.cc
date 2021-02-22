@@ -12,3 +12,11 @@ void BlockedGibbsAlgorithm::print_startup_message() const {
                     bayesmix::MixingId_Name(mixing->get_id()) + " mixing...";
   std::cout << msg << std::endl;
 }
+
+void BlockedGibbsAlgorithm::sample_allocations() {
+  return;  // TODO
+}
+
+void BlockedGibbsAlgorithm::sample_unique_values() {
+  return;  // TODO
+}

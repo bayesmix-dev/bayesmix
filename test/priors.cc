@@ -23,7 +23,7 @@ TEST(mixing, fixed_value) {
 
   std::vector<std::shared_ptr<AbstractHierarchy>> hiers(100);
   unsigned int n_data = 1000;
-  mix.update_state(hiers, n_data);
+  mix.update_state(hiers, std::vector<unsigned int>(), n_data);
   double m_mix_after = mix.get_state().totalmass;
   ASSERT_DOUBLE_EQ(m, m_mix_after);
 }
@@ -43,7 +43,7 @@ TEST(mixing, gamma_prior) {
 
   std::vector<std::shared_ptr<AbstractHierarchy>> hiers(100);
   unsigned int n_data = 1000;
-  mix.update_state(hiers, n_data);
+  mix.update_state(hiers, std::vector<unsigned int>(), n_data);
   double m_mix_after = mix.get_state().totalmass;
 
   std::cout << "             after = " << m_mix_after << std::endl;
