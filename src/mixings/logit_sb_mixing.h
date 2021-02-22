@@ -22,7 +22,7 @@ class LogitSBMixing : public ConditionalMixing {
   unsigned int num_clusters;
   unsigned int dim;
   State state;
-  Eigen::MatrixXd precision;  // TODO should it be in the state?
+  Eigen::MatrixXd precision;  // TODO should this be in the state?
 
   //!
   void create_empty_prior() override { prior.reset(new bayesmix::LogSBPrior); }
