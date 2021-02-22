@@ -21,6 +21,7 @@ add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   collectors.cc
   runtime.cc
   rng.cc
+  logit_sb.cc
 )
 
 target_include_directories(test_bayesmix PUBLIC ${INCLUDE_PATHS})
