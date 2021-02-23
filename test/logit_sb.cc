@@ -10,55 +10,64 @@
 #include "src/utils/rng.h"
 
 TEST(logit_sb, misc) {
+  // Initialize parameters
   auto &rng = bayesmix::Rng::Instance().get();
   rng.seed(20201124);
+  unsigned int dim = 2;
+  unsigned int n_clust = 3;
+  unsigned int n_data = 60;
+  unsigned int n_iter = 500;
 
+  // DATA GENERATION
+  // True coefficients
+  Eigen::MatrixXd true_alphas(dim, n_clust);
+  for(int i = 0; i < n_clust; i++) {
+    for(int j = 0; j < dim; j++)
+      true_alphas(j, i) = std::pow(2.0, i + 1);
+  }
+  // Allocations
+  std::vector<unsigned int> allocations(n_data);
+  for(int i = 0; i < n_data / 3; i++) {
+    allocations[n_data / 3 + i] = 1;
+    allocations[2 * n_data / 3 + i] = 2;
+  }
+  // Covariates
+  Eigen::MatrixXd covariates = Eigen::MatrixXd::Random(n_data, dim);
+
+  // INITIALIZATION
+  // Prior parameters
+  double step = 0.5;
+  auto prior_mean = Eigen::VectorXd::Zero(dim);
+  auto cov = 2.0 * Eigen::MatrixXd::Identity(dim, dim);
+  // Set parameters to mixing object
   LogitSBMixing mix;
   bayesmix::LogSBPrior prior;
-
-  double step = 0.5;
-  unsigned int num_clusters = 7;
-  Eigen::Vector3d mu;
-  mu << -2.0, 2.0, 0.0;
-  auto cov = 2.0 * Eigen::MatrixXd::Identity(3, 3);
-
   prior.set_step_size(step);
-  prior.set_num_clusters(num_clusters);
-  bayesmix::to_proto(mu, prior.mutable_normal_prior()->mutable_mean());
+  prior.set_num_clusters(n_clust);
+  bayesmix::to_proto(prior_mean, prior.mutable_normal_prior()->mutable_mean());
   bayesmix::to_proto(cov, prior.mutable_normal_prior()->mutable_var());
-
   mix.get_mutable_prior()->CopyFrom(prior);
-
-  std::string covsfile = "resources/test/mh_covs.csv";
-  Eigen::MatrixXd covariates = bayesmix::read_eigen_matrix(covsfile);
   mix.set_covariates(&covariates);
-
   mix.initialize();
 
+  // TESTING
+  // Test prior read/write
   google::protobuf::Message *prior_out = mix.get_mutable_prior();
   ASSERT_EQ(prior.DebugString(), prior_out->DebugString());
-
+  // Test initialization of state
   Eigen::MatrixXd coeffs = mix.get_state().regression_coeffs;
   std::cout << coeffs << std::endl;
   for (int i = 0; i < coeffs.cols(); i++) {
     // Check equality of i-th column, element-by-element
-    for (int j = 0; j < mu.size(); j++) {
-      ASSERT_DOUBLE_EQ(mu(j), coeffs(j, i));
+    for (int j = 0; j < prior_mean.size(); j++) {
+      ASSERT_DOUBLE_EQ(prior_mean(j), coeffs(j, i));
     }
   }
-
-  unsigned int n_data = 200;
-  std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(num_clusters);
-  std::vector<unsigned int> allocations(n_data, 0);
-  for (int i = n_data / 2; i < n_data; i++) {
-    allocations[i] = 1;
-  }
-
-  unsigned int n_iter = 100;
+  // Statistical test
+  std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(n_clust);
   for (int i = 0; i < n_iter; i++) {
     mix.update_state(hierarchies, allocations);
   }
-
   Eigen::MatrixXd coeffs_out = mix.get_state().regression_coeffs;
   std::cout << coeffs_out << std::endl;
 }
