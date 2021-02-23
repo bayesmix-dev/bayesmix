@@ -74,8 +74,9 @@ double LogitSBMixing::log_like(const Eigen::VectorXd &alpha,
 
 void LogitSBMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-    const std::vector<unsigned int> &allocations, const unsigned int n) {
+    const std::vector<unsigned int> &allocations) {
   // Langevin-Adjusted Metropolis-Hastings step
+  unsigned int n = allocations.size();
   auto &rng = bayesmix::Rng::Instance().get();
   Eigen::VectorXd state_c = state.regression_coeffs;
   auto priorcast = cast_prior();

@@ -41,7 +41,7 @@ class BaseMixing {
 
   virtual void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-      const std::vector<unsigned int> &allocations, const unsigned int n) = 0;
+      const std::vector<unsigned int> &allocations) = 0;
 
   // GETTERS AND SETTERS
   google::protobuf::Message *get_mutable_prior() {

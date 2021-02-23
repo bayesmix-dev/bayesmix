@@ -68,8 +68,7 @@ class DirichletMixing : public MarginalMixing {
   //!
   void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-      const std::vector<unsigned int> &allocations,
-      const unsigned int n) override;
+      const std::vector<unsigned int> &allocations) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }

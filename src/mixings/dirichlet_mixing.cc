@@ -54,10 +54,10 @@ double DirichletMixing::mass_new_cluster(
 
 void DirichletMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-    const std::vector<unsigned int> &allocations, const unsigned int n) {
+    const std::vector<unsigned int> &allocations) {
   auto &rng = bayesmix::Rng::Instance().get();
-
   auto priorcast = cast_prior();
+  unsigned int n = allocations.size();
 
   if (priorcast->has_fixed_value()) {
     return;

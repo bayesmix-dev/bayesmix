@@ -21,7 +21,7 @@ class ConditionalAlgorithm : public BaseAlgorithm {
   //!
   void step() override {
     BaseAlgorithm::step();
-    cond_mixing->update_state(unique_values, allocations, data.size());
+    cond_mixing->update_state(unique_values, allocations);
   }
   //!
   Eigen::MatrixXd eval_lpdf(
