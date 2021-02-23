@@ -5,6 +5,7 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <vector>
 
 #include "marginal_mixing.h"
 #include "mixing_id.pb.h"

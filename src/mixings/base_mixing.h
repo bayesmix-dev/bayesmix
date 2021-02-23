@@ -5,6 +5,7 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <vector>
 
 #include "mixing_id.pb.h"
 #include "src/hierarchies/base_hierarchy.h"

@@ -4,6 +4,7 @@
 
 #include <Eigen/Dense>
 #include <stan/math/prim.hpp>
+#include <vector>
 
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"

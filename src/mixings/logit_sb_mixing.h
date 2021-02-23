@@ -5,6 +5,7 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <vector>
 
 #include "base_mixing.h"
 #include "conditional_mixing.h"

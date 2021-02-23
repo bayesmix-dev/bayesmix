@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <vector>
 
 #include "marginal_state.pb.h"
 #include "mixing_state.pb.h"

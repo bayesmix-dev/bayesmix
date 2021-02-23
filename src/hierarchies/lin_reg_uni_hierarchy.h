@@ -5,6 +5,7 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <vector>
 
 #include "conjugate_hierarchy.h"
 #include "hierarchy_id.pb.h"

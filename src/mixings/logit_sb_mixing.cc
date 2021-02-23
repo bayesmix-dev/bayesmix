@@ -4,6 +4,7 @@
 
 #include <Eigen/Dense>
 #include <stan/math/prim.hpp>
+#include <vector>
 
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"

@@ -3,6 +3,7 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <stan/math/prim/prob.hpp>
+#include <vector>
 
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
