@@ -78,7 +78,6 @@ void LogitSBMixing::update_state(
   // Langevin-Adjusted Metropolis-Hastings step
   unsigned int n = allocations.size();
   auto &rng = bayesmix::Rng::Instance().get();
-  Eigen::VectorXd state_c = state.regression_coeffs;
   auto priorcast = cast_prior();
   Eigen::VectorXd prior_mean =
       bayesmix::to_eigen(priorcast->normal_prior().mean());
@@ -86,6 +85,7 @@ void LogitSBMixing::update_state(
   double prop_var = std::sqrt(2.0 * step);
   // Loop over clusters
   for (int h = 0; h < unique_values.size(); h++) {
+    Eigen::VectorXd state_c = state.regression_coeffs.col(h);
     // Compute allocation indicators
     std::vector<bool> is_curr_clus(n);
     std::vector<bool> is_prev_clus(n);
@@ -119,6 +119,7 @@ void LogitSBMixing::update_state(
     double p = stan::math::uniform_rng(0.0, 1.0, rng);
     if (p < std::exp(log_accept_ratio)) {
       state.regression_coeffs = state_prop;
+      // TODO should we set an internal flag proposal_was_accepted?
     }
   }
 }

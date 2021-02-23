@@ -28,14 +28,16 @@ TEST(logit_sb, misc) {
   bayesmix::to_proto(cov, prior.mutable_normal_prior()->mutable_var());
 
   mix.get_mutable_prior()->CopyFrom(prior);
+
+  std::string covsfile = "resources/test/mh_covs.csv";
+  Eigen::MatrixXd covariates = bayesmix::read_eigen_matrix(covsfile);
+  mix.set_covariates(&covariates);
+
   mix.initialize();
 
   google::protobuf::Message *prior_out = mix.get_mutable_prior();
   ASSERT_EQ(prior.DebugString(), prior_out->DebugString());
 
-  // bayesmix::LogSBState state;
-  // mix.write_state_to_proto(&state);
-  // Eigen::MatrixXd coeffs = bayesmix::to_eigen(state.regression_coeffs());
   Eigen::MatrixXd coeffs = mix.get_state().regression_coeffs;
   std::cout << coeffs << std::endl;
   for (int i = 0; i < coeffs.cols(); i++) {
@@ -45,7 +47,7 @@ TEST(logit_sb, misc) {
     }
   }
 
-  unsigned int n_data = 100;
+  unsigned int n_data = 200;
   std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(n_data);
   std::vector<unsigned int> allocations(n_data, 0);
   for (int i = n_data / 2; i < n_data; i++) {
@@ -59,12 +61,4 @@ TEST(logit_sb, misc) {
 
   Eigen::MatrixXd coeffs_out = mix.get_state().regression_coeffs;
   std::cout << coeffs_out << std::endl;
-}
-
-TEST(logit_sb, metroplois) {
-  std::string datafile = "resources/test/mh_data.csv";
-  std::string covsfile = "resources/test/mh_covs.csv";
-
-  Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
-  Eigen::MatrixXd covariates = bayesmix::read_eigen_matrix(covsfile);
 }
