@@ -1,13 +1,18 @@
 #include <gtest/gtest.h>
 
 #include <Eigen/Dense>
+#include <vector>
 
+#include "src/hierarchies/abstract_hierarchy.h"
 #include "src/mixings/logit_sb_mixing.h"
 #include "src/utils/io_utils.h"
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-TEST(logit_sb, read_write) {
+TEST(logit_sb, misc) {
+  auto &rng = bayesmix::Rng::Instance().get();
+  rng.seed(20201124);
+
   LogitSBMixing mix;
   bayesmix::LogSBPrior prior;
 
@@ -28,9 +33,11 @@ TEST(logit_sb, read_write) {
   google::protobuf::Message *prior_out = mix.get_mutable_prior();
   ASSERT_EQ(prior.DebugString(), prior_out->DebugString());
 
-  bayesmix::LogSBState state;
-  mix.write_state_to_proto(&state);
-  Eigen::MatrixXd coeffs = bayesmix::to_eigen(state.regression_coeffs());
+  // bayesmix::LogSBState state;
+  // mix.write_state_to_proto(&state);
+  // Eigen::MatrixXd coeffs = bayesmix::to_eigen(state.regression_coeffs());
+  Eigen::MatrixXd coeffs = mix.get_state().regression_coeffs;
+  std::cout << coeffs << std::endl;
   for (int i = 0; i < coeffs.cols(); i++) {
     // Check equality of i-th column, element-by-element
     for (int j = 0; j < mu.size(); j++) {
@@ -38,22 +45,23 @@ TEST(logit_sb, read_write) {
     }
   }
 
-  // double m_mix = mix.get_state().totalmass;
-  // ASSERT_DOUBLE_EQ(m_prior, m_mix);
+  unsigned int n_data = 100;
+  std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(n_data);
+  std::vector<unsigned int> allocations(n_data, 0);
+  for (int i = n_data / 2; i < n_data; i++) {
+    allocations[i] = 1;
+  }
 
-  // std::vector<std::shared_ptr<AbstractHierarchy>> hiers(100);
-  // unsigned int n_data = 1000;
-  // mix.update_state(hiers, std::vector<unsigned int>(), n_data);
-  // double m_mix_after = mix.get_state().totalmass;
+  unsigned int n_iter = 100;
+  for (int i = 0; i < n_iter; i++) {
+    mix.update_state(hierarchies, allocations);
+  }
 
-  // std::cout << "             after = " << m_mix_after << std::endl;
-  // ASSERT_TRUE(m_mix_after > m_mix);
+  Eigen::MatrixXd coeffs_out = mix.get_state().regression_coeffs;
+  std::cout << coeffs_out << std::endl;
 }
 
 TEST(logit_sb, metroplois) {
-  auto &rng = bayesmix::Rng::Instance().get();
-  rng.seed(20201124);
-
   std::string datafile = "resources/test/mh_data.csv";
   std::string covsfile = "resources/test/mh_covs.csv";
 
