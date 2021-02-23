@@ -118,7 +118,7 @@ void LogitSBMixing::update_state(
     // Accept with probability ratio
     double p = stan::math::uniform_rng(0.0, 1.0, rng);
     if (p < std::exp(log_accept_ratio)) {
-      state.regression_coeffs = state_prop;
+      state.regression_coeffs.col(h) = state_prop;
       // TODO should we set an internal flag proposal_was_accepted?
     }
   }

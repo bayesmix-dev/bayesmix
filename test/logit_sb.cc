@@ -17,7 +17,7 @@ TEST(logit_sb, misc) {
   bayesmix::LogSBPrior prior;
 
   double step = 0.5;
-  unsigned int num_clusters = 10;
+  unsigned int num_clusters = 7;
   Eigen::Vector3d mu;
   mu << -2.0, 2.0, 0.0;
   auto cov = 2.0 * Eigen::MatrixXd::Identity(3, 3);
@@ -48,7 +48,7 @@ TEST(logit_sb, misc) {
   }
 
   unsigned int n_data = 200;
-  std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(n_data);
+  std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(num_clusters);
   std::vector<unsigned int> allocations(n_data, 0);
   for (int i = n_data / 2; i < n_data; i++) {
     allocations[i] = 1;
