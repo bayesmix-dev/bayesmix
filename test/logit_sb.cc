@@ -73,7 +73,6 @@ TEST(logit_sb, misc) {
   std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(n_clust);
   for (int i = 0; i < n_iter; i++) {
     mix.update_state(hierarchies, allocations);
-    std::cout << i << "\n" << mix.get_state().regression_coeffs <<
-    std::endl;
+    std::cout << i << "\n" << mix.get_state().regression_coeffs << std::endl;
   }
 }

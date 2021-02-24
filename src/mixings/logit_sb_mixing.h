@@ -36,13 +36,12 @@ class LogitSBMixing : public ConditionalMixing {
   //!
   double sigmoid(const double x) const { return 1.0 / (1.0 + std::exp(-x)); }
   //!
-  Eigen::VectorXd grad_log_full_cond(const Eigen::VectorXd &alpha,
-                                     const std::vector<bool> &is_curr_clus,
-                                     const std::vector<bool> &is_subseq_clus);
+  Eigen::VectorXd grad_log_full_cond(
+      const Eigen::VectorXd &alpha, const unsigned int clust,
+      const std::vector<unsigned int> &allocations);
   //!
-  double log_like(const Eigen::VectorXd &alpha,
-                  const std::vector<bool> &is_curr_clus,
-                  const std::vector<bool> &is_prev_clus);
+  double log_like(const Eigen::VectorXd &alpha, const unsigned int clust,
+                  const std::vector<unsigned int> &allocations);
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
