@@ -17,7 +17,7 @@ TEST(logit_sb, misc) {
   unsigned int dim = 2;
   unsigned int n_clust = 3;
   unsigned int n_data = 90;
-  unsigned int n_iter = 2;  // TODO
+  unsigned int n_iter = 200;
 
   // DATA GENERATION
   // True coefficients
@@ -73,9 +73,7 @@ TEST(logit_sb, misc) {
   std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(n_clust);
   for (int i = 0; i < n_iter; i++) {
     mix.update_state(hierarchies, allocations);
-    // std::cout << i << "\n" << mix.get_state().regression_coeffs <<
-    // std::endl;
+    std::cout << i << "\n" << mix.get_state().regression_coeffs <<
+    std::endl;
   }
-  // Eigen::MatrixXd coeffs_out = mix.get_state().regression_coeffs;
-  // std::cout << coeffs_out << std::endl;
 }

@@ -85,7 +85,7 @@ void LogitSBMixing::update_state(
   double step = priorcast->step_size();
   double prop_var = std::sqrt(2.0 * step);
   // Loop over clusters, but last alpha is ignored
-  for (int h = 0; h < unique_values.size() - 1; h++) {
+  for (int h = 0; h < unique_values.size(); h++) {  // TODO -1?
     Eigen::VectorXd state_c = state.regression_coeffs.col(h);
     // Compute allocation indicators
     std::vector<bool> is_curr_clus(n, false);
