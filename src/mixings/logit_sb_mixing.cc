@@ -55,8 +55,7 @@ Eigen::VectorXd LogitSBMixing::grad_log_full_cond(
   Eigen::VectorXd grad = state.precision * (prior_mean - alpha);
   for (int i = 0; i < is_curr_clus.size(); i++) {
     double sig = sigmoid(covariates_ptr->row(i).dot(alpha));
-    double coeff = double(is_curr_clus[i]) * (1.0 - sig) -
-                   double(is_subseq_clus[i]) * sig;
+    double coeff = is_curr_clus[i] * (1.0 - sig) - is_subseq_clus[i] * sig;
     grad += coeff * covariates_ptr->row(i);
   }
   return grad;
@@ -68,8 +67,8 @@ double LogitSBMixing::log_like(const Eigen::VectorXd &alpha,
   double like = 0.0;
   for (int i = 0; i < is_curr_clus.size(); i++) {
     double sig = sigmoid(covariates_ptr->row(i).dot(alpha));
-    like += double(is_curr_clus[i]) * std::log(sig) +
-            double(is_subseq_clus[i]) * std::log(1.0 - sig);
+    like += is_curr_clus[i] * std::log(sig) +
+            is_subseq_clus[i] * std::log(1.0 - sig);
   }
   return like;
 }
