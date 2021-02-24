@@ -48,26 +48,28 @@ void LogitSBMixing::initialize_state() {
 
 Eigen::VectorXd LogitSBMixing::grad_log_full_cond(
     const Eigen::VectorXd &alpha, const std::vector<bool> &is_curr_clus,
-    const std::vector<bool> &is_prev_clus) {
+    const std::vector<bool> &is_subseq_clus) {
   auto priorcast = cast_prior();
   Eigen::VectorXd prior_mean =
       bayesmix::to_eigen(priorcast->normal_prior().mean());
   Eigen::VectorXd grad = state.precision * (prior_mean - alpha);
   for (int i = 0; i < is_curr_clus.size(); i++) {
-    double prod = covariates_ptr->row(i).dot(alpha);
-    grad += -(is_curr_clus[i] + (1.0 - is_prev_clus[i]) * sigmoid(-prod)) *
-            covariates_ptr->row(i);
+    double sig = sigmoid(covariates_ptr->row(i).dot(alpha));
+    double coeff = double(is_curr_clus[i]) * (1.0 - sig) -
+                   double(is_subseq_clus[i]) * sig;
+    grad += coeff * covariates_ptr->row(i);
   }
   return grad;
 }
 
 double LogitSBMixing::log_like(const Eigen::VectorXd &alpha,
                                const std::vector<bool> &is_curr_clus,
-                               const std::vector<bool> &is_prev_clus) {
+                               const std::vector<bool> &is_subseq_clus) {
   double like = 0.0;
   for (int i = 0; i < is_curr_clus.size(); i++) {
-    double prod = covariates_ptr->row(i).dot(alpha);
-    like += -is_curr_clus[i] * prod + (1.0 - is_prev_clus[i]) * sigmoid(prod);
+    double sig = sigmoid(covariates_ptr->row(i).dot(alpha));
+    like += double(is_curr_clus[i]) * std::log(sig) +
+            double(is_subseq_clus[i]) * std::log(1.0 - sig);
   }
   return like;
 }
@@ -87,19 +89,19 @@ void LogitSBMixing::update_state(
   for (int h = 0; h < unique_values.size(); h++) {
     Eigen::VectorXd state_c = state.regression_coeffs.col(h);
     // Compute allocation indicators
-    std::vector<bool> is_curr_clus(n);
-    std::vector<bool> is_prev_clus(n);
+    std::vector<bool> is_curr_clus(n, false);
+    std::vector<bool> is_subseq_clus(n, false);
     for (int i = 0; i < n; i++) {
       if (allocations[i] == h) {
         is_curr_clus[i] = true;
-      } else if (allocations[i] < h) {
-        is_prev_clus[i] = true;
+      } else if (allocations[i] > h) {
+        is_subseq_clus[i] = true;
       }
     }
     // Draw proposed state from its distribution
     Eigen::VectorXd prop_mean =
         state_c +
-        step * grad_log_full_cond(state_c, is_curr_clus, is_prev_clus);
+        step * grad_log_full_cond(state_c, is_curr_clus, is_subseq_clus);
     auto prop_covar = prop_var * Eigen::MatrixXd::Identity(dim, dim);
     Eigen::VectorXd state_prop =
         stan::math::multi_normal_rng(prop_mean, prop_covar, rng);
@@ -109,8 +111,8 @@ void LogitSBMixing::update_state(
                     (state_prop - prior_mean) -
                 (state_c - prior_mean).transpose() * state.precision *
                     (state_c - prior_mean))(0);
-    double like_ratio = log_like(state_prop, is_curr_clus, is_prev_clus) -
-                        log_like(state_c, is_curr_clus, is_prev_clus);
+    double like_ratio = log_like(state_prop, is_curr_clus, is_subseq_clus) -
+                        log_like(state_c, is_curr_clus, is_subseq_clus);
     double prop_ratio = (-0.5 / prop_var) *
                         ((state_prop - prop_mean).dot(state_prop - prop_mean) -
                          (state_c - prop_mean).dot(state_c - prop_mean));

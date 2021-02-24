@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <Eigen/Dense>
+#include <stan/math/prim.hpp>
 #include <vector>
 
 #include "src/hierarchies/abstract_hierarchy.h"
@@ -15,24 +16,30 @@ TEST(logit_sb, misc) {
   rng.seed(20201124);
   unsigned int dim = 2;
   unsigned int n_clust = 3;
-  unsigned int n_data = 60;
-  unsigned int n_iter = 500;
+  unsigned int n_data = 90;
+  unsigned int n_iter = 2;  // TODO
 
   // DATA GENERATION
   // True coefficients
   Eigen::MatrixXd true_alphas(dim, n_clust);
-  for(int i = 0; i < n_clust; i++) {
-    for(int j = 0; j < dim; j++)
+  for (int i = 0; i < n_clust; i++) {
+    for (int j = 0; j < dim; j++) {
       true_alphas(j, i) = std::pow(2.0, i + 1);
+    }
   }
   // Allocations
   std::vector<unsigned int> allocations(n_data);
-  for(int i = 0; i < n_data / 3; i++) {
+  for (int i = 0; i < n_data / 3; i++) {
     allocations[n_data / 3 + i] = 1;
     allocations[2 * n_data / 3 + i] = 2;
   }
-  // Covariates
-  Eigen::MatrixXd covariates = Eigen::MatrixXd::Random(n_data, dim);
+  // Covariates, based on cluster allocation
+  Eigen::MatrixXd covariates(n_data, dim);
+  for (int i = 0; i < n_data; i++) {
+    covariates.row(i) =
+        stan::math::multi_normal_rng(true_alphas.col(allocations[i]),
+                                     Eigen::MatrixXd::Identity(dim, dim), rng);
+  }
 
   // INITIALIZATION
   // Prior parameters
@@ -56,7 +63,6 @@ TEST(logit_sb, misc) {
   ASSERT_EQ(prior.DebugString(), prior_out->DebugString());
   // Test initialization of state
   Eigen::MatrixXd coeffs = mix.get_state().regression_coeffs;
-  std::cout << coeffs << std::endl;
   for (int i = 0; i < coeffs.cols(); i++) {
     // Check equality of i-th column, element-by-element
     for (int j = 0; j < prior_mean.size(); j++) {
@@ -67,7 +73,9 @@ TEST(logit_sb, misc) {
   std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(n_clust);
   for (int i = 0; i < n_iter; i++) {
     mix.update_state(hierarchies, allocations);
+    // std::cout << i << "\n" << mix.get_state().regression_coeffs <<
+    // std::endl;
   }
-  Eigen::MatrixXd coeffs_out = mix.get_state().regression_coeffs;
-  std::cout << coeffs_out << std::endl;
+  // Eigen::MatrixXd coeffs_out = mix.get_state().regression_coeffs;
+  // std::cout << coeffs_out << std::endl;
 }

@@ -38,7 +38,7 @@ class LogitSBMixing : public ConditionalMixing {
   //!
   Eigen::VectorXd grad_log_full_cond(const Eigen::VectorXd &alpha,
                                      const std::vector<bool> &is_curr_clus,
-                                     const std::vector<bool> &is_prev_clus);
+                                     const std::vector<bool> &is_subseq_clus);
   //!
   double log_like(const Eigen::VectorXd &alpha,
                   const std::vector<bool> &is_curr_clus,
