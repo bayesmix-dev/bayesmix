@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # build/run \
-#   algo_type rng_seed init_num_cl maxiter burnin \
+#   algo_params_file \
 #   hier_type hier_args \
 #   mix_type mix_args \
 #   collname \
@@ -16,15 +16,9 @@
 #   [mix_cov_file] \
 #   [mix_grid_cov_file]
 
-if (( $# == 1 )); then
-  algo='Neal2'
-else
-  algo="$2"
-fi
-
 if [ "$1" == 'uni' ]; then
   build/run \
-    $algo 20201124 0 1000 100 \
+    algo_settings.asciipb \
     NNIG resources/asciipb/nnig_ngg_prior.asciipb \
     DP   resources/asciipb/dp_gamma_prior.asciipb \
     "" \
@@ -36,7 +30,7 @@ if [ "$1" == 'uni' ]; then
     resources/csv/out/uni_${algo}_clus.csv
 elif [ "$1" == 'multi' ]; then
   build/run \
-    $algo 20201124 0 1000 100 \
+    algo_settings.asciipb \
     NNW resources/asciipb/nnw_ngiw_prior.asciipb \
     DP  resources/asciipb/dp_gamma_prior.asciipb \
     "" \
@@ -48,7 +42,7 @@ elif [ "$1" == 'multi' ]; then
     resources/csv/out/multi_${algo}_clus.csv
 elif [ "$1" == 'lru' ]; then
   build/run \
-    $algo 20201124 0 1000 100 \
+    algo_settings.asciipb \
     LinRegUni resources/asciipb/lin_reg_uni_fixed.asciipb \
     DP        resources/asciipb/dp_gamma_prior.asciipb \
     "" \

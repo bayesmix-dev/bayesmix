@@ -1,4 +1,7 @@
-# RNG initial seed
+# Algorithm ID string, e.g. "Neal2"
+algo_id: "Neal2"
+
+# RNG initial seed: any nonnegative integer
 rng_seed: 20201124
 
 # Number of iterations of the algorithm
@@ -8,15 +11,12 @@ iterations: 1000
 burnin: 100
 
 # Number of clusters in which data will be first initialized
-# (NOTE: Write 0 if you want to initialize one datum per cluster.)
+# (NOTE: If you want to initialize one datum per cluster, please write 0.)
 # (NOTE: This argument will be ignored by the BlockedGibbs algorithm.)
 init_num_clusters: 3
-
-# Test string
-test: "abc"
 
 ## PARAMETER-SPECIFIC SETTINGS
 # Neal8 number of auxiliary blocks
 # (NOTE: 3 is the recommended value in most cases, please change it only if you
-# know what you're doing.)
+#  know what you're doing.)
 neal8_n_aux: 3

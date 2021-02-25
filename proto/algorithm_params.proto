@@ -3,10 +3,10 @@ syntax = "proto3";
 package bayesmix;
 
 message AlgorithmParams {
-  uint32 rng_seed = 1;
-  uint32 iterations = 2;
-  uint32 burnin = 3;
-  uint32 init_num_clusters = 4;
-  string test = 5;
+  string algo_id = 1;
+  uint32 rng_seed = 2;
+  uint32 iterations = 3;
+  uint32 burnin = 4;
+  uint32 init_num_clusters = 5;
   uint32 neal8_n_aux = 6;
 }
