@@ -19,7 +19,7 @@ void LogitSBMixing::initialize() {
   auto priorcast = cast_prior();
   num_components = priorcast->num_components();
   initialize_state();
-  acceptance_rates = Eigen::VectorXd::Zero(num_components);
+  acceptance_rates = Eigen::VectorXd::Zero(num_components - 1);
   n_iter = 0;
 }
 
@@ -93,8 +93,8 @@ void LogitSBMixing::update_state(
       bayesmix::to_eigen(priorcast->normal_prior().mean());
   double step = priorcast->step_size();
   double prop_var = std::sqrt(2.0 * step);
-  // Loop over clusters, but last alpha is ignored
-  for (int h = 0; h < unique_values.size(); h++) {  // TODO -1?
+  // Loop over components
+  for (int h = 0; h < num_components - 1; h++) {
     Eigen::VectorXd state_c = state.regression_coeffs.col(h);
     // Draw proposed state from its distribution
     Eigen::VectorXd prop_mean =

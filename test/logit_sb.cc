@@ -15,13 +15,13 @@ TEST(logit_sb, misc) {
   auto &rng = bayesmix::Rng::Instance().get();
   rng.seed(20201124);
   unsigned int dim = 2;
-  unsigned int n_clust = 3;
+  unsigned int n_comp = 3;
   unsigned int n_data = 90;
   unsigned int n_iter = 20;
 
   // DATA GENERATION
   // True coefficients
-  Eigen::MatrixXd cov_centers(dim, n_clust);
+  Eigen::MatrixXd cov_centers(dim, n_comp);
   cov_centers.col(0) << -5.0, 0.0;
   cov_centers.col(1) << 5.0, 0.0;
   cov_centers.col(2) << 0.0, 5.0;
@@ -47,7 +47,7 @@ TEST(logit_sb, misc) {
   LogitSBMixing mix;
   bayesmix::LogSBPrior prior;
   prior.set_step_size(step);
-  prior.set_num_clusters(n_clust);
+  prior.set_num_components(n_comp);
   bayesmix::to_proto(prior_mean, prior.mutable_normal_prior()->mutable_mean());
   bayesmix::to_proto(cov, prior.mutable_normal_prior()->mutable_var());
   mix.get_mutable_prior()->CopyFrom(prior);
@@ -67,7 +67,7 @@ TEST(logit_sb, misc) {
     }
   }
   // M-H run
-  std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(n_clust);
+  std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(n_comp);
   for (int i = 0; i < n_iter; i++) {
     mix.update_state(hierarchies, allocations);
     // std::cout << i << "\n" << mix.get_state().regression_coeffs <<
