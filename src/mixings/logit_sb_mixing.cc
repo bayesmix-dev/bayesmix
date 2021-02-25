@@ -16,9 +16,9 @@ void LogitSBMixing::initialize() {
     throw std::invalid_argument("Mixing prior was not provided");
   }
   auto priorcast = cast_prior();
-  num_clusters = priorcast->num_clusters();
+  num_components = priorcast->num_components();
   initialize_state();
-  acceptance_rates = Eigen::VectorXd::Zero(num_clusters);
+  acceptance_rates = Eigen::VectorXd::Zero(num_components);
   n_iter = 0;
 }
 
@@ -38,8 +38,8 @@ void LogitSBMixing::initialize_state() {
       throw std::invalid_argument("Step size parameter must be > 0");
     }
 
-    state.regression_coeffs = Eigen::MatrixXd(dim, num_clusters);
-    for (int i = 0; i < num_clusters; i++) {
+    state.regression_coeffs = Eigen::MatrixXd(dim, num_components);
+    for (int i = 0; i < num_components; i++) {
       state.regression_coeffs.col(i) = prior_vec;
     }
 
@@ -143,18 +143,18 @@ Eigen::VectorXd LogitSBMixing::get_weights(
     const Eigen::VectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   // TODO design choice: no check on covariate
   // Compute eta
-  std::vector<double> eta(num_clusters);
-  for (int h = 0; h < num_clusters; h++) {
+  std::vector<double> eta(num_components);
+  for (int h = 0; h < num_components; h++) {
     eta[h] = covariate.dot(state.regression_coeffs.col(h));
   }
   // Compute cumulative products
-  std::vector<double> cumprod(num_clusters + 1, 1.0);
-  for (int h = 1; h < num_clusters + 1; h++) {
+  std::vector<double> cumprod(num_components + 1, 1.0);
+  for (int h = 1; h < num_components + 1; h++) {
     cumprod[h] = cumprod[h - 1] * sigmoid(-eta[h - 1]);
   }
   // Compute weights
-  Eigen::VectorXd weights(num_clusters);
-  for (int h = 0; h < num_clusters; h++) {
+  Eigen::VectorXd weights(num_components);
+  for (int h = 0; h < num_components; h++) {
     weights(h) = sigmoid(eta[h]) * cumprod[h];
   }
   return weights;
