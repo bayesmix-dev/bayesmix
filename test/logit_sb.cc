@@ -25,7 +25,6 @@ TEST(logit_sb, misc) {
   cov_centers.col(0) << -5.0, 0.0;
   cov_centers.col(1) << 5.0, 0.0;
   cov_centers.col(2) << 0.0, 5.0;
-
   // Allocations
   std::vector<unsigned int> allocations(n_data);
   for (int i = 0; i < n_data / 3; i++) {
@@ -39,14 +38,6 @@ TEST(logit_sb, misc) {
         stan::math::multi_normal_rng(cov_centers.col(allocations[i]),
                                      Eigen::MatrixXd::Identity(dim, dim), rng);
   }
-
-  std::cout << "allocation: ";
-  for (auto &c : allocations) {
-    std::cout << c << ", ";
-  }
-  std::cout << std::endl;
-  std::cout << "covariates: \n" << covariates << std::endl;
-
   // INITIALIZATION
   // Prior parameters
   double step = 0.025;
@@ -75,27 +66,23 @@ TEST(logit_sb, misc) {
       ASSERT_DOUBLE_EQ(prior_mean(j), coeffs(j, i));
     }
   }
-  // Statistical test
+  // M-H run
   std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(n_clust);
   for (int i = 0; i < n_iter; i++) {
     mix.update_state(hierarchies, allocations);
     // std::cout << i << "\n" << mix.get_state().regression_coeffs <<
     // std::endl;
   }
-
+  std::cout << "acceptance rates: " << mix.get_acceptance_rates().transpose()
+            << std::endl;
+  // Weights with test set
   Eigen::VectorXd test1(2);
   test1 << -5, 0;
-
   Eigen::VectorXd test2(2);
   test2 << 5, 0;
-
   Eigen::VectorXd test3(2);
   test3 << 0, 5;
-
   std::cout << "test1: " << mix.get_weights(test1).transpose() << std::endl;
   std::cout << "test2: " << mix.get_weights(test2).transpose() << std::endl;
   std::cout << "test3: " << mix.get_weights(test3).transpose() << std::endl;
-
-  std::cout << "acceptance rates: " << mix.get_acceptance_rates().transpose()
-            << std::endl;
 }

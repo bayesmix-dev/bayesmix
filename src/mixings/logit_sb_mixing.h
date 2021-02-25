@@ -75,7 +75,7 @@ class LogitSBMixing : public ConditionalMixing {
     return bayesmix::MixingId::LogSB;
   }
   Eigen::VectorXd get_acceptance_rates() const {
-    return acceptance_rates / (1.0 * n_iter);
+    return acceptance_rates / n_iter;
   }
 };
 

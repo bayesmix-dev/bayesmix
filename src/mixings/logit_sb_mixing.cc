@@ -19,6 +19,7 @@ void LogitSBMixing::initialize() {
   num_clusters = priorcast->num_clusters();
   initialize_state();
   acceptance_rates = Eigen::VectorXd::Zero(num_clusters);
+  n_iter = 0;
 }
 
 void LogitSBMixing::initialize_state() {
@@ -83,7 +84,6 @@ void LogitSBMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     const std::vector<unsigned int> &allocations) {
   n_iter += 1;
-
   // Langevin-Adjusted Metropolis-Hastings step
   unsigned int n = allocations.size();
   auto &rng = bayesmix::Rng::Instance().get();
