@@ -141,7 +141,6 @@ void LogitSBMixing::write_state_to_proto(
 
 Eigen::VectorXd LogitSBMixing::get_weights(
     const Eigen::VectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
-  // TODO design choice: no check on covariate
   // Compute eta
   std::vector<double> eta(num_components);
   for (int h = 0; h < num_components; h++) {
