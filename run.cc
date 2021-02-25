@@ -8,6 +8,11 @@
 int main(int argc, char *argv[]) {
   std::cout << "Running run.cc" << std::endl;
 
+  // TODO
+  bayesmix::AlgorithmParams settings;
+  bayesmix::read_proto_from_file("algo_settings.asciipb", &settings);
+  std::cout << "\n" << settings.DebugString() << std::endl;
+
   // Get console parameters
   std::string algo_type = argv[1];
   int rng_seed = std::stoi(argv[2]);
