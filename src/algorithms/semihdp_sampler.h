@@ -1,5 +1,5 @@
-#ifndef SRC_ALGORITHMS_SEMI_HDP_SAMPLER_HPP
-#define SRC_ALGORITHMS_SEMI_HDP_SAMPLER_HPP
+#ifndef SRC_ALGORITHMS_SEMIHDP_SAMPLER_H
+#define SRC_ALGORITHMS_SEMIHDP_SAMPLER_H
 
 #include <omp.h>
 
@@ -218,4 +218,4 @@ class SemiHdpSampler {
   void check();
 };
 
-#endif
+#endif  // SRC_ALGORITHMS_SEMIHDP_SAMPLER_H

@@ -3,6 +3,7 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <stan/math/prim/prob.hpp>
+#include <vector>
 
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
@@ -53,10 +54,10 @@ double DirichletMixing::mass_new_cluster(
 
 void DirichletMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-    unsigned int n) {
+    const std::vector<unsigned int> &allocations) {
   auto &rng = bayesmix::Rng::Instance().get();
-
   auto priorcast = cast_prior();
+  unsigned int n = allocations.size();
 
   if (priorcast->has_fixed_value()) {
     return;

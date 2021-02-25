@@ -56,21 +56,5 @@ make test_bayesmix
 ./test/test_bayesmix
 ```
 
-## For Developers
-
-Please install the pre-commit hooks before commiting anything: it clears the output of jupyter notebooks. Just type
-
-```shell
-./bash/setup_pre_commit.sh
-```
-
-## Future steps (contributors are welcome!)
-
-A Python package is already under development
-
-- Extension to normalized random measures
-- Using HMC / MALA MCMC algorithm to sample from the cluster-specific full conditionals when it's not conjugate to the base measure
-- R package
-
-
-
+## Contributions are welcome!
+Please check out [CONTRIBUTORS.md](CONTRIBUTORS.md) for details on how to collaborate with us.

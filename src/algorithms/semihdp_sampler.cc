@@ -1,6 +1,7 @@
 #include "semihdp_sampler.h"
 
 #include <algorithm>
+#include <vector>
 
 #include "marginal_state.pb.h"
 #include "src/utils/distributions.h"

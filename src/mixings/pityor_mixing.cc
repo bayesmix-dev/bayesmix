@@ -2,6 +2,8 @@
 
 #include <google/protobuf/stubs/casts.h>
 
+#include <vector>
+
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
 
@@ -44,7 +46,7 @@ double PitYorMixing::mass_new_cluster(
 
 void PitYorMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-    unsigned int n) {
+    const std::vector<unsigned int> &allocations) {
   auto priorcast = cast_prior();
   if (priorcast->has_fixed_values()) {
     return;

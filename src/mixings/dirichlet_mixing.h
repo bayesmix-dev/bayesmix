@@ -5,8 +5,9 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <vector>
 
-#include "base_mixing.h"
+#include "marginal_mixing.h"
 #include "mixing_id.pb.h"
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
@@ -21,7 +22,7 @@
 //! creation of a new cluster, and weights of already existing clusters are
 //! proportional to their cardinalities.
 
-class DirichletMixing : public BaseMixing {
+class DirichletMixing : public MarginalMixing {
  public:
   struct State {
     double totalmass;
@@ -37,8 +38,8 @@ class DirichletMixing : public BaseMixing {
   std::shared_ptr<bayesmix::DPPrior> cast_prior() {
     return std::dynamic_pointer_cast<bayesmix::DPPrior>(prior);
   }
-
-  void initialize_state();
+  //!
+  void initialize_state() override;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -67,7 +68,7 @@ class DirichletMixing : public BaseMixing {
   //!
   void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-      unsigned int n) override;
+      const std::vector<unsigned int> &allocations) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }

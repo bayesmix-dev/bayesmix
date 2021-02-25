@@ -2,11 +2,10 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <vector>
 
 #include "marginal_state.pb.h"
 #include "mixing_state.pb.h"
-#include "src/hierarchies/base_hierarchy.h"
-#include "src/mixings/dependent_mixing.h"
 
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;
@@ -58,6 +57,7 @@ void BaseAlgorithm::initialize() {
     // Create empty covariates vector
     mix_covariates = Eigen::MatrixXd::Zero(data.rows(), 0);
   }
+  mixing->set_covariates(&mix_covariates);
   // Interpet default number of clusters
   if (init_num_clusters == 0) {
     init_num_clusters = data.rows();
@@ -94,8 +94,10 @@ void BaseAlgorithm::update_hierarchy_hypers() {
   bayesmix::MarginalState::ClusterState clust;
   std::vector<bayesmix::MarginalState::ClusterState> states;
   for (auto &un : unique_values) {
-    un->write_state_to_proto(&clust);
-    states.push_back(clust);
+    if (un->get_card() > 0) {
+      un->write_state_to_proto(&clust);
+      states.push_back(clust);
+    }
   }
   unique_values[0]->update_hypers(states);
 }

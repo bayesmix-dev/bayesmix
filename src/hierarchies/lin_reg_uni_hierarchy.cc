@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 #include <stan/math/prim/err.hpp>
+#include <vector>
 
 #include "src/utils/eigen_utils.h"
 #include "src/utils/proto_utils.h"

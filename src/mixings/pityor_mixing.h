@@ -5,8 +5,9 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <vector>
 
-#include "base_mixing.h"
+#include "marginal_mixing.h"
 #include "mixing_id.pb.h"
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
@@ -22,7 +23,7 @@
 //! factor, while the weight for a newly created cluster is the remaining
 //! one counting the total amount as the sample size increased by the strength.
 
-class PitYorMixing : public BaseMixing {
+class PitYorMixing : public MarginalMixing {
  public:
   struct State {
     double strength, discount;
@@ -38,7 +39,7 @@ class PitYorMixing : public BaseMixing {
     return std::dynamic_pointer_cast<bayesmix::PYPrior>(prior);
   }
   //!
-  void initialize_state();
+  void initialize_state() override;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -66,7 +67,7 @@ class PitYorMixing : public BaseMixing {
   //!
   void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-      unsigned int n) override;
+      const std::vector<unsigned int> &allocations) override;
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }
