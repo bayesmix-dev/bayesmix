@@ -17,16 +17,15 @@ TEST(logit_sb, misc) {
   unsigned int dim = 2;
   unsigned int n_clust = 3;
   unsigned int n_data = 90;
-  unsigned int n_iter = 200;
+  unsigned int n_iter = 20;
 
   // DATA GENERATION
   // True coefficients
-  Eigen::MatrixXd true_alphas(dim, n_clust);
-  for (int i = 0; i < n_clust; i++) {
-    for (int j = 0; j < dim; j++) {
-      true_alphas(j, i) = std::pow(2.0, i + 1);
-    }
-  }
+  Eigen::MatrixXd cov_centers(dim, n_clust);
+  cov_centers.col(0) << -5.0, 0.0;
+  cov_centers.col(1) << 5.0, 0.0;
+  cov_centers.col(2) << 0.0, 5.0;
+
   // Allocations
   std::vector<unsigned int> allocations(n_data);
   for (int i = 0; i < n_data / 3; i++) {
@@ -37,15 +36,22 @@ TEST(logit_sb, misc) {
   Eigen::MatrixXd covariates(n_data, dim);
   for (int i = 0; i < n_data; i++) {
     covariates.row(i) =
-        stan::math::multi_normal_rng(true_alphas.col(allocations[i]),
+        stan::math::multi_normal_rng(cov_centers.col(allocations[i]),
                                      Eigen::MatrixXd::Identity(dim, dim), rng);
   }
 
+  std::cout << "allocation: ";
+  for (auto &c : allocations) {
+    std::cout << c << ", ";
+  }
+  std::cout << std::endl;
+  std::cout << "covariates: \n" << covariates << std::endl;
+
   // INITIALIZATION
   // Prior parameters
-  double step = 0.5;
+  double step = 0.025;
   auto prior_mean = Eigen::VectorXd::Zero(dim);
-  auto cov = 2.0 * Eigen::MatrixXd::Identity(dim, dim);
+  auto cov = 5.0 * Eigen::MatrixXd::Identity(dim, dim);
   // Set parameters to mixing object
   LogitSBMixing mix;
   bayesmix::LogSBPrior prior;
@@ -73,6 +79,23 @@ TEST(logit_sb, misc) {
   std::vector<std::shared_ptr<AbstractHierarchy>> hierarchies(n_clust);
   for (int i = 0; i < n_iter; i++) {
     mix.update_state(hierarchies, allocations);
-    std::cout << i << "\n" << mix.get_state().regression_coeffs << std::endl;
+    // std::cout << i << "\n" << mix.get_state().regression_coeffs <<
+    // std::endl;
   }
+
+  Eigen::VectorXd test1(2);
+  test1 << -5, 0;
+
+  Eigen::VectorXd test2(2);
+  test2 << 5, 0;
+
+  Eigen::VectorXd test3(2);
+  test3 << 0, 5;
+
+  std::cout << "test1: " << mix.get_weights(test1).transpose() << std::endl;
+  std::cout << "test2: " << mix.get_weights(test2).transpose() << std::endl;
+  std::cout << "test3: " << mix.get_weights(test3).transpose() << std::endl;
+
+  std::cout << "acceptance rates: " << mix.get_acceptance_rates().transpose()
+            << std::endl;
 }

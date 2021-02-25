@@ -24,6 +24,8 @@ class LogitSBMixing : public ConditionalMixing {
   unsigned int num_clusters;
   unsigned int dim;
   State state;
+  Eigen::VectorXd acceptance_rates;
+  int n_iter = 0;
 
   //!
   void create_empty_prior() override { prior.reset(new bayesmix::LogSBPrior); }
@@ -71,6 +73,9 @@ class LogitSBMixing : public ConditionalMixing {
   void write_state_to_proto(google::protobuf::Message *out) const override;
   bayesmix::MixingId get_id() const override {
     return bayesmix::MixingId::LogSB;
+  }
+  Eigen::VectorXd get_acceptance_rates() const {
+    return acceptance_rates / (1.0 * n_iter);
   }
 };
 
