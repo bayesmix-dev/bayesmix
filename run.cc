@@ -34,6 +34,10 @@ int main(int argc, char *argv[]) {
     mix_grid_cov_file = argv[16];
   }
 
+  // Read algorithm settings proto
+  bayesmix::AlgorithmParams algo_proto;
+  bayesmix::read_proto_from_file(algo_params_file, &algo_proto);
+
   // Create factories and objects
   auto &factory_algo = AlgorithmFactory::Instance();
   auto &factory_hier = HierarchyFactory::Instance();
@@ -68,14 +72,12 @@ int main(int argc, char *argv[]) {
   }
 
   // Set algorithm parameters
-  bayesmix::AlgorithmParams algo_proto;
-  bayesmix::read_proto_from_file(algo_params_file, &algo_proto);
   algo->read_params_from_proto(algo_proto);
 
   // Allocate objects in algorithm
   algo->set_mixing(mixing);
   algo->set_data(data);
-  algo->set_initial_clusters(hier, algo_params_file.init_num_clusters());
+  algo->set_hierarchy(hier);
 
   // Read and set covariates
   if (hier->is_dependent()) {

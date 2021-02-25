@@ -1,3 +1,4 @@
+##### GENERIC PARAMETERS FOR ALL ALGORITHMS #####
 # Algorithm ID string, e.g. "Neal2"
 algo_id: "Neal2"
 
@@ -15,7 +16,8 @@ burnin: 100
 # (NOTE: This argument will be ignored by the BlockedGibbs algorithm.)
 init_num_clusters: 3
 
-## PARAMETER-SPECIFIC SETTINGS
+
+##### PARAMETER-SPECIFIC SETTINGS #####
 # Neal8 number of auxiliary blocks
 # (NOTE: 3 is the recommended value in most cases, please change it only if you
 #  know what you're doing.)
