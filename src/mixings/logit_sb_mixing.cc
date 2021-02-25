@@ -3,6 +3,7 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
+#include <numeric>
 #include <stan/math/prim.hpp>
 #include <vector>
 
@@ -38,8 +39,8 @@ void LogitSBMixing::initialize_state() {
       throw std::invalid_argument("Step size parameter must be > 0");
     }
 
-    state.regression_coeffs = Eigen::MatrixXd(dim, num_components);
-    for (int i = 0; i < num_components; i++) {
+    state.regression_coeffs = Eigen::MatrixXd(dim, num_components - 1);
+    for (int i = 0; i < num_components - 1; i++) {
       state.regression_coeffs.col(i) = prior_vec;
     }
 
@@ -142,19 +143,22 @@ void LogitSBMixing::write_state_to_proto(
 Eigen::VectorXd LogitSBMixing::get_weights(
     const Eigen::VectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
   // Compute eta
-  std::vector<double> eta(num_components);
-  for (int h = 0; h < num_components; h++) {
+  std::vector<double> eta(num_components - 1);
+  for (int h = 0; h < num_components - 1; h++) {
     eta[h] = covariate.dot(state.regression_coeffs.col(h));
   }
   // Compute cumulative products
-  std::vector<double> cumprod(num_components + 1, 1.0);
-  for (int h = 1; h < num_components + 1; h++) {
+  std::vector<double> cumprod(num_components, 1.0);
+  for (int h = 1; h < num_components; h++) {
     cumprod[h] = cumprod[h - 1] * sigmoid(-eta[h - 1]);
   }
   // Compute weights
   Eigen::VectorXd weights(num_components);
-  for (int h = 0; h < num_components; h++) {
+  for (int h = 0; h < num_components - 1; h++) {
     weights(h) = sigmoid(eta[h]) * cumprod[h];
   }
+  weights(num_components - 1) =
+      1.0 - std::accumulate(weights.data(),
+                            weights.data() + num_components - 1, 0.0);
   return weights;
 }
