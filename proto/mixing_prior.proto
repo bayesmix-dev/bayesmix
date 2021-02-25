@@ -34,6 +34,6 @@ message LogSBPrior {
   oneof coeff {
     MultiNormalDistribution normal_prior = 1;
   }
-  double step_size = 2;
+  double step_size = 2;  // TODO move?
   uint32 num_components = 3;
 }

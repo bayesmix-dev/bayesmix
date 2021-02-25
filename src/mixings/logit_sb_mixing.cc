@@ -49,7 +49,7 @@ void LogitSBMixing::initialize_state() {
   }
 }
 
-Eigen::VectorXd LogitSBMixing::grad_log_full_cond(
+Eigen::VectorXd LogitSBMixing::grad_full_cond_lpdf(
     const Eigen::VectorXd &alpha, const unsigned int clust,
     const std::vector<unsigned int> &allocations) {
   auto priorcast = cast_prior();
@@ -66,10 +66,14 @@ Eigen::VectorXd LogitSBMixing::grad_log_full_cond(
   return grad;
 }
 
-double LogitSBMixing::log_like(const Eigen::VectorXd &alpha,
-                               const unsigned int clust,
-                               const std::vector<unsigned int> &allocations) {
-  double like = 0.0;
+double LogitSBMixing::full_cond_lpdf(
+    const Eigen::VectorXd &alpha, const unsigned int clust,
+    const std::vector<unsigned int> &allocations) {
+  auto priorcast = cast_prior();
+  Eigen::VectorXd prior_mean =
+      bayesmix::to_eigen(priorcast->normal_prior().mean());
+  double like = -0.5 * ((alpha - prior_mean).transpose() * state.precision *
+                        (alpha - prior_mean))(0);
   for (int i = 0; i < allocations.size(); i++) {
     if (allocations[i] >= clust) {
       bool is_curr_clus = (allocations[i] == clust);
@@ -98,22 +102,17 @@ void LogitSBMixing::update_state(
     Eigen::VectorXd state_c = state.regression_coeffs.col(h);
     // Draw proposed state from its distribution
     Eigen::VectorXd prop_mean =
-        state_c + step * grad_log_full_cond(state_c, h, allocations);
+        state_c + step * grad_full_cond_lpdf(state_c, h, allocations);
     auto prop_covar = prop_var * Eigen::MatrixXd::Identity(dim, dim);
     Eigen::VectorXd state_prop =
         stan::math::multi_normal_rng(prop_mean, prop_covar, rng);
     // Compute acceptance ratio
-    double prior_ratio =
-        -0.5 * ((state_prop - prior_mean).transpose() * state.precision *
-                    (state_prop - prior_mean) -
-                (state_c - prior_mean).transpose() * state.precision *
-                    (state_c - prior_mean))(0);
-    double like_ratio = log_like(state_prop, h, allocations) -
-                        log_like(state_c, h, allocations);
+    double full_cond_ratio = full_cond_lpdf(state_prop, h, allocations) -
+                             full_cond_lpdf(state_c, h, allocations);
     double prop_ratio = (-0.5 / prop_var) *
                         ((state_prop - prop_mean).dot(state_prop - prop_mean) -
                          (state_c - prop_mean).dot(state_c - prop_mean));
-    double log_accept_ratio = prior_ratio + like_ratio - prop_ratio;
+    double log_accept_ratio = full_cond_ratio - prop_ratio;
     // Accept with probability ratio
     double p = stan::math::uniform_rng(0.0, 1.0, rng);
     if (p < std::exp(log_accept_ratio)) {
