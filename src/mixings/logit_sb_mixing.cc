@@ -49,23 +49,6 @@ void LogitSBMixing::initialize_state() {
   }
 }
 
-Eigen::VectorXd LogitSBMixing::grad_full_cond_lpdf(
-    const Eigen::VectorXd &alpha, const unsigned int clust,
-    const std::vector<unsigned int> &allocations) {
-  auto priorcast = cast_prior();
-  Eigen::VectorXd prior_mean =
-      bayesmix::to_eigen(priorcast->normal_prior().mean());
-  Eigen::VectorXd grad = state.precision * (prior_mean - alpha);
-  for (int i = 0; i < allocations.size(); i++) {
-    if (allocations[i] >= clust) {
-      bool is_curr_clus = (allocations[i] == clust);
-      double prob = sigmoid(covariates_ptr->row(i).dot(alpha));
-      grad += (is_curr_clus - prob) * covariates_ptr->row(i);
-    }
-  }
-  return grad;
-}
-
 double LogitSBMixing::full_cond_lpdf(
     const Eigen::VectorXd &alpha, const unsigned int clust,
     const std::vector<unsigned int> &allocations) {
@@ -83,6 +66,23 @@ double LogitSBMixing::full_cond_lpdf(
     }
   }
   return like;
+}
+
+Eigen::VectorXd LogitSBMixing::grad_full_cond_lpdf(
+    const Eigen::VectorXd &alpha, const unsigned int clust,
+    const std::vector<unsigned int> &allocations) {
+  auto priorcast = cast_prior();
+  Eigen::VectorXd prior_mean =
+      bayesmix::to_eigen(priorcast->normal_prior().mean());
+  Eigen::VectorXd grad = state.precision * (prior_mean - alpha);
+  for (int i = 0; i < allocations.size(); i++) {
+    if (allocations[i] >= clust) {
+      bool is_curr_clus = (allocations[i] == clust);
+      double prob = sigmoid(covariates_ptr->row(i).dot(alpha));
+      grad += (is_curr_clus - prob) * covariates_ptr->row(i);
+    }
+  }
+  return grad;
 }
 
 void LogitSBMixing::update_state(
