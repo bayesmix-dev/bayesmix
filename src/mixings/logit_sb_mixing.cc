@@ -59,7 +59,7 @@ double LogitSBMixing::full_cond_lpdf(
                         (alpha - prior_mean))(0);
   for (int i = 0; i < allocations.size(); i++) {
     if (allocations[i] >= clust) {
-      bool is_curr_clus = (allocations[i] == clust);
+      double is_curr_clus = (allocations[i] == clust);
       double prob = sigmoid(covariates_ptr->row(i).dot(alpha));
       like += is_curr_clus * std::log(prob) +
               (1.0 - is_curr_clus) * std::log(1.0 - prob);
@@ -77,7 +77,7 @@ Eigen::VectorXd LogitSBMixing::grad_full_cond_lpdf(
   Eigen::VectorXd grad = state.precision * (prior_mean - alpha);
   for (int i = 0; i < allocations.size(); i++) {
     if (allocations[i] >= clust) {
-      bool is_curr_clus = (allocations[i] == clust);
+      double is_curr_clus = (allocations[i] == clust);
       double prob = sigmoid(covariates_ptr->row(i).dot(alpha));
       grad += (is_curr_clus - prob) * covariates_ptr->row(i);
     }
