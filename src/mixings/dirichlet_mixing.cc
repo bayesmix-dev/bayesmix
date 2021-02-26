@@ -3,10 +3,12 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <stan/math/prim/prob.hpp>
+#include <memory>
 #include <vector>
 
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
+#include "src/hierarchies/abstract_hierarchy.h"
 #include "src/utils/rng.h"
 
 void DirichletMixing::initialize() {

@@ -3,12 +3,14 @@
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
+#include <memory>
 #include <numeric>
 #include <stan/math/prim.hpp>
 #include <vector>
 
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
+#include "src/hierarchies/abstract_hierarchy.h"
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
