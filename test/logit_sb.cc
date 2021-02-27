@@ -82,7 +82,10 @@ TEST(logit_sb, misc) {
   test2 << 5, 0;
   Eigen::VectorXd test3(2);
   test3 << 0, 5;
-  std::cout << "test1: " << mix.get_weights(test1).transpose() << std::endl;
-  std::cout << "test2: " << mix.get_weights(test2).transpose() << std::endl;
-  std::cout << "test3: " << mix.get_weights(test3).transpose() << std::endl;
+  std::cout << "test1: " << mix.get_weights(false, false, test1).transpose()
+            << std::endl;
+  std::cout << "test2: " << mix.get_weights(false, false, test2).transpose()
+            << std::endl;
+  std::cout << "test3: " << mix.get_weights(false, false, test3).transpose()
+            << std::endl;
 }

@@ -13,6 +13,7 @@ class ConditionalMixing : public BaseMixing {
   bool is_conditional() const override { return true; }
   //!
   virtual Eigen::VectorXd get_weights(
+      const bool log, const bool propto,
       const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) const = 0;
 };
 
