@@ -1,17 +1,19 @@
 #include "ClusterEstimator.hpp"
 using namespace std;
 
-ClusterEstimator::ClusterEstimator(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTION loss_type,
-                  int Kup, Eigen::VectorXi &initial_partition_)
-    : loss_function(0)
-{
+ClusterEstimator::ClusterEstimator(Eigen::MatrixXi &mcmc_sample_,
+                                   LOSS_FUNCTION loss_type, int Kup,
+                                   Eigen::VectorXi &initial_partition_)
+    : loss_function(0) {
   mcmc_sample = mcmc_sample_;
   T = mcmc_sample.rows();
   N = mcmc_sample.cols();
   K_up = Kup;
-  initial_partition= initial_partition_;
-  switch(loss_type) {
-    case BINDER_LOSS: loss_function = new BinderLoss(1,1); break;
+  initial_partition = initial_partition_;
+  switch (loss_type) {
+    case BINDER_LOSS:
+      loss_function = new BinderLoss(1, 1);
+      break;
     case VARIATION_INFORMATION: {
       loss_function = new VariationInformation(false);
       break;
@@ -25,12 +27,9 @@ ClusterEstimator::ClusterEstimator(Eigen::MatrixXi &mcmc_sample_, LOSS_FUNCTION 
   }
 }
 
-ClusterEstimator::~ClusterEstimator() {
-  delete loss_function;
-}
+ClusterEstimator::~ClusterEstimator() { delete loss_function; }
 
-double ClusterEstimator::expected_posterior_loss(Eigen::VectorXi a)
-{
+double ClusterEstimator::expected_posterior_loss(Eigen::VectorXi a) {
   double epl = 0;
   loss_function->SetFirstCluster(a);
 
@@ -42,8 +41,8 @@ double ClusterEstimator::expected_posterior_loss(Eigen::VectorXi a)
   return epl / T;
 }
 
-
-Eigen::VectorXi ClusterEstimator::cluster_estimate(MINIMIZATION_METHOD method) {
+Eigen::VectorXi ClusterEstimator::cluster_estimate(
+    MINIMIZATION_METHOD method) {
   switch (method) {
     case GREEDY:
       return greedy_algorithm(initial_partition);
@@ -52,7 +51,6 @@ Eigen::VectorXi ClusterEstimator::cluster_estimate(MINIMIZATION_METHOD method) {
       throw std::domain_error("Non valid method chosen");
   }
 }
-
 
 /**
  * replace (vec[i], vec[i+1], ..., vec[N-1]) with (vec[i+1], ..., vec[N-1], ?)
@@ -111,7 +109,7 @@ int argmin(Eigen::VectorXd &vec) {
 void rename_labels(Eigen::VectorXi &cluster) {
   map<int, int> m;
   int current_index(1);
-  for (int i = 0; i < cluster.size(); i ++) {
+  for (int i = 0; i < cluster.size(); i++) {
     if (m[cluster(i)] == 0) {
       m[cluster(i)] = current_index;
       cluster(i) = current_index;
@@ -122,21 +120,20 @@ void rename_labels(Eigen::VectorXi &cluster) {
   }
 }
 
-
 /**
  * a starting partition
  */
 Eigen::VectorXi ClusterEstimator::greedy_algorithm(Eigen::VectorXi &a) {
   double phi_a(expected_posterior_loss(a)), phi_stop;
   Eigen::VectorXi nu, a_modified;
-  Eigen::VectorXd epl_vec(K_up  );
+  Eigen::VectorXd epl_vec(K_up);
   bool stop = false;
   int cmpt = 0;
 
-  while(!stop) {
+  while (!stop) {
     phi_stop = phi_a;
-    nu = Eigen::VectorXi::LinSpaced(N, 1 ,N);
-    while(nu.size() != 0) {
+    nu = Eigen::VectorXi::LinSpaced(N, 1, N);
+    while (nu.size() != 0) {
       int i = rand() % nu.size();  // random int between 0 and size-1
       int nu_i = nu(i);
       delete_ith_element(nu, i);
@@ -157,7 +154,7 @@ Eigen::VectorXi ClusterEstimator::greedy_algorithm(Eigen::VectorXi &a) {
 
   rename_labels(a);
   cout << endl << "FINAL CLUSTER : " << a.transpose() << endl;
-  cout << mcmc_sample.rows() << ":" << mcmc_sample.cols() << " --> " << cmpt << " while loops." << endl;
+  cout << mcmc_sample.rows() << ":" << mcmc_sample.cols() << " --> " << cmpt
+       << " while loops." << endl;
   return a;
 }
-

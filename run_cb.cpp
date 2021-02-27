@@ -1,10 +1,10 @@
+#include <Eigen/Dense>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include <Eigen/Dense>
 #include "src/includes.hpp"
 
 using namespace std;
@@ -114,4 +114,3 @@ int main(int argc, char const *argv[]) {
 
   return 0;
 }
-

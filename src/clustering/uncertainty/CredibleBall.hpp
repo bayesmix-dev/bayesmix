@@ -1,15 +1,15 @@
 #ifndef CREDIBLE_BALL_HPP
 #define CREDIBLE_BALL_HPP
 
+#include <Eigen/Dense>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <set>
-#include <fstream>
-#include <Eigen/Dense>
-#include "../lossfunction/LossFunction.hpp"
-#include "../lossfunction/BinderLoss.hpp"
-#include "../lossfunction/VariationInformation.hpp"
 
+#include "../lossfunction/BinderLoss.hpp"
+#include "../lossfunction/LossFunction.hpp"
+#include "../lossfunction/VariationInformation.hpp"
 
 class CredibleBall {
  private:
