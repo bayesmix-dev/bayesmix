@@ -36,11 +36,16 @@ class ConjugateHierarchy
 
   //! Generates new values for state from the centering posterior distribution
   void sample_full_cond(bool update_params = true) override {
-    Hyperparams params =
-        update_params
-            ? static_cast<Derived *>(this)->get_posterior_parameters()
-            : posterior_hypers;
-    state = static_cast<Derived *>(this)->draw(params);
+    if (card == 0) {
+      // No posterior update possible
+      sample_prior();
+    } else {
+      Hyperparams params =
+          update_params
+              ? static_cast<Derived *>(this)->get_posterior_parameters()
+              : posterior_hypers;
+      state = static_cast<Derived *>(this)->draw(params);
+    }
   }
 
   //! Evaluates the log-marginal of data in a grid of points
