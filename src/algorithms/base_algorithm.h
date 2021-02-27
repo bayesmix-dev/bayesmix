@@ -131,7 +131,7 @@ class BaseAlgorithm {
   virtual Eigen::MatrixXd eval_lpdf(
       BaseCollector *const collector, const Eigen::MatrixXd &grid,
       const Eigen::MatrixXd &hier_covariates = Eigen::MatrixXd(0, 0),
-      const Eigen::MatrixXd &mix_covariates = Eigen::MatrixXd(0, 0)) = 0;
+      const Eigen::MatrixXd &mix_covariates = Eigen::MatrixXd(0, 0));
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseAlgorithm() = default;

@@ -6,8 +6,11 @@
 
 #include "algorithm_params.pb.h"
 #include "algorithm_state.pb.h"
+#include "lib/progressbar/progressbar.h"
 #include "mixing_state.pb.h"
 #include "src/algorithms/neal8_algorithm.h"
+#include "src/collectors/base_collector.h"
+#include "src/utils/eigen_utils.h"
 #include "src/utils/rng.h"
 
 void BaseAlgorithm::initialize() {
@@ -135,4 +138,28 @@ void BaseAlgorithm::read_params_from_proto(
   init_num_clusters = params.init_num_clusters();
   auto &rng = bayesmix::Rng::Instance().get();
   rng.seed(params.rng_seed());
+}
+
+//! \param grid      Grid of points in matrix form to evaluate the density on
+//! \param collector Collector containing the algorithm chain
+//! \return          Matrix whose i-th column is the lpdf at i-th iteration
+Eigen::MatrixXd BaseAlgorithm::eval_lpdf(
+    BaseCollector *const collector, const Eigen::MatrixXd &grid,
+    const Eigen::MatrixXd &hier_covariates /*= Eigen::MatrixXd(0, 0)*/,
+    const Eigen::MatrixXd &mix_covariates /*= Eigen::MatrixXd(0, 0)*/) {
+  std::deque<Eigen::VectorXd> lpdf;
+  bool keep = true;
+  progresscpp::ProgressBar bar(collector->get_size(), 60);
+  while (keep) {
+    keep = update_state_from_collector(collector);
+    if (!keep) {
+      break;
+    }
+    lpdf.push_back(lpdf_from_state(grid, hier_covariates, mix_covariates));
+    ++bar;
+    bar.display();
+  }
+  collector->reset();
+  bar.done();
+  return bayesmix::stack_vectors(lpdf);
 }

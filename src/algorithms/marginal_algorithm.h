@@ -9,7 +9,7 @@
 #include "algorithm_state.pb.h"
 #include "base_algorithm.h"
 #include "src/collectors/base_collector.h"
-#include "src/hierarchies/base_hierarchy.h"
+#include "src/hierarchies/abstract_hierarchy.h"
 #include "src/mixings/marginal_mixing.h"
 
 class MarginalAlgorithm : public BaseAlgorithm {
@@ -18,8 +18,6 @@ class MarginalAlgorithm : public BaseAlgorithm {
   std::shared_ptr<MarginalMixing> marg_mixing;
   //!
   bayesmix::AlgorithmState curr_state;
-  //!
-  void initialize() override;
   //! Computes marginal contribution of a given iteration & cluster
   virtual Eigen::VectorXd lpdf_marginal_component(
       std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
@@ -30,6 +28,8 @@ class MarginalAlgorithm : public BaseAlgorithm {
                                   const Eigen::MatrixXd &mix_covariates);
   //!
   bool update_state_from_collector(BaseCollector *coll);
+  //!
+  void initialize() override;
 
  public:
   ~MarginalAlgorithm() = default;
