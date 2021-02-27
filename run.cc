@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
   Eigen::MatrixXd clusterings(coll->get_size(), data.rows());
   Eigen::VectorXd num_clust(coll->get_size());
   for (int i = 0; i < coll->get_size(); i++) {
-    bayesmix::MarginalState state;
+    bayesmix::AlgorithmState state;
     coll->get_next_state(&state);
     for (int j = 0; j < data.rows(); j++) {
       clusterings(i, j) = state.cluster_allocs(j);

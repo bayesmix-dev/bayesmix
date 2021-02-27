@@ -6,8 +6,8 @@
 #include <Eigen/Dense>
 #include <memory>
 
+#include "algorithm_state.pb.h"
 #include "base_algorithm.h"
-#include "marginal_state.pb.h"
 #include "src/collectors/base_collector.h"
 #include "src/hierarchies/base_hierarchy.h"
 #include "src/mixings/marginal_mixing.h"
@@ -17,7 +17,7 @@ class MarginalAlgorithm : public BaseAlgorithm {
   //! Points at the same object as BaseAlgorithm::mixing
   std::shared_ptr<MarginalMixing> marg_mixing;
   //!
-  bayesmix::MarginalState curr_state;
+  bayesmix::AlgorithmState curr_state;
   //!
   void initialize() override;
   //! Computes marginal contribution of a given iteration & cluster

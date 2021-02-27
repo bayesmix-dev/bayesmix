@@ -22,11 +22,12 @@ void BlockedGibbsAlgorithm::sample_allocations() {
   unsigned int num_components = 0;  // TODO; maybe we should set init_num_cl...
   for (int i = 0; i < data.rows(); i++) {
     // Compute weights
-    Eigen::VectorXd logprobas = cond_mixing->get_weights(
-      true, false, mix_covariates.row(i));;
+    Eigen::VectorXd logprobas =
+        cond_mixing->get_weights(true, false, mix_covariates.row(i));
+    ;
     for (int j = 0; j < num_components; j++) {
-      logprobas(j) = old_weights(j) + unique_values[j]->like_lpdf(
-                                          data.row(j), hier_covariates.row(j));
+      logprobas(j) +=
+          unique_values[j]->like_lpdf(data.row(j), hier_covariates.row(j));
     }
     // Draw a NEW value for datum allocation
     unsigned int c_new =
@@ -37,8 +38,8 @@ void BlockedGibbsAlgorithm::sample_allocations() {
       // Remove datum from old cluster, add to new
       unique_values[c_old]->remove_datum(
           i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
-      unique_values[c_new]->add_datum(i, data.row(i), update_hierarchy_params(),
-                                      hier_covariates.row(i));
+      unique_values[c_new]->add_datum(
+          i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     }
   }
 }

@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "algorithm_params.pb.h"
-#include "marginal_state.pb.h"
+#include "algorithm_state.pb.h"
 #include "mixing_state.pb.h"
 #include "src/algorithms/neal8_algorithm.h"
 #include "src/utils/rng.h"
@@ -94,8 +94,8 @@ void BaseAlgorithm::initialize() {
 }
 
 void BaseAlgorithm::update_hierarchy_hypers() {
-  bayesmix::MarginalState::ClusterState clust;
-  std::vector<bayesmix::MarginalState::ClusterState> states;
+  bayesmix::AlgorithmState::ClusterState clust;
+  std::vector<bayesmix::AlgorithmState::ClusterState> states;
   for (auto &un : unique_values) {
     if (un->get_card() > 0) {
       un->write_state_to_proto(&clust);
@@ -107,15 +107,15 @@ void BaseAlgorithm::update_hierarchy_hypers() {
 
 //! \param iter Number of the current iteration
 //! \return     Protobuf-object version of the current state
-bayesmix::MarginalState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
-  bayesmix::MarginalState iter_out;
+bayesmix::AlgorithmState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
+  bayesmix::AlgorithmState iter_out;
   // Transcribe iteration number, allocations, and cardinalities
   iter_out.set_iteration_num(iter);
   *iter_out.mutable_cluster_allocs() = {allocations.begin(),
                                         allocations.end()};
   // Transcribe unique values vector
   for (size_t i = 0; i < unique_values.size(); i++) {
-    bayesmix::MarginalState::ClusterState clusval;
+    bayesmix::AlgorithmState::ClusterState clusval;
     unique_values[i]->write_state_to_proto(&clusval);
     iter_out.add_cluster_states()->CopyFrom(clusval);
   }

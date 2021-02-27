@@ -10,8 +10,8 @@
 #include <stan/math/prim.hpp>
 
 #include "abstract_hierarchy.h"
+#include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
-#include "marginal_state.pb.h"
 #include "src/utils/rng.h"
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>

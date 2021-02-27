@@ -3,8 +3,8 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/fun.hpp>
 
+#include "algorithm_state.pb.h"
 #include "lib/progressbar/progressbar.h"
-#include "marginal_state.pb.h"
 #include "src/algorithms/base_algorithm.h"
 #include "src/collectors/base_collector.h"
 #include "src/mixings/marginal_mixing.h"

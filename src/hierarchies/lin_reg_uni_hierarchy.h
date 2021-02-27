@@ -7,10 +7,10 @@
 #include <memory>
 #include <vector>
 
+#include "algorithm_state.pb.h"
 #include "conjugate_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
-#include "marginal_state.pb.h"
 
 namespace LinRegUni {
 struct State {
@@ -63,7 +63,7 @@ class LinRegUniHierarchy
 
   void clear_data();
   void update_hypers(
-      const std::vector<bayesmix::MarginalState::ClusterState> &states);
+      const std::vector<bayesmix::AlgorithmState::ClusterState> &states);
 
   void initialize_state();
   void initialize_hypers();

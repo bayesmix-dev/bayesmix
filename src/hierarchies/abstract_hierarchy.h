@@ -9,8 +9,8 @@
 #include <set>
 #include <stan/math/prim.hpp>
 
+#include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
-#include "marginal_state.pb.h"
 #include "src/utils/rng.h"
 
 //! Abstract base template class for a hierarchy object.
@@ -54,7 +54,7 @@ class AbstractHierarchy {
 
   //!
   virtual void update_hypers(
-      const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
+      const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
   //! Evaluates the log-likelihood of data in a single point

@@ -4,7 +4,7 @@
 #include <stan/math/prim/fun.hpp>  // lgamma, lmgamma
 #include <stan/math/prim/prob.hpp>
 
-#include "marginal_state.pb.h"
+#include "algorithm_state.pb.h"
 #include "src/hierarchies/lin_reg_uni_hierarchy.h"
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/hierarchies/nnw_hierarchy.h"

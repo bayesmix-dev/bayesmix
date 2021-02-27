@@ -5,8 +5,8 @@
 #include <stan/math/prim/fun.hpp>
 
 #include "algorithm_id.pb.h"
+#include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
-#include "marginal_state.pb.h"
 #include "mixing_id.pb.h"
 #include "neal2_algorithm.h"
 #include "src/algorithms/marginal_algorithm.h"
@@ -101,7 +101,7 @@ void Neal8Algorithm::sample_allocations() {
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
     if (singleton) {
       // Save unique value in the first auxiliary block
-      bayesmix::MarginalState::ClusterState curr_val;
+      bayesmix::AlgorithmState::ClusterState curr_val;
       unique_values[allocations[i]]->write_state_to_proto(&curr_val);
       aux_unique_values[0]->set_state_from_proto(curr_val);
     }

@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "marginal_state.pb.h"
+#include "algorithm_state.pb.h"
 
 //! Abstract base class for a collector that contains a chain in Protobuf form
 

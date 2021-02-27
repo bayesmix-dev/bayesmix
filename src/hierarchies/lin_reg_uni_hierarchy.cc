@@ -112,7 +112,7 @@ void LinRegUniHierarchy::initialize_hypers() {
 }
 
 void LinRegUniHierarchy::update_hypers(
-    const std::vector<bayesmix::MarginalState::ClusterState> &states) {
+    const std::vector<bayesmix::AlgorithmState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();
   if (prior->has_fixed_values()) {
     return;
@@ -126,7 +126,7 @@ void LinRegUniHierarchy::update_hypers(
 void LinRegUniHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast = google::protobuf::internal::down_cast<
-      const bayesmix::MarginalState::ClusterState &>(state_);
+      const bayesmix::AlgorithmState::ClusterState &>(state_);
   state.regression_coeffs =
       bayesmix::to_eigen(statecast.lin_reg_uni_ls_state().regression_coeffs());
   state.var = statecast.lin_reg_uni_ls_state().var();
@@ -141,7 +141,7 @@ void LinRegUniHierarchy::write_state_to_proto(
   state_.set_var(state.var);
 
   auto *out_cast = google::protobuf::internal::down_cast<
-      bayesmix::MarginalState::ClusterState *>(out);
+      bayesmix::AlgorithmState::ClusterState *>(out);
   out_cast->mutable_lin_reg_uni_ls_state()->CopyFrom(state_);
   out_cast->set_cardinality(card);
 }

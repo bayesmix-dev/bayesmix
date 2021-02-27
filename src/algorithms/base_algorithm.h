@@ -9,7 +9,7 @@
 
 #include "algorithm_id.pb.h"
 #include "algorithm_params.pb.h"
-#include "marginal_state.pb.h"
+#include "algorithm_state.pb.h"
 #include "src/collectors/base_collector.h"
 #include "src/hierarchies/base_hierarchy.h"
 #include "src/mixings/base_mixing.h"
@@ -75,7 +75,7 @@ class BaseAlgorithm {
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object
-  bayesmix::MarginalState get_state_as_proto(unsigned int iter);
+  bayesmix::AlgorithmState get_state_as_proto(unsigned int iter);
 
   // ALGORITHM FUNCTIONS
   virtual void print_startup_message() const = 0;
