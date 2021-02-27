@@ -18,9 +18,9 @@ TEST(can_build, allmodels) {
       for (auto &hier_id : factory_hier.list_of_known_builders()) {
         auto hier = factory_hier.create_object(hier_id);
         if (hier->is_conjugate() & algo->requires_conjugate_hierarchy())
-          algo->set_initial_clusters(hier);
+          algo->set_hierarchy(hier);
         else if (!algo->requires_conjugate_hierarchy())
-          algo->set_initial_clusters(hier);
+          algo->set_hierarchy(hier);
       }
     }
   }

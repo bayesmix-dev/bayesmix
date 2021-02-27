@@ -112,6 +112,8 @@ class BaseAlgorithm {
  public:
   //!
   virtual bool requires_conjugate_hierarchy() const { return false; }
+  //!
+  virtual bool is_conditional() const = 0;
 
   //! Runs the algorithm and saves the whole chain to a collector
   void run(BaseCollector *collector) {

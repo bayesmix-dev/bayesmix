@@ -50,6 +50,11 @@ void BaseAlgorithm::initialize() {
   if (mixing == nullptr) {
     throw std::invalid_argument("Mixing was not provided to algorithm");
   }
+  if (this->is_conditional() != mixing->is_conditional()) {
+    throw std::invalid_argument(
+        "Algorithm and mixing must be either both"
+        "marginal or both conditional");
+  }
   if (mix_covariates.rows() != 0) {
     if (mixing->is_dependent() == false) {
       throw std::invalid_argument(

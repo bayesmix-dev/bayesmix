@@ -31,6 +31,8 @@ class ConditionalAlgorithm : public BaseAlgorithm {
  public:
   ~ConditionalAlgorithm() = default;
   ConditionalAlgorithm() = default;
+  //!
+  bool is_conditional() const override { return true; }
 };
 
 #endif  // BAYESMIX_ALGORITHMS_CONDITIONAL_ALGORITHM_H_

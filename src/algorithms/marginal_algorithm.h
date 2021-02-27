@@ -27,6 +27,8 @@ class MarginalAlgorithm : public BaseAlgorithm {
  public:
   ~MarginalAlgorithm() = default;
   MarginalAlgorithm() = default;
+  //!
+  bool is_conditional() const override { return false; }
 };
 
 #endif  // BAYESMIX_ALGORITHMS_MARGINAL_ALGORITHM_H_
