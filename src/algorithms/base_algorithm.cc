@@ -4,17 +4,14 @@
 #include <memory>
 #include <vector>
 
+#include "algorithm_params.pb.h"
 #include "marginal_state.pb.h"
 #include "mixing_state.pb.h"
+#include "src/algorithms/neal8_algorithm.h"
+#include "src/utils/rng.h"
 
 void BaseAlgorithm::initialize() {
   std::cout << "Initializing... " << std::flush;
-  if (unique_values[0]->is_conjugate() == false and
-      requires_conjugate_hierarchy()) {
-    std::string msg = "Algorithm \"" + bayesmix::AlgorithmId_Name(get_id()) +
-                      "\"  only supports conjugate hierarchies";
-    throw std::invalid_argument(msg);
-  }
   // Perform checks
   if (data.rows() == 0) {
     throw std::invalid_argument("Data was not provided to algorithm");
@@ -22,6 +19,12 @@ void BaseAlgorithm::initialize() {
   // Hierarchy checks
   if (unique_values.size() == 0) {
     throw std::invalid_argument("Hierarchy was not provided to algorithm");
+  }
+  if (unique_values[0]->is_conjugate() == false and
+      requires_conjugate_hierarchy()) {
+    std::string msg = "Algorithm \"" + bayesmix::AlgorithmId_Name(get_id()) +
+                      "\"  only supports conjugate hierarchies";
+    throw std::invalid_argument(msg);
   }
   if (unique_values[0]->is_multivariate() == false && data.cols() > 1) {
     throw std::invalid_argument(
@@ -122,4 +125,14 @@ bayesmix::MarginalState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
   iter_out.mutable_mixing_state()->CopyFrom(mixstate);
 
   return iter_out;
+}
+
+void BaseAlgorithm::read_params_from_proto(
+    const bayesmix::AlgorithmParams &params) {
+  // Generic parameters
+  maxiter = params.iterations();
+  burnin = params.burnin();
+  init_num_clusters = params.init_num_clusters();
+  auto &rng = bayesmix::Rng::Instance().get();
+  rng.seed(params.rng_seed());
 }

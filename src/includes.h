@@ -1,6 +1,7 @@
 #ifndef BAYESMIX_INCLUDES_H_
 #define BAYESMIX_INCLUDES_H_
 
+#include "algorithm_params.pb.h"
 #include "algorithms/blocked_gibbs_algorithm.h"
 #include "algorithms/load_algorithms.h"
 #include "algorithms/neal2_algorithm.h"

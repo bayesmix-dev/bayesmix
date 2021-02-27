@@ -2,8 +2,10 @@
 #define BAYESMIX_MIXINGS_MARGINAL_MIXING_H_
 
 #include <Eigen/Dense>
+#include <memory>
 
 #include "base_mixing.h"
+#include "src/hierarchies/abstract_hierarchy.h"
 
 //! Abstract base class for a marginal mixture model
 

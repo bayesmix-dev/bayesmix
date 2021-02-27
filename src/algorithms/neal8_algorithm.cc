@@ -144,3 +144,9 @@ void Neal8Algorithm::sample_allocations() {
     }
   }
 }
+
+void Neal8Algorithm::read_params_from_proto(
+    const bayesmix::AlgorithmParams &params) {
+  BaseAlgorithm::read_params_from_proto(params);
+  n_aux = params.neal8_n_aux();
+}

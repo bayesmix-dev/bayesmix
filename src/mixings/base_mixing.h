@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "mixing_id.pb.h"
-#include "src/hierarchies/base_hierarchy.h"
+#include "src/hierarchies/abstract_hierarchy.h"
 
 //! Abstract base class for a generic mixture model
 

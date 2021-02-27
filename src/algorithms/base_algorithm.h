@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "algorithm_id.pb.h"
+#include "algorithm_params.pb.h"
 #include "marginal_state.pb.h"
 #include "src/collectors/base_collector.h"
 #include "src/hierarchies/base_hierarchy.h"
@@ -58,7 +59,7 @@ class BaseAlgorithm {
   //! Matrix of row-vectorial data points
   Eigen::MatrixXd data;
   //! Prescribed number of clusters for the algorithm initialization
-  unsigned int init_num_clusters;
+  unsigned int init_num_clusters = 0;
   //! Allocation for each datum, i.e. label of the cluster it belongs to
   std::vector<unsigned int> allocations;
   //! Hierarchy of the unique values that identify each cluster
@@ -143,6 +144,9 @@ class BaseAlgorithm {
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
+  void set_init_num_clusters(const unsigned int init_) {
+    init_num_clusters = init_;
+  }
   void set_mixing(const std::shared_ptr<BaseMixing> mixing_) {
     mixing = mixing_;
   }
@@ -151,13 +155,12 @@ class BaseAlgorithm {
     hier_covariates = cov;
   }
   void set_mix_covariates(const Eigen::MatrixXd &cov) { mix_covariates = cov; }
-  void set_initial_clusters(const std::shared_ptr<AbstractHierarchy> hier_,
-                            const unsigned int init = 0) {
+  void set_hierarchy(const std::shared_ptr<AbstractHierarchy> hier_) {
     unique_values.clear();
     unique_values.push_back(hier_);
-    init_num_clusters = init;
   }
   virtual bayesmix::AlgorithmId get_id() const = 0;
+  virtual void read_params_from_proto(const bayesmix::AlgorithmParams &params);
 };
 
 #endif  // BAYESMIX_ALGORITHMS_BASE_ALGORITHM_H_

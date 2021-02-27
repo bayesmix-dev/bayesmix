@@ -10,7 +10,7 @@
 #include "marginal_mixing.h"
 #include "mixing_id.pb.h"
 #include "mixing_prior.pb.h"
-#include "src/hierarchies/base_hierarchy.h"
+#include "src/hierarchies/abstract_hierarchy.h"
 
 //! Class that represents the Pitman-Yor process mixture model.
 
