@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <set>
-
+#include <fstream>
 #include <Eigen/Dense>
 #include "../lossfunction/LossFunction.hpp"
 #include "../lossfunction/BinderLoss.hpp"

@@ -156,7 +156,7 @@ Eigen::VectorXi ClusterEstimator::greedy_algorithm(Eigen::VectorXi &a) {
   }
 
   rename_labels(a);
-//  cout << endl << "FINAL CLUSTER : " << a.transpose() << endl;
+  cout << endl << "FINAL CLUSTER : " << a.transpose() << endl;
   cout << mcmc_sample.rows() << ":" << mcmc_sample.cols() << " --> " << cmpt << " while loops." << endl;
   return a;
 }
