@@ -2,8 +2,8 @@
 
 #include <google/protobuf/stubs/casts.h>
 
-#include <stan/math/prim/prob.hpp>
 #include <memory>
+#include <stan/math/prim/prob.hpp>
 #include <vector>
 
 #include "mixing_prior.pb.h"

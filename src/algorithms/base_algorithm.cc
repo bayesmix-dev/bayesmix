@@ -135,9 +135,4 @@ void BaseAlgorithm::read_params_from_proto(
   init_num_clusters = params.init_num_clusters();
   auto &rng = bayesmix::Rng::Instance().get();
   rng.seed(params.rng_seed());
-  // Algorithm-specific parameters
-  if (get_id() == bayesmix::AlgorithmId::Neal8) {
-    auto *algocast = dynamic_cast<Neal8Algorithm *>(this);
-    algocast->set_n_aux(params.neal8_n_aux());
-  }
 }

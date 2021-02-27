@@ -160,7 +160,7 @@ class BaseAlgorithm {
     unique_values.push_back(hier_);
   }
   virtual bayesmix::AlgorithmId get_id() const = 0;
-  void read_params_from_proto(const bayesmix::AlgorithmParams &params);
+  virtual void read_params_from_proto(const bayesmix::AlgorithmParams &params);
 };
 
 #endif  // BAYESMIX_ALGORITHMS_BASE_ALGORITHM_H_
