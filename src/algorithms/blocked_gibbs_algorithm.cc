@@ -21,10 +21,9 @@ void BlockedGibbsAlgorithm::sample_allocations() {
   auto &rng = bayesmix::Rng::Instance().get();
   unsigned int num_components = 0;  // TODO; maybe we should set init_num_cl...
   for (int i = 0; i < data.rows(); i++) {
-    Eigen::VectorXd old_weights =
-        cond_mixing->get_weights(true, false, mix_covariates.row(i));
     // Compute weights
-    Eigen::VectorXd logprobas(num_components);
+    Eigen::VectorXd logprobas = cond_mixing->get_weights(
+      true, false, mix_covariates.row(i));;
     for (int j = 0; j < num_components; j++) {
       logprobas(j) = old_weights(j) + unique_values[j]->like_lpdf(
                                           data.row(j), hier_covariates.row(j));
@@ -33,23 +32,23 @@ void BlockedGibbsAlgorithm::sample_allocations() {
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
     unsigned int c_old = allocations[i];
-    allocations[i] = c_new;
-    // Remove datum from old cluster, add to new
-    unique_values[c_old]->remove_datum(
-        i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
-    unique_values[c_new]->add_datum(i, data.row(i), update_hierarchy_params(),
-                                    hier_covariates.row(i));
+    if (c_new != c_old) {
+      allocations[i] = c_new;
+      // Remove datum from old cluster, add to new
+      unique_values[c_old]->remove_datum(
+          i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
+      unique_values[c_new]->add_datum(i, data.row(i), update_hierarchy_params(),
+                                      hier_covariates.row(i));
+    }
   }
 }
 
 void BlockedGibbsAlgorithm::sample_unique_values() {
   for (auto &un : unique_values) {
-    // TODO should we only do it for nonempty clusters? if so, also in Neal2+
     un->sample_full_cond(!update_hierarchy_params());
   }
 }
 
 void BlockedGibbsAlgorithm::sample_weights() {
   cond_mixing->update_state(unique_values, allocations);
-  // TODO anything else?
 }
