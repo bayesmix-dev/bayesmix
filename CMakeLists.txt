@@ -30,7 +30,7 @@ set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
 
 set(INCLUDE_PATHS
   ${BASEPATH}
-  # ${BASEPATH}/proto
+  ${BASEPATH}/proto
   ${CMAKE_CURRENT_LIST_DIR}/lib/math
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.72.0
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
@@ -87,5 +87,5 @@ target_compile_options(run_cb PUBLIC ${COMPILE_OPTIONS})
 
 if (NOT DISABLE_TESTS)
   # Build test executable
-  # add_subdirectory(test)
+  add_subdirectory(test)
 endif()
