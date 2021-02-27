@@ -22,13 +22,12 @@ Eigen::VectorXd ConditionalAlgorithm::lpdf_from_state(
   cond_mixing->set_state_from_proto(curr_state.mixing_state());
   Eigen::MatrixXd lpdf_local(grid.rows(), n_clust);
   auto temp_hier = unique_values[0]->clone();
-  Eigen::VectorXd weights;  // TODO
   for (size_t j = 0; j < n_clust; j++) {
+    Eigen::VectorXd logweights =
+        cond_mixing->get_weights(true, false, mix_covariates.row(j));  // TODO
     temp_hier->set_state_from_proto(curr_state.cluster_states(j));
     lpdf_local.col(j) =
-        std::log(weights(j)) +
-        temp_hier->like_lpdf_grid(grid, hier_covariates).array();
-    // TODO add mixing covariate
+        logweights(j) + temp_hier->like_lpdf_grid(grid, hier_covariates);
   }
 
   for (size_t j = 0; j < grid.rows(); j++) {
