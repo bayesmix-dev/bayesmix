@@ -19,7 +19,7 @@ class Neal3Algorithm : public Neal2Algorithm {
   // DESTRUCTOR AND CONSTRUCTORS
   ~Neal3Algorithm() = default;
   Neal3Algorithm() = default;
-
+  //!
   bayesmix::AlgorithmId get_id() const override {
     return bayesmix::AlgorithmId::Neal3;
   }

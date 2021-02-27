@@ -4,7 +4,7 @@
 #include <stan/math/prim/fun.hpp>
 
 #include "algorithm_state.pb.h"
-#include "src/algorithms/base_algorithm.h"
+#include "base_algorithm.h"
 #include "src/collectors/base_collector.h"
 #include "src/mixings/marginal_mixing.h"
 
@@ -38,9 +38,4 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
     lpdf(j) = stan::math::log_sum_exp(lpdf_local.row(j));
   }
   return lpdf;
-}
-
-bool MarginalAlgorithm::update_state_from_collector(BaseCollector *coll) {
-  bool success = coll->get_next_state(&curr_state);
-  return success;
 }

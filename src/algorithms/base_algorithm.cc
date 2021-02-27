@@ -140,6 +140,11 @@ void BaseAlgorithm::read_params_from_proto(
   rng.seed(params.rng_seed());
 }
 
+bool BaseAlgorithm::update_state_from_collector(BaseCollector *coll) {
+  bool success = coll->get_next_state(&curr_state);
+  return success;
+}
+
 //! \param grid      Grid of points in matrix form to evaluate the density on
 //! \param collector Collector containing the algorithm chain
 //! \return          Matrix whose i-th column is the lpdf at i-th iteration

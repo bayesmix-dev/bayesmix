@@ -5,8 +5,11 @@
 #include "conditional_algorithm.h"
 
 class BlockedGibbsAlgorithm : public ConditionalAlgorithm {
+ protected:
   //!
   bool update_hierarchy_params() override { return true; }  // TODO ?
+  //!
+  void initialize() override;
   //!
   void print_startup_message() const override;
   //!

@@ -13,11 +13,9 @@ class ConditionalAlgorithm : public BaseAlgorithm {
   //! Points at the same object as BaseAlgorithm::mixing
   std::shared_ptr<ConditionalMixing> cond_mixing;
   //!
-  bayesmix::AlgorithmState curr_state;
-  //!
-  Eigen::VectorXd lpdf_from_state(const Eigen::MatrixXd &grid,
-                                  const Eigen::MatrixXd &hier_covariates,
-                                  const Eigen::MatrixXd &mix_covariates);
+  Eigen::VectorXd lpdf_from_state(
+      const Eigen::MatrixXd &grid, const Eigen::MatrixXd &hier_covariates,
+      const Eigen::MatrixXd &mix_covariates) override;
   //!
   void initialize() override;
   //!

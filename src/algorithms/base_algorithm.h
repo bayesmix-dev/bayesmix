@@ -71,18 +71,27 @@ class BaseAlgorithm {
   //!
   Eigen::MatrixXd mix_covariates;
   //!
+  bayesmix::AlgorithmState curr_state;
+  //!
   virtual bool update_hierarchy_params() { return false; }
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object
   bayesmix::AlgorithmState get_state_as_proto(unsigned int iter);
+  bool update_state_from_collector(BaseCollector *coll);
 
   // ALGORITHM FUNCTIONS
-  virtual void print_startup_message() const = 0;
+  //!
   virtual void initialize();
+  //!
+  virtual void print_startup_message() const = 0;
+  //!
   virtual void sample_allocations() = 0;
+  //!
   virtual void sample_unique_values() = 0;
+  //!
   void update_hierarchy_hypers();
+  //!
   virtual void print_ending_message() const {
     std::cout << "Done" << std::endl;
   };
@@ -127,6 +136,9 @@ class BaseAlgorithm {
   }
 
   // ESTIMATE FUNCTION
+  virtual Eigen::VectorXd lpdf_from_state(
+      const Eigen::MatrixXd &grid, const Eigen::MatrixXd &hier_covariates,
+      const Eigen::MatrixXd &mix_covariates) = 0;
   //! Evaluates the logpdf for each single iteration on a given grid of points
   virtual Eigen::MatrixXd eval_lpdf(
       BaseCollector *const collector, const Eigen::MatrixXd &grid,

@@ -9,6 +9,10 @@
 #include "src/utils/distributions.h"
 #include "src/utils/rng.h"
 
+void BlockedGibbsAlgorithm::initialize() const {
+  return;  // TODO
+}
+
 void BlockedGibbsAlgorithm::print_startup_message() const {
   std::string msg = "Running BlockedGibbs algorithm with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +

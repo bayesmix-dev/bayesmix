@@ -71,6 +71,15 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_lpdf(
   return loglpdf;
 }
 
+void Neal8Algorithm::initialize() {
+  MarginalAlgorithm::initialize();
+  // Create correct amount of auxiliary blocks
+  aux_unique_values.clear();
+  for (size_t i = 0; i < n_aux; i++) {
+    aux_unique_values.push_back(unique_values[0]->clone());
+  }
+}
+
 void Neal8Algorithm::print_startup_message() const {
   std::string msg = "Running Neal8 algorithm (m=" + std::to_string(n_aux) +
                     " aux. blocks) with " +
@@ -79,15 +88,6 @@ void Neal8Algorithm::print_startup_message() const {
                     bayesmix::MixingId_Name(marg_mixing->get_id()) +
                     " mixing...";
   std::cout << msg << std::endl;
-}
-
-void Neal8Algorithm::initialize() {
-  MarginalAlgorithm::initialize();
-  // Create correct amount of auxiliary blocks
-  aux_unique_values.clear();
-  for (size_t i = 0; i < n_aux; i++) {
-    aux_unique_values.push_back(unique_values[0]->clone());
-  }
 }
 
 void Neal8Algorithm::sample_allocations() {

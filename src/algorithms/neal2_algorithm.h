@@ -41,17 +41,20 @@ class Neal2Algorithm : public MarginalAlgorithm {
   virtual Eigen::VectorXd get_cluster_lpdf(const unsigned int data_idx) const;
 
   // ALGORITHM FUNCTIONS
+  //!
   void print_startup_message() const override;
+  //!
   void sample_allocations() override;
+  //!
   void sample_unique_values() override;
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   ~Neal2Algorithm() = default;
   Neal2Algorithm() = default;
-
+  //!
   bool requires_conjugate_hierarchy() const override { return true; }
-
+  //!
   bayesmix::AlgorithmId get_id() const override {
     return bayesmix::AlgorithmId::Neal2;
   }

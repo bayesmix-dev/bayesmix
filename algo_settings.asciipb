@@ -12,8 +12,9 @@ iterations: 1000
 burnin: 100
 
 # Number of clusters in which data will be first initialized
-# (NOTE: If you want to initialize one datum per cluster, please write 0.)
-# (NOTE: This argument will be ignored by the BlockedGibbs algorithm.)
+# (NOTE: If you wish to initialize one datum per cluster, please write 0.)
+# (NOTE: In the BlockedGibbs algorithm, this argument will be overwritten by
+#  the num_components parameter from its mixing prior.)
 init_num_clusters: 3
 
 

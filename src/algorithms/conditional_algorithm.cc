@@ -1,7 +1,9 @@
 #include "conditional_algorithm.h"
 
 #include <Eigen/Dense>
+#include <stan/math/prim/fun.hpp>
 
+#include "algorithm_state.pb.h"
 #include "base_algorithm.h"
 #include "src/collectors/base_collector.h"
 #include "src/mixings/conditional_mixing.h"
@@ -9,12 +11,6 @@
 void ConditionalAlgorithm::initialize() {
   BaseAlgorithm::initialize();
   cond_mixing = std::dynamic_pointer_cast<ConditionalMixing>(mixing);
-}
-
-//! \param grid Grid of points in matrix form to evaluate the density on
-//! \param coll Collector containing the algorithm chain
-Eigen::MatrixXd ConditionalAlgorithm::eval_lpdf(...) {
-  // TODO use the MargAlgo one?
 }
 
 Eigen::VectorXd ConditionalAlgorithm::lpdf_from_state(
