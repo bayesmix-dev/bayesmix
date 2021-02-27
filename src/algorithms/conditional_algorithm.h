@@ -18,10 +18,13 @@ class ConditionalAlgorithm : public BaseAlgorithm {
   ConditionalAlgorithm() = default;
   //!
   void initialize() override;
+  virtual void sample_weights() = 0;
   //!
   void step() override {
-    BaseAlgorithm::step();
-    cond_mixing->update_state(unique_values, allocations);
+    sample_allocations();
+    sample_unique_values();
+    update_hierarchy_hypers();
+    sample_weights();
   }
   //!
   Eigen::MatrixXd eval_lpdf(

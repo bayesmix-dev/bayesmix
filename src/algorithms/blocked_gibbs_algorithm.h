@@ -13,6 +13,8 @@ class BlockedGibbsAlgorithm : public ConditionalAlgorithm {
   void sample_allocations() override;
   //!
   void sample_unique_values() override;
+  //!
+  void sample_weights() override;
 
  public:
   ~BlockedGibbsAlgorithm() = default;
