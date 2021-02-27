@@ -27,7 +27,8 @@ Eigen::VectorXd ConditionalAlgorithm::lpdf_from_state(
         cond_mixing->get_weights(true, false, mix_covariates.row(j));  // TODO
     temp_hier->set_state_from_proto(curr_state.cluster_states(j));
     lpdf_local.col(j) =
-        logweights(j) + temp_hier->like_lpdf_grid(grid, hier_covariates);
+        logweights(j) +
+        temp_hier->like_lpdf_grid(grid, hier_covariates).array();
   }
 
   for (size_t j = 0; j < grid.rows(); j++) {
