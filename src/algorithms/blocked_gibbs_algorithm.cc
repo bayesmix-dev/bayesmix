@@ -9,10 +9,6 @@
 #include "src/utils/distributions.h"
 #include "src/utils/rng.h"
 
-void BlockedGibbsAlgorithm::initialize() const {
-  return;  // TODO
-}
-
 void BlockedGibbsAlgorithm::print_startup_message() const {
   std::string msg = "Running BlockedGibbs algorithm with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
@@ -23,13 +19,11 @@ void BlockedGibbsAlgorithm::print_startup_message() const {
 
 void BlockedGibbsAlgorithm::sample_allocations() {
   auto &rng = bayesmix::Rng::Instance().get();
-  unsigned int num_components = 0;  // TODO; maybe we should set init_num_cl...
   for (int i = 0; i < data.rows(); i++) {
     // Compute weights
     Eigen::VectorXd logprobas =
         cond_mixing->get_weights(true, false, mix_covariates.row(i));
-    ;
-    for (int j = 0; j < num_components; j++) {
+    for (int j = 0; j < logprobas.size(); j++) {  // TODO?
       logprobas(j) +=
           unique_values[j]->like_lpdf(data.row(j), hier_covariates.row(j));
     }

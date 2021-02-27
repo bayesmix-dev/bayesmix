@@ -36,9 +36,9 @@ class ConjugateHierarchy
 
   //! Generates new values for state from the centering posterior distribution
   void sample_full_cond(bool update_params = true) override {
-    if (card == 0) {
+    if (this->card == 0) {
       // No posterior update possible
-      sample_prior();
+      static_cast<Derived *>(this)->sample_prior();
     } else {
       Hyperparams params =
           update_params

@@ -67,15 +67,14 @@ class AbstractHierarchy {
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const {
     throw std::runtime_error(
-        "You are callign 'prior_pred_lpdf' from a non conjugate hieararchy");
+        "Cannot call prior_pred_lpdf() from a non-conjugate hieararchy");
   }
 
   virtual double conditional_pred_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const {
     throw std::runtime_error(
-        "You are callign 'conditional_pred_lpdf' from a non conjugate "
-        "hieararchy");
+        "Cannot call conditional_pred_lpdf() from a non-conjugate hieararchy");
   }
 
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
@@ -88,15 +87,14 @@ class AbstractHierarchy {
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     throw std::runtime_error(
-        "You are callign 'prior_pred_lpdf_grid' from a non conjugate "
-        "hieararchy");
+        "Cannot call prior_pred_lpdf_grid() from a non-conjugate hieararchy");
   }
 
   virtual Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     throw std::runtime_error(
-        "You are callign 'conditional_pred_lpdf_grid' from a non conjugate "
+        "Cannot call conditional_pred_lpdf_grid() from a non-conjugate "
         "hieararchy");
   }
 

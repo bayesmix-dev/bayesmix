@@ -9,8 +9,6 @@ class BlockedGibbsAlgorithm : public ConditionalAlgorithm {
   //!
   bool update_hierarchy_params() override { return true; }  // TODO ?
   //!
-  void initialize() override;
-  //!
   void print_startup_message() const override;
   //!
   void sample_allocations() override;
