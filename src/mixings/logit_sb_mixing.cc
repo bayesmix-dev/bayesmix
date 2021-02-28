@@ -137,8 +137,9 @@ void LogitSBMixing::write_state_to_proto(
   bayesmix::LogSBState state_;
   bayesmix::to_proto(state.regression_coeffs,
                      state_.mutable_regression_coeffs());
-  google::protobuf::internal::down_cast<bayesmix::LogSBState *>(out)->CopyFrom(
-      state_);
+  google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
+      ->mutable_log_sb_state()
+      ->CopyFrom(state_);
 }
 
 Eigen::VectorXd LogitSBMixing::get_weights(
