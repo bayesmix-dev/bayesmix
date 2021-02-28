@@ -14,8 +14,8 @@ class ConditionalAlgorithm : public BaseAlgorithm {
   std::shared_ptr<ConditionalMixing> cond_mixing;
   //!
   Eigen::VectorXd lpdf_from_state(
-      const Eigen::MatrixXd &grid, const Eigen::MatrixXd &hier_covariates,
-      const Eigen::MatrixXd &mix_covariates) override;
+      const Eigen::MatrixXd &grid, const Eigen::VectorXd &hier_covariate,
+      const Eigen::VectorXd &mix_covariate) override;
   //!
   void initialize() override;
   //!

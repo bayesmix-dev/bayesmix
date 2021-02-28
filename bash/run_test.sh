@@ -47,13 +47,13 @@ elif [ "$1" == 'lru' ]; then
     DP        resources/asciipb/dp_gamma_prior.asciipb \
     "" \
     resources/csv/in/data_lru.csv \
-    resources/csv/in/covs_grid_lru.csv \
+    resources/csv/in/grid_lru.csv \
     resources/csv/out/lru_dens.csv \
     resources/csv/out/lru_mass.csv \
     resources/csv/out/lru_nclu.csv \
     resources/csv/out/lru_clus.csv \
-    resources/csv/in/covs_lru.csv \
-    resources/csv/in/covs_grid_lru.csv
+    resources/csv/in/lru_hier_cov.csv \
+    resources/csv/in/lru_hier_cov_grid.csv
 else
   echo 'Syntax: bash/run_test.sh followed by one of: uni, multi, lru'
 fi

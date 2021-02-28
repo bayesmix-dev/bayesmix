@@ -14,8 +14,8 @@ void MarginalAlgorithm::initialize() {
 }
 
 Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
-    const Eigen::MatrixXd &grid, const Eigen::MatrixXd &hier_covariates,
-    const Eigen::MatrixXd &mix_covariates) {
+    const Eigen::MatrixXd &grid, const Eigen::VectorXd &hier_covariate,
+    const Eigen::VectorXd &mix_covariate) {
   // Read mixing state
   unsigned int n_data = curr_state.cluster_allocs_size();
   unsigned int n_clust = curr_state.cluster_states_size();
@@ -28,19 +28,19 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
   for (size_t i = 0; i < grid.rows(); i++) {
     // Get mass values for i-th grid point
     double mass_ex = marg_mixing->mass_existing_cluster(
-        n_data, true, false, temp_hier, mix_covariates.row(i));
-    double mass_new = marg_mixing->mass_new_cluster(
-        n_data, true, false, n_clust, mix_covariates.row(i));
+        n_data, true, false, temp_hier, mix_covariate);
+    double mass_new = marg_mixing->mass_new_cluster(n_data, true, false,
+                                                    n_clust, mix_covariate);
     // Loop over clusters
     for (size_t j = 0; j < n_clust; j++) {
       temp_hier->set_state_from_proto(curr_state.cluster_states(j));
       // Get local, single-point estimate
       lpdf_local(i, j) =
-          mass_ex + temp_hier->like_lpdf(grid.row(i), hier_covariates.row(i));
+          mass_ex + temp_hier->like_lpdf(grid.row(i), hier_covariate);
     }
     lpdf_local(i, n_clust) =
-        mass_new + lpdf_marginal_component(temp_hier, grid.row(i),
-                                           hier_covariates.row(i))(0);
+        mass_new +
+        lpdf_marginal_component(temp_hier, grid.row(i), hier_covariate)(0);
     // Final estimate for i-th grid point
     lpdf_final(i) = stan::math::log_sum_exp(lpdf_local.row(i));
   }

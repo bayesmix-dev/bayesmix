@@ -155,8 +155,8 @@ bool BaseAlgorithm::update_state_from_collector(BaseCollector *coll) {
 //! \return          Matrix whose i-th column is the lpdf at i-th iteration
 Eigen::MatrixXd BaseAlgorithm::eval_lpdf(
     BaseCollector *const collector, const Eigen::MatrixXd &grid,
-    const Eigen::MatrixXd &hier_covariates /*= Eigen::MatrixXd(0, 0)*/,
-    const Eigen::MatrixXd &mix_covariates /*= Eigen::MatrixXd(0, 0)*/) {
+    const Eigen::VectorXd &hier_covariate /*= Eigen::VectorXd(0)*/,
+    const Eigen::VectorXd &mix_covariate /*= Eigen::VectorXd(0)*/) {
   std::deque<Eigen::VectorXd> lpdf;
   bool keep = true;
   progresscpp::ProgressBar bar(collector->get_size(), 60);
@@ -165,7 +165,7 @@ Eigen::MatrixXd BaseAlgorithm::eval_lpdf(
     if (!keep) {
       break;
     }
-    lpdf.push_back(lpdf_from_state(grid, hier_covariates, mix_covariates));
+    lpdf.push_back(lpdf_from_state(grid, hier_covariate, mix_covariate));
     ++bar;
     bar.display();
   }

@@ -14,8 +14,8 @@ void ConditionalAlgorithm::initialize() {
 }
 
 Eigen::VectorXd ConditionalAlgorithm::lpdf_from_state(
-    const Eigen::MatrixXd &grid, const Eigen::MatrixXd &hier_covariates,
-    const Eigen::MatrixXd &mix_covariates) {
+    const Eigen::MatrixXd &grid, const Eigen::VectorXd &hier_covariate,
+    const Eigen::VectorXd &mix_covariate) {
   // Read mixing state
   unsigned int n_data = curr_state.cluster_allocs_size();
   unsigned int n_clust = curr_state.cluster_states_size();
@@ -28,14 +28,13 @@ Eigen::VectorXd ConditionalAlgorithm::lpdf_from_state(
   for (size_t i = 0; i < grid.rows(); i++) {
     // Get mixing weights for the i-th grid point
     Eigen::VectorXd logweights =
-        cond_mixing->get_weights(true, false, mix_covariates.row(i));
+        cond_mixing->get_weights(true, false, mix_covariate);
     // Loop over clusters
     for (size_t j = 0; j < n_clust; j++) {
       temp_hier->set_state_from_proto(curr_state.cluster_states(j));
       // Get local, single-point estimate
       lpdf_local(i, j) =
-          logweights(j) +
-          temp_hier->like_lpdf(grid.row(i), hier_covariates.row(i));
+          logweights(j) + temp_hier->like_lpdf(grid.row(i), hier_covariate);
     }
     // Final estimate for i-th grid point
     lpdf_final(i) = stan::math::log_sum_exp(lpdf_local.row(i));

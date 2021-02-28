@@ -62,13 +62,9 @@ int main(int argc, char *argv[]) {
   Eigen::MatrixXd mix_cov_grid(0, 0);
   if (hier->is_dependent()) {
     hier_cov_grid = bayesmix::read_eigen_matrix(hier_grid_cov_file);
-  } else {
-    hier_cov_grid = Eigen::MatrixXd(grid.rows(), 0);
   }
   if (mixing->is_dependent()) {
     mix_cov_grid = bayesmix::read_eigen_matrix(mix_grid_cov_file);
-  } else {
-    mix_cov_grid = Eigen::MatrixXd(grid.rows(), 0);
   }
 
   // Set algorithm parameters
