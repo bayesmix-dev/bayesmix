@@ -127,9 +127,10 @@ void LogitSBMixing::update_state(
 void LogitSBMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast =
-      google::protobuf::internal::down_cast<const bayesmix::LogSBState &>(
+      google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
           state_);
-  state.regression_coeffs = bayesmix::to_eigen(statecast.regression_coeffs());
+  state.regression_coeffs =
+      bayesmix::to_eigen(statecast.log_sb_state().regression_coeffs());
 }
 
 void LogitSBMixing::write_state_to_proto(
