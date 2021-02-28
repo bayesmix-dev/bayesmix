@@ -144,7 +144,7 @@ void LogitSBMixing::write_state_to_proto(
 
 Eigen::VectorXd LogitSBMixing::get_weights(
     const bool log, const bool propto,
-    const Eigen::VectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   // Compute eta
   std::vector<double> eta(num_components - 1);
   for (int h = 0; h < num_components - 1; h++) {
