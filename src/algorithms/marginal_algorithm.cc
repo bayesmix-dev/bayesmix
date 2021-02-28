@@ -14,8 +14,8 @@ void MarginalAlgorithm::initialize() {
 }
 
 Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
-    const Eigen::MatrixXd &grid, const Eigen::VectorXd &hier_covariate,
-    const Eigen::VectorXd &mix_covariate) {
+    const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
+    const Eigen::RowVectorXd &mix_covariate) {
   // Read mixing state
   unsigned int n_data = curr_state.cluster_allocs_size();
   unsigned int n_clust = curr_state.cluster_states_size();
