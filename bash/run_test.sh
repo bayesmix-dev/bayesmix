@@ -8,7 +8,6 @@
 #   datafile \
 #   gridfile \
 #   densfile \
-#   massfile \
 #   nclufile \
 #   clusfile \
 #   [hier_cov_file] \
@@ -25,7 +24,6 @@ if [ "$1" == 'uni' ]; then
     resources/csv/in/data_uni.csv \
     resources/csv/in/grid_uni.csv \
     resources/csv/out/uni_dens.csv \
-    resources/csv/out/uni_mass.csv \
     resources/csv/out/uni_nclu.csv \
     resources/csv/out/uni_clus.csv
 elif [ "$1" == 'multi' ]; then
@@ -37,7 +35,6 @@ elif [ "$1" == 'multi' ]; then
     resources/csv/in/data_multi.csv \
     resources/csv/in/grid_multi.csv \
     resources/csv/out/multi_dens.csv \
-    resources/csv/out/multi_mass.csv \
     resources/csv/out/multi_nclu.csv \
     resources/csv/out/multi_clus.csv
 elif [ "$1" == 'lru' ]; then
@@ -49,7 +46,6 @@ elif [ "$1" == 'lru' ]; then
     resources/csv/in/data_lru.csv \
     resources/csv/in/grid_lru.csv \
     resources/csv/out/lru_dens.csv \
-    resources/csv/out/lru_mass.csv \
     resources/csv/out/lru_nclu.csv \
     resources/csv/out/lru_clus.csv \
     resources/csv/in/lru_hier_cov.csv \
@@ -63,7 +59,6 @@ elif [ "$1" == 'sb' ]; then
     resources/csv/in/logsb_data.csv \
     resources/csv/in/logsb_grid_data.csv \
     resources/csv/out/logsb_dens.csv \
-    resources/csv/out/logsb_mass.csv \
     resources/csv/out/logsb_nclu.csv \
     resources/csv/out/logsb_clus.csv \
     "" \

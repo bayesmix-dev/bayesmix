@@ -18,20 +18,19 @@ int main(int argc, char *argv[]) {
   std::string datafile = argv[7];
   std::string gridfile = argv[8];
   std::string densfile = argv[9];
-  std::string massfile = argv[10];
-  std::string nclufile = argv[11];
-  std::string clusfile = argv[12];
+  std::string nclufile = argv[10];
+  std::string clusfile = argv[11];
   std::string hier_cov_file;
   std::string hier_grid_cov_file;
   std::string mix_cov_file;
   std::string mix_grid_cov_file;
-  if (argc >= 15) {
-    hier_cov_file = argv[13];
-    hier_grid_cov_file = argv[14];
+  if (argc >= 14) {
+    hier_cov_file = argv[12];
+    hier_grid_cov_file = argv[13];
   }
-  if (argc >= 17) {
-    mix_cov_file = argv[15];
-    mix_grid_cov_file = argv[16];
+  if (argc >= 16) {
+    mix_cov_file = argv[14];
+    mix_grid_cov_file = argv[15];
   }
 
   // Read algorithm settings proto
@@ -105,17 +104,10 @@ int main(int argc, char *argv[]) {
       clusterings(i, j) = state.cluster_allocs(j);
     }
     num_clust(i) = state.cluster_states_size();
-    bayesmix::MixingState mixstate = state.mixing_state();
-    if (mixstate.has_dp_state()) {
-      masses(i) = mixstate.dp_state().totalmass();
-    }
   }
   // Write collected data to files
-  bayesmix::write_matrix_to_file(masses, massfile);
-  std::cout << "Successfully wrote total masses to " << massfile << std::endl;
   bayesmix::write_matrix_to_file(num_clust, nclufile);
   std::cout << "Successfully wrote cluster sizes to " << nclufile << std::endl;
-
   // Compute cluster estimate
   std::cout << "Computing cluster estimate..." << std::endl;
   Eigen::VectorXd clust_est = bayesmix::cluster_estimate(clusterings);
