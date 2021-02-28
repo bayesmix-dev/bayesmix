@@ -56,5 +56,47 @@ make test_bayesmix
 ./test/test_bayesmix
 ```
 
+## Cluster estimate
+
+This library provides a cluster estimates computation, given a mcmc chains. 
+It is based on expected posterior loss minimisation given a loss function and using a greedy algorithm.
+Sources files are in the folder `src/clustering`.
+
+To run the code :
+```shell
+cd build
+cmake ..
+make run_pe
+./run_pe filename_in filename_out loss Kup
+```
+
+where :
+
+- filename_in is the entry filename that contains mcmc chain (a file in which values are separated with spaces)
+- filename_out is the out filename in which cluster estimate will be writen
+- loss is the specification of the loss function : 0 for binder loss, 1 for variation of information, 2 for normalized variation of information
+- Kup is the max number of clusters (usually Kup=N is a good entry if dataset has a length of N)
+
+Credible balls computation is also available. This aims to quantify the uncertainty of a cluster estimate. 
+To run the credible balls code : 
+
+```shell
+cd build
+cmake ..
+make run_cb
+./run_cb filename_mcmc filename_pe filename_out loss rate
+```
+
+where :
+- filename_mcmc is the filename in which there is the mcmc chain.
+- filename_pe is the filename in which there is the cluster estimate.
+- filename_out  is the filename in which result will be writen
+- loss is the specification of the loss function : 0 for binder loss, 1 for variation of information, 2 for normalized variation of information
+- rate : has to be > 0. The smaller it is, the longer will run the program.
+
+
+The directory `src/clustering/R scripts` contains some scripts to generate mcmc chains for univariate and multivariate datasets.
+
+
 ## Contributions are welcome!
 Please check out [CONTRIBUTORS.md](CONTRIBUTORS.md) for details on how to collaborate with us.

@@ -75,6 +75,16 @@ target_include_directories(run PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
 target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 
+add_executable(run_pe $<TARGET_OBJECTS:bayesmix> run_pe.cpp)
+target_include_directories(run_pe PUBLIC ${INCLUDE_PATHS})
+target_link_libraries(run_pe PUBLIC ${LINK_LIBRARIES})
+target_compile_options(run_pe PUBLIC ${COMPILE_OPTIONS})
+
+add_executable(run_cb $<TARGET_OBJECTS:bayesmix> run_cb.cpp)
+target_include_directories(run_cb PUBLIC ${INCLUDE_PATHS})
+target_link_libraries(run_cb PUBLIC ${LINK_LIBRARIES})
+target_compile_options(run_cb PUBLIC ${COMPILE_OPTIONS})
+
 if (NOT DISABLE_TESTS)
   # Build test executable
   add_subdirectory(test)

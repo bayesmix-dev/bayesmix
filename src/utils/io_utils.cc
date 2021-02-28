@@ -37,9 +37,9 @@ Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename) {
   rows--;
 
   // Fill an Eigen Matrix with values from the buffer array
-  Eigen::MatrixXd mat(rows, cols);
+  Eigen::MatrixXd mat(rows, cols-1);
   for (size_t i = 0; i < rows; i++) {
-    for (size_t j = 0; j < cols; j++) {
+    for (size_t j = 0; j < cols-1; j++) {
       mat(i, j) = buffer[cols * i + j];
     }
   }
