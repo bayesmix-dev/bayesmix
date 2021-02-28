@@ -23,7 +23,7 @@ void BlockedGibbsAlgorithm::sample_allocations() {
     // Compute weights
     Eigen::VectorXd logprobas =
         cond_mixing->get_weights(true, false, mix_covariates.row(i));
-    for (int j = 0; j < logprobas.size(); j++) {  // TODO?
+    for (int j = 0; j < logprobas.size(); j++) {
       logprobas(j) +=
           unique_values[j]->like_lpdf(data.row(j), hier_covariates.row(j));
     }
