@@ -163,9 +163,7 @@ Eigen::VectorXd LogitSBMixing::get_weights(
       1.0 - std::accumulate(weights.data(),
                             weights.data() + num_components - 1, 0.0);
   if (log) {
-    for (int h = 0; h < num_components; h++) {
-      weights(h) = std::log(weights(h));
-    }
+    weights = weights.array().log();
   }
   return weights;
 }
