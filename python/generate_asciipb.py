@@ -29,9 +29,9 @@ if __name__ == "__main__":
 
   # LSB normal hyperprior
   dim = 2
-  mu00 = dim*[1.0]
-  sig00 = [1.5*_ for _ in identity_list(dim)]
-  step = 0.05
+  mu00 = dim*[0.0]
+  sig00 = [5.0*_ for _ in identity_list(dim)]
+  step = 0.025
   n_comp = 3
   lsb_prior = mixing_prior_pb2.LogSBPrior()
   lsb_prior.normal_prior.mean.size = len(mu00)
