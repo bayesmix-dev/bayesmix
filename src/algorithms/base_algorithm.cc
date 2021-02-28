@@ -52,7 +52,7 @@ void BaseAlgorithm::initialize() {
   }
   if (this->is_conditional() != mixing->is_conditional()) {
     throw std::invalid_argument(
-        "Algorithm and mixing must be either both"
+        "Algorithm and mixing must be either both "
         "marginal or both conditional");
   }
   if (mix_covariates.rows() != 0) {
