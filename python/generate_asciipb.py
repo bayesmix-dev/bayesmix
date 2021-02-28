@@ -27,6 +27,23 @@ if __name__ == "__main__":
   with open("resources/asciipb/py_fixed.asciipb", "w") as f:
     PrintMessage(py_prior, f)
 
+  # LSB normal hyperprior
+  dim = 3
+  mu00 = dim*[1.0]
+  sig00 = [1.5*_ for _ in identity_list(dim)]
+  step = 0.05
+  n_comp = 3
+  lsb_prior = mixing_prior_pb2.LogSBPrior()
+  lsb_prior.normal_prior.mean.size = len(mu00)
+  lsb_prior.normal_prior.mean.data[:] = mu00
+  lsb_prior.normal_prior.var.rows = int(sqrt(len(sig00)))
+  lsb_prior.normal_prior.var.cols = int(sqrt(len(sig00)))
+  lsb_prior.normal_prior.var.data[:] = sig00
+  lsb_prior.step_size = step
+  lsb_prior.num_components = n_comp
+  with open("resources/asciipb/lsb_normal.asciipb", "w") as f:
+    PrintMessage(lsb_prior, f)
+
 
   # NNIG NGG hyperprior
   nnig_prior = hierarchy_prior_pb2.NNIGPrior()
