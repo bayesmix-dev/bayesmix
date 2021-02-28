@@ -28,7 +28,7 @@ if __name__ == "__main__":
     PrintMessage(py_prior, f)
 
   # LSB normal hyperprior
-  dim = 3
+  dim = 2
   mu00 = dim*[1.0]
   sig00 = [1.5*_ for _ in identity_list(dim)]
   step = 0.05
@@ -41,7 +41,7 @@ if __name__ == "__main__":
   lsb_prior.normal_prior.var.data[:] = sig00
   lsb_prior.step_size = step
   lsb_prior.num_components = n_comp
-  with open("resources/asciipb/lsb_normal.asciipb", "w") as f:
+  with open("resources/asciipb/lsb_normal_prior.asciipb", "w") as f:
     PrintMessage(lsb_prior, f)
 
 
