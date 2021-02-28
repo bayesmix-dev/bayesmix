@@ -169,7 +169,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
       static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
                                               covariates.row(i));
   }
-  static_cast<Derived *>(this)->sample_full_cond(false);
+  static_cast<Derived *>(this)->sample_full_cond(true);
 }
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_
