@@ -37,14 +37,14 @@ class AbstractHierarchy {
 
   //! Adds a datum and its index to the hierarchy
   virtual void add_datum(
-      const int id, const Eigen::VectorXd &datum,
+      const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
-      const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
   //! Removes a datum and its index from the hierarchy
   virtual void remove_datum(
-      const int id, const Eigen::VectorXd &datum,
+      const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
-      const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
 
   virtual void initialize() = 0;
 
@@ -60,19 +60,19 @@ class AbstractHierarchy {
   //! Evaluates the log-likelihood of data in a single point
   virtual double like_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const = 0;
 
   //! Evaluates the log-marginal distribution of data in a single point
   virtual double prior_pred_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const {
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     throw std::runtime_error(
         "Cannot call prior_pred_lpdf() from a non-conjugate hieararchy");
   }
 
   virtual double conditional_pred_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const {
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     throw std::runtime_error(
         "Cannot call conditional_pred_lpdf() from a non-conjugate hieararchy");
   }

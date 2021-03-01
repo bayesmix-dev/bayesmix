@@ -29,7 +29,7 @@ void NNWHierarchy::wite_prec_to_state(const Eigen::MatrixXd &prec_,
 //! \return     Log-Likehood vector evaluated in data
 double NNWHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   // Initialize relevant objects
   return bayesmix::multi_normal_prec_lpdf(datum, state.mean, state.prec_chol,
                                           state.prec_logdet);
@@ -37,7 +37,7 @@ double NNWHierarchy::like_lpdf(
 
 double NNWHierarchy::marg_lpdf(
     const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * params.deg_free - dim + 1;
   Eigen::MatrixXd sigma_n = params.scale_inv *
@@ -60,15 +60,15 @@ NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
   return out;
 }
 
-void NNWHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
-                                             const Eigen::VectorXd &covariate,
+void NNWHierarchy::update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                             const Eigen::RowVectorXd &covariate,
                                              bool add) {
   if (add) {
-    data_sum += datum;
-    data_sum_squares += datum * datum.transpose();
+    data_sum += datum.transpose();
+    data_sum_squares += datum.transpose() * datum;
   } else {
-    data_sum -= datum;
-    data_sum_squares -= datum * datum.transpose();
+    data_sum -= datum.transpose();
+    data_sum_squares -= datum.transpose() * datum;
   }
 }
 

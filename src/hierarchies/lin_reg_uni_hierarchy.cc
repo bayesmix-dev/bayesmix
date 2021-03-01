@@ -10,14 +10,14 @@
 
 double LinRegUniHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   return stan::math::normal_lpdf(
       datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
 }
 
 double LinRegUniHierarchy::marg_lpdf(
     const LinRegUni::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   double sig_n = sqrt(
       (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
       params.scale / params.shape);
@@ -36,15 +36,15 @@ LinRegUni::State LinRegUniHierarchy::draw(
 }
 
 void LinRegUniHierarchy::update_summary_statistics(
-    const Eigen::VectorXd &datum, const Eigen::VectorXd &covariate, bool add) {
+    const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate, bool add) {
   if (add) {
     data_sum_squares += datum(0) * datum(0);
-    covar_sum_squares += covariate * covariate.transpose();
-    mixed_prod += datum(0) * covariate;
+    covar_sum_squares += covariate.transpose() * covariate;
+    mixed_prod += datum(0) * covariate.transpose();
   } else {
     data_sum_squares -= datum(0) * datum(0);
-    covar_sum_squares -= covariate * covariate.transpose();
-    mixed_prod -= datum(0) * covariate;
+    covar_sum_squares -= covariate.transpose() * covariate;
+    mixed_prod -= datum(0) * covariate.transpose();
   }
 }
 
