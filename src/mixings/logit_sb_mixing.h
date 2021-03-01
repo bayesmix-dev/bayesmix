@@ -21,7 +21,6 @@ class LogitSBMixing : public ConditionalMixing {
   };
 
  protected:
-  unsigned int num_components;
   unsigned int dim;
   State state;
   Eigen::VectorXd acceptance_rates;

@@ -58,7 +58,7 @@ class BaseAlgorithm {
   // DATA AND VALUES CONTAINERS
   //! Matrix of row-vectorial data points
   Eigen::MatrixXd data;
-  //! Prescribed number of clusters for the algorithm initialization
+  //! Initial number of clusters, only used for initialization
   unsigned int init_num_clusters = 0;
   //! Allocation for each datum, i.e. label of the cluster it belongs to
   std::vector<unsigned int> allocations;
@@ -154,7 +154,6 @@ class BaseAlgorithm {
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }
   unsigned int get_burnin() const { return burnin; }
-  unsigned int get_init_num_clusters() const { return init_num_clusters; }
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
