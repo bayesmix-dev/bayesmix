@@ -51,9 +51,9 @@ class LinRegUniHierarchy
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
-  double like_lpdf(
-      const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const override;
+  double like_lpdf(const Eigen::RowVectorXd &datum,
+                   const Eigen::RowVectorXd &covariate =
+                       Eigen::RowVectorXd(0)) const override;
 
   double marg_lpdf(
       const LinRegUni::Hyperparams &params, const Eigen::RowVectorXd &datum,
@@ -68,7 +68,8 @@ class LinRegUniHierarchy
   void initialize_state();
   void initialize_hypers();
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                 const Eigen::RowVectorXd &covariate, bool add);
+                                 const Eigen::RowVectorXd &covariate,
+                                 bool add);
   LinRegUni::Hyperparams get_posterior_parameters();
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;

@@ -36,9 +36,9 @@ NNIG::State NNIGHierarchy::draw(const NNIG::Hyperparams &params) {
   return out;
 }
 
-void NNIGHierarchy::update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                              const Eigen::RowVectorXd &covariate,
-                                              bool add) {
+void NNIGHierarchy::update_summary_statistics(
+    const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate,
+    bool add) {
   if (add) {
     data_sum += datum(0);
     data_sum_squares += datum(0) * datum(0);
