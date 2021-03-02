@@ -147,25 +147,24 @@ Eigen::VectorXd LogitSBMixing::get_weights(
     const bool log, const bool propto,
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   // Compute eta
-  std::vector<double> eta(num_components - 1);
+  std::vector<double> eta(num_components);
   for (int h = 0; h < num_components - 1; h++) {
     eta[h] = covariate.dot(state.regression_coeffs.col(h));
   }
-  // Compute cumulative products
-  std::vector<double> cumprod(num_components, 1.0);
-  for (int h = 1; h < num_components; h++) {
-    cumprod[h] = cumprod[h - 1] * sigmoid(-eta[h - 1]);
+  eta[num_components - 1] = 1.0;
+  // Compute cumulative sums of logarithms
+  std::vector<double> cumsum(num_components + 1, 0.0);
+  for (int h = 1; h < num_components + 1; h++) {
+    cumsum[h] = cumsum[h - 1] + std::log(sigmoid(-eta[h - 1]));
   }
   // Compute weights
-  Eigen::VectorXd weights(num_components);
-  for (int h = 0; h < num_components - 1; h++) {
-    weights(h) = sigmoid(eta[h]) * cumprod[h];
+  Eigen::VectorXd logweights(num_components);
+  for (int h = 0; h < num_components; h++) {
+    logweights(h) = std::log(sigmoid(eta[h])) + cumsum[h];
   }
-  weights(num_components - 1) =
-      1.0 - std::accumulate(weights.data(),
-                            weights.data() + num_components - 1, 0.0);
   if (log) {
-    weights = weights.array().log();
+    return logweights;
+  } else {
+    return logweights.array().exp();
   }
-  return weights;
 }
