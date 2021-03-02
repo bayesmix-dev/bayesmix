@@ -94,7 +94,6 @@ int main(int argc, char *argv[]) {
   std::cout << "Successfully wrote density to " << densfile << std::endl;
 
   // Collect mixing and cluster states
-  Eigen::VectorXd masses(coll->get_size());
   Eigen::MatrixXd clusterings(coll->get_size(), data.rows());
   Eigen::VectorXd num_clust(coll->get_size());
   for (int i = 0; i < coll->get_size(); i++) {
