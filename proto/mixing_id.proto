@@ -7,4 +7,5 @@ enum MixingId {
     DP = 1;
     PY = 2;
     LogSB = 3;
+    TruncSB = 4;
 }

@@ -17,6 +17,7 @@
 #include "mixings/load_mixings.h"
 #include "mixings/logit_sb_mixing.h"
 #include "mixings/pityor_mixing.h"
+#include "mixings/truncated_sb_mixing.h"
 #include "runtime/factory.h"
 #include "utils/cluster_utils.h"
 #include "utils/io_utils.h"

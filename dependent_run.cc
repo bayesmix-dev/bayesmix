@@ -58,8 +58,8 @@ int main(int argc, char *argv[]) {
   // Read data matrices
   Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
   Eigen::MatrixXd grid = bayesmix::read_eigen_matrix(gridfile);
-  Eigen::MatrixXd hier_cov_grid = Eigen::RowVectorXd(0);
-  Eigen::MatrixXd mix_cov_grid = Eigen::RowVectorXd(0);
+  Eigen::MatrixXd hier_cov_grid = Eigen::MatrixXd(data.rows(), 0);
+  Eigen::MatrixXd mix_cov_grid = Eigen::MatrixXd(data.rows(), 0);
   if (hier->is_dependent()) {
     hier_cov_grid = bayesmix::read_eigen_matrix(hier_grid_cov_file);
   }
@@ -92,8 +92,7 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < mix_cov_grid.rows(); i++) {
     Eigen::VectorXd dens_mean_i(grid.rows());
     Eigen::MatrixXd tmp =
-        algo->eval_lpdf(coll, grid, hier_cov_grid,
-                        mix_cov_grid.row(i));
+        algo->eval_lpdf(coll, grid, hier_cov_grid.row(i), mix_cov_grid.row(i));
     for (int j = 0; j < coll->get_size(); j++) {
       dens_mean_i += tmp.row(j);
     }

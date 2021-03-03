@@ -37,3 +37,23 @@ message LogSBPrior {
   double step_size = 2;  // TODO move?
   uint32 num_components = 3;
 }
+
+message TruncSBPrior {
+  message BetaPriors {
+    repeated BetaDistribution beta_distributions = 1;
+  }
+  message DPPrior {
+    double totalmass = 1;
+  }
+  message PYPrior {
+    double strength = 1;
+    double discount = 2;
+  }
+
+  oneof prior {
+    BetaPriors beta_priors = 1;
+    DPPrior dp_prior = 2;
+    PYPrior py_prior = 3;
+  }
+  uint32 num_components = 4;
+}
