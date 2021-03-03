@@ -25,13 +25,15 @@ class TruncatedSBMixing : public ConditionalMixing {
 
   //!
   Eigen::VectorXd logweights_from_sticks() const;
+  //!
+  Eigen::MatrixXd get_prior_shape_parameters() const;
 
   //!
   void create_empty_prior() override {
     prior.reset(new bayesmix::TruncSBPrior);
   }
   //!
-  std::shared_ptr<bayesmix::TruncSBPrior> cast_prior() {
+  std::shared_ptr<bayesmix::TruncSBPrior> cast_prior() const {
     return std::dynamic_pointer_cast<bayesmix::TruncSBPrior>(prior);
   }
   //!

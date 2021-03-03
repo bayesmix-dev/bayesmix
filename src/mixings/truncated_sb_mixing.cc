@@ -30,6 +30,31 @@ Eigen::VectorXd TruncatedSBMixing::logweights_from_sticks() const {
   return logweights;
 }
 
+Eigen::MatrixXd TruncatedSBMixing::get_prior_shape_parameters() const {
+  Eigen::MatrixXd shapes(2, num_components);
+  auto priorcast = cast_prior();
+  if (priorcast->has_beta_priors()) {
+    for (int i = 0; i < num_components; i++) {
+      shapes(0, i) = priorcast->beta_priors().beta_distributions(i).shape_a();
+      shapes(1, i) = priorcast->beta_priors().beta_distributions(i).shape_b();
+    }
+  } else if (priorcast->has_dp_prior()) {
+    double totmass = priorcast->dp_prior().totalmass();
+    shapes.row(0) = Eigen::VectorXd::Ones(num_components);
+    shapes.row(1) = totmass * Eigen::VectorXd::Ones(num_components);
+  } else if (priorcast->has_py_prior()) {
+    double strength = priorcast->py_prior().strength();
+    double disc = priorcast->py_prior().discount();
+    for (int i = 0; i < num_components; i++) {
+      shapes(0, i) = 1.0 - disc;
+      shapes(1, i) = strength + i * disc;
+    }
+  } else {
+    throw std::invalid_argument("Unrecognized mixing prior");
+  }
+  return shapes;
+}
+
 void TruncatedSBMixing::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
@@ -47,24 +72,36 @@ void TruncatedSBMixing::initialize_state() {
       throw std::invalid_argument(
           "Hyperparameters dimensions are not consistent");
     }
-    // Initialize sticks
     for (int i = 0; i < num_components - 1; i++) {
-      double shape_a =
-          priorcast->beta_priors().beta_distributions(i).shape_a();
-      double shape_b =
-          priorcast->beta_priors().beta_distributions(i).shape_b();
-      if (shape_a <= 0 or shape_b <= 0) {
+      if (priorcast->beta_priors().beta_distributions(i).shape_a() <= 0 or
+          priorcast->beta_priors().beta_distributions(i).shape_b() <= 0) {
         throw std::invalid_argument("Beta shape parameters must be > 0");
       }
-      state.sticks(i) = shape_a / (shape_a + shape_b);
     }
-    state.sticks(num_components - 1) = 1.0;
-    // Initialize logweights
-    state.logweights = logweights_from_sticks();
-
+  } else if (priorcast->has_dp_prior()) {
+    if (priorcast->dp_prior().totalmass() <= 0) {
+      throw std::invalid_argument("Total mass parameter must be > 0");
+    }
+  } else if (priorcast->has_py_prior()) {
+    if (priorcast->py_prior().strength() <=
+        -priorcast->py_prior().discount()) {
+      throw std::invalid_argument("Prior parameters are not valid");
+    }
+    if (priorcast->py_prior().discount() < 0 or
+        priorcast->py_prior().discount() >= 1) {
+      throw std::invalid_argument("Discount parameter must be in [0,1)");
+    }
   } else {
     throw std::invalid_argument("Unrecognized mixing prior");
   }
+  // Initialize sticks
+  Eigen::MatrixXd shapes = get_prior_shape_parameters();
+  for (int i = 0; i < num_components - 1; i++) {
+    state.sticks(i) = shapes(0, i) / (shapes(0, i) + shapes(1, i));
+  }
+  state.sticks(num_components - 1) = 1.0;
+  // Initialize logweights
+  state.logweights = logweights_from_sticks();
 }
 
 void TruncatedSBMixing::update_state(
@@ -79,19 +116,18 @@ void TruncatedSBMixing::update_state(
   for (int i = 0; i < num_components; i++) {
     cards[i] = unique_values[i]->get_card();
   }
+  // Get prior parameters
+  Eigen::MatrixXd shapes = get_prior_shape_parameters();
   // Loop over components
   for (int i = 0; i < num_components - 1; i++) {
-    // Get prior parameters
-    double shape_a = priorcast->beta_priors().beta_distributions(i).shape_a();
-    double shape_b = priorcast->beta_priors().beta_distributions(i).shape_b();
     // Count data points in subsequent clusters than the i-th one
     unsigned int subseq_count = 0;
     for (int j = i + 1; j < num_components; j++) {
       subseq_count += cards[j];
     }
     // Draw new value for i-th stick
-    state.sticks(i) =
-        stan::math::beta_rng(shape_a + cards[i], shape_b + subseq_count, rng);
+    state.sticks(i) = stan::math::beta_rng(shapes(0, i) + cards[i],
+                                           shapes(1, i) + subseq_count, rng);
   }
   state.sticks(num_components - 1) = 1.0;
   // Update logweights
@@ -104,7 +140,8 @@ void TruncatedSBMixing::set_state_from_proto(
       google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
           state_);
   state.sticks = bayesmix::to_eigen(statecast.trunc_sb_state().sticks());
-  state.logweights = bayesmix::to_eigen(statecast.trunc_sb_state().logweights());
+  state.logweights =
+      bayesmix::to_eigen(statecast.trunc_sb_state().logweights());
 }
 
 void TruncatedSBMixing::write_state_to_proto(
