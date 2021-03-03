@@ -50,7 +50,7 @@ elif [ "$1" == 'lru' ]; then
     resources/csv/out/lru_clus.csv \
     resources/csv/in/lru_hier_cov.csv \
     resources/csv/in/lru_hier_cov_grid.csv
-elif [ "$1" == 'sb' ]; then
+elif [ "$1" == 'lsb' ]; then
   build/run \
     algo_settings.asciipb \
     NNIG  resources/asciipb/nnig_ngg_prior.asciipb \
@@ -65,6 +65,21 @@ elif [ "$1" == 'sb' ]; then
     "" \
     resources/csv/in/logsb_cov_mix.csv \
     resources/csv/in/logsb_grid_cov_mix.csv
+elif [ "$1" == 'tsb' ]; then
+  build/run \
+    algo_settings.asciipb \
+    NNIG    resources/asciipb/nnig_ngg_prior.asciipb \
+    TruncSB resources/asciipb/truncsb_beta_priors.asciipb \
+    "" \
+    resources/csv/in/truncsb_data.csv \
+    resources/csv/in/truncsb_grid.csv \
+    resources/csv/out/truncsb_dens.csv \
+    resources/csv/out/truncsb_nclu.csv \
+    resources/csv/out/truncsb_clus.csv \
+    "" \
+    "" \
+    resources/csv/in/truncsb_cov_mix.csv \
+    resources/csv/in/truncsb_grid_cov_mix.csv
 else
-  echo 'Syntax: bash/run_test.sh followed by one of: uni, multi, lru, sb'
+  echo 'Syntax: bash/run_test.sh followed by uni, multi, lru, lsb, or tsb'
 fi
