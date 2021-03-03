@@ -19,6 +19,7 @@ message LogSBState {
 
 message TruncSBState {
   Vector sticks = 1;
+  Vector logweights = 2;
 }
 
 message MixingState {

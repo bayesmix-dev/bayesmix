@@ -17,10 +17,14 @@ class TruncatedSBMixing : public ConditionalMixing {
  public:
   struct State {
     Eigen::VectorXd sticks;
+    Eigen::VectorXd logweights;
   };
 
  protected:
   State state;
+
+  //!
+  Eigen::VectorXd logweights_from_sticks() const;
 
   //!
   void create_empty_prior() override {
@@ -47,7 +51,7 @@ class TruncatedSBMixing : public ConditionalMixing {
   }
 
   //! Returns true if the hierarchy has covariates i.e. is a dependent model
-  bool is_dependent() const override { return true; }
+  bool is_dependent() const override { return false; }
   //!
   void initialize() override;
   //!

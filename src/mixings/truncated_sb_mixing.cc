@@ -16,6 +16,20 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
+Eigen::VectorXd TruncatedSBMixing::logweights_from_sticks() const {
+  // Compute cumulative sums of logarithms
+  std::vector<double> cumsum(num_components + 1, 0.0);
+  for (int h = 1; h < num_components + 1; h++) {
+    cumsum[h] = cumsum[h - 1] + std::log(state.sticks(h - 1));
+  }
+  // Compute weights
+  Eigen::VectorXd logweights(num_components);
+  for (int h = 0; h < num_components; h++) {
+    logweights(h) = std::log(state.sticks(h)) + cumsum[h];
+  }
+  return logweights;
+}
+
 void TruncatedSBMixing::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
@@ -33,6 +47,7 @@ void TruncatedSBMixing::initialize_state() {
       throw std::invalid_argument(
           "Hyperparameters dimensions are not consistent");
     }
+    // Initialize sticks
     for (int i = 0; i < num_components - 1; i++) {
       double shape_a =
           priorcast->beta_priors().beta_distributions(i).shape_a();
@@ -44,6 +59,8 @@ void TruncatedSBMixing::initialize_state() {
       state.sticks(i) = shape_a / (shape_a + shape_b);
     }
     state.sticks(num_components - 1) = 1.0;
+    // Initialize logweights
+    state.logweights = logweights_from_sticks();
 
   } else {
     throw std::invalid_argument("Unrecognized mixing prior");
@@ -77,6 +94,8 @@ void TruncatedSBMixing::update_state(
         stan::math::beta_rng(shape_a + cards[i], shape_b + subseq_count, rng);
   }
   state.sticks(num_components - 1) = 1.0;
+  // Update logweights
+  state.logweights = logweights_from_sticks();
 }
 
 void TruncatedSBMixing::set_state_from_proto(
@@ -85,12 +104,14 @@ void TruncatedSBMixing::set_state_from_proto(
       google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
           state_);
   state.sticks = bayesmix::to_eigen(statecast.trunc_sb_state().sticks());
+  state.logweights = bayesmix::to_eigen(statecast.trunc_sb_state().logweights());
 }
 
 void TruncatedSBMixing::write_state_to_proto(
     google::protobuf::Message *out) const {
   bayesmix::TruncSBState state_;
   bayesmix::to_proto(state.sticks, state_.mutable_sticks());
+  bayesmix::to_proto(state.sticks, state_.mutable_logweights());
   google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
       ->mutable_trunc_sb_state()
       ->CopyFrom(state_);
@@ -99,19 +120,9 @@ void TruncatedSBMixing::write_state_to_proto(
 Eigen::VectorXd TruncatedSBMixing::get_weights(
     const bool log, const bool propto,
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
-  // Compute cumulative sums of logarithms
-  std::vector<double> cumsum(num_components + 1, 0.0);
-  for (int h = 1; h < num_components + 1; h++) {
-    cumsum[h] = cumsum[h - 1] + std::log(state.sticks(h - 1));
-  }
-  // Compute weights
-  Eigen::VectorXd logweights(num_components);
-  for (int h = 0; h < num_components; h++) {
-    logweights(h) = std::log(state.sticks(h)) + cumsum[h];
-  }
   if (log) {
-    return logweights;
+    return state.logweights;
   } else {
-    return logweights.array().exp();
+    return state.logweights.array().exp();
   }
 }
