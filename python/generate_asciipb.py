@@ -45,20 +45,39 @@ if __name__ == "__main__":
   with open("resources/asciipb/lsb_normal_prior.asciipb", "w") as f:
     PrintMessage(lsb_prior, f)
 
-  # TruncSB beta priors
+  # TRUNCSB PRIORS
+  ## Beta priors
   num_comp = 4
   shape_a = 1.0
   shape_b = 2.0
-  truncsb_prior = mixing_prior_pb2.TruncSBPrior()
-  truncsb_prior.num_components = num_comp
+  truncsb_prior_beta = mixing_prior_pb2.TruncSBPrior()
+  truncsb_prior_beta.num_components = num_comp
   for i in range(num_comp):
     beta = distribution_pb2.BetaDistribution()
     beta.shape_a = shape_a
     beta.shape_b = shape_b
-    truncsb_prior.beta_priors.beta_distributions.append(beta)
-
+    truncsb_prior_beta.beta_priors.beta_distributions.append(beta)
   with open("resources/asciipb/truncsb_beta_priors.asciipb", "w") as f:
-    PrintMessage(truncsb_prior, f)
+    PrintMessage(truncsb_prior_beta, f)
+  ## Dirichlet Process prior
+  num_comp = 4
+  totalmass = 0.5
+  truncsb_prior_dp = mixing_prior_pb2.TruncSBPrior()
+  truncsb_prior_dp.num_components = num_comp
+  truncsb_prior_dp.dp_prior.totalmass = totalmass
+  with open("resources/asciipb/truncsb_dp_prior.asciipb", "w") as f:
+    PrintMessage(truncsb_prior_dp, f)
+  ## Pitman-Yor prior
+  num_comp = 4
+  strength = 1.0
+  discount = 0.1
+  truncsb_prior_py = mixing_prior_pb2.TruncSBPrior()
+  truncsb_prior_py.num_components = num_comp
+  truncsb_prior_py.py_prior.strength = strength
+  truncsb_prior_py.py_prior.discount = discount
+  with open("resources/asciipb/truncsb_py_prior.asciipb", "w") as f:
+    PrintMessage(truncsb_prior_py, f)
+
 
 
   # NNIG NGG hyperprior
