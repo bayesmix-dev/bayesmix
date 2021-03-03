@@ -35,7 +35,7 @@ class DirichletMixing : public MarginalMixing {
   //!
   void create_empty_prior() override { prior.reset(new bayesmix::DPPrior); }
   //!
-  std::shared_ptr<bayesmix::DPPrior> cast_prior() {
+  std::shared_ptr<bayesmix::DPPrior> cast_prior() const {
     return std::dynamic_pointer_cast<bayesmix::DPPrior>(prior);
   }
   //!
