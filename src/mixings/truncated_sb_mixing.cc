@@ -69,7 +69,7 @@ void TruncatedSBMixing::update_state(
     double shape_b = priorcast->beta_priors().beta_distributions(i).shape_b();
     // Count data points in subsequent clusters than the i-th one
     unsigned int subseq_count = 0;
-    for (int j = i + 1; i < num_components; j++) {
+    for (int j = i + 1; j < num_components; j++) {
       subseq_count += cards[j];
     }
     // Draw new value for i-th stick
