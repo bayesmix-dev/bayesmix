@@ -27,6 +27,7 @@ void TruncatedSBMixing::initialize() {
 
 void TruncatedSBMixing::initialize_state() {
   auto priorcast = cast_prior();
+  state.sticks = Eigen::VectorXd(num_components);
   if (priorcast->has_beta_priors()) {
     if (priorcast->beta_priors().beta_distributions_size() != num_components) {
       throw std::invalid_argument(

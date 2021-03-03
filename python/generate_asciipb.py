@@ -50,6 +50,7 @@ if __name__ == "__main__":
   shape_a = 1.0
   shape_b = 2.0
   truncsb_prior = mixing_prior_pb2.TruncSBPrior()
+  truncsb_prior.num_components = num_comp
   for i in range(num_comp):
     beta = distribution_pb2.BetaDistribution()
     beta.shape_a = shape_a
