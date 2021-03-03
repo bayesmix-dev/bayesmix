@@ -75,6 +75,11 @@ target_include_directories(run PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
 target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 
+add_executable(dependent_run $<TARGET_OBJECTS:bayesmix> dependent_run.cc)
+target_include_directories(dependent_run PUBLIC ${INCLUDE_PATHS})
+target_link_libraries(dependent_run PUBLIC ${LINK_LIBRARIES})
+target_compile_options(dependent_run PUBLIC ${COMPILE_OPTIONS})
+
 if (NOT DISABLE_TESTS)
   # Build test executable
   add_subdirectory(test)
