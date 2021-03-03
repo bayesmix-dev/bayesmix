@@ -17,10 +17,15 @@ message LogSBState {
   Matrix regression_coeffs = 1;
 }
 
+message TruncSBState {
+  Vector sticks = 1;
+}
+
 message MixingState {
   oneof state {
     DPState dp_state = 1;
     PYState py_state = 2;
     LogSBState log_sb_state = 3;
+    TruncSBState trunc_sb_state = 4;
   }
 }

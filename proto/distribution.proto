@@ -23,3 +23,8 @@ message InvWishartDistribution {
   double deg_free = 1;
   Matrix scale = 2;
 }
+
+message BetaDistribution {
+  double shape_a = 1;
+  double shape_b = 2;
+}
