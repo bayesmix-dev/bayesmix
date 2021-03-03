@@ -140,8 +140,7 @@ void TruncatedSBMixing::set_state_from_proto(
       google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
           state_);
   state.sticks = bayesmix::to_eigen(statecast.trunc_sb_state().sticks());
-  state.logweights =
-      bayesmix::to_eigen(statecast.trunc_sb_state().logweights());
+  state.logweights = logweights_from_sticks();
 }
 
 void TruncatedSBMixing::write_state_to_proto(
