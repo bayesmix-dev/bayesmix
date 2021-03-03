@@ -20,7 +20,7 @@ Eigen::VectorXd TruncatedSBMixing::logweights_from_sticks() const {
   // Compute cumulative sums of logarithms
   std::vector<double> cumsum(num_components + 1, 0.0);
   for (int h = 1; h < num_components + 1; h++) {
-    cumsum[h] = cumsum[h - 1] + std::log(state.sticks(h - 1));
+    cumsum[h] = cumsum[h - 1] + std::log(1 - state.sticks(h - 1));
   }
   // Compute weights
   Eigen::VectorXd logweights(num_components);
