@@ -1,5 +1,6 @@
 from google.protobuf.text_format import PrintMessage
 from math import sqrt
+from proto.py import distribution_pb2
 from proto.py import mixing_prior_pb2
 from proto.py import hierarchy_prior_pb2
 
@@ -43,6 +44,20 @@ if __name__ == "__main__":
   lsb_prior.num_components = n_comp
   with open("resources/asciipb/lsb_normal_prior.asciipb", "w") as f:
     PrintMessage(lsb_prior, f)
+
+  # TruncSB beta priors
+  num_comp = 4
+  shape_a = 1.0
+  shape_b = 2.0
+  truncsb_prior = mixing_prior_pb2.TruncSBPrior()
+  for i in range(num_comp):
+    beta = distribution_pb2.BetaDistribution()
+    beta.shape_a = shape_a
+    beta.shape_b = shape_b
+    truncsb_prior.beta_priors.beta_distributions.append(beta)
+
+  with open("resources/asciipb/truncsb_beta_priors.asciipb", "w") as f:
+    PrintMessage(truncsb_prior, f)
 
 
   # NNIG NGG hyperprior
