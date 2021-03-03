@@ -92,8 +92,7 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < mix_cov_grid.rows(); i++) {
     Eigen::VectorXd dens_mean_i(grid.rows());
     Eigen::MatrixXd tmp =
-        algo->eval_lpdf(coll, grid, hier_cov_grid,
-                        mix_cov_grid.row(i));
+        algo->eval_lpdf(coll, grid, hier_cov_grid, mix_cov_grid.row(i));
     for (int j = 0; j < coll->get_size(); j++) {
       dens_mean_i += tmp.row(j);
     }
