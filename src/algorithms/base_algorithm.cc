@@ -125,9 +125,11 @@ bayesmix::AlgorithmState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
                                         allocations.end()};
   // Transcribe unique values vector
   for (size_t i = 0; i < unique_values.size(); i++) {
-    bayesmix::AlgorithmState::ClusterState clusval;
-    unique_values[i]->write_state_to_proto(&clusval);
-    iter_out.add_cluster_states()->CopyFrom(clusval);
+    if (unique_values[i]->get_card() > 0) {
+      bayesmix::AlgorithmState::ClusterState clusval;
+      unique_values[i]->write_state_to_proto(&clusval);
+      iter_out.add_cluster_states()->CopyFrom(clusval);
+    }
   }
   // Transcribe mixing state
   bayesmix::MixingState mixstate;
