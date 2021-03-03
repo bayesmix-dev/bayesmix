@@ -69,7 +69,7 @@ elif [ "$1" == 'tsb' ]; then
   build/run \
     algo_settings.asciipb \
     NNIG    resources/asciipb/nnig_ngg_prior.asciipb \
-    TruncSB resources/asciipb/truncsb_beta_priors.asciipb \
+    TruncSB resources/asciipb/truncsb_py_prior.asciipb \
     "" \
     resources/csv/in/truncsb_data.csv \
     resources/csv/in/truncsb_grid.csv \
