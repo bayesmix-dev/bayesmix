@@ -57,7 +57,7 @@ elif [ "$1" == 'sb' ]; then
     LogSB resources/asciipb/lsb_normal_prior.asciipb \
     "" \
     resources/csv/in/logsb_data.csv \
-    resources/csv/in/logsb_grid_data.csv \
+    resources/csv/in/logsb_grid.csv \
     resources/csv/out/logsb_dens.csv \
     resources/csv/out/logsb_nclu.csv \
     resources/csv/out/logsb_clus.csv \
