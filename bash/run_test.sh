@@ -17,7 +17,7 @@
 
 if [ "$1" == 'uni' ]; then
   build/run \
-    algo_settings.asciipb \
+    algo_marg_settings.asciipb \
     NNIG resources/asciipb/nnig_ngg_prior.asciipb \
     DP   resources/asciipb/dp_gamma_prior.asciipb \
     "" \
@@ -28,7 +28,7 @@ if [ "$1" == 'uni' ]; then
     resources/csv/out/uni_clus.csv
 elif [ "$1" == 'multi' ]; then
   build/run \
-    algo_settings.asciipb \
+    algo_marg_settings.asciipb \
     NNW resources/asciipb/nnw_ngiw_prior.asciipb \
     DP  resources/asciipb/dp_gamma_prior.asciipb \
     "" \
@@ -39,7 +39,7 @@ elif [ "$1" == 'multi' ]; then
     resources/csv/out/multi_clus.csv
 elif [ "$1" == 'lru' ]; then
   build/run \
-    algo_settings.asciipb \
+    algo_marg_settings.asciipb \
     LinRegUni resources/asciipb/lin_reg_uni_fixed.asciipb \
     DP        resources/asciipb/dp_gamma_prior.asciipb \
     "" \
@@ -52,7 +52,7 @@ elif [ "$1" == 'lru' ]; then
     resources/csv/in/lru_hier_cov_grid.csv
 elif [ "$1" == 'lsb' ]; then
   build/run \
-    algo_settings.asciipb \
+    algo_cond_settings.asciipb \
     NNIG  resources/asciipb/nnig_ngg_prior.asciipb \
     LogSB resources/asciipb/lsb_normal_prior.asciipb \
     "" \
@@ -67,7 +67,7 @@ elif [ "$1" == 'lsb' ]; then
     resources/csv/in/logsb_grid_cov_mix.csv
 elif [ "$1" == 'tsb' ]; then
   build/run \
-    algo_settings.asciipb \
+    algo_cond_settings.asciipb \
     NNIG    resources/asciipb/nnig_ngg_prior.asciipb \
     TruncSB resources/asciipb/truncsb_py_prior.asciipb \
     "" \
