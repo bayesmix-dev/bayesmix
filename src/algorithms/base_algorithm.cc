@@ -107,8 +107,10 @@ void BaseAlgorithm::update_hierarchy_hypers() {
   bayesmix::AlgorithmState::ClusterState clust;
   std::vector<bayesmix::AlgorithmState::ClusterState> states;
   for (auto &un : unique_values) {
-    un->write_state_to_proto(&clust);
-    states.push_back(clust);
+    if (un->get_card() > 0) {
+      un->write_state_to_proto(&clust);
+      states.push_back(clust);
+    }
   }
   unique_values[0]->update_hypers(states);
 }
@@ -123,11 +125,9 @@ bayesmix::AlgorithmState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
                                         allocations.end()};
   // Transcribe unique values vector
   for (size_t i = 0; i < unique_values.size(); i++) {
-    if (unique_values[i]->get_card() > 0) {
-      bayesmix::AlgorithmState::ClusterState clusval;
-      unique_values[i]->write_state_to_proto(&clusval);
-      iter_out.add_cluster_states()->CopyFrom(clusval);
-    }
+    bayesmix::AlgorithmState::ClusterState clusval;
+    unique_values[i]->write_state_to_proto(&clusval);
+    iter_out.add_cluster_states()->CopyFrom(clusval);
   }
   // Transcribe mixing state
   bayesmix::MixingState mixstate;
