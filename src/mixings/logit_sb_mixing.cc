@@ -127,9 +127,10 @@ void LogitSBMixing::update_state(
 void LogitSBMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast =
-      google::protobuf::internal::down_cast<const bayesmix::LogSBState &>(
+      google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
           state_);
-  state.regression_coeffs = bayesmix::to_eigen(statecast.regression_coeffs());
+  state.regression_coeffs =
+      bayesmix::to_eigen(statecast.log_sb_state().regression_coeffs());
 }
 
 void LogitSBMixing::write_state_to_proto(
@@ -137,29 +138,33 @@ void LogitSBMixing::write_state_to_proto(
   bayesmix::LogSBState state_;
   bayesmix::to_proto(state.regression_coeffs,
                      state_.mutable_regression_coeffs());
-  google::protobuf::internal::down_cast<bayesmix::LogSBState *>(out)->CopyFrom(
-      state_);
+  google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
+      ->mutable_log_sb_state()
+      ->CopyFrom(state_);
 }
 
 Eigen::VectorXd LogitSBMixing::get_weights(
-    const Eigen::VectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+    const bool log, const bool propto,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   // Compute eta
-  std::vector<double> eta(num_components - 1);
+  std::vector<double> eta(num_components);
   for (int h = 0; h < num_components - 1; h++) {
     eta[h] = covariate.dot(state.regression_coeffs.col(h));
   }
-  // Compute cumulative products
-  std::vector<double> cumprod(num_components, 1.0);
-  for (int h = 1; h < num_components; h++) {
-    cumprod[h] = cumprod[h - 1] * sigmoid(-eta[h - 1]);
+  eta[num_components - 1] = 1.0;
+  // Compute cumulative sums of logarithms
+  std::vector<double> cumsum(num_components + 1, 0.0);
+  for (int h = 1; h < num_components + 1; h++) {
+    cumsum[h] = cumsum[h - 1] + std::log(sigmoid(-eta[h - 1]));
   }
   // Compute weights
-  Eigen::VectorXd weights(num_components);
-  for (int h = 0; h < num_components - 1; h++) {
-    weights(h) = sigmoid(eta[h]) * cumprod[h];
+  Eigen::VectorXd logweights(num_components);
+  for (int h = 0; h < num_components; h++) {
+    logweights(h) = std::log(sigmoid(eta[h])) + cumsum[h];
   }
-  weights(num_components - 1) =
-      1.0 - std::accumulate(weights.data(),
-                            weights.data() + num_components - 1, 0.0);
-  return weights;
+  if (log) {
+    return logweights;
+  } else {
+    return logweights.array().exp();
+  }
 }

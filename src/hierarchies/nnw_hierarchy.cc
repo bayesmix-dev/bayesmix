@@ -6,9 +6,9 @@
 #include <stan/math/prim.hpp>
 #include <vector>
 
+#include "algorithm_state.pb.h"
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"
-#include "marginal_state.pb.h"
 #include "matrix.pb.h"
 #include "src/utils/distributions.h"
 #include "src/utils/eigen_utils.h"
@@ -29,7 +29,7 @@ void NNWHierarchy::wite_prec_to_state(const Eigen::MatrixXd &prec_,
 //! \return     Log-Likehood vector evaluated in data
 double NNWHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   // Initialize relevant objects
   return bayesmix::multi_normal_prec_lpdf(datum, state.mean, state.prec_chol,
                                           state.prec_logdet);
@@ -37,7 +37,7 @@ double NNWHierarchy::like_lpdf(
 
 double NNWHierarchy::marg_lpdf(
     const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::VectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * params.deg_free - dim + 1;
   Eigen::MatrixXd sigma_n = params.scale_inv *
@@ -60,15 +60,15 @@ NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
   return out;
 }
 
-void NNWHierarchy::update_summary_statistics(const Eigen::VectorXd &datum,
-                                             const Eigen::VectorXd &covariate,
-                                             bool add) {
+void NNWHierarchy::update_summary_statistics(
+    const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate,
+    bool add) {
   if (add) {
-    data_sum += datum;
-    data_sum_squares += datum * datum.transpose();
+    data_sum += datum.transpose();
+    data_sum_squares += datum.transpose() * datum;
   } else {
-    data_sum -= datum;
-    data_sum_squares -= datum * datum.transpose();
+    data_sum -= datum.transpose();
+    data_sum_squares -= datum.transpose() * datum;
   }
 }
 
@@ -219,7 +219,7 @@ void NNWHierarchy::initialize_hypers() {
 }
 
 void NNWHierarchy::update_hypers(
-    const std::vector<bayesmix::MarginalState::ClusterState> &states) {
+    const std::vector<bayesmix::AlgorithmState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();
   if (prior->has_fixed_values()) {
     return;
@@ -298,7 +298,7 @@ void NNWHierarchy::update_hypers(
 void NNWHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast = google::protobuf::internal::down_cast<
-      const bayesmix::MarginalState::ClusterState &>(state_);
+      const bayesmix::AlgorithmState::ClusterState &>(state_);
   state.mean = to_eigen(statecast.multi_ls_state().mean());
   wite_prec_to_state(to_eigen(statecast.multi_ls_state().prec()), &state);
   set_card(statecast.cardinality());
@@ -309,7 +309,7 @@ void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   bayesmix::to_proto(state.mean, state_.mutable_mean());
   bayesmix::to_proto(state.prec, state_.mutable_prec());
   auto *out_cast = google::protobuf::internal::down_cast<
-      bayesmix::MarginalState::ClusterState *>(out);
+      bayesmix::AlgorithmState::ClusterState *>(out);
   out_cast->mutable_multi_ls_state()->CopyFrom(state_);
   out_cast->set_cardinality(card);
 }

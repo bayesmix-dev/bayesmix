@@ -7,7 +7,7 @@
 #include <random>
 #include <vector>
 
-#include "marginal_state.pb.h"
+#include "algorithm_state.pb.h"
 
 namespace bayesmix {
 
@@ -94,9 +94,9 @@ double gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
  * @return the L2 distance between p and q
  */
 double gaussian_mixture_dist(
-    std::vector<bayesmix::MarginalState::ClusterState> clus1,
+    std::vector<bayesmix::AlgorithmState::ClusterState> clus1,
     Eigen::VectorXd weights1,
-    std::vector<bayesmix::MarginalState::ClusterState> clus2,
+    std::vector<bayesmix::AlgorithmState::ClusterState> clus2,
     Eigen::VectorXd weights2);
 
 }  // namespace bayesmix

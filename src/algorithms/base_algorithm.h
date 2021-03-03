@@ -9,7 +9,7 @@
 
 #include "algorithm_id.pb.h"
 #include "algorithm_params.pb.h"
-#include "marginal_state.pb.h"
+#include "algorithm_state.pb.h"
 #include "src/collectors/base_collector.h"
 #include "src/hierarchies/base_hierarchy.h"
 #include "src/mixings/base_mixing.h"
@@ -58,7 +58,7 @@ class BaseAlgorithm {
   // DATA AND VALUES CONTAINERS
   //! Matrix of row-vectorial data points
   Eigen::MatrixXd data;
-  //! Prescribed number of clusters for the algorithm initialization
+  //! Initial number of clusters, only used for initialization
   unsigned int init_num_clusters = 0;
   //! Allocation for each datum, i.e. label of the cluster it belongs to
   std::vector<unsigned int> allocations;
@@ -71,18 +71,27 @@ class BaseAlgorithm {
   //!
   Eigen::MatrixXd mix_covariates;
   //!
+  bayesmix::AlgorithmState curr_state;
+  //!
   virtual bool update_hierarchy_params() { return false; }
 
   // AUXILIARY TOOLS
   //! Returns the values of an algo iteration as a Protobuf object
-  bayesmix::MarginalState get_state_as_proto(unsigned int iter);
+  bayesmix::AlgorithmState get_state_as_proto(unsigned int iter);
+  bool update_state_from_collector(BaseCollector *coll);
 
   // ALGORITHM FUNCTIONS
-  virtual void print_startup_message() const = 0;
+  //!
   virtual void initialize();
+  //!
+  virtual void print_startup_message() const = 0;
+  //!
   virtual void sample_allocations() = 0;
+  //!
   virtual void sample_unique_values() = 0;
+  //!
   void update_hierarchy_hypers();
+  //!
   virtual void print_ending_message() const {
     std::cout << "Done" << std::endl;
   };
@@ -103,6 +112,8 @@ class BaseAlgorithm {
  public:
   //!
   virtual bool requires_conjugate_hierarchy() const { return false; }
+  //!
+  virtual bool is_conditional() const = 0;
 
   //! Runs the algorithm and saves the whole chain to a collector
   void run(BaseCollector *collector) {
@@ -127,11 +138,14 @@ class BaseAlgorithm {
   }
 
   // ESTIMATE FUNCTION
+  virtual Eigen::VectorXd lpdf_from_state(
+      const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
+      const Eigen::RowVectorXd &mix_covariate) = 0;
   //! Evaluates the logpdf for each single iteration on a given grid of points
   virtual Eigen::MatrixXd eval_lpdf(
       BaseCollector *const collector, const Eigen::MatrixXd &grid,
-      const Eigen::MatrixXd &hier_covariates = Eigen::MatrixXd(0, 0),
-      const Eigen::MatrixXd &mix_covariates = Eigen::MatrixXd(0, 0)) = 0;
+      const Eigen::RowVectorXd &hier_covariate = Eigen::RowVectorXd(0),
+      const Eigen::RowVectorXd &mix_covariate = Eigen::RowVectorXd(0));
 
   // DESTRUCTOR AND CONSTRUCTORS
   virtual ~BaseAlgorithm() = default;
@@ -140,7 +154,6 @@ class BaseAlgorithm {
   // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }
   unsigned int get_burnin() const { return burnin; }
-  unsigned int get_init_num_clusters() const { return init_num_clusters; }
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }

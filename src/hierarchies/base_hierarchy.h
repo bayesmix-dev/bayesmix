@@ -10,8 +10,8 @@
 #include <stan/math/prim.hpp>
 
 #include "abstract_hierarchy.h"
+#include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
-#include "marginal_state.pb.h"
 #include "src/utils/rng.h"
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
@@ -62,14 +62,14 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   void add_datum(
-      const int id, const Eigen::VectorXd &datum,
+      const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
-      const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) override;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
   //! Removes a datum and its index from the hierarchy
   void remove_datum(
-      const int id, const Eigen::VectorXd &datum,
+      const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
-      const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) override;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
 
   void check_prior_is_set() const;
 
@@ -95,9 +95,9 @@ class BaseHierarchy : public AbstractHierarchy {
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
-    const int id, const Eigen::VectorXd &datum,
+    const int id, const Eigen::RowVectorXd &datum,
     const bool update_params /*= false*/,
-    const Eigen::VectorXd &covariate /*= Eigen::VectorXd(0)*/) {
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) {
   assert(cluster_data_idx.find(id) == cluster_data_idx.end());
   card += 1;
   log_card = std::log(card);
@@ -111,9 +111,9 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
-    const int id, const Eigen::VectorXd &datum,
+    const int id, const Eigen::RowVectorXd &datum,
     const bool update_params /*= false*/,
-    const Eigen::VectorXd &covariate /* = Eigen::VectorXd(0)*/) {
+    const Eigen::RowVectorXd &covariate /* = Eigen::RowVectorXd(0)*/) {
   static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
                                                           false);
   card -= 1;
@@ -169,7 +169,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
       static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
                                               covariates.row(i));
   }
-  static_cast<Derived *>(this)->sample_full_cond();
+  static_cast<Derived *>(this)->sample_full_cond(true);
 }
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

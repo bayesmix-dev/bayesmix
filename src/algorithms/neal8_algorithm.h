@@ -41,8 +41,8 @@ class Neal8Algorithm : public Neal2Algorithm {
   Eigen::VectorXd get_cluster_lpdf(const unsigned int data_idx) const override;
 
   // ALGORITHM FUNCTIONS
-  void print_startup_message() const override;
   void initialize() override;
+  void print_startup_message() const override;
   void sample_allocations() override;
 
  public:

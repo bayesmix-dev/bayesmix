@@ -15,7 +15,7 @@
 #include "src/utils/distributions.h"
 #include "src/utils/rng.h"
 
-using bayesmix::MarginalState;
+using bayesmix::AlgorithmState;
 using bayesmix::SemiHdpState;
 
 /*
@@ -153,7 +153,7 @@ class SemiHdpSampler {
 
   void relabel();
   void sample_pseudo_prior();
-  void perturb(bayesmix::MarginalState::ClusterState *out);
+  void perturb(bayesmix::AlgorithmState::ClusterState *out);
 
   double lpdf_for_group(int i, int r);
   void reassign_group(int i, int new_r, int old_r);

@@ -1,6 +1,6 @@
 ##### GENERIC SETTINGS FOR ALL ALGORITHMS #####
 # Algorithm ID string, e.g. "Neal2"
-algo_id: "Neal2"
+algo_id: "BlockedGibbs"
 
 # RNG initial seed: any nonnegative integer
 rng_seed: 20201124
@@ -12,8 +12,11 @@ iterations: 1000
 burnin: 100
 
 # Number of clusters in which data will be first initialized
-# (NOTE: If you want to initialize one datum per cluster, please write 0.)
-# (NOTE: This argument will be ignored by the BlockedGibbs algorithm.)
+# (NOTE: If you wish to initialize one datum per cluster, please write 0.)
+# (NOTE: This value is ONLY used for initialization, and it may be overwritten
+#  by certain mixing objects, such as LogSBMixing. Please check a mixing's
+#  initialize() function to know for sure whether or not it will override this
+#  value.)
 init_num_clusters: 3
 
 

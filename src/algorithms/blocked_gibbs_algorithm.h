@@ -5,14 +5,15 @@
 #include "conditional_algorithm.h"
 
 class BlockedGibbsAlgorithm : public ConditionalAlgorithm {
-  //!
-  bool update_hierarchy_params() override { return true; }  // TODO ?
+ protected:
   //!
   void print_startup_message() const override;
   //!
   void sample_allocations() override;
   //!
   void sample_unique_values() override;
+  //!
+  void sample_weights() override;
 
  public:
   ~BlockedGibbsAlgorithm() = default;

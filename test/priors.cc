@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "marginal_state.pb.h"
+#include "algorithm_state.pb.h"
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/hierarchies/nnw_hierarchy.h"
 #include "src/mixings/dirichlet_mixing.h"
@@ -63,7 +63,7 @@ TEST(hierarchies, fixed_values) {
   hier->initialize();
 
   std::vector<std::shared_ptr<AbstractHierarchy>> unique_values;
-  std::vector<bayesmix::MarginalState::ClusterState> states;
+  std::vector<bayesmix::AlgorithmState::ClusterState> states;
 
   // Check equality before update
   unique_values.push_back(hier);
@@ -100,7 +100,7 @@ TEST(hierarchies, normal_mean_prior) {
   bayesmix::to_proto(ident,
                      prior.mutable_normal_mean_prior()->mutable_scale());
 
-  std::vector<bayesmix::MarginalState::ClusterState> states(4);
+  std::vector<bayesmix::AlgorithmState::ClusterState> states(4);
   for (int i = 0; i < states.size(); i++) {
     double mean = 9.0 + i;
     Eigen::Vector2d vec;

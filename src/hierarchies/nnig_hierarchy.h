@@ -7,10 +7,10 @@
 #include <memory>
 #include <vector>
 
+#include "algorithm_state.pb.h"
 #include "conjugate_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
-#include "marginal_state.pb.h"
 
 //! Normal Normal-InverseGamma hierarchy for univariate data.
 
@@ -56,23 +56,24 @@ class NNIGHierarchy
 
   // EVALUATION FUNCTIONS
   //! Evaluates the log-likelihood of data in a single point
-  double like_lpdf(
-      const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const override;
+  double like_lpdf(const Eigen::RowVectorXd &datum,
+                   const Eigen::RowVectorXd &covariate =
+                       Eigen::RowVectorXd(0)) const override;
   //! Evaluates the log-marginal distribution of data in a single point
   double marg_lpdf(
       const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
 
   NNIG::State draw(const NNIG::Hyperparams &params);
 
   void clear_data();
   void update_hypers(
-      const std::vector<bayesmix::MarginalState::ClusterState> &states);
+      const std::vector<bayesmix::AlgorithmState::ClusterState> &states);
   void initialize_state();
   void initialize_hypers();
-  void update_summary_statistics(const Eigen::VectorXd &datum,
-                                 const Eigen::VectorXd &covariate, bool add);
+  void update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                 const Eigen::RowVectorXd &covariate,
+                                 bool add);
   NNIG::Hyperparams get_posterior_parameters();
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;

@@ -104,9 +104,9 @@ double bayesmix::gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
 }
 
 double bayesmix::gaussian_mixture_dist(
-    std::vector<bayesmix::MarginalState::ClusterState> clus1,
+    std::vector<bayesmix::AlgorithmState::ClusterState> clus1,
     Eigen::VectorXd weights1,
-    std::vector<bayesmix::MarginalState::ClusterState> clus2,
+    std::vector<bayesmix::AlgorithmState::ClusterState> clus2,
     Eigen::VectorXd weights2) {
   double out;
 

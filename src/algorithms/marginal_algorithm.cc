@@ -3,70 +3,47 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/fun.hpp>
 
-#include "lib/progressbar/progressbar.h"
-#include "marginal_state.pb.h"
-#include "src/algorithms/base_algorithm.h"
+#include "algorithm_state.pb.h"
+#include "base_algorithm.h"
 #include "src/collectors/base_collector.h"
 #include "src/mixings/marginal_mixing.h"
-#include "src/utils/eigen_utils.h"
 
 void MarginalAlgorithm::initialize() {
   BaseAlgorithm::initialize();
   marg_mixing = std::dynamic_pointer_cast<MarginalMixing>(mixing);
 }
 
-//! \param grid      Grid of points in matrix form to evaluate the density on
-//! \param collector Collector containing the algorithm chain
-//! \return          Matrix whose i-th column is the lpdf at i-th iteration
-Eigen::MatrixXd MarginalAlgorithm::eval_lpdf(
-    BaseCollector *const collector, const Eigen::MatrixXd &grid,
-    const Eigen::MatrixXd &hier_covariates /*= Eigen::MatrixXd(0, 0)*/,
-    const Eigen::MatrixXd &mix_covariates /*= Eigen::MatrixXd(0, 0)*/) {
-  std::deque<Eigen::VectorXd> lpdf;
-  bool keep = true;
-  progresscpp::ProgressBar bar(collector->get_size(), 60);
-  while (keep) {
-    keep = update_state_from_collector(collector);
-    if (!keep) {
-      break;
-    }
-    lpdf.push_back(lpdf_from_state(grid, hier_covariates, mix_covariates));
-    ++bar;
-    bar.display();
-  }
-  collector->reset();
-  bar.done();
-  return bayesmix::stack_vectors(lpdf);
-}
-
 Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
-    const Eigen::MatrixXd &grid, const Eigen::MatrixXd &hier_covariates,
-    const Eigen::MatrixXd &mix_covariates) {
-  Eigen::VectorXd lpdf(grid.rows());
+    const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
+    const Eigen::RowVectorXd &mix_covariate) {
+  // Read mixing state
   unsigned int n_data = curr_state.cluster_allocs_size();
   unsigned int n_clust = curr_state.cluster_states_size();
   marg_mixing->set_state_from_proto(curr_state.mixing_state());
+  // Initialize estimate containers
   Eigen::MatrixXd lpdf_local(grid.rows(), n_clust + 1);
+  Eigen::VectorXd lpdf_final(grid.rows());
   auto temp_hier = unique_values[0]->clone();
-  for (size_t j = 0; j < n_clust; j++) {
-    temp_hier->set_state_from_proto(curr_state.cluster_states(j));
-    lpdf_local.col(j) =
-        marg_mixing->mass_existing_cluster(n_data, true, false, temp_hier) +
-        temp_hier->like_lpdf_grid(grid, hier_covariates).array();
-    // TODO add mixing covariate
+  // Loop over grid points
+  for (size_t i = 0; i < grid.rows(); i++) {
+    // Loop over clusters
+    for (size_t j = 0; j < n_clust; j++) {
+      // Get hierarchy and mass values
+      temp_hier->set_state_from_proto(curr_state.cluster_states(j));
+      double mass_ex = marg_mixing->mass_existing_cluster(
+          n_data, true, false, temp_hier, mix_covariate);
+      // Get local, single-point estimate
+      lpdf_local(i, j) =
+          mass_ex + temp_hier->like_lpdf(grid.row(i), hier_covariate);
+    }
+    // Marginal component of estimate
+    double mass_new = marg_mixing->mass_new_cluster(n_data, true, false,
+                                                    n_clust, mix_covariate);
+    lpdf_local(i, n_clust) =
+        mass_new +
+        lpdf_marginal_component(temp_hier, grid.row(i), hier_covariate)(0);
+    // Final estimate for i-th grid point
+    lpdf_final(i) = stan::math::log_sum_exp(lpdf_local.row(i));
   }
-  lpdf_local.col(n_clust) =
-      marg_mixing->mass_new_cluster(n_data, true, false, n_clust) +
-      lpdf_marginal_component(temp_hier, grid, hier_covariates).array();
-  // TODO add mixing covariate
-
-  for (size_t j = 0; j < grid.rows(); j++) {
-    lpdf(j) = stan::math::log_sum_exp(lpdf_local.row(j));
-  }
-  return lpdf;
-}
-
-bool MarginalAlgorithm::update_state_from_collector(BaseCollector *coll) {
-  bool success = coll->get_next_state(&curr_state);
-  return success;
+  return lpdf_final;
 }

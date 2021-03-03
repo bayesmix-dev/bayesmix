@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "algorithm_state.pb.h"
 #include "ls_state.pb.h"
-#include "marginal_state.pb.h"
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/hierarchies/nnw_hierarchy.h"
 #include "src/utils/proto_utils.h"
@@ -16,7 +16,7 @@ TEST(set_state, uni_ls) {
 
   ASSERT_EQ(curr.mean(), mean);
 
-  bayesmix::MarginalState::ClusterState clusval;
+  bayesmix::AlgorithmState::ClusterState clusval;
   clusval.mutable_uni_ls_state()->CopyFrom(curr);
   NNIGHierarchy cluster;
   cluster.set_state_from_proto(clusval);
@@ -32,13 +32,13 @@ TEST(write_proto, uni_ls) {
   curr.set_mean(mean);
   curr.set_var(var);
 
-  bayesmix::MarginalState::ClusterState clusval_in;
+  bayesmix::AlgorithmState::ClusterState clusval_in;
   clusval_in.mutable_uni_ls_state()->CopyFrom(curr);
   NNIGHierarchy cluster;
   cluster.set_state_from_proto(clusval_in);
 
-  bayesmix::MarginalState out;
-  bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
   cluster.write_state_to_proto(clusval);
 
   double out_mean = clusval->uni_ls_state().mean();
@@ -60,7 +60,7 @@ TEST(set_state, multi_ls) {
   ASSERT_EQ(curr.prec().data(0), 1.0);
   ASSERT_EQ(curr.prec().data(6), 10.0);
 
-  bayesmix::MarginalState::ClusterState clusval_in;
+  bayesmix::AlgorithmState::ClusterState clusval_in;
   clusval_in.mutable_multi_ls_state()->CopyFrom(curr);
   NNWHierarchy cluster;
   cluster.set_state_from_proto(clusval_in);

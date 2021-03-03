@@ -5,7 +5,7 @@ import "ls_state.proto";
 
 package bayesmix;
 
-message MarginalState {
+message AlgorithmState {
   message ClusterState {
     oneof val {
       UniLSState uni_ls_state = 1;

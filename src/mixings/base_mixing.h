@@ -21,6 +21,8 @@ class BaseMixing {
   std::shared_ptr<google::protobuf::Message> prior;
   //!
   const Eigen::MatrixXd *covariates_ptr;
+  //!
+  unsigned int num_components;
 
   //!
   virtual void create_empty_prior() = 0;
@@ -44,12 +46,14 @@ class BaseMixing {
       const std::vector<unsigned int> &allocations) = 0;
 
   // GETTERS AND SETTERS
+  unsigned int get_num_components() const { return num_components; }
   google::protobuf::Message *get_mutable_prior() {
     if (prior == nullptr) {
       create_empty_prior();
     }
     return prior.get();
   }
+  void set_num_components(const unsigned int num_) { num_components = num_; }
   void set_covariates(Eigen::MatrixXd *covar) { covariates_ptr = covar; }
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;

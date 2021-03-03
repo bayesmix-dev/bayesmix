@@ -3,8 +3,8 @@
 #include <Eigen/Dense>
 #include <stan/math/prim.hpp>
 
+#include "algorithm_state.pb.h"
 #include "ls_state.pb.h"
-#include "marginal_state.pb.h"
 #include "src/hierarchies/lin_reg_uni_hierarchy.h"
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/hierarchies/nnw_hierarchy.h"
@@ -28,9 +28,9 @@ TEST(nnighierarchy, draw) {
   auto hier2 = hier->clone();
   hier2->sample_prior();
 
-  bayesmix::MarginalState out;
-  bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
-  bayesmix::MarginalState::ClusterState* clusval2 = out.add_cluster_states();
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
   hier->write_state_to_proto(clusval);
   hier2->write_state_to_proto(clusval2);
 
@@ -59,9 +59,9 @@ TEST(nnighierarchy, sample_given_data) {
   hier2->add_datum(0, datum, false);
   hier2->sample_full_cond();
 
-  bayesmix::MarginalState out;
-  bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
-  bayesmix::MarginalState::ClusterState* clusval2 = out.add_cluster_states();
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
   hier->write_state_to_proto(clusval);
   hier2->write_state_to_proto(clusval2);
 
@@ -90,9 +90,9 @@ TEST(nnwhierarchy, draw) {
   auto hier2 = hier->clone();
   hier2->sample_prior();
 
-  bayesmix::MarginalState out;
-  bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
-  bayesmix::MarginalState::ClusterState* clusval2 = out.add_cluster_states();
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
   hier->write_state_to_proto(clusval);
   hier2->write_state_to_proto(clusval2);
 
@@ -125,9 +125,9 @@ TEST(nnwhierarchy, sample_given_data) {
   hier2->add_datum(0, datum, false);
   hier2->sample_full_cond();
 
-  bayesmix::MarginalState out;
-  bayesmix::MarginalState::ClusterState* clusval = out.add_cluster_states();
-  bayesmix::MarginalState::ClusterState* clusval2 = out.add_cluster_states();
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
   hier->write_state_to_proto(clusval);
   hier2->write_state_to_proto(clusval2);
 
@@ -143,7 +143,7 @@ TEST(lin_reg_uni_hierarchy, state_read_write) {
   bayesmix::to_proto(beta, ls.mutable_regression_coeffs());
   ls.set_var(sigma2);
 
-  bayesmix::MarginalState::ClusterState state;
+  bayesmix::AlgorithmState::ClusterState state;
   state.mutable_lin_reg_uni_ls_state()->CopyFrom(ls);
 
   LinRegUniHierarchy hier;
@@ -152,8 +152,8 @@ TEST(lin_reg_uni_hierarchy, state_read_write) {
   ASSERT_EQ(hier.get_state().regression_coeffs, beta);
   ASSERT_EQ(hier.get_state().var, sigma2);
 
-  bayesmix::MarginalState outt;
-  bayesmix::MarginalState::ClusterState* out = outt.add_cluster_states();
+  bayesmix::AlgorithmState outt;
+  bayesmix::AlgorithmState::ClusterState* out = outt.add_cluster_states();
   hier.write_state_to_proto(out);
   ASSERT_EQ(beta, bayesmix::to_eigen(
                       out->lin_reg_uni_ls_state().regression_coeffs()));

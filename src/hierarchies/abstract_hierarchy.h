@@ -9,8 +9,8 @@
 #include <set>
 #include <stan/math/prim.hpp>
 
+#include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
-#include "marginal_state.pb.h"
 #include "src/utils/rng.h"
 
 //! Abstract base template class for a hierarchy object.
@@ -37,14 +37,14 @@ class AbstractHierarchy {
 
   //! Adds a datum and its index to the hierarchy
   virtual void add_datum(
-      const int id, const Eigen::VectorXd &datum,
+      const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
-      const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
   //! Removes a datum and its index from the hierarchy
   virtual void remove_datum(
-      const int id, const Eigen::VectorXd &datum,
+      const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
-      const Eigen::VectorXd &covariate = Eigen::VectorXd(0)) = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
 
   virtual void initialize() = 0;
 
@@ -54,28 +54,27 @@ class AbstractHierarchy {
 
   //!
   virtual void update_hypers(
-      const std::vector<bayesmix::MarginalState::ClusterState> &states) = 0;
+      const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
   //! Evaluates the log-likelihood of data in a single point
   virtual double like_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const = 0;
 
   //! Evaluates the log-marginal distribution of data in a single point
   virtual double prior_pred_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const {
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     throw std::runtime_error(
-        "You are callign 'prior_pred_lpdf' from a non conjugate hieararchy");
+        "Cannot call prior_pred_lpdf() from a non-conjugate hieararchy");
   }
 
   virtual double conditional_pred_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::VectorXd(0)) const {
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     throw std::runtime_error(
-        "You are callign 'conditional_pred_lpdf' from a non conjugate "
-        "hieararchy");
+        "Cannot call conditional_pred_lpdf() from a non-conjugate hieararchy");
   }
 
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
@@ -88,15 +87,14 @@ class AbstractHierarchy {
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     throw std::runtime_error(
-        "You are callign 'prior_pred_lpdf_grid' from a non conjugate "
-        "hieararchy");
+        "Cannot call prior_pred_lpdf_grid() from a non-conjugate hieararchy");
   }
 
   virtual Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     throw std::runtime_error(
-        "You are callign 'conditional_pred_lpdf_grid' from a non conjugate "
+        "Cannot call conditional_pred_lpdf_grid() from a non-conjugate "
         "hieararchy");
   }
 

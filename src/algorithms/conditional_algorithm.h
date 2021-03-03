@@ -12,22 +12,27 @@ class ConditionalAlgorithm : public BaseAlgorithm {
  protected:
   //! Points at the same object as BaseAlgorithm::mixing
   std::shared_ptr<ConditionalMixing> cond_mixing;
+  //!
+  Eigen::VectorXd lpdf_from_state(
+      const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
+      const Eigen::RowVectorXd &mix_covariate) override;
+  //!
+  void initialize() override;
+  //!
+  virtual void sample_weights() = 0;
+  //!
+  void step() override {
+    sample_allocations();
+    sample_unique_values();
+    update_hierarchy_hypers();
+    sample_weights();
+  }
 
  public:
   ~ConditionalAlgorithm() = default;
   ConditionalAlgorithm() = default;
   //!
-  void initialize() override;
-  //!
-  void step() override {
-    BaseAlgorithm::step();
-    cond_mixing->update_state(unique_values, allocations);
-  }
-  //!
-  Eigen::MatrixXd eval_lpdf(
-      BaseCollector *const collector, const Eigen::MatrixXd &grid,
-      const Eigen::MatrixXd &hier_covariates = Eigen::MatrixXd(0, 0),
-      const Eigen::MatrixXd &mix_covariates = Eigen::MatrixXd(0, 0)) override;
+  bool is_conditional() const override { return true; }
 };
 
 #endif  // BAYESMIX_ALGORITHMS_CONDITIONAL_ALGORITHM_H_

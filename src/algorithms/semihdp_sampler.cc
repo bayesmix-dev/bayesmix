@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "marginal_state.pb.h"
+#include "algorithm_state.pb.h"
 #include "src/utils/distributions.h"
 #include "src/utils/eigen_utils.h"
 
@@ -470,7 +470,7 @@ void SemiHdpSampler::sample_pseudo_prior() {
       Eigen::VectorXd::Ones(pseudo_iter).array() / (1.0 * pseudo_iter);
   int iter = bayesmix::categorical_rng(probas, rng);
   for (int r = 0; r < ngroups; r++) {
-    bayesmix::MarginalState state;
+    bayesmix::AlgorithmState state;
     pseudoprior_collectors[r].get_state(iter, &state);
     // compute the cardinalities
     int nclus = state.cluster_states_size();
@@ -492,7 +492,7 @@ void SemiHdpSampler::sample_pseudo_prior() {
 
     rest_tables_pseudo[r].resize(0);
     for (int l = 0; l < state.cluster_states_size(); l++) {
-      bayesmix::MarginalState::ClusterState clusval = state.cluster_states(l);
+      bayesmix::AlgorithmState::ClusterState clusval = state.cluster_states(l);
       // perturb(&clusval);
       std::shared_ptr<AbstractHierarchy> curr_clus =
           G0_master_hierarchy->clone();
@@ -502,7 +502,7 @@ void SemiHdpSampler::sample_pseudo_prior() {
   }
 }
 
-void SemiHdpSampler::perturb(bayesmix::MarginalState::ClusterState* out) {
+void SemiHdpSampler::perturb(bayesmix::AlgorithmState::ClusterState* out) {
   auto& rng = bayesmix::Rng::Instance().get();
   if (out->has_uni_ls_state()) {
     double cnt_shared_tables =
@@ -587,11 +587,11 @@ void SemiHdpSampler::reassign_group(int i, int new_r, int old_r) {
 }
 
 Eigen::VectorXd SemiHdpSampler::_compute_mixture_distance(int i) {
-  std::vector<bayesmix::MarginalState::ClusterState> clus1(
+  std::vector<bayesmix::AlgorithmState::ClusterState> clus1(
       rest_tables[i].size());
   Eigen::VectorXd weights1(rest_tables[i].size());
   for (int l = 0; l < rest_tables[i].size(); l++) {
-    bayesmix::MarginalState::ClusterState clus;
+    bayesmix::AlgorithmState::ClusterState clus;
     rest_tables[i][l]->write_state_to_proto(&clus);
     clus1[l] = clus;
     weights1(l) = n_by_table[i][l];
@@ -600,11 +600,11 @@ Eigen::VectorXd SemiHdpSampler::_compute_mixture_distance(int i) {
   Eigen::VectorXd dists(ngroups);
 
   for (int r = 0; r < ngroups; r++) {
-    std::vector<bayesmix::MarginalState::ClusterState> clus2(
+    std::vector<bayesmix::AlgorithmState::ClusterState> clus2(
         rest_tables[r].size());
     Eigen::VectorXd weights2(rest_tables[r].size());
     for (int l = 0; l < rest_tables[r].size(); l++) {
-      bayesmix::MarginalState::ClusterState clus;
+      bayesmix::AlgorithmState::ClusterState clus;
       rest_tables[r][l]->write_state_to_proto(&clus);
       clus2[l] = clus;
       weights2(l) = n_by_table[r][l];
