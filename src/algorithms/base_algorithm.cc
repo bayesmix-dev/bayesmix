@@ -107,10 +107,8 @@ void BaseAlgorithm::update_hierarchy_hypers() {
   bayesmix::AlgorithmState::ClusterState clust;
   std::vector<bayesmix::AlgorithmState::ClusterState> states;
   for (auto &un : unique_values) {
-    if (un->get_card() > 0) {
-      un->write_state_to_proto(&clust);
-      states.push_back(clust);
-    }
+    un->write_state_to_proto(&clust);
+    states.push_back(clust);
   }
   unique_values[0]->update_hypers(states);
 }
