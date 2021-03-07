@@ -1,7 +1,8 @@
 # Build folder
 build/
 # Resources folder
-resources/
+resources/csv
+resources/asciipb
 # Visual Studio Code folder
 .vscode
 # SFTP configuration file
