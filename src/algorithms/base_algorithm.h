@@ -56,19 +56,19 @@ class BaseAlgorithm {
   unsigned int burnin = 100;
 
   // DATA AND VALUES CONTAINERS
-  //! Matrix of row-vectorial data points
-  Eigen::MatrixXd data;
   //! Initial number of clusters, only used for initialization
   unsigned int init_num_clusters = 0;
-  //! Allocation for each datum, i.e. label of the cluster it belongs to
+  //! Matrix of row-vectorial data points
+  Eigen::MatrixXd data;
+  //! Vector of allocation labels for each datum
   std::vector<unsigned int> allocations;
-  //! Hierarchy of the unique values that identify each cluster
+  //! Vector of pointers to Hierarchy objects that identify each cluster
   std::vector<std::shared_ptr<AbstractHierarchy>> unique_values;
-  //!
+  //! Covariates matrix for the Hierarchy objects
   Eigen::MatrixXd hier_covariates;
-  //! Mixing object
+  //! Pointer to the Mixing object
   std::shared_ptr<BaseMixing> mixing;
-  //!
+  //! Covariates matrix for the Mixing object
   Eigen::MatrixXd mix_covariates;
   //!
   bayesmix::AlgorithmState curr_state;
