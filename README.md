@@ -1,7 +1,9 @@
-bayesmix is a C++ library for running MCMC simulation in Bayesian mixture models.
+<img src="resources/logo_full.svg" alt="drawing" width="250"/>
+
+`bayesmix` is a C++ library for running MCMC simulation in Bayesian mixture models.
 
 Current state of the software:
-- bayesmix performs inference for mixture models of the kind
+- `bayesmix` performs inference for mixture models of the kind
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=y_1,&space;\ldots,&space;y_n&space;\sim&space;\int&space;k(\cdot&space;\mid&space;\theta)&space;P(d\theta)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?y_1,&space;\ldots,&space;y_n&space;\sim&space;\int&space;k(\cdot&space;\mid&space;\theta)&space;P(d\theta)" title="y_1, \ldots, y_n \sim \int k(\cdot \mid \theta) \Pi(d\theta)" /></a>
 
