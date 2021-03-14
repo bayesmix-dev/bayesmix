@@ -21,6 +21,7 @@ if __name__ == '__main__':
   settings.iterations = 1000
   settings.burnin = 100
   settings.init_num_clusters = 10
+  settings.neal8_n_aux = 3
   for algo in ['Neal2', 'Neal3', 'Neal8', 'BlockedGibbs']:
     settings.algo_id = algo
     with open(ASCIIPB + algo + '.asciipb', 'w') as f:
