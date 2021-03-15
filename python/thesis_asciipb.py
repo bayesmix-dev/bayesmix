@@ -40,7 +40,7 @@ if __name__ == '__main__':
   with open(ASCIIPB + 'PY.asciipb', 'w') as f:
     PrintMessage(py_prior, f)
   # For "dde": LSB and TSB mixings
-  dim = 2
+  dim = 1
   mu00 = dim*[0.0]
   sig00 = [5.0*_ for _ in identity_list(dim)]
   lsb_prior = mixing_prior_pb2.LogSBPrior()
