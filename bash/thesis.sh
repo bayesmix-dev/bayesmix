@@ -18,7 +18,7 @@ elif [ "$data" == 'faithful' ]; then
   declare -a mixs=('DP' 'PY')
   hier='NNW'
   covsname=''
-# Case 3: dde datase
+# Case 3: dde dataset
 elif [ "$data" == 'dde' ]; then
   declare -a algos=('BlockedGibbs')
   declare -a mixs=('LogSB' 'TruncSB')
