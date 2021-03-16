@@ -18,8 +18,8 @@ if __name__ == '__main__':
   ## ALGORITHM PARAMETERS
   settings = algorithm_params_pb2.AlgorithmParams()
   settings.rng_seed = 20201124
-  settings.iterations = 1000
-  settings.burnin = 100
+  settings.iterations = 5000
+  settings.burnin = 1000
   settings.init_num_clusters = 10
   settings.neal8_n_aux = 3
   for algo in ['Neal2', 'Neal3', 'Neal8', 'BlockedGibbs']:
