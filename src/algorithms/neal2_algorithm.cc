@@ -71,18 +71,22 @@ void Neal2Algorithm::sample_allocations() {
   auto &rng = bayesmix::Rng::Instance().get();
   // Loop over data points
   for (size_t i = 0; i < n_data; i++) {
-    unsigned int n_clust = unique_values.size();
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
     // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(
-        i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
+    unsigned int c_old = allocations[i];
+    if (singleton) {
+      remove_singleton(c_old);
+    } else {
+      unique_values[c_old]->remove_datum(
+          i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
+    }
+    unsigned int n_clust = unique_values.size();
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas =
         get_cluster_prior_mass(i) + get_cluster_lpdf(i);
     // Draw a NEW value for datum allocation
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
-    unsigned int c_old = allocations[i];
 
     if (c_new == n_clust) {
       std::shared_ptr<AbstractHierarchy> new_unique =
@@ -97,15 +101,6 @@ void Neal2Algorithm::sample_allocations() {
       allocations[i] = c_new;
       unique_values[c_new]->add_datum(
           i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
-    }
-    if (singleton) {
-      // Relabel allocations so that they are consecutive numbers
-      for (auto &c : allocations) {
-        if (c > c_old) {
-          c -= 1;
-        }
-      }
-      unique_values.erase(unique_values.begin() + c_old);
     }
   }
 }
