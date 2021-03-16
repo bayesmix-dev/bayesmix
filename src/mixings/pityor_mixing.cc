@@ -4,6 +4,7 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <stan/math/prim.hpp>
 #include <vector>
 
 #include "mixing_prior.pb.h"
@@ -26,11 +27,15 @@ double PitYorMixing::mass_existing_cluster(
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   double out;
   if (hier->get_card() == 0) {
-    out = 0;
-  } else {
-    out = (hier->get_card() - state.discount) / (n + state.strength);
+    return log ? stan::math::NEGATIVE_INFTY : 0;
   }
-  if (log) out = std::log(out);
+  if (log) {
+    out = std::log(hier->get_card() - state.discount);
+    if (!propto) out -= std::log(n + state.strength);
+  } else {
+    out = hier->get_card() - state.discount;
+    if (!propto) out /= n + state.strength;
+  }
   return out;
 }
 
@@ -41,9 +46,14 @@ double PitYorMixing::mass_new_cluster(
     const unsigned int n, const bool log, const bool propto,
     const unsigned int n_clust,
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
-  double out =
-      (state.strength + state.discount * n_clust) / (n + state.strength);
-  if (log) out = std::log(out);
+  double out;
+  if (log) {
+    out = std::log(state.strength + state.discount * n_clust);
+    if (!propto) out -= std::log(n + state.strength);
+  } else {
+    out = state.strength + state.discount * n_clust;
+    if (!propto) out /= n + state.strength;
+  }
   return out;
 }
 
@@ -61,9 +71,10 @@ void PitYorMixing::update_state(
 void PitYorMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast =
-      google::protobuf::internal::down_cast<const bayesmix::PYState &>(state_);
-  state.strength = statecast.strength();
-  state.discount = statecast.discount();
+      google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
+          state_);
+  state.strength = statecast.py_state().strength();
+  state.discount = statecast.py_state().discount();
 }
 
 void PitYorMixing::initialize_state() {
@@ -88,6 +99,7 @@ void PitYorMixing::write_state_to_proto(google::protobuf::Message *out) const {
   state_.set_strength(state.strength);
   state_.set_discount(state.discount);
 
-  google::protobuf::internal::down_cast<bayesmix::PYState *>(out)->CopyFrom(
-      state_);
+  auto *out_cast =
+      google::protobuf::internal::down_cast<bayesmix::MixingState *>(out);
+  out_cast->mutable_py_state()->CopyFrom(state_);
 }
