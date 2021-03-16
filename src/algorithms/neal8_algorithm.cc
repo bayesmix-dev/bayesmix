@@ -97,17 +97,20 @@ void Neal8Algorithm::sample_allocations() {
 
   // Loop over data points
   for (size_t i = 0; i < n_data; i++) {
-    unsigned int n_clust = unique_values.size();
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
+    unsigned int c_old = allocations[i];
     if (singleton) {
       // Save unique value in the first auxiliary block
       bayesmix::AlgorithmState::ClusterState curr_val;
       unique_values[allocations[i]]->write_state_to_proto(&curr_val);
       aux_unique_values[0]->set_state_from_proto(curr_val);
+      // Remove datum from cluster
+      remove_singleton(c_old);
+    } else {
+      unique_values[c_old]->remove_datum(
+          i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     }
-    // Remove datum from cluster
-    unique_values[allocations[i]]->remove_datum(
-        i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
+    unsigned int n_clust = unique_values.size();
     // Draw the unique values in the auxiliary blocks from their prior
     for (size_t j = singleton; j < n_aux; j++) {
       aux_unique_values[j]->sample_prior();
@@ -118,7 +121,6 @@ void Neal8Algorithm::sample_allocations() {
     // Draw a NEW value for datum allocation
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
-    unsigned int c_old = allocations[i];
     if (c_new >= n_clust) {
       // datum moves to a new cluster
       // Copy one of the auxiliary block as the new cluster
@@ -132,15 +134,6 @@ void Neal8Algorithm::sample_allocations() {
       allocations[i] = c_new;
       unique_values[c_new]->add_datum(
           i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
-    }
-    if (singleton) {
-      // Relabel allocations so that they are consecutive numbers
-      for (auto &c : allocations) {
-        if (c > c_old) {
-          c -= 1;
-        }
-      }
-      unique_values.erase(unique_values.begin() + c_old);
     }
   }
 }
