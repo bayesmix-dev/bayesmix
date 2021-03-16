@@ -23,6 +23,8 @@ class MarginalAlgorithm : public BaseAlgorithm {
       const Eigen::RowVectorXd &mix_covariate) override;
   //!
   void initialize() override;
+  //!
+  void remove_singleton(const unsigned int idx);
 
  public:
   ~MarginalAlgorithm() = default;
