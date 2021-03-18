@@ -24,9 +24,9 @@ We heavily depend on Google's [Protocol Buffers](https://github.com/protocolbuff
 
 On Linux machine the following will install the library
 ```shell
-sudo apt-get install autoconf automake libtool curl make g++ unzip
+sudo apt-get install autoconf automake libtool curl make g++ unzip cmake
 wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protobuf-python-3.14.0.zip
-unizp protobuf-python-3.14.0.zip
+unzip protobuf-python-3.14.0.zip
 cd protobuf-3.14.0/
 ./configure --prefix=/usr
 make check
