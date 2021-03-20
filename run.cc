@@ -44,12 +44,7 @@ int main(int argc, char *argv[]) {
   auto algo = factory_algo.create_object(algo_proto.algo_id());
   auto hier = factory_hier.create_object(hier_type);
   auto mixing = factory_mixing.create_object(mix_type);
-  BaseCollector *coll;
-  if (collname == "") {
-    coll = new MemoryCollector();
-  } else {
-    coll = new FileCollector(collname);
-  }
+  MemoryCollector *coll = new MemoryCollector();
 
   bayesmix::read_proto_from_file(mix_args, mixing->get_mutable_prior());
   bayesmix::read_proto_from_file(hier_args, hier->get_mutable_prior());
@@ -86,6 +81,13 @@ int main(int argc, char *argv[]) {
 
   // Run algorithm and density evaluation
   algo->run(coll);
+  if (collname != "") {
+    std::cout << "Writing states to file..." << std::endl;
+    coll->write_to_file<bayesmix::AlgorithmState>(collname);
+    std::cout << "Successfully wrote collector states to " << collname
+              << std::endl;
+  }
+
   std::cout << "Computing log-density..." << std::endl;
   Eigen::MatrixXd dens =
       algo->eval_lpdf(coll, grid, hier_cov_grid, mix_cov_grid);
