@@ -44,7 +44,7 @@ double NNWHierarchy::marg_lpdf(
                             (params.deg_free - 0.5 * (dim - 1)) *
                             params.var_scaling / (params.var_scaling + 1);
   // TODO: check if this is optimized as our bayesmix::multi_normal_prec_lpdf
-  return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean, sigma_n);
+  return stan::math::multi_student_t_lpdf(datum, nu_n, params.mean, sigma_n);
 }
 
 NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
