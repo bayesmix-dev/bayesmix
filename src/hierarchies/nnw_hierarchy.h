@@ -94,6 +94,16 @@ class NNWHierarchy
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNW;
   }
+  void set_hypers(const NNW::Hyperparams &hypers_) {
+    hypers = std::make_shared<NNW::Hyperparams>();
+    hypers->mean = hypers_.mean;
+    hypers->var_scaling = hypers_.var_scaling;
+    hypers->deg_free = hypers_.deg_free;
+    hypers->scale = hypers_.scale;
+    hypers->scale_inv = hypers_.scale_inv;
+    this->dim = hypers_.mean.size();
+  }
+  void set_state(const NNW::State &state) { this->state = state; }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_NNW_HIERARCHY_H_

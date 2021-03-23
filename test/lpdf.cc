@@ -54,88 +54,68 @@ TEST(lpdf, nnig) {
   ASSERT_DOUBLE_EQ(sum, marg);
 }
 
-// TEST(lpdf, nnw) {  // TODO
-//   using namespace stan::math;
-//   NNWHierarchy hier;
-//   bayesmix::NNWPrior hier_prior;
-//   Eigen::Vector2d mu0; mu0 << 5.5, 5.5;
-//   bayesmix::Vector mu0_proto;
-//   bayesmix::to_proto(mu0, &mu0_proto);
-//   double lambda0 = 0.2;
-//   double nu0 = 5.0;
-//   Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
-//   bayesmix::Matrix tau0_proto;
-//   bayesmix::to_proto(tau0, &tau0_proto);
-//   *hier_prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
-//   hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
-//   hier_prior.mutable_fixed_values()->set_deg_free(nu0);
-//   *hier_prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
-//   hier.set_prior(hier_prior);
-//   hier.initialize();
-//
-//   Eigen::VectorXd mu = mu0;
-//   Eigen::MatrixXd tau = lambda0 * Eigen::Matrix2d::Identity();
-//
-//   Eigen::RowVectorXd datum(2);
-//   datum << 4.5, 4.5;
-//
-//   // Compute prior parameters
-//   Eigen::MatrixXd tau_pr = lambda0 * tau0;
-//
-//   // Compute posterior parameters
-//   double mu_n = (lambda0 * mu0 + datum(0)) / (lambda0 + 1);
-//   double alpha_n = alpha0 + 0.5;
-//   double lambda_n = lambda0 + 1;
-//   double nu_n = nu0 + 0.5;
-//   Eigen::VectorXd mu_n =
-//       (lambda0 * mu0 + datum.transpose()) / (lambda0 + 1);
-//   Eigen::MatrixXd tau_temp =
-//       stan::math::inverse_spd(tau0) + (0.5 * lambda0 / (lambda0 + 1)) *
-//                                           (datum.transpose() - mu0) *
-//                                           (datum - mu0.transpose());
-//   Eigen::MatrixXd tau_n = stan::math::inverse_spd(tau_temp);
-//   Eigen::MatrixXd tau_post = lambda_n * tau_n;
-//
-//   // Compute pieces
-//   double prior1 = stan::math::wishart_lpdf(tau, nu0, tau0);
-//   double prior2 = stan::math::multi_normal_prec_lpdf(mu, mu0, tau_pr);
-//   double prior = prior1 + prior2;
-//   double like = hier.like_lpdf(datum);
-//   double post1 = stan::math::wishart_lpdf(tau, nu_n, tau_post);
-//   double post2 = stan::math::multi_normal_prec_lpdf(mu, mu0, tau_post);
-//   double post = post1 + post2;
-//
-//   // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
-//   double sum = prior + like - post;
-//   double marg = hier.prior_pred_lpdf(false, datum);
-//
-//   // Compute logdet's
-//   Eigen::MatrixXd tauchol0 =
-//       Eigen::LLT<Eigen::MatrixXd>(tau0).matrixL().transpose();
-//   double logdet0 = 2 * log(tauchol0.diagonal().array()).sum();
-//   Eigen::MatrixXd tauchol_n =
-//       Eigen::LLT<Eigen::MatrixXd>(tau_n).matrixL().transpose();
-//   double logdet_n = 2 * log(tauchol_n.diagonal().array()).sum();
-//
-//   // lmgamma(dim, x)
-//   int dim = 2;
-//   double marg_murphy = lmgamma(dim, 0.5 * nu_n) + 0.5 * nu_n * logdet_n +
-//                        0.5 * dim * log(lambda0) + dim * NEG_LOG_SQRT_TWO_PI
-//                        - lmgamma(dim, 0.5 * nu0) - 0.5 * nu0 * logdet0 - 0.5
-//                        * dim * log(lambda_n);
-//
-//   // std::cout << "prior1=" << prior1 << std::endl;
-//   // std::cout << "prior2=" << prior2 << std::endl;
-//   // std::cout << "prior =" << prior << std::endl;
-//   // std::cout << "like  =" << like << std::endl;
-//   // std::cout << "post1 =" << post1 << std::endl;
-//   // std::cout << "post2 =" << post2 << std::endl;
-//   // std::cout << "post  =" << post << std::endl;
-//   std::cout << "sum   =" << sum << std::endl;
-//   std::cout << "marg  =" << marg << std::endl;
-//   std::cout << "murphy=" << marg_murphy << std::endl;
-//   ASSERT_DOUBLE_EQ(marg, marg_murphy);
-// }
+TEST(lpdf, nnw) {  // TODO
+  using namespace stan::math;
+  NNWHierarchy hier;
+
+  NNW::Hyperparams prior_params;
+  prior_params.mean = Eigen::VectorXd::Ones(2) * 5.5;
+  prior_params.var_scaling = 0.2;
+  prior_params.deg_free = 10;
+  prior_params.scale = Eigen::MatrixXd::Identity(2, 2) * 0.5;
+  prior_params.scale_inv = inverse_spd(prior_params.scale);
+  hier.set_hypers(prior_params);
+  std::cout << "set hypers ok" << std::endl;
+
+  NNW::State curr_state;
+  curr_state.mean = Eigen::VectorXd::Ones(2) * 5.0;
+  curr_state.prec = Eigen::MatrixXd::Identity(2, 2) * 1.0;
+  curr_state.prec_chol =
+      Eigen::LLT<Eigen::MatrixXd>(curr_state.prec).matrixL().transpose();
+  Eigen::VectorXd diag = curr_state.prec_chol.diagonal();
+  curr_state.prec_logdet = 2 * log(diag.array()).sum();
+  hier.set_state(curr_state);
+
+  Eigen::VectorXd datum = Eigen::VectorXd::Ones(2) * 15.5;
+  hier.clear_data();
+  hier.add_datum(0, datum);
+  NNW::Hyperparams post_params = hier.get_posterior_parameters();
+
+  double prior_lpdf =
+      multi_normal_prec_lpdf(curr_state.mean, prior_params.mean,
+                             curr_state.prec * prior_params.var_scaling) +
+      wishart_lpdf(curr_state.prec, prior_params.deg_free, prior_params.scale);
+
+  double post_lpdf =
+      multi_normal_prec_lpdf(curr_state.mean, post_params.mean,
+                             curr_state.prec * post_params.var_scaling) +
+      wishart_lpdf(curr_state.prec, post_params.deg_free, post_params.scale);
+
+  double like_lpdf = hier.like_lpdf(datum);
+
+  double marg_lpdf = hier.marg_lpdf(prior_params, datum);
+
+  double marg_murphy;
+  double num = lmgamma(2, 0.5 * post_params.deg_free) +
+               0.5 * prior_params.deg_free *
+                   std::log(prior_params.scale_inv.determinant());
+  double den = 2 * ((-1) * NEG_LOG_SQRT_TWO_PI) *
+                   lmgamma(2, 0.5 * prior_params.deg_free) +
+               0.5 * prior_params.deg_free *
+                   std::log(post_params.scale_inv.determinant());
+
+  marg_murphy =
+      num - den +
+      1.0 * std::log(prior_params.var_scaling / post_params.var_scaling);
+
+  std::cout << "marg_murphy: " << marg_murphy << std::endl;
+  std::cout << "marg_lpdf: " << marg_lpdf << std::endl;
+  std::cout << "sums: " << prior_lpdf + like_lpdf - post_lpdf << std::endl;
+
+  ASSERT_DOUBLE_EQ(marg_lpdf, prior_lpdf + like_lpdf - post_lpdf);
+  ASSERT_DOUBLE_EQ(marg_murphy, prior_lpdf + like_lpdf - post_lpdf);
+  ASSERT_DOUBLE_EQ(marg_lpdf, prior_lpdf + like_lpdf - post_lpdf);
+}
 
 TEST(lpdf, lin_reg_uni) {
   // Create hierarchy objects
