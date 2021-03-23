@@ -3,6 +3,7 @@ build/
 # Resources folder
 resources/csv
 resources/asciipb
+resources/halp
 # Visual Studio Code folder
 .vscode
 # SFTP configuration file

@@ -49,7 +49,6 @@ double NNWHierarchy::marg_lpdf(
   // scale = stan::math::inverse_spd(scale);
   // TODO: check if this is optimized as our bayesmix::multi_normal_prec_lpdf
   return stan::math::multi_student_t_lpdf(datum, nu_n, params.mean, scale);
-}
 
 NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
   // Generate new state values from their prior centering distribution
