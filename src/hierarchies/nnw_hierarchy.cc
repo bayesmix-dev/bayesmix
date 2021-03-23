@@ -39,12 +39,11 @@ double NNWHierarchy::marg_lpdf(
     const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   // Compute dof and scale of marginal distribution
-  double nu_n = 2 * params.deg_free - dim + 1;
-  Eigen::MatrixXd sigma_n = params.scale_inv *
-                            (params.deg_free - 0.5 * (dim - 1)) *
-                            params.var_scaling / (params.var_scaling + 1);
+  double nu_n = params.deg_free - dim + 1;
+  Eigen::MatrixXd scale = params.scale_inv * (params.var_scaling + 1) /
+                          (params.var_scaling * (params.deg_free - dim + 1));
   // TODO: check if this is optimized as our bayesmix::multi_normal_prec_lpdf
-  return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean, sigma_n);
+  return stan::math::multi_student_t_lpdf(datum, nu_n, params.mean, scale);
 }
 
 NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
@@ -82,7 +81,7 @@ NNW::Hyperparams NNWHierarchy::get_posterior_parameters() {
   // Compute posterior hyperparameters
   NNW::Hyperparams post_params;
   post_params.var_scaling = hypers->var_scaling + card;
-  post_params.deg_free = hypers->deg_free + 0.5 * card;
+  post_params.deg_free = hypers->deg_free + card;
   Eigen::VectorXd mubar = data_sum.array() / card;  // sample mean
   post_params.mean = (hypers->var_scaling * hypers->mean + card * mubar) /
                      (hypers->var_scaling + card);
@@ -91,7 +90,7 @@ NNW::Hyperparams NNWHierarchy::get_posterior_parameters() {
       data_sum_squares - card * mubar * mubar.transpose();
   tau_temp += (card * hypers->var_scaling / (card + hypers->var_scaling)) *
               (mubar - hypers->mean) * (mubar - hypers->mean).transpose();
-  post_params.scale_inv = 0.5 * tau_temp + hypers->scale_inv;
+  post_params.scale_inv = tau_temp + hypers->scale_inv;
   post_params.scale = stan::math::inverse_spd(post_params.scale_inv);
   return post_params;
 }

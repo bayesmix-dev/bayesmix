@@ -47,6 +47,7 @@ class BaseHierarchy : public AbstractHierarchy {
 
   State get_state() const { return state; }
   Hyperparams get_hypers() const { return *hypers; }
+  Hyperparams get_posterior_hypers() const { return posterior_hypers; }
 
   void sample_prior() override {
     state = static_cast<Derived *>(this)->draw(*hypers);
