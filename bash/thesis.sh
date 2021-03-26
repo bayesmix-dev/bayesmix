@@ -4,7 +4,6 @@
 ASCIIPB='resources/asciipb/thesis'
 CSVIN='resources/csv/in/thesis'
 CSVOUT='resources/csv/out/thesis'
-RECORDIO='resources/recordio'
 
 data=$1
 # Case 1: galaxy dataset
@@ -38,7 +37,7 @@ for algo in "${algos[@]}"; do
       $ASCIIPB/$algo.asciipb \
       $hier $ASCIIPB/hier_$data.asciipb \
       $mix  $ASCIIPB/$mix.asciipb \
-      $RECORDIO/${data}_${algo}_${mix}.recordio \
+      "" \
       $CSVIN/$data.csv \
       $CSVIN/${data}_grid.csv \
       $CSVOUT/${data}_dens_${algo}_$mix.csv \
