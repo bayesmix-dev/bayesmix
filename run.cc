@@ -95,14 +95,17 @@ int main(int argc, char *argv[]) {
 
   // Collect mixing and cluster states
   Eigen::MatrixXd clusterings(coll->get_size(), data.rows());
-  Eigen::VectorXd num_clust(coll->get_size());
+  Eigen::VectorXd num_clust = Eigen::VectorXd::Zero(coll->get_size());
   for (int i = 0; i < coll->get_size(); i++) {
     bayesmix::AlgorithmState state;
     coll->get_next_state(&state);
     for (int j = 0; j < data.rows(); j++) {
       clusterings(i, j) = state.cluster_allocs(j);
     }
-    num_clust(i) = state.cluster_states_size();
+    for (int j = 0; j < state.cluster_states_size(); j++) {
+      if (state.cluster_states(j).cardinality() > 0)
+        num_clust(i) += 1.0;
+    }
   }
   // Write collected data to files
   bayesmix::write_matrix_to_file(num_clust, nclufile);
