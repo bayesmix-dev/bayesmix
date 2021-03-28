@@ -21,6 +21,22 @@ double bayesmix::multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
   return 0.5 * (base - exp);
 }
 
+double bayesmix::multi_student_t_scale_lpdf(const Eigen::VectorXd &datum,
+                                            double df,
+                                            const Eigen::VectorXd &mean,
+                                            const Eigen::MatrixXd &scale_chol,
+                                            double scale_logdet, bool propto) {
+  int dim = datum.size();
+  double out = -0.5 * (df + dim) *
+               std::log(1 + (scale_chol * (datum - mean)).squaredNorm() / df);
+  if (!propto) {
+    out += stan::math::lgamma((df + dim) * 0.5) -
+           stan::math::lgamma(df * 0.5) - (0.5 * dim) * std::log(df) -
+           (0.5 * dim) * stan::math::LOG_PI + 0.5 * scale_logdet;
+  }
+  return out;
+}
+
 double bayesmix::gaussian_mixture_dist(
     Eigen::VectorXd means1, Eigen::VectorXd vars1, Eigen::VectorXd weights1,
     Eigen::VectorXd means2, Eigen::VectorXd vars2, Eigen::VectorXd weights2) {

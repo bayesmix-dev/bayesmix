@@ -39,6 +39,11 @@ double multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
                               const Eigen::MatrixXd &prec_chol,
                               double prec_logdet);
 
+double multi_student_t_scale_lpdf(const Eigen::VectorXd &datum, double df,
+                                  const Eigen::VectorXd &mean,
+                                  const Eigen::MatrixXd &scale_chol,
+                                  double scale_logdet, bool propto = false);
+
 /*
  * Computes the L2 distance between the univariate mixture of Gaussian
  * densities p1(x) = \sum_{h=1}^m1 w1[h] N(x | mean1[h], var1[h]) and
