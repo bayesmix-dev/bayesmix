@@ -113,9 +113,9 @@ TEST(student_t, marginal) {
   Eigen::MatrixXd scale_inv =
       (A * A.transpose()) + 1.0 * Eigen::MatrixXd::Identity(dim, dim);
 
-  Eigen::MatrixXd sigma_n = scale_inv * (deg_free - 0.5 * (dim - 1)) *
-                            var_scaling / (var_scaling + 1);
-  double nu_n = 2 * deg_free - dim + 1;
+  Eigen::MatrixXd sigma_n =
+      scale_inv * (var_scaling + 1) / (var_scaling * (deg_free - dim + 1));
+  double nu_n = deg_free - dim + 1;
 
   Eigen::VectorXd datum = Eigen::VectorXd::Ones(dim);
   Eigen::VectorXd mean = Eigen::VectorXd::Zero(dim);
@@ -124,9 +124,12 @@ TEST(student_t, marginal) {
   Eigen::MatrixXd scale_chol =
       Eigen::LLT<Eigen::MatrixXd>(scale).matrixL().transpose();
 
-  Eigen::MatrixXd scale_chol_n =
-      scale_chol / std::sqrt((deg_free - 0.5 * (dim - 1)) * var_scaling /
-                             (var_scaling + 1));
+  // Eigen::MatrixXd scale_chol_n =
+  //     scale_chol / std::sqrt((deg_free - 0.5 * (dim - 1)) * var_scaling /
+  //                            (var_scaling + 1));
+
+  double coeff = (var_scaling + 1) / (var_scaling * (deg_free - dim + 1));
+  Eigen::MatrixXd scale_chol_n = scale_chol / std::sqrt(coeff);
   Eigen::VectorXd diag = scale_chol_n.diagonal();
   double logdet = 2 * log(diag.array()).sum();
 

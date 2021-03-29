@@ -7,12 +7,9 @@ endif()
 
 project(bayesmix)
 
-set (CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-
-find_package(OpenMP REQUIRED)
 
 include(FindPythonInterp)
 add_custom_target(
