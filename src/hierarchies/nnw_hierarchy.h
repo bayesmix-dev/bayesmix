@@ -42,6 +42,7 @@ struct Hyperparams {
   double deg_free;
   Eigen::MatrixXd scale;
   Eigen::MatrixXd scale_inv;
+  Eigen::MatrixXd scale_chol;
 };
 }  // namespace NNW
 

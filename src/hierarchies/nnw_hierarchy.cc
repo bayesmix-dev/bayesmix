@@ -40,10 +40,18 @@ double NNWHierarchy::marg_lpdf(
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   // Compute dof and scale of marginal distribution
   double nu_n = 2 * params.deg_free - dim + 1;
+  // Eigen::MatrixXd scale_chol_n =
+  //     params.scale_chol /
+  //     std::sqrt((params.deg_free - 0.5 * (dim - 1)) * params.var_scaling /
+  //               (params.var_scaling + 1));
+  // Eigen::VectorXd diag = scale_chol_n.diagonal();
+  // double logdet = 2 * log(diag.array()).sum();
+  // return bayesmix::multi_student_t_scale_lpdf(datum, nu_n, hypers->mean,
+  //                                             scale_chol_n, logdet);
   Eigen::MatrixXd sigma_n = params.scale_inv *
                             (params.deg_free - 0.5 * (dim - 1)) *
                             params.var_scaling / (params.var_scaling + 1);
-  // TODO: check if this is optimized as our bayesmix::multi_normal_prec_lpdf
+  // TODO: check if this is optimized as our
   return stan::math::multi_student_t_lpdf(datum, nu_n, hypers->mean, sigma_n);
 }
 
@@ -93,6 +101,8 @@ NNW::Hyperparams NNWHierarchy::get_posterior_parameters() {
               (mubar - hypers->mean) * (mubar - hypers->mean).transpose();
   post_params.scale_inv = 0.5 * tau_temp + hypers->scale_inv;
   post_params.scale = stan::math::inverse_spd(post_params.scale_inv);
+  post_params.scale_chol =
+      Eigen::LLT<Eigen::MatrixXd>(hypers->scale).matrixL().transpose();
   return post_params;
 }
 
@@ -116,7 +126,6 @@ void NNWHierarchy::initialize_hypers() {
     dim = hypers->mean.size();
     hypers->var_scaling = prior->fixed_values().var_scaling();
     hypers->scale = bayesmix::to_eigen(prior->fixed_values().scale());
-    hypers->scale_inv = stan::math::inverse_spd(hypers->scale);
     hypers->deg_free = prior->fixed_values().deg_free();
     // Check validity
     if (hypers->var_scaling <= 0) {
@@ -160,7 +169,6 @@ void NNWHierarchy::initialize_hypers() {
     hypers->mean = mu00;
     hypers->var_scaling = lambda0;
     hypers->scale = tau0;
-    hypers->scale_inv = stan::math::inverse_spd(tau0);
     hypers->deg_free = nu0;
   }
 
@@ -209,13 +217,13 @@ void NNWHierarchy::initialize_hypers() {
     hypers->mean = mu00;
     hypers->var_scaling = alpha00 / beta00;
     hypers->scale = tau00 / (nu00 + dim + 1);
-    hypers->scale_inv = stan::math::inverse_spd(hypers->scale);
     hypers->deg_free = nu0;
-  }
-
-  else {
+  } else {
     throw std::invalid_argument("Unrecognized hierarchy prior");
   }
+  hypers->scale_inv = stan::math::inverse_spd(hypers->scale);
+  hypers->scale_chol =
+      Eigen::LLT<Eigen::MatrixXd>(hypers->scale).matrixL().transpose();
 }
 
 void NNWHierarchy::update_hypers(
@@ -288,6 +296,8 @@ void NNWHierarchy::update_hypers(
     hypers->var_scaling = stan::math::gamma_rng(alpha_n, beta_n, rng);
     hypers->scale = stan::math::inv_wishart_rng(nu_n, tau_n, rng);
     hypers->scale_inv = stan::math::inverse_spd(hypers->scale);
+    hypers->scale_chol =
+        Eigen::LLT<Eigen::MatrixXd>(hypers->scale).matrixL().transpose();
   }
 
   else {
