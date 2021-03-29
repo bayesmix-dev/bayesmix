@@ -14,7 +14,9 @@
 #include "src/utils/rng.h"
 
 void BaseAlgorithm::initialize() {
-  std::cout << "Initializing... " << std::flush;
+  if (verbose) {
+    std::cout << "Initializing... " << std::flush;
+  }
   // Perform checks
   if (data.rows() == 0) {
     throw std::invalid_argument("Data was not provided to algorithm");
@@ -100,7 +102,9 @@ void BaseAlgorithm::initialize() {
     unique_values[clust]->add_datum(i, data.row(i), update_hierarchy_params(),
                                     hier_covariates.row(i));
   }
-  std::cout << "Done" << std::endl;
+  if (verbose) {
+    std::cout << "Done" << std::endl;
+  }
 }
 
 void BaseAlgorithm::update_hierarchy_hypers() {
@@ -161,17 +165,26 @@ Eigen::MatrixXd BaseAlgorithm::eval_lpdf(
     const Eigen::RowVectorXd &mix_covariate /*= Eigen::RowVectorXd(0)*/) {
   std::deque<Eigen::VectorXd> lpdf;
   bool keep = true;
-  progresscpp::ProgressBar bar(collector->get_size(), 60);
+  progresscpp::ProgressBar *bar = nullptr;
+    if (verbose) {
+      bar = new progresscpp::ProgressBar(maxiter, 60);
+    }
   while (keep) {
     keep = update_state_from_collector(collector);
     if (!keep) {
       break;
     }
     lpdf.push_back(lpdf_from_state(grid, hier_covariate, mix_covariate));
-    ++bar;
-    bar.display();
+    if (verbose) {
+        ++(*bar);
+        bar->display();
+      }
   }
   collector->reset();
-  bar.done();
+  if (verbose) {
+    bar->done();
+    delete bar;
+    print_ending_message();
+  }
   return bayesmix::stack_vectors(lpdf);
 }

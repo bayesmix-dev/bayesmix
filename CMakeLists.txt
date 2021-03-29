@@ -8,6 +8,8 @@ endif()
 project(bayesmix)
 
 set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_BUILD_TYPE Debug)
+
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops
   -ftree-vectorize -fopenmp")
 
@@ -23,6 +25,8 @@ find_package(Protobuf REQUIRED)
 
 option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
+option(DISABLE_BENCHMARKS
+      "If benchmarks should be compiled or no" OFF)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -81,6 +85,9 @@ target_link_libraries(dependent_run PUBLIC ${LINK_LIBRARIES})
 target_compile_options(dependent_run PUBLIC ${COMPILE_OPTIONS})
 
 if (NOT DISABLE_TESTS)
-  # Build test executable
   add_subdirectory(test)
+endif()
+
+if (NOT DISABLE_BENCHMARKS)
+  add_subdirectory(benchmarks)
 endif()
