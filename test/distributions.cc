@@ -124,10 +124,6 @@ TEST(student_t, marginal) {
   Eigen::MatrixXd scale_chol =
       Eigen::LLT<Eigen::MatrixXd>(scale).matrixL().transpose();
 
-  // Eigen::MatrixXd scale_chol_n =
-  //     scale_chol / std::sqrt((deg_free - 0.5 * (dim - 1)) * var_scaling /
-  //                            (var_scaling + 1));
-
   double coeff = (var_scaling + 1) / (var_scaling * (deg_free - dim + 1));
   Eigen::MatrixXd scale_chol_n = scale_chol / std::sqrt(coeff);
   Eigen::VectorXd diag = scale_chol_n.diagonal();
