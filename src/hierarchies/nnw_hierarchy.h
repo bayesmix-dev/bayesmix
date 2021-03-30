@@ -58,6 +58,9 @@ class NNWHierarchy
   //! Special setter for prec and its utilities
   void wite_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);
 
+  NNW::Hyperparams get_predictive_t_parameters(
+      const NNW::Hyperparams &params) const;
+
  public:
   // DESTRUCTOR AND CONSTRUCTORS
   ~NNWHierarchy() = default;
@@ -75,6 +78,20 @@ class NNWHierarchy
       const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
 
+  Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data,
+                                 const Eigen::MatrixXd &covariates =
+                                     Eigen::MatrixXd(0, 0)) const override;
+
+  Eigen::VectorXd prior_pred_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
+                                                          0)) const override;
+
+  Eigen::VectorXd conditional_pred_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
+                                                          0)) const override;
+
   // SAMPLING FUNCTIONS
   NNW::State draw(const NNW::Hyperparams &params);
 
@@ -87,7 +104,7 @@ class NNWHierarchy
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  const Eigen::RowVectorXd &covariate,
                                  bool add);
-  NNW::Hyperparams get_posterior_parameters();
+  NNW::Hyperparams get_posterior_parameters() const;
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;

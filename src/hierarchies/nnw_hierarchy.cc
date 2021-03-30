@@ -30,7 +30,6 @@ void NNWHierarchy::wite_prec_to_state(const Eigen::MatrixXd &prec_,
 double NNWHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
-  // Initialize relevant objects
   return bayesmix::multi_normal_prec_lpdf(datum, state.mean, state.prec_chol,
                                           state.prec_logdet);
 }
@@ -38,15 +37,42 @@ double NNWHierarchy::like_lpdf(
 double NNWHierarchy::marg_lpdf(
     const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
-  // Compute dof and scale of marginal distribution
-  double nu_n = params.deg_free - dim + 1;
-  double coeff = (params.var_scaling + 1) / (params.var_scaling * nu_n);
-  Eigen::MatrixXd scale_chol_n = params.scale_chol / std::sqrt(coeff);
-  Eigen::VectorXd diag = scale_chol_n.diagonal();
+  NNW::Hyperparams pred_params = get_predictive_t_parameters(params);
+  Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
   double logdet = 2 * log(diag.array()).sum();
 
-  return bayesmix::multi_student_t_scale_lpdf(datum, nu_n, params.mean,
-                                              scale_chol_n, logdet);
+  return bayesmix::multi_student_t_invscale_lpdf(
+      datum, pred_params.deg_free, pred_params.mean, pred_params.scale_chol,
+      logdet);
+}
+
+Eigen::VectorXd NNWHierarchy::like_lpdf_grid(
+    const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
+  return bayesmix::multi_normal_prec_lpdf_grid(
+      data, state.mean, state.prec_chol, state.prec_logdet);
+}
+
+Eigen::VectorXd NNWHierarchy::prior_pred_lpdf_grid(
+    const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
+  NNW::Hyperparams pred_params = get_predictive_t_parameters(*hypers);
+  Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
+  double logdet = 2 * log(diag.array()).sum();
+
+  return bayesmix::multi_student_t_invscale_lpdf_grid(
+      data, pred_params.deg_free, pred_params.mean, pred_params.scale_chol,
+      logdet);
+}
+
+Eigen::VectorXd NNWHierarchy::conditional_pred_lpdf_grid(
+    const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
+  NNW::Hyperparams pred_params =
+      get_predictive_t_parameters(get_posterior_parameters());
+  Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
+  double logdet = 2 * log(diag.array()).sum();
+
+  return bayesmix::multi_student_t_invscale_lpdf_grid(
+      data, pred_params.deg_free, pred_params.mean, pred_params.scale_chol,
+      logdet);
 }
 
 NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
@@ -77,7 +103,7 @@ void NNWHierarchy::update_summary_statistics(
 //! \param data                    Matrix of row-vectorial data points
 //! \param mu0, lambda0, tau0, nu0 Original values for hyperparameters
 //! \return                        Vector of updated values for hyperparameters
-NNW::Hyperparams NNWHierarchy::get_posterior_parameters() {
+NNW::Hyperparams NNWHierarchy::get_posterior_parameters() const {
   if (card == 0) {  // no update possible
     return *hypers;
   }
@@ -98,6 +124,20 @@ NNW::Hyperparams NNWHierarchy::get_posterior_parameters() {
   post_params.scale_chol =
       Eigen::LLT<Eigen::MatrixXd>(post_params.scale).matrixU();
   return post_params;
+}
+
+NNW::Hyperparams NNWHierarchy::get_predictive_t_parameters(
+    const NNW::Hyperparams &params) const {
+  // Compute dof and scale of marginal distribution
+  double nu_n = params.deg_free - dim + 1;
+  double coeff = (params.var_scaling + 1) / (params.var_scaling * nu_n);
+  Eigen::MatrixXd scale_chol_n = params.scale_chol / std::sqrt(coeff);
+
+  NNW::Hyperparams out;
+  out.mean = params.mean;
+  out.deg_free = nu_n;
+  out.scale_chol = scale_chol_n;
+  return out;
 }
 
 void NNWHierarchy::clear_data() {

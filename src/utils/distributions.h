@@ -39,10 +39,29 @@ double multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
                               const Eigen::MatrixXd &prec_chol,
                               double prec_logdet);
 
-double multi_student_t_scale_lpdf(const Eigen::VectorXd &datum, double df,
-                                  const Eigen::VectorXd &mean,
-                                  const Eigen::MatrixXd &scale_chol,
-                                  double scale_logdet, bool propto = false);
+/*
+ * Evaluates the log probability density function of a multivariate Gaussian
+ * distribution parametrized by mean and precision matrix
+ *
+ * @param data a grid of points (by row) where to evaluate the lpdf
+ * @param mean the mean of the Gaussian distribution
+ * @prec_chol the (lower) cholesky factor of the precision matric
+ * @prec_logdet logarithm of the determinant of the precision matrix
+ * @return the evaluation of the lpdf
+ */
+Eigen::VectorXd multi_normal_prec_lpdf_grid(const Eigen::MatrixXd &data,
+                                       const Eigen::VectorXd &mean,
+                                       const Eigen::MatrixXd &prec_chol,
+                                       double prec_logdet);
+
+double multi_student_t_invscale_lpdf(const Eigen::VectorXd &datum, double df,
+                                     const Eigen::VectorXd &mean,
+                                     const Eigen::MatrixXd &invscale_chol,
+                                     double scale_logdet);
+
+Eigen::VectorXd multi_student_t_invscale_lpdf_grid(
+    const Eigen::MatrixXd &data, double df, const Eigen::VectorXd &mean,
+    const Eigen::MatrixXd &invscale_chol, double scale_logdet);
 
 /*
  * Computes the L2 distance between the univariate mixture of Gaussian

@@ -96,7 +96,7 @@ TEST(student_t, optimized) {
   Eigen::VectorXd diag = sigma_inv_chol.diagonal();
   double logdet = 2 * log(diag.array()).sum();
 
-  double our_lpdf = bayesmix::multi_student_t_scale_lpdf(
+  double our_lpdf = bayesmix::multi_student_t_invscale_lpdf(
       x, df, mean, sigma_inv_chol, logdet);
 
   // std::cout << "our_lpdf: " << our_lpdf << std::endl;
@@ -138,8 +138,54 @@ TEST(student_t, marginal) {
   double old_lpdf =
       stan::math::multi_student_t_lpdf(datum, nu_n, mean, sigma_n);
 
-  double new_lpdf = bayesmix::multi_student_t_scale_lpdf(datum, nu_n, mean,
-                                                         scale_chol_n, logdet);
+  double new_lpdf = bayesmix::multi_student_t_invscale_lpdf(
+      datum, nu_n, mean, scale_chol_n, logdet);
 
   ASSERT_LE(std::abs(old_lpdf - new_lpdf), 0.001);
+}
+
+TEST(mult_normal, lpdf_grid) {
+  int dim = 3;
+
+  Eigen::MatrixXd data = Eigen::MatrixXd::Random(20, dim);
+  Eigen::VectorXd mean = Eigen::ArrayXd::LinSpaced(dim, 0.0, 10.0);
+  Eigen::MatrixXd tmp = Eigen::MatrixXd::Random(dim + 1, dim);
+  Eigen::MatrixXd prec =
+      tmp.transpose() * tmp + Eigen::MatrixXd::Identity(dim, dim);
+  Eigen::MatrixXd prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec).matrixU();
+  Eigen::VectorXd diag = prec_chol.diagonal();
+  double prec_logdet = 2 * log(diag.array()).sum();
+
+  Eigen::VectorXd lpdfs =
+      bayesmix::multi_normal_prec_lpdf_grid(data, mean, prec_chol, prec_logdet);
+
+  for (int i=0; i < 20; i++) {
+    double curr =
+        bayesmix::multi_normal_prec_lpdf(data.row(i), mean, prec_chol, prec_logdet);
+    ASSERT_DOUBLE_EQ(curr, lpdfs(i));
+  }
+}
+
+TEST(mult_t, lpdf_grid) {
+  int dim = 3;
+
+  Eigen::MatrixXd data = Eigen::MatrixXd::Random(20, dim);
+  Eigen::VectorXd mean = Eigen::ArrayXd::LinSpaced(dim, 0.0, 10.0);
+  Eigen::MatrixXd tmp = Eigen::MatrixXd::Random(dim + 1, dim);
+  Eigen::MatrixXd invscale =
+      tmp.transpose() * tmp + Eigen::MatrixXd::Identity(dim, dim);
+  Eigen::MatrixXd invscale_chol =
+      Eigen::LLT<Eigen::MatrixXd>(invscale).matrixU();
+  Eigen::VectorXd diag = invscale_chol.diagonal();
+  double invscale_logdet = 2 * log(diag.array()).sum();
+  double df = 10;
+
+  Eigen::VectorXd lpdfs = bayesmix::multi_student_t_invscale_lpdf_grid(
+      data, df, mean, invscale_chol, invscale_logdet);
+
+  for (int i = 0; i < 20; i++) {
+    double curr = bayesmix::multi_student_t_invscale_lpdf(
+        data.row(i), df, mean, invscale_chol, invscale_logdet);
+    ASSERT_DOUBLE_EQ(curr, lpdfs(i));
+  }
 }

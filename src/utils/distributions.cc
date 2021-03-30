@@ -21,20 +21,49 @@ double bayesmix::multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
   return 0.5 * (base - exp);
 }
 
-double bayesmix::multi_student_t_scale_lpdf(const Eigen::VectorXd &datum,
-                                            double df,
-                                            const Eigen::VectorXd &mean,
-                                            const Eigen::MatrixXd &scale_chol,
-                                            double scale_logdet, bool propto) {
+Eigen::VectorXd bayesmix::multi_normal_prec_lpdf_grid(
+    const Eigen::MatrixXd &data, const Eigen::VectorXd &mean,
+    const Eigen::MatrixXd &prec_chol, double prec_logdet) {
+  using stan::math::NEG_LOG_SQRT_TWO_PI;
+  Eigen::VectorXd exp =
+      ((data.rowwise() - mean.transpose()) * prec_chol.transpose())
+          .rowwise()
+          .squaredNorm();
+  Eigen::VectorXd base = Eigen::ArrayXd::Ones(data.rows()) * prec_logdet +
+                         NEG_LOG_SQRT_TWO_PI * data.cols();
+  return (base - exp) * 0.5;
+}
+
+double bayesmix::multi_student_t_invscale_lpdf(
+    const Eigen::VectorXd &datum, double df, const Eigen::VectorXd &mean,
+    const Eigen::MatrixXd &invscale_chol, double scale_logdet) {
   int dim = datum.size();
-  double out = -0.5 * (df + dim) *
-               std::log(1 + (scale_chol * (datum - mean)).squaredNorm() / df);
-  if (!propto) {
-    out += stan::math::lgamma((df + dim) * 0.5) -
-           stan::math::lgamma(df * 0.5) - (0.5 * dim) * std::log(df) -
-           (0.5 * dim) * stan::math::LOG_PI + 0.5 * scale_logdet;
-  }
-  return out;
+  double exp =
+      0.5 * (df + dim) *
+      std::log(1 + (invscale_chol * (datum - mean)).squaredNorm() / df);
+  double base = stan::math::lgamma((df + dim) * 0.5) -
+                stan::math::lgamma(df * 0.5) - (0.5 * dim) * std::log(df) -
+                (0.5 * dim) * stan::math::LOG_PI + 0.5 * scale_logdet;
+  return base - exp;
+}
+
+Eigen::VectorXd bayesmix::multi_student_t_invscale_lpdf_grid(
+    const Eigen::MatrixXd &data, double df, const Eigen::VectorXd &mean,
+    const Eigen::MatrixXd &invscale_chol, double scale_logdet) {
+  int dim = data.cols();
+  int n = data.rows();
+  double base_coeff = stan::math::lgamma((df + dim) * 0.5) -
+                      stan::math::lgamma(df * 0.5) -
+                      (0.5 * dim) * std::log(df) -
+                      (0.5 * dim) * stan::math::LOG_PI + 0.5 * scale_logdet;
+  Eigen::VectorXd base = Eigen::VectorXd::Ones(n) * base_coeff;
+  Eigen::VectorXd quadforms =
+      ((data.rowwise() - mean.transpose()) * invscale_chol.transpose())
+          .rowwise()
+          .squaredNorm();
+  Eigen::VectorXd exp =
+      (quadforms.array() / df + 1.0).log() * 0.5 * (df + dim);
+  return base - exp;
 }
 
 double bayesmix::gaussian_mixture_dist(

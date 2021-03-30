@@ -1,9 +1,7 @@
 #include "utils.h"
 
 std::shared_ptr<AbstractHierarchy> get_multivariate_nnw_hierarchy(int dim) {
-  Eigen::MatrixXd A = Eigen::MatrixXd::Random(dim + 1, dim);
-  Eigen::MatrixXd scale =
-      A.transpose() * A + Eigen::MatrixXd::Identity(dim, dim);
+  Eigen::MatrixXd scale = get_spd_matrix(dim);
 
   double deg_free = dim + 5;
   double var_scaling = 0.1;
@@ -64,4 +62,11 @@ std::shared_ptr<BaseAlgorithm> get_algorithm(const std::string& id, int dim) {
   algo->set_mixing(mixing);
   algo->set_hierarchy(hier);
   return algo;
+}
+
+Eigen::MatrixXd get_spd_matrix(int dim) {
+  Eigen::MatrixXd A = Eigen::MatrixXd::Random(dim + 1, dim);
+  Eigen::MatrixXd out =
+      A.transpose() * A + Eigen::MatrixXd::Identity(dim, dim);
+  return out;
 }
