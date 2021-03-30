@@ -93,28 +93,28 @@ int main(int argc, char *argv[]) {
   bayesmix::write_matrix_to_file(dens, densfile);
   std::cout << "Successfully wrote density to " << densfile << std::endl;
 
-  // // Collect mixing and cluster states
-  // Eigen::MatrixXd clusterings(coll->get_size(), data.rows());
-  // Eigen::VectorXd num_clust(coll->get_size());
-  // for (int i = 0; i < coll->get_size(); i++) {
-  //   bayesmix::AlgorithmState state;
-  //   coll->get_next_state(&state);
-  //   for (int j = 0; j < data.rows(); j++) {
-  //     clusterings(i, j) = state.cluster_allocs(j);
-  //   }
-  //   num_clust(i) = state.cluster_states_size();
-  // }
-  // // Write collected data to files
-  // bayesmix::write_matrix_to_file(num_clust, nclufile);
-  // std::cout << "Successfully wrote cluster sizes to " << nclufile << std::endl;
-  // // Compute cluster estimate
-  // std::cout << "Computing cluster estimate..." << std::endl;
-  // Eigen::VectorXd clust_est = bayesmix::cluster_estimate(clusterings);
-  // std::cout << "Done" << std::endl;
-  // bayesmix::write_matrix_to_file(clust_est, clusfile);
-  // std::cout << "Successfully wrote clustering to " << clusfile << std::endl;
+  // Collect mixing and cluster states
+  Eigen::MatrixXd clusterings(coll->get_size(), data.rows());
+  Eigen::VectorXd num_clust(coll->get_size());
+  for (int i = 0; i < coll->get_size(); i++) {
+    bayesmix::AlgorithmState state;
+    coll->get_next_state(&state);
+    for (int j = 0; j < data.rows(); j++) {
+      clusterings(i, j) = state.cluster_allocs(j);
+    }
+    num_clust(i) = state.cluster_states_size();
+  }
+  // Write collected data to files
+  bayesmix::write_matrix_to_file(num_clust, nclufile);
+  std::cout << "Successfully wrote cluster sizes to " << nclufile << std::endl;
+  // Compute cluster estimate
+  std::cout << "Computing cluster estimate..." << std::endl;
+  Eigen::VectorXd clust_est = bayesmix::cluster_estimate(clusterings);
+  std::cout << "Done" << std::endl;
+  bayesmix::write_matrix_to_file(clust_est, clusfile);
+  std::cout << "Successfully wrote clustering to " << clusfile << std::endl;
 
-  // std::cout << "End of run.cc" << std::endl;
+  std::cout << "End of run.cc" << std::endl;
   delete coll;
   return 0;
 }

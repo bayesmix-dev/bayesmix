@@ -10,18 +10,18 @@ set(CMAKE_CXX_FLAGS -pthread)
 include_directories(${GTEST_INCLUDE_DIR})
 
 add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
-  # write_proto.cc
-  # proto_utils.cc
-  # hierarchies.cc
-  # lpdf.cc
-  # priors.cc
-  # eigen_utils.cc
+  write_proto.cc
+  proto_utils.cc
+  hierarchies.cc
+  lpdf.cc
+  priors.cc
+  eigen_utils.cc
   distributions.cc
-  # semi_hdp.cc
-  # collectors.cc
-  # runtime.cc
-  # rng.cc
-  # logit_sb.cc
+  semi_hdp.cc
+  collectors.cc
+  runtime.cc
+  rng.cc
+  logit_sb.cc
 )
 
 target_include_directories(test_bayesmix PUBLIC ${INCLUDE_PATHS})
