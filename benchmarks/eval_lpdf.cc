@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 
 #include "src/includes.h"
+#include "src/utils/eigen_utils.h"
 #include "utils.h"
 
 std::string get_chain_file(std::string algo_id, int dim) {
@@ -21,15 +22,7 @@ Eigen::MatrixXd get_grid(int dim) {
     out.resize(100, 1);
     out.col(0) = Eigen::ArrayXd::LinSpaced(100, -10, 10);
   } else if (dim == 2) {
-    Eigen::VectorXd basegrid = Eigen::ArrayXd::LinSpaced(10, -10, 10);
-    out.resize(100, 2);
-    for (int i = 0; i < basegrid.size(); i++) {
-      for (int j = 0; j < basegrid.size(); j++) {
-        Eigen::VectorXd curr(2);
-        curr << basegrid(i), basegrid(j);
-        out.row(i * basegrid.size() + j) = curr;
-      }
-    }
+    out = bayesmix::get_2d_grid(-10, 10, 10, -10, 10, 10);
   }
   return out;
 }

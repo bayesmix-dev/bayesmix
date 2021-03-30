@@ -80,3 +80,18 @@ void bayesmix::check_spd(const Eigen::MatrixXd &mat) {
   }
   stan::math::check_pos_definite("", "Matrix", mat);
 }
+
+Eigen::MatrixXd bayesmix::get_2d_grid(double x1, double x2, int nx, double y1,
+                                      double y2, int ny) {
+  Eigen::VectorXd xgrid = Eigen::ArrayXd::LinSpaced(nx, x1, x2);
+  Eigen::VectorXd ygrid = Eigen::ArrayXd::LinSpaced(ny, y1, y2);
+  Eigen::MatrixXd out(nx * ny, 2);
+  for (int i = 0; i < xgrid.size(); i++) {
+    for (int j = 0; j < ygrid.size(); j++) {
+      Eigen::VectorXd curr(2);
+      curr << xgrid(i), ygrid(j);
+      out.row(i * xgrid.size() + j) = curr;
+    }
+  }
+  return out;
+}
