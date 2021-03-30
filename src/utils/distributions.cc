@@ -26,7 +26,6 @@ double bayesmix::multi_student_t_scale_lpdf(const Eigen::VectorXd &datum,
                                             const Eigen::VectorXd &mean,
                                             const Eigen::MatrixXd &scale_chol,
                                             double scale_logdet, bool propto) {
-
   int dim = datum.size();
   double out = -0.5 * (df + dim) *
                std::log(1 + (scale_chol * (datum - mean)).squaredNorm() / df);
