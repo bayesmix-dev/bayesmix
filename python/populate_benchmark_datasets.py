@@ -2,7 +2,7 @@ import numpy as np
 import os
 
 multivariate_dims = [2, 4, 8]
-N_BY_CLUS = 10
+N_BY_CLUS = 20
 BASE_PATH = os.path.join("resources", "benchmarks", "datasets")
 BASE_CHAIN_PATH = os.path.join("resources", "benchmarks", "chains")
 

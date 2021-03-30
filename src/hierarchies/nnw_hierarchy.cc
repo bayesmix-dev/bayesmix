@@ -312,6 +312,7 @@ void NNWHierarchy::set_state_from_proto(
 void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   bayesmix::MultiLSState state_;
   bayesmix::to_proto(state.mean, state_.mutable_mean());
+  bayesmix::to_proto(state.prec, state_.mutable_prec());
   bayesmix::to_proto(state.prec_chol, state_.mutable_prec_chol());
 
   auto *out_cast = google::protobuf::internal::down_cast<
