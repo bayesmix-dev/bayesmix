@@ -20,7 +20,7 @@ void NNWHierarchy::wite_prec_to_state(const Eigen::MatrixXd &prec_,
                                       NNW::State *out) {
   out->prec = prec_;
   // Update prec utilities
-  out->prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_).matrixL().transpose();
+  out->prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_).matrixU();
   Eigen::VectorXd diag = out->prec_chol.diagonal();
   out->prec_logdet = 2 * log(diag.array()).sum();
 }
@@ -96,7 +96,7 @@ NNW::Hyperparams NNWHierarchy::get_posterior_parameters() {
   post_params.scale_inv = tau_temp + hypers->scale_inv;
   post_params.scale = stan::math::inverse_spd(post_params.scale_inv);
   post_params.scale_chol =
-      Eigen::LLT<Eigen::MatrixXd>(post_params.scale).matrixL().transpose();
+      Eigen::LLT<Eigen::MatrixXd>(post_params.scale).matrixU();
   return post_params;
 }
 
@@ -216,8 +216,7 @@ void NNWHierarchy::initialize_hypers() {
     throw std::invalid_argument("Unrecognized hierarchy prior");
   }
   hypers->scale_inv = stan::math::inverse_spd(hypers->scale);
-  hypers->scale_chol =
-      Eigen::LLT<Eigen::MatrixXd>(hypers->scale).matrixL().transpose();
+  hypers->scale_chol = Eigen::LLT<Eigen::MatrixXd>(hypers->scale).matrixU();
 }
 
 void NNWHierarchy::update_hypers(
@@ -290,8 +289,7 @@ void NNWHierarchy::update_hypers(
     hypers->var_scaling = stan::math::gamma_rng(alpha_n, beta_n, rng);
     hypers->scale = stan::math::inv_wishart_rng(nu_n, tau_n, rng);
     hypers->scale_inv = stan::math::inverse_spd(hypers->scale);
-    hypers->scale_chol =
-        Eigen::LLT<Eigen::MatrixXd>(hypers->scale).matrixL().transpose();
+    hypers->scale_chol = Eigen::LLT<Eigen::MatrixXd>(hypers->scale).matrixU();
   }
 
   else {
@@ -314,7 +312,6 @@ void NNWHierarchy::set_state_from_proto(
 void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   bayesmix::MultiLSState state_;
   bayesmix::to_proto(state.mean, state_.mutable_mean());
-  bayesmix::to_proto(state.prec, state_.mutable_prec());
   bayesmix::to_proto(state.prec_chol, state_.mutable_prec_chol());
 
   auto *out_cast = google::protobuf::internal::down_cast<

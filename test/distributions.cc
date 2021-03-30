@@ -68,7 +68,7 @@ TEST(student_t, squareform) {
 
   Eigen::MatrixXd sigma_inv = stan::math::inverse_spd(sigma);
   Eigen::MatrixXd sigma_inv_chol =
-      Eigen::LLT<Eigen::MatrixXd>(sigma_inv).matrixL().transpose();
+      Eigen::LLT<Eigen::MatrixXd>(sigma_inv).matrixU();
 
   Eigen::VectorXd x = Eigen::VectorXd::Ones(5);
 
@@ -92,7 +92,7 @@ TEST(student_t, optimized) {
 
   Eigen::MatrixXd sigma_inv = stan::math::inverse_spd(sigma);
   Eigen::MatrixXd sigma_inv_chol =
-      Eigen::LLT<Eigen::MatrixXd>(sigma_inv).matrixL().transpose();
+      Eigen::LLT<Eigen::MatrixXd>(sigma_inv).matrixU();
   Eigen::VectorXd diag = sigma_inv_chol.diagonal();
   double logdet = 2 * log(diag.array()).sum();
 
@@ -121,8 +121,7 @@ TEST(student_t, marginal) {
   Eigen::VectorXd mean = Eigen::VectorXd::Zero(dim);
 
   Eigen::MatrixXd scale = stan::math::inverse_spd(scale_inv);
-  Eigen::MatrixXd scale_chol =
-      Eigen::LLT<Eigen::MatrixXd>(scale).matrixL().transpose();
+  Eigen::MatrixXd scale_chol = Eigen::LLT<Eigen::MatrixXd>(scale).matrixU();
 
   double coeff = (var_scaling + 1) / (var_scaling * (deg_free - dim + 1));
   Eigen::MatrixXd scale_chol_n = scale_chol / std::sqrt(coeff);
