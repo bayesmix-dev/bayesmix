@@ -28,6 +28,11 @@ void MarginalAlgorithm::remove_singleton(const unsigned int idx) {
 Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
     const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
     const Eigen::RowVectorXd &mix_covariate) {
+    
+  // TODO: this is a ACK, needed to instantiate the algorithm 
+  // & perform density estimation without sampling
+  marg_mixing = std::dynamic_pointer_cast<MarginalMixing>(mixing);
+  
   // Read mixing state
   unsigned int n_data = curr_state.cluster_allocs_size();
   unsigned int n_clust = curr_state.cluster_states_size();

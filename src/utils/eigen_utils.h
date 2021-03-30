@@ -49,4 +49,12 @@ Eigen::MatrixXd stack_vectors(const Container<Eigen::VectorXd> &rows) {
 
 //! Checks whether the matrix is symmetric and semi-positive definite
 void check_spd(const Eigen::MatrixXd &mat);
+
+/*
+ * creates a 2d grid over the rectangle [x1, x2] x [y1, y2]
+ * by expanding the grids covering [x1, x2] and [y1, y2] with nx and ny points
+ */
+Eigen::MatrixXd get_2d_grid(double x1, double x2, int nx, double y1, double y2,
+                            int ny);
+
 }  // namespace bayesmix

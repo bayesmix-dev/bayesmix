@@ -72,6 +72,9 @@ class BaseAlgorithm {
   Eigen::MatrixXd mix_covariates;
   //!
   bayesmix::AlgorithmState curr_state;
+
+  bool verbose = true;
+
   //!
   virtual bool update_hierarchy_params() { return false; }
 
@@ -118,23 +121,32 @@ class BaseAlgorithm {
   //! Runs the algorithm and saves the whole chain to a collector
   void run(BaseCollector *collector) {
     initialize();
-    print_startup_message();
+    if (verbose) {
+      print_startup_message();
+    }
     unsigned int iter = 0;
     collector->start_collecting();
-    progresscpp::ProgressBar bar(maxiter, 60);
-
+    progresscpp::ProgressBar *bar = nullptr;
+    if (verbose) {
+      bar = new progresscpp::ProgressBar(maxiter, 60);
+    }
     while (iter < maxiter) {
       step();
       if (iter >= burnin) {
         save_state(collector, iter);
       }
       iter++;
-      ++bar;
-      bar.display();
+      if (verbose) {
+        ++(*bar);
+        bar->display();
+      }
     }
     collector->finish_collecting();
-    bar.done();
-    print_ending_message();
+    if (verbose) {
+      bar->done();
+      delete bar;
+      print_ending_message();
+    }
   }
 
   // ESTIMATE FUNCTION
@@ -174,6 +186,8 @@ class BaseAlgorithm {
   }
   virtual bayesmix::AlgorithmId get_id() const = 0;
   virtual void read_params_from_proto(const bayesmix::AlgorithmParams &params);
+
+  void set_verbose(bool verbose_) { verbose = verbose_; }
 };
 
 #endif  // BAYESMIX_ALGORITHMS_BASE_ALGORITHM_H_

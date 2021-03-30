@@ -48,16 +48,42 @@ class MemoryCollector : public BaseCollector {
     // and re-serialize to file. Still it's a reasonable work-around.
 
     int outfd = open(outfile.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
-    google::protobuf::io::FileOutputStream* fout =
-        new google::protobuf::io::FileOutputStream(outfd);
+    google::protobuf::io::FileOutputStream fout(outfd);
 
     for (std::string& serialized_state : chain) {
       MsgType state;
       state.ParseFromString(serialized_state);
       bool success =
           google::protobuf::util::SerializeDelimitedToZeroCopyStream(state,
-                                                                     fout);
+                                                                     &fout);
+      if (!success) {
+        std::cout << "ERROR WHILE SERIALIZING TO FILE" << std::endl;
+      }
     }
+
+    fout.Close();
+    close(outfd);
+  }
+
+  template <typename MsgType>
+  void read_from_file(std::string infile) {
+    int infd = open(infile.c_str(), O_RDONLY);
+    if (infd == -1) std::cout << "errno: " << strerror(errno) << std::endl;
+
+    google::protobuf::io::FileInputStream fin(infd);
+    bool keep = true;
+    bool clean_eof = false;
+    chain.resize(0);
+
+    while (keep) {
+      MsgType msg;
+      keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(
+          &msg, &fin, &clean_eof);
+
+      if (keep) collect(msg);
+    }
+    fin.Close();
+    close(infd);
   }
 };
 
