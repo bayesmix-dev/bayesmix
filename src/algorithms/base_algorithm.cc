@@ -166,9 +166,9 @@ Eigen::MatrixXd BaseAlgorithm::eval_lpdf(
   std::deque<Eigen::VectorXd> lpdf;
   bool keep = true;
   progresscpp::ProgressBar *bar = nullptr;
-    if (verbose) {
-      bar = new progresscpp::ProgressBar(maxiter, 60);
-    }
+  if (verbose) {
+    bar = new progresscpp::ProgressBar(maxiter, 60);
+  }
   while (keep) {
     keep = update_state_from_collector(collector);
     if (!keep) {
@@ -176,9 +176,9 @@ Eigen::MatrixXd BaseAlgorithm::eval_lpdf(
     }
     lpdf.push_back(lpdf_from_state(grid, hier_covariate, mix_covariate));
     if (verbose) {
-        ++(*bar);
-        bar->display();
-      }
+      ++(*bar);
+      bar->display();
+    }
   }
   collector->reset();
   if (verbose) {

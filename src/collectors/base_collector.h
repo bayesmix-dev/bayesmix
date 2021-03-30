@@ -56,6 +56,7 @@ class BaseCollector {
   virtual void reset() = 0;
 
   unsigned int get_size() const { return size; }
+
 };
 
 #endif  // BAYESMIX_COLLECTORS_BASE_COLLECTOR_H_

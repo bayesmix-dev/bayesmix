@@ -304,7 +304,10 @@ void NNWHierarchy::set_state_from_proto(
   auto &statecast = google::protobuf::internal::down_cast<
       const bayesmix::AlgorithmState::ClusterState &>(state_);
   state.mean = to_eigen(statecast.multi_ls_state().mean());
-  wite_prec_to_state(to_eigen(statecast.multi_ls_state().prec()), &state);
+  state.prec = to_eigen(statecast.multi_ls_state().prec());
+  state.prec_chol = to_eigen(statecast.multi_ls_state().prec());
+  Eigen::VectorXd diag = state.prec_chol.diagonal();
+  state.prec_logdet = 2 * log(diag.array()).sum();
   set_card(statecast.cardinality());
 }
 
@@ -312,6 +315,8 @@ void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
   bayesmix::MultiLSState state_;
   bayesmix::to_proto(state.mean, state_.mutable_mean());
   bayesmix::to_proto(state.prec, state_.mutable_prec());
+  bayesmix::to_proto(state.prec_chol, state_.mutable_prec_chol());
+
   auto *out_cast = google::protobuf::internal::down_cast<
       bayesmix::AlgorithmState::ClusterState *>(out);
   out_cast->mutable_multi_ls_state()->CopyFrom(state_);
