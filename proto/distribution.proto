@@ -4,7 +4,7 @@ import "matrix.proto";
 
 package bayesmix;
 
-message UnivNormalDistribution {
+message UniNormalDistribution {
   double mean = 1;
   double var = 2;
 }
@@ -22,4 +22,9 @@ message GammaDistribution {
 message InvWishartDistribution {
   double deg_free = 1;
   Matrix scale = 2;
+}
+
+message BetaDistribution {
+  double shape_a = 1;
+  double shape_b = 2;
 }

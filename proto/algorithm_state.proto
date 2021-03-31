@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "mixing_state.proto";
+import "ls_state.proto";
+
+package bayesmix;
+
+message AlgorithmState {
+  message ClusterState {
+    oneof val {
+      UniLSState uni_ls_state = 1;
+      MultiLSState multi_ls_state = 2;
+      LinRegUniLSState lin_reg_uni_ls_state = 4;
+    }
+    int32 cardinality = 3;
+  }
+
+  repeated ClusterState cluster_states = 1;
+  repeated int32 cluster_allocs = 2 [packed = true];
+  MixingState mixing_state = 3;
+  int32 iteration_num = 4;
+}

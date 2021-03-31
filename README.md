@@ -1,7 +1,9 @@
-bayesmix is a C++ library for running MCMC simulation in Bayesian mixture models.
+<img src="resources/logo_full.svg" alt="drawing" width="250"/>
+
+`bayesmix` is a C++ library for running MCMC simulation in Bayesian mixture models.
 
 Current state of the software:
-- bayesmix performs inference for mixture models of the kind
+- `bayesmix` performs inference for mixture models of the kind
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=y_1,&space;\ldots,&space;y_n&space;\sim&space;\int&space;k(\cdot&space;\mid&space;\theta)&space;P(d\theta)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?y_1,&space;\ldots,&space;y_n&space;\sim&space;\int&space;k(\cdot&space;\mid&space;\theta)&space;P(d\theta)" title="y_1, \ldots, y_n \sim \int k(\cdot \mid \theta) \Pi(d\theta)" /></a>
 
@@ -22,9 +24,9 @@ We heavily depend on Google's [Protocol Buffers](https://github.com/protocolbuff
 
 On Linux machine the following will install the library
 ```shell
-sudo apt-get install autoconf automake libtool curl make g++ unzip
+sudo apt-get install autoconf automake libtool curl make g++ unzip cmake
 wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protobuf-python-3.14.0.zip
-unizp protobuf-python-3.14.0.zip
+unzip protobuf-python-3.14.0.zip
 cd protobuf-3.14.0/
 ./configure --prefix=/usr
 make check
@@ -56,21 +58,5 @@ make test_bayesmix
 ./test/test_bayesmix
 ```
 
-## For Developers
-
-Please install the pre-commit hooks before commiting anything: it clears the output of jupyter notebooks. Just type
-
-```shell
-./bash/setup_pre_commit.sh
-```
-
-## Future steps (contributors are welcome!)
-
-A Python package is already under development
-
-- Extension to normalized random measures
-- Using HMC / MALA MCMC algorithm to sample from the cluster-specific full conditionals when it's not conjugate to the base measure
-- R package
-
-
-
+## Contributions are welcome!
+Please check out [CONTRIBUTORS.md](CONTRIBUTORS.md) for details on how to collaborate with us.

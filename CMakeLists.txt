@@ -7,10 +7,11 @@ if (CCACHE_PROGRAM)
 	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
-
 project(bayesmix)
 
 set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_BUILD_TYPE Release)
+
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
@@ -62,6 +63,10 @@ message("   --> PROTOBUF Found: ${Protobuf_FOUND}")
 
 endif()
 
+option(DISABLE_TESTS
+      "If tests should be compiled or no" OFF)
+option(DISABLE_BENCHMARKS
+      "If benchmarks should be compiled or no" OFF)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -76,6 +81,7 @@ set(INCLUDE_PATHS
   ${CMAKE_CURRENT_BINARY_DIR}
   ${protobuf_SOURCE_DIR}/src
 )
+
 
 set(LINK_LIBRARIES 
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so 
@@ -134,7 +140,7 @@ add_dependencies(bayesmixlib build_tbb)
 
 if (BUILD_RUN)
 # Build run executable
-add_executable(run $<TARGET_OBJECTS:bayesmix> run.cpp)
+add_executable(run $<TARGET_OBJECTS:bayesmix> run.cc)
 target_include_directories(run PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
 target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
@@ -142,4 +148,8 @@ endif()
 
 if (NOT DISABLE_TESTS)
   add_subdirectory(test)
+endif()
+
+if (NOT DISABLE_BENCHMARKS)
+  add_subdirectory(benchmarks)
 endif()

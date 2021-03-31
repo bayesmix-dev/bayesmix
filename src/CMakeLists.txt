@@ -1,4 +1,4 @@
-target_sources(bayesmix PUBLIC includes.hpp)
+target_sources(bayesmix PUBLIC includes.h)
 
 add_subdirectory(algorithms)
 add_subdirectory(collectors)
