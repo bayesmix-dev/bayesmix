@@ -11,4 +11,6 @@ std::shared_ptr<BaseMixing> get_dirichlet_mixing();
 
 std::shared_ptr<BaseAlgorithm> get_algorithm(const std::string& id, int dim);
 
+Eigen::MatrixXd get_spd_matrix(int dim);
+
 #endif
