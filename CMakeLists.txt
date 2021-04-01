@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.14.0)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+message("CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}")
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
@@ -11,6 +13,11 @@ set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+
+option(DISABLE_TESTS
+      "If tests should be compiled or no" OFF)
+option(BUILD_RUN "" ON)
 
 include(FindPythonInterp)
 add_custom_target(
@@ -18,9 +25,43 @@ add_custom_target(
  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/build_tbb.py
 )
 
+
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
-find_package(Protobuf REQUIRED)
+find_package(Protobuf)
+
+
+if (NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
+  include(FetchContent)
+  set(FETCHCONTENT_QUIET OFF)
+  set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+  set(BUILD_SHARED_LIBS OFF)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  set(BUILD_TESTING OFF)
+
+  message(CHECK_START "Fetching Protobuf")
+  list(APPEND CMAKE_MESSAGE_INDENT "  ")
+
+  option(protobuf_BUILD_TESTS "" OFF)
+  set(protobuf_BUILD_EXPORT OFF)
+  set(protobuf_MSVC_STATIC_RUNTIME OFF)
+  FetchContent_Declare(
+      protobuf
+      GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
+      GIT_TAG "v3.14.0"
+      GIT_SUBMODULES ""
+      SOURCE_SUBDIR cmake)
+  FetchContent_MakeAvailable(protobuf)
+
+  list(POP_BACK CMAKE_MESSAGE_INDENT)
+  message(CHECK_PASS "fetched")
+message("Protobuf_FOUND ${Protobuf_FOUND}")
+message("   --> PROTOBUF LIB: ${PROTOBUF_LIBRARIES}")
+message("   --> PROTOBUF INCLUDE: ${PROTOBUF_INCLUDE_DIRS}")
+message("   --> PROTOBUF VERSION: ${Protobuf_VERSION}")
+message("   --> PROTOBUF Found: ${Protobuf_FOUND}")
+
+endif()
 
 option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
@@ -30,7 +71,6 @@ option(DISABLE_BENCHMARKS
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
-
 set(INCLUDE_PATHS
   ${BASEPATH}
   ${BASEPATH}/proto
@@ -39,22 +79,48 @@ set(INCLUDE_PATHS
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/include
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${protobuf_SOURCE_DIR}/src
 )
 
-set(LINK_LIBRARIES ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so pthread
-  protobuf)
+
+set(LINK_LIBRARIES 
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so 
+  pthread 
+  protobuf::libprotobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
 file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
-PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${ProtoFiles})
-SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED
-  TRUE)
+set(PROTO_DIR proto)
+
+foreach(PROTO_FILE IN LISTS ProtoFiles)
+  message(STATUS "protoc proto(cc): ${PROTO_FILE}")
+  get_filename_component(PROTO_DIR ${PROTO_FILE} DIRECTORY)
+  get_filename_component(PROTO_NAME ${PROTO_FILE} NAME_WE)
+  set(PROTO_HDR ${CMAKE_CURRENT_BINARY_DIR}/${PROTO_NAME}.pb.h)
+  set(PROTO_SRC ${CMAKE_CURRENT_BINARY_DIR}/${PROTO_NAME}.pb.cc)
+  message(STATUS "protoc hdr: ${PROTO_HDR}")
+  message(STATUS "protoc src: ${PROTO_SRC}")
+  add_custom_command(
+    OUTPUT ${PROTO_SRC} ${PROTO_HDR}
+    COMMAND protobuf::protoc "--proto_path=${BASEPATH}/proto"
+    ${PROTO_DIRS} "--cpp_out=${PROJECT_BINARY_DIR}" ${PROTO_FILE}
+    DEPENDS ${PROTO_FILE} protobuf::protoc
+    COMMENT "Generate C++ protocol buffer for ${PROTO_FILE}"
+    VERBATIM)
+  list(APPEND PROTO_HDRS ${PROTO_HDR})
+  list(APPEND PROTO_SRCS ${PROTO_SRC})
+endforeach()
+
+SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 
 get_directory_property(HAS_PARENT PARENT_DIRECTORY)
 if(HAS_PARENT)
   set(BAYESMIX_INCLUDE_PATHS ${INCLUDE_PATHS} PARENT_SCOPE)
+  set(BAYESMIX_LINK_LIBRARIES ${LINK_LIBRARIES} PARENT_SCOPE)
+  set(BAYESMIX_COMPILE_OPTIONS ${COMPILE_OPTIONS} PARENT_SCOPE)
   set(PROTO_HEADERS ${PROTO_HDRS} PARENT_SCOPE)
   set(PROTO_SOURCES ${PROTO_SRCS} PARENT_SCOPE)
+  set(ProtoFiles ${ProtoFiles} PARENT_SCOPE)
 endif()
 
 
@@ -72,16 +138,13 @@ add_library(bayesmixlib $<TARGET_OBJECTS:bayesmix>)
 add_dependencies(bayesmixlib build_tbb)
 
 
+if (BUILD_RUN)
 # Build run executable
 add_executable(run $<TARGET_OBJECTS:bayesmix> run.cc)
 target_include_directories(run PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
 target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
-
-add_executable(dependent_run $<TARGET_OBJECTS:bayesmix> dependent_run.cc)
-target_include_directories(dependent_run PUBLIC ${INCLUDE_PATHS})
-target_link_libraries(dependent_run PUBLIC ${LINK_LIBRARIES})
-target_compile_options(dependent_run PUBLIC ${COMPILE_OPTIONS})
+endif()
 
 if (NOT DISABLE_TESTS)
   add_subdirectory(test)
