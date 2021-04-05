@@ -22,22 +22,16 @@
 //! creation of a new cluster, and weights of already existing clusters are
 //! proportional to their cardinalities.
 
-class DirichletMixing : public MarginalMixing {
- public:
-  struct State {
-    double totalmass;
-    double logtotmass;
-  };
+namespace Dirichlet {
+struct State {
+  double totalmass, logtotmass;
+};
+};  // namespace Dirichlet
 
+class DirichletMixing
+    : public MarginalMixing<DirichletMixing, Dirichlet::State,
+                                bayesmix::DPPrior> {
  protected:
-  State state;
-
-  //!
-  void create_empty_prior() override { prior.reset(new bayesmix::DPPrior); }
-  //!
-  std::shared_ptr<bayesmix::DPPrior> cast_prior() const {
-    return std::dynamic_pointer_cast<bayesmix::DPPrior>(prior);
-  }
   //!
   void initialize_state() override;
 
@@ -45,10 +39,6 @@ class DirichletMixing : public MarginalMixing {
   // DESTRUCTOR AND CONSTRUCTORS
   ~DirichletMixing() = default;
   DirichletMixing() = default;
-
-  std::shared_ptr<BaseMixing> clone() const override {
-    return std::make_shared<DirichletMixing>(*this);
-  }
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
@@ -71,7 +61,6 @@ class DirichletMixing : public MarginalMixing {
       const std::vector<unsigned int> &allocations) override;
 
   // GETTERS AND SETTERS
-  State get_state() const { return state; }
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   bayesmix::MixingId get_id() const override { return bayesmix::MixingId::DP; }

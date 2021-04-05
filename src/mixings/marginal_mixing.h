@@ -18,7 +18,9 @@
 //! aforementioned events. The class will then have its own parameters, and
 //! maybe even prior distributions on them.
 
-class MarginalMixing : public BaseMixing {
+template <class Derived, typename State, typename Prior>
+class MarginalMixing
+    : public BaseMixing<Derived, State, Prior> {
  public:
   ~MarginalMixing() = default;
   MarginalMixing() = default;

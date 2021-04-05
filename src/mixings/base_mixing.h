@@ -5,18 +5,14 @@
 
 #include <Eigen/Dense>
 #include <memory>
-#include <vector>
 
-#include "mixing_id.pb.h"
-#include "src/hierarchies/abstract_hierarchy.h"
+#include "abstract_mixing.h"
 
-//! Abstract base class for a generic mixture model
-
-//! This class represents a mixture model object to be used in a BNP iterative
-//! algorithm.
-
-class BaseMixing {
+template <class Derived, typename State, typename Prior>
+class BaseMixing : public AbstractMixing {
  protected:
+  //!
+  State state;
   //!
   std::shared_ptr<google::protobuf::Message> prior;
   //!
@@ -25,40 +21,32 @@ class BaseMixing {
   unsigned int num_components;
 
   //!
-  virtual void create_empty_prior() = 0;
+  void create_empty_prior() { prior.reset(new Prior); }
   //!
   virtual void initialize_state() = 0;
+  //!
+  std::shared_ptr<Prior> cast_prior() const {
+    return std::dynamic_pointer_cast<Prior>(prior);
+  }
 
  public:
   // DESTRUCTOR AND CONSTRUCTORS
-  virtual ~BaseMixing() = default;
+  ~BaseMixing() = default;
   BaseMixing() = default;
-  virtual std::shared_ptr<BaseMixing> clone() const = 0;
-
-  virtual void initialize() = 0;
-  //! Returns true if the mixing has covariates i.e. is a dependent model
-  virtual bool is_dependent() const { return false; }
-  //!
-  virtual bool is_conditional() const = 0;
-
-  virtual void update_state(
-      const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-      const std::vector<unsigned int> &allocations) = 0;
+  // virtual std::shared_ptr<AbstractMixing> clone() const override {
+  //   return std::make_shared<Derived>(static_cast<Derived const &>(*this));
+  // }  // TODO keep it?
 
   // GETTERS AND SETTERS
-  unsigned int get_num_components() const { return num_components; }
-  google::protobuf::Message *get_mutable_prior() {
+  unsigned int get_num_components() const override { return num_components; }
+  google::protobuf::Message *get_mutable_prior() override {
     if (prior == nullptr) {
       create_empty_prior();
     }
     return prior.get();
   }
-  void set_num_components(const unsigned int num_) { num_components = num_; }
-  void set_covariates(Eigen::MatrixXd *covar) { covariates_ptr = covar; }
-  virtual void set_state_from_proto(
-      const google::protobuf::Message &state_) = 0;
-  virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
-  virtual bayesmix::MixingId get_id() const = 0;
+  void set_num_components(const unsigned int num_) override { num_components = num_; }
+  void set_covariates(Eigen::MatrixXd *covar) override { covariates_ptr = covar; }
 };
 
 #endif  // BAYESMIX_MIXINGS_BASE_MIXING_H_

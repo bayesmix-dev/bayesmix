@@ -5,7 +5,9 @@
 
 #include "base_mixing.h"
 
-class ConditionalMixing : public BaseMixing {
+template <class Derived, typename State, typename Prior>
+class ConditionalMixing
+    : public BaseMixing<Derived, State, Prior> {
  public:
   ~ConditionalMixing() = default;
   ConditionalMixing() = default;
