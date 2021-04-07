@@ -150,7 +150,7 @@ BaseHierarchy<Derived, State, Hyperparams, Prior>::like_lpdf_grid(
   } else {
     for (int i = 0; i < data.rows(); i++) {
       lpdf(i) = static_cast<Derived const *>(this)->like_lpdf(
-          data.row(i), covariates.row(i));
+          data.row(i), covariates.row(0));
     }
   }
   return lpdf;

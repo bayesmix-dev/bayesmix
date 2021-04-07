@@ -40,7 +40,6 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
     lpdf_local.col(j) =
         temp_hier->like_lpdf_grid(grid, hier_covariate).array() + mass_ex;
   }
-
   double mass_new =
       mixing->mass_new_cluster(n_data, true, false, n_clust, mix_covariate);
   lpdf_local.col(n_clust) =
