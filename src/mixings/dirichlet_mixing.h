@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-#include "marginal_mixing.h"
+#include "base_mixing.h"
 #include "mixing_id.pb.h"
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
@@ -29,7 +29,7 @@ struct State {
 };  // namespace Dirichlet
 
 class DirichletMixing
-    : public MarginalMixing<DirichletMixing, Dirichlet::State,
+    : public BaseMixing<DirichletMixing, Dirichlet::State,
                                 bayesmix::DPPrior> {
  protected:
   //!
@@ -39,6 +39,10 @@ class DirichletMixing
   // DESTRUCTOR AND CONSTRUCTORS
   ~DirichletMixing() = default;
   DirichletMixing() = default;
+  //!
+  virtual bool is_conditional() const { return false; }
+  //!
+  virtual bool is_dependent() const { return false; }
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster

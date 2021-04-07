@@ -13,18 +13,18 @@ void BlockedGibbsAlgorithm::print_startup_message() const {
   std::string msg = "Running BlockedGibbs algorithm with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
                     " hierarchies, " +
-                    bayesmix::MixingId_Name(cond_mixing->get_id()) +
+                    bayesmix::MixingId_Name(mixing->get_id()) +
                     " mixing...";
   std::cout << msg << std::endl;
 }
 
 void BlockedGibbsAlgorithm::sample_allocations() {
   auto &rng = bayesmix::Rng::Instance().get();
-  unsigned int num_components = cond_mixing->get_num_components();
+  unsigned int num_components = mixing->get_num_components();
   for (int i = 0; i < data.rows(); i++) {
     // Compute weights
     Eigen::VectorXd logprobas =
-        cond_mixing->get_weights(true, false, mix_covariates.row(i));
+        mixing->get_weights(true, false, mix_covariates.row(i));
     for (int j = 0; j < num_components; j++) {
       logprobas(j) +=
           unique_values[j]->like_lpdf(data.row(i), hier_covariates.row(i));
@@ -51,5 +51,5 @@ void BlockedGibbsAlgorithm::sample_unique_values() {
 }
 
 void BlockedGibbsAlgorithm::sample_weights() {
-  cond_mixing->update_state(unique_values, allocations);
+  mixing->update_state(unique_values, allocations);
 }
