@@ -33,9 +33,6 @@ class BaseMixing : public AbstractMixing {
   // DESTRUCTOR AND CONSTRUCTORS
   ~BaseMixing() = default;
   BaseMixing() = default;
-  // virtual std::shared_ptr<AbstractMixing> clone() const override {
-  //   return std::make_shared<Derived>(static_cast<Derived const &>(*this));
-  // }  // TODO keep it?
 
   // GETTERS AND SETTERS
   State get_state() const { return state; }
