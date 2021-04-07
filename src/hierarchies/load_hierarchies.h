@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 
-#include "base_hierarchy.h"
+#include "abstract_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "lin_reg_uni_hierarchy.h"
 #include "nnig_hierarchy.h"

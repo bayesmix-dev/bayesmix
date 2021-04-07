@@ -75,7 +75,7 @@ ConjugateHierarchy<Derived, State, Hyperparams, Prior>::prior_pred_lpdf_grid(
   } else {
     for (int i = 0; i < data.rows(); i++) {
       lpdf(i) = static_cast<Derived const *>(this)->prior_pred_lpdf(
-          data.row(i), covariates.row(i));
+          data.row(i), covariates.row(0));
     }
   }
   return lpdf;
@@ -96,7 +96,7 @@ Eigen::VectorXd ConjugateHierarchy<Derived, State, Hyperparams, Prior>::
   } else {
     for (int i = 0; i < data.rows(); i++) {
       lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
-          data.row(i), covariates.row(i));
+          data.row(i), covariates.row(0));
     }
   }
   return lpdf;

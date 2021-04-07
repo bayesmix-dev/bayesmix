@@ -167,7 +167,7 @@ Eigen::MatrixXd BaseAlgorithm::eval_lpdf(
   bool keep = true;
   progresscpp::ProgressBar *bar = nullptr;
   if (verbose) {
-    bar = new progresscpp::ProgressBar(maxiter, 60);
+    bar = new progresscpp::ProgressBar(collector->get_size(), 60);
   }
   while (keep) {
     keep = update_state_from_collector(collector);

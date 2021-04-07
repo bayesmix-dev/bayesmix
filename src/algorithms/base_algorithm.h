@@ -12,7 +12,7 @@
 #include "algorithm_state.pb.h"
 #include "src/collectors/base_collector.h"
 #include "src/hierarchies/base_hierarchy.h"
-#include "src/mixings/base_mixing.h"
+#include "src/mixings/abstract_mixing.h"
 
 //! Abstract template class for a Gibbs sampling iterative BNP algorithm.
 
@@ -67,7 +67,7 @@ class BaseAlgorithm {
   //! Covariates matrix for the Hierarchy objects
   Eigen::MatrixXd hier_covariates;
   //! Pointer to the Mixing object
-  std::shared_ptr<BaseMixing> mixing;
+  std::shared_ptr<AbstractMixing> mixing;
   //! Covariates matrix for the Mixing object
   Eigen::MatrixXd mix_covariates;
   //!
@@ -172,7 +172,7 @@ class BaseAlgorithm {
   void set_init_num_clusters(const unsigned int init_) {
     init_num_clusters = init_;
   }
-  void set_mixing(const std::shared_ptr<BaseMixing> mixing_) {
+  void set_mixing(const std::shared_ptr<AbstractMixing> mixing_) {
     mixing = mixing_;
   }
   void set_data(const Eigen::MatrixXd &data_) { data = data_; }

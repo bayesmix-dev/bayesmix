@@ -89,7 +89,6 @@ int main(int argc, char *argv[]) {
   std::cout << "Computing log-density..." << std::endl;
   Eigen::MatrixXd dens =
       algo->eval_lpdf(coll, grid, hier_cov_grid, mix_cov_grid);
-  std::cout << "Done" << std::endl;
   bayesmix::write_matrix_to_file(dens, densfile);
   std::cout << "Successfully wrote density to " << densfile << std::endl;
 

@@ -8,30 +8,23 @@
 #include <vector>
 
 #include "base_mixing.h"
-#include "conditional_mixing.h"
 #include "mixing_id.pb.h"
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-class LogitSBMixing : public ConditionalMixing {
- public:
-  struct State {
-    Eigen::MatrixXd regression_coeffs;
-    Eigen::MatrixXd precision;
-  };
+namespace LogitSB {
+struct State {
+  Eigen::MatrixXd regression_coeffs, precision;
+};
+};  // namespace LogitSB
 
+class LogitSBMixing
+    : public BaseMixing<LogitSBMixing, LogitSB::State, bayesmix::LogSBPrior> {
  protected:
   unsigned int dim;
-  State state;
   Eigen::VectorXd acceptance_rates;
   int n_iter = 0;
 
-  //!
-  void create_empty_prior() override { prior.reset(new bayesmix::LogSBPrior); }
-  //!
-  std::shared_ptr<bayesmix::LogSBPrior> cast_prior() const {
-    return std::dynamic_pointer_cast<bayesmix::LogSBPrior>(prior);
-  }
   //!
   void initialize_state() override;
   //!
@@ -48,17 +41,14 @@ class LogitSBMixing : public ConditionalMixing {
   // DESTRUCTOR AND CONSTRUCTORS
   ~LogitSBMixing() = default;
   LogitSBMixing() = default;
-
+  //!
   Eigen::VectorXd get_weights(const bool log, const bool propto,
                               const Eigen::RowVectorXd &covariate =
                                   Eigen::RowVectorXd(0)) const override;
-
-  std::shared_ptr<BaseMixing> clone() const override {
-    return std::make_shared<LogitSBMixing>(*this);
-  }
-
+  //!
+  virtual bool is_conditional() const { return true; }
   //! Returns true if the hierarchy has covariates i.e. is a dependent model
-  bool is_dependent() const override { return true; }
+  virtual bool is_dependent() const { return true; }
 
   //!
   void initialize() override;
@@ -68,7 +58,6 @@ class LogitSBMixing : public ConditionalMixing {
       const std::vector<unsigned int> &allocations) override;
 
   // GETTERS AND SETTERS
-  State get_state() const { return state; }
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   bayesmix::MixingId get_id() const override {

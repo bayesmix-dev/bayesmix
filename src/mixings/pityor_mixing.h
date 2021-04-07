@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-#include "marginal_mixing.h"
+#include "base_mixing.h"
 #include "mixing_id.pb.h"
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
@@ -23,21 +23,15 @@
 //! factor, while the weight for a newly created cluster is the remaining
 //! one counting the total amount as the sample size increased by the strength.
 
-class PitYorMixing : public MarginalMixing {
- public:
-  struct State {
-    double strength, discount;
-  };
+namespace PitYor {
+struct State {
+  double strength, discount;
+};
+};  // namespace PitYor
 
+class PitYorMixing
+    : public BaseMixing<PitYorMixing, PitYor::State, bayesmix::PYPrior> {
  protected:
-  State state;
-
-  //!
-  void create_empty_prior() override { prior.reset(new bayesmix::PYPrior); }
-  //!
-  std::shared_ptr<bayesmix::PYPrior> cast_prior() const {
-    return std::dynamic_pointer_cast<bayesmix::PYPrior>(prior);
-  }
   //!
   void initialize_state() override;
 
@@ -45,10 +39,10 @@ class PitYorMixing : public MarginalMixing {
   // DESTRUCTOR AND CONSTRUCTORS
   ~PitYorMixing() = default;
   PitYorMixing() = default;
-
-  std::shared_ptr<BaseMixing> clone() const override {
-    return std::make_shared<PitYorMixing>(*this);
-  }
+  //!
+  virtual bool is_conditional() const { return false; }
+  //!
+  virtual bool is_dependent() const { return false; }
 
   // PROBABILITIES FUNCTIONS
   //! Mass probability for choosing an already existing cluster
@@ -70,7 +64,6 @@ class PitYorMixing : public MarginalMixing {
       const std::vector<unsigned int> &allocations) override;
 
   // GETTERS AND SETTERS
-  State get_state() const { return state; }
   void set_state_from_proto(const google::protobuf::Message &state_) override;
   void write_state_to_proto(google::protobuf::Message *out) const override;
   bayesmix::MixingId get_id() const override { return bayesmix::MixingId::PY; }
