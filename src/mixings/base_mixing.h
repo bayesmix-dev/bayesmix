@@ -38,6 +38,7 @@ class BaseMixing : public AbstractMixing {
   // }  // TODO keep it?
 
   // GETTERS AND SETTERS
+  State get_state() const { return state; }
   unsigned int get_num_components() const override { return num_components; }
   google::protobuf::Message *get_mutable_prior() override {
     if (prior == nullptr) {
