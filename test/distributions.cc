@@ -156,12 +156,12 @@ TEST(mult_normal, lpdf_grid) {
   Eigen::VectorXd diag = prec_chol.diagonal();
   double prec_logdet = 2 * log(diag.array()).sum();
 
-  Eigen::VectorXd lpdfs =
-      bayesmix::multi_normal_prec_lpdf_grid(data, mean, prec_chol, prec_logdet);
+  Eigen::VectorXd lpdfs = bayesmix::multi_normal_prec_lpdf_grid(
+      data, mean, prec_chol, prec_logdet);
 
-  for (int i=0; i < 20; i++) {
-    double curr =
-        bayesmix::multi_normal_prec_lpdf(data.row(i), mean, prec_chol, prec_logdet);
+  for (int i = 0; i < 20; i++) {
+    double curr = bayesmix::multi_normal_prec_lpdf(data.row(i), mean,
+                                                   prec_chol, prec_logdet);
     ASSERT_DOUBLE_EQ(curr, lpdfs(i));
   }
 }

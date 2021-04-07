@@ -50,9 +50,9 @@ double multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
  * @return the evaluation of the lpdf
  */
 Eigen::VectorXd multi_normal_prec_lpdf_grid(const Eigen::MatrixXd &data,
-                                       const Eigen::VectorXd &mean,
-                                       const Eigen::MatrixXd &prec_chol,
-                                       double prec_logdet);
+                                            const Eigen::VectorXd &mean,
+                                            const Eigen::MatrixXd &prec_chol,
+                                            double prec_logdet);
 
 double multi_student_t_invscale_lpdf(const Eigen::VectorXd &datum, double df,
                                      const Eigen::VectorXd &mean,

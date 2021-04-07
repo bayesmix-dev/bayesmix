@@ -30,8 +30,7 @@ struct State {
 };  // namespace PitYor
 
 class PitYorMixing
-    : public BaseMixing<PitYorMixing, PitYor::State,
-                                bayesmix::PYPrior> {
+    : public BaseMixing<PitYorMixing, PitYor::State, bayesmix::PYPrior> {
  protected:
   //!
   void initialize_state() override;

@@ -34,17 +34,18 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
   for (size_t j = 0; j < n_clust; j++) {
     // Get hierarchy and mass values
     temp_hier->set_state_from_proto(curr_state.cluster_states(j));
-    double mass_ex = mixing->mass_existing_cluster(
-        n_data, true, false, temp_hier, mix_covariate);
+    double mass_ex = mixing->mass_existing_cluster(n_data, true, false,
+                                                   temp_hier, mix_covariate);
     // Get local, single-point estimate
     lpdf_local.col(j) =
         temp_hier->like_lpdf_grid(grid, hier_covariate).array() + mass_ex;
   }
 
-  double mass_new = mixing->mass_new_cluster(n_data, true, false, n_clust,
-                                                  mix_covariate);
+  double mass_new =
+      mixing->mass_new_cluster(n_data, true, false, n_clust, mix_covariate);
   lpdf_local.col(n_clust) =
-      lpdf_marginal_component(temp_hier, grid, hier_covariate).array() + mass_new;
+      lpdf_marginal_component(temp_hier, grid, hier_covariate).array() +
+      mass_new;
   // Loop over grid points
   for (size_t i = 0; i < grid.rows(); i++) {
     // Final estimate for i-th grid point

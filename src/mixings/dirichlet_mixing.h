@@ -29,8 +29,7 @@ struct State {
 };  // namespace Dirichlet
 
 class DirichletMixing
-    : public BaseMixing<DirichletMixing, Dirichlet::State,
-                                bayesmix::DPPrior> {
+    : public BaseMixing<DirichletMixing, Dirichlet::State, bayesmix::DPPrior> {
  protected:
   //!
   void initialize_state() override;

@@ -12,15 +12,14 @@
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-namespace LogitSB{
-  struct State {
-    Eigen::MatrixXd regression_coeffs, precision;
-  };
+namespace LogitSB {
+struct State {
+  Eigen::MatrixXd regression_coeffs, precision;
+};
 };  // namespace LogitSB
 
 class LogitSBMixing
-    : public BaseMixing<LogitSBMixing, LogitSB::State,
-                                bayesmix::LogSBPrior> {
+    : public BaseMixing<LogitSBMixing, LogitSB::State, bayesmix::LogSBPrior> {
  protected:
   unsigned int dim;
   Eigen::VectorXd acceptance_rates;

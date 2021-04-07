@@ -18,9 +18,8 @@ struct State {
 };
 };  // namespace TruncSB
 
-class TruncatedSBMixing
-    : public BaseMixing<TruncatedSBMixing, TruncSB::State,
-                                bayesmix::TruncSBPrior> {
+class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
+                                            bayesmix::TruncSBPrior> {
  protected:
   //!
   Eigen::VectorXd logweights_from_sticks() const;

@@ -43,7 +43,8 @@ class AbstractMixing {
   virtual Eigen::VectorXd get_weights(
       const bool log, const bool propto,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error("Cannot call get_weights() from non-conditional mixing");
+    throw std::runtime_error(
+        "Cannot call get_weights() from non-conditional mixing");
   };
 
   //! \param card Cardinality of the cluster
@@ -53,7 +54,8 @@ class AbstractMixing {
       const unsigned int n, const bool log, const bool propto,
       std::shared_ptr<AbstractHierarchy> hier,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error("Cannot call mass_existing_cluster() from non-marginal mixing");
+    throw std::runtime_error(
+        "Cannot call mass_existing_cluster() from non-marginal mixing");
   };
 
   //! \param n_clust Number of clusters
@@ -62,8 +64,9 @@ class AbstractMixing {
   virtual double mass_new_cluster(
       const unsigned int n, const bool log, const bool propto,
       const unsigned int n_clust,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const  {
-    throw std::runtime_error("Cannot call mass_new_cluster() from non-marginal mixing");
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
+    throw std::runtime_error(
+        "Cannot call mass_new_cluster() from non-marginal mixing");
   };
 
   // GETTERS AND SETTERS

@@ -45,8 +45,12 @@ class BaseMixing : public AbstractMixing {
     }
     return prior.get();
   }
-  void set_num_components(const unsigned int num_) override { num_components = num_; }
-  void set_covariates(Eigen::MatrixXd *covar) override { covariates_ptr = covar; }
+  void set_num_components(const unsigned int num_) override {
+    num_components = num_;
+  }
+  void set_covariates(Eigen::MatrixXd *covar) override {
+    covariates_ptr = covar;
+  }
 };
 
 #endif  // BAYESMIX_MIXINGS_BASE_MIXING_H_
