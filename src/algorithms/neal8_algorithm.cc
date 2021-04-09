@@ -17,13 +17,13 @@
 //! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
     std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
-    const Eigen::MatrixXd &covariates) const {
+    const Eigen::RowVectorXd &covariate) const {
   unsigned int n_grid = grid.rows();
   Eigen::VectorXd lpdf_(n_grid);
   Eigen::MatrixXd lpdf_temp(n_grid, n_aux);
   for (size_t i = 0; i < n_aux; i++) {
     hier->sample_prior();
-    lpdf_temp.col(i) = hier->like_lpdf_grid(grid, covariates);
+    lpdf_temp.col(i) = hier->like_lpdf_grid(grid, covariate);
   }
   for (size_t i = 0; i < n_grid; i++) {
     lpdf_(i) = stan::math::log_sum_exp(lpdf_temp.row(i));

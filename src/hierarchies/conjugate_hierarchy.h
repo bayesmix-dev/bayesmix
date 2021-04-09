@@ -67,15 +67,22 @@ ConjugateHierarchy<Derived, State, Hyperparams, Prior>::prior_pred_lpdf_grid(
     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
   Eigen::VectorXd lpdf(data.rows());
   if (covariates.cols() == 0) {
+    // Pass null value as covariate
     for (int i = 0; i < data.rows(); i++) {
-      // Pass null value as covariate
       lpdf(i) = static_cast<Derived const *>(this)->prior_pred_lpdf(
           data.row(i), Eigen::RowVectorXd(0));
     }
-  } else {
+  } else if (covariates.rows() == 1) {
+    // Use unique covariate
     for (int i = 0; i < data.rows(); i++) {
       lpdf(i) = static_cast<Derived const *>(this)->prior_pred_lpdf(
           data.row(i), covariates.row(0));
+    }
+  } else {
+    // Use different covariates
+    for (int i = 0; i < data.rows(); i++) {
+      lpdf(i) = static_cast<Derived const *>(this)->prior_pred_lpdf(
+          data.row(i), covariates.row(i));
     }
   }
   return lpdf;
@@ -88,15 +95,22 @@ Eigen::VectorXd ConjugateHierarchy<Derived, State, Hyperparams, Prior>::
         const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
   Eigen::VectorXd lpdf(data.rows());
   if (covariates.cols() == 0) {
+    // Pass null value as covariate
     for (int i = 0; i < data.rows(); i++) {
-      // Pass null value as covariate
       lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
           data.row(i), Eigen::RowVectorXd(0));
     }
-  } else {
+  } else if (covariates.rows() == 1) {
+    // Use unique covariate
     for (int i = 0; i < data.rows(); i++) {
       lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
           data.row(i), covariates.row(0));
+    }
+  } else {
+    // Use different covariates
+    for (int i = 0; i < data.rows(); i++) {
+      lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
+          data.row(i), covariates.row(i));
     }
   }
   return lpdf;

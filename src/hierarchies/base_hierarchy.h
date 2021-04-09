@@ -142,15 +142,22 @@ BaseHierarchy<Derived, State, Hyperparams, Prior>::like_lpdf_grid(
     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
   Eigen::VectorXd lpdf(data.rows());
   if (covariates.cols() == 0) {
+    // Pass null value as covariate
     for (int i = 0; i < data.rows(); i++) {
-      // Pass null value as covariate
       lpdf(i) = static_cast<Derived const *>(this)->like_lpdf(
           data.row(i), Eigen::RowVectorXd(0));
     }
-  } else {
+  } else if (covariates.rows() == 1) {
+    // Use unique covariate
     for (int i = 0; i < data.rows(); i++) {
       lpdf(i) = static_cast<Derived const *>(this)->like_lpdf(
           data.row(i), covariates.row(0));
+    }
+  } else {
+    // Use different covariates
+    for (int i = 0; i < data.rows(); i++) {
+      lpdf(i) = static_cast<Derived const *>(this)->like_lpdf(
+          data.row(i), covariates.row(i));
     }
   }
   return lpdf;
@@ -161,14 +168,24 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
     const Eigen::MatrixXd &data,
     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
   static_cast<Derived *>(this)->clear_data();
-  if (covariates == Eigen::MatrixXd(0, 0)) {
-    for (int i = 0; i < data.rows(); i++)
+  if (covariates.cols() == 0) {
+    // Pass null value as covariate
+    for (int i = 0; i < data.rows(); i++) {
       static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
                                               Eigen::RowVectorXd(0));
+    }
+  } else if (covariates.rows() == 1) {
+    // Use unique covariate
+    for (int i = 0; i < data.rows(); i++) {
+      static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
+                                              covariates.row(0));
+    }
   } else {
-    for (int i = 0; i < data.rows(); i++)
+    // Use different covariates
+    for (int i = 0; i < data.rows(); i++) {
       static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
                                               covariates.row(i));
+    }
   }
   static_cast<Derived *>(this)->sample_full_cond(true);
 }
