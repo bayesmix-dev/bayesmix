@@ -17,8 +17,8 @@
 //! \return     Vector of evaluation of component on the provided grid
 Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
     std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
-    const Eigen::MatrixXd &covariates) const {
-  return hier->prior_pred_lpdf_grid(grid, covariates);
+    const Eigen::RowVectorXd &covariate) const {
+  return hier->prior_pred_lpdf_grid(grid, covariate);
 }
 
 Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
