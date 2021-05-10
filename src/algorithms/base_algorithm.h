@@ -52,7 +52,7 @@ class BaseAlgorithm {
   // METHOD PARAMETERS
   //! Iterations of the algorithm
   unsigned int maxiter = 1000;
-  //! Number of burn-in iterations, which will be discarded
+  //! Number of initial burn-in iterations, which will be discarded
   unsigned int burnin = 100;
 
   // DATA AND VALUES CONTAINERS
