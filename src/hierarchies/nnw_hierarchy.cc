@@ -15,7 +15,7 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-//! \param prec_ Value to set to prec
+//! @param prec_ Value to set to prec
 void NNWHierarchy::wite_prec_to_state(const Eigen::MatrixXd &prec_,
                                       NNW::State *out) {
   out->prec = prec_;
@@ -25,8 +25,8 @@ void NNWHierarchy::wite_prec_to_state(const Eigen::MatrixXd &prec_,
   out->prec_logdet = 2 * log(diag.array()).sum();
 }
 
-//! \param data Matrix of row-vectorial single data point
-//! \return     Log-Likehood vector evaluated in data
+//! @param data Matrix of row-vectorial single data point
+//! @return     Log-Likehood vector evaluated in data
 double NNWHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
@@ -100,9 +100,9 @@ void NNWHierarchy::update_summary_statistics(
   }
 }
 
-//! \param data                    Matrix of row-vectorial data points
-//! \param mu0, lambda0, tau0, nu0 Original values for hyperparameters
-//! \return                        Vector of updated values for hyperparameters
+//! @param data                    Matrix of row-vectorial data points
+//! @param mu0, lambda0, tau0, nu0 Original values for hyperparameters
+//! @return                        Vector of updated values for hyperparameters
 NNW::Hyperparams NNWHierarchy::get_posterior_parameters() const {
   if (card == 0) {  // no update possible
     return *hypers;

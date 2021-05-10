@@ -22,8 +22,8 @@
 //! The Identifier template parameter must be a protobuf 'enum' type
 //! since we use protobuf to pass between ids and strings
 
-//! \param Identifier Protobuf enum type for the indentifier
-//! \param AbstractProduct Class name for the abstract base object
+//! @param Identifier Protobuf enum type for the indentifier
+//! @param AbstractProduct Class name for the abstract base object
 
 template <typename Identifier, class AbstractProduct>
 class Factory {
@@ -56,7 +56,7 @@ class Factory {
 
   //! Creates the factory via Meyer's trick
 
-  //! \return A reference to the factory object
+  //! @return A reference to the factory object
   static Factory &Instance() {
     static Factory factory;
     return factory;
@@ -64,8 +64,8 @@ class Factory {
 
   //! Creates a specific object based on an identifier
 
-  //! \param id Identifier for the object
-  //! \return     An shared pointer to the created object
+  //! @param id Identifier for the object
+  //! @return     An shared pointer to the created object
   std::shared_ptr<AbstractProduct> create_object(const Identifier &id) const {
     auto f = storage.find(id);
     if (f == storage.end()) {
@@ -78,8 +78,8 @@ class Factory {
     }
   }
 
-  //! \param name string identifier for the object
-  //! \return     An shared pointer to the created object
+  //! @param name string identifier for the object
+  //! @return     An shared pointer to the created object
   std::shared_ptr<AbstractProduct> create_object(
       const std::string &name) const {
     try {
@@ -93,8 +93,8 @@ class Factory {
 
   //! Adds a builder function to the storage
 
-  //! \param id    Identifier to associate the builder with
-  //! \param bulider Builder function for a specific object type
+  //! @param id    Identifier to associate the builder with
+  //! @param bulider Builder function for a specific object type
   void add_builder(const Identifier &id, const Builder &builder) {
     auto f = storage.insert(std::make_pair(id, builder));
     if (f.second == false) {
@@ -113,7 +113,7 @@ class Factory {
     return tmp;
   }
 
-  //! \param id Id for the object to check
+  //! @param id Id for the object to check
   bool check_existence(const Identifier &id) const {
     return !(storage.find(id) == storage.end());
   }

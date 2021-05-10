@@ -21,7 +21,6 @@ void FileCollector::close_reading() {
   }
 }
 
-// \return Chain state in Protobuf-object form
 bool FileCollector::next_state(google::protobuf::Message *out) {
   if (!is_open_read) {
     open_for_reading();
@@ -50,7 +49,6 @@ void FileCollector::finish_collecting() {
   }
 }
 
-// \param iter_state State in Protobuf-object form to write to the collector
 void FileCollector::collect(const google::protobuf::Message &state) {
   bool success =
       google::protobuf::util::SerializeDelimitedToZeroCopyStream(state, fout);

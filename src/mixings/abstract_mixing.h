@@ -47,9 +47,9 @@ class AbstractMixing {
         "Cannot call get_weights() from non-conditional mixing");
   };
 
-  //! \param card Cardinality of the cluster
-  //! \param n    Total number of data points
-  //! \return     Probability value
+  //! @param card Cardinality of the cluster
+  //! @param n    Total number of data points
+  //! @return     Probability value
   virtual double mass_existing_cluster(
       const unsigned int n, const bool log, const bool propto,
       std::shared_ptr<AbstractHierarchy> hier,
@@ -58,9 +58,9 @@ class AbstractMixing {
         "Cannot call mass_existing_cluster() from non-marginal mixing");
   };
 
-  //! \param n_clust Number of clusters
-  //! \param n       Total number of data points
-  //! \return        Probability value
+  //! @param n_clust Number of clusters
+  //! @param n       Total number of data points
+  //! @return        Probability value
   virtual double mass_new_cluster(
       const unsigned int n, const bool log, const bool propto,
       const unsigned int n_clust,
