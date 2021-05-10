@@ -18,6 +18,7 @@
 using bayesmix::AlgorithmState;
 using bayesmix::SemiHdpState;
 
+// TODO plz do it yourself since you this class the best :)
 /*
  * This class implements the algorithm for posterior simulation under the
  * semi-hierarchical Dirichlet process in [1].
