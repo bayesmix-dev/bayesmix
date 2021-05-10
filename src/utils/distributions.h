@@ -17,8 +17,8 @@ namespace bayesmix {
  * probability vector
  *
  * @param probas Probabilities for each category
- * @param rng random number generator
- * @param start (default = 0)
+ * @param rng    random number generator
+ * @param start  (default = 0)
  * @return categorical random variate with values on {start, ...., start + k}
  */
 int categorical_rng(const Eigen::VectorXd &probas, std::mt19937_64 &rng,
