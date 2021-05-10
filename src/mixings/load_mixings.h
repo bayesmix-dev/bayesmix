@@ -11,6 +11,8 @@
 #include "src/runtime/factory.h"
 #include "truncated_sb_mixing.h"
 
+//! Loads all available `Mixing` objects into the appropriate factory.
+
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
@@ -18,6 +20,7 @@ using MixingFactory = Factory<bayesmix::MixingId, AbstractMixing>;
 
 __attribute__((constructor)) static void load_mixings() {
   MixingFactory &factory = MixingFactory::Instance();
+  // Initialize factory builders
   Builder<AbstractMixing> DPbuilder = []() {
     return std::make_shared<DirichletMixing>();
   };
@@ -30,6 +33,7 @@ __attribute__((constructor)) static void load_mixings() {
   Builder<AbstractMixing> TruncSBbuilder = []() {
     return std::make_shared<TruncatedSBMixing>();
   };
+
   factory.add_builder(DirichletMixing().get_id(), DPbuilder);
   factory.add_builder(LogitSBMixing().get_id(), LogSBbuilder);
   factory.add_builder(PitYorMixing().get_id(), PYbuilder);

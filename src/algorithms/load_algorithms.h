@@ -12,6 +12,8 @@
 #include "neal8_algorithm.h"
 #include "src/runtime/factory.h"
 
+//! Loads all available `Algorithm` objects into the appropriate factory.
+
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
@@ -19,6 +21,7 @@ using AlgorithmFactory = Factory<bayesmix::AlgorithmId, BaseAlgorithm>;
 
 __attribute__((constructor)) static void load_algorithms() {
   AlgorithmFactory &factory = AlgorithmFactory::Instance();
+  // Initialize factory builders
   Builder<BaseAlgorithm> Neal2builder = []() {
     return std::make_shared<Neal2Algorithm>();
   };
@@ -31,6 +34,7 @@ __attribute__((constructor)) static void load_algorithms() {
   Builder<BaseAlgorithm> BlockedGibbsbuilder = []() {
     return std::make_shared<BlockedGibbsAlgorithm>();
   };
+
   factory.add_builder(Neal2Algorithm().get_id(), Neal2builder);
   factory.add_builder(Neal3Algorithm().get_id(), Neal3builder);
   factory.add_builder(Neal8Algorithm().get_id(), Neal8builder);

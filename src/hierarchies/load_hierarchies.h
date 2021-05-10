@@ -11,6 +11,8 @@
 #include "nnw_hierarchy.h"
 #include "src/runtime/factory.h"
 
+//! Loads all available `Hierarchy` objects into the appropriate factory.
+
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
@@ -18,6 +20,7 @@ using HierarchyFactory = Factory<bayesmix::HierarchyId, AbstractHierarchy>;
 
 __attribute__((constructor)) static void load_hierarchies() {
   HierarchyFactory &factory = HierarchyFactory::Instance();
+  // Initialize factory builders
   Builder<AbstractHierarchy> NNIGbuilder = []() {
     return std::make_shared<NNIGHierarchy>();
   };
@@ -27,6 +30,7 @@ __attribute__((constructor)) static void load_hierarchies() {
   Builder<AbstractHierarchy> LinRegUnibuilder = []() {
     return std::make_shared<LinRegUniHierarchy>();
   };
+
   factory.add_builder(NNIGHierarchy().get_id(), NNIGbuilder);
   factory.add_builder(NNWHierarchy().get_id(), NNWbuilder);
   factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
