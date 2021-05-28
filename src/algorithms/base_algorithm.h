@@ -44,8 +44,14 @@
 //! message. It also utilizes several class objects related to the underlying
 //! model: a `Mixing` object, and a vector of `Hierarchy` objects.
 //! It includes methods for running the MCMC simulation and for estimating the
-//! posterior density on a given grid of points. Results of these methods are
-//! saved either to `Collector` objects, or to text files.
+//! posterior density on a given grid of points. In particular, density
+//! estimation is performed by averaging the estimate associated to each
+//! single MCMC iteration, which in turn is a weighted average of likelihood
+//! and marginal (if any) lpdf's. The specific method depends on whether the
+//! algorithm is marginal or conditional (see derived classes
+//! `MarginalAlgorithm` and `ConditionalAlgorithm`).
+//! Results for this class' methods are saved either to `Collector` objects, or
+//! to text files.
 
 class BaseAlgorithm {
  public:

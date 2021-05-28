@@ -8,7 +8,20 @@
 #include "src/collectors/base_collector.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-//! TODO class description
+//! Template class for a marginal sampler deriving from `BaseAlgorithm`.
+
+//! This template class implements a generic Gibbs sampling marginal algorithm
+//! as the child of the `BaseAlgorithm` class.
+//!
+//! A marginal algorithm is one in which the component weights have been
+//! marginalized out. Therefore its state only consists of allocations and
+//! unique values. In this class of algorithms, the local lpdf estimate for
+//! a single iteration is a weighted average of likelihood values corresponding
+//! to each component (i.e. cluster), with the weights being based on its
+//! cardinality, and of the marginal component, which depends on the specific.
+//! algorithm.
+//! For more information on Gibbs samplers implemented in the library, please
+//! refer to the `BaseAlgorithm` base class.
 
 class MarginalAlgorithm : public BaseAlgorithm {
  public:

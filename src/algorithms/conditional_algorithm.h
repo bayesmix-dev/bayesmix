@@ -7,8 +7,21 @@
 #include "base_algorithm.h"
 #include "src/collectors/base_collector.h"
 
-// TODO class description. Mention weights as part of state! (but they are not
-// stored here)
+//! Template class for a conditional sampler deriving from `BaseAlgorithm`.
+
+//! This template class implements a generic Gibbs sampling conditional
+//! algorithm as the child of the `BaseAlgorithm` class.
+//!
+//! A conditional algorithm is one in which the component weights are not
+//! marginalized out, unlike in the marginal case. Weights therefore are part
+//! of the state of the algorithm alongside allocations and unique values.
+//! Although, unlike the latter two, weights are not stored in this class, but
+//! into the pointed `Mixing` object. In this class of algorithms, the local
+//! lpdf estimate for a single iteration is a weighted average of likelihood
+//! values corresponding to each component (i.e. cluster), with respect to the
+//! state weights described earlier.
+//! For more information on Gibbs samplers implemented in the library, please
+//! refer to the `BaseAlgorithm` base class.
 
 class ConditionalAlgorithm : public BaseAlgorithm {
  public:
