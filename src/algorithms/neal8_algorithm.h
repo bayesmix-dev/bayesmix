@@ -9,10 +9,9 @@
 #include "neal2_algorithm.h"
 
 //! Template class for Neal's algorithm 8 for conjugate hierarchies
-// TODO update
 
-//! This class implements Neal's Gibbs sampling algorithm 8 that generates a
-//! Markov chain on the clustering of the provided data.
+//! This class implements Neal's Gibbs sampling algorithm 8 from Neal (2000)
+//! that generates a Markov chain on the clustering of the provided data.
 //!
 //! It is a generalization of Neal's algorithm 2 which works for any
 //! hierarchical model, even non-conjugate ones, unlike its predecessor. The
@@ -23,6 +22,9 @@
 //! marginal density via a weighted mean on these new blocks. Other than this
 //! and some minor adjustments in the allocation sampling phase to circumvent
 //! non-conjugacy, it is the same as Neal's algorithm 2.
+//! For more information, please refer to the `Neal2Algorithm`,
+//! `BaseAlgorithm`, and `MarginalAlgorithm` base classes, from which this
+//! class inherits.
 
 class Neal8Algorithm : public Neal2Algorithm {
  public:
