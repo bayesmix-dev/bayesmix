@@ -84,10 +84,11 @@ set(INCLUDE_PATHS
 
 
 set(LINK_LIBRARIES 
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so 
+  tbb 
   pthread 
   protobuf::libprotobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
+set(LINK_OPTIONS "-L${CMAKE_CURRENT_LIST_DIR}/pybmix/core/pybmixcpp/bayesmix/lib/math/lib/tbb/")
 
 file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
 set(PROTO_DIR proto)
@@ -130,7 +131,7 @@ add_dependencies(bayesmix build_tbb)
 target_sources(bayesmix PUBLIC ${PROTO_SRCS} ${PROTO_HDRS})
 add_subdirectory(src)    # source files
 target_include_directories(bayesmix PUBLIC ${INCLUDE_PATHS})
-target_link_libraries(bayesmix PUBLIC ${LINK_LIBRARIES})
+target_link_libraries(bayesmix PUBLIC ${LINK_OPTIONS} ${LINK_LIBRARIES})
 target_compile_options(bayesmix PUBLIC ${COMPILE_OPTIONS})
 
 # Build static library
@@ -142,7 +143,7 @@ if (BUILD_RUN)
 # Build run executable
 add_executable(run $<TARGET_OBJECTS:bayesmix> run.cc)
 target_include_directories(run PUBLIC ${INCLUDE_PATHS})
-target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
+target_link_libraries(run PUBLIC ${LINK_OPTIONS} ${LINK_LIBRARIES})
 target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 endif()
 
