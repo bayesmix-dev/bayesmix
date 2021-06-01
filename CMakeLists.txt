@@ -88,7 +88,7 @@ set(LINK_LIBRARIES
   pthread 
   protobuf::libprotobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
-set(LINK_OPTIONS "-L${CMAKE_CURRENT_LIST_DIR}/pybmix/core/pybmixcpp/bayesmix/lib/math/lib/tbb/")
+set(LINK_OPTIONS "-L${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/")
 
 file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
 set(PROTO_DIR proto)
