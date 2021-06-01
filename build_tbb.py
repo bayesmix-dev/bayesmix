@@ -17,8 +17,12 @@ def maybe_build_tbb():
 
     tbb_dir = os.path.join(stan_math_lib, 'tbb')
     tbb_dir = os.path.abspath(tbb_dir)
-    if os.path.exists(tbb_dir):
-        return
+
+    import glob
+    print("TBB FILES0: ", "\n".join(glob.glob(tbb_dir + "/*")))
+
+    # if os.path.exists(tbb_dir):
+    #     return
 
     make = 'make' if platform.system() != 'Windows' else 'mingw32-make'
     cmd = [make]
@@ -42,7 +46,6 @@ def maybe_build_tbb():
     tbb_release = os.path.join(stan_math_lib, "tbb_release")
     tbb_dir = os.path.join(stan_math_lib, "tbb")
 
-    import glob
     print("TBB FILES1: ", "\n".join(glob.glob(tbb_dir + "/*")))
 
     if not os.path.exists(tbb_dir):
