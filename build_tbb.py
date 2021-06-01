@@ -21,8 +21,8 @@ def maybe_build_tbb():
     import glob
     print("TBB FILES0: ", "\n".join(glob.glob(tbb_dir + "/*")))
 
-    # if os.path.exists(tbb_dir):
-    #     return
+    if os.path.exists(tbb_dir):
+        return
 
     make = 'make' if platform.system() != 'Windows' else 'mingw32-make'
     cmd = [make]
