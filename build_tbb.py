@@ -9,12 +9,13 @@ import subprocess
 def maybe_build_tbb():
     """Build tbb. This function is taken from
     https://github.com/stan-dev/pystan/blob/develop/setup.py"""
-    
+
     stan_math_lib = os.path.abspath(os.path.join(os.path.dirname(
         __file__), 'lib', 'math', 'lib'))
 
     tbb_dir = os.path.join(stan_math_lib, 'tbb')
     tbb_dir = os.path.abspath(tbb_dir)
+
     if os.path.exists(tbb_dir):
         return
 
@@ -27,9 +28,7 @@ def maybe_build_tbb():
     cmd.append('tbb_build_dir={}'.format(stan_math_lib))
     cmd.append('tbb_build_prefix=tbb')
     cmd.append('tbb_root={}'.format(tbb_root))
-
     cmd.append('stdver=c++14')
-
     cmd.append('compiler=gcc')
 
     cwd = os.path.abspath(os.path.dirname(__file__))
