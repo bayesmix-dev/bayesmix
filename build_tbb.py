@@ -10,16 +10,11 @@ def maybe_build_tbb():
     """Build tbb. This function is taken from
     https://github.com/stan-dev/pystan/blob/develop/setup.py"""
 
-    print("**** BUILD TBB ****")
-    
     stan_math_lib = os.path.abspath(os.path.join(os.path.dirname(
         __file__), 'lib', 'math', 'lib'))
 
     tbb_dir = os.path.join(stan_math_lib, 'tbb')
     tbb_dir = os.path.abspath(tbb_dir)
-
-    import glob
-    print("TBB FILES0: ", "\n".join(glob.glob(tbb_dir + "/*")))
 
     if os.path.exists(tbb_dir):
         return
@@ -33,9 +28,7 @@ def maybe_build_tbb():
     cmd.append('tbb_build_dir={}'.format(stan_math_lib))
     cmd.append('tbb_build_prefix=tbb')
     cmd.append('tbb_root={}'.format(tbb_root))
-
     cmd.append('stdver=c++14')
-
     cmd.append('compiler=gcc')
 
     cwd = os.path.abspath(os.path.dirname(__file__))
@@ -45,8 +38,6 @@ def maybe_build_tbb():
     tbb_debug = os.path.join(stan_math_lib, "tbb_debug")
     tbb_release = os.path.join(stan_math_lib, "tbb_release")
     tbb_dir = os.path.join(stan_math_lib, "tbb")
-
-    print("TBB FILES1: ", "\n".join(glob.glob(tbb_dir + "/*")))
 
     if not os.path.exists(tbb_dir):
         os.makedirs(tbb_dir)
@@ -65,7 +56,6 @@ def maybe_build_tbb():
     if os.path.exists(tbb_release):
         shutil.rmtree(tbb_release)
 
-    print("TBB FILES2: ", "\n".join(glob.glob(tbb_dir + "/*")))
 
 if __name__ == "__main__":
     maybe_build_tbb()
