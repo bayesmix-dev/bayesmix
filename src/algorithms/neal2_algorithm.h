@@ -38,6 +38,7 @@ class Neal2Algorithm : public MarginalAlgorithm {
   bayesmix::AlgorithmId get_id() const override {
     return bayesmix::AlgorithmId::Neal2;
   }
+
  protected:
   void print_startup_message() const override;
 
