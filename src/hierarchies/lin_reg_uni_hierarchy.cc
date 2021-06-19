@@ -25,59 +25,6 @@ double LinRegUniHierarchy::marg_lpdf(
                                     covariate.dot(params.mean), sig_n);
 }
 
-LinRegUni::State LinRegUniHierarchy::draw(
-    const LinRegUni::Hyperparams &params) {
-  auto &rng = bayesmix::Rng::Instance().get();
-  LinRegUni::State out;
-  out.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
-  out.regression_coeffs = stan::math::multi_normal_prec_rng(
-      params.mean, params.var_scaling / out.var, rng);
-  return out;
-}
-
-void LinRegUniHierarchy::update_summary_statistics(
-    const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate,
-    bool add) {
-  if (add) {
-    data_sum_squares += datum(0) * datum(0);
-    covar_sum_squares += covariate.transpose() * covariate;
-    mixed_prod += datum(0) * covariate.transpose();
-  } else {
-    data_sum_squares -= datum(0) * datum(0);
-    covar_sum_squares -= covariate.transpose() * covariate;
-    mixed_prod -= datum(0) * covariate.transpose();
-  }
-}
-
-LinRegUni::Hyperparams LinRegUniHierarchy::get_posterior_parameters() {
-  if (card == 0) {  // no update possible
-    return *hypers;
-  }
-  // Compute posterior hyperparameters
-  LinRegUni::Hyperparams post_params;
-  post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
-  auto llt = post_params.var_scaling.llt();
-  post_params.var_scaling_inv = llt.solve(Eigen::MatrixXd::Identity(dim, dim));
-  post_params.mean =
-      llt.solve(mixed_prod + hypers->var_scaling * hypers->mean);
-  post_params.shape = hypers->shape + 0.5 * card;
-  post_params.scale =
-      hypers->scale +
-      0.5 * (data_sum_squares +
-             hypers->mean.transpose() * hypers->var_scaling * hypers->mean -
-             post_params.mean.transpose() * post_params.var_scaling *
-                 post_params.mean);
-  return post_params;
-}
-
-void LinRegUniHierarchy::clear_data() {
-  mixed_prod = Eigen::VectorXd::Zero(dim);
-  data_sum_squares = 0.0;
-  covar_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
-  card = 0;
-  cluster_data_idx = std::set<int>();
-}
-
 void LinRegUniHierarchy::initialize_state() {
   state.regression_coeffs = hypers->mean;
   state.var = hypers->scale / (hypers->shape + 1);
@@ -122,6 +69,59 @@ void LinRegUniHierarchy::update_hypers(
   else {
     throw std::invalid_argument("Unrecognized hierarchy prior");
   }
+}
+
+LinRegUni::State LinRegUniHierarchy::draw(
+    const LinRegUni::Hyperparams &params) {
+  auto &rng = bayesmix::Rng::Instance().get();
+  LinRegUni::State out;
+  out.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+  out.regression_coeffs = stan::math::multi_normal_prec_rng(
+      params.mean, params.var_scaling / out.var, rng);
+  return out;
+}
+
+void LinRegUniHierarchy::update_summary_statistics(
+    const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate,
+    bool add) {
+  if (add) {
+    data_sum_squares += datum(0) * datum(0);
+    covar_sum_squares += covariate.transpose() * covariate;
+    mixed_prod += datum(0) * covariate.transpose();
+  } else {
+    data_sum_squares -= datum(0) * datum(0);
+    covar_sum_squares -= covariate.transpose() * covariate;
+    mixed_prod -= datum(0) * covariate.transpose();
+  }
+}
+
+void LinRegUniHierarchy::clear_data() {
+  mixed_prod = Eigen::VectorXd::Zero(dim);
+  data_sum_squares = 0.0;
+  covar_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
+  card = 0;
+  cluster_data_idx = std::set<int>();
+}
+
+LinRegUni::Hyperparams LinRegUniHierarchy::get_posterior_parameters() {
+  if (card == 0) {  // no update possible
+    return *hypers;
+  }
+  // Compute posterior hyperparameters
+  LinRegUni::Hyperparams post_params;
+  post_params.var_scaling = covar_sum_squares + hypers->var_scaling;
+  auto llt = post_params.var_scaling.llt();
+  post_params.var_scaling_inv = llt.solve(Eigen::MatrixXd::Identity(dim, dim));
+  post_params.mean =
+      llt.solve(mixed_prod + hypers->var_scaling * hypers->mean);
+  post_params.shape = hypers->shape + 0.5 * card;
+  post_params.scale =
+      hypers->scale +
+      0.5 * (data_sum_squares +
+             hypers->mean.transpose() * hypers->var_scaling * hypers->mean -
+             post_params.mean.transpose() * post_params.var_scaling *
+                 post_params.mean);
+  return post_params;
 }
 
 void LinRegUniHierarchy::set_state_from_proto(
