@@ -37,9 +37,7 @@ class Factory {
  public:
   ~Factory() = default;
 
-  //! Creates the factory via Meyer's trick
-
-  //! @return A reference to the factory object
+  //! Returns (and creates if nonexistent) the singleton of this class
   static Factory &Instance() {
     static Factory factory;
     return factory;

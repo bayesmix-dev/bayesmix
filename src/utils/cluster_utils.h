@@ -3,6 +3,9 @@
 
 #include <Eigen/Dense>
 
+//! This file includes some utilities for cluster estimation. These functions
+//! only use Eigen ojects.
+
 namespace bayesmix {
 //! Computes the posterior similarity matrix the data
 Eigen::MatrixXd posterior_similarity(const Eigen::MatrixXd &alloc_chain);
