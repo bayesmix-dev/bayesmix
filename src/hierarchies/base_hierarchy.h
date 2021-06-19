@@ -14,40 +14,33 @@
 #include "hierarchy_id.pb.h"
 #include "src/utils/rng.h"
 
+//! Base template class for a hierarchy object.
+
+//! This class is a templatized version of, and derived from, the
+//! `AbstractHierarchy` class, and the second stage of the curiously recurring
+//! template pattern for `Hierarchy` objects (please see the file of the parent
+//! class for further information). It includes class members and some more
+//! functions which could not be implemented in the non-templatized abstract
+//! class. When deriving a class from `BaseHierarchy`, its own name must be
+//! passed to the first template argument, and custom containers for state,
+//! hyperparameters, and prior values must be provided in the remaining ones.
+
+//! @tparam Derived      Name of the implemented derived class
+//! @tparam State        Class name for the Protobuf for state values
+//! @tparam Hyperparams  Class name for the Protobuf for hyperprior parameters
+//! @tparam Prior        Class name for the Protobuf for prior parameters
+
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 class BaseHierarchy : public AbstractHierarchy {
- protected:
-  State state;
-  // HYPERPARAMETERS
-  std::shared_ptr<Hyperparams> hypers;
-  Hyperparams posterior_hypers;
-  std::shared_ptr<Prior> prior;
-
-  std::set<int> cluster_data_idx;
-  int card = 0;
-  double log_card = stan::math::NEGATIVE_INFTY;
-
-  virtual void initialize_state() = 0;
-  void create_empty_prior() { prior.reset(new Prior); }
-
-  void set_card(const int card_) {
-    card = card_;
-    log_card = std::log(card_);
-  }
-
  public:
-  // DESTRUCTOR AND CONSTRUCTORS
-  ~BaseHierarchy() = default;
   BaseHierarchy() = default;
+  ~BaseHierarchy() = default;
+
   virtual std::shared_ptr<AbstractHierarchy> clone() const override {
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
     out->clear_data();
     return out;
   }
-
-  State get_state() const { return state; }
-  Hyperparams get_hypers() const { return *hypers; }
-  Hyperparams get_posterior_hypers() const { return posterior_hypers; }
 
   void sample_prior() override {
     state = static_cast<Derived *>(this)->draw(*hypers);
@@ -62,16 +55,6 @@ class BaseHierarchy : public AbstractHierarchy {
     static_cast<Derived *>(this)->clear_data();
   }
 
-  void add_datum(
-      const int id, const Eigen::RowVectorXd &datum,
-      const bool update_params = false,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
-  //! Removes a datum and its index from the hierarchy
-  void remove_datum(
-      const int id, const Eigen::RowVectorXd &datum,
-      const bool update_params = false,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
-
   void check_prior_is_set() const;
 
   virtual google::protobuf::Message *get_mutable_prior() override {
@@ -79,10 +62,6 @@ class BaseHierarchy : public AbstractHierarchy {
 
     return prior.get();
   }
-
-  int get_card() const override { return card; }
-  double get_log_card() const override { return log_card; }
-  std::set<int> get_data_idx() const override { return cluster_data_idx; }
 
   virtual Eigen::VectorXd like_lpdf_grid(
       const Eigen::MatrixXd &data,
@@ -92,6 +71,52 @@ class BaseHierarchy : public AbstractHierarchy {
   virtual void sample_full_cond(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
+
+  void add_datum(
+      const int id, const Eigen::RowVectorXd &datum,
+      const bool update_params = false,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
+
+  void remove_datum(
+      const int id, const Eigen::RowVectorXd &datum,
+      const bool update_params = false,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
+
+  State get_state() const { return state; }
+  Hyperparams get_hypers() const { return *hypers; }
+  Hyperparams get_posterior_hypers() const { return posterior_hypers; }
+
+  int get_card() const override { return card; }
+
+  double get_log_card() const override { return log_card; }
+
+  std::set<int> get_data_idx() const override { return cluster_data_idx; }
+
+ protected:
+  //! Container for state values
+  State state;
+  //! Container for prior hyperparameters values
+  std::shared_ptr<Hyperparams> hypers;
+  //! Container for posterior hyperparameters values
+  Hyperparams posterior_hypers;
+  //! Pointer to a Protobuf prior object for this class
+  std::shared_ptr<Prior> prior;
+  //! Set of indexes of data points belonging to this cluster
+  std::set<int> cluster_data_idx;
+  //! Current cardinality of this cluster
+  int card = 0;
+  //! Logarithm of current cardinality of this cluster
+  double log_card = stan::math::NEGATIVE_INFTY;
+
+  //! Initialize state parameters to appropriate values
+  virtual void initialize_state() = 0;
+
+  void create_empty_prior() { prior.reset(new Prior); }
+
+  void set_card(const int card_) {
+    card = card_;
+    log_card = std::log(card_);
+  }
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>

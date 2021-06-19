@@ -12,11 +12,26 @@
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 
+//! Linear regression hierarchy for univariate data.
+
+//! This class implements a dependent hierarchy which represents the classical
+//! Bayesian linear regression model. Its state is composed of an arbitrarily-
+//! sized vector of regression coefficients, which have a multivariate Normal
+//! prior distribution attached to them. Its hyperparameters are mean and
+//! variance-scaling factor (a vector and a matrix respectively), and the
+//! scalar values shape and scale. The inverse of the variance-scaling matrix
+//! is also included in their container for efficiency reasons. For more
+//! information, please refer to parent classes: `AbstractHierarchy`,
+//! `BaseHierarchy`, and `ConjugateHierarchy`.
+
 namespace LinRegUni {
+//! Custom container for State values
 struct State {
   Eigen::VectorXd regression_coeffs;
   double var;
 };
+
+//! Custom container for Hyperparameters values
 struct Hyperparams {
   Eigen::VectorXd mean;
   Eigen::MatrixXd var_scaling;
@@ -31,19 +46,8 @@ class LinRegUniHierarchy
                                 LinRegUni::Hyperparams,
                                 bayesmix::LinRegUniPrior> {
  public:
- protected:
-  unsigned int dim;
-  //! Represents pieces of y^t y
-  double data_sum_squares;
-  //! Represents pieces of X^T X
-  Eigen::MatrixXd covar_sum_squares;
-  //! Represents pieces of X^t y
-  Eigen::VectorXd mixed_prod;
-
- public:
-  // DESTRUCTOR AND CONSTRUCTORS
-  ~LinRegUniHierarchy() = default;
   LinRegUniHierarchy() = default;
+  ~LinRegUniHierarchy() = default;
 
   bool is_multivariate() const override { return false; }
   bool is_dependent() const override { return true; }
@@ -78,6 +82,15 @@ class LinRegUniHierarchy
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::LinRegUni;
   }
+
+ protected:
+  unsigned int dim;
+  //! Represents pieces of y^t y
+  double data_sum_squares;
+  //! Represents pieces of X^T X
+  Eigen::MatrixXd covar_sum_squares;
+  //! Represents pieces of X^t y
+  Eigen::VectorXd mixed_prod;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_H_

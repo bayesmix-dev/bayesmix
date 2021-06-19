@@ -122,6 +122,7 @@ class BaseAlgorithm {
   unsigned int get_maxiter() const { return maxiter; }
   unsigned int get_burnin() const { return burnin; }
   virtual bayesmix::AlgorithmId get_id() const = 0;
+  //! Returns the Protobuf ID associated to this class
 
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }

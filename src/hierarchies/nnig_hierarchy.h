@@ -12,7 +12,7 @@
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 
-//! Normal Normal-InverseGamma hierarchy for univariate data.
+//! Conjugate Normal Normal-InverseGamma hierarchy for univariate data.
 
 //! This class represents a hierarchy, i.e. a cluster, whose univariate data
 //! are distributed according to a normal likelihood, the parameters of which
@@ -22,17 +22,20 @@
 //!    (mu,sig^2) ~ G            (unique values distribution);
 //!             G ~ MM           (mixture model);
 //!            G0 = N-IG         (centering distribution).
-//! state[0] = mu is called location, and state[1] = sig is called scale. The
-//! state hyperparameters, contained in the Hypers object, are (mu_0, lambda0,
-//! alpha0, beta0), all scalar values. Note that this hierarchy is conjugate,
-//! thus the marginal and the posterior distribution are available in closed
-//! form and Neal's algorithm 2 may be used with it.
+//! The state is composed of mean and variance. The state hyperparameters,
+//! contained in the Hypers object, are (mu_0, lambda0, alpha0, beta0), all
+//! scalar values. Note that this hierarchy is conjugate, thus the marginal
+//! distribution is available in closed form.  For more information, please
+//! refer to parent classes: `AbstractHierarchy`, `BaseHierarchy`, and
+//! `ConjugateHierarchy`.
 
 namespace NNIG {
+//! Custom container for State values
 struct State {
   double mean, var;
 };
 
+//! Custom container for Hyperparameters values
 struct Hyperparams {
   double mean, var_scaling, shape, scale;
 };
@@ -55,11 +58,15 @@ class NNIGHierarchy
   bool is_multivariate() const override { return false; }
 
   // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate =
                        Eigen::RowVectorXd(0)) const override;
+
   //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   double marg_lpdf(
       const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;

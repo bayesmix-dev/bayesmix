@@ -77,6 +77,7 @@ class AbstractMixing {
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
+  //! Returns the Protobuf ID associated to this class
   virtual bayesmix::MixingId get_id() const = 0;
 };
 

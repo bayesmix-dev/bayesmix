@@ -29,8 +29,8 @@
 //! strings. These `enum` types are described in the proto/algorithm_id.proto,
 //! hierarchy_id.proto, and mixing_id.proto files.
 
-//! @param Identifier       Protobuf enum type for the indentifier
-//! @param AbstractProduct  Class name for the abstract base object
+//! @tparam Identifier       Protobuf enum type for the indentifier
+//! @tparam AbstractProduct  Class name for the abstract base object
 
 template <typename Identifier, class AbstractProduct>
 class Factory {
