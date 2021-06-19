@@ -85,15 +85,15 @@ class NNWHierarchy
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
 
-  //! Updates state values using the given (prior or posterior) hyperparameters
-  NNW::State draw(const NNW::Hyperparams &params);
-
-  void update_hypers(
-      const std::vector<bayesmix::AlgorithmState::ClusterState> &states);
-
   void initialize_state();
 
   void initialize_hypers();
+
+  void update_hypers(
+      const std::vector<bayesmix::AlgorithmState::ClusterState> &states) override;
+
+  //! Updates state values using the given (prior or posterior) hyperparameters
+  NNW::State draw(const NNW::Hyperparams &params);
 
   //! Updates cluster statistics when a datum is added or removed from it
   //! @param datum      Data point which is being added or removed
@@ -108,11 +108,15 @@ class NNWHierarchy
 
   bool is_multivariate() const override { return true; }
 
+  //! Computes and return posterior hypers given data currently in this cluster
   NNW::Hyperparams get_posterior_parameters() const;
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
+
   void write_state_to_proto(google::protobuf::Message *out) const override;
+
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
+
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNW;
   }
@@ -126,7 +130,7 @@ class NNWHierarchy
   Eigen::MatrixXd data_sum_squares;
 
   //! Special setter for prec and its utilities
-  void wite_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);
+  void write_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);
   //! Returns parameters for the predictive Student's t distribution
   NNW::Hyperparams get_predictive_t_parameters(
       const NNW::Hyperparams &params) const;

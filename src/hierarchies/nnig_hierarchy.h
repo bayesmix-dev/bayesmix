@@ -62,15 +62,15 @@ class NNIGHierarchy
       const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
 
-  //! Updates state values using the given (prior or posterior) hyperparameters
-  NNIG::State draw(const NNIG::Hyperparams &params);
-
-  void update_hypers(
-      const std::vector<bayesmix::AlgorithmState::ClusterState> &states);
-
   void initialize_state();
 
   void initialize_hypers();
+
+  void update_hypers(
+      const std::vector<bayesmix::AlgorithmState::ClusterState> &states) override;
+
+  //! Updates state values using the given (prior or posterior) hyperparameters
+  NNIG::State draw(const NNIG::Hyperparams &params);
 
   //! Updates cluster statistics when a datum is added or removed from it
   //! @param datum      Data point which is being added or removed
@@ -85,6 +85,7 @@ class NNIGHierarchy
 
   bool is_multivariate() const override { return false; }
 
+  //! Computes and return posterior hypers given data currently in this cluster
   NNIG::Hyperparams get_posterior_parameters();
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;

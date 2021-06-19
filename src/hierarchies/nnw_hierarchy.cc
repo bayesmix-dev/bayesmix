@@ -15,15 +15,6 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-void NNWHierarchy::wite_prec_to_state(const Eigen::MatrixXd &prec_,
-                                      NNW::State *out) {
-  out->prec = prec_;
-  // Update prec utilities
-  out->prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_).matrixU();
-  Eigen::VectorXd diag = out->prec_chol.diagonal();
-  out->prec_logdet = 2 * log(diag.array()).sum();
-}
-
 double NNWHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
@@ -81,7 +72,7 @@ NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
   NNW::State out;
   out.mean = stan::math::multi_normal_prec_rng(
       params.mean, tau_new * params.var_scaling, rng);
-  wite_prec_to_state(tau_new, &out);
+  write_prec_to_state(tau_new, &out);
   return out;
 }
 
@@ -123,20 +114,6 @@ NNW::Hyperparams NNWHierarchy::get_posterior_parameters() const {
   return post_params;
 }
 
-NNW::Hyperparams NNWHierarchy::get_predictive_t_parameters(
-    const NNW::Hyperparams &params) const {
-  // Compute dof and scale of marginal distribution
-  double nu_n = params.deg_free - dim + 1;
-  double coeff = (params.var_scaling + 1) / (params.var_scaling * nu_n);
-  Eigen::MatrixXd scale_chol_n = params.scale_chol / std::sqrt(coeff);
-
-  NNW::Hyperparams out;
-  out.mean = params.mean;
-  out.deg_free = nu_n;
-  out.scale_chol = scale_chol_n;
-  return out;
-}
-
 void NNWHierarchy::clear_data() {
   data_sum = Eigen::VectorXd::Zero(dim);
   data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
@@ -146,7 +123,7 @@ void NNWHierarchy::clear_data() {
 
 void NNWHierarchy::initialize_state() {
   state.mean = hypers->mean;
-  wite_prec_to_state(hypers->var_scaling * Eigen::MatrixXd::Identity(dim, dim),
+  write_prec_to_state(hypers->var_scaling * Eigen::MatrixXd::Identity(dim, dim),
                      &state);
 }
 
@@ -371,4 +348,27 @@ void NNWHierarchy::write_hypers_to_proto(
   google::protobuf::internal::down_cast<bayesmix::NNWPrior *>(out)
       ->mutable_fixed_values()
       ->CopyFrom(hypers_.fixed_values());
+}
+
+void NNWHierarchy::write_prec_to_state(const Eigen::MatrixXd &prec_,
+                                      NNW::State *out) {
+  out->prec = prec_;
+  // Update prec utilities
+  out->prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_).matrixU();
+  Eigen::VectorXd diag = out->prec_chol.diagonal();
+  out->prec_logdet = 2 * log(diag.array()).sum();
+}
+
+NNW::Hyperparams NNWHierarchy::get_predictive_t_parameters(
+    const NNW::Hyperparams &params) const {
+  // Compute dof and scale of marginal distribution
+  double nu_n = params.deg_free - dim + 1;
+  double coeff = (params.var_scaling + 1) / (params.var_scaling * nu_n);
+  Eigen::MatrixXd scale_chol_n = params.scale_chol / std::sqrt(coeff);
+
+  NNW::Hyperparams out;
+  out.mean = params.mean;
+  out.deg_free = nu_n;
+  out.scale_chol = scale_chol_n;
+  return out;
 }
