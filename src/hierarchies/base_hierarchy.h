@@ -26,9 +26,9 @@
 //! hyperparameters, and prior values must be provided in the remaining ones.
 
 //! @tparam Derived      Name of the implemented derived class
-//! @tparam State        Class name for the Protobuf for state values
-//! @tparam Hyperparams  Class name for the Protobuf for hyperprior parameters
-//! @tparam Prior        Class name for the Protobuf for prior parameters
+//! @tparam State        Class name of the container for state values
+//! @tparam Hyperparams  Class name of the container for hyperprior parameters
+//! @tparam Prior        Class name of the container for prior parameters
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 class BaseHierarchy : public AbstractHierarchy {

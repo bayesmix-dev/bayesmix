@@ -15,7 +15,6 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-//! @param prec_ Value to set to prec
 void NNWHierarchy::wite_prec_to_state(const Eigen::MatrixXd &prec_,
                                       NNW::State *out) {
   out->prec = prec_;
@@ -25,8 +24,6 @@ void NNWHierarchy::wite_prec_to_state(const Eigen::MatrixXd &prec_,
   out->prec_logdet = 2 * log(diag.array()).sum();
 }
 
-//! @param data Matrix of row-vectorial single data point
-//! @return     Log-Likehood vector evaluated in data
 double NNWHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {

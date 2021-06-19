@@ -49,41 +49,60 @@ class LinRegUniHierarchy
   LinRegUniHierarchy() = default;
   ~LinRegUniHierarchy() = default;
 
-  bool is_multivariate() const override { return false; }
-  bool is_dependent() const override { return true; }
-  unsigned int get_dim() const { return dim; }
-
-  // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate =
                        Eigen::RowVectorXd(0)) const override;
 
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   double marg_lpdf(
       const LinRegUni::Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
 
+  //! Updates state values using the given (prior or posterior) hyperparameters
   LinRegUni::State draw(const LinRegUni::Hyperparams &params);
 
-  void clear_data();
   void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states);
 
   void initialize_state();
+
   void initialize_hypers();
+
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param covariate  Covariate vector associated to datum
+  //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  const Eigen::RowVectorXd &covariate,
                                  bool add);
+
+  //! Removes every data point from this cluster
+  void clear_data();
+
+  bool is_multivariate() const override { return false; }
+
+  bool is_dependent() const override { return true; }
+
+  unsigned int get_dim() const { return dim; }
+
   LinRegUni::Hyperparams get_posterior_parameters();
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
+
   void write_state_to_proto(google::protobuf::Message *out) const override;
+
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
+
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::LinRegUni;
   }
 
  protected:
+  //! Dimension of the coefficients vector
   unsigned int dim;
   //! Represents pieces of y^t y
   double data_sum_squares;

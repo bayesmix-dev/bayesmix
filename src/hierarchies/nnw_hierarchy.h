@@ -55,18 +55,18 @@ class NNWHierarchy
     : public ConjugateHierarchy<NNWHierarchy, NNW::State, NNW::Hyperparams,
                                 bayesmix::NNWPrior> {
  public:
-  // DESTRUCTOR AND CONSTRUCTORS
-  ~NNWHierarchy() = default;
   NNWHierarchy() = default;
+  ~NNWHierarchy() = default;
 
-  bool is_multivariate() const override { return true; }
-
-  // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate =
                        Eigen::RowVectorXd(0)) const override;
 
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   double marg_lpdf(
       const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
@@ -85,18 +85,29 @@ class NNWHierarchy
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
 
-  // SAMPLING FUNCTIONS
+  //! Updates state values using the given (prior or posterior) hyperparameters
   NNW::State draw(const NNW::Hyperparams &params);
 
-  void clear_data();
   void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states);
 
   void initialize_state();
+
   void initialize_hypers();
+
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param covariate  Covariate vector associated to datum
+  //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  const Eigen::RowVectorXd &covariate,
                                  bool add);
+
+  //! Removes every data point from this cluster
+  void clear_data();
+
+  bool is_multivariate() const override { return true; }
+
   NNW::Hyperparams get_posterior_parameters() const;
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;

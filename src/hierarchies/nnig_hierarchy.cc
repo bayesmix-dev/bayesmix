@@ -27,7 +27,6 @@ double NNIGHierarchy::marg_lpdf(
 }
 
 NNIG::State NNIGHierarchy::draw(const NNIG::Hyperparams &params) {
-  // Update state values from their prior centering distribution
   auto &rng = bayesmix::Rng::Instance().get();
   NNIG::State out;
   out.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);

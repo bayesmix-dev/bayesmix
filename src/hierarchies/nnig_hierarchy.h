@@ -45,19 +45,10 @@ struct Hyperparams {
 class NNIGHierarchy
     : public ConjugateHierarchy<NNIGHierarchy, NNIG::State, NNIG::Hyperparams,
                                 bayesmix::NNIGPrior> {
- protected:
-  double data_sum = 0;
-  double data_sum_squares = 0;
-
  public:
-  // DESTRUCTOR AND CONSTRUCTORS
-  ~NNIGHierarchy() = default;
   NNIGHierarchy() = default;
+  ~NNIGHierarchy() = default;
 
-  //! Returns true if the hierarchy models multivariate data (here, false)
-  bool is_multivariate() const override { return false; }
-
-  // EVALUATION FUNCTIONS
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate =
                        Eigen::RowVectorXd(0)) const override;
@@ -71,24 +62,46 @@ class NNIGHierarchy
       const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
 
+  //! Updates state values using the given (prior or posterior) hyperparameters
   NNIG::State draw(const NNIG::Hyperparams &params);
 
-  void clear_data();
   void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states);
+
   void initialize_state();
+
   void initialize_hypers();
+
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param covariate  Covariate vector associated to datum
+  //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  const Eigen::RowVectorXd &covariate,
                                  bool add);
+
+  //! Removes every data point from this cluster
+  void clear_data();
+
+  bool is_multivariate() const override { return false; }
+
   NNIG::Hyperparams get_posterior_parameters();
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
+
   void write_state_to_proto(google::protobuf::Message *out) const override;
+
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
+
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNIG;
   }
+
+ protected:
+  //! Sum of data points currently belonging to the cluster
+  double data_sum = 0;
+  //! Sum of squared data points currently belonging to the cluster
+  double data_sum_squares = 0;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_H_
