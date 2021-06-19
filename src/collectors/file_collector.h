@@ -15,9 +15,40 @@
 //! corresponding file. This approach is mandatory, for instance, if different
 //! main programs are used both to run the algorithm and the estimates.
 //! Therefore, a file collector has both a reading and a writing mode.
+//! For more information about collectors, please refer to the `BaseCollector`
+//! base class.
 
 class FileCollector : public BaseCollector {
+ public:
+  FileCollector(const std::string &filename_) : filename(filename_) {}
+
+  ~FileCollector() {
+    if (is_open_write) {
+      fout->Close();
+      close(outfd);
+    }
+    if (is_open_read) {
+      fin->Close();
+      close(infd);
+    }
+  }
+  
+  void start_collecting() override;
+
+  void finish_collecting() override;
+
+  void collect(const google::protobuf::Message &state) override;
+
+  void reset() override;
+
  protected:
+  //! Opens collector in reading mode
+  void open_for_reading();
+  //! Terminates reading mode for the collector
+  void close_reading();
+
+  bool next_state(google::protobuf::Message *out) override;
+
   //! Unix file descriptor for reading mode
   int infd;
   //! Unix file descriptor for writing mode
@@ -32,36 +63,6 @@ class FileCollector : public BaseCollector {
   bool is_open_read = false;
   //! Flag that indicates if the collector is open in write-mode
   bool is_open_write = false;
-
-  //! Opens collector in reading mode
-  void open_for_reading();
-  //! Terminates reading mode for the collector
-  void close_reading();
-  //! Reads the next state, based on the curr_iter curson
-  bool next_state(google::protobuf::Message *out) override;
-
- public:
-  // DESTRUCTOR AND CONSTRUCTORS
-  ~FileCollector() {
-    if (is_open_write) {
-      fout->Close();
-      close(outfd);
-    }
-    if (is_open_read) {
-      fin->Close();
-      close(infd);
-    }
-  }
-  FileCollector(const std::string &filename_) : filename(filename_) {}
-  //! Initializes collector
-  void start_collecting() override;
-  //! Closes collector
-  void finish_collecting() override;
-
-  //! Writes the given state to the collector
-  void collect(const google::protobuf::Message &state) override;
-
-  void reset() override;
 };
 
 #endif  // BAYESMIX_COLLECTORS_FILE_COLLECTOR_H_
