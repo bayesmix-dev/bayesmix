@@ -11,7 +11,8 @@
 #include "nnw_hierarchy.h"
 #include "src/runtime/factory.h"
 
-//! Loads all available `Hierarchy` objects into the appropriate factory.
+//! Loads all available `Hierarchy` objects into the appropriate factory, so
+//! that they are ready to be chosen and used at runtime.
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;

@@ -12,7 +12,8 @@
 #include "neal8_algorithm.h"
 #include "src/runtime/factory.h"
 
-//! Loads all available `Algorithm` objects into the appropriate factory.
+//! Loads all available `Algorithm` objects into the appropriate factory, so
+//! that they are ready to be chosen and used at runtime.
 
 template <class AbstractProduct>
 using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
