@@ -103,7 +103,6 @@ class AbstractHierarchy {
   //! @param data        Grid of points (by row) which are to be evaluated
   //! @param covariates  (Optional) covariate vectors associated to data
   //! @return            The evaluation of the lpdf
-  virtual Eigen::VectorXd prior_pred_lpdf_grid(
   virtual Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
