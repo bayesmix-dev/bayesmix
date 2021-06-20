@@ -24,19 +24,22 @@
 //! parameters for the distribution of the data points that belong to it. Since
 //! the prior distribution for the state is often the same across multiple
 //! different hierarchies, the hyperparameters object is accessed via a shared
-//! pointer. Lastly, any hierarchy that inherits from this class contains
-//! multiple ways of updating the state, either via prior or posterior
-//! distributions, and of evaluating the distribution of the data, either its
-//! likelihood (whose parameters are the state) or its marginal distribution. 
-//! Other methods are also required. Communication with external classes, as
-//! well as storage of some relevant values, is performed via appropriately
-//! defined Protobuf messages (see for instance the proto/ls_state.proto and
+//! pointer. In conjunction with a single `Mixing` object, a collection of
+//! `Hierarchy` objects completely defines a mixture model, and these two parts
+//! can be chosen independently of each other.
+//! Lastly, any hierarchy that inherits from this class contains multiple ways
+//! of updating the state, either via prior or posterior distributions, and of
+//! evaluating the distribution of the data, either its likelihood (whose
+//! parameters are the state) or its marginal distribution.  Other methods are
+//! also required. Communication with external classes, as well as storage of
+//! some relevant values, is performed via appropriately defined Protobuf
+//! messages (see for instance the proto/ls_state.proto and
 //! proto/hierarchy_prior.proto files) and their relative class methods.
 //! This class is the basis for a curiously recurring template pattern (CRTP)
 //! for `Hierarchy` objects, and is solely composed of interface functions for
 //! derived classes to use. For more information about this pattern, as well
 //! the list of methods required for classes in this inheritance tree, please
-//! refer to the README.md file included in (TODO).
+//! refer to the README.md file included in this folder.
 
 class AbstractHierarchy {
  public:
