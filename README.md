@@ -49,6 +49,7 @@ make run
 cd ..
 ./build/run
 ```
+(TODO last line is not true!)
 
 To run unit tests:
 ```shell
