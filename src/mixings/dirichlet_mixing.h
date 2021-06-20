@@ -21,6 +21,9 @@
 //! creation of a new cluster, and weights of already existing clusters are
 //! proportional to their cardinalities. Its state is solely composed of M, but
 //! the provided container also includes its logarithm for efficiency reasons.
+//! See Neal (2000) for a thorough explanation of this model representation.
+//! For more information about the class, please refer instead to base classes,
+//! `AbstractMixing` and `BaseMixing`.
 
 namespace Dirichlet {
 struct State {

@@ -18,42 +18,6 @@ void DirichletMixing::initialize() {
   initialize_state();
 }
 
-//! @param card Cardinality of the cluster
-//! @param n    Total number of data points
-//! @return     Probability value
-double DirichletMixing::mass_existing_cluster(
-    const unsigned int n, const bool log, const bool propto,
-    std::shared_ptr<AbstractHierarchy> hier,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
-  double out;
-  if (log) {
-    out = hier->get_log_card();
-    if (!propto) out -= std::log(n + state.totalmass);
-  } else {
-    out = 1.0 * hier->get_card();
-    if (!propto) out /= (n + state.totalmass);
-  }
-  return out;
-}
-
-//! @param n_clust Number of clusters
-//! @param n       Total number of data points
-//! @return        Probability value
-double DirichletMixing::mass_new_cluster(
-    const unsigned int n, const bool log, const bool propto,
-    const unsigned int n_clust,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
-  double out;
-  if (log) {
-    out = state.logtotmass;
-    if (!propto) out -= std::log(n + state.totalmass);
-  } else {
-    out = state.totalmass;
-    if (!propto) out /= (n + state.totalmass);
-  }
-  return out;
-}
-
 void DirichletMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     const std::vector<unsigned int> &allocations) {
@@ -70,7 +34,7 @@ void DirichletMixing::update_state(
     unsigned int k = unique_values.size();
     double alpha = priorcast->gamma_prior().totalmass_prior().shape();
     double beta = priorcast->gamma_prior().totalmass_prior().rate();
-
+    // Update state (see Neal (2000) for details)
     double phi = stan::math::gamma_rng(state.totalmass + 1, n, rng);
     double odds = (alpha + k - 1) / (n * (beta - log(phi)));
     double prob = odds / (1 + odds);
@@ -88,6 +52,36 @@ void DirichletMixing::update_state(
   }
 }
 
+double DirichletMixing::mass_existing_cluster(
+    const unsigned int n, const bool log, const bool propto,
+    std::shared_ptr<AbstractHierarchy> hier,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+  double out;
+  if (log) {
+    out = hier->get_log_card();
+    if (!propto) out -= std::log(n + state.totalmass);
+  } else {
+    out = 1.0 * hier->get_card();
+    if (!propto) out /= (n + state.totalmass);
+  }
+  return out;
+}
+
+double DirichletMixing::mass_new_cluster(
+    const unsigned int n, const bool log, const bool propto,
+    const unsigned int n_clust,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+  double out;
+  if (log) {
+    out = state.logtotmass;
+    if (!propto) out -= std::log(n + state.totalmass);
+  } else {
+    out = state.totalmass;
+    if (!propto) out /= (n + state.totalmass);
+  }
+  return out;
+}
+
 void DirichletMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast =
@@ -95,6 +89,16 @@ void DirichletMixing::set_state_from_proto(
           state_);
   state.totalmass = statecast.dp_state().totalmass();
   state.logtotmass = std::log(state.totalmass);
+}
+
+void DirichletMixing::write_state_to_proto(
+    google::protobuf::Message *out) const {
+  bayesmix::DPState state_;
+  state_.set_totalmass(state.totalmass);
+
+  google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
+      ->mutable_dp_state()
+      ->CopyFrom(state_);
 }
 
 void DirichletMixing::initialize_state() {
@@ -121,14 +125,4 @@ void DirichletMixing::initialize_state() {
   else {
     throw std::invalid_argument("Uunrecognized mixing prior");
   }
-}
-
-void DirichletMixing::write_state_to_proto(
-    google::protobuf::Message *out) const {
-  bayesmix::DPState state_;
-  state_.set_totalmass(state.totalmass);
-
-  google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
-      ->mutable_dp_state()
-      ->CopyFrom(state_);
 }

@@ -18,9 +18,17 @@ void PitYorMixing::initialize() {
   initialize_state();
 }
 
-//! @param card Cardinality of the cluster
-//! @param n    Total number of data points
-//! @return     Probability value
+void PitYorMixing::update_state(
+    const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
+    const std::vector<unsigned int> &allocations) {
+  auto priorcast = cast_prior();
+  if (priorcast->has_fixed_values()) {
+    return;
+  } else {
+    throw std::invalid_argument("Unrecognized mixing prior");
+  }
+}
+
 double PitYorMixing::mass_existing_cluster(
     const unsigned int n, const bool log, const bool propto,
     std::shared_ptr<AbstractHierarchy> hier,
@@ -39,9 +47,6 @@ double PitYorMixing::mass_existing_cluster(
   return out;
 }
 
-//! @param n_clust Number of clusters
-//! @param n       Total number of data points
-//! @return        Probability value
 double PitYorMixing::mass_new_cluster(
     const unsigned int n, const bool log, const bool propto,
     const unsigned int n_clust,
@@ -57,17 +62,6 @@ double PitYorMixing::mass_new_cluster(
   return out;
 }
 
-void PitYorMixing::update_state(
-    const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-    const std::vector<unsigned int> &allocations) {
-  auto priorcast = cast_prior();
-  if (priorcast->has_fixed_values()) {
-    return;
-  } else {
-    throw std::invalid_argument("Unrecognized mixing prior");
-  }
-}
-
 void PitYorMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast =
@@ -75,6 +69,16 @@ void PitYorMixing::set_state_from_proto(
           state_);
   state.strength = statecast.py_state().strength();
   state.discount = statecast.py_state().discount();
+}
+
+void PitYorMixing::write_state_to_proto(google::protobuf::Message *out) const {
+  bayesmix::PYState state_;
+  state_.set_strength(state.strength);
+  state_.set_discount(state.discount);
+
+  auto *out_cast =
+      google::protobuf::internal::down_cast<bayesmix::MixingState *>(out);
+  out_cast->mutable_py_state()->CopyFrom(state_);
 }
 
 void PitYorMixing::initialize_state() {
@@ -92,14 +96,4 @@ void PitYorMixing::initialize_state() {
   } else {
     throw std::invalid_argument("Unrecognized mixing prior");
   }
-}
-
-void PitYorMixing::write_state_to_proto(google::protobuf::Message *out) const {
-  bayesmix::PYState state_;
-  state_.set_strength(state.strength);
-  state_.set_discount(state.discount);
-
-  auto *out_cast =
-      google::protobuf::internal::down_cast<bayesmix::MixingState *>(out);
-  out_cast->mutable_py_state()->CopyFrom(state_);
 }

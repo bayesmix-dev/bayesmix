@@ -50,10 +50,12 @@ class AbstractMixing {
 
   //! Initializes class members to appropriate values
   virtual void initialize() = 0;
+
   //! Performs conditional update of state, given allocations and unique values
   virtual void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       const std::vector<unsigned int> &allocations) = 0;
+
   //! Returns mixing weights (for conditional mixings only)
   virtual Eigen::VectorXd get_weights(
       const bool log, const bool propto,
@@ -91,12 +93,16 @@ class AbstractMixing {
     throw std::runtime_error(
         "Cannot call mass_new_cluster() from non-marginal mixing");
   };
+
   //! Returns current number of clusters of the mixture model
   virtual unsigned int get_num_components() const = 0;
+
   //! Returns a pointer to the Protobuf message of the prior of this cluster
   virtual google::protobuf::Message *get_mutable_prior() = 0;
+
   //! Sets current number of clusters of the mixture model
   virtual void set_num_components(const unsigned int num_) = 0;
+
   //! Sets pointer to the covariate matrix for the mixture model
   virtual void set_covariates(Eigen::MatrixXd *covar) = 0;
 
@@ -104,11 +110,13 @@ class AbstractMixing {
       const google::protobuf::Message &state_) = 0;
   
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
+
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::MixingId get_id() const = 0;
 
   //! Returns whether the mixing is conditional or marginal
   virtual bool is_conditional() const = 0;
+
   //! Returns whether the mixing depends on covariate values or not
   virtual bool is_dependent() const = 0;
 };
