@@ -16,10 +16,10 @@ clang-format -i --style=file yourfile.cc
 which reads the appropriate settings from the ```.clang-format``` file at the root folder.
 
 ## Future steps
-* A Python package is already under development at https://github.com/bayesmix-dev/pybmix
 * Extension to normalized random measures
 * Using HMC / MALA MCMC algorithm to sample from the cluster-specific full conditionals when it's not conjugate to the base measure
 * R package
+* Please check out the [issue page](https://github.com/bayesmix-dev/bayesmix/issues) for more planned enhancements.
 
 ## Hierarchies
 This library implements hierarchy objects through the [Curiously Recurring Template Pattern](https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern).
