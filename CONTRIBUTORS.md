@@ -22,5 +22,5 @@ which reads the appropriate settings from the ```.clang-format``` file at the ro
 * Please check out the [issue page](https://github.com/bayesmix-dev/bayesmix/issues) for more planned enhancements.
 
 ## Hierarchies
-This library implements hierarchy objects through the [Curiously Recurring Template Pattern](https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern).
+This library implements `Hierarchy` and `Mixing` objects through the [Curiously Recurring Template Pattern](https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern).
 Please check out [src/hierarchies/README.md](src/hierarchies/README.md) for more details.
