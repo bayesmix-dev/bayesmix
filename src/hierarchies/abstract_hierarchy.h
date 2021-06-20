@@ -44,6 +44,7 @@
 class AbstractHierarchy {
  public:
   virtual ~AbstractHierarchy() = default;
+
   //! Returns an independent copy of this object
   virtual std::shared_ptr<AbstractHierarchy> clone() const = 0;
 
@@ -114,9 +115,11 @@ class AbstractHierarchy {
   // SAMPLING FUNCTIONS
   //! Generates new state values from the centering prior distribution
   virtual void sample_prior() = 0;
+
   //! Generates new state values from the centering posterior distribution
   //! @param update_params  Save posterior hypers after the computation?
   virtual void sample_full_cond(bool update_params = false) = 0;
+
   //! Updates hyperparameter values given a vector of cluster states
   virtual void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;
@@ -124,16 +127,22 @@ class AbstractHierarchy {
   // GETTERS AND SETTERS
   //! Returns the current cardinality of the cluster
   virtual int get_card() const = 0;
+
   //! Returns the logarithm of the current cardinality of the cluster
   virtual double get_log_card() const = 0;
+
   //! Returns the indexes of data points belonging to this cluster
   virtual std::set<int> get_data_idx() const = 0;
+
   //! Returns a pointer to the Protobuf message of the prior of this cluster
   virtual google::protobuf::Message *get_mutable_prior() = 0;
+
   //! Write current state to a Protobuf message by pointer
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
+
   //! Write current hyperparameters to a Protobuf message by pointer
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
+
   //! Read and set state values from a given Protobuf message
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
@@ -144,21 +153,28 @@ class AbstractHierarchy {
       const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
+
   //! Removes a datum and its index from the hierarchy
   virtual void remove_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
+
   //! Initializes class members to appropriate values
   virtual void initialize() = 0;
+
   //! Returns whether the hierarchy models multivariate data or not
   virtual bool is_multivariate() const = 0;
+
   //! Returns whether the hierarchy depends on covariate values or not
   virtual bool is_dependent() const { return false; }
+
   //! Returns whether the hierarchy represents a conjugate model or not
   virtual bool is_conjugate() const { return false; }
+
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::HierarchyId get_id() const = 0;
+
   //! Overloaded version of sample_full_cond(), mainly used for debugging
   virtual void sample_full_cond(
       const Eigen::MatrixXd &data,

@@ -32,9 +32,10 @@ class Neal8Algorithm : public Neal2Algorithm {
   Neal8Algorithm() = default;
   ~Neal8Algorithm() = default;
 
-  // GETTERS AND SETTERS
+  //! Returns number of auxiliary blocks
   unsigned int get_n_aux() const { return n_aux; }
 
+  //! Sets number of auxiliary blocks
   void set_n_aux(const unsigned int n_aux_) {
     if (n_aux_ == 0) {
       throw std::invalid_argument("Number of auxiliary block must be > 0");
@@ -67,6 +68,7 @@ class Neal8Algorithm : public Neal2Algorithm {
 
   //! Number of auxiliary blocks
   unsigned int n_aux = 3;
+
   //! Vector of auxiliary blocks
   std::vector<std::shared_ptr<AbstractHierarchy>> aux_unique_values;
 };

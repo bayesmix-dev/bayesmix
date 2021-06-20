@@ -101,6 +101,7 @@ class NNIGHierarchy
  protected:
   //! Sum of data points currently belonging to the cluster
   double data_sum = 0;
+
   //! Sum of squared data points currently belonging to the cluster
   double data_sum_squares = 0;
 };

@@ -45,6 +45,7 @@ class BaseCollector {
 
   //! Initializes collector
   virtual void start_collecting() = 0;
+
   //! Closes collector
   virtual void finish_collecting() = 0;
 
@@ -52,10 +53,13 @@ class BaseCollector {
   bool get_next_state(google::protobuf::Message *out) {
     return next_state(out);
   }
+
   //! Writes the given state to the collector
   virtual void collect(const google::protobuf::Message &state) = 0;
+
   //! Resets the collector to the beginning of the chain
   virtual void reset() = 0;
+
   //! Returns the number of stored states
   unsigned int get_size() const { return size; }
 
@@ -65,6 +69,7 @@ class BaseCollector {
 
   //! Current size of the chain
   unsigned int size = 0;
+
   //! Read cursor that indicates the current iteration
   unsigned int curr_iter = 0;
 };

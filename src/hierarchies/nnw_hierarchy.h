@@ -124,14 +124,17 @@ class NNWHierarchy
  protected:
   //! Writes prec and its utilities to the given state object by pointer
   void write_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);
+
   //! Returns parameters for the predictive Student's t distribution
   NNW::Hyperparams get_predictive_t_parameters(
       const NNW::Hyperparams &params) const;
 
   //! Dimension of data space
   unsigned int dim;
+
   //! Sum of data points currently belonging to the cluster
   Eigen::VectorXd data_sum;
+
   //! Sum of squared data points currently belonging to the cluster
   Eigen::MatrixXd data_sum_squares;
 };

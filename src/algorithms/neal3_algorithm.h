@@ -18,7 +18,6 @@
 
 class Neal3Algorithm : public Neal2Algorithm {
  public:
-  // DESTRUCTOR AND CONSTRUCTORS
   Neal3Algorithm() = default;
   ~Neal3Algorithm() = default;
 

@@ -27,7 +27,6 @@ class Rng {
  private:
   Rng(int seed_val = 20201103) { mt.seed(seed_val); }
   ~Rng() {}
-
   Rng(Rng const &) = delete;
   Rng &operator=(Rng const &) = delete;
 

@@ -105,10 +105,13 @@ class LinRegUniHierarchy
  protected:
   //! Dimension of the coefficients vector
   unsigned int dim;
+
   //! Represents pieces of y^t y
   double data_sum_squares;
+
   //! Represents pieces of X^T X
   Eigen::MatrixXd covar_sum_squares;
+
   //! Represents pieces of X^t y
   Eigen::VectorXd mixed_prod;
 };

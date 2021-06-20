@@ -95,16 +95,22 @@ class BaseHierarchy : public AbstractHierarchy {
  protected:
   //! Container for state values
   State state;
+
   //! Container for prior hyperparameters values
   std::shared_ptr<Hyperparams> hypers;
+
   //! Container for posterior hyperparameters values
   Hyperparams posterior_hypers;
+
   //! Pointer to a Protobuf prior object for this class
   std::shared_ptr<Prior> prior;
+
   //! Set of indexes of data points belonging to this cluster
   std::set<int> cluster_data_idx;
+
   //! Current cardinality of this cluster
   int card = 0;
+
   //! Logarithm of current cardinality of this cluster
   double log_card = stan::math::NEGATIVE_INFTY;
 

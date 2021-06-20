@@ -44,6 +44,7 @@ class FileCollector : public BaseCollector {
  protected:
   //! Opens collector in reading mode
   void open_for_reading();
+
   //! Terminates reading mode for the collector
   void close_reading();
 
@@ -51,16 +52,22 @@ class FileCollector : public BaseCollector {
 
   //! Unix file descriptor for reading mode
   int infd;
+
   //! Unix file descriptor for writing mode
   int outfd;
+
   //! Pointer to a reading file stream
   google::protobuf::io::FileInputStream *fin;
+
   //! Pointer to a writing file stream
   google::protobuf::io::FileOutputStream *fout;
+
   //! Name of file from which read/write
   std::string filename;
+
   //! Flag that indicates if the collector is open in read-mode
   bool is_open_read = false;
+
   //! Flag that indicates if the collector is open in write-mode
   bool is_open_write = false;
 };

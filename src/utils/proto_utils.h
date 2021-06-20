@@ -15,11 +15,13 @@ namespace bayesmix {
 
 //! Writes an Eigen vector to a bayesmix::Vector Protobuf object by pointer
 void to_proto(const Eigen::VectorXd &vec, bayesmix::Vector *out);
+
 //! Writes an Eigen matrix to a bayesmix::Matrix Protobuf object by pointer
 void to_proto(const Eigen::MatrixXd &mat, bayesmix::Matrix *out);
 
 //! Converts a bayesmix::Vector Protobuf object into an Eigen vector
 Eigen::VectorXd to_eigen(const bayesmix::Vector &vec);
+
 //! Converts a bayesmix::Matrix Protobuf object into an Eigen matrix
 Eigen::MatrixXd to_eigen(const bayesmix::Matrix &mat);
 

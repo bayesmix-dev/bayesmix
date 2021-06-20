@@ -60,6 +60,7 @@ class BaseAlgorithm {
 
   //! Returns whether the algorithm is conditional or marginal
   virtual bool is_conditional() const = 0;
+
   //! Returns whether it is restricted to conjugate `Hierarchy` objects
   virtual bool requires_conjugate_hierarchy() const { return false; }
 
@@ -118,29 +119,38 @@ class BaseAlgorithm {
       const Eigen::RowVectorXd &mix_covariate) = 0;
 
 
-  // GETTERS AND SETTERS
   unsigned int get_maxiter() const { return maxiter; }
-  unsigned int get_burnin() const { return burnin; }
-  virtual bayesmix::AlgorithmId get_id() const = 0;
-  //! Returns the Protobuf ID associated to this class
 
+  unsigned int get_burnin() const { return burnin; }
+
+  //! Returns the Protobuf ID associated to this class
+  virtual bayesmix::AlgorithmId get_id() const = 0;
+  
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
+
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }
+
   void set_init_num_clusters(const unsigned int init_) {
     init_num_clusters = init_;
   }
+
   void set_data(const Eigen::MatrixXd &data_) { data = data_; }
+
   void set_hier_covariates(const Eigen::MatrixXd &cov) {
     hier_covariates = cov;
   }
+
   void set_mix_covariates(const Eigen::MatrixXd &cov) { mix_covariates = cov; }
+
   void set_mixing(const std::shared_ptr<AbstractMixing> mixing_) {
     mixing = mixing_;
   }
+
   void set_hierarchy(const std::shared_ptr<AbstractHierarchy> hier_) {
     unique_values.clear();
     unique_values.push_back(hier_);
   }
+
   void set_verbose(const bool verbose_) { verbose = verbose_; }
 
   //! Reads and sets algorithm parameters from an appropriate Protobuf message
@@ -150,18 +160,24 @@ class BaseAlgorithm {
   // ALGORITHM FUNCTIONS
   //! Initializes all members of the class before running the algorithm
   virtual void initialize();
+
   //! Prints a message at the beginning of `run()`
   virtual void print_startup_message() const = 0;
+
   //! Performs Gibbs sampling sub-step for all allocation values
   virtual void sample_allocations() = 0;
+
   //! Performs Gibbs sampling sub-step for all unique values
   virtual void sample_unique_values() = 0;
+
   //! Updates hyperparameters for all `Hierarchy` objects
   void update_hierarchy_hypers();
+
   //! Prints a message at the end of `run()`
   virtual void print_ending_message() const {
     std::cout << "Done" << std::endl;
   };
+
   //! Saves the current iteration's state in Protobuf form to a `Collector`
   void save_state(BaseCollector *collector, unsigned int iter) {
     collector->collect(get_state_as_proto(iter));
@@ -178,8 +194,10 @@ class BaseAlgorithm {
   // AUXILIARY TOOLS
   //! Returns Protobuf object containing current state values and iter number
   bayesmix::AlgorithmState get_state_as_proto(unsigned int iter);
+
   //! Advances `Collector` reading pointer by one, and returns 1 if successful
   bool update_state_from_collector(BaseCollector *coll);
+
   //! Should `Hierarchy` hypers be updated when adding/removing data?
   // TODO explain better/change name?
   virtual bool update_hierarchy_params() { return false; }
@@ -187,26 +205,33 @@ class BaseAlgorithm {
   // ALGORITHM PARAMETERS
   //! Iterations of the algorithm, including burn-in
   unsigned int maxiter = 1000;
+
   //! Number of initial burn-in iterations, which will be then discarded
   unsigned int burnin = 100;
+
   //! Initial number of clusters, only used for initialization
   unsigned int init_num_clusters = 0;
 
   // DATA AND VALUES CONTAINERS
   //! Matrix of row-vectorial data points
   Eigen::MatrixXd data;
+
   //! Matrix of covariates (if any) for the `Hierarchy` objects
   Eigen::MatrixXd hier_covariates;
+
   //! Matrix of covariates (if any) for the `Mixing` object
   Eigen::MatrixXd mix_covariates;
+
   //! Pointer to the `Mixing` object
   std::shared_ptr<AbstractMixing> mixing;
+
   //! Protobuf message that holds the currently evaluated `Collector` state
   bayesmix::AlgorithmState curr_state;
 
   // ALGORITHM STATE
   //! Vector of allocation labels for each datum
   std::vector<unsigned int> allocations;
+
   //! Vector of pointers to `Hierarchy` objects that identify each cluster
   std::vector<std::shared_ptr<AbstractHierarchy>> unique_values;
 

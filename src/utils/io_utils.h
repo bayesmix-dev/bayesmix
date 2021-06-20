@@ -8,6 +8,7 @@
 namespace bayesmix {
 //! Returns an Eigen matrix after reading it from a file
 Eigen::MatrixXd read_eigen_matrix(const std::string &filename);
+
 //! Writes the given Eigen matrix to a text file
 void write_matrix_to_file(const Eigen::MatrixXd &mat, const std::string &filename);
 }  // namespace bayesmix
