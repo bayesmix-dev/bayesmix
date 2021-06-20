@@ -89,8 +89,8 @@ class NNWHierarchy
 
   void initialize_hypers();
 
-  void update_hypers(
-      const std::vector<bayesmix::AlgorithmState::ClusterState> &states) override;
+  void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
+                         &states) override;
 
   //! Updates state values using the given (prior or posterior) hyperparameters
   NNW::State draw(const NNW::Hyperparams &params);

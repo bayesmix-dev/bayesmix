@@ -118,14 +118,13 @@ class BaseAlgorithm {
       const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
       const Eigen::RowVectorXd &mix_covariate) = 0;
 
-
   unsigned int get_maxiter() const { return maxiter; }
 
   unsigned int get_burnin() const { return burnin; }
 
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::AlgorithmId get_id() const = 0;
-  
+
   void set_maxiter(const unsigned int maxiter_) { maxiter = maxiter_; }
 
   void set_burnin(const unsigned int burnin_) { burnin = burnin_; }

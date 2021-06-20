@@ -37,7 +37,7 @@ class MemoryCollector : public BaseCollector {
 
   //! Templatized utility for writing states directly to file
   template <typename MsgType>
-  void write_to_file(const std::string &outfile) {
+  void write_to_file(const std::string& outfile) {
     // THIS is probabily a HACK: we de-serialize from the chain and
     //! re-serialize to file. Still, it's a reasonable work-around.
     int outfd = open(outfile.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
@@ -61,7 +61,7 @@ class MemoryCollector : public BaseCollector {
 
   //! Templatized utility for reading states directly from a file
   template <typename MsgType>
-  void read_from_file(const std::string &infile) {
+  void read_from_file(const std::string& infile) {
     int infd = open(infile.c_str(), O_RDONLY);
     if (infd == -1) std::cout << "errno: " << strerror(errno) << std::endl;
 

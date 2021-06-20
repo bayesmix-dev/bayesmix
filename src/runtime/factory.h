@@ -98,7 +98,7 @@ class Factory {
     return !(storage.find(id) == storage.end());
   }
 
-private:
+ private:
   using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
   Factory() = default;

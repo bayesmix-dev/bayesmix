@@ -32,7 +32,7 @@ class FileCollector : public BaseCollector {
       close(infd);
     }
   }
-  
+
   void start_collecting() override;
 
   void finish_collecting() override;

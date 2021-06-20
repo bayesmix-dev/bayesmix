@@ -84,10 +84,10 @@ class AbstractHierarchy {
   //! @param data        Grid of points (by row) which are to be evaluated
   //! @param covariates  (Optional) covariate vectors associated to data
   //! @return            The evaluation of the lpdf
-    virtual Eigen::VectorXd like_lpdf_grid(
+  virtual Eigen::VectorXd like_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const = 0;
-  
+
   //! Evaluates the log-prior predictive distr. of data in a grid of points
   //! @param data        Grid of points (by row) which are to be evaluated
   //! @param covariates  (Optional) covariate vectors associated to data
@@ -167,10 +167,12 @@ class AbstractHierarchy {
   virtual bool is_multivariate() const = 0;
 
   //! Returns whether the hierarchy depends on covariate values or not
-  virtual bool is_dependent() const { return false; }
+  virtual bool is_dependent() const {
+    return false; }
 
   //! Returns whether the hierarchy represents a conjugate model or not
-  virtual bool is_conjugate() const { return false; }
+  virtual bool is_conjugate() const {
+    return false; }
 
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::HierarchyId get_id() const = 0;

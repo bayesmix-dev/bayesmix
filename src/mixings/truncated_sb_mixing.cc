@@ -16,8 +16,6 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-
-
 void TruncatedSBMixing::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");

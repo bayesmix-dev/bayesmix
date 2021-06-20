@@ -68,8 +68,8 @@ Eigen::VectorXd NNWHierarchy::conditional_pred_lpdf_grid(
 
 void NNWHierarchy::initialize_state() {
   state.mean = hypers->mean;
-  write_prec_to_state(hypers->var_scaling * Eigen::MatrixXd::Identity(dim, dim),
-                     &state);
+  write_prec_to_state(
+      hypers->var_scaling * Eigen::MatrixXd::Identity(dim, dim), &state);
 }
 
 void NNWHierarchy::initialize_hypers() {
@@ -350,7 +350,7 @@ void NNWHierarchy::write_hypers_to_proto(
 }
 
 void NNWHierarchy::write_prec_to_state(const Eigen::MatrixXd &prec_,
-                                      NNW::State *out) {
+                                       NNW::State *out) {
   out->prec = prec_;
   // Update prec utilities
   out->prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec_).matrixU();
