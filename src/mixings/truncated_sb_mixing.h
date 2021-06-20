@@ -54,7 +54,7 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
     return bayesmix::MixingId::TruncSB;
   }
 
-  virtual bool is_conditional() const { return true; }
+  bool is_conditional() const override { return true; }
 
   bool is_dependent() const override { return false; }
 

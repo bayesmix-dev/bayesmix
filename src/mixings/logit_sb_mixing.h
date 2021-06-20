@@ -63,9 +63,9 @@ class LogitSBMixing
     return acceptance_rates / n_iter;
   }
 
-  virtual bool is_conditional() const { return true; }
+  bool is_conditional() const override { return true; }
 
-  virtual bool is_dependent() const { return true; }
+  bool is_dependent() const override { return true; }
 
  protected:
   //! Dimension of the coefficients vector

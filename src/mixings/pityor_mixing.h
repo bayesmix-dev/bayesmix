@@ -62,9 +62,9 @@ class PitYorMixing
 
   bayesmix::MixingId get_id() const override { return bayesmix::MixingId::PY; }
 
-  virtual bool is_conditional() const { return false; }
+  bool is_conditional() const override { return false; }
 
-  virtual bool is_dependent() const { return false; }
+  bool is_dependent() const override { return false; }
 
  protected:
   void initialize_state() override;
