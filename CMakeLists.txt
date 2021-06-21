@@ -12,22 +12,15 @@ project(bayesmix)
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_BUILD_TYPE Release)
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
 option(BUILD_RUN "" ON)
 
-include(FindPythonInterp)
-add_custom_target(
- build_tbb ALL
- COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/build_tbb.py
-)
-
 
 find_package(PkgConfig REQUIRED)
-find_package(OpenMP REQUIRED)
 find_package(Protobuf)
 
 
@@ -76,7 +69,7 @@ set(INCLUDE_PATHS
   ${BASEPATH}/proto
   ${CMAKE_CURRENT_LIST_DIR}/lib/math
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.72.0
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.7
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/include
   ${CMAKE_CURRENT_BINARY_DIR}
   ${protobuf_SOURCE_DIR}/src
@@ -84,7 +77,7 @@ set(INCLUDE_PATHS
 
 
 set(LINK_LIBRARIES 
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so 
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.dylib
   pthread 
   protobuf::libprotobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
@@ -126,7 +119,6 @@ endif()
 
 # Build library object
 add_library(bayesmix OBJECT)
-add_dependencies(bayesmix build_tbb)
 target_sources(bayesmix PUBLIC ${PROTO_SRCS} ${PROTO_HDRS})
 add_subdirectory(src)    # source files
 target_include_directories(bayesmix PUBLIC ${INCLUDE_PATHS})
@@ -135,7 +127,6 @@ target_compile_options(bayesmix PUBLIC ${COMPILE_OPTIONS})
 
 # Build static library
 add_library(bayesmixlib $<TARGET_OBJECTS:bayesmix>)
-add_dependencies(bayesmixlib build_tbb)
 
 
 if (BUILD_RUN)
