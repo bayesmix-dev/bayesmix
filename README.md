@@ -15,16 +15,14 @@ Where P is either the Dirichlet process or the Pitman--Yor process.
 
 - We currently support univariate and multivariate location-scale mixture of Gaussian densities
 
-- Inference is carried out using either Algorithm 2 or Algorithm 8 in [Neal (2000)](http://www.stat.columbia.edu/npbayes/papers/neal_sampling.pdf).
+- Inference is carried out using algorithms such as Neal's Algorithm 2 from [Neal (2000)](http://www.stat.columbia.edu/npbayes/papers/neal_sampling.pdf).
 
 - Serialization of the MCMC chains is possible using [Google's protocol buffers](https://developers.google.com/protocol-buffers)
 
 
 ## Installation:
 
-We heavily depend on Google's [Protocol Buffers](https://github.com/protocolbuffers/protobuf), so make sure to install it beforehand!
-
-On Linux machine the following will install the library
+We heavily depend on Google's [Protocol Buffers](https://github.com/protocolbuffers/protobuf), so make sure to install it beforehand! In particular, on a Linux machine the following will install the `protobuf` library:
 ```shell
 sudo apt-get install autoconf automake libtool curl make g++ unzip cmake
 wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protobuf-python-3.14.0.zip
@@ -51,6 +49,7 @@ make run
 cd ..
 ./build/run
 ```
+(TODO last line is not true!)
 
 To run unit tests:
 ```shell

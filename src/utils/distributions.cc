@@ -112,7 +112,6 @@ double bayesmix::gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
   std::vector<Eigen::MatrixXd> vars2;
 
   for (const auto &p : precs1) vars1.push_back(stan::math::inverse_spd(p));
-
   for (const auto &p : precs2) vars2.push_back(stan::math::inverse_spd(p));
 
   double mix1 = 0.0;

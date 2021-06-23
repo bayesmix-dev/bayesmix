@@ -13,6 +13,46 @@
 #include "src/utils/eigen_utils.h"
 #include "src/utils/rng.h"
 
+Eigen::MatrixXd BaseAlgorithm::eval_lpdf(
+    BaseCollector *const collector, const Eigen::MatrixXd &grid,
+    const Eigen::RowVectorXd &hier_covariate /*= Eigen::RowVectorXd(0)*/,
+    const Eigen::RowVectorXd &mix_covariate /*= Eigen::RowVectorXd(0)*/) {
+  std::deque<Eigen::VectorXd> lpdf;
+  bool keep = true;
+  progresscpp::ProgressBar *bar = nullptr;
+  if (verbose) {
+    bar = new progresscpp::ProgressBar(collector->get_size(), 60);
+  }
+  while (keep) {
+    keep = update_state_from_collector(collector);
+    if (!keep) {
+      break;
+    }
+    lpdf.push_back(lpdf_from_state(grid, hier_covariate, mix_covariate));
+    if (verbose) {
+      ++(*bar);
+      bar->display();
+    }
+  }
+  collector->reset();
+  if (verbose) {
+    bar->done();
+    delete bar;
+    print_ending_message();
+  }
+  return bayesmix::stack_vectors(lpdf);
+}
+
+void BaseAlgorithm::read_params_from_proto(
+    const bayesmix::AlgorithmParams &params) {
+  // Generic parameters
+  maxiter = params.iterations();
+  burnin = params.burnin();
+  init_num_clusters = params.init_num_clusters();
+  auto &rng = bayesmix::Rng::Instance().get();
+  rng.seed(params.rng_seed());
+}
+
 void BaseAlgorithm::initialize() {
   if (verbose) {
     std::cout << "Initializing... " << std::flush;
@@ -110,6 +150,7 @@ void BaseAlgorithm::initialize() {
 void BaseAlgorithm::update_hierarchy_hypers() {
   bayesmix::AlgorithmState::ClusterState clust;
   std::vector<bayesmix::AlgorithmState::ClusterState> states;
+  // Build vector of states associated to non-empty clusters
   for (auto &un : unique_values) {
     if (un->get_card() > 0) {
       un->write_state_to_proto(&clust);
@@ -119,8 +160,6 @@ void BaseAlgorithm::update_hierarchy_hypers() {
   unique_values[0]->update_hypers(states);
 }
 
-//! \param iter Number of the current iteration
-//! \return     Protobuf-object version of the current state
 bayesmix::AlgorithmState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
   bayesmix::AlgorithmState iter_out;
   // Transcribe iteration number, allocations, and cardinalities
@@ -141,50 +180,7 @@ bayesmix::AlgorithmState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
   return iter_out;
 }
 
-void BaseAlgorithm::read_params_from_proto(
-    const bayesmix::AlgorithmParams &params) {
-  // Generic parameters
-  maxiter = params.iterations();
-  burnin = params.burnin();
-  init_num_clusters = params.init_num_clusters();
-  auto &rng = bayesmix::Rng::Instance().get();
-  rng.seed(params.rng_seed());
-}
-
 bool BaseAlgorithm::update_state_from_collector(BaseCollector *coll) {
   bool success = coll->get_next_state(&curr_state);
   return success;
-}
-
-//! \param grid      Grid of points in matrix form to evaluate the density on
-//! \param collector Collector containing the algorithm chain
-//! \return          Matrix whose i-th column is the lpdf at i-th iteration
-Eigen::MatrixXd BaseAlgorithm::eval_lpdf(
-    BaseCollector *const collector, const Eigen::MatrixXd &grid,
-    const Eigen::RowVectorXd &hier_covariate /*= Eigen::RowVectorXd(0)*/,
-    const Eigen::RowVectorXd &mix_covariate /*= Eigen::RowVectorXd(0)*/) {
-  std::deque<Eigen::VectorXd> lpdf;
-  bool keep = true;
-  progresscpp::ProgressBar *bar = nullptr;
-  if (verbose) {
-    bar = new progresscpp::ProgressBar(collector->get_size(), 60);
-  }
-  while (keep) {
-    keep = update_state_from_collector(collector);
-    if (!keep) {
-      break;
-    }
-    lpdf.push_back(lpdf_from_state(grid, hier_covariate, mix_covariate));
-    if (verbose) {
-      ++(*bar);
-      bar->display();
-    }
-  }
-  collector->reset();
-  if (verbose) {
-    bar->done();
-    delete bar;
-    print_ending_message();
-  }
-  return bayesmix::stack_vectors(lpdf);
 }

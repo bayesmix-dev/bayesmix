@@ -25,6 +25,88 @@ void LogitSBMixing::initialize() {
   n_iter = 0;
 }
 
+void LogitSBMixing::update_state(
+    const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
+    const std::vector<unsigned int> &allocations) {
+  n_iter += 1;
+  // Langevin-Adjusted Metropolis-Hastings step
+  unsigned int n = allocations.size();
+  auto &rng = bayesmix::Rng::Instance().get();
+  auto priorcast = cast_prior();
+  Eigen::VectorXd prior_mean =
+      bayesmix::to_eigen(priorcast->normal_prior().mean());
+  double step = priorcast->step_size();
+  double prop_var = std::sqrt(2.0 * step);
+  // Loop over components
+  for (int h = 0; h < num_components - 1; h++) {
+    Eigen::VectorXd state_c = state.regression_coeffs.col(h);
+    // Draw proposed state from its distribution
+    Eigen::VectorXd prop_mean =
+        state_c + step * grad_full_cond_lpdf(state_c, h, allocations);
+    auto prop_covar = prop_var * Eigen::MatrixXd::Identity(dim, dim);
+    Eigen::VectorXd state_prop =
+        stan::math::multi_normal_rng(prop_mean, prop_covar, rng);
+    // Compute acceptance ratio
+    double full_cond_ratio = full_cond_lpdf(state_prop, h, allocations) -
+                             full_cond_lpdf(state_c, h, allocations);
+    double prop_ratio = (-0.5 / prop_var) *
+                        ((state_prop - prop_mean).dot(state_prop - prop_mean) -
+                         (state_c - prop_mean).dot(state_c - prop_mean));
+    double log_accept_ratio = full_cond_ratio - prop_ratio;
+    // Accept with probability ratio
+    double p = stan::math::uniform_rng(0.0, 1.0, rng);
+    if (p < std::exp(log_accept_ratio)) {
+      state.regression_coeffs.col(h) = state_prop;
+      acceptance_rates(h) += 1;
+    }
+  }
+}
+
+Eigen::VectorXd LogitSBMixing::get_weights(
+    const bool log, const bool propto,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+  // Compute eta
+  std::vector<double> eta(num_components);
+  for (int h = 0; h < num_components - 1; h++) {
+    eta[h] = covariate.dot(state.regression_coeffs.col(h));
+  }
+  eta[num_components - 1] = 1.0;
+  // Compute cumulative sums of logarithms
+  std::vector<double> cumsum(num_components + 1, 0.0);
+  for (int h = 1; h < num_components + 1; h++) {
+    cumsum[h] = cumsum[h - 1] + std::log(sigmoid(-eta[h - 1]));
+  }
+  // Compute weights
+  Eigen::VectorXd logweights(num_components);
+  for (int h = 0; h < num_components; h++) {
+    logweights(h) = std::log(sigmoid(eta[h])) + cumsum[h];
+  }
+  if (log) {
+    return logweights;
+  } else {
+    return logweights.array().exp();
+  }
+}
+
+void LogitSBMixing::set_state_from_proto(
+    const google::protobuf::Message &state_) {
+  auto &statecast =
+      google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
+          state_);
+  state.regression_coeffs =
+      bayesmix::to_eigen(statecast.log_sb_state().regression_coeffs());
+}
+
+void LogitSBMixing::write_state_to_proto(
+    google::protobuf::Message *out) const {
+  bayesmix::LogSBState state_;
+  bayesmix::to_proto(state.regression_coeffs,
+                     state_.mutable_regression_coeffs());
+  google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
+      ->mutable_log_sb_state()
+      ->CopyFrom(state_);
+}
+
 void LogitSBMixing::initialize_state() {
   auto priorcast = cast_prior();
   if (priorcast->has_normal_prior()) {
@@ -85,86 +167,4 @@ Eigen::VectorXd LogitSBMixing::grad_full_cond_lpdf(
     }
   }
   return grad;
-}
-
-void LogitSBMixing::update_state(
-    const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
-    const std::vector<unsigned int> &allocations) {
-  n_iter += 1;
-  // Langevin-Adjusted Metropolis-Hastings step
-  unsigned int n = allocations.size();
-  auto &rng = bayesmix::Rng::Instance().get();
-  auto priorcast = cast_prior();
-  Eigen::VectorXd prior_mean =
-      bayesmix::to_eigen(priorcast->normal_prior().mean());
-  double step = priorcast->step_size();
-  double prop_var = std::sqrt(2.0 * step);
-  // Loop over components
-  for (int h = 0; h < num_components - 1; h++) {
-    Eigen::VectorXd state_c = state.regression_coeffs.col(h);
-    // Draw proposed state from its distribution
-    Eigen::VectorXd prop_mean =
-        state_c + step * grad_full_cond_lpdf(state_c, h, allocations);
-    auto prop_covar = prop_var * Eigen::MatrixXd::Identity(dim, dim);
-    Eigen::VectorXd state_prop =
-        stan::math::multi_normal_rng(prop_mean, prop_covar, rng);
-    // Compute acceptance ratio
-    double full_cond_ratio = full_cond_lpdf(state_prop, h, allocations) -
-                             full_cond_lpdf(state_c, h, allocations);
-    double prop_ratio = (-0.5 / prop_var) *
-                        ((state_prop - prop_mean).dot(state_prop - prop_mean) -
-                         (state_c - prop_mean).dot(state_c - prop_mean));
-    double log_accept_ratio = full_cond_ratio - prop_ratio;
-    // Accept with probability ratio
-    double p = stan::math::uniform_rng(0.0, 1.0, rng);
-    if (p < std::exp(log_accept_ratio)) {
-      state.regression_coeffs.col(h) = state_prop;
-      acceptance_rates(h) += 1;
-    }
-  }
-}
-
-void LogitSBMixing::set_state_from_proto(
-    const google::protobuf::Message &state_) {
-  auto &statecast =
-      google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
-          state_);
-  state.regression_coeffs =
-      bayesmix::to_eigen(statecast.log_sb_state().regression_coeffs());
-}
-
-void LogitSBMixing::write_state_to_proto(
-    google::protobuf::Message *out) const {
-  bayesmix::LogSBState state_;
-  bayesmix::to_proto(state.regression_coeffs,
-                     state_.mutable_regression_coeffs());
-  google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
-      ->mutable_log_sb_state()
-      ->CopyFrom(state_);
-}
-
-Eigen::VectorXd LogitSBMixing::get_weights(
-    const bool log, const bool propto,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
-  // Compute eta
-  std::vector<double> eta(num_components);
-  for (int h = 0; h < num_components - 1; h++) {
-    eta[h] = covariate.dot(state.regression_coeffs.col(h));
-  }
-  eta[num_components - 1] = 1.0;
-  // Compute cumulative sums of logarithms
-  std::vector<double> cumsum(num_components + 1, 0.0);
-  for (int h = 1; h < num_components + 1; h++) {
-    cumsum[h] = cumsum[h - 1] + std::log(sigmoid(-eta[h - 1]));
-  }
-  // Compute weights
-  Eigen::VectorXd logweights(num_components);
-  for (int h = 0; h < num_components; h++) {
-    logweights(h) = std::log(sigmoid(eta[h])) + cumsum[h];
-  }
-  if (log) {
-    return logweights;
-  } else {
-    return logweights.array().exp();
-  }
 }

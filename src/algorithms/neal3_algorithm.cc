@@ -7,6 +7,14 @@
 #include "mixing_id.pb.h"
 #include "src/hierarchies/base_hierarchy.h"
 
+void Neal3Algorithm::print_startup_message() const {
+  std::string msg = "Running Neal3 algorithm with " +
+                    bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
+                    " hierarchies, " +
+                    bayesmix::MixingId_Name(mixing->get_id()) + " mixing...";
+  std::cout << msg << std::endl;
+}
+
 Eigen::VectorXd Neal3Algorithm::get_cluster_lpdf(
     const unsigned int data_idx) const {
   unsigned int n_data = data.rows();
@@ -21,12 +29,4 @@ Eigen::VectorXd Neal3Algorithm::get_cluster_lpdf(
   loglpdf(n_clust) = unique_values[0]->prior_pred_lpdf(
       data.row(data_idx), hier_covariates.row(data_idx));
   return loglpdf;
-}
-
-void Neal3Algorithm::print_startup_message() const {
-  std::string msg = "Running Neal3 algorithm with " +
-                    bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
-                    " hierarchies, " +
-                    bayesmix::MixingId_Name(mixing->get_id()) + " mixing...";
-  std::cout << msg << std::endl;
 }

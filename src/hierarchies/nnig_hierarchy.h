@@ -12,27 +12,27 @@
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 
-//! Normal Normal-InverseGamma hierarchy for univariate data.
+//! Conjugate Normal Normal-InverseGamma hierarchy for univariate data.
 
-//! This class represents a hierarchy, i.e. a cluster, whose univariate data
-//! are distributed according to a normal likelihood, the parameters of which
-//! have a Normal-InverseGamma centering distribution. That is:
-//!           phi = (mu,sig)     (state);
-//! f(x_i|mu,sig) = N(mu,sig^2)  (data likelihood);
-//!    (mu,sig^2) ~ G            (unique values distribution);
-//!             G ~ MM           (mixture model);
-//!            G0 = N-IG         (centering distribution).
-//! state[0] = mu is called location, and state[1] = sig is called scale. The
-//! state hyperparameters, contained in the Hypers object, are (mu_0, lambda0,
-//! alpha0, beta0), all scalar values. Note that this hierarchy is conjugate,
-//! thus the marginal and the posterior distribution are available in closed
-//! form and Neal's algorithm 2 may be used with it.
+//! This class represents a hierarchical model where data are distributed
+//! according to a normal likelihood, the parameters of which have a
+//! Normal-InverseGamma centering distribution. That is:
+//! f(x_i|mu,sig) = N(mu,sig^2)
+//!    (mu,sig^2) ~ N-IG(mu0, lambda0, alpha0, beta0)
+//! The state is composed of mean and variance. The state hyperparameters,
+//! contained in the Hypers object, are (mu_0, lambda0, alpha0, beta0), all
+//! scalar values. Note that this hierarchy is conjugate, thus the marginal
+//! distribution is available in closed form.  For more information, please
+//! refer to parent classes: `AbstractHierarchy`, `BaseHierarchy`, and
+//! `ConjugateHierarchy`.
 
 namespace NNIG {
+//! Custom container for State values
 struct State {
   double mean, var;
 };
 
+//! Custom container for Hyperparameters values
 struct Hyperparams {
   double mean, var_scaling, shape, scale;
 };
@@ -42,46 +42,65 @@ struct Hyperparams {
 class NNIGHierarchy
     : public ConjugateHierarchy<NNIGHierarchy, NNIG::State, NNIG::Hyperparams,
                                 bayesmix::NNIGPrior> {
- protected:
-  double data_sum = 0;
-  double data_sum_squares = 0;
-
  public:
-  // DESTRUCTOR AND CONSTRUCTORS
-  ~NNIGHierarchy() = default;
   NNIGHierarchy() = default;
+  ~NNIGHierarchy() = default;
 
-  //! Returns true if the hierarchy models multivariate data (here, false)
-  bool is_multivariate() const override { return false; }
-
-  // EVALUATION FUNCTIONS
-  //! Evaluates the log-likelihood of data in a single point
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate =
                        Eigen::RowVectorXd(0)) const override;
+
   //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   double marg_lpdf(
       const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
 
+  void initialize_state();
+
+  void initialize_hypers();
+
+  void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
+                         &states) override;
+
+  //! Updates state values using the given (prior or posterior) hyperparameters
   NNIG::State draw(const NNIG::Hyperparams &params);
 
-  void clear_data();
-  void update_hypers(
-      const std::vector<bayesmix::AlgorithmState::ClusterState> &states);
-  void initialize_state();
-  void initialize_hypers();
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param covariate  Covariate vector associated to datum
+  //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  const Eigen::RowVectorXd &covariate,
                                  bool add);
+
+  //! Removes every data point from this cluster
+  void clear_data();
+
+  bool is_multivariate() const override { return false; }
+
+  //! Computes and return posterior hypers given data currently in this cluster
   NNIG::Hyperparams get_posterior_parameters();
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
+
   void write_state_to_proto(google::protobuf::Message *out) const override;
+
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
+
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNIG;
   }
+
+ protected:
+  //! Sum of data points currently belonging to the cluster
+  double data_sum = 0;
+
+  //! Sum of squared data points currently belonging to the cluster
+  double data_sum_squares = 0;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_H_
