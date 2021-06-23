@@ -15,7 +15,7 @@
 #include "src/mixings/abstract_mixing.h"
 
 //! Abstract template class representing a Gibbs sampler for mixture models.
-//! Gibbs samplers are a particular class of Markov chain Monte Carlo (MCMC) 
+//! Gibbs samplers are a particular class of Markov chain Monte Carlo (MCMC)
 //! algorithms that are used to perform posterior inference in Bayesian
 //! models.
 //! For the specific class of models that can be fit using these algorithm,

@@ -22,7 +22,7 @@
 //!      p(k+1-th cluster | ...) \propto M + k * d
 //!
 //! When `discount=0`, the EPPF of the PY process coincides with the one of the
-//! DP with totalmass = strength. 
+//! DP with totalmass = strength.
 //! For more information about the class, please refer instead to base classes,
 //! `AbstractMixing` and `BaseMixing`.
 

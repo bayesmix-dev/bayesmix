@@ -25,17 +25,17 @@
 //!         theta \sim G
 //! A Hierarchy object can compute the following quantities:
 //! 1- the likelihood log-probability density function
-//! 2- the prior predictive probability: \int_\Theta f(x | theta) G(d\theta) 
+//! 2- the prior predictive probability: \int_\Theta f(x | theta) G(d\theta)
 //!    (for conjugate models only)
-//! 3- the posterior predictive probability 
-//!    \int_\Theta f(x | theta) G(d\theta | x_1, ..., x_n) 
+//! 3- the posterior predictive probability
+//!    \int_\Theta f(x | theta) G(d\theta | x_1, ..., x_n)
 //!    (for conjugate models only)
 //! Moreover, the Hierarchy knows how to sample from the full conditional of
 //! theta, possibly in an approximate way.
 //!
 //! In the context of our Gibbs samplers, an hierarchy represents the parameter
 //! value associated to a certain cluster, and also knows which observations
-//! are allocated to that cluster. 
+//! are allocated to that cluster.
 //! Moreover, hyperparameters and (possibly) hyperpriors associated to them can
 //! be shared across multiple Hierarchies objects via a shared pointer.
 //! In conjunction with a single `Mixing` object, a collection of `Hierarchy`
@@ -171,12 +171,10 @@ class AbstractHierarchy {
   virtual bool is_multivariate() const = 0;
 
   //! Returns whether the hierarchy depends on covariate values or not
-  virtual bool is_dependent() const {
-    return false; }
+  virtual bool is_dependent() const { return false; }
 
   //! Returns whether the hierarchy represents a conjugate model or not
-  virtual bool is_conjugate() const {
-    return false; }
+  virtual bool is_conjugate() const { return false; }
 
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::HierarchyId get_id() const = 0;

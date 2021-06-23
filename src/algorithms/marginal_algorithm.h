@@ -11,7 +11,7 @@
 //! Template class for a marginal sampler deriving from `BaseAlgorithm`.
 
 //! This template class implements a generic Gibbs sampling marginal algorithm
-//! as the child of the `BaseAlgorithm` class. 
+//! as the child of the `BaseAlgorithm` class.
 //! A mixture model sampled from a Marginal Algorithm can be expressed as
 //!   x_i | c_i, phi_1, ..., phi_k ~ f(x_i|phi_(c_i))    (data likelihood);
 //!               phi_1, ... phi_k ~ G                   (unique values);

@@ -16,7 +16,7 @@
 //! Abstract base class for a collector that contains a chain in Protobuf form
 
 //! This is an abstract base class for a structure called data collector, or
-//! collector for short. 
+//! collector for short.
 //! A collector is used to store a sequence of Google Protobuf's objects, also
 //! known as messages, by serializing them. Data can be retrieved and
 //! de-serialized into a Protobuf object, either in C++ or in other programming
