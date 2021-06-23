@@ -14,32 +14,38 @@
 #include "src/utils/rng.h"
 
 //! Abstract base class for a hierarchy object.
-
-//! This template class represents a hierarchy object in a generic iterative
-//! Gibbs sampling algorithm, that is, a single set of unique values with their
-//! own prior distribution attached to it. These values are part of the state
-//! the MCMC (which includes multiple hierarchies) and are simply referred
-//! to as the state of the hierarchy. This object also corresponds to a single
-//! cluster in the algorithm, in the sense that its state is the set of
-//! parameters for the distribution of the data points that belong to it. Since
-//! the prior distribution for the state is often the same across multiple
-//! different hierarchies, the hyperparameters object is accessed via a shared
-//! pointer. In conjunction with a single `Mixing` object, a collection of
-//! `Hierarchy` objects completely defines a mixture model, and these two parts
-//! can be chosen independently of each other.
-//! Lastly, any hierarchy that inherits from this class contains multiple ways
-//! of updating the state, either via prior or posterior distributions, and of
-//! evaluating the distribution of the data, either its likelihood (whose
-//! parameters are the state) or its marginal distribution.  Other methods are
-//! also required. Communication with external classes, as well as storage of
-//! some relevant values, is performed via appropriately defined Protobuf
-//! messages (see for instance the proto/ls_state.proto and
-//! proto/hierarchy_prior.proto files) and their relative class methods.
 //! This class is the basis for a curiously recurring template pattern (CRTP)
 //! for `Hierarchy` objects, and is solely composed of interface functions for
 //! derived classes to use. For more information about this pattern, as well
 //! the list of methods required for classes in this inheritance tree, please
 //! refer to the README.md file included in this folder.
+
+//! This abstract class represents a Bayesian hierarchical model:
+//! x_1, ..., x_n \sim f(x | \theta)
+//!         theta \sim G
+//! A Hierarchy object can compute the following quantities
+//! 1- Likelihood log probability density function
+//! 2- Prior predictive probability: \int_\Theta f(x | theta) G(d\theta) 
+//!    (only for conjugate models)
+//! 3- posterior predictive probability 
+//!    \int_\Theta f(x | theta) G(d\theta | x_1, ..., x_n) 
+//!    (only for conjugate models)
+//! Moreover, the Hierarchy knows how to sample (possibly in an approximate
+//! way) from the full conditional of theta.
+//!
+//! In the context of our Gibbs samplers, an hierarchy represents 
+//! the parameter value associated to a certain cluster and knows also which
+//! observations are allocated to that cluster. 
+//! Moreover, hyperparameters with possibly hyperpriors associated to
+//! them can be shared across multiple Hierarchies objects via a shared
+//! pointer.
+//! In conjunction with a single `Mixing` object, a collection of
+//! `Hierarchy` objects completely defines a mixture model, and these two parts
+//! can be chosen independently of each other.
+//! sCommunication with other classes, as well as storage of
+//! some relevant values, is performed via appropriately defined Protobuf
+//! messages (see for instance the proto/ls_state.proto and
+//! proto/hierarchy_prior.proto files) and their relative class methods.
 
 class AbstractHierarchy {
  public:

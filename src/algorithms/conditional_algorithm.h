@@ -11,17 +11,19 @@
 
 //! This template class implements a generic Gibbs sampling conditional
 //! algorithm as the child of the `BaseAlgorithm` class.
-//!
-//! A conditional algorithm is one in which the component weights are not
-//! marginalized out, unlike in the marginal case. Weights therefore are part
-//! of the state of the algorithm alongside allocations and unique values.
-//! Although, unlike the latter two, weights are not stored in this class, but
-//! into the pointed `Mixing` object. In this class of algorithms, the local
-//! lpdf estimate for a single iteration is a weighted average of likelihood
-//! values corresponding to each component (i.e. cluster), with respect to the
-//! state weights described earlier.
-//! For more information on Gibbs samplers implemented in the library, please
-//! refer to the `BaseAlgorithm` base class.
+//! A mixture model sampled from a Marginal Algorithm can be expressed as
+//!   x_i | c_i, phi_1, ..., phi_k ~ f(x_i|phi_(c_i))    (data likelihood);
+//!               phi_1, ... phi_k ~ G                   (unique values);
+//!   c_1, ... c_n | w_1, ..., w_k ~ Cat(w_1, ... w_k)   (cluster allocations);
+//!                  w_1, ..., w_k ~ p(w_1, ..., w_k)    (mixture weights)
+//! where f(x | phi_j) is a density for each value of phi_j, the c_i take
+//! values in {1, ..., k} and w_1, ..., w_k are nonnegative weight that sum
+//! to one almost surely (i.e. p(w_1, ... w_k) is a probability distribution
+//! on the k-1 dimensional unit simplex).
+
+//! The state of a conditional algorithm consists of the unique values, the
+//! cluster allocations and the mixture weights. The first two are stored
+//! in this class, while the weights are stored in the `Mixing` object.
 
 class ConditionalAlgorithm : public BaseAlgorithm {
  public:

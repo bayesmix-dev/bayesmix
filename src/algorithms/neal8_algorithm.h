@@ -13,18 +13,9 @@
 //! This class implements Neal's Gibbs sampling algorithm 8 from Neal (2000)
 //! that generates a Markov chain on the clustering of the provided data.
 //!
-//! It is a generalization of Neal's algorithm 2 which works for any
-//! hierarchical model, even non-conjugate ones, unlike its predecessor. The
-//! main difference is the presence of a fixed number of additional unique
-//! values, called the auxiliary blocks, which are constantly updated and from
-//! which new clusters choose their unique values. They offset the lack of
-//! conjugacy of the model by allowing an estimate of the (uncomputable)
-//! marginal density via a weighted mean on these new blocks. Other than this
-//! and some minor adjustments in the allocation sampling phase to circumvent
-//! non-conjugacy, it is the same as Neal's algorithm 2.
-//! For more information, please refer to the `Neal2Algorithm`,
-//! `BaseAlgorithm`, and `MarginalAlgorithm` base classes, from which this
-//! class inherits.
+//! It extends Neal's algorithm 2 to deal also cases when the kernel/likelihood
+//! f(x | phi) is not conjugate to G, thanks to the introductions of additional
+//! (auxiliary) unique values.
 
 class Neal8Algorithm : public Neal2Algorithm {
  public:

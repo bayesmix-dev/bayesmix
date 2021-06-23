@@ -14,14 +14,11 @@
 
 //! Conjugate Normal Normal-InverseGamma hierarchy for univariate data.
 
-//! This class represents a hierarchy, i.e. a cluster, whose univariate data
+//! This class represents a hierarchical model where data
 //! are distributed according to a normal likelihood, the parameters of which
 //! have a Normal-InverseGamma centering distribution. That is:
-//!           phi = (mu,sig)     (state);
-//! f(x_i|mu,sig) = N(mu,sig^2)  (data likelihood);
-//!    (mu,sig^2) ~ G            (unique values distribution);
-//!             G ~ MM           (mixture model);
-//!            G0 = N-IG         (centering distribution).
+//! f(x_i|mu,sig) = N(mu,sig^2)
+//!    (mu,sig^2) ~ N-IG(mu0, lambda0, alpha0, beta0)
 //! The state is composed of mean and variance. The state hyperparameters,
 //! contained in the Hypers object, are (mu_0, lambda0, alpha0, beta0), all
 //! scalar values. Note that this hierarchy is conjugate, thus the marginal

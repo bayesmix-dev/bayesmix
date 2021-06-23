@@ -7,7 +7,14 @@
 
 //! This class wraps the C++ standard RNG object and allows the use of any RNG
 //! seed. It is implemented as a singleton, so that every object used in the
-//! library has access to the same exact RNG engine. (TODO explain why)
+//! library has access to the same exact RNG engine.
+//! This is needed to ensure that the rng stream is well defined and that every
+//! random number generation causes an update in the rng state.
+//! The main drawback is that this design does not allow for efficient parallelization
+//! as calls to the Rng::Instance() from different threads could cause data races.
+//! A preferred solution would be to define the Rng to be thread local if 
+//! omp-parallelism over several cores is desired, see:
+//! https://stackoverflow.com/questions/64937761/c-parallel-random-number-engines-surviving-function-calls
 
 namespace bayesmix {
 class Rng {

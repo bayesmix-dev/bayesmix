@@ -11,16 +11,17 @@
 #include "src/hierarchies/abstract_hierarchy.h"
 
 //! Abstract base class for a generic mixture model
+//! This class is the basis for a curiously recurring template pattern (CRTP)
+//! for `Mixing` objects, and is solely composed of interface functions for
+//! derived classes to use, similarly to how the `Hierarchy` objects were
+//! implemented. For more information about this pattern, please refer to the
+//! README.md file included in the `hierarchies` subfolder.
 
-//! This class represents a mixing measure to be used as part of a model in a
-//! Gibbs sampling algorithm. It can either depend or covariate values, or not.
-//! One `Mixing` object defines a mixture model in conjunction with a
-//! collection of `Hierarchy` objects of the same kind, and these two parts can
-//! be chosen independently of each other. In the context of this library, and
-//! of the algorithms implemented therein, where a clustering structure is
-//! generated on the data, a `Mixing` object represents a certain way of
-//! weighing different clusters, and also collects any hyperprior on the
-//! hyperparameters of the used mixing measure. In particular, there are two
+//! This class represents a prior for the mixture weights and the induced
+//! exchangeable partition probability function (EPPF). See `ConditionalAlgorithm`
+//! and `MarginalAlgorithm` for further details.
+
+//! There are two
 //! kinds of `Mixing` objects: marginal and conditional mixings. Any class
 //! inheriting from this one must implement the `is_conditional()` flag
 //! accordingly, and can only be used with the same type of `Algorithm` object.
@@ -37,11 +38,6 @@
 //! mixing's state (if any) given allocations and unique values coming from the
 //! library's `Algorithm` classes, and read-write methods involving Protobuf
 //! objects.
-//! This class is the basis for a curiously recurring template pattern (CRTP)
-//! for `Mixing` objects, and is solely composed of interface functions for
-//! derived classes to use, similarly to how the `Hierarchy` objects were
-//! implemented. For more information about this pattern, please refer to the
-//! README.md file included in the `hierarchies` subfolder.
 
 class AbstractMixing {
  public:

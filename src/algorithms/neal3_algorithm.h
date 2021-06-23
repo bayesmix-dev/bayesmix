@@ -9,10 +9,12 @@
 //! This class implements Neal's Gibbs sampling algorithm 3 from Neal (2000)
 //! that generates a Markov chain on the clustering of the provided data.
 //!
-//! This algorithm is almost identical to its algorithm 2 counterpart, except
-//! that the weights in the allocation sampling phase use the conditional
-//! predictive distribution of the cluster given its current observations,
-//! rather than the likelihood given its own unique values.
+//! This algorithm requires the use of a `ConjugateHierarchy` object.
+//! Algorithm 3 from Neal (2000) is almost identical to Algorithm 2, except
+//! that conjugacy is further exploied by marginalizing the unique values
+//! from the state when updating the cluster allocations, which leads to
+//! improved efficiency in terms of effective sample size, but might require
+//! longer runtimes.
 //! For more information, please refer to the `Neal2Algorithm` class, as well
 //! as `BaseAlgorithm` and `MarginalAlgorithm` on which it is based.
 

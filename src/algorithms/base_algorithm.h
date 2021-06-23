@@ -14,30 +14,12 @@
 #include "src/hierarchies/base_hierarchy.h"
 #include "src/mixings/abstract_mixing.h"
 
-//! Abstract template class for a Gibbs sampling iterative BNP algorithm.
-
-//! This template class implements a generic Gibbs sampling algorithm that
-//! generates a Markov chain on the clustering of the provided data.
-//!
-//! An algorithm that inherits from this abstract class will have multiple
-//! iterations of the same step. Steps are further split into substeps, each of
-//! which updates specific values of the state of the Markov chain, which is
-//! composed of an allocations vector and a unique values vector. This is known
-//! as a Gibbs sampling structure, where a set of values is updated according
-//! to a conditional distribution given all other values, and is a particular
-//! subset of the Markov chain Monte Carlo (MCMC) family.
-//! The underlying model for the data is assumed to be a so-called hierarchical
-//! model. Under this assumption, a clustering structure on data emerges, with
-//! each cluster being identified by its own parameters, called unique values.
-//! The allocation of a datum is instead the numeric label that indicates the
-//! cluster it is currently assigned to. These two set of values constitute
-//! the state of the algorithm.
-//! A formal description of a generic model follows:
-//!   x_i ~ f(x_i|phi_(c_i))  (data likelihood);
-//! phi_c ~ G                 (unique values);
-//!     G ~ MM                (mixture model);
-//!  E[G] = G0                (centering distribution),
-//! where c_i is the allocation of the i-th datum.
+//! Abstract template class representing a Gibbs sampler for mixture models.
+//! Gibbs samplers are a particular class of Markov chain Monte Carlo (MCMC) 
+//! algorithms that are used to perform posterior inference in Bayesian
+//! models.
+//! For the specific class of models that can be fit using these algorithm,
+//! see `MarginalAlgorithm` and `ConditionalAlgorithm`.
 //!
 //! This class receives a number of initialization parameters related to the
 //! MCMC algorithm itself (such as the number of iterations) in a Protobuf
@@ -46,8 +28,7 @@
 //! It includes methods for running the MCMC simulation and for estimating the
 //! posterior density on a given grid of points. In particular, density
 //! estimation is performed by averaging the estimate associated to each
-//! single MCMC iteration, which in turn is a weighted average of likelihood
-//! and marginal (if any) lpdf's. The specific method depends on whether the
+//! single MCMC iteration. The specific method depends on whether the
 //! algorithm is marginal or conditional (see derived classes
 //! `MarginalAlgorithm` and `ConditionalAlgorithm`).
 //! Results for this class' methods are saved either to `Collector` objects, or

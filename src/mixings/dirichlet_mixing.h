@@ -12,16 +12,16 @@
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-//! Class that represents the Dirichlet process mixture model.
-
-//! This class represents a popular mixture model for iterative Gibbs sampling
-//! algorithms, called the Dirichlet process. See Ferguson (1973) for a formal
-//! definition. In the context of implemented algorithms, it translates to a
-//! mixture that assigns a weight M, called the total mass parameter, to the
-//! creation of a new cluster, and weights of already existing clusters are
-//! proportional to their cardinalities. Its state is solely composed of M, but
-//! the provided container also includes its logarithm for efficiency reasons.
-//! See Neal (2000) for a thorough explanation of this model representation.
+//! Class that represents the EPPF induced by the Dirithclet process (DP)
+//! introduced in Ferguson (1973), see also Sethuraman (1994).
+//! The EPPF induced by the DP depends on a `totalmass` parameter M.
+//! Given a clustering of n elements into k clusters, each with cardinality
+//! n_j, j=1, ..., k, the EPPF of the DP gives the following probabilities
+//! for the cluster membership of the n+1 observation
+//!      p(j-th cluster | ...) = n_j / (n + M)
+//!      p(k+1-th cluster | ...) = M / (n + M)
+//!
+//! The state is solely composed of M, but we also store log(M) for efficiency reasons.
 //! For more information about the class, please refer instead to base classes,
 //! `AbstractMixing` and `BaseMixing`.
 

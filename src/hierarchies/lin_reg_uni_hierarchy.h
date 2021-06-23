@@ -15,12 +15,14 @@
 //! Linear regression hierarchy for univariate data.
 
 //! This class implements a dependent hierarchy which represents the classical
-//! Bayesian linear regression model. Its state is composed of an arbitrarily-
-//! sized vector of regression coefficients, which have a multivariate Normal
-//! prior distribution attached to them. Its hyperparameters are mean and
-//! variance-scaling factor (a vector and a matrix respectively), and the
-//! scalar values shape and scale. The inverse of the variance-scaling matrix
-//! is also included in their container for efficiency reasons. For more
+//! (univariate) Bayesian linear regression model, i.e.:
+//!    y_i | \beta, x_i, \sigma^2 \sim N(\beta^T x_i, sigma^2)
+//!              \beta | \sigma^2 \sim N(\mu, sigma^2 Lambda^{-1})
+//!                      \sigma^2 \sim InvGamma(a, b)
+//!
+//! The state consists on the `regression_coeffs` \beta and on
+//! the `var` sigma^2.
+//! Lambda is called the variance-scaling factor. For more
 //! information, please refer to parent classes: `AbstractHierarchy`,
 //! `BaseHierarchy`, and `ConjugateHierarchy`.
 
