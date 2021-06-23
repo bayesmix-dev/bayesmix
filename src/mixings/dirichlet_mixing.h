@@ -16,14 +16,13 @@
 //! introduced in Ferguson (1973), see also Sethuraman (1994).
 //! The EPPF induced by the DP depends on a `totalmass` parameter M.
 //! Given a clustering of n elements into k clusters, each with cardinality
-//! n_j, j=1, ..., k, the EPPF of the DP gives the following probabilities
-//! for the cluster membership of the n+1 observation
+//! n_j, j=1, ..., k, the EPPF of the DP gives the following probabilities for
+//! the cluster membership of the (n+1)-th observation:
 //!      p(j-th cluster | ...) = n_j / (n + M)
 //!      p(k+1-th cluster | ...) = M / (n + M)
-//!
-//! The state is solely composed of M, but we also store log(M) for efficiency reasons.
-//! For more information about the class, please refer instead to base classes,
-//! `AbstractMixing` and `BaseMixing`.
+//! The state is solely composed of M, but we also store log(M) for efficiency
+//! reasons. For more information about the class, please refer instead to base
+//! classes, `AbstractMixing` and `BaseMixing`.
 
 namespace Dirichlet {
 struct State {

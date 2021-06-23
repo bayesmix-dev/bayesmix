@@ -15,16 +15,15 @@
 //! Linear regression hierarchy for univariate data.
 
 //! This class implements a dependent hierarchy which represents the classical
-//! (univariate) Bayesian linear regression model, i.e.:
+//! univariate Bayesian linear regression model, i.e.:
 //!    y_i | \beta, x_i, \sigma^2 \sim N(\beta^T x_i, sigma^2)
 //!              \beta | \sigma^2 \sim N(\mu, sigma^2 Lambda^{-1})
 //!                      \sigma^2 \sim InvGamma(a, b)
 //!
-//! The state consists on the `regression_coeffs` \beta and on
-//! the `var` sigma^2.
-//! Lambda is called the variance-scaling factor. For more
-//! information, please refer to parent classes: `AbstractHierarchy`,
-//! `BaseHierarchy`, and `ConjugateHierarchy`.
+//! The state consists of the `regression_coeffs` \beta, and the `var` sigma^2.
+//! Lambda is called the variance-scaling factor. For more information, please
+//! refer to parent classes: `AbstractHierarchy`, `BaseHierarchy`, and
+//! `ConjugateHierarchy`.
 
 namespace LinRegUni {
 //! Custom container for State values

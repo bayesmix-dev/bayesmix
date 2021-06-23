@@ -23,29 +23,28 @@
 //! This abstract class represents a Bayesian hierarchical model:
 //! x_1, ..., x_n \sim f(x | \theta)
 //!         theta \sim G
-//! A Hierarchy object can compute the following quantities
-//! 1- Likelihood log probability density function
-//! 2- Prior predictive probability: \int_\Theta f(x | theta) G(d\theta) 
-//!    (only for conjugate models)
-//! 3- posterior predictive probability 
+//! A Hierarchy object can compute the following quantities:
+//! 1- the likelihood log-probability density function
+//! 2- the prior predictive probability: \int_\Theta f(x | theta) G(d\theta) 
+//!    (for conjugate models only)
+//! 3- the posterior predictive probability 
 //!    \int_\Theta f(x | theta) G(d\theta | x_1, ..., x_n) 
-//!    (only for conjugate models)
-//! Moreover, the Hierarchy knows how to sample (possibly in an approximate
-//! way) from the full conditional of theta.
+//!    (for conjugate models only)
+//! Moreover, the Hierarchy knows how to sample from the full conditional of
+//! theta, possibly in an approximate way.
 //!
-//! In the context of our Gibbs samplers, an hierarchy represents 
-//! the parameter value associated to a certain cluster and knows also which
-//! observations are allocated to that cluster. 
-//! Moreover, hyperparameters with possibly hyperpriors associated to
-//! them can be shared across multiple Hierarchies objects via a shared
-//! pointer.
-//! In conjunction with a single `Mixing` object, a collection of
-//! `Hierarchy` objects completely defines a mixture model, and these two parts
-//! can be chosen independently of each other.
-//! sCommunication with other classes, as well as storage of
-//! some relevant values, is performed via appropriately defined Protobuf
-//! messages (see for instance the proto/ls_state.proto and
-//! proto/hierarchy_prior.proto files) and their relative class methods.
+//! In the context of our Gibbs samplers, an hierarchy represents the parameter
+//! value associated to a certain cluster, and also knows which observations
+//! are allocated to that cluster. 
+//! Moreover, hyperparameters and (possibly) hyperpriors associated to them can
+//! be shared across multiple Hierarchies objects via a shared pointer.
+//! In conjunction with a single `Mixing` object, a collection of `Hierarchy`
+//! objects completely defines a mixture model, and these two parts can be
+//! chosen independently of each other.
+//! Communication with other classes, as well as storage of some relevant
+//! values, is performed via appropriately defined Protobuf messages (see for
+//! instance the proto/ls_state.proto and proto/hierarchy_prior.proto files)
+//! and their relative class methods.
 
 class AbstractHierarchy {
  public:

@@ -17,18 +17,18 @@
 //!   c_1, ... c_n | w_1, ..., w_k ~ Cat(w_1, ... w_k)   (cluster allocations);
 //!                  w_1, ..., w_k ~ p(w_1, ..., w_k)    (mixture weights)
 //! where f(x | phi_j) is a density for each value of phi_j, the c_i take
-//! values in {1, ..., k} and w_1, ..., w_k are nonnegative weight that sum
-//! to one almost surely (i.e. p(w_1, ... w_k) is a probability distribution
-//! on the k-1 dimensional unit simplex).
-//! In this library, each phi_j is represented as an `Hierarchy` object
-//! (inheriting from `AbstractHierarchy`), that also knows what the base
-//! measure `G` is (see `AbstractHierarchy`).
-//! The weights (w_1, ..., w_k) are represented as a `Mixing` object
-//! (inheriting from `AbstractMixing`).
+//! values in {1, ..., k} and w_1, ..., w_k are nonnegative weights whose sum
+//! is a.s. 1, i.e. p(w_1, ... w_k) is a probability distribution on the k-1
+//! dimensional unit simplex).
+//! In this library, each phi_j is represented as an `Hierarchy` object (which
+//! inherits from `AbstractHierarchy`), that also holds the information related
+//! to the base measure `G` is (see `AbstractHierarchy`).
+//! The weights (w_1, ..., w_k) are represented as a `Mixing` object, which
+//! inherits from `AbstractMixing`.
 
 //! The state of a conditional algorithm consists of the unique values, the
-//! cluster allocations and the mixture weights. The first two are stored
-//! in this class, while the weights are stored in the `Mixing` object.
+//! cluster allocations and the mixture weights. The former two are stored in
+//! this class, while the weights are stored in the `Mixing` object.
 
 class ConditionalAlgorithm : public BaseAlgorithm {
  public:

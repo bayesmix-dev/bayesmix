@@ -13,9 +13,9 @@
 //! This class implements Neal's Gibbs sampling algorithm 8 from Neal (2000)
 //! that generates a Markov chain on the clustering of the provided data.
 //!
-//! It extends Neal's algorithm 2 to deal also cases when the kernel/likelihood
-//! f(x | phi) is not conjugate to G, thanks to the introductions of additional
-//! (auxiliary) unique values.
+//! It extends Neal's algorithm 2 to also deal with cases when the
+//! kernel/likelihood f(x | phi) is not conjugate to G, thanks to the
+//! introduction of additional, auxiliary unique values.
 
 class Neal8Algorithm : public Neal2Algorithm {
  public:

@@ -12,21 +12,20 @@
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-//! Class that represents a truncated stick-breaking process, see 
+//! Class that represents a truncated stick-breaking process, as shown in
 //! Ishwaran and James (2001).
 //!
-//! A truncated stick-breaking process is a prior for weights (w_1,...,w_H)
-//! in the H-1 dimensional unit simplex, defined as follows
+//! A truncated stick-breaking process is a prior for weights (w_1,...,w_H) in
+//! the H-1 dimensional unit simplex, and is defined as follows:
 //!   w_1 = v_1 
 //!   w_j = v_j (1 - v_1) ... (1 - v_{j-1}), for j=1, ... H-1
 //!   w_H = 1 - (w_1 + w_2 + ... + w_{H-1})
 //! The v_j's are called sticks and we assume them to be independently
 //! distributed as v_j ~ Beta(a_j, b_j).
 //!
-//! When a_j = 1 and b_j = M, the stick-breaking process is a truncation
-//! of the stick-breaking representation of the DP
-//! When a_j = 1 - d and b_j = M + i * d, it is the trunctation of a 
-//! PY process.
+//! When a_j = 1 and b_j = M, the stick-breaking process is a truncation of the
+//! stick-breaking representation of the DP.
+//! When a_j = 1 - d and b_j = M + i*d, it is the trunctation of a PY process.
 //! Its state is composed of the weights w_j in log-scale and the sticks v_j.
 //! For more information about the class, please refer instead to base classes,
 //! `AbstractMixing` and `BaseMixing`.
