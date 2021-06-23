@@ -18,12 +18,12 @@
 
 //! This class is a templatized version of, and derived from, the
 //! `AbstractHierarchy` class, and the second stage of the curiously recurring
-//! template pattern for `Hierarchy` objects (please see the file of the parent
+//! template pattern for `Hierarchy` objects (please see the docs of the parent
 //! class for further information). It includes class members and some more
 //! functions which could not be implemented in the non-templatized abstract
-//! class. When deriving a class from `BaseHierarchy`, its own name must be
-//! passed to the first template argument, and custom containers for state,
-//! hyperparameters, and prior values must be provided in the remaining ones.
+//! class. 
+//! See, for instance, `ConjugateHierarchy` and `NNIGHierarchy` to better
+//! understand the CRTP patterns.
 
 //! @tparam Derived      Name of the implemented derived class
 //! @tparam State        Class name of the container for state values

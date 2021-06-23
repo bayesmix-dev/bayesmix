@@ -20,6 +20,11 @@
 //! values in {1, ..., k} and w_1, ..., w_k are nonnegative weight that sum
 //! to one almost surely (i.e. p(w_1, ... w_k) is a probability distribution
 //! on the k-1 dimensional unit simplex).
+//! In this library, each phi_j is represented as an `Hierarchy` object
+//! (inheriting from `AbstractHierarchy`), that also knows what the base
+//! measure `G` is (see `AbstractHierarchy`).
+//! The weights (w_1, ..., w_k) are represented as a `Mixing` object
+//! (inheriting from `AbstractMixing`).
 
 //! The state of a conditional algorithm consists of the unique values, the
 //! cluster allocations and the mixture weights. The first two are stored
