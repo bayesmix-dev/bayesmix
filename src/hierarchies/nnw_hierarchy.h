@@ -17,11 +17,8 @@
 //! This class represents a hierarchy, i.e. a cluster, whose multivariate data
 //! are distributed according to a multinomial normal likelihood, the
 //! parameters of which have a Normal-Wishart centering distribution. That is:
-//!           phi = (mu,tau)   (state);
-//! f(x_i|mu,tau) = N(mu,tau)  (data likelihood);
-//!      (mu,tau) ~ G          (unique values distribution);
-//!             G ~ MM         (mixture model);
-//!            G0 = N-W        (centering distribution).
+//! f(x_i|mu,tau) = N(mu,tau^{-1})
+//!      (mu,tau) ~ NW(mu0, lambda0, tau0, nu0)
 //! The state is composed of mean and precision matrix. The Cholesky factor and
 //! log-determinant of the latter are also included in the container for
 //! efficiency reasons. The state's hyperparameters, contained in the Hypers

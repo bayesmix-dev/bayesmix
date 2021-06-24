@@ -13,20 +13,7 @@
 //! This class implements Neal's Gibbs sampling algorithm 2 from Neal (2000)
 //! that generates a Markov chain on the clustering of the provided data.
 //!
-//! This algorithm requires the use of a `Hierarchy` object corresponding to
-//! a conjugate model, i.e. in which posterior distributions have the same form
-//! as their corresponding prior distributions. Conjugacy is made use of in the
-//! computation of the estimated density's marginal component, since the
-//! marginal distribution for the data can be expressed analytically.
-//! The basic idea for this algorithm is randomly drawing new allocations for
-//! data points according to weights that depend on the cardinalities of the
-//! current clustering and on the mixture model used. This way, sometimes new
-//! clusters are created, and thus new unique values for them must be generated
-//! from the prior centering distribution. After that, unique values for each
-//! cluster are instead updated via the posterior distribution, which again has
-//! a closed-form expression thanks to conjugacy.
-//! For more information, please refer to the `BaseAlgorithm` and
-//! `MarginalAlgorithm` base classes, from which this class inherits.
+//! This algorithm requires the use of a `ConjugateHierarchy` object.
 
 class Neal2Algorithm : public MarginalAlgorithm {
  public:

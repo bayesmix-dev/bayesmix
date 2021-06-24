@@ -6,16 +6,11 @@
 
 //! Template class for the blocked Gibbs sampling algorithm.
 
-//! This class implement the blocked Gibbs sampling procedure from Ishwaran and
-//! James (2004). A basic example of conditional algorithm, it performs
-//! allocation sampling based on the mixing weights and on the clusters'
-//! likelihood given their own unique values. Updates of unique values for each
-//! cluster are performed similarly to marginal algorithms, with a Bayesian
-//! posterior update given all observations belonging to that cluster. Finally,
-//! the weights update phase heavily depends on the `Mixing` object use -- in
-//! fact, an appropriate method from that object is called.
-//! For more information, please refer to the `BaseAlgorithm` and
-//! `ConditionalAlgorithm` classes, from which this one inherits.
+//! This class implement the blocked Gibbs sampling procedure from [1].
+//!
+//! [1] Ishwaran, H., & James, L. F. (2001). Gibbs sampling methods for
+//! stick-breaking priors. Journal of the American Statistical
+//! Association, 96(453), 161-173.
 
 class BlockedGibbsAlgorithm : public ConditionalAlgorithm {
  public:
