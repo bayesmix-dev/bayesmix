@@ -153,3 +153,6 @@ endif()
 if (NOT DISABLE_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif()
+
+# Doxygen documentation
+add_subdirectory(docs)
