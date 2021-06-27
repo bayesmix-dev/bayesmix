@@ -12,7 +12,7 @@ Current state of the software:
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=P&space;\sim&space;\Pi" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P&space;\sim&space;\Pi" title="\Pi \sim P" /></a>
 
-Where P is either the Dirichlet process or the Pitman-Yor process.
+where P is either the Dirichlet process or the Pitman-Yor process.
 
 - We currently support univariate and multivariate location-scale mixture of Gaussian densities
 
