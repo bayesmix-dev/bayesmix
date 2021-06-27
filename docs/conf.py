@@ -55,6 +55,4 @@ html_static_path = ['_static']
 
 highlight_language = 'cpp'
 
-root_doc = 'README'
-
 imgmath_latex = 'latex'
