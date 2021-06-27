@@ -18,10 +18,11 @@ bayesmix: a nonparametric C++ library for mixture models
 ``bayesmix`` is a C++ library for running MCMC simulations in Bayesian mixture models.
 
 Current state of the software:
+
 - ``bayesmix`` performs inference for mixture models with the following form:
 
 .. math::
-   y_1, \ldots, y_n \sim \int k(\cdot \mid \theta) \Pi(d\theta)
+   y_1, \ldots, y_n \sim \int k(\cdot \mid \theta) \Pi(d\theta) \\
    \Pi \sim P
 
 Where P is either the Dirichlet process or the Pitman-Yor process.
