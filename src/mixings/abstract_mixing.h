@@ -11,23 +11,22 @@
 #include "src/hierarchies/abstract_hierarchy.h"
 
 //! Abstract base class for a generic mixture model
+//!
 //! This class is the basis for a curiously recurring template pattern (CRTP)
 //! for `Mixing` objects, and is solely composed of interface functions for
 //! derived classes to use, similarly to how the `Hierarchy` objects were
 //! implemented. For more information about this pattern, please refer to the
 //! README.md file included in the `hierarchies` subfolder.
-
 //! This class represents a prior for the mixture weights and the induced
-//! exchangeable partition probability function (EPPF). See `ConditionalAlgorithm`
-//! and `MarginalAlgorithm` for further details.
-
-//! There are two
-//! kinds of `Mixing` objects: marginal and conditional mixings. Any class
-//! inheriting from this one must implement the `is_conditional()` flag
-//! accordingly, and can only be used with the same type of `Algorithm` object.
-//! In a conditional mixing, mixing weights for the clusters are part of the
-//! state of the algorithm. Their values are stored in some form in this class,
-//! and they can be obtained by calling the `get_weights()` method. In a
+//! exchangeable partition probability function (EPPF). See
+//! `ConditionalAlgorithm` and `MarginalAlgorithm` for further details.
+//!
+//! There are two kinds of `Mixing` objects: marginal and conditional mixings.
+//! Any class inheriting from this one must implement the `is_conditional()`
+//! flag accordingly, and can only be used with the same type of `Algorithm`
+//! object. In a conditional mixing, mixing weights for the clusters are part
+//! of the state of the algorithm. Their values are stored in some form in this
+//! class, and they can be obtained by calling the `get_weights()` method. In a
 //! marginal mixing, the actual mixing weights have been marginalized out of
 //! the model, and information related to them translates to probability masses
 //! to assign a data point to an existing cluster, or to a new one.

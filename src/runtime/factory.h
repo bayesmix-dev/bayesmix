@@ -35,7 +35,7 @@
 template <typename Identifier, class AbstractProduct>
 class Factory {
  private:
-    using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
+  using Builder = std::function<std::shared_ptr<AbstractProduct>()>;
 
  public:
   ~Factory() = default;

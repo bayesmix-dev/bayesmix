@@ -14,9 +14,9 @@
 
 //! Conjugate Normal Normal-InverseGamma hierarchy for univariate data.
 
-//! This class represents a hierarchical model where data
-//! are distributed according to a normal likelihood, the parameters of which
-//! have a Normal-InverseGamma centering distribution. That is:
+//! This class represents a hierarchical model where data are distributed
+//! according to a normal likelihood, the parameters of which have a
+//! Normal-InverseGamma centering distribution. That is:
 //! f(x_i|mu,sig) = N(mu,sig^2)
 //!    (mu,sig^2) ~ N-IG(mu0, lambda0, alpha0, beta0)
 //! The state is composed of mean and variance. The state hyperparameters,

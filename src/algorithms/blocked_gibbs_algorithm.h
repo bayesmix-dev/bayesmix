@@ -9,7 +9,7 @@
 //! This class implement the blocked Gibbs sampling procedure from [1].
 //!
 //! [1] Ishwaran, H., & James, L. F. (2001). Gibbs sampling methods for
-//! stick-breaking priors. Journal of the American Statistical 
+//! stick-breaking priors. Journal of the American Statistical
 //! Association, 96(453), 161-173.
 
 class BlockedGibbsAlgorithm : public ConditionalAlgorithm {

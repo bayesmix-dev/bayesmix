@@ -12,22 +12,21 @@
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-//! Class that represents the logit stick-breaking process indroduced
-//! in Rigon and Durante (2020).
-//! That it, a prior for weights (w_1,...,w_H), depending on covariates
-//! x in R^p, in the H-1 dimensional unit simplex, defined as follows
+//! Class that represents the logit stick-breaking process indroduced in Rigon
+//! and Durante (2020).
+//! That is, a prior for weights (w_1,...,w_H), depending on covariates x in
+//! R^p, in the H-1 dimensional unit simplex, defined as follows:
 //!   w_1(x) = v_1(x)
 //!   w_j(x) = v_j(x) (1 - v_1(x)) ... (1 - v_{j-1}(x)), for j=2, ... H-1
 //!   w_H(x) = 1 - (w_1(x) + w_2 + ... + w_{H-1}(x))
 //! and
 //!   v_j(x) = 1 / exp(- <alpha_j, x> ), for j = 1, ..., H-1
 //!
-//! The main difference with the paper Rigon and Durante (2020) is that 
-//! they propose a Gibbs sampler in which the full conditionals are available
-//! in close form thanks to a Polya-Gamma augmentation. 
-//! Here instead, a Metropolis-adjusted Langevin algorithm (MALA) step is used.
-//! The step-size of the MALA step must be passed in the LogSBPrior protobuf
-//! message.
+//! The main difference with the mentioned paper is that the authors propose a
+//! Gibbs sampler in which the full conditionals are available in close form
+//! thanks to a Polya-Gamma augmentation. Here instead, a Metropolis-adjusted
+//! Langevin algorithm (MALA) step is used. The step-size of the MALA step must
+//! be passed in the LogSBPrior Protobuf message.
 //! For more information about the class, please refer instead to base classes,
 //! `AbstractMixing` and `BaseMixing`.
 

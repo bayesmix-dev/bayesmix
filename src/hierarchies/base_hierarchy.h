@@ -21,7 +21,7 @@
 //! template pattern for `Hierarchy` objects (please see the docs of the parent
 //! class for further information). It includes class members and some more
 //! functions which could not be implemented in the non-templatized abstract
-//! class. 
+//! class.
 //! See, for instance, `ConjugateHierarchy` and `NNIGHierarchy` to better
 //! understand the CRTP patterns.
 
