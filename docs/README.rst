@@ -6,9 +6,13 @@
 bayesmix: a nonparametric C++ library for mixture models
 ========================================================
 
-Intro
-=====
-``bayesmix`` is a C++ library for running MCMC simulation in Bayesian mixture models.
+Introduction
+============
+.. image:: https://readthedocs.org/projects/bayesmix/badge/?version=latest
+:target: https://bayesmix.readthedocs.io/en/latest/?badge=latest
+:alt: Documentation Status
+
+``bayesmix`` is a C++ library for running MCMC simulations in Bayesian mixture models.
 
 
 Submodules
