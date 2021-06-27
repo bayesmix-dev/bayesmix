@@ -9,15 +9,14 @@ endif()
 
 project(bayesmix)
 
-set (CMAKE_CXX_STANDARD 14)
-set (CMAKE_BUILD_TYPE Release)
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
-
-option(DISABLE_TESTS
-      "If tests should be compiled or no" OFF)
-option(BUILD_RUN "" ON)
 
 include(FindPythonInterp)
 add_custom_target(
@@ -67,6 +66,9 @@ option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
 option(DISABLE_BENCHMARKS
       "If benchmarks should be compiled or no" OFF)
+option(DISABLE_DOCS
+      "If docs should be generated or no" OFF)
+option(BUILD_RUN "" ON)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -154,5 +156,6 @@ if (NOT DISABLE_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif()
 
-# Doxygen documentation
-add_subdirectory(docs)
+if (NOT DISABLE_DOCS)
+  add_subdirectory(docs)
+endif()

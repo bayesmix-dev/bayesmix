@@ -17,5 +17,6 @@ sftp-config.json
 *.pdf
 # Local files
 *.local.*
-# Sphinx documentation
-docs/_build
+# MacOS storage files
+.DS_Store
+*/.DS_Store
