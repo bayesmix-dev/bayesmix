@@ -3,21 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-bayexmix: a C++ library for fitting Bayesian mixture models
-===========================================================
+bayesmix: a nonparametric C++ library for mixture models
+========================================================
 
 Intro
 =====
-bayesmix is a C++ library for running MCMC simulation in Bayesian mixture models.
+``bayesmix`` is a C++ library for running MCMC simulation in Bayesian mixture models.
 
 
 Submodules
 ==========
-There are currently three submodules to the bayesmix library, playing the following roles:
+There are currently three submodules to the ``bayesmix`` library, playing the following roles:
 
-- ``algorithms``;
-- ``hierarchies``;
-- ``mixings``.
+- ``Algorithms``;
+- ``Hierarchies``;
+- ``Mixings``.
 
 
 .. toctree::
