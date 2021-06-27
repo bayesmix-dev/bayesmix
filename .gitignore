@@ -17,3 +17,6 @@ sftp-config.json
 *.pdf
 # Local files
 *.local.*
+# MacOS storage files
+.DS_Store
+*/.DS_Store
