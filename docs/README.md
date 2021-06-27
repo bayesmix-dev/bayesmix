@@ -65,7 +65,6 @@ You can refer to our documentation for more in-depth information about this libr
 You can find it at https://bayesmix.readthedocs.io, or you can compile in on your machine by running:
 ```shell
 cd build
-cmake ..
 make Sphinx
 ```
 Then, navigate to the `build/docs/sphinx/index.html` file and open it with your favorite browser/HTML reader.
