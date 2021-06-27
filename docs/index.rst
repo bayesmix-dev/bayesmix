@@ -3,9 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-bayesmix: a nonparametric C++ library for mixture models
-========================================================
-
+Introduction
+============
 .. image:: ../resources/logo_full.svg
    :width: 250px
    :alt: bayesmix full logo
@@ -17,33 +16,14 @@ bayesmix: a nonparametric C++ library for mixture models
 
 ``bayesmix`` is a C++ library for running MCMC simulations in Bayesian mixture models.
 
-Current state of the software:
-
-- ``bayesmix`` performs inference for mixture models with the following form:
-
-.. math::
-   y_1, \ldots, y_n \sim \int k(\cdot \mid \theta) \Pi(d\theta) \\
-   \Pi \sim P
-
-Where P is either the Dirichlet process or the Pitman-Yor process.
-
-- We currently support univariate and multivariate location-scale mixture of Gaussian densities
-
-- Inference is carried out using algorithms such as Neal's Algorithm 2 from `Neal (2000)`_.
-.. _Neal (2000): http://www.stat.columbia.edu/npbayes/papers/neal_sampling.pdf
-
-- Serialization of the MCMC chains is possible using Google's `Protocol Buffers library`_.
-.. _Protocol Buffers library: https://developers.google.com/protocol-buffers
-
 
 Submodules
 ==========
-There are currently three submodules to the ``bayesmix`` library, playing the following roles:
+There are currently three submodules to the ``bayesmix`` library, represented by three classes of objects:
 
-- ``Algorithms``;
-- ``Hierarchies``;
+- ``Algorithms``
+- ``Hierarchies``
 - ``Mixings``.
-
 
 .. toctree::
    :maxdepth: 1
@@ -55,9 +35,15 @@ There are currently three submodules to the ``bayesmix`` library, playing the fo
    collectors
    utils
 
+
+Tutorials
+=========
+TODO coming soon!
+
+
+
 Indices and tables
 ==================
-
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
