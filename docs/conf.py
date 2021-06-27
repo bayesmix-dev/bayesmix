@@ -54,3 +54,5 @@ html_theme = 'haiku'
 html_static_path = ['_static']
 
 highlight_language = 'cpp'
+
+root_doc = 'README'
