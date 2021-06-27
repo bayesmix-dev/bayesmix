@@ -1,4 +1,4 @@
-<img src="resources/logo_full.svg" alt="drawing" width="250"/>
+<img src="../resources/logo_full.svg" alt="drawing" width="250"/>
 
 [![Documentation Status](https://readthedocs.org/projects/bayesmix/badge/?version=latest)](https://bayesmix.readthedocs.io/en/latest/?badge=latest)
 
