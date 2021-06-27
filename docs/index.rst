@@ -22,7 +22,7 @@ There are currently three submodules to the ``bayesmix`` library, playing the fo
 
 .. toctree::
    :maxdepth: 1
-   :caption: API: bayesmix submodules
+   :caption: API: ``bayesmix`` submodules
 
    algorithms
    hierarchies
