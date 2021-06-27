@@ -9,10 +9,13 @@ endif()
 
 project(bayesmix)
 
+
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_BUILD_TYPE Release)
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize")
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -arch=arm64 -funroll-loops -ftree-vectorize")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 option(DISABLE_TESTS
@@ -144,3 +147,5 @@ endif()
 if (NOT DISABLE_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif()
+
+add_subdirectory(docs)

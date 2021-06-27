@@ -3,7 +3,12 @@ project(benchmark_bayesmix)
 enable_testing()
 
 
-find_package(benchmark REQUIRED)
+find_package(benchmark REQUIRED PATH "/opt/homebrew/Cellar/google-benchmark/1.5.5/")
+message("***** BENCHMARK: ${BENCHMARK_INCLUDE_DIR}")
+message("***** BENCHMARK: ${benchmark_INCLUDE_DIR}")
+message("***** BENCHMARK: ${benchmark_LIBRARY}")
+
+
 
 add_executable(benchmark_bayesmix $<TARGET_OBJECTS:bayesmix>
   nnw_marg_lpdf.cc
