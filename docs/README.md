@@ -73,7 +73,33 @@ make Sphinx
 Then, navigate to the `build/docs/sphinx/index.html` file and open it with your favorite browser/HTML reader.
 
 ### Examples
-TODO coming soon!
+`run.cc` is an example of C++ main file that performs MCMC simulation and density estimation via `bayesmix`.
+It needs a few command line parameters, as detailed below:
+```shell
+build/run \
+  algorithm_parameters_file \
+  hierarchy_type hierarchy_args \
+  mixing_type mixing_args \
+  collector_name \
+  data_file \
+  grid_file \
+  density_file \
+  num_clusters_file \
+  clustering_file \
+  [hierarchy_covariates_file] \
+  [hierarchy_grid_covariates_file] \
+  [mixing_covariates_file] \
+  [mixing_grid_covariates_file]
+```
+First batch of parameters up until `grid_file` is mainly composed of names of input files or objects IDs. Then there are output files, and finally, in square brackets, optional input files, in the case that the chosen hierarchy needs covariates.
+A working example follows, using input files already present in the library:
+```shell
+build/run \
+  resources/benchmarks/default_algo_params.asciipb \
+  TODO
+
+```
+Due to the large number of parameters, such command is usually written to a `.sh` and then the script itself is executed. Please see `bash/run_test.sh` for further examples.
 
 ## Contributions are welcome!
 Please check out [CONTRIBUTORS.md](CONTRIBUTORS.md) for details on how to collaborate with us.
