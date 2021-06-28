@@ -4,13 +4,15 @@ In our algorithms, we store a vector of hierarchies, each of which represent a p
 The hierarchy implements all the methods needed to update theta_h: sampling from the prior distribution (P_0), the full conditional distribution (given the data {y_i such that c_i = h} ) and so on.
 
 
-## Main operations performed
+Main operations performed
+=========================
 
-Given what we said, a hierarchy must be able to perform the following operations
+A hierarchy must be able to perform the following operations
 
 1. Sample from the prior distribution: generate theta_h ~ P_0 [`sample_prior`]
 2. Sample from the 'full conditional' distribution: generate theta_h from the distribution 
-p(theta_h)  into<a href="https://www.codecogs.com/eqnedit.php?latex=p(\theta_h&space;\mid&space;\cdots&space;)&space;\propto&space;P_0(\theta_h)&space;\prod_{i:&space;c_i&space;=&space;h}&space;k(y_i&space;|&space;\theta_h)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p(\theta_h&space;\mid&space;\cdots&space;)&space;\propto&space;P_0(\theta_h)&space;\prod_{i:&space;c_i&space;=&space;h}&space;k(y_i&space;|&space;\theta_h)" title="p(\theta_h \mid \cdots ) \propto P_0(\theta_h) \prod_{i: c_i = h} k(y_i | \theta_h)" /></a>
+.. math
+   p(\theta_h \mid \cdots ) \propto P_0(\theta_h) \prod_{i: c_i = h} k(y_i | \theta_h)
 [`sample_full_conditional`]
 3. Update the hyperparameters involved in P_0 [`update_hypers`]
 4. Evaluate the likelihood in one point, i.e. k(x | \theta_h) for theta_h the current value of the parameters [`like_lpdf`]
@@ -33,7 +35,8 @@ For this purpose `add_datum` and `remove_datum` are employed.
 Finally, the update involeved in the full_conditional, especially if P_0 and k are conjugate an semi-conjugate can be performed efficiently from a set of sufficient statistics, hence when `add_datum` or `remove_datum` are invoked, the method `update_summary_statistics` is called.
 
 
-## Code structure
+Code structure
+==============
 
 We employ a Curiously Recurring Template Pattern coupled with an abstract interface. 
 The code thus composes of: a virtual class defining the API, a template base class that is the base for the CRTP and derived child classes that fully specialize the template arguments.
@@ -59,7 +62,7 @@ Instead, child classes must implement:
 12. `write_hypers_to_proto`
 
 
-Observe that not all of these members are declared virtual in AbstractHierarchy or BaseHierarchy: this is because virtual members are only the ones that must be called from outside the Hierarchy, the other ones are handled via CRTP. Not having them virtual saves a lot of lookups in the vtables.
+Observe that not all of these members are declared virtual in `AbstractHierarchy` or `BaseHierarchy`: this is because virtual members are only the ones that must be called from outside the `Hierarchy`, the other ones are handled via CRTP. Not having them virtual saves a lot of lookups in the vtables.
 
 The BaseHierarchy class takes 4 template parameters:
 1. `Derived` must be the type of the child class (needed for the CRTP)
