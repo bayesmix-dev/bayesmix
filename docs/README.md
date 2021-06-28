@@ -45,12 +45,10 @@ Then, `cd` into the `bayesmix` root folder and compile the library executable as
 ```shell
 mkdir build
 cd build
-cmake ..
+cmake .. -DDISABLE_DOCS="ON"
 make run
 ```
-If the `cmake` line returns errors about not finding the GTest/GoogleTest library, please run the following line in its place:
-```shell
-cmake .. -DDISABLE_TESTS="ON" -DDISABLE_BENCHMARKS="ON"
+If the `cmake` line returns errors about not finding the GTest/GoogleTest library, please add `-DDISABLE_TESTS="ON" -DDISABLE_BENCHMARKS="ON"` at the end of the command and try again.
 ```
 
 To compile and run unit tests, use:
@@ -62,8 +60,13 @@ make test_bayesmix
 
 ## Usage
 You can refer to our documentation for more in-depth information about this library.
-You can find it at https://bayesmix.readthedocs.io, or you can compile in on your machine by running:
+You can find it at https://bayesmix.readthedocs.io, or you can compile in on your machine by first installing required dependences:
 ```shell
+sudo apt install doxygen python3-pip breathe
+python3 -m pip install sphinx_rtd_theme
+```
+then `cd`ing into the root folder and running:
+```
 cd build
 make Sphinx
 ```
