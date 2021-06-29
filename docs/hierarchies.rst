@@ -16,6 +16,31 @@ A hierarchy must be able to perform the following operations
 1. Sample from the prior distribution: generate theta_h ~ P_0 [`sample_prior`]
 2. Sample from the 'full conditional' distribution: generate theta_h from the distribution
 
+
+
+.. role:: raw-latex(raw)
+        :format: latex html
+
+    .. raw:: html
+
+       <script type="text/javascript" src="http://localhost/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    This: :raw-latex:`\((x+a)^3\)`
+
+    this: :raw-latex:`\(W \approx \sum{f(x_k) \Delta x}\)`
+
+    this: :raw-latex:`\(W = \int_{a}^{b}{f(x) dx}\)`
+
+    and this:
+
+    .. raw:: latex html
+
+       \[ \frac{1}{\Bigl(\sqrt{\phi \sqrt{5}}-\phi\Bigr) e^{\frac25 \pi}} =
+              1+\frac{e^{-2\pi}} {1+\frac{e^{-4\pi}} {1+\frac{e^{-6\pi}}
+              {1+\frac{e^{-8\pi}} {1+\ldots} } } } \]
+
+
+
 .. math::
 
    \\frac{ \\sum_{t=0}^{N}f(t,k) }{N}
