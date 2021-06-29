@@ -35,6 +35,6 @@ Distribution-related utilities
 -----------
 RNG wrapper
 -----------
-.. doxygenclass:: rng
+.. doxygenfile:: rng.h
    :project: bayesmix
    :members:
