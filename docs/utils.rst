@@ -5,11 +5,34 @@ Utils
 
 Collection of miscellaneous auxiliary tools for the library.
 
--------------------
-Classes and methods
--------------------
+--------------------
+Clustering utilities
+--------------------
 .. doxygenfile:: cluster_utils.h
    :project: bayesmix
-.. doxygenclass:: rng.h
+
+------------------------------
+Distribution-related utilities
+------------------------------
+.. doxygenfile:: distributions.h
    :project: bayesmix
-   :members:
+
+----------------------------------------------
+``Eigen`` input-output and matrix manipulation
+----------------------------------------------
+.. doxygenfile:: eigen_utils.h
+   :project: bayesmix
+.. doxygenfile:: io_utils.h
+   :project: bayesmix
+
+-------------------------
+``protobuf`` input-output
+-------------------------
+.. doxygenfile:: proto_utils.h
+   :project: bayesmix
+
+-----------
+RNG wrapper
+-----------
+.. doxygenfile:: rng.h
+   :project: bayesmix

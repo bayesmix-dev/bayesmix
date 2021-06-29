@@ -16,6 +16,7 @@ bayesmix: a nonparametric C++ library for mixture models
    :alt: Documentation Status
 
 ``bayesmix`` is a C++ library for running MCMC simulations in Bayesian mixture models.
+It uses the ``Eigen`` library for vector-matrix manipulation and linear algebra, and ``protobuf`` (Protocol Buffers) for communication and storage of structured data.
 
 
 

@@ -3,7 +3,7 @@ bayesmix/hierarchies
 Hierarchies
 ===========
 
-In our algorithms, we store a vector of hierarchies, each of which represent a parameter :math:`theta_h`.
+In our algorithms, we store a vector of hierarchies, each of which represent a parameter :math:`\theta_h`.
 The hierarchy implements all the methods needed to update :math:`\theta_h`: sampling from the prior distribution :math:`P_0`, the full-conditional distribution (given the data {:math:`y_i` such that :math:`c_i = h`} ) and so on.
 
 
@@ -13,7 +13,7 @@ Main operations performed
 
 A hierarchy must be able to perform the following operations:
 
-1. Sample from the prior distribution: generate :math:`\theta_h ~ P_0` [``sample_prior``]
+1. Sample from the prior distribution: generate :math:`\theta_h \sim P_0` [``sample_prior``]
 2. Sample from the 'full conditional' distribution: generate theta_h from the distribution :math:`p(\theta_h \mid \cdots ) \propto P_0(\theta_h) \prod_{i: c_i = h} k(y_i | \theta_h)` [``sample_full_conditional``]
 3. Update the hyperparameters involved in :math:`P_0` [``update_hypers``]
 4. Evaluate the likelihood in one point, i.e. :math:`k(x | \theta_h)` for theta_h the current value of the parameters [``like_lpdf``]
@@ -22,7 +22,7 @@ A hierarchy must be able to perform the following operations:
 Moreover, the following utilities are needed:
 
 6. write the current state :math:`\theta_h` into a appropriately defined Protobuf message [``write_state_to_proto``]
-7. restore theta_h from a given Protobuf message [`set_state_from_proto`]
+7. restore theta_h from a given Protobuf message [``set_state_from_proto``]
 8. write the values of the hyperparameters in :math:`P_0` to a Protobuf message [``write_hypers_to_proto``]
 
 
@@ -43,10 +43,10 @@ A template class ``BaseHierarchy`` inherits from ``AbstractHierarchy`` and imple
 Instead, child classes must implement:
 
 1. ``like_lpdf``: evaluates :math:`k(x | \theta_h)`
-2. ``marg_lpdf``: evaluates m(x) given some parameters :math:`theta_h` (could be both the hyperparameters in :math:`P_0` or the paramters given by the full conditionals)
+2. ``marg_lpdf``: evaluates m(x) given some parameters :math:`\theta_h` (could be both the hyperparameters in :math:`P_0` or the paramters given by the full conditionals)
 3. ``draw``: samples from :math:`P_0` given the parameters
 4. ``clear_data``: clears all the summary statistics
-5. ``update_hypers``: performs the update of parameters in :math:`P_0` given all the :math:`theta_h` (passed as a vector of protobuf Messages)
+5. ``update_hypers``: performs the update of parameters in :math:`P_0` given all the :math:`\theta_h` (passed as a vector of protobuf Messages)
 6. ``initialize_state``: initializes the current :math:`\theta_h` given the hyperparameters in :math:`P_0`
 7. ``initialize_hypers``: initializes the hyperparameters in :math:`P_0` given their hyperprior
 8. ``update_summary_statistics``: updates the summary statistics when an observation is allocated or de-allocated from the hierarchy
@@ -60,7 +60,7 @@ Note that not all of these members are declared virtual in ``AbstractHierarchy``
 The ``BaseHierarchy`` class takes 4 template parameters:
 
 1. ``Derived`` must be the type of the child class (needed for the CRTP)
-2. ``State`` is usually a struct representing :math:`theta_h`
+2. ``State`` is usually a struct representing :math:`\theta_h`
 3. ``Hyperparams`` is usually a struct representing the parameters in :math:`P_0`
 4. ``Prior`` must be a protobuf object encoding the prior parameters.
 

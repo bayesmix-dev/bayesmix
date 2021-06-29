@@ -36,6 +36,8 @@ sudo ldconfig
 ```
 On Mac and Windows machines, please follow the [official install guide](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md) instead.
 
+We also depend on popular ``Eigen`` and ``Stan`` libraries for vector-matrix operations and probability functions, respectively, but these libraries come included with `bayesmix` so you do not need to install them separately.
+
 ### Library
 To work with `bayesmix`, first clone the repository with:
 ```shell
