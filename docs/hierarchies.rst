@@ -45,30 +45,30 @@ These methods do not need to be implemented by the child classes.
 
 Instead, child classes must implement:
 
-1. `like_lpdf`: evaluates :math:`k(x | \theta_h)`
-2. `marg_lpdf`: evaluates m(x) given some parameters :math:`theta_h` (could be both the hyperparameters in :math:`P_0` or the paramters given by the full conditionals)
-3. `draw`: samples from :math:`P_0` given the parameters
-4. `clear_data`: clears all the summary statistics
-5. `update_hypers`: performs the update of parameters in :math:`P_0` given all the :math:`theta_h` (passed as a vector of protobuf Messages)
-6. `initialize_state`: initializes the current :math:`\theta_h` given the hyperparameters in :math:`P_0`
-7. `initialize_hypers`: initializes the hyperparameters in :math:`P_0` given their hyperprior
-8. `update_summary_statistics`: updates the summary statistics when an observation is allocated or de-allocated from the hierarchy
-9. `get_posterior_parameters`: returns the paramters of the full conditional distribution **possible only when** :math:`P_0` **and** :math:`k` **are conjugate**
-10. `set_state_from_proto`
-11. `write_state_to_proto`
-12. `write_hypers_to_proto`
+1. ``like_lpdf``: evaluates :math:`k(x | \theta_h)`
+2. ``marg_lpdf``: evaluates m(x) given some parameters :math:`theta_h` (could be both the hyperparameters in :math:`P_0` or the paramters given by the full conditionals)
+3. ``draw``: samples from :math:`P_0` given the parameters
+4. ``clear_data``: clears all the summary statistics
+5. ``update_hypers``: performs the update of parameters in :math:`P_0` given all the :math:`theta_h` (passed as a vector of protobuf Messages)
+6. ``initialize_state``: initializes the current :math:`\theta_h` given the hyperparameters in :math:`P_0`
+7. ``initialize_hypers``: initializes the hyperparameters in :math:`P_0` given their hyperprior
+8. ``update_summary_statistics``: updates the summary statistics when an observation is allocated or de-allocated from the hierarchy
+9. ``get_posterior_parameters``: returns the paramters of the full conditional distribution **possible only when** :math:`P_0` **and** :math:`k` **are conjugate**
+10. ``set_state_from_proto``
+11. ``write_state_to_proto``
+12. ``write_hypers_to_proto``
 
 
-Observe that not all of these members are declared virtual in `AbstractHierarchy` or `BaseHierarchy`: this is because virtual members are only the ones that must be called from outside the `Hierarchy`, the other ones are handled via CRTP. Not having them virtual saves a lot of lookups in the vtables.
+Observe that not all of these members are declared virtual in ``AbstractHierarchy`` or ``BaseHierarchy``: this is because virtual members are only the ones that must be called from outside the ``Hierarchy``, the other ones are handled via CRTP. Not having them virtual saves a lot of lookups in the vtables.
 
 The BaseHierarchy class takes 4 template parameters:
-1. `Derived` must be the type of the child class (needed for the CRTP)
-2. `State` is usually a struct representing theta_h
-3. `Hyperparams` is usually a struct representing the parameters in :math:`P_0`
-4. `Prior` must be a protobuf object encoding the prior parameters.
+1. ``Derived`` must be the type of the child class (needed for the CRTP)
+2. ``State`` is usually a struct representing :math:`theta_h`
+3. ``Hyperparams`` is usually a struct representing the parameters in :math:`P_0`
+4. ``Prior`` must be a protobuf object encoding the prior parameters.
 
 
-Finally, a `ConjugateHierarchy takes care of the implementation of some methods that are specific to conjugate models.
+Finally, a ``ConjugateHierarchy`` takes care of the implementation of some methods that are specific to conjugate models.
 
 -------
 Classes
