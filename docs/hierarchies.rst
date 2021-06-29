@@ -18,10 +18,10 @@ A hierarchy must be able to perform the following operations
 
 .. math::
 
-   \frac{ \sum_{t=0}^{N}f(t,k) }{N}
+   \\frac{ \\sum_{t=0}^{N}f(t,k) }{N}
 
 
-or :math:`p(\theta_h \mid \cdots ) \propto P_0(\theta_h) \prod_{i: c_i = h} k(y_i | \theta_h)` [`sample_full_conditional`]
+or :math:`p(\\theta_h \\mid \\cdots ) \\propto P_0(\\theta_h) \\prod_{i: c_i = h} k(y_i | \\theta_h)` [`sample_full_conditional`]
 3. Update the hyperparameters involved in P_0 [`update_hypers`]
 4. Evaluate the likelihood in one point, i.e. k(x | \theta_h) for theta_h the current value of the parameters [`like_lpdf`]
 5. When k and P_0 are conjugate, we must also be able to compute the marginal/prior predictive distribution in one point, i.e. 
