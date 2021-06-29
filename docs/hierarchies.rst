@@ -14,47 +14,10 @@ Main operations performed
 A hierarchy must be able to perform the following operations
 
 1. Sample from the prior distribution: generate theta_h ~ P_0 [`sample_prior`]
-2. Sample from the 'full conditional' distribution: generate theta_h from the distribution
-
-
-
-.. role:: raw-latex(raw)
-        :format: latex html
-
-    .. raw:: html
-
-       <script type="text/javascript" src="http://localhost/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-    This: :raw-latex:`\((x+a)^3\)`
-
-    this: :raw-latex:`\(W \approx \sum{f(x_k) \Delta x}\)`
-
-    this: :raw-latex:`\(W = \int_{a}^{b}{f(x) dx}\)`
-
-    and this:
-
-    .. raw:: latex html
-
-       \[ \frac{1}{\Bigl(\sqrt{\phi \sqrt{5}}-\phi\Bigr) e^{\frac25 \pi}} =
-              1+\frac{e^{-2\pi}} {1+\frac{e^{-4\pi}} {1+\frac{e^{-6\pi}}
-              {1+\frac{e^{-8\pi}} {1+\ldots} } } } \]
-
-
-
-.. math::
-
-   \\frac{ \\sum_{t=0}^{N}f(t,k) }{N}
-
-
-or :math:`p(\\theta_h \\mid \\cdots ) \\propto P_0(\\theta_h) \\prod_{i: c_i = h} k(y_i | \\theta_h)` [`sample_full_conditional`]
+2. Sample from the 'full conditional' distribution: generate theta_h from the distribution :math:`p(\theta_h \mid \cdots ) \propto P_0(\theta_h) \prod_{i: c_i = h} k(y_i | \theta_h)` [`sample_full_conditional`]
 3. Update the hyperparameters involved in P_0 [`update_hypers`]
 4. Evaluate the likelihood in one point, i.e. k(x | \theta_h) for theta_h the current value of the parameters [`like_lpdf`]
-5. When k and P_0 are conjugate, we must also be able to compute the marginal/prior predictive distribution in one point, i.e. 
-<a href="https://www.codecogs.com/eqnedit.php?latex=m(x)&space;=&space;\int&space;k(x&space;|&space;\theta)&space;P_0(d\theta)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?m(x)&space;=&space;\int&space;k(x&space;|&space;\theta)&space;P_0(d\theta)" title="m(x) = \int k(x | \theta) P_0(d\theta)" /></a>
-and the conditional predictive distribution: 
-<a href="https://www.codecogs.com/eqnedit.php?latex=m(x&space;|&space;\textbf{y}&space;)&space;=&space;\int&space;k(x&space;|&space;\theta)&space;P_0(d\theta&space;|&space;\{y_i:&space;c_i&space;=&space;h\})" target="_blank"><img src="https://latex.codecogs.com/gif.latex?m(x&space;|&space;\textbf{y}&space;)&space;=&space;\int&space;k(x&space;|&space;\theta)&space;P_0(d\theta&space;|&space;\{y_i:&space;c_i&space;=&space;h\})" title="m(x | \textbf{y} ) = \int k(x | \theta) P_0(d\theta | \{y_i: c_i = h\})" /></a>
-[`prior_pred_lpdf`, `conditional_pred_lpdf`]
-
+5. When k and P_0 are conjugate, we must also be able to compute the marginal/prior predictive distribution in one point, i.e. :math:`m(x) = \int k(x | \theta) P_0(d\theta)`, and the conditional predictive distribution :math:`m(x | \textbf{y} ) = \int k(x | \theta) P_0(d\theta | \{y_i: c_i = h\})` [`prior_pred_lpdf`, `conditional_pred_lpdf`]
 
 Moreover, the following utilities are needed:
 
