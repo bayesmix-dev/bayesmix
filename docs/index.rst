@@ -44,8 +44,7 @@ There are currently three submodules to the ``bayesmix`` library, represented by
 Tutorials
 =========
 
-TODO coming soon!
-
+:doc:`tutorial`
 
 
 
