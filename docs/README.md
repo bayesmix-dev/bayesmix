@@ -67,14 +67,16 @@ make test_bayesmix
 You can refer to our documentation for more in-depth information about this library.
 You can find it at https://bayesmix.readthedocs.io, or you can compile in on your machine by first installing required dependences:
 ```shell
-sudo apt install doxygen python3-pip breathe
-python3 -m pip install sphinx_rtd_theme
+sudo apt install doxygen python3-pip
+python3 -m pip install sphinx_rtd_theme breathe
 ```
 then `cd`ing into the root folder and running:
 ```
 cd build
+cmake ..
 make Sphinx
 ```
+(Please refer to the above paragraph if you get an error.)
 Then, navigate to the `build/docs/sphinx/index.html` file and open it with your favorite browser/HTML reader.
 
 ### Examples
