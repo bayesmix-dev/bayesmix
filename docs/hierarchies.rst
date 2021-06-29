@@ -1,19 +1,27 @@
 bayesmix/hierarchies
 
+Hierarchies
+===========
+
 In our algorithms, we store a vector of hierarchies, each of which represent a parameter theta_h.
 The hierarchy implements all the methods needed to update theta_h: sampling from the prior distribution (P_0), the full conditional distribution (given the data {y_i such that c_i = h} ) and so on.
 
 
+-------------------------
 Main operations performed
-=========================
+-------------------------
 
 A hierarchy must be able to perform the following operations
 
 1. Sample from the prior distribution: generate theta_h ~ P_0 [`sample_prior`]
-2. Sample from the 'full conditional' distribution: generate theta_h from the distribution 
-.. math
-   p(\theta_h \mid \cdots ) \propto P_0(\theta_h) \prod_{i: c_i = h} k(y_i | \theta_h)
-[`sample_full_conditional`]
+2. Sample from the 'full conditional' distribution: generate theta_h from the distribution
+
+.. math::
+
+   \frac{ \sum_{t=0}^{N}f(t,k) }{N}
+
+
+or :math:`p(\theta_h \mid \cdots ) \propto P_0(\theta_h) \prod_{i: c_i = h} k(y_i | \theta_h)` [`sample_full_conditional`]
 3. Update the hyperparameters involved in P_0 [`update_hypers`]
 4. Evaluate the likelihood in one point, i.e. k(x | \theta_h) for theta_h the current value of the parameters [`like_lpdf`]
 5. When k and P_0 are conjugate, we must also be able to compute the marginal/prior predictive distribution in one point, i.e. 
@@ -35,8 +43,9 @@ For this purpose `add_datum` and `remove_datum` are employed.
 Finally, the update involeved in the full_conditional, especially if P_0 and k are conjugate an semi-conjugate can be performed efficiently from a set of sufficient statistics, hence when `add_datum` or `remove_datum` are invoked, the method `update_summary_statistics` is called.
 
 
+--------------
 Code structure
-==============
+--------------
 
 We employ a Curiously Recurring Template Pattern coupled with an abstract interface. 
 The code thus composes of: a virtual class defining the API, a template base class that is the base for the CRTP and derived child classes that fully specialize the template arguments.
@@ -73,9 +82,10 @@ The BaseHierarchy class takes 4 template parameters:
 
 Finally, a ConjugateHierarchy takes care of the implementation of some methods that are specific to conjugate models.
 
+-------
+Classes
+-------
 
-Hierarchies
-===========
 .. doxygenclass:: AbstractHierarchy
    :project: bayesmix
    :members:
