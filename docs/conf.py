@@ -28,8 +28,8 @@ if read_the_docs_build:
 
 
 project = 'bayesmix'
-copyright = '2021, Beraha, M. and Guindani, B.'
-author = 'Beraha, M. and Guindani, B.'
+copyright = '2021, Guindani, B. and Beraha, M.'
+author = 'Guindani, B. and Beraha, M.'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'

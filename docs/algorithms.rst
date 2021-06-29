@@ -1,6 +1,7 @@
 bayesmix/algorithms
 
-Algorithms are .. TODO ..
+The ``Algorithm`` class handles other class objects and performs the MCMC simulation.
+There are two types of ``Algorithm``s: marginal and conditional, each of which can only be used with the matching type of ``Mixing``.
 
 Algorithms
 ==========
