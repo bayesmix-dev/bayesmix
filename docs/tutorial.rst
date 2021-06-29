@@ -8,16 +8,17 @@ This example uses files which are available in the ``resources/tutorial`` subfol
 We recommend that you open and read these files for a better understanding of how the process works.
 The aforementioned script executes the following command:
 
-``build/run \
-  resources/tutorial/algo.asciipb \
-  NNIG resources/tutorial/nnig_ngg.asciipb \
-  DP   resources/tutorial/dp_gamma.asciipb \
-  "" \
-  resources/tutorial/data.csv \
-  resources/tutorial/grid.csv \
-  resources/tutorial/out/density.csv \
-  resources/tutorial/out/numclust.csv \
-  resources/tutorial/out/clustering.csv``
+.. code-block:: shell
+  build/run \
+    resources/tutorial/algo.asciipb \
+    NNIG resources/tutorial/nnig_ngg.asciipb \
+    DP   resources/tutorial/dp_gamma.asciipb \
+    "" \
+    resources/tutorial/data.csv \
+    resources/tutorial/grid.csv \
+    resources/tutorial/out/density.csv \
+    resources/tutorial/out/numclust.csv \
+    resources/tutorial/out/clustering.csv
 
 In general, the pattern to use the executable is:
 
@@ -42,11 +43,11 @@ Arguments
 
 The arguments provided to the executable are:
 * ``algorithm_settings_file``: the text file that contains algorithm parameters, such as the actual algorithm to be used and the number of MCMC iterations
-* ``hierarchy_type``: the identifier for the hierarchy to be used, which in the above case is a Normal-Normal-InverseGamma (NNIG)
-* ``hierarchy_prior_file``:
-* ``mixing_type``:
-* ``mixing_prior_file``:
-* ``collector_name``:
+* ``hierarchy_type``: the identifier for the type of hierarchy to be used. In the above case we use a Normal-Normal-InverseGamma (NNIG) hierarchy
+* ``hierarchy_prior_file``: the text file that contains information about the prior and hyperprior values for the hierarchy. In the above case, we use a Normal-Gamma-Gamma (NGG) hyperprior
+* ``mixing_type``: the identifier for the type of mixing to be used. In the above case, we use a Dirichlet Process (DP) mixture
+* ``mixing_prior_file``: the text file that contains information about the prior and hyperprior values for the mixing. In the above case, we use a Gamma hyperprior on the DP total mass parameter
+* ``collector_name``: the name of the file 
 * ``data_file``:
 * ``grid_file``:
 * ``density_output_file``:
