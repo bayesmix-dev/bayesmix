@@ -9,6 +9,7 @@ We recommend that you open and read these files for a better understanding of ho
 The aforementioned script executes the following command:
 
 .. code-block:: shell
+
   build/run \
     resources/tutorial/algo.asciipb \
     NNIG resources/tutorial/nnig_ngg.asciipb \
@@ -19,6 +20,7 @@ The aforementioned script executes the following command:
     resources/tutorial/out/density.csv \
     resources/tutorial/out/numclust.csv \
     resources/tutorial/out/clustering.csv
+
 
 In general, the pattern to use the executable is:
 
@@ -44,10 +46,10 @@ Arguments
 The arguments provided to the executable are:
 * ``algorithm_settings_file``: the text file that contains algorithm parameters, such as the actual algorithm to be used and the number of MCMC iterations
 * ``hierarchy_type``: the identifier for the type of hierarchy to be used. In the above case we use a Normal-Normal-InverseGamma (NNIG) hierarchy
-* ``hierarchy_prior_file``: the text file that contains information about the prior and hyperprior values for the hierarchy. In the above case, we use a Normal-Gamma-Gamma (NGG) hyperprior
-* ``mixing_type``: the identifier for the type of mixing to be used. In the above case, we use a Dirichlet Process (DP) mixture
-* ``mixing_prior_file``: the text file that contains information about the prior and hyperprior values for the mixing. In the above case, we use a Gamma hyperprior on the DP total mass parameter
-* ``collector_name``: the name of the file 
+* ``hierarchy_prior_file``: the text file that contains information about the prior and hyperprior values for the hierarchy. In the above example, we use a Normal-Gamma-Gamma (NGG) hyperprior
+* ``mixing_type``: the identifier for the type of mixing to be used. In the above example, we use a Dirichlet Process (DP) mixture
+* ``mixing_prior_file``: the text file that contains information about the prior and hyperprior values for the mixing. In the above example, we use a Gamma hyperprior on the DP total mass parameter
+* ``collector_name``: the name of the ``FileCollector`` file in which to store the full information of the MCMC chain, in binary form. If you don't need to store it into a file, you can use an empty string, which will instruct the code to use a ``MemoryCollector``. This is what we use in the above example
 * ``data_file``:
 * ``grid_file``:
 * ``density_output_file``:
