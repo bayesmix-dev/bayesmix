@@ -177,8 +177,13 @@ class BaseAlgorithm {
       const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
       const Eigen::RowVectorXd &mix_covariate) = 0;
 
-  //! Should `Hierarchy` hypers be updated when adding/removing data?
-  // TODO explain better/change name?
+  /*
+    Returns whether the posterior parameters for the hierarchies should be
+     updated each time an observation is added or removed from the cluster.
+     This can potentially reduce computational effort in algorithms which do
+     not need this kind of update. If false, this update is usually performed
+     instead during the `sample_unique_values()` substep, and viceversa.
+  */
   virtual bool update_hierarchy_params() { return false; }
 
   // ALGORITHM PARAMETERS
