@@ -1,0 +1,6 @@
+gamma_prior {
+  totalmass_prior {
+    shape: 4.0
+    rate: 2.0
+  }
+}
