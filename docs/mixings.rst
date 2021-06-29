@@ -4,7 +4,7 @@ Mixings
 =======
 
 In the algorithms of the library, we store a single ``Mixing`` object that represents the mixing measure used in the model.
-There are two types of ``Mixing``s: marginal and conditional, each of which can only be used with the matching type of ``Algorithm``.
+There are two types of ``Mixing``: marginal and conditional, each of which can only be used with the matching type of ``Algorithm``.
 For both of these types, certain API functions are required.
 
 

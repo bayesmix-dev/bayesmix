@@ -22,6 +22,7 @@ Distribution-related utilities
 ----------------------------------------------
 .. doxygenfile:: eigen_utils.h
    :project: bayesmix
+   :members:
 .. doxygenfile:: io_utils.h
    :project: bayesmix
 
@@ -34,5 +35,6 @@ Distribution-related utilities
 -----------
 RNG wrapper
 -----------
-.. doxygenfile:: rng.h
+.. doxygenclass:: rng
    :project: bayesmix
+   :members:
