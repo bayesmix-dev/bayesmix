@@ -31,10 +31,3 @@ Distribution-related utilities
 -------------------------
 .. doxygenfile:: proto_utils.h
    :project: bayesmix
-
------------
-RNG wrapper
------------
-.. doxygenfile:: rng.h
-   :project: bayesmix
-   :members:
