@@ -64,7 +64,7 @@ make test_bayesmix
 
 ## Usage
 You can refer to our documentation for more in-depth information about this library.
-You can find it at https://bayesmix.readthedocs.io, or you can compile in on your machine by first installing required dependences:
+You can find it at https://bayesmix.readthedocs.io, or you can compile in on your machine by first installing required dependencies:
 ```shell
 sudo apt install doxygen python3-pip
 python3 -m pip install sphinx_rtd_theme breathe
@@ -83,15 +83,15 @@ Then, navigate to the `build/docs/sphinx/index.html` file and open it with your 
 It needs a few command line parameters, as detailed below:
 ```shell
 build/run \
-  algorithm_parameters_file \
-  hierarchy_type hierarchy_args \
-  mixing_type mixing_args \
+  algorithm_settings_file \
+  hierarchy_type  hierarchy_prior_file \
+  mixing_type  mixing_prior_file \
   collector_name \
   data_file \
   grid_file \
-  density_file \
-  num_clusters_file \
-  clustering_file \
+  density_output_file \
+  numclust_output_file \
+  clustering_output_file \
   [hierarchy_covariates_file] \
   [hierarchy_grid_covariates_file] \
   [mixing_covariates_file] \
