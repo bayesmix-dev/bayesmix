@@ -42,11 +42,15 @@ In general, the pattern to use the executable is:
     [mixing_grid_covariates_file]
 
 
+Due to the large number of parameters, it is recommended that such a command is written to a ``.sh`` script which is then executed, just like with the given example.
+
+
+
 ---------
 Arguments
 ---------
 
-The arguments provided to the executable are:
+The arguments which must be provided to the ``build/run`` executable are:
 
 * ``algorithm_settings_file``: the text file that contains algorithm parameters, such as the actual algorithm to be used and the number of MCMC iterations
 * ``hierarchy_type``: the identifier for the type of hierarchy to be used. In the above case we use a Normal-Normal-InverseGamma (NNIG) hierarchy
@@ -60,6 +64,7 @@ The arguments provided to the executable are:
 * ``numclust_output_file``: the output CSV file in which the number of clusters at each iteration will be written
 * ``clustering_output_file``: the output CSV file in which the labels of the posterior clustering will be written
 * the remaining arguments ``hierarchy_covariates_file``, ``hierarchy_grid_covariates_file``, ``mixing_covariates_file``, and ``mixing_grid_covariates_file`` are optional, and are only to be used if the model is dependent on covariates, which is not the case for our NNIG + DP example.
+
 
 
 ------

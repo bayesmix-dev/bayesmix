@@ -21,6 +21,7 @@ where P is either the Dirichlet process or the Pitman-Yor process.
 - Serialization of the MCMC chains is possible using [Google's protocol buffers](https://developers.google.com/protocol-buffers).
 
 
+
 ## Installation
 ### Dependencies
 We heavily depend on Google's [Protocol Buffers](https://github.com/protocolbuffers/protobuf), so make sure to install it beforehand! In particular, on a Linux machine the following will install the `protobuf` library:
@@ -60,6 +61,8 @@ make test_bayesmix
 ./test/test_bayesmix
 ```
 
+
+
 ## Usage
 You can refer to our documentation for more in-depth information about this library.
 You can find it at https://bayesmix.readthedocs.io, or you can compile in on your machine by first installing required dependences:
@@ -94,14 +97,23 @@ build/run \
   [mixing_grid_covariates_file]
 ```
 First batch of parameters up until `grid_file` is mainly composed of names of input files or objects IDs. Then there are output files, and finally, in square brackets, optional input files, in the case that the chosen hierarchy needs covariates.
-A working example follows, using input files already present in the library:
+A working example follows, taken from `bash/tutorial.sh`, which uses input files already present in the library:
 ```shell
 build/run \
-  resources/benchmarks/default_algo_params.asciipb \
-  TODO
+  resources/tutorial/algo.asciipb \
+  NNIG resources/tutorial/nnig_ngg.asciipb \
+  DP   resources/tutorial/dp_gamma.asciipb \
+  "" \
+  resources/tutorial/data.csv \
+  resources/tutorial/grid.csv \
+  resources/tutorial/out/density.csv \
+  resources/tutorial/out/numclust.csv \
+  resources/tutorial/out/clustering.csv
 
 ```
-Due to the large number of parameters, such command is usually written to a `.sh` and then the script itself is executed. Please see `bash/run_test.sh` for further examples.
+Due to the large number of parameters, it is recommended that such a command is written to a `.sh` script which is then executed, just like with the given example.
+
+
 
 ## Contributions are welcome!
 Please check out [CONTRIBUTORS.md](CONTRIBUTORS.md) for details on how to collaborate with us.
