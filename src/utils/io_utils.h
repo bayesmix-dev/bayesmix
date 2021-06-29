@@ -3,7 +3,7 @@
 
 #include <Eigen/Dense>
 
-//! This file implements basic input-output utilities for Eigen matrices from 
+//! This file implements basic input-output utilities for Eigen matrices from
 //! and to text files.
 
 #define MAXBUFSIZE ((int)1e6)
