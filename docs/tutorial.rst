@@ -47,6 +47,7 @@ Arguments
 ---------
 
 The arguments provided to the executable are:
+
 * ``algorithm_settings_file``: the text file that contains algorithm parameters, such as the actual algorithm to be used and the number of MCMC iterations
 * ``hierarchy_type``: the identifier for the type of hierarchy to be used. In the above case we use a Normal-Normal-InverseGamma (NNIG) hierarchy
 * ``hierarchy_prior_file``: the text file that contains information about the prior and hyperprior values for the hierarchy. In the above example, we use a Normal-Gamma-Gamma (NGG) hyperprior
