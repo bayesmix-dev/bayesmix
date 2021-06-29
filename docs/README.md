@@ -70,7 +70,7 @@ sudo apt install doxygen python3-pip
 python3 -m pip install sphinx_rtd_theme breathe
 ```
 then `cd`ing into the root folder and running:
-```
+```shell
 cd build
 cmake ..
 make Sphinx
