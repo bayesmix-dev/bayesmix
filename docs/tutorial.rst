@@ -4,9 +4,11 @@ Univariate data
 ===============
 
 You can run the ``bash/tutorial.sh`` script for a quick example on how to use the ``run.cc`` file.
+This example uses files which are available in the ``resources/tutorial`` subfolder.
+We recommend that you open and read these files for a better understanding of how the process works.
 The aforementioned script executes the following command:
-``
-build/run \
+
+``build/run \
   resources/tutorial/algo.asciipb \
   NNIG resources/tutorial/nnig_ngg.asciipb \
   DP   resources/tutorial/dp_gamma.asciipb \
@@ -15,17 +17,50 @@ build/run \
   resources/tutorial/grid.csv \
   resources/tutorial/out/density.csv \
   resources/tutorial/out/numclust.csv \
-  resources/tutorial/out/clustering.csv
-``
-The arguments provided to the ``build/run`` executable are:
+  resources/tutorial/out/clustering.csv``
 
-* sa
-* sa
-* prova
+In general, the pattern to use the executable is:
 
-The output of the program will look something like this:
-``
-Running run.cc
+``build/run \
+  algorithm_settings_file \
+  hierarchy_type  hierarchy_prior_file \
+  mixing_type  mixing_prior_file \
+  collector_name \
+  data_file \
+  grid_file \
+  density_output_file \
+  numclust_output_file \
+  clustering_output_file \
+  [hierarchy_covariates_file] \
+  [hierarchy_grid_covariates_file] \
+  [mixing_covariates_file] \
+  [mixing_grid_covariates_file]``
+
+---------
+Arguments
+---------
+
+The arguments provided to the executable are:
+* ``algorithm_settings_file``: the text file that contains algorithm parameters, such as the actual algorithm to be used and the number of MCMC iterations
+* ``hierarchy_type``: the identifier for the hierarchy to be used, which in the above case is a Normal-Normal-InverseGamma (NNIG)
+* ``hierarchy_prior_file``:
+* ``mixing_type``:
+* ``mixing_prior_file``:
+* ``collector_name``:
+* ``data_file``:
+* ``grid_file``:
+* ``density_output_file``:
+* ``numclust_output_file``:
+* ``clustering_output_file``:
+* the remaining arguments ``hierarchy_covariates_file``, ``hierarchy_grid_covariates_file``, ``mixing_covariates_file``, and ``mixing_grid_covariates_file`` are optional, and are only to be used if the model is dependent on covariates, which is not the case for our NNIG + DP example.
+
+------
+Output
+------
+
+The output of the program should look something like this:
+
+``Running run.cc
 Initializing... Done
 Running Neal3 algorithm with NNIG hierarchies, DP mixing...
 [============================================================] 100% 0.157s
@@ -40,5 +75,7 @@ Computing cluster estimate...
 [============================================================] 100% 0.056s
 Done
 Successfully wrote clustering to resources/tutorial/out/clustering.csv
-End of run.cc
-``
+End of run.cc``
+
+This means that the output has been written into the indicated files.
+You can open them with your favorite CSV reader, or manipulate them with Python libraries in order to make plots, or whatever you wish.
