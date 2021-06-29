@@ -52,7 +52,6 @@ cmake .. -DDISABLE_DOCS="ON"
 make run
 ```
 If the `cmake` line returns errors about not finding the GTest/GoogleTest library, please add `-DDISABLE_TESTS="ON" -DDISABLE_BENCHMARKS="ON"` at the end of the command and try again.
-```
 
 To compile and run unit tests, use:
 ```shell
