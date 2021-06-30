@@ -60,5 +60,8 @@ make test_bayesmix
 ./test/test_bayesmix
 ```
 
+## Documentation
+Documentation is available at https://bayesmix.readthedocs.io.
+
 ## Contributions are welcome!
 Please check out [CONTRIBUTORS.md](CONTRIBUTORS.md) for details on how to collaborate with us.
