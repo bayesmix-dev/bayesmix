@@ -26,55 +26,6 @@ double NNIGHierarchy::marg_lpdf(
                                     sig_n);
 }
 
-NNIG::State NNIGHierarchy::draw(const NNIG::Hyperparams &params) {
-  // Update state values from their prior centering distribution
-  auto &rng = bayesmix::Rng::Instance().get();
-  NNIG::State out;
-  out.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
-  out.mean = stan::math::normal_rng(params.mean,
-                                    sqrt(state.var / params.var_scaling), rng);
-  return out;
-}
-
-void NNIGHierarchy::update_summary_statistics(
-    const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate,
-    bool add) {
-  if (add) {
-    data_sum += datum(0);
-    data_sum_squares += datum(0) * datum(0);
-  } else {
-    data_sum -= datum(0);
-    data_sum_squares -= datum(0) * datum(0);
-  }
-}
-
-NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
-  // Initialize relevant variables
-  if (card == 0) {  // no update possible
-    return *hypers;
-  }
-  // Compute posterior hyperparameters
-  NNIG::Hyperparams post_params;
-  double y_bar = data_sum / (1.0 * card);  // sample mean
-  double ss = data_sum_squares - card * y_bar * y_bar;
-  post_params.mean = (hypers->var_scaling * hypers->mean + data_sum) /
-                     (hypers->var_scaling + card);
-  post_params.var_scaling = hypers->var_scaling + card;
-  post_params.shape = hypers->shape + 0.5 * card;
-  post_params.scale = hypers->scale + 0.5 * ss +
-                      0.5 * hypers->var_scaling * card *
-                          (y_bar - hypers->mean) * (y_bar - hypers->mean) /
-                          (card + hypers->var_scaling);
-  return post_params;
-}
-
-void NNIGHierarchy::clear_data() {
-  data_sum = 0;
-  data_sum_squares = 0;
-  card = 0;
-  cluster_data_idx = std::set<int>();
-}
-
 void NNIGHierarchy::initialize_state() {
   state.mean = hypers->mean;
   state.var = hypers->scale / (hypers->shape + 1);
@@ -230,6 +181,54 @@ void NNIGHierarchy::update_hypers(
   else {
     throw std::invalid_argument("Unrecognized hierarchy prior");
   }
+}
+
+NNIG::State NNIGHierarchy::draw(const NNIG::Hyperparams &params) {
+  auto &rng = bayesmix::Rng::Instance().get();
+  NNIG::State out;
+  out.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+  out.mean = stan::math::normal_rng(params.mean,
+                                    sqrt(state.var / params.var_scaling), rng);
+  return out;
+}
+
+void NNIGHierarchy::update_summary_statistics(
+    const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate,
+    bool add) {
+  if (add) {
+    data_sum += datum(0);
+    data_sum_squares += datum(0) * datum(0);
+  } else {
+    data_sum -= datum(0);
+    data_sum_squares -= datum(0) * datum(0);
+  }
+}
+
+void NNIGHierarchy::clear_data() {
+  data_sum = 0;
+  data_sum_squares = 0;
+  card = 0;
+  cluster_data_idx = std::set<int>();
+}
+
+NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
+  // Initialize relevant variables
+  if (card == 0) {  // no update possible
+    return *hypers;
+  }
+  // Compute posterior hyperparameters
+  NNIG::Hyperparams post_params;
+  double y_bar = data_sum / (1.0 * card);  // sample mean
+  double ss = data_sum_squares - card * y_bar * y_bar;
+  post_params.mean = (hypers->var_scaling * hypers->mean + data_sum) /
+                     (hypers->var_scaling + card);
+  post_params.var_scaling = hypers->var_scaling + card;
+  post_params.shape = hypers->shape + 0.5 * card;
+  post_params.scale = hypers->scale + 0.5 * ss +
+                      0.5 * hypers->var_scaling * card *
+                          (y_bar - hypers->mean) * (y_bar - hypers->mean) /
+                          (card + hypers->var_scaling);
+  return post_params;
 }
 
 void NNIGHierarchy::set_state_from_proto(

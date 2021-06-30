@@ -3,18 +3,39 @@
 
 #include "base_hierarchy.h"
 
+//! Template base class for conjugate hierarchy objects.
+
+//! This class acts as the base class for conjugate models, i.e. ones for which
+//! both the prior and posterior distribution have the same form
+//! (non-conjugate hierarchies should instead inherit directly from
+//! `BaseHierarchy`). This also means that the marginal distribution for the
+//! data is available in closed form. For this reason, each class deriving from
+//! this one must have a free method with the following signature:
+//! double marg_lpdf(
+//!      const Hyperparams &params, const Eigen::RowVectorXd &datum,
+//!      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
+//! This returns the evaluation of the marginal distribution on the given data
+//! point (and possibly a covariate), conditioned on the provided
+//! `Hyperparams` object. The latter may contain either prior or posterior
+//| values for hyperparameters, depending on where this function is called
+//! within the library.
+//! For more information, please refer to parent classes `AbstractHierarchy`
+//! and `BaseHierarchy`.
+
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 class ConjugateHierarchy
     : public BaseHierarchy<Derived, State, Hyperparams, Prior> {
  public:
-  ~ConjugateHierarchy() = default;
-  ConjugateHierarchy() = default;
-  bool is_conjugate() const { return true; }
-
   using BaseHierarchy<Derived, State, Hyperparams, Prior>::hypers;
   using BaseHierarchy<Derived, State, Hyperparams, Prior>::posterior_hypers;
   using BaseHierarchy<Derived, State, Hyperparams, Prior>::state;
 
+  ConjugateHierarchy() = default;
+  ~ConjugateHierarchy() = default;
+
+  bool is_conjugate() const { return true; }
+
+  //! Saves posterior hyperparameters to the corresponding class member
   void save_posterior_hypers() {
     posterior_hypers =
         static_cast<Derived *>(this)->get_posterior_parameters();
@@ -34,7 +55,6 @@ class ConjugateHierarchy
                                                          datum, covariate);
   }
 
-  //! Generates new values for state from the centering posterior distribution
   void sample_full_cond(bool update_params = true) override {
     if (this->card == 0) {
       // No posterior update possible
@@ -48,7 +68,6 @@ class ConjugateHierarchy
     }
   }
 
-  //! Evaluates the log-marginal of data in a grid of points
   virtual Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,

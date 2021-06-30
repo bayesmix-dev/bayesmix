@@ -13,48 +13,6 @@
 #include "src/utils/distributions.h"
 #include "src/utils/rng.h"
 
-//! \param hier Hierarchy object
-//! \return     Vector of evaluation of component on the provided grid
-Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
-    std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
-    const Eigen::RowVectorXd &covariate) const {
-  return hier->prior_pred_lpdf_grid(grid, covariate);
-}
-
-Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
-    const unsigned int data_idx) const {
-  unsigned int n_data = data.rows();
-  unsigned int n_clust = unique_values.size();
-  Eigen::VectorXd logprior(n_clust + 1);
-  for (size_t j = 0; j < n_clust; j++) {
-    // Probability of being assigned to an already existing cluster
-    logprior(j) =
-        mixing->mass_existing_cluster(n_data - 1, true, true, unique_values[j],
-                                      mix_covariates.row(data_idx));
-  }
-  // Further update with marginal component
-  logprior(n_clust) = mixing->mass_new_cluster(n_data - 1, true, true, n_clust,
-                                               mix_covariates.row(data_idx));
-
-  return logprior;
-}
-
-Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
-    const unsigned int data_idx) const {
-  unsigned int n_data = data.rows();
-  unsigned int n_clust = unique_values.size();
-  Eigen::VectorXd loglpdf(n_clust + 1);
-  for (size_t j = 0; j < n_clust; j++) {
-    // Probability of being assigned to an already existing cluster
-    loglpdf(j) = unique_values[j]->like_lpdf(data.row(data_idx),
-                                             hier_covariates.row(data_idx));
-  }
-  // Probability of being assigned to a newly created cluster
-  loglpdf(n_clust) = unique_values[0]->prior_pred_lpdf(
-      data.row(data_idx), hier_covariates.row(data_idx));
-  return loglpdf;
-}
-
 void Neal2Algorithm::print_startup_message() const {
   std::string msg = "Running Neal2 algorithm with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
@@ -107,4 +65,44 @@ void Neal2Algorithm::sample_unique_values() {
   for (auto &un : unique_values) {
     un->sample_full_cond(!update_hierarchy_params());
   }
+}
+
+Eigen::VectorXd Neal2Algorithm::lpdf_marginal_component(
+    std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+    const Eigen::RowVectorXd &covariate) const {
+  return hier->prior_pred_lpdf_grid(grid, covariate);
+}
+
+Eigen::VectorXd Neal2Algorithm::get_cluster_prior_mass(
+    const unsigned int data_idx) const {
+  unsigned int n_data = data.rows();
+  unsigned int n_clust = unique_values.size();
+  Eigen::VectorXd logprior(n_clust + 1);
+  for (size_t j = 0; j < n_clust; j++) {
+    // Probability of being assigned to an already existing cluster
+    logprior(j) =
+        mixing->mass_existing_cluster(n_data - 1, true, true, unique_values[j],
+                                      mix_covariates.row(data_idx));
+  }
+  // Further update with marginal component
+  logprior(n_clust) = mixing->mass_new_cluster(n_data - 1, true, true, n_clust,
+                                               mix_covariates.row(data_idx));
+
+  return logprior;
+}
+
+Eigen::VectorXd Neal2Algorithm::get_cluster_lpdf(
+    const unsigned int data_idx) const {
+  unsigned int n_data = data.rows();
+  unsigned int n_clust = unique_values.size();
+  Eigen::VectorXd loglpdf(n_clust + 1);
+  for (size_t j = 0; j < n_clust; j++) {
+    // Probability of being assigned to an already existing cluster
+    loglpdf(j) = unique_values[j]->like_lpdf(data.row(data_idx),
+                                             hier_covariates.row(data_idx));
+  }
+  // Probability of being assigned to a newly created cluster
+  loglpdf(n_clust) = unique_values[0]->prior_pred_lpdf(
+      data.row(data_idx), hier_covariates.row(data_idx));
+  return loglpdf;
 }

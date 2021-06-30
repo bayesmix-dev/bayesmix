@@ -8,16 +8,16 @@
 
 #include "matrix.pb.h"
 
+void bayesmix::to_proto(const Eigen::VectorXd &vec, bayesmix::Vector *out) {
+  out->set_size(vec.size());
+  *out->mutable_data() = {vec.data(), vec.data() + vec.size()};
+}
+
 void bayesmix::to_proto(const Eigen::MatrixXd &mat, bayesmix::Matrix *out) {
   out->set_rows(mat.rows());
   out->set_cols(mat.cols());
   out->set_rowmajor(false);
   *out->mutable_data() = {mat.data(), mat.data() + mat.size()};
-}
-
-void bayesmix::to_proto(const Eigen::VectorXd &vec, bayesmix::Vector *out) {
-  out->set_size(vec.size());
-  *out->mutable_data() = {vec.data(), vec.data() + vec.size()};
 }
 
 Eigen::VectorXd bayesmix::to_eigen(const bayesmix::Vector &vec) {

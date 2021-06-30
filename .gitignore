@@ -1,8 +1,5 @@
 # Build folder
 build/
-# Resources folder
-resources/csv
-resources/asciipb
 # Visual Studio Code folder
 .vscode
 # SFTP configuration file
@@ -17,3 +14,5 @@ sftp-config.json
 *.pdf
 # Local files
 *.local.*
+# MacOS storage files
+.DS_Store

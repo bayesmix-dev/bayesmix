@@ -7,6 +7,7 @@
 #include <stan/math/prim/err.hpp>
 
 Eigen::MatrixXd bayesmix::vstack(const std::vector<Eigen::MatrixXd> &mats) {
+  // Check that row dimensions are consistent
   int ncols = mats[0].cols();
   for (int i = 0; i < mats.size(); i++) {
     if (mats[i].cols() != ncols) {
@@ -17,11 +18,13 @@ Eigen::MatrixXd bayesmix::vstack(const std::vector<Eigen::MatrixXd> &mats) {
     }
   }
 
+  // Counts total number of rows
   auto cnt_rows = [&](int curr, const Eigen::MatrixXd &mat) {
     return curr + mat.rows();
   };
   int nrows = std::accumulate(mats.begin(), mats.end(), 0, cnt_rows);
 
+  // Write new matrix block by block
   Eigen::MatrixXd out(nrows, ncols);
   int begin = 0;
   for (int i = 0; i < mats.size(); i++) {
@@ -38,6 +41,7 @@ void bayesmix::append_by_row(Eigen::MatrixXd *a, const Eigen::MatrixXd &b) {
   } else if (b.rows() == 0) {
     return;
   } else {
+    // Check that column dimensions are consistent
     if (a->cols() != b.cols()) {
       std::stringstream msg;
       msg << "Expected a and b to have the same number of columns, but"
@@ -58,6 +62,7 @@ Eigen::MatrixXd bayesmix::append_by_row(const Eigen::MatrixXd &a,
   else if (b.rows() == 0)
     return a;
   else {
+    // Check that column dimensions are consistent
     if (a.cols() != b.cols()) {
       std::stringstream msg;
       msg << "Expected a and b to have the same number of columns, but"
