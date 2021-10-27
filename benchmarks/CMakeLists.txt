@@ -3,11 +3,11 @@ project(benchmark_bayesmix)
 enable_testing()
 
 
-find_package(benchmark REQUIRED PATH "/opt/homebrew/Cellar/google-benchmark/1.5.5/")
-message("***** BENCHMARK: ${BENCHMARK_INCLUDE_DIR}")
-message("***** BENCHMARK: ${benchmark_INCLUDE_DIR}")
-message("***** BENCHMARK: ${benchmark_LIBRARY}")
-
+# find_package(benchmark REQUIRED PATH "/usr/local/Homebrew/Cellar/google-benchmark/1.6.0")
+# message("***** BENCHMARK: ${benchmark_INCLUDE_DIR}")
+# message("***** BENCHMARK: ${benchmark_INCLUDE_DIR}")
+# message("***** BENCHMARK: ${benchmark_LIBRARY}")
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../lib/math/lib/benchmark_1.5.1 build)
 
 
 add_executable(benchmark_bayesmix $<TARGET_OBJECTS:bayesmix>
@@ -22,5 +22,5 @@ add_executable(benchmark_bayesmix $<TARGET_OBJECTS:bayesmix>
 
 target_include_directories(benchmark_bayesmix PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(benchmark_bayesmix PUBLIC
-  ${LINK_LIBRARIES}  benchmark::benchmark)
+  ${LINK_LIBRARIES}  benchmark::benchmark benchmark::benchmark_main)
 target_compile_options(benchmark_bayesmix PUBLIC ${COMPILE_OPTIONS})

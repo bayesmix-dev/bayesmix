@@ -15,7 +15,7 @@ set (CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -arch=arm64 -funroll-loops -ftree-vectorize")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 option(DISABLE_TESTS
@@ -80,7 +80,6 @@ set(INCLUDE_PATHS
 
 
 set(LINK_LIBRARIES 
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.dylib
   pthread 
   protobuf::libprotobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
@@ -133,11 +132,11 @@ add_library(bayesmixlib $<TARGET_OBJECTS:bayesmix>)
 
 
 if (BUILD_RUN)
-# Build run executable
-add_executable(run $<TARGET_OBJECTS:bayesmix> run.cc)
-target_include_directories(run PUBLIC ${INCLUDE_PATHS})
-target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
-target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
+  # Build run executable
+  add_executable(run $<TARGET_OBJECTS:bayesmix> run.cc)
+  target_include_directories(run PUBLIC ${INCLUDE_PATHS})
+  target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
+  target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 endif()
 
 if (NOT DISABLE_TESTS)
@@ -148,4 +147,6 @@ if (NOT DISABLE_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif()
 
-add_subdirectory(docs)
+add_subdirectory(examples)
+
+# add_subdirectory(docs)
