@@ -33,6 +33,18 @@ int main(int argc, char *argv[]) {
     mix_grid_cov_file = argv[15];
   }
 
+  // Check whether we can write to output files
+  std::ofstream ofstr;
+  for (int i = 9; i < 12; i++) {
+    ofstr.open(argv[i]);
+    if (ofstr.fail()) {
+      std::cerr << "Error: cannot write to " << argv[i] << std::endl;
+      ofstr.close();
+      return 1;
+    }
+    ofstr.close();
+  }
+
   // Read algorithm settings proto
   bayesmix::AlgorithmParams algo_proto;
   bayesmix::read_proto_from_file(algo_params_file, &algo_proto);
