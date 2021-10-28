@@ -11,7 +11,7 @@
 
 //! This template class implements a generic Gibbs sampling conditional
 //! algorithm as the child of the `BaseAlgorithm` class.
-//! A mixture model sampled from a Marginal Algorithm can be expressed as
+//! A mixture model sampled from a conditional algorithm can be expressed as
 //!   x_i | c_i, phi_1, ..., phi_k ~ f(x_i|phi_(c_i))    (data likelihood);
 //!               phi_1, ... phi_k ~ G                   (unique values);
 //!   c_1, ... c_n | w_1, ..., w_k ~ Cat(w_1, ... w_k)   (cluster allocations);

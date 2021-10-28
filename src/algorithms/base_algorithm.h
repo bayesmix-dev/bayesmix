@@ -89,16 +89,6 @@ class BaseAlgorithm {
       const Eigen::RowVectorXd &hier_covariate = Eigen::RowVectorXd(0),
       const Eigen::RowVectorXd &mix_covariate = Eigen::RowVectorXd(0));
 
-  //! Evaluates the estimated log-lpdf on the state contained in `curr_state`
-  //! @param grid   Grid of row points on which the density is to be evaluated
-  //! @param hier_covariate   Optional covariates related to the `Hierarchy`
-  //! @param mix_covariate   Optional covariates related to the `Mixing`
-  //! @return   The estimation on the iteration of `curr_state` over all points
-  // TODO move to protected?
-  virtual Eigen::VectorXd lpdf_from_state(
-      const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
-      const Eigen::RowVectorXd &mix_covariate) = 0;
-
   unsigned int get_maxiter() const { return maxiter; }
 
   unsigned int get_burnin() const { return burnin; }
@@ -178,8 +168,22 @@ class BaseAlgorithm {
   //! Advances `Collector` reading pointer by one, and returns 1 if successful
   bool update_state_from_collector(BaseCollector *coll);
 
-  //! Should `Hierarchy` hypers be updated when adding/removing data?
-  // TODO explain better/change name?
+  //! Evaluates the estimated log-lpdf on the state contained in `curr_state`
+  //! @param grid   Grid of row points on which the density is to be evaluated
+  //! @param hier_covariate   Optional covariates related to the `Hierarchy`
+  //! @param mix_covariate   Optional covariates related to the `Mixing`
+  //! @return   The estimation on the iteration of `curr_state` over all points
+  virtual Eigen::VectorXd lpdf_from_state(
+      const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
+      const Eigen::RowVectorXd &mix_covariate) = 0;
+
+  /*
+    Returns whether the posterior parameters for the hierarchies should be
+     updated each time an observation is added or removed from the cluster.
+     This can potentially reduce computational effort in algorithms which do
+     not need this kind of update. If false, this update is usually performed
+     instead during the `sample_unique_values()` substep, and viceversa.
+  */
   virtual bool update_hierarchy_params() { return false; }
 
   // ALGORITHM PARAMETERS
