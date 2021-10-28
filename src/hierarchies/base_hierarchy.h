@@ -162,7 +162,7 @@ template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::check_prior_is_set()
     const {
   if (prior == nullptr) {
-    std::cout << "WARNING: Hierarchy prior was not provided" << std::endl;
+    throw std::invalid_argument("Hierarchy prior was not provided");
   }
 }
 
