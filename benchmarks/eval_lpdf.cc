@@ -27,17 +27,17 @@ Eigen::MatrixXd get_grid(int dim) {
   return out;
 }
 
-// static void BM_eval_lpdf_memory_read(benchmark::State& state) {
-//   int dim = state.range(0);
-//   std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
-//   Eigen::MatrixXd grid = get_grid(dim);
-//   MemoryCollector collector;
-//   for (auto _ : state) {
-//     collector.read_from_file<bayesmix::AlgorithmState>(
-//         get_chain_file("Neal2", dim));
-//     algo->eval_lpdf(&collector, grid);
-//   }
-// }
+static void BM_eval_lpdf_memory_read(benchmark::State& state) {
+  int dim = state.range(0);
+  std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
+  Eigen::MatrixXd grid = get_grid(dim);
+  MemoryCollector collector;
+  for (auto _ : state) {
+    collector.read_from_file<bayesmix::AlgorithmState>(
+        get_chain_file("Neal2", dim));
+    algo->eval_lpdf(&collector, grid);
+  }
+}
 
 static void BM_eval_lpdf_memory_noread(benchmark::State& state) {
   int dim = state.range(0);
@@ -61,6 +61,6 @@ static void BM_eval_lpdf_file(benchmark::State& state) {
   }
 }
 
-// BENCHMARK(BM_eval_lpdf_memory_read)->Arg(1)->Arg(2);
+BENCHMARK(BM_eval_lpdf_memory_read)->Arg(1)->Arg(2);
 BENCHMARK(BM_eval_lpdf_memory_noread)->Arg(1)->Arg(2);
-// BENCHMARK(BM_eval_lpdf_file)->Arg(1)->Arg(2);
+BENCHMARK(BM_eval_lpdf_file)->Arg(1)->Arg(2);

@@ -2,13 +2,7 @@ cmake_minimum_required(VERSION 3.13.0)
 project(benchmark_bayesmix)
 enable_testing()
 
-
-# find_package(benchmark REQUIRED PATH "/usr/local/Homebrew/Cellar/google-benchmark/1.6.0")
-# message("***** BENCHMARK: ${benchmark_INCLUDE_DIR}")
-# message("***** BENCHMARK: ${benchmark_INCLUDE_DIR}")
-# message("***** BENCHMARK: ${benchmark_LIBRARY}")
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../lib/math/lib/benchmark_1.5.1 build)
-
 
 add_executable(benchmark_bayesmix $<TARGET_OBJECTS:bayesmix>
   nnw_marg_lpdf.cc

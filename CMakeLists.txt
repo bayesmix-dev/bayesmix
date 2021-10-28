@@ -122,6 +122,7 @@ endif()
 
 # Build library object
 add_library(bayesmix OBJECT)
+add_dependencies(bayesmix build_tbb)
 target_sources(bayesmix PUBLIC ${PROTO_SRCS} ${PROTO_HDRS})
 add_subdirectory(src)    # source files
 target_include_directories(bayesmix PUBLIC ${INCLUDE_PATHS})
