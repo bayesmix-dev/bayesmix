@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 
   // Check whether we can write to output files
   std::ofstream ofstr;
-  for (int i = 9; i < argc; i++) {
+  for (int i = 9; i < 12; i++) {
     ofstr.open(argv[i]);
     if (ofstr.fail()) {
       std::cerr << "Error: cannot write to " << argv[i] << std::endl;
