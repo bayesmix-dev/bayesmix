@@ -17,7 +17,7 @@ def maybe_build_tbb():
     tbb_dir = os.path.abspath(tbb_dir)
 
     if os.path.exists(tbb_dir):
-        return
+         return
 
     make = 'make' if platform.system() != 'Windows' else 'mingw32-make'
     cmd = [make]
@@ -33,6 +33,9 @@ def maybe_build_tbb():
 
     cwd = os.path.abspath(os.path.dirname(__file__))
 
+    print(cwd)
+    print(" ".join(cmd))
+
     subprocess.check_call(cmd, cwd=cwd)
 
     tbb_debug = os.path.join(stan_math_lib, "tbb_debug")
@@ -42,19 +45,13 @@ def maybe_build_tbb():
     if not os.path.exists(tbb_dir):
         os.makedirs(tbb_dir)
 
-    if os.path.exists(tbb_debug):
-        shutil.rmtree(tbb_debug)
-
     shutil.move(os.path.join(tbb_root, 'include'), tbb_dir)
-    shutil.rmtree(tbb_root)
 
     for name in os.listdir(tbb_release):
         srcname = os.path.join(tbb_release, name)
         dstname = os.path.join(tbb_dir, name)
         shutil.move(srcname, dstname)
 
-    if os.path.exists(tbb_release):
-        shutil.rmtree(tbb_release)
 
 
 if __name__ == "__main__":

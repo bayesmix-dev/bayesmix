@@ -63,4 +63,4 @@ static void BM_eval_lpdf_file(benchmark::State& state) {
 
 BENCHMARK(BM_eval_lpdf_memory_read)->Arg(1)->Arg(2);
 BENCHMARK(BM_eval_lpdf_memory_noread)->Arg(1)->Arg(2);
-// BENCHMARK(BM_eval_lpdf_file)->Arg(1)->Arg(2);
+BENCHMARK(BM_eval_lpdf_file)->Arg(1)->Arg(2);

@@ -33,7 +33,7 @@ std::shared_ptr<AbstractHierarchy> get_univariate_nnig_hierarchy() {
   return hier;
 }
 
-std::shared_ptr<BaseMixing> get_dirichlet_mixing() {
+std::shared_ptr<AbstractMixing> get_dirichlet_mixing() {
   bayesmix::DPPrior mix_prior;
   double totalmass = 1.0;
   mix_prior.mutable_fixed_value()->set_totalmass(totalmass);
@@ -52,7 +52,7 @@ std::shared_ptr<BaseAlgorithm> get_algorithm(const std::string& id, int dim) {
   algo->read_params_from_proto(algo_proto);
   algo->set_verbose(false);
 
-  std::shared_ptr<BaseMixing> mixing = get_dirichlet_mixing();
+  std::shared_ptr<AbstractMixing> mixing = get_dirichlet_mixing();
   std::shared_ptr<AbstractHierarchy> hier;
   if (dim == 1) {
     hier = get_univariate_nnig_hierarchy();

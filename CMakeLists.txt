@@ -9,13 +9,11 @@ endif()
 
 project(bayesmix)
 
+
+set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_BUILD_TYPE Release)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-
-
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_BUILD_TYPE Release)
-
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -msse2 -funroll-loops -ftree-vectorize -fopenmp")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 include(FindPythonInterp)
@@ -24,11 +22,8 @@ add_custom_target(
  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/build_tbb.py
 )
 
-
 find_package(PkgConfig REQUIRED)
-find_package(OpenMP REQUIRED)
 find_package(Protobuf)
-
 
 if (NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
   include(FetchContent)
@@ -86,7 +81,6 @@ set(INCLUDE_PATHS
 
 
 set(LINK_LIBRARIES 
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb.so 
   pthread 
   protobuf::libprotobuf)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
@@ -137,15 +131,14 @@ target_compile_options(bayesmix PUBLIC ${COMPILE_OPTIONS})
 
 # Build static library
 add_library(bayesmixlib $<TARGET_OBJECTS:bayesmix>)
-add_dependencies(bayesmixlib build_tbb)
 
 
 if (BUILD_RUN)
-# Build run executable
-add_executable(run $<TARGET_OBJECTS:bayesmix> run.cc)
-target_include_directories(run PUBLIC ${INCLUDE_PATHS})
-target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
-target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
+  # Build run executable
+  add_executable(run $<TARGET_OBJECTS:bayesmix> run.cc)
+  target_include_directories(run PUBLIC ${INCLUDE_PATHS})
+  target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
+  target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
 endif()
 
 if (NOT DISABLE_TESTS)
