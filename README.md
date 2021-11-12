@@ -41,7 +41,7 @@ cd ..
 The executable `./build/run` can be used to perform all the necessary analysis. See the file `bash/run_test.sh` for examples of usage with command line arguments.
 
 
-## For developers
+### For developers
 
 
 We heavily depend on Google's [Protocol Buffers](https://github.com/protocolbuffers/protobuf). The CMakeLists.txt file is set up to install the library if it does not find it in the computer. However any call to `make clean` will uninstall it, causing a huge waste of time... so make sure to install it beforehand!
