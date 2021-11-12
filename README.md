@@ -20,9 +20,31 @@ Where P is either the Dirichlet process or the Pitman--Yor process.
 - Serialization of the MCMC chains is possible using [Google's protocol buffers](https://developers.google.com/protocol-buffers)
 
 
-## Installation:
+## Installation
 
-We heavily depend on Google's [Protocol Buffers](https://github.com/protocolbuffers/protobuf), so make sure to install it beforehand!
+### For end users
+
+Just clone the repository with
+```shell
+git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
+```
+
+To run the executable:
+```shell
+mkdir build
+cd build
+cmake .. -DDISABLE_DOCS -DDISABLE_BENCHMARKS -DDISABLE_TESTS
+make run
+cd ..
+```
+
+The executable `./build/run` can be used to perform all the necessary analysis. See the file `bash/run_test.sh` for examples of usage with command line arguments.
+
+
+## For developers
+
+
+We heavily depend on Google's [Protocol Buffers](https://github.com/protocolbuffers/protobuf). The CMakeLists.txt file is set up to install the library if it does not find it in the computer. However any call to `make clean` will uninstall it, causing a huge waste of time... so make sure to install it beforehand!
 
 On Linux machine the following will install the library
 ```shell
@@ -37,7 +59,9 @@ sudo ldconfig # refresh shared library cache.
 ```
 On Mac and Windows machines, follow the official install guide ([link](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md))
 
-Finally, to work with `bayesmix` just clone the repository with
+Another very useful tool is [`ccache`](https://ccache.dev) that significantly speed up the compilation.
+
+Finally, to work with `bayesmix`, just clone the repository with
 ```shell
 git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
 ```
@@ -49,7 +73,6 @@ cd build
 cmake ..
 make run
 cd ..
-./build/run
 ```
 
 To run unit tests:
