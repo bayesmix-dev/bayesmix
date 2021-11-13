@@ -21,7 +21,6 @@ struct State {
 struct Hyperparams {
   double shape, rate_alpha, rate_beta;
 };
-
 }; // namespace GammaGamma
 
 class GammaGammaHierarchy
@@ -36,28 +35,35 @@ class GammaGammaHierarchy
 
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const override {
-        return stan::math::gamma_lpdf(datum(0), hypers->shape, state.rate);
-    }
+    return stan::math::gamma_lpdf(datum(0), hypers->shape, state.rate);
+  }
+
+  double marg_lpdf(
+      const GammaGamma::Hyperparams &params, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
+    throw std::runtime_error("Not implemented");
+    return 0;
+  }
 
   GammaGamma::State draw(const GammaGamma::Hyperparams &params) { 
-      return GammaGamma::State{stan::math::gamma_rng(
-          params.rate_alpha, params.rate_beta, bayesmix::Rng::Instance().get())};
+    return GammaGamma::State{stan::math::gamma_rng(
+     params.rate_alpha, params.rate_beta, bayesmix::Rng::Instance().get())};
   }
 
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  const Eigen::RowVectorXd &covariate,
                                  bool add) {
-        if (add) { data_sum += datum(0); ndata += 1; } 
-        else { data_sum -= datum(0); ndata -= 1; }
+    if (add) { data_sum += datum(0); ndata += 1; } 
+    else { data_sum -= datum(0); ndata -= 1; }
   }
 
   //! Computes and return posterior hypers given data currently in this cluster
   GammaGamma::Hyperparams get_posterior_parameters() {
-      GammaGamma::Hyperparams out;
-      out.shape = hypers->shape;
-      out.rate_alpha = hypers->rate_alpha + hypers->shape * ndata;
-      out.rate_beta = hypers->rate_beta + data_sum;
-      return out;
+    GammaGamma::Hyperparams out;
+    out.shape = hypers->shape;
+    out.rate_alpha = hypers->rate_alpha + hypers->shape * ndata;
+    out.rate_beta = hypers->rate_beta + data_sum;
+    return out;
   }
 
   void initialize_state() override {
@@ -68,7 +74,6 @@ class GammaGammaHierarchy
     hypers->rate_alpha = rate_alpha;
     hypers->rate_beta = rate_beta; 
   }
-
 
   //! Removes every data point from this cluster
   void clear_summary_statistics() {
@@ -82,12 +87,13 @@ class GammaGammaHierarchy
       auto &statecast = google::protobuf::internal::down_cast<
         const bayesmix::AlgorithmState::ClusterState &>(state_);
     state.rate = statecast.general_state().data()[0];
+    set_card(statecast.cardinality());
   }
 
   std::unique_ptr<google::protobuf::Message> get_state_proto() const override {
-      auto out = std::make_unique<bayesmix::Vector>();
-      out->mutable_data()->Add(state.rate);
-      return out;
+    auto out = std::make_unique<bayesmix::Vector>();
+    out->mutable_data()->Add(state.rate);
+    return out;
   }
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
@@ -98,14 +104,6 @@ class GammaGammaHierarchy
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::UNKNOWN_HIERARCHY;
   }
-
-  double marg_lpdf(
-      const GammaGamma::Hyperparams &params, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-        throw std::runtime_error("Not implemented");
-        return 0;
-  }
-
 
  protected:
   double data_sum = 0;
