@@ -47,6 +47,10 @@ void Neal8Algorithm::sample_allocations() {
   for (size_t i = 0; i < n_data; i++) {
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
     unsigned int c_old = allocations[i];
+
+    unique_values[c_old]->remove_datum(
+          i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
+
     if (singleton) {
       // Save unique value in the first auxiliary block
       bayesmix::AlgorithmState::ClusterState curr_val;
@@ -54,10 +58,8 @@ void Neal8Algorithm::sample_allocations() {
       aux_unique_values[0]->set_state_from_proto(curr_val);
       // Remove datum from cluster
       remove_singleton(c_old);
-    } else {
-      unique_values[c_old]->remove_datum(
-          i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     }
+
     unsigned int n_clust = unique_values.size();
     // Draw the unique values in the auxiliary blocks from their prior
     for (size_t j = singleton; j < n_aux; j++) {
@@ -69,6 +71,7 @@ void Neal8Algorithm::sample_allocations() {
     // Draw a NEW value for datum allocation
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
+
     if (c_new >= n_clust) {
       // datum moves to a new cluster
       // Copy one of the auxiliary block as the new cluster
@@ -84,6 +87,7 @@ void Neal8Algorithm::sample_allocations() {
           i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     }
   }
+
 }
 
 Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(

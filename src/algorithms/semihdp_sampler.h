@@ -116,7 +116,7 @@ class SemiHdpSampler {
       adapt = true;
       for (int i = 0; i < adapt_iter; i++) {
         step();
-        if (display_progress & (i + 1) % log_every == 0) {
+        if (display_progress & ((i + 1) % log_every == 0)) {
           std::cout << "Adapt iter: " << i << " / " << adapt_iter << std::endl;
         }
       }
@@ -129,7 +129,7 @@ class SemiHdpSampler {
     std::cout << "Beginning" << std::endl;
     for (int i = 0; i < burnin; i++) {
       step();
-      if (display_progress & (i + 1) % log_every == 0) {
+      if (display_progress & ((i + 1) % log_every == 0)) {
         std::cout << "Burn-in iter: " << i + 1 << " / " << burnin << std::endl;
       }
     }
@@ -137,7 +137,7 @@ class SemiHdpSampler {
     for (int i = 0; i < iter; i++) {
       step();
       if (iter % thin == 0) collector->collect(get_state_as_proto());
-      if (display_progress && (i + 1) % log_every == 0) {
+      if (display_progress & ((i + 1) % log_every == 0)) {
         std::cout << "Running iter: " << i + 1 << " / " << iter << std::endl;
       }
     }
