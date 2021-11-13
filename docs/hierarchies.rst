@@ -45,7 +45,7 @@ Instead, child classes must implement:
 1. ``like_lpdf``: evaluates :math:`k(x | \theta_h)`
 2. ``marg_lpdf``: evaluates m(x) given some parameters :math:`\theta_h` (could be both the hyperparameters in :math:`P_0` or the paramters given by the full conditionals)
 3. ``draw``: samples from :math:`P_0` given the parameters
-4. ``clear_data``: clears all the summary statistics
+4. ``clear_summary_statistics``: clears all the summary statistics
 5. ``update_hypers``: performs the update of parameters in :math:`P_0` given all the :math:`\theta_h` (passed as a vector of protobuf Messages)
 6. ``initialize_state``: initializes the current :math:`\theta_h` given the hyperparameters in :math:`P_0`
 7. ``initialize_hypers``: initializes the hyperparameters in :math:`P_0` given their hyperprior
