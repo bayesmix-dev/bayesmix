@@ -18,8 +18,7 @@ Eigen::MatrixXd simulate_data(int ndata) {
 }
 
 int main() {
-    auto hier = std::make_shared<GammaGammaHierarchy>();
-    hier->set_hypers(1.0, 2.0, 2.0);
+    auto hier = std::make_shared<GammaGammaHierarchy>(1.0, 2.0, 2.0);
     
     bayesmix::DPPrior mix_prior;
     double totalmass = 1.0;
@@ -31,7 +30,7 @@ int main() {
     auto algo = AlgorithmFactory::Instance().create_object("Neal8");
     MemoryCollector* coll = new MemoryCollector();
 
-    Eigen::MatrixXd data = simulate_data(200);
+    Eigen::MatrixXd data = simulate_data(50);
     algo->set_mixing(mixing);
     algo->set_data(data);
     algo->set_hierarchy(hier);
@@ -42,7 +41,7 @@ int main() {
     params.set_burnin(1000);
     params.set_iterations(2000);
     params.set_init_num_clusters(10);
-    params.set_neal8_n_aux(3);
+    params.set_neal8_n_aux(1);
 
     algo->read_params_from_proto(params);
     algo->run(coll);

@@ -28,7 +28,10 @@ class GammaGammaHierarchy
     : public ConjugateHierarchy<GammaGammaHierarchy, GammaGamma::State, 
                                 GammaGamma::Hyperparams, bayesmix::EmptyPrior> {
  public:
-  GammaGammaHierarchy() = default;
+  GammaGammaHierarchy(double shape, double rate_alpha, double rate_beta): 
+      shape(shape), rate_alpha(rate_alpha), rate_beta(rate_beta) {
+    this->prior = std::make_shared<bayesmix::EmptyPrior>();
+  }
   ~GammaGammaHierarchy() = default;
 
   double like_lpdf(const Eigen::RowVectorXd &datum,
@@ -57,27 +60,20 @@ class GammaGammaHierarchy
       return out;
   }
 
-  void initialize_state() {state.rate = hypers->rate_alpha / hypers->rate_beta;}
-
-  void set_hypers(double shape, double rate_alpha, double rate_beta) {
-    this->shape = shape;
-    this->rate_alpha = rate_alpha;
-    this->rate_beta = rate_beta; 
-  }
+  void initialize_state() override {
+    state.rate = hypers->rate_alpha / hypers->rate_beta;}
 
   void initialize_hypers() { 
-      hypers->shape = shape;
-      hypers->rate_alpha = rate_alpha;
-      hypers->rate_beta = rate_beta; 
-    }
+    hypers->shape = shape;
+    hypers->rate_alpha = rate_alpha;
+    hypers->rate_beta = rate_beta; 
+  }
 
-  void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
-                     &states) override { return; }
 
   //! Removes every data point from this cluster
-  void clear_data() {
-      data_sum = 0;
-      ndata = 0;
+  void clear_summary_statistics() {
+    data_sum = 0;
+    ndata = 0;
   }
 
   bool is_multivariate() const override { return false; }
@@ -85,19 +81,17 @@ class GammaGammaHierarchy
   void set_state_from_proto(const google::protobuf::Message &state_) override {
       auto &statecast = google::protobuf::internal::down_cast<
         const bayesmix::AlgorithmState::ClusterState &>(state_);
-
     state.rate = statecast.general_state().data()[0];
   }
 
-  void write_state_to_proto(google::protobuf::Message *out) const override {
-      bayesmix::Vector state_;
-      state_.mutable_data()->Add(state.rate);
-      auto *out_cast = google::protobuf::internal::down_cast<
-        bayesmix::AlgorithmState::ClusterState *>(out);
-      out_cast->mutable_general_state()->CopyFrom(state_);
-      out_cast->set_cardinality(card);
-      std::cout << "card: " << card << std::endl;
+  std::unique_ptr<google::protobuf::Message> get_state_proto() const override {
+      auto out = std::make_unique<bayesmix::Vector>();
+      out->mutable_data()->Add(state.rate);
+      return out;
   }
+
+  void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
+                     &states) override { return; }
 
   void write_hypers_to_proto(google::protobuf::Message *out) const override { return; }
 
@@ -110,7 +104,7 @@ class GammaGammaHierarchy
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
         throw std::runtime_error("Not implemented");
         return 0;
-    }
+  }
 
 
  protected:
