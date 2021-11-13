@@ -95,12 +95,10 @@ void LinRegUniHierarchy::update_summary_statistics(
   }
 }
 
-void LinRegUniHierarchy::clear_data() {
+void LinRegUniHierarchy::clear_summary_statistics() {
   mixed_prod = Eigen::VectorXd::Zero(dim);
   data_sum_squares = 0.0;
   covar_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
-  card = 0;
-  cluster_data_idx = std::set<int>();
 }
 
 LinRegUni::Hyperparams LinRegUniHierarchy::get_posterior_parameters() {
@@ -134,17 +132,13 @@ void LinRegUniHierarchy::set_state_from_proto(
   set_card(statecast.cardinality());
 }
 
-void LinRegUniHierarchy::write_state_to_proto(
-    google::protobuf::Message *out) const {
-  bayesmix::LinRegUniLSState state_;
+std::unique_ptr<google::protobuf::Message> LinRegUniHierarchy::get_state_proto() 
+      const {
+  auto out = std::make_unique<bayesmix::LinRegUniLSState>();
   bayesmix::to_proto(state.regression_coeffs,
-                     state_.mutable_regression_coeffs());
-  state_.set_var(state.var);
-
-  auto *out_cast = google::protobuf::internal::down_cast<
-      bayesmix::AlgorithmState::ClusterState *>(out);
-  out_cast->mutable_lin_reg_uni_ls_state()->CopyFrom(state_);
-  out_cast->set_cardinality(card);
+                     out->mutable_regression_coeffs());
+  out->set_var(state.var);
+  return out;
 }
 
 void LinRegUniHierarchy::write_hypers_to_proto(

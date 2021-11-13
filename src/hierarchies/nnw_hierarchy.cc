@@ -280,11 +280,9 @@ void NNWHierarchy::update_summary_statistics(
   }
 }
 
-void NNWHierarchy::clear_data() {
+void NNWHierarchy::clear_summary_statistics() {
   data_sum = Eigen::VectorXd::Zero(dim);
   data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
-  card = 0;
-  cluster_data_idx = std::set<int>();
 }
 
 NNW::Hyperparams NNWHierarchy::get_posterior_parameters() const {
@@ -322,16 +320,12 @@ void NNWHierarchy::set_state_from_proto(
   set_card(statecast.cardinality());
 }
 
-void NNWHierarchy::write_state_to_proto(google::protobuf::Message *out) const {
-  bayesmix::MultiLSState state_;
-  bayesmix::to_proto(state.mean, state_.mutable_mean());
-  bayesmix::to_proto(state.prec, state_.mutable_prec());
-  bayesmix::to_proto(state.prec_chol, state_.mutable_prec_chol());
-
-  auto *out_cast = google::protobuf::internal::down_cast<
-      bayesmix::AlgorithmState::ClusterState *>(out);
-  out_cast->mutable_multi_ls_state()->CopyFrom(state_);
-  out_cast->set_cardinality(card);
+std::unique_ptr<google::protobuf::Message> NNWHierarchy::get_state_proto() const {
+    auto out = std::make_unique<bayesmix::MultiLSState>();
+    bayesmix::to_proto(state.mean, out->mutable_mean());
+    bayesmix::to_proto(state.prec, out->mutable_prec());
+    bayesmix::to_proto(state.prec_chol, out->mutable_prec_chol());
+    return out;
 }
 
 void NNWHierarchy::write_hypers_to_proto(

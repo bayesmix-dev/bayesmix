@@ -59,7 +59,7 @@ class NNIGHierarchy
       const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
 
-  void initialize_state();
+  void initialize_state() override;
 
   void initialize_hypers();
 
@@ -78,7 +78,7 @@ class NNIGHierarchy
                                  bool add);
 
   //! Removes every data point from this cluster
-  void clear_data();
+  void clear_summary_statistics();
 
   bool is_multivariate() const override { return false; }
 
@@ -87,7 +87,7 @@ class NNIGHierarchy
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
-  void write_state_to_proto(google::protobuf::Message *out) const override;
+  std::unique_ptr<google::protobuf::Message> get_state_proto() const override;
 
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 

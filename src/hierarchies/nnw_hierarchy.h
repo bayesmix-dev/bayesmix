@@ -82,7 +82,7 @@ class NNWHierarchy
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
 
-  void initialize_state();
+  void initialize_state() override;
 
   void initialize_hypers();
 
@@ -101,7 +101,7 @@ class NNWHierarchy
                                  bool add);
 
   //! Removes every data point from this cluster
-  void clear_data();
+  void clear_summary_statistics();
 
   bool is_multivariate() const override { return true; }
 
@@ -110,7 +110,7 @@ class NNWHierarchy
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
-  void write_state_to_proto(google::protobuf::Message *out) const override;
+  std::unique_ptr<google::protobuf::Message> get_state_proto() const override;
 
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
