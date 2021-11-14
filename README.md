@@ -24,6 +24,8 @@ Where P is either the Dirichlet process or the Pitman--Yor process.
 
 ### For end users
 
+!!! Make sure you have a recent version of cmake installed (at least 3.20.x) or install protobuf beforehand (see the section for developers)
+
 Just clone the repository with
 ```shell
 git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
