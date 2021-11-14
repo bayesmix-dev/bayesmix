@@ -26,6 +26,12 @@ find_package(PkgConfig REQUIRED)
 find_package(Protobuf)
 
 if (NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
+  if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
+    message(FATAL_ERROR 
+            "Your cmake version is too old: either install a newer version (>=3.20)"
+            " or install google's protocol buffer (protobuf) library by hand.")
+  endif()
+
   include(FetchContent)
   set(FETCHCONTENT_QUIET OFF)
   set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
