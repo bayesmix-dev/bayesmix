@@ -57,7 +57,7 @@ void Neal8Algorithm::sample_allocations() {
       remove_singleton(c_old);
     } else {
       unique_values[c_old]->remove_datum(
-        i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
+          i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     }
 
     unsigned int n_clust = unique_values.size();
