@@ -4,6 +4,7 @@
 #include <google/protobuf/stubs/casts.h>
 #include <src/hierarchies/base_hierarchy.h>
 #include <src/hierarchies/conjugate_hierarchy.h>
+#include "hierarchy_prior.pb.h"
 
 #include <Eigen/Dense>
 #include <memory>
@@ -28,7 +29,7 @@ class GammaGammaHierarchy
  public:
   GammaGammaHierarchy(double shape, double rate_alpha, double rate_beta)
       : shape(shape), rate_alpha(rate_alpha), rate_beta(rate_beta) {
-    this->prior = std::make_shared<bayesmix::EmptyPrior>();
+    create_empty_prior();
   }
   ~GammaGammaHierarchy() = default;
 
