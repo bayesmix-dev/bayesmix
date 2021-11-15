@@ -161,7 +161,6 @@ class BaseHierarchy : public AbstractHierarchy {
   std::function<
     void(std::shared_ptr<google::protobuf::Message>, 
          bayesmix::AlgorithmState::ClusterState *)> state_setter;
-
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
