@@ -48,9 +48,6 @@ void Neal8Algorithm::sample_allocations() {
     bool singleton = (unique_values[allocations[i]]->get_card() <= 1);
     unsigned int c_old = allocations[i];
 
-    unique_values[c_old]->remove_datum(
-        i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
-
     if (singleton) {
       // Save unique value in the first auxiliary block
       bayesmix::AlgorithmState::ClusterState curr_val;
@@ -58,6 +55,9 @@ void Neal8Algorithm::sample_allocations() {
       aux_unique_values[0]->set_state_from_proto(curr_val);
       // Remove datum from cluster
       remove_singleton(c_old);
+    } else {
+      unique_values[c_old]->remove_datum(
+        i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     }
 
     unsigned int n_clust = unique_values.size();
