@@ -58,9 +58,20 @@ class AbstractHierarchy {
   //! @param datum      Point which is to be evaluated
   //! @param covariate  (Optional) covariate vector associated to datum
   //! @return           The evaluation of the lpdf
-  virtual double like_lpdf(
+  double get_like_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
+    if (is_dependent()) {
+      return like_lpdf(datum, covariate);
+    } else {
+      return like_lpdf(datum);
+    }
+  }
+
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate) const = 0;
+
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
 
   //! Evaluates the log-prior predictive distribution of data in a single point
   //! @param datum      Point which is to be evaluated
