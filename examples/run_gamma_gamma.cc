@@ -45,7 +45,5 @@ int main() {
   algo->read_params_from_proto(params);
   algo->run(coll);
 
-  std::cout << "Done" << std::endl;
-
   delete coll;
 }
