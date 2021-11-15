@@ -68,11 +68,6 @@ class AbstractHierarchy {
     }
   }
 
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum,
-                           const Eigen::RowVectorXd &covariate) const = 0;
-
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
-
   //! Evaluates the log-prior predictive distribution of data in a single point
   //! @param datum      Point which is to be evaluated
   //! @param covariate  (Optional) covariate vector associated to datum
@@ -81,7 +76,7 @@ class AbstractHierarchy {
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     throw std::runtime_error(
-        "Cannot call prior_pred_lpdf() from a non-conjugate hieararchy");
+        "Cannot call prior_pred_lpdf() from a non-conjugate hierarchy");
   }
 
   //! Evaluates the log-conditional predictive distr. of data in a single point
@@ -92,7 +87,7 @@ class AbstractHierarchy {
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     throw std::runtime_error(
-        "Cannot call conditional_pred_lpdf() from a non-conjugate hieararchy");
+        "Cannot call conditional_pred_lpdf() from a non-conjugate hierarchy");
   }
 
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
@@ -112,7 +107,7 @@ class AbstractHierarchy {
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     throw std::runtime_error(
-        "Cannot call prior_pred_lpdf_grid() from a non-conjugate hieararchy");
+        "Cannot call prior_pred_lpdf_grid() from a non-conjugate hierarchy");
   }
 
   //! Evaluates the log-prior predictive distr. of data in a grid of points
@@ -124,7 +119,7 @@ class AbstractHierarchy {
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     throw std::runtime_error(
         "Cannot call conditional_pred_lpdf_grid() from a non-conjugate "
-        "hieararchy");
+        "hierarchy");
   }
 
   // SAMPLING FUNCTIONS
@@ -194,6 +189,18 @@ class AbstractHierarchy {
   virtual void sample_full_cond(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
+
+ protected:
+  //! Private version of get_like_lpdf()
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate) const {
+    throw std::runtime_error(
+        "Cannot call this version of like_lpdf() from "
+        "a non-dependent hierarchy");
+  }
+
+  //! Private, overloaded version of get_like_lpdf()
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_ABSTRACT_HIERARCHY_H_

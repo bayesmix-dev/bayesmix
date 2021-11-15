@@ -11,9 +11,7 @@
 #include "ls_state.pb.h"
 #include "src/utils/rng.h"
 
-double NNIGHierarchy::like_lpdf(
-    const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 

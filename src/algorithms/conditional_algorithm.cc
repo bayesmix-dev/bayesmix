@@ -27,8 +27,8 @@ Eigen::VectorXd ConditionalAlgorithm::lpdf_from_state(
     for (size_t j = 0; j < n_clust; j++) {
       temp_hier->set_state_from_proto(curr_state.cluster_states(j));
       // Get local, single-point estimate
-      lpdf_local(i, j) =
-          logweights(j) + temp_hier->like_lpdf(grid.row(i), hier_covariate);
+      lpdf_local(i, j) = logweights(j) +
+                         temp_hier->get_like_lpdf(grid.row(i), hier_covariate);
     }
     // Final estimate for i-th grid point
     lpdf_final(i) = stan::math::log_sum_exp(lpdf_local.row(i));

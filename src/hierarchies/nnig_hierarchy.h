@@ -46,10 +46,6 @@ class NNIGHierarchy
   NNIGHierarchy() = default;
   ~NNIGHierarchy() = default;
 
-  double like_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate =
-                       Eigen::RowVectorXd(0)) const override;
-
   //! Evaluates the log-marginal distribution of data in a single point
   //! @param params     Container of (prior or posterior) hyperparameter values
   //! @param datum      Point which is to be evaluated
@@ -96,6 +92,9 @@ class NNIGHierarchy
   }
 
  protected:
+  //! Private, overloaded version of get_like_lpdf()
+  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
+
   //! Sum of data points currently belonging to the cluster
   double data_sum = 0;
 

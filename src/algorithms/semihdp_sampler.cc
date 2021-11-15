@@ -184,7 +184,7 @@ void SemiHdpSampler::update_table_allocs() {
 #pragma omp parallel for
       for (int l = 0; l < rest_tables[r].size(); l++) {
         double log_n = log_n_by_table[r][l];
-        probas[l] = log_n + rest_tables[r][l]->like_lpdf(data[i].row(j));
+        probas[l] = log_n + rest_tables[r][l]->get_like_lpdf(data[i].row(j));
       }
 
       double margG0 =
@@ -195,7 +195,7 @@ void SemiHdpSampler::update_table_allocs() {
       for (int h = 0; h < shared_tables.size(); h++) {
         double logm = log_m[h];
         hdp_contribs[h] =
-            logm - logmsum + shared_tables[h]->like_lpdf(data[i].row(j));
+            logm - logmsum + shared_tables[h]->get_like_lpdf(data[i].row(j));
       }
 
       hdp_contribs[shared_tables.size()] =
@@ -579,7 +579,7 @@ void SemiHdpSampler::reassign_group(int i, int new_r, int old_r) {
       else
         log_n = 1e-20;
 
-      probas[l] = log_n + rest_tables[new_r][l]->like_lpdf(data[i].row(j));
+      probas[l] = log_n + rest_tables[new_r][l]->get_like_lpdf(data[i].row(j));
     }
     table_allocs[i][j] =
         bayesmix::categorical_rng(stan::math::softmax(probas), rng);

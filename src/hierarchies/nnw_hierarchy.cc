@@ -15,9 +15,7 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-double NNWHierarchy::like_lpdf(
-    const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   return bayesmix::multi_normal_prec_lpdf(datum, state.mean, state.prec_chol,
                                           state.prec_logdet);
 }

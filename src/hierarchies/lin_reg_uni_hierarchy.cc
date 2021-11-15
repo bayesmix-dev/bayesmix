@@ -10,7 +10,7 @@
 
 double LinRegUniHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate) const {
   return stan::math::normal_lpdf(
       datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
 }

@@ -55,10 +55,6 @@ class NNWHierarchy
   NNWHierarchy() = default;
   ~NNWHierarchy() = default;
 
-  double like_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate =
-                       Eigen::RowVectorXd(0)) const override;
-
   //! Evaluates the log-marginal distribution of data in a single point
   //! @param params     Container of (prior or posterior) hyperparameter values
   //! @param datum      Point which is to be evaluated
@@ -119,6 +115,9 @@ class NNWHierarchy
   }
 
  protected:
+  //! Private, overloaded version of get_like_lpdf()
+  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
+
   //! Writes prec and its utilities to the given state object by pointer
   void write_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);
 
