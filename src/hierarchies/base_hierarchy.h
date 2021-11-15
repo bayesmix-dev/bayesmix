@@ -157,14 +157,11 @@ class BaseHierarchy : public AbstractHierarchy {
     card = 0;
     cluster_data_idx = std::set<int>();
   }
-<<<<<<< HEAD
 
   std::function<
     void(std::shared_ptr<google::protobuf::Message>, 
          bayesmix::AlgorithmState::ClusterState *)> state_setter;
 
-=======
->>>>>>> f2eb3f8a148f39619e81f32ffcfa8c3666d737d1
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
