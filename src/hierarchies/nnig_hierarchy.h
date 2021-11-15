@@ -87,13 +87,18 @@ class NNIGHierarchy
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
-  std::unique_ptr<google::protobuf::Message> get_state_proto() const override;
+  std::shared_ptr<google::protobuf::Message> get_state_proto() const override;
 
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNIG;
   }
+
+  std::string proto_state_type() const override {
+    return "UniLSState";
+  }
+
 
  protected:
   //! Sum of data points currently belonging to the cluster

@@ -90,7 +90,7 @@ class GammaGammaHierarchy
     set_card(statecast.cardinality());
   }
 
-  std::unique_ptr<google::protobuf::Message> get_state_proto() const override {
+  std::shared_ptr<google::protobuf::Message> get_state_proto() const override {
     auto out = std::make_unique<bayesmix::Vector>();
     out->mutable_data()->Add(state.rate);
     return out;
@@ -103,6 +103,10 @@ class GammaGammaHierarchy
 
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::UNKNOWN_HIERARCHY;
+  }
+
+  std::string proto_state_type() const override {
+    return "Vector";
   }
 
  protected:
