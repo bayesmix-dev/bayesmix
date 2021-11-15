@@ -194,13 +194,13 @@ class AbstractHierarchy {
   //! Private version of get_like_lpdf()
   virtual double like_lpdf(const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const {
-    throw std::runtime_error(
-        "Cannot call this version of like_lpdf() from "
-        "a non-dependent hierarchy");
+    throw std::runtime_error("Not implemented");
   }
 
   //! Private, overloaded version of get_like_lpdf()
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const = 0;
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const {
+    throw std::runtime_error("Not implemented");
+  }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_ABSTRACT_HIERARCHY_H_

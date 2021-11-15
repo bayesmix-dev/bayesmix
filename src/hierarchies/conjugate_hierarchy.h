@@ -77,21 +77,6 @@ class ConjugateHierarchy
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
-
- protected:
-  //! Private version of get_like_lpdf()
-  virtual double like_lpdf(
-      const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate) const override {
-    throw std::runtime_error("Not implemented");
-  }
-
-  //! Private, overloaded version of get_like_lpdf()
-  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const {
-    throw std::runtime_error(
-        "Cannot call this version of like_lpdf() from "
-        "a dependent hierarchy");
-  };
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
