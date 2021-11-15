@@ -15,9 +15,8 @@ double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
-double NNIGHierarchy::marg_lpdf(
-    const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+double NNIGHierarchy::marg_lpdf(const NNIG::Hyperparams &params,
+                                const Eigen::RowVectorXd &datum) const {
   double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
                       (params.shape * params.var_scaling));
   return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,

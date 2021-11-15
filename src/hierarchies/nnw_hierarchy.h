@@ -60,9 +60,8 @@ class NNWHierarchy
   //! @param datum      Point which is to be evaluated
   //! @param covariate  (Optional) covariate vector associated to datum
   //! @return           The evaluation of the lpdf
-  double marg_lpdf(
-      const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
+  double marg_lpdf(const NNW::Hyperparams &params,
+                   const Eigen::RowVectorXd &datum) const;
 
   Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data,
                                  const Eigen::MatrixXd &covariates =

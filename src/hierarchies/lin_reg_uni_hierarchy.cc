@@ -17,7 +17,7 @@ double LinRegUniHierarchy::like_lpdf(
 
 double LinRegUniHierarchy::marg_lpdf(
     const LinRegUni::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate) const {
   double sig_n = sqrt(
       (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
       params.scale / params.shape);

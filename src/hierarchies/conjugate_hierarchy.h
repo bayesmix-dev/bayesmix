@@ -10,15 +10,19 @@
 //! (non-conjugate hierarchies should instead inherit directly from
 //! `BaseHierarchy`). This also means that the marginal distribution for the
 //! data is available in closed form. For this reason, each class deriving from
-//! this one must have a free method with the following signature:
+//! this one must have a free method with one of the following signatures,
+//! based on whether it depends on covariates or not:
 //! double marg_lpdf(
 //!      const Hyperparams &params, const Eigen::RowVectorXd &datum,
-//!      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
+//!      const Eigen::RowVectorXd &covariate) const;
+//!  or
+//! double marg_lpdf(
+//!      const Hyperparams &params, const Eigen::RowVectorXd &datum) const;
 //! This returns the evaluation of the marginal distribution on the given data
-//! point (and possibly a covariate), conditioned on the provided
-//! `Hyperparams` object. The latter may contain either prior or posterior
-//| values for hyperparameters, depending on where this function is called
-//! within the library.
+//! point (and covariate, if any), conditioned on the provided `Hyperparams`
+//! object. The latter may contain either prior or posterior values for
+//! hyperparameters, depending on where this function is called within the
+//! library.
 //! For more information, please refer to parent classes `AbstractHierarchy`
 //! and `BaseHierarchy`.
 
@@ -43,16 +47,25 @@ class ConjugateHierarchy
 
   double prior_pred_lpdf(const Eigen::RowVectorXd &datum,
                          const Eigen::RowVectorXd &covariate =
-                             Eigen::VectorXd(0)) const override {
-    return static_cast<Derived const *>(this)->marg_lpdf(*hypers, datum,
-                                                         covariate);
+                             Eigen::RowVectorXd(0)) const override {
+    if (static_cast<Derived const *>(this)->is_dependent()) {
+      return static_cast<Derived const *>(this)->marg_lpdf(*hypers, datum,
+                                                           covariate);
+    } else {
+      return static_cast<Derived const *>(this)->marg_lpdf(*hypers, datum);
+    }
   }
 
   double conditional_pred_lpdf(const Eigen::RowVectorXd &datum,
                                const Eigen::RowVectorXd &covariate =
-                                   Eigen::VectorXd(0)) const override {
-    return static_cast<Derived const *>(this)->marg_lpdf(posterior_hypers,
-                                                         datum, covariate);
+                                   Eigen::RowVectorXd(0)) const override {
+    if (static_cast<Derived const *>(this)->is_dependent()) {
+      return static_cast<Derived const *>(this)->marg_lpdf(posterior_hypers,
+                                                           datum, covariate);
+    } else {
+      return static_cast<Derived const *>(this)->marg_lpdf(posterior_hypers,
+                                                           datum);
+    }
   }
 
   void sample_full_cond(bool update_params = true) override {
@@ -77,6 +90,18 @@ class ConjugateHierarchy
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
+
+ protected:
+  virtual double marg_lpdf(const Hyperparams &params,
+                           const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate) const {
+    throw std::runtime_error("Not implemented");
+  }
+
+  virtual double marg_lpdf(const Hyperparams &params,
+                           const Eigen::RowVectorXd &datum) const {
+    throw std::runtime_error("Not implemented");
+  }
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>

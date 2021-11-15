@@ -20,9 +20,8 @@ double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
                                           state.prec_logdet);
 }
 
-double NNWHierarchy::marg_lpdf(
-    const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+double NNWHierarchy::marg_lpdf(const NNW::Hyperparams &params,
+                               const Eigen::RowVectorXd &datum) const {
   NNW::Hyperparams pred_params = get_predictive_t_parameters(params);
   Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
   double logdet = 2 * log(diag.array()).sum();

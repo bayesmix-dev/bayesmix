@@ -51,9 +51,8 @@ class NNIGHierarchy
   //! @param datum      Point which is to be evaluated
   //! @param covariate  (Optional) covariate vector associated to datum
   //! @return           The evaluation of the lpdf
-  double marg_lpdf(
-      const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
+  double marg_lpdf(const NNIG::Hyperparams &params,
+                   const Eigen::RowVectorXd &datum) const;
 
   void initialize_state();
 
