@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "gamma_gamma_hier.hpp"
+#include "gamma_gamma_hier.h"
 #include "src/includes.h"
 
 Eigen::MatrixXd simulate_data(int ndata) {
