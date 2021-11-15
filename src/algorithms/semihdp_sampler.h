@@ -1,7 +1,6 @@
 #ifndef SRC_ALGORITHMS_SEMIHDP_SAMPLER_H
 #define SRC_ALGORITHMS_SEMIHDP_SAMPLER_H
 
-
 #include <Eigen/Dense>
 #include <numeric>
 #include <stan/math/prim.hpp>

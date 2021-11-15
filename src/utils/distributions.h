@@ -1,7 +1,6 @@
 #ifndef BAYESMIX_UTILS_DISTRIBUTIONS_H_
 #define BAYESMIX_UTILS_DISTRIBUTIONS_H_
 
-
 #include <Eigen/Dense>
 #include <random>
 #include <vector>

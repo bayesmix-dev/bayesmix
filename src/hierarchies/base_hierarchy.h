@@ -132,7 +132,6 @@ class BaseHierarchy : public AbstractHierarchy {
     card = 0;
     cluster_data_idx = std::set<int>();
   }
-
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
@@ -180,7 +179,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
     google::protobuf::Message *out) const {
   std::unique_ptr<google::protobuf::Message> state_ = get_state_proto();
   auto *out_cast = google::protobuf::internal::down_cast<
-    bayesmix::AlgorithmState::ClusterState *>(out);
+      bayesmix::AlgorithmState::ClusterState *>(out);
   out_cast->mutable_general_state()->CopyFrom(*state_.get());
   out_cast->set_cardinality(card);
 }

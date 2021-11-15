@@ -49,7 +49,7 @@ void Neal8Algorithm::sample_allocations() {
     unsigned int c_old = allocations[i];
 
     unique_values[c_old]->remove_datum(
-          i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
+        i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
 
     if (singleton) {
       // Save unique value in the first auxiliary block
@@ -87,7 +87,6 @@ void Neal8Algorithm::sample_allocations() {
           i, data.row(i), update_hierarchy_params(), hier_covariates.row(i));
     }
   }
-
 }
 
 Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(

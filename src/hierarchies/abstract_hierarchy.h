@@ -144,8 +144,9 @@ class AbstractHierarchy {
   //! Write current state to a Protobuf message by pointer
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
-   //! Write current state to a Protobuf message and return a unique_ptr
-  virtual std::unique_ptr<google::protobuf::Message> get_state_proto() const = 0;
+  //! Write current state to a Protobuf message and return a unique_ptr
+  virtual std::unique_ptr<google::protobuf::Message> get_state_proto()
+      const = 0;
 
   //! Write current hyperparameters to a Protobuf message by pointer
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
