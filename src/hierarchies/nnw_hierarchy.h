@@ -118,10 +118,6 @@ class NNWHierarchy
     return bayesmix::HierarchyId::NNW;
   }
 
-  std::string proto_state_type() const override {
-    return "UniLSState";
-  }
-
  protected:
   //! Writes prec and its utilities to the given state object by pointer
   void write_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);

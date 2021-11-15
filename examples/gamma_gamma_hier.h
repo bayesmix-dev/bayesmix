@@ -115,10 +115,6 @@ class GammaGammaHierarchy
     return bayesmix::HierarchyId::UNKNOWN_HIERARCHY;
   }
 
-  std::string proto_state_type() const override {
-    return "Vector";
-  }
-
  protected:
   double data_sum = 0;
   int ndata = 0;

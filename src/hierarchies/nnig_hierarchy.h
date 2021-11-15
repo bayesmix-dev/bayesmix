@@ -95,11 +95,6 @@ class NNIGHierarchy
     return bayesmix::HierarchyId::NNIG;
   }
 
-  std::string proto_state_type() const override {
-    return "UniLSState";
-  }
-
-
  protected:
   //! Sum of data points currently belonging to the cluster
   double data_sum = 0;

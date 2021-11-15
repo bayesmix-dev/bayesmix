@@ -56,7 +56,7 @@ class BaseHierarchy : public AbstractHierarchy {
     static_cast<Derived *>(this)->clear_data();
     static_cast<Derived *>(this)->clear_summary_statistics();
 
-    std::string proto_type = proto_state_type();
+    std::string proto_type = get_state_proto()->GetDescriptor()->name();
     if (proto_type == "UniLSState") {
       state_setter = [](std::shared_ptr<google::protobuf::Message> in, 
                         bayesmix::AlgorithmState::ClusterState *out) {

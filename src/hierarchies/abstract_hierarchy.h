@@ -145,7 +145,7 @@ class AbstractHierarchy {
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
   //! Write current state to a Protobuf message and return a unique_ptr
-  virtual std::unique_ptr<google::protobuf::Message> get_state_proto()
+  virtual std::shared_ptr<google::protobuf::Message> get_state_proto()
       const = 0;
 
   //! Write current hyperparameters to a Protobuf message by pointer
@@ -182,9 +182,6 @@ class AbstractHierarchy {
 
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::HierarchyId get_id() const = 0;
-
-  //! Returns the name of the protobuf message that stores the state
-  virtual std::string proto_state_type() const = 0;
 
   //! Overloaded version of sample_full_cond(), mainly used for debugging
   virtual void sample_full_cond(

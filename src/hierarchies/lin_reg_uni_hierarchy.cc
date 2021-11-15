@@ -132,7 +132,7 @@ void LinRegUniHierarchy::set_state_from_proto(
   set_card(statecast.cardinality());
 }
 
-std::unique_ptr<google::protobuf::Message>
+std::shared_ptr<google::protobuf::Message>
 LinRegUniHierarchy::get_state_proto() const {
   auto out = std::make_unique<bayesmix::LinRegUniLSState>();
   bayesmix::to_proto(state.regression_coeffs,

@@ -103,10 +103,6 @@ class LinRegUniHierarchy
     return bayesmix::HierarchyId::LinRegUni;
   }
 
-  std::string proto_state_type() const override {
-    return "LinRegUniLSState";
-  }
-
  protected:
   //! Dimension of the coefficients vector
   unsigned int dim;
