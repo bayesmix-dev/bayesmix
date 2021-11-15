@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.13.0)
 project(examples_bayesmix)
 
 add_executable(run_ex1 $<TARGET_OBJECTS:bayesmix>  
-    run_gamma_gamma.cpp
-    gamma_gamma_hier.hpp
+    run_gamma_gamma.cc
+    gamma_gamma_hier.h
 )
 
 target_include_directories(run_ex1 PUBLIC ${INCLUDE_PATHS})

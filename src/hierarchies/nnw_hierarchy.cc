@@ -320,12 +320,13 @@ void NNWHierarchy::set_state_from_proto(
   set_card(statecast.cardinality());
 }
 
-std::shared_ptr<google::protobuf::Message> NNWHierarchy::get_state_proto() const {
-    auto out = std::make_unique<bayesmix::MultiLSState>();
-    bayesmix::to_proto(state.mean, out->mutable_mean());
-    bayesmix::to_proto(state.prec, out->mutable_prec());
-    bayesmix::to_proto(state.prec_chol, out->mutable_prec_chol());
-    return out;
+std::unique_ptr<google::protobuf::Message> NNWHierarchy::get_state_proto()
+    const {
+  auto out = std::make_unique<bayesmix::MultiLSState>();
+  bayesmix::to_proto(state.mean, out->mutable_mean());
+  bayesmix::to_proto(state.prec, out->mutable_prec());
+  bayesmix::to_proto(state.prec_chol, out->mutable_prec_chol());
+  return out;
 }
 
 void NNWHierarchy::write_hypers_to_proto(
