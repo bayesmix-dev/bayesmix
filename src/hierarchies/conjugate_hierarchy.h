@@ -110,10 +110,9 @@ double ConjugateHierarchy<Derived, State, Hyperparams, Prior>::get_marg_lpdf(
     const Hyperparams &params, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
   if (static_cast<Derived const *>(this)->IS_DEPENDENT) {
-    return static_cast<Derived const *>(this)->marg_lpdf(params, datum,
-                                                         covariate);
+    return marg_lpdf(params, datum, covariate);
   } else {
-    return static_cast<Derived const *>(this)->marg_lpdf(params, datum);
+    return marg_lpdf(params, datum);
   }
 }
 
