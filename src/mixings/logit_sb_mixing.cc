@@ -14,17 +14,6 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-void LogitSBMixing::initialize() {
-  if (prior == nullptr) {
-    throw std::invalid_argument("Mixing prior was not provided");
-  }
-  auto priorcast = cast_prior();
-  num_components = priorcast->num_components();
-  initialize_state();
-  acceptance_rates = Eigen::VectorXd::Zero(num_components - 1);
-  n_iter = 0;
-}
-
 void LogitSBMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     const std::vector<unsigned int> &allocations) {
@@ -97,18 +86,22 @@ void LogitSBMixing::set_state_from_proto(
       bayesmix::to_eigen(statecast.log_sb_state().regression_coeffs());
 }
 
-void LogitSBMixing::write_state_to_proto(
-    google::protobuf::Message *out) const {
+std::shared_ptr<bayesmix::MixingState> LogitSBMixing::get_state_proto() 
+    const {
   bayesmix::LogSBState state_;
   bayesmix::to_proto(state.regression_coeffs,
                      state_.mutable_regression_coeffs());
-  google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
-      ->mutable_log_sb_state()
-      ->CopyFrom(state_);
+
+  auto out = std::make_unique<bayesmix::MixingState>();
+  out->mutable_log_sb_state()->CopyFrom(state_);
+  return out;
 }
 
 void LogitSBMixing::initialize_state() {
   auto priorcast = cast_prior();
+  num_components = priorcast->num_components();
+  acceptance_rates = Eigen::VectorXd::Zero(num_components - 1);
+  n_iter = 0;
   if (priorcast->has_normal_prior()) {
     Eigen::VectorXd prior_vec =
         bayesmix::to_eigen(priorcast->normal_prior().mean());

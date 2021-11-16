@@ -42,8 +42,6 @@ class LogitSBMixing
   LogitSBMixing() = default;
   ~LogitSBMixing() = default;
 
-  void initialize() override;
-
   void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       const std::vector<unsigned int> &allocations) override;
@@ -54,7 +52,7 @@ class LogitSBMixing
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
-  void write_state_to_proto(google::protobuf::Message *out) const override;
+  std::shared_ptr<bayesmix::MixingState> get_state_proto() const override; 
 
   bayesmix::MixingId get_id() const override {
     return bayesmix::MixingId::LogSB;
