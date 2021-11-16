@@ -69,9 +69,11 @@ class NNWHierarchy
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
 
+  //! Initializes state parameters to appropriate values
   void initialize_state() override;
 
-  void initialize_hypers();
+  //! Initializes hierarchy hyperparameters to appropriate values
+  void initialize_hypers() override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;

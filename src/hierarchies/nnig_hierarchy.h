@@ -46,9 +46,11 @@ class NNIGHierarchy
   NNIGHierarchy() = default;
   ~NNIGHierarchy() = default;
 
+  //! Initializes state parameters to appropriate values
   void initialize_state() override;
 
-  void initialize_hypers();
+  //! Initializes hierarchy hyperparameters to appropriate values
+  void initialize_hypers() override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;

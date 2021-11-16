@@ -187,6 +187,12 @@ class AbstractHierarchy {
   //! Initializes class members to appropriate values
   virtual void initialize() = 0;
 
+  //! Initializes state parameters to appropriate values
+  virtual void initialize_state() = 0;
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  virtual void initialize_hypers() = 0;
+
   //! Returns whether the hierarchy models multivariate data or not
   virtual bool is_multivariate() const = 0;
 

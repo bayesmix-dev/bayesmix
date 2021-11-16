@@ -116,9 +116,6 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Logarithm of current cardinality of this cluster
   double log_card = stan::math::NEGATIVE_INFTY;
 
-  //! Initialize state parameters to appropriate values
-  virtual void initialize_state() = 0;
-
   void create_empty_prior() { prior.reset(new Prior); }
 
   void set_card(const int card_) {
