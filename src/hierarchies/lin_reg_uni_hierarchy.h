@@ -82,8 +82,6 @@ class LinRegUniHierarchy
 
   bool is_multivariate() const override { return false; }
 
-  bool is_dependent() const override { return true; }
-
   unsigned int get_dim() const { return dim; }
 
   //! Computes and return posterior hypers given data currently in this cluster
@@ -98,6 +96,8 @@ class LinRegUniHierarchy
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::LinRegUni;
   }
+
+  const bool IS_DEPENDENT = true;
 
  protected:
   //! Private version of get_like_lpdf()

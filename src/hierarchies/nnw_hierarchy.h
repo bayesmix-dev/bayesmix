@@ -113,6 +113,8 @@ class NNWHierarchy
     return bayesmix::HierarchyId::NNW;
   }
 
+  const bool IS_DEPENDENT = false;
+
  protected:
   //! Private, overloaded version of get_like_lpdf()
   double like_lpdf(const Eigen::RowVectorXd &datum) const override;
