@@ -139,7 +139,7 @@ LinRegUniHierarchy::get_state_proto() const {
   state_.set_var(state.var);
 
   auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
-  out->mutable_uni_ls_state()->CopyFrom(state_);
+  out->mutable_lin_reg_uni_ls_state()->CopyFrom(state_);
   return out;
 }
 
