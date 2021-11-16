@@ -133,13 +133,13 @@ class BaseHierarchy : public AbstractHierarchy {
     cluster_data_idx = std::set<int>();
   }
 
-  bayesmix::ClusterState* downcast_state(google::protobuf::Message *out) const {
-    return google::protobuf::internal::down_cast<bayesmix::ClusterState *>(out);
+  bayesmix::AlgorithmState::ClusterState* downcast_state(google::protobuf::Message *out) const {
+    return google::protobuf::internal::down_cast<bayesmix::AlgorithmState::ClusterState *>(out);
   }
 
-  const bayesmix::ClusterState& downcast_state(
+  const bayesmix::AlgorithmState::ClusterState& downcast_state(
         const google::protobuf::Message &state_) const {
-    return google::protobuf::internal::down_cast<const bayesmix::ClusterState &>(
+    return google::protobuf::internal::down_cast<const bayesmix::AlgorithmState::ClusterState &>(
           state_);
   }
 };
