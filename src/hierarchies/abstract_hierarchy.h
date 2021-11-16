@@ -145,7 +145,9 @@ class AbstractHierarchy {
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
   //! Write current state to a Protobuf message and return a shared_ptr
-  virtual std::shared_ptr<google::protobuf::Message> get_state_proto()
+  //! New hierarchies have to first modify the field 'oneof val' in the 
+  //! AlgoritmState::ClusterState message by adding the appropriate type
+  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const = 0;
 
   //! Write current hyperparameters to a Protobuf message by pointer

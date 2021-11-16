@@ -55,31 +55,6 @@ class BaseHierarchy : public AbstractHierarchy {
     posterior_hypers = *hypers;
     static_cast<Derived *>(this)->clear_data();
     static_cast<Derived *>(this)->clear_summary_statistics();
-
-    std::string proto_type = get_state_proto()->GetDescriptor()->name();
-    if (proto_type == "UniLSState") {
-      state_setter = [](std::shared_ptr<google::protobuf::Message> in,
-                        bayesmix::AlgorithmState::ClusterState *out) {
-        out->mutable_uni_ls_state()->CopyFrom(*in.get());
-      };
-    } else if (proto_type == "MultiLSState") {
-      state_setter = [](std::shared_ptr<google::protobuf::Message> in,
-                        bayesmix::AlgorithmState::ClusterState *out) {
-        out->mutable_multi_ls_state()->CopyFrom(*in.get());
-      };
-    } else if (proto_type == "LinRegUniLSState") {
-      state_setter = [](std::shared_ptr<google::protobuf::Message> in,
-                        bayesmix::AlgorithmState::ClusterState *out) {
-        out->mutable_lin_reg_uni_ls_state()->CopyFrom(*in.get());
-      };
-    } else if (proto_type == "Vector") {
-      state_setter = [](std::shared_ptr<google::protobuf::Message> in,
-                        bayesmix::AlgorithmState::ClusterState *out) {
-        out->mutable_general_state()->CopyFrom(*in.get());
-      };
-    } else {
-      throw std::invalid_argument("Unknown proto state type " + proto_type);
-    }
   }
 
   void write_state_to_proto(google::protobuf::Message *out) const override;
@@ -158,7 +133,7 @@ class BaseHierarchy : public AbstractHierarchy {
     cluster_data_idx = std::set<int>();
   }
 
-  std::function<void(std::shared_ptr<google::protobuf::Message>,
+  std::function<void(std::shared_ptr<bayesmix::AlgorithmState::ClusterState>,
                      bayesmix::AlgorithmState::ClusterState *)>
       state_setter;
 };
@@ -206,11 +181,11 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::check_prior_is_set()
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
     google::protobuf::Message *out) const {
-  std::shared_ptr<google::protobuf::Message> state_ = get_state_proto();
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> state_ = get_state_proto();
   std::string state_type = state_->GetDescriptor()->name();
   auto *out_cast = google::protobuf::internal::down_cast<
       bayesmix::AlgorithmState::ClusterState *>(out);
-  state_setter(state_, out_cast);
+  out_cast->CopyFrom(*state_.get());
   out_cast->set_cardinality(card);
 }
 

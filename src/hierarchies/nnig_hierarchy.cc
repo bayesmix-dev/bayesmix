@@ -238,11 +238,14 @@ void NNIGHierarchy::set_state_from_proto(
   set_card(statecast.cardinality());
 }
 
-std::shared_ptr<google::protobuf::Message> NNIGHierarchy::get_state_proto()
-    const {
-  auto out = std::make_unique<bayesmix::UniLSState>();
-  out->set_mean(state.mean);
-  out->set_var(state.var);
+std::shared_ptr<bayesmix::AlgorithmState::ClusterState> 
+    NNIGHierarchy::get_state_proto() const {
+  bayesmix::UniLSState state_;
+  state_.set_mean(state.mean);
+  state_.set_var(state.var);
+
+  auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
+  out->mutable_uni_ls_state()->CopyFrom(state_);
   return out;
 }
 
