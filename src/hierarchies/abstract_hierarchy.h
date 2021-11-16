@@ -194,12 +194,22 @@ class AbstractHierarchy {
   //! Private version of get_like_lpdf()
   virtual double like_lpdf(const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const {
-    throw std::runtime_error("Not implemented");
+    if (!is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from a non-dependent hierarchy");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
   }
 
   //! Private version of get_like_lpdf(), overloaded without covariates
   virtual double like_lpdf(const Eigen::RowVectorXd &datum) const {
-    throw std::runtime_error("Not implemented");
+    if (is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from a dependent hierarchy");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
   }
 };
 
