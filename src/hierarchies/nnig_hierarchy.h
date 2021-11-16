@@ -56,14 +56,6 @@ class NNIGHierarchy
   //! Updates state values using the given (prior or posterior) hyperparameters
   NNIG::State draw(const NNIG::Hyperparams &params);
 
-  //! Updates cluster statistics when a datum is added or removed from it
-  //! @param datum      Data point which is being added or removed
-  //! @param covariate  Covariate vector associated to datum
-  //! @param add        Whether the datum is being added or removed
-  void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                 const Eigen::RowVectorXd &covariate,
-                                 bool add);
-
   //! Removes every data point from this cluster
   void clear_data();
 
@@ -91,6 +83,10 @@ class NNIGHierarchy
   //! Private version of get_marg_lpdf(), overloaded without covariates
   double marg_lpdf(const NNIG::Hyperparams &params,
                    const Eigen::RowVectorXd &datum) const override;
+
+  //! Private version of get_summary_statistics_update(), without covariates
+  void update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                 bool add) override;
 
   //! Sum of data points currently belonging to the cluster
   double data_sum = 0;

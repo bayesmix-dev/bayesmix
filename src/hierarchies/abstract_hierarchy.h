@@ -170,6 +170,20 @@ class AbstractHierarchy {
       const bool update_params = false,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
 
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param covariate  Covariate vector associated to datum
+  //! @param add        Whether the datum is being added or removed
+  void get_summary_statistics_update(const Eigen::RowVectorXd &datum,
+                                     const Eigen::RowVectorXd &covariate,
+                                     bool add) {
+    if (is_dependent()) {
+      return update_summary_statistics(datum, covariate, add);
+    } else {
+      return update_summary_statistics(datum, add);
+    }
+  }
+
   //! Initializes class members to appropriate values
   virtual void initialize() = 0;
 
@@ -204,6 +218,29 @@ class AbstractHierarchy {
 
   //! Private version of get_like_lpdf(), overloaded without covariates
   virtual double like_lpdf(const Eigen::RowVectorXd &datum) const {
+    if (is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from a dependent hierarchy");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  }
+
+  //! Private version of get_summary_statistics_update()
+  virtual void update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                         const Eigen::RowVectorXd &covariate,
+                                         bool add) {
+    if (!is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from a non-dependent hierarchy");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  }
+
+  //! Private version of get_summary_statistics_update(), without covariates
+  virtual void update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                         bool add) {
     if (is_dependent()) {
       throw std::runtime_error(
           "Cannot call this function from a dependent hierarchy");
