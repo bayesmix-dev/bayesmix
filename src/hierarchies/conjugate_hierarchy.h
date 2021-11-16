@@ -70,8 +70,8 @@ class ConjugateHierarchy
     }
   }
 
-  virtual double get_marg_lpdf(const Hyperparams &params,
-      const Eigen::RowVectorXd &datum,
+  virtual double get_marg_lpdf(
+      const Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
 
   virtual Eigen::VectorXd prior_pred_lpdf_grid(
@@ -85,18 +85,17 @@ class ConjugateHierarchy
                                                           0)) const override;
 };
 
-
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 double ConjugateHierarchy<Derived, State, Hyperparams, Prior>::get_marg_lpdf(
-      const Hyperparams &params,
-      const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
-    if (static_cast<Derived const *>(this)->IS_DEPENDENT) {
-      return static_cast<Derived const *>(this)->marg_lpdf(params, datum, covariate);
-    } else {
-      return static_cast<Derived const *>(this)->marg_lpdf(params, datum);
-    }
+    const Hyperparams &params, const Eigen::RowVectorXd &datum,
+    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+  if (static_cast<Derived const *>(this)->IS_DEPENDENT) {
+    return static_cast<Derived const *>(this)->marg_lpdf(params, datum,
+                                                         covariate);
+  } else {
+    return static_cast<Derived const *>(this)->marg_lpdf(params, datum);
   }
+}
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 Eigen::VectorXd

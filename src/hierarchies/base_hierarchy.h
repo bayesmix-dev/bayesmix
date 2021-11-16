@@ -162,7 +162,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 bool BaseHierarchy<Derived, State, Hyperparams, Prior>::is_dependent() const {
-  return static_cast<Derived const*>(this)->IS_DEPENDENT;
+  return static_cast<Derived const *>(this)->IS_DEPENDENT;
 }
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
