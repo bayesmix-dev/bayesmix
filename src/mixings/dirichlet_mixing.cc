@@ -54,8 +54,7 @@ void DirichletMixing::update_state(
 
 double DirichletMixing::mass_existing_cluster(
     const unsigned int n, const bool log, const bool propto,
-    std::shared_ptr<AbstractHierarchy> hier,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+    std::shared_ptr<AbstractHierarchy> hier) const {
   double out;
   if (log) {
     out = hier->get_log_card();
@@ -69,8 +68,7 @@ double DirichletMixing::mass_existing_cluster(
 
 double DirichletMixing::mass_new_cluster(
     const unsigned int n, const bool log, const bool propto,
-    const unsigned int n_clust,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+    const unsigned int n_clust) const {
   double out;
   if (log) {
     out = state.logtotmass;

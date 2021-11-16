@@ -46,14 +46,10 @@ class PitYorMixing
 
   double mass_existing_cluster(const unsigned int n, const bool log,
                                const bool propto,
-                               std::shared_ptr<AbstractHierarchy> hier,
-                               const Eigen::RowVectorXd &covariate =
-                                   Eigen::RowVectorXd(0)) const override;
+                               std::shared_ptr<AbstractHierarchy> hier) const override;
 
   double mass_new_cluster(const unsigned int n, const bool log,
-                          const bool propto, const unsigned int n_clust,
-                          const Eigen::RowVectorXd &covariate =
-                              Eigen::RowVectorXd(0)) const override;
+                          const bool propto, const unsigned int n_clust) const override;
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 

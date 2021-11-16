@@ -70,17 +70,16 @@ class AbstractMixing {
   //! @param hier       `Hierarchy` object representing the cluster
   //! @param covariate  (Optional) covariate vector
   //! @return           Probability value
-  virtual double mass_existing_cluster(
+  double get_mass_existing_cluster(
       const unsigned int n, const bool log, const bool propto,
       std::shared_ptr<AbstractHierarchy> hier,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    if (is_conditional()) {
-      throw std::runtime_error(
-          "Cannot call this function from non-marginal mixing");
+    if (is_dependent()) {
+      return mass_existing_cluster(n, log, propto, hier, covariate);
     } else {
-      throw std::runtime_error("Not implemented");
+      return mass_existing_cluster(n, log, propto, hier);
     }
-  };
+  }
 
   //! Returns probability mass for a new cluster (for marginal mixings only)
   //! @param n          Total dataset size
@@ -89,17 +88,16 @@ class AbstractMixing {
   //! @param n_clust    Current number of clusters
   //! @param covariate  (Optional) covariate vector
   //! @return           Probability value
-  virtual double mass_new_cluster(
+  double get_mass_new_cluster(
       const unsigned int n, const bool log, const bool propto,
       const unsigned int n_clust,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    if (is_conditional()) {
-      throw std::runtime_error(
-          "Cannot call this function from non-marginal mixing");
+    if (is_dependent()) {
+      return mass_new_cluster(n, log, propto, n_clust, covariate);
     } else {
-      throw std::runtime_error("Not implemented");
+      return mass_new_cluster(n, log, propto, n_clust);
     }
-  };
+  }
 
   //! Returns current number of clusters of the mixture model
   virtual unsigned int get_num_components() const = 0;
@@ -126,6 +124,57 @@ class AbstractMixing {
 
   //! Returns whether the mixing depends on covariate values or not
   virtual bool is_dependent() const = 0;
+
+ protected:
+  //! Private version of get_mass_existing_cluster()
+  virtual double mass_existing_cluster(
+      const unsigned int n, const bool log, const bool propto,
+      std::shared_ptr<AbstractHierarchy> hier,
+      const Eigen::RowVectorXd &covariate) const {
+    if (!is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from non-dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
+
+  //! Private version of get_mass_existing_cluster(), without covariates
+  virtual double mass_existing_cluster(
+      const unsigned int n, const bool log, const bool propto,
+      std::shared_ptr<AbstractHierarchy> hier) const {
+    if (is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
+
+  //! Private version of get_mass_new_cluster()
+  virtual double mass_new_cluster(const unsigned int n, const bool log,
+                                  const bool propto,
+                                  const unsigned int n_clust,
+                                  const Eigen::RowVectorXd &covariate) const {
+    if (!is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from non-dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
+
+  //! Private version of get_mass_new_cluster(), without covariates
+  virtual double mass_new_cluster(const unsigned int n, const bool log,
+                                  const bool propto,
+                                  const unsigned int n_clust) const {
+    if (is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
 };
 
 #endif  // BAYESMIX_MIXINGS_ABSTRACT_MIXING_H_
