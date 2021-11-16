@@ -67,18 +67,9 @@ class LogitSBMixing
 
   bool is_conditional() const override { return true; }
 
-  bool is_dependent() const override { return true; }
+  const bool IS_DEPENDENT = true;
 
  protected:
-  //! Dimension of the coefficients vector
-  unsigned int dim;
-
-  //! Acceptance rates of the Metropolis steps
-  Eigen::VectorXd acceptance_rates;
-
-  //! Number of Metropolis steps performed
-  int n_iter = 0;
-
   void initialize_state() override;
 
   //! Sigmoid function
@@ -92,6 +83,15 @@ class LogitSBMixing
   Eigen::VectorXd grad_full_cond_lpdf(
       const Eigen::VectorXd &alpha, const unsigned int clust,
       const std::vector<unsigned int> &allocations);
+
+  //! Dimension of the coefficients vector
+  unsigned int dim;
+
+  //! Acceptance rates of the Metropolis steps
+  Eigen::VectorXd acceptance_rates;
+
+  //! Number of Metropolis steps performed
+  int n_iter = 0;
 };
 
 #endif  // BAYESMIX_MIXINGS_LOGIT_SB_MIXING_H_

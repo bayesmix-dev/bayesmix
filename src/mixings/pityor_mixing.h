@@ -59,7 +59,7 @@ class PitYorMixing
 
   bool is_conditional() const override { return false; }
 
-  bool is_dependent() const override { return false; }
+  const bool IS_DEPENDENT = false;
 
  protected:
   void initialize_state() override;

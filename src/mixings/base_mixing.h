@@ -48,6 +48,10 @@ class BaseMixing : public AbstractMixing {
     covariates_ptr = covar;
   }
 
+  bool is_dependent() const override {
+    return static_cast<Derived const *>(this)->IS_DEPENDENT;
+  }
+
  protected:
   void create_empty_prior() { prior.reset(new Prior); }
 
