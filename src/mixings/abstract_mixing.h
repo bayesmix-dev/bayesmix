@@ -55,8 +55,12 @@ class AbstractMixing {
   virtual Eigen::VectorXd get_weights(
       const bool log, const bool propto,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error(
-        "Cannot call get_weights() from non-conditional mixing");
+    if (!is_conditional()) {
+      throw std::runtime_error(
+          "Cannot call this function from non-conditional mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
   };
 
   //! Returns probability mass for an old cluster (for marginal mixings only)
@@ -70,8 +74,12 @@ class AbstractMixing {
       const unsigned int n, const bool log, const bool propto,
       std::shared_ptr<AbstractHierarchy> hier,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error(
-        "Cannot call mass_existing_cluster() from non-marginal mixing");
+    if (is_conditional()) {
+      throw std::runtime_error(
+          "Cannot call this function from non-marginal mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
   };
 
   //! Returns probability mass for a new cluster (for marginal mixings only)
@@ -85,8 +93,12 @@ class AbstractMixing {
       const unsigned int n, const bool log, const bool propto,
       const unsigned int n_clust,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error(
-        "Cannot call mass_new_cluster() from non-marginal mixing");
+    if (is_conditional()) {
+      throw std::runtime_error(
+          "Cannot call this function from non-marginal mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
   };
 
   //! Returns current number of clusters of the mixture model
