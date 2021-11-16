@@ -158,3 +158,5 @@ endif()
 if (NOT DISABLE_DOCS)
   add_subdirectory(docs)
 endif()
+
+add_subdirectory(examples)

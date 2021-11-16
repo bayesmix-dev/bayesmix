@@ -59,7 +59,7 @@ class NNIGHierarchy
   NNIG::State draw(const NNIG::Hyperparams &params);
 
   //! Removes every data point from this cluster
-  void clear_data();
+  void clear_summary_statistics();
 
   bool is_multivariate() const override { return false; }
 
@@ -68,7 +68,8 @@ class NNIGHierarchy
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
-  void write_state_to_proto(google::protobuf::Message *out) const override;
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
+      const override;
 
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 

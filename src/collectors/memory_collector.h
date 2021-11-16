@@ -84,7 +84,7 @@ class MemoryCollector : public BaseCollector {
 
  protected:
   //! Reads the next state, based on the curr_iter curson
-  bool next_state(google::protobuf::Message* out);
+  bool next_state(google::protobuf::Message* out) override;
 
   //! Deque that contains all states in Protobuf-object form
   std::deque<std::string> chain;
