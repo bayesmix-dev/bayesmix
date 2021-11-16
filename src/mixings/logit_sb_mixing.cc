@@ -84,8 +84,7 @@ void LogitSBMixing::set_state_from_proto(
       bayesmix::to_eigen(statecast.log_sb_state().regression_coeffs());
 }
 
-std::shared_ptr<bayesmix::MixingState> LogitSBMixing::get_state_proto() 
-    const {
+std::shared_ptr<bayesmix::MixingState> LogitSBMixing::get_state_proto() const {
   bayesmix::LogSBState state_;
   bayesmix::to_proto(state.regression_coeffs,
                      state_.mutable_regression_coeffs());

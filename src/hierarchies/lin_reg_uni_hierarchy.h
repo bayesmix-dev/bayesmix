@@ -95,7 +95,8 @@ class LinRegUniHierarchy
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto() const override;
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
+      const override;
 
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 

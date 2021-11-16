@@ -133,14 +133,16 @@ class BaseHierarchy : public AbstractHierarchy {
     cluster_data_idx = std::set<int>();
   }
 
-  bayesmix::AlgorithmState::ClusterState* downcast_state(google::protobuf::Message *out) const {
-    return google::protobuf::internal::down_cast<bayesmix::AlgorithmState::ClusterState *>(out);
+  bayesmix::AlgorithmState::ClusterState *downcast_state(
+      google::protobuf::Message *out) const {
+    return google::protobuf::internal::down_cast<
+        bayesmix::AlgorithmState::ClusterState *>(out);
   }
 
-  const bayesmix::AlgorithmState::ClusterState& downcast_state(
-        const google::protobuf::Message &state_) const {
-    return google::protobuf::internal::down_cast<const bayesmix::AlgorithmState::ClusterState &>(
-          state_);
+  const bayesmix::AlgorithmState::ClusterState &downcast_state(
+      const google::protobuf::Message &state_) const {
+    return google::protobuf::internal::down_cast<
+        const bayesmix::AlgorithmState::ClusterState &>(state_);
   }
 };
 
@@ -187,7 +189,8 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::check_prior_is_set()
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
     google::protobuf::Message *out) const {
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> state_ = get_state_proto();
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> state_ =
+      get_state_proto();
   std::string state_type = state_->GetDescriptor()->name();
   auto *out_cast = downcast_state(out);
   out_cast->CopyFrom(*state_.get());

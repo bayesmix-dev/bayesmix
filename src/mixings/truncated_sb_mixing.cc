@@ -16,7 +16,6 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-
 void TruncatedSBMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     const std::vector<unsigned int> &allocations) {
@@ -64,7 +63,7 @@ void TruncatedSBMixing::set_state_from_proto(
   state.logweights = logweights_from_sticks();
 }
 
-std::shared_ptr<bayesmix::MixingState> TruncatedSBMixing::get_state_proto() 
+std::shared_ptr<bayesmix::MixingState> TruncatedSBMixing::get_state_proto()
     const {
   bayesmix::TruncSBState state_;
   bayesmix::to_proto(state.sticks, state_.mutable_sticks());

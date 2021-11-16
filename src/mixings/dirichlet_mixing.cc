@@ -11,7 +11,6 @@
 #include "src/hierarchies/abstract_hierarchy.h"
 #include "src/utils/rng.h"
 
-
 void DirichletMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     const std::vector<unsigned int> &allocations) {
@@ -83,7 +82,7 @@ void DirichletMixing::set_state_from_proto(
   state.logtotmass = std::log(state.totalmass);
 }
 
-std::shared_ptr<bayesmix::MixingState> DirichletMixing::get_state_proto() 
+std::shared_ptr<bayesmix::MixingState> DirichletMixing::get_state_proto()
     const {
   bayesmix::DPState state_;
   state_.set_totalmass(state.totalmass);
@@ -91,7 +90,6 @@ std::shared_ptr<bayesmix::MixingState> DirichletMixing::get_state_proto()
   out->mutable_dp_state()->CopyFrom(state_);
   return out;
 }
-
 
 void DirichletMixing::initialize_state() {
   auto priorcast = cast_prior();

@@ -55,7 +55,7 @@ class PitYorMixing
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
-  std::shared_ptr<bayesmix::MixingState> get_state_proto() const override; 
+  std::shared_ptr<bayesmix::MixingState> get_state_proto() const override;
 
   bayesmix::MixingId get_id() const override { return bayesmix::MixingId::PY; }
 

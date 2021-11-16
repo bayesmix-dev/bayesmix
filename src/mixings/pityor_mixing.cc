@@ -11,7 +11,6 @@
 #include "mixing_state.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-
 void PitYorMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     const std::vector<unsigned int> &allocations) {
@@ -63,9 +62,7 @@ void PitYorMixing::set_state_from_proto(
   state.discount = statecast.py_state().discount();
 }
 
-
-std::shared_ptr<bayesmix::MixingState> PitYorMixing::get_state_proto() 
-    const {
+std::shared_ptr<bayesmix::MixingState> PitYorMixing::get_state_proto() const {
   bayesmix::PYState state_;
   state_.set_strength(state.strength);
   state_.set_discount(state.discount);

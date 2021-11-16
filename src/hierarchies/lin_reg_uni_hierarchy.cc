@@ -132,7 +132,7 @@ void LinRegUniHierarchy::set_state_from_proto(
 }
 
 std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
-    LinRegUniHierarchy::get_state_proto() const {
+LinRegUniHierarchy::get_state_proto() const {
   bayesmix::LinRegUniLSState state_;
   bayesmix::to_proto(state.regression_coeffs,
                      state_.mutable_regression_coeffs());
