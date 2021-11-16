@@ -83,6 +83,26 @@ class ConjugateHierarchy
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
+
+ protected:
+  virtual double marg_lpdf(const Hyperparams &params,
+                           const Eigen::RowVectorXd &datum) const {
+    if (static_cast<Derived const *>(this)->IS_DEPENDENT)
+      throw std::runtime_error(
+          "Cannot call this function from a dependent hierarchy");
+    else
+      throw std::runtime_error("Not implemented");
+  }
+
+  virtual double marg_lpdf(const Hyperparams &params,
+                           const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate) const {
+    if (!static_cast<Derived const *>(this)->IS_DEPENDENT)
+      throw std::runtime_error(
+          "Cannot call this function from a non-dependent hierarchy");
+    else
+      throw std::runtime_error("Not implemented");
+  }
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
