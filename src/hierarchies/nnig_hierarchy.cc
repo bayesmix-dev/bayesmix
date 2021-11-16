@@ -204,11 +204,9 @@ void NNIGHierarchy::update_summary_statistics(
   }
 }
 
-void NNIGHierarchy::clear_data() {
+void NNIGHierarchy::clear_summary_statistics() {
   data_sum = 0;
   data_sum_squares = 0;
-  card = 0;
-  cluster_data_idx = std::set<int>();
 }
 
 NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
@@ -233,23 +231,21 @@ NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
 
 void NNIGHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  auto &statecast = google::protobuf::internal::down_cast<
-      const bayesmix::AlgorithmState::ClusterState &>(state_);
+  auto &statecast = downcast_state(state_);
   state.mean = statecast.uni_ls_state().mean();
   state.var = statecast.uni_ls_state().var();
   set_card(statecast.cardinality());
 }
 
-void NNIGHierarchy::write_state_to_proto(
-    google::protobuf::Message *out) const {
+std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
+NNIGHierarchy::get_state_proto() const {
   bayesmix::UniLSState state_;
   state_.set_mean(state.mean);
   state_.set_var(state.var);
 
-  auto *out_cast = google::protobuf::internal::down_cast<
-      bayesmix::AlgorithmState::ClusterState *>(out);
-  out_cast->mutable_uni_ls_state()->CopyFrom(state_);
-  out_cast->set_cardinality(card);
+  auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
+  out->mutable_uni_ls_state()->CopyFrom(state_);
+  return out;
 }
 
 void NNIGHierarchy::write_hypers_to_proto(

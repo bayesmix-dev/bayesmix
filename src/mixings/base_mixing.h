@@ -33,12 +33,11 @@ class BaseMixing : public AbstractMixing {
 
   unsigned int get_num_components() const override { return num_components; }
 
-  google::protobuf::Message *get_mutable_prior() override {
-    if (prior == nullptr) {
-      create_empty_prior();
-    }
-    return prior.get();
-  }
+  void initialize() override;
+
+  google::protobuf::Message *get_mutable_prior() override;
+
+  void write_state_to_proto(google::protobuf::Message *out) const override;
 
   void set_num_components(const unsigned int num_) override {
     num_components = num_;
@@ -70,6 +69,40 @@ class BaseMixing : public AbstractMixing {
 
   //! Current number of clusters of the mixture model
   unsigned int num_components;
+
+  bayesmix::MixingState *downcast_state(google::protobuf::Message *out) const {
+    return google::protobuf::internal::down_cast<bayesmix::MixingState *>(out);
+  }
+
+  const bayesmix::MixingState &downcast_state(
+      const google::protobuf::Message &state_) const {
+    return google::protobuf::internal::down_cast<
+        const bayesmix::MixingState &>(state_);
+  }
 };
+
+template <class Derived, typename State, typename Prior>
+google::protobuf::Message *
+BaseMixing<Derived, State, Prior>::get_mutable_prior() {
+  if (prior == nullptr) {
+    create_empty_prior();
+  }
+  return prior.get();
+}
+
+template <class Derived, typename State, typename Prior>
+void BaseMixing<Derived, State, Prior>::initialize() {
+  if (prior == nullptr) {
+    throw std::invalid_argument("Mixing prior was not provided");
+  }
+  initialize_state();
+}
+
+template <class Derived, typename State, typename Prior>
+void BaseMixing<Derived, State, Prior>::write_state_to_proto(
+    google::protobuf::Message *out) const {
+  auto outcast = downcast_state(out);
+  outcast->CopyFrom(*get_state_proto().get());
+}
 
 #endif  // BAYESMIX_MIXINGS_BASE_MIXING_H_

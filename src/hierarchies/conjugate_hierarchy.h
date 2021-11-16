@@ -33,7 +33,7 @@ class ConjugateHierarchy
   ConjugateHierarchy() = default;
   ~ConjugateHierarchy() = default;
 
-  bool is_conjugate() const { return true; }
+  bool is_conjugate() const override { return true; }
 
   //! Saves posterior hyperparameters to the corresponding class member
   void save_posterior_hypers() {

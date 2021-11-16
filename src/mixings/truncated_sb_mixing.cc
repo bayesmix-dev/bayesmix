@@ -16,15 +16,6 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-void TruncatedSBMixing::initialize() {
-  if (prior == nullptr) {
-    throw std::invalid_argument("Mixing prior was not provided");
-  }
-  auto priorcast = cast_prior();
-  num_components = priorcast->num_components();
-  initialize_state();
-}
-
 void TruncatedSBMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     const std::vector<unsigned int> &allocations) {
@@ -67,25 +58,25 @@ Eigen::VectorXd TruncatedSBMixing::get_weights(
 
 void TruncatedSBMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  auto &statecast =
-      google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
-          state_);
+  auto &statecast = downcast_state(state_);
   state.sticks = bayesmix::to_eigen(statecast.trunc_sb_state().sticks());
   state.logweights = logweights_from_sticks();
 }
 
-void TruncatedSBMixing::write_state_to_proto(
-    google::protobuf::Message *out) const {
+std::shared_ptr<bayesmix::MixingState> TruncatedSBMixing::get_state_proto()
+    const {
   bayesmix::TruncSBState state_;
   bayesmix::to_proto(state.sticks, state_.mutable_sticks());
-  bayesmix::to_proto(state.sticks, state_.mutable_logweights());
-  google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
-      ->mutable_trunc_sb_state()
-      ->CopyFrom(state_);
+  bayesmix::to_proto(state.logweights, state_.mutable_logweights());
+
+  auto out = std::make_unique<bayesmix::MixingState>();
+  out->mutable_trunc_sb_state()->CopyFrom(state_);
+  return out;
 }
 
 void TruncatedSBMixing::initialize_state() {
   auto priorcast = cast_prior();
+  num_components = priorcast->num_components();
   state.sticks = Eigen::VectorXd(num_components);
   if (priorcast->has_beta_priors()) {
     if (priorcast->beta_priors().beta_distributions_size() != num_components) {

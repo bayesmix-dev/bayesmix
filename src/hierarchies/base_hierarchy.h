@@ -39,6 +39,7 @@ class BaseHierarchy : public AbstractHierarchy {
   virtual std::shared_ptr<AbstractHierarchy> clone() const override {
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
     out->clear_data();
+    out->clear_summary_statistics();
     return out;
   }
 
@@ -53,7 +54,10 @@ class BaseHierarchy : public AbstractHierarchy {
     static_cast<Derived *>(this)->initialize_state();
     posterior_hypers = *hypers;
     static_cast<Derived *>(this)->clear_data();
+    static_cast<Derived *>(this)->clear_summary_statistics();
   }
+
+  void write_state_to_proto(google::protobuf::Message *out) const override;
 
   void check_prior_is_set() const;
 
@@ -123,6 +127,23 @@ class BaseHierarchy : public AbstractHierarchy {
     card = card_;
     log_card = std::log(card_);
   }
+
+  void clear_data() {
+    card = 0;
+    cluster_data_idx = std::set<int>();
+  }
+
+  bayesmix::AlgorithmState::ClusterState *downcast_state(
+      google::protobuf::Message *out) const {
+    return google::protobuf::internal::down_cast<
+        bayesmix::AlgorithmState::ClusterState *>(out);
+  }
+
+  const bayesmix::AlgorithmState::ClusterState &downcast_state(
+      const google::protobuf::Message &state_) const {
+    return google::protobuf::internal::down_cast<
+        const bayesmix::AlgorithmState::ClusterState &>(state_);
+  }
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
@@ -165,6 +186,16 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::check_prior_is_set()
     throw std::invalid_argument("Hierarchy prior was not provided");
   }
 }
+template <class Derived, typename State, typename Hyperparams, typename Prior>
+void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
+    google::protobuf::Message *out) const {
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> state_ =
+      get_state_proto();
+  std::string state_type = state_->GetDescriptor()->name();
+  auto *out_cast = downcast_state(out);
+  out_cast->CopyFrom(*state_.get());
+  out_cast->set_cardinality(card);
+}
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 Eigen::VectorXd
@@ -199,6 +230,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
     const Eigen::MatrixXd &data,
     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
   static_cast<Derived *>(this)->clear_data();
+  static_cast<Derived *>(this)->clear_summary_statistics();
   if (covariates.cols() == 0) {
     // Pass null value as covariate
     for (int i = 0; i < data.rows(); i++) {

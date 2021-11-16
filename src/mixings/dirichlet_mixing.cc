@@ -11,13 +11,6 @@
 #include "src/hierarchies/abstract_hierarchy.h"
 #include "src/utils/rng.h"
 
-void DirichletMixing::initialize() {
-  if (prior == nullptr) {
-    throw std::invalid_argument("Mixing prior was not provided");
-  }
-  initialize_state();
-}
-
 void DirichletMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     const std::vector<unsigned int> &allocations) {
@@ -84,21 +77,18 @@ double DirichletMixing::mass_new_cluster(
 
 void DirichletMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  auto &statecast =
-      google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
-          state_);
+  auto &statecast = downcast_state(state_);
   state.totalmass = statecast.dp_state().totalmass();
   state.logtotmass = std::log(state.totalmass);
 }
 
-void DirichletMixing::write_state_to_proto(
-    google::protobuf::Message *out) const {
+std::shared_ptr<bayesmix::MixingState> DirichletMixing::get_state_proto()
+    const {
   bayesmix::DPState state_;
   state_.set_totalmass(state.totalmass);
-
-  google::protobuf::internal::down_cast<bayesmix::MixingState *>(out)
-      ->mutable_dp_state()
-      ->CopyFrom(state_);
+  auto out = std::make_unique<bayesmix::MixingState>();
+  out->mutable_dp_state()->CopyFrom(state_);
+  return out;
 }
 
 void DirichletMixing::initialize_state() {

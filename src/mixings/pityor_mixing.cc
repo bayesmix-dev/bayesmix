@@ -11,13 +11,6 @@
 #include "mixing_state.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-void PitYorMixing::initialize() {
-  if (prior == nullptr) {
-    throw std::invalid_argument("Mixing prior was not provided");
-  }
-  initialize_state();
-}
-
 void PitYorMixing::update_state(
     const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
     const std::vector<unsigned int> &allocations) {
@@ -64,21 +57,19 @@ double PitYorMixing::mass_new_cluster(
 
 void PitYorMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  auto &statecast =
-      google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
-          state_);
+  auto &statecast = downcast_state(state_);
   state.strength = statecast.py_state().strength();
   state.discount = statecast.py_state().discount();
 }
 
-void PitYorMixing::write_state_to_proto(google::protobuf::Message *out) const {
+std::shared_ptr<bayesmix::MixingState> PitYorMixing::get_state_proto() const {
   bayesmix::PYState state_;
   state_.set_strength(state.strength);
   state_.set_discount(state.discount);
 
-  auto *out_cast =
-      google::protobuf::internal::down_cast<bayesmix::MixingState *>(out);
-  out_cast->mutable_py_state()->CopyFrom(state_);
+  auto out = std::make_unique<bayesmix::MixingState>();
+  out->mutable_py_state()->CopyFrom(state_);
+  return out;
 }
 
 void PitYorMixing::initialize_state() {
