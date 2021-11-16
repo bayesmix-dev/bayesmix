@@ -97,9 +97,13 @@ class GammaGammaHierarchy
     set_card(statecast.cardinality());
   }
 
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto() const override {
-    auto out = std::make_unique<bayesmix::Vector>();
-    out->mutable_data()->Add(state.rate);
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto() 
+      const override {
+    bayesmix::Vector state_;
+    state_.mutable_data()->Add(state.rate);
+
+    auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
+    out->mutable_general_state()->CopyFrom(state_);
     return out;
   }
 
