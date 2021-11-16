@@ -55,9 +55,8 @@ void TruncatedSBMixing::update_state(
   state.logweights = logweights_from_sticks();
 }
 
-Eigen::VectorXd TruncatedSBMixing::get_weights(
-    const bool log, const bool propto,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+Eigen::VectorXd TruncatedSBMixing::mixing_weights(const bool log,
+                                                  const bool propto) const {
   if (log) {
     return state.logweights;
   } else {

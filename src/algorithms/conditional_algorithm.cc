@@ -22,7 +22,7 @@ Eigen::VectorXd ConditionalAlgorithm::lpdf_from_state(
   for (size_t i = 0; i < grid.rows(); i++) {
     // Get mixing weights for the i-th grid point
     Eigen::VectorXd logweights =
-        mixing->get_weights(true, false, mix_covariate);
+        mixing->get_mixing_weights(true, false, mix_covariate);
     // Loop over clusters
     for (size_t j = 0; j < n_clust; j++) {
       temp_hier->set_state_from_proto(curr_state.cluster_states(j));

@@ -26,17 +26,19 @@
 //! flag accordingly, and can only be used with the same type of `Algorithm`
 //! object. In a conditional mixing, mixing weights for the clusters are part
 //! of the state of the algorithm. Their values are stored in some form in this
-//! class, and they can be obtained by calling the `get_weights()` method. In a
-//! marginal mixing, the actual mixing weights have been marginalized out of
-//! the model, and information related to them translates to probability masses
-//! to assign a data point to an existing cluster, or to a new one.
-//! Classes inheriting from this one must either implement the `get_weights()`
-//! method, or the `mass_existing_cluster()` and `mass_new_cluster()` methods,
-//! according to the type of mixing which is being implemented. Other
-//! required methods are `update_state()` for a conditional update of the
-//! mixing's state (if any) given allocations and unique values coming from the
-//! library's `Algorithm` classes, and read-write methods involving Protobuf
-//! objects.
+//! class, and they can be obtained by calling the `get_mixing_weights()`
+//! method. In a marginal mixing, the actual mixing weights have been
+//! marginalized out of the model, and information related to them translates
+//! to probability masses to assign a data point to an existing cluster, or to
+//! a new one. According to the type of mixing which is being implemented,
+//! classes inheriting from this one must either implement `get_weights()`, or
+//! both `mass_existing_cluster()` and `mass_new_cluster()` methods. Each of
+//! these methods has a version with covariates for dependent mixings and one
+//! without covariates; please implement the ones that reflect your mixing
+//! type. Other required methods are `update_state()` for a conditional update
+//! of the mixing state (if any) given allocations and unique values coming
+//! from the library `Algorithm` classes, and read-write methods involving
+//! Protobuf objects.
 
 class AbstractMixing {
  public:
@@ -52,14 +54,18 @@ class AbstractMixing {
       const std::vector<unsigned int> &allocations) = 0;
 
   //! Returns mixing weights (for conditional mixings only)
-  virtual Eigen::VectorXd get_weights(
+  Eigen::VectorXd get_mixing_weights(
       const bool log, const bool propto,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     if (!is_conditional()) {
       throw std::runtime_error(
           "Cannot call this function from non-conditional mixing");
     } else {
-      throw std::runtime_error("Not implemented");
+      if (is_dependent()) {
+        return mixing_weights(log, propto, covariate);
+      } else {
+        return mixing_weights(log, propto);
+      }
     }
   };
 
@@ -126,6 +132,29 @@ class AbstractMixing {
   virtual bool is_dependent() const = 0;
 
  protected:
+  //! Private version of get_mixing_weights()
+  virtual Eigen::VectorXd mixing_weights(
+      const bool log, const bool propto,
+      const Eigen::RowVectorXd &covariate) const {
+    if (!is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from non-dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
+
+  //! Private version of get_mixing_weights(), overloaded without covariates
+  virtual Eigen::VectorXd mixing_weights(const bool log,
+                                         const bool propto) const {
+    if (is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
+
   //! Private version of get_mass_existing_cluster()
   virtual double mass_existing_cluster(
       const unsigned int n, const bool log, const bool propto,

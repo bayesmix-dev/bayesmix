@@ -62,9 +62,9 @@ void LogitSBMixing::update_state(
   }
 }
 
-Eigen::VectorXd LogitSBMixing::get_weights(
+Eigen::VectorXd LogitSBMixing::mixing_weights(
     const bool log, const bool propto,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate) const {
   // Compute eta
   std::vector<double> eta(num_components);
   for (int h = 0; h < num_components - 1; h++) {

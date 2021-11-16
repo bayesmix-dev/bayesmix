@@ -109,9 +109,9 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_prior_mass(
   Eigen::VectorXd logprior(n_clust + n_aux);
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    logprior(j) =
-        mixing->get_mass_existing_cluster(n_data - 1, true, true, unique_values[j],
-                                      mix_covariates.row(data_idx));
+    logprior(j) = mixing->get_mass_existing_cluster(
+        n_data - 1, true, true, unique_values[j],
+        mix_covariates.row(data_idx));
   }
   // Further update with marginal components
   for (size_t j = 0; j < n_aux; j++) {

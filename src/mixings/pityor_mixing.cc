@@ -46,9 +46,9 @@ double PitYorMixing::mass_existing_cluster(
   return out;
 }
 
-double PitYorMixing::mass_new_cluster(
-    const unsigned int n, const bool log, const bool propto,
-    const unsigned int n_clust) const {
+double PitYorMixing::mass_new_cluster(const unsigned int n, const bool log,
+                                      const bool propto,
+                                      const unsigned int n_clust) const {
   double out;
   if (log) {
     out = std::log(state.strength + state.discount * n_clust);

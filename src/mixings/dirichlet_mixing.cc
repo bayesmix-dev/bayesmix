@@ -66,9 +66,9 @@ double DirichletMixing::mass_existing_cluster(
   return out;
 }
 
-double DirichletMixing::mass_new_cluster(
-    const unsigned int n, const bool log, const bool propto,
-    const unsigned int n_clust) const {
+double DirichletMixing::mass_new_cluster(const unsigned int n, const bool log,
+                                         const bool propto,
+                                         const unsigned int n_clust) const {
   double out;
   if (log) {
     out = state.logtotmass;

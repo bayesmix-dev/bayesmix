@@ -47,7 +47,8 @@ class DirichletMixing
       std::shared_ptr<AbstractHierarchy> hier) const override;
 
   double mass_new_cluster(const unsigned int n, const bool log,
-                          const bool propto, const unsigned int n_clust) const override;
+                          const bool propto,
+                          const unsigned int n_clust) const override;
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 

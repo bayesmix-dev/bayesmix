@@ -48,9 +48,9 @@ class LogitSBMixing
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       const std::vector<unsigned int> &allocations) override;
 
-  Eigen::VectorXd get_weights(const bool log, const bool propto,
-                              const Eigen::RowVectorXd &covariate =
-                                  Eigen::RowVectorXd(0)) const override;
+  Eigen::VectorXd mixing_weights(
+      const bool log, const bool propto,
+      const Eigen::RowVectorXd &covariate) const override;
 
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
