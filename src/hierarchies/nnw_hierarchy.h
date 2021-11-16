@@ -55,14 +55,6 @@ class NNWHierarchy
   NNWHierarchy() = default;
   ~NNWHierarchy() = default;
 
-  //! Evaluates the log-marginal distribution of data in a single point
-  //! @param params     Container of (prior or posterior) hyperparameter values
-  //! @param datum      Point which is to be evaluated
-  //! @param covariate  (Optional) covariate vector associated to datum
-  //! @return           The evaluation of the lpdf
-  double marg_lpdf(const NNW::Hyperparams &params,
-                   const Eigen::RowVectorXd &datum) const;
-
   Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data,
                                  const Eigen::MatrixXd &covariates =
                                      Eigen::MatrixXd(0, 0)) const override;
@@ -116,8 +108,12 @@ class NNWHierarchy
   const bool IS_DEPENDENT = false;
 
  protected:
-  //! Private, overloaded version of get_like_lpdf()
+  //! Private version of get_like_lpdf(), overloaded without covariates
   double like_lpdf(const Eigen::RowVectorXd &datum) const override;
+
+  //! Private version of get_marg_lpdf(), overloaded without covariates
+  double marg_lpdf(const NNW::Hyperparams &params,
+                   const Eigen::RowVectorXd &datum) const override;
 
   //! Writes prec and its utilities to the given state object by pointer
   void write_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);

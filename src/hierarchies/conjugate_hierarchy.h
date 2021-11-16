@@ -45,6 +45,15 @@ class ConjugateHierarchy
         static_cast<Derived *>(this)->get_posterior_parameters();
   }
 
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
+  virtual double get_marg_lpdf(
+      const Hyperparams &params, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
+
   double prior_pred_lpdf(const Eigen::RowVectorXd &datum,
                          const Eigen::RowVectorXd &covariate =
                              Eigen::RowVectorXd(0)) const override {
@@ -70,10 +79,6 @@ class ConjugateHierarchy
     }
   }
 
-  virtual double get_marg_lpdf(
-      const Hyperparams &params, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
-
   virtual Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
@@ -83,27 +88,32 @@ class ConjugateHierarchy
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
-
  protected:
-  virtual double marg_lpdf(const Hyperparams &params,
-                           const Eigen::RowVectorXd &datum) const {
-    if (static_cast<Derived const *>(this)->IS_DEPENDENT)
-      throw std::runtime_error(
-          "Cannot call this function from a dependent hierarchy");
-    else
-      throw std::runtime_error("Not implemented");
-  }
-
+  //! Private version of get_marg_lpdf()
   virtual double marg_lpdf(const Hyperparams &params,
                            const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const {
-    if (!static_cast<Derived const *>(this)->IS_DEPENDENT)
+    if (!static_cast<Derived const *>(this)->IS_DEPENDENT) {
       throw std::runtime_error(
           "Cannot call this function from a non-dependent hierarchy");
-    else
+    }
+    else {
       throw std::runtime_error("Not implemented");
+    }
+  }
+
+  //! Private version of get_marg_lpdf(), overloaded without covariates
+  virtual double marg_lpdf(const Hyperparams &params,
+                           const Eigen::RowVectorXd &datum) const {
+    if (static_cast<Derived const *>(this)->IS_DEPENDENT) {
+      throw std::runtime_error(
+          "Cannot call this function from a dependent hierarchy");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
   }
 };
+
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 double ConjugateHierarchy<Derived, State, Hyperparams, Prior>::get_marg_lpdf(

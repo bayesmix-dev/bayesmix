@@ -50,15 +50,6 @@ class LinRegUniHierarchy
   LinRegUniHierarchy() = default;
   ~LinRegUniHierarchy() = default;
 
-  //! Evaluates the log-marginal distribution of data in a single point
-  //! @param params     Container of (prior or posterior) hyperparameter values
-  //! @param datum      Point which is to be evaluated
-  //! @param covariate  (Optional) covariate vector associated to datum
-  //! @return           The evaluation of the lpdf
-  double marg_lpdf(const LinRegUni::Hyperparams &params,
-                   const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate) const;
-
   void initialize_state();
 
   void initialize_hypers();
@@ -102,6 +93,11 @@ class LinRegUniHierarchy
  protected:
   //! Private version of get_like_lpdf()
   double like_lpdf(const Eigen::RowVectorXd &datum,
+                   const Eigen::RowVectorXd &covariate) const override;
+
+  //! Private version of get_marg_lpdf()
+  double marg_lpdf(const LinRegUni::Hyperparams &params,
+                   const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override;
 
   //! Dimension of the coefficients vector

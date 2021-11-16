@@ -197,7 +197,7 @@ class AbstractHierarchy {
     throw std::runtime_error("Not implemented");
   }
 
-  //! Private, overloaded version of get_like_lpdf()
+  //! Private version of get_like_lpdf(), overloaded without covariates
   virtual double like_lpdf(const Eigen::RowVectorXd &datum) const {
     throw std::runtime_error("Not implemented");
   }
