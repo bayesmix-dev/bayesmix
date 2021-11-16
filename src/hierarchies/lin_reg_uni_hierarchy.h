@@ -50,7 +50,7 @@ class LinRegUniHierarchy
   LinRegUniHierarchy() = default;
   ~LinRegUniHierarchy() = default;
 
-  void initialize_state();
+  void initialize_state() override;
 
   void initialize_hypers();
 

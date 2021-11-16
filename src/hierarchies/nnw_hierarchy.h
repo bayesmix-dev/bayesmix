@@ -69,7 +69,7 @@ class NNWHierarchy
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
 
-  void initialize_state();
+  void initialize_state() override;
 
   void initialize_hypers();
 

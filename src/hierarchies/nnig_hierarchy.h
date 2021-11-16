@@ -46,7 +46,7 @@ class NNIGHierarchy
   NNIGHierarchy() = default;
   ~NNIGHierarchy() = default;
 
-  void initialize_state();
+  void initialize_state() override;
 
   void initialize_hypers();
 
