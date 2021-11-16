@@ -59,9 +59,7 @@ Eigen::VectorXd TruncatedSBMixing::get_weights(
 
 void TruncatedSBMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  auto &statecast =
-      google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
-          state_);
+  auto &statecast = downcast_state(state_);
   state.sticks = bayesmix::to_eigen(statecast.trunc_sb_state().sticks());
   state.logweights = logweights_from_sticks();
 }

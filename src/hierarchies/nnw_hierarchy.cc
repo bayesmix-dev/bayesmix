@@ -310,8 +310,7 @@ NNW::Hyperparams NNWHierarchy::get_posterior_parameters() const {
 
 void NNWHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  auto &statecast = google::protobuf::internal::down_cast<
-      const bayesmix::AlgorithmState::ClusterState &>(state_);
+  auto &statecast = downcast_state(state_);
   state.mean = to_eigen(statecast.multi_ls_state().mean());
   state.prec = to_eigen(statecast.multi_ls_state().prec());
   state.prec_chol = to_eigen(statecast.multi_ls_state().prec());

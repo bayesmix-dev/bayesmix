@@ -58,9 +58,7 @@ double PitYorMixing::mass_new_cluster(
 
 void PitYorMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  auto &statecast =
-      google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
-          state_);
+  auto &statecast = downcast_state(state_);
   state.strength = statecast.py_state().strength();
   state.discount = statecast.py_state().discount();
 }

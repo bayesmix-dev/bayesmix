@@ -79,9 +79,7 @@ Eigen::VectorXd LogitSBMixing::get_weights(
 
 void LogitSBMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  auto &statecast =
-      google::protobuf::internal::down_cast<const bayesmix::MixingState &>(
-          state_);
+  auto &statecast = downcast_state(state_);
   state.regression_coeffs =
       bayesmix::to_eigen(statecast.log_sb_state().regression_coeffs());
 }

@@ -124,8 +124,7 @@ LinRegUni::Hyperparams LinRegUniHierarchy::get_posterior_parameters() {
 
 void LinRegUniHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
-  auto &statecast = google::protobuf::internal::down_cast<
-      const bayesmix::AlgorithmState::ClusterState &>(state_);
+  auto &statecast = downcast_state(state_);
   state.regression_coeffs =
       bayesmix::to_eigen(statecast.lin_reg_uni_ls_state().regression_coeffs());
   state.var = statecast.lin_reg_uni_ls_state().var();
