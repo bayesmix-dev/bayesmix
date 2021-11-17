@@ -88,7 +88,7 @@ class LinRegUniHierarchy
     return bayesmix::HierarchyId::LinRegUni;
   }
 
-  const bool IS_DEPENDENT = true;
+  bool is_dependent() const override { return true; }
 
  protected:
   //! Private version of get_like_lpdf()

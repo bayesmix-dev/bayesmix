@@ -57,7 +57,7 @@ class BaseHierarchy : public AbstractHierarchy {
     static_cast<Derived *>(this)->clear_summary_statistics();
   }
 
-  bool is_dependent() const override;
+  bool is_dependent() const override { return false; }
 
   void write_state_to_proto(google::protobuf::Message *out) const override;
 
@@ -176,11 +176,6 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
   if (update_params) {
     static_cast<Derived *>(this)->save_posterior_hypers();
   }
-}
-
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-bool BaseHierarchy<Derived, State, Hyperparams, Prior>::is_dependent() const {
-  return static_cast<Derived const *>(this)->IS_DEPENDENT;
 }
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
