@@ -59,8 +59,6 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
 
   bool is_conditional() const override { return true; }
 
-  const bool IS_DEPENDENT = false;
-
  protected:
   void initialize_state() override;
 

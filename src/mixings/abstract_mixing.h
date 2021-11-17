@@ -131,7 +131,7 @@ class AbstractMixing {
   virtual bool is_conditional() const = 0;
 
   //! Returns whether the mixing depends on covariate values or not
-  virtual bool is_dependent() const = 0;
+  virtual bool is_dependent() const { return false; }
 
  protected:
   //! Private version of get_mixing_weights()

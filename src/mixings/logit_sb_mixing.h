@@ -65,7 +65,7 @@ class LogitSBMixing
 
   bool is_conditional() const override { return true; }
 
-  const bool IS_DEPENDENT = true;
+  bool is_dependent() const override { return true; }
 
  protected:
   void initialize_state() override;

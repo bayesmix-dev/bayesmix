@@ -56,8 +56,6 @@ class DirichletMixing
 
   bool is_conditional() const override { return false; }
 
-  const bool IS_DEPENDENT = false;
-
  protected:
   void initialize_state() override;
 };
