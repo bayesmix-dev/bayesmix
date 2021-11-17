@@ -203,7 +203,7 @@ class AbstractHierarchy {
   virtual bool is_multivariate() const = 0;
 
   //! Returns whether the hierarchy depends on covariate values or not
-  virtual bool is_dependent() const = 0;
+  virtual bool is_dependent() const { return false; }
 
   //! Returns whether the hierarchy represents a conjugate model or not
   virtual bool is_conjugate() const { return false; }

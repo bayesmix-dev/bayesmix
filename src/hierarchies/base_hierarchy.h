@@ -57,11 +57,13 @@ class BaseHierarchy : public AbstractHierarchy {
     static_cast<Derived *>(this)->clear_summary_statistics();
   }
 
-  bool is_dependent() const override { return false; }
-
   void write_state_to_proto(google::protobuf::Message *out) const override;
 
-  void check_prior_is_set() const;
+  void check_prior_is_set() const {
+    if (prior == nullptr) {
+      throw std::invalid_argument("Hierarchy prior was not provided");
+    }
+  }
 
   virtual google::protobuf::Message *get_mutable_prior() override {
     if (prior == nullptr) create_empty_prior();
@@ -145,6 +147,7 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 };
 
+
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
     const int id, const Eigen::RowVectorXd &datum,
@@ -160,6 +163,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
     static_cast<Derived *>(this)->save_posterior_hypers();
   }
 }
+
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
@@ -178,13 +182,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
   }
 }
 
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-void BaseHierarchy<Derived, State, Hyperparams, Prior>::check_prior_is_set()
-    const {
-  if (prior == nullptr) {
-    throw std::invalid_argument("Hierarchy prior was not provided");
-  }
-}
+
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
     google::protobuf::Message *out) const {
@@ -195,6 +193,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
   out_cast->CopyFrom(*state_.get());
   out_cast->set_cardinality(card);
 }
+
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 Eigen::VectorXd
@@ -224,6 +223,7 @@ BaseHierarchy<Derived, State, Hyperparams, Prior>::like_lpdf_grid(
   return lpdf;
 }
 
+
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
     const Eigen::MatrixXd &data,
@@ -251,5 +251,6 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
   }
   static_cast<Derived *>(this)->sample_full_cond(true);
 }
+
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_
