@@ -147,7 +147,6 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 };
 
-
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
     const int id, const Eigen::RowVectorXd &datum,
@@ -163,7 +162,6 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
     static_cast<Derived *>(this)->save_posterior_hypers();
   }
 }
-
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
@@ -182,7 +180,6 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
   }
 }
 
-
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
     google::protobuf::Message *out) const {
@@ -193,7 +190,6 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
   out_cast->CopyFrom(*state_.get());
   out_cast->set_cardinality(card);
 }
-
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 Eigen::VectorXd
@@ -223,7 +219,6 @@ BaseHierarchy<Derived, State, Hyperparams, Prior>::like_lpdf_grid(
   return lpdf;
 }
 
-
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
     const Eigen::MatrixXd &data,
@@ -251,6 +246,5 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
   }
   static_cast<Derived *>(this)->sample_full_cond(true);
 }
-
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_
