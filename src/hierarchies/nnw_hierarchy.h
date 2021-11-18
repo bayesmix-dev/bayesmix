@@ -108,7 +108,9 @@ class NNWHierarchy
   double marg_lpdf(const NNW::Hyperparams &params,
                    const Eigen::RowVectorXd &datum) const override;
 
-  //! Private version of get_summary_statistics_update(), without covariates
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  bool add) override;
 

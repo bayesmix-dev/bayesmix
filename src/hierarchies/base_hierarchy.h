@@ -155,8 +155,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
   assert(cluster_data_idx.find(id) == cluster_data_idx.end());
   card += 1;
   log_card = std::log(card);
-  static_cast<Derived *>(this)->get_summary_statistics_update(datum, covariate,
-                                                              true);
+  static_cast<Derived *>(this)->update_ss(datum, covariate, true);
   cluster_data_idx.insert(id);
   if (update_params) {
     static_cast<Derived *>(this)->save_posterior_hypers();
@@ -168,8 +167,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
     const int id, const Eigen::RowVectorXd &datum,
     const bool update_params /*= false*/,
     const Eigen::RowVectorXd &covariate /* = Eigen::RowVectorXd(0)*/) {
-  static_cast<Derived *>(this)->get_summary_statistics_update(datum, covariate,
-                                                              false);
+  static_cast<Derived *>(this)->update_ss(datum, covariate, false);
   card -= 1;
   log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
   auto it = cluster_data_idx.find(id);

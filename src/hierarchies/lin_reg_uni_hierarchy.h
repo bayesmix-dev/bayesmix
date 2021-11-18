@@ -62,7 +62,10 @@ class LinRegUniHierarchy
   //! Updates state values using the given (prior or posterior) hyperparameters
   LinRegUni::State draw(const LinRegUni::Hyperparams &params);
 
-  //! Private version of get_summary_statistics_update()
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param covariate  Covariate vector associated to datum
+  //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  const Eigen::RowVectorXd &covariate,
                                  bool add) override;
