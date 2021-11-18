@@ -37,31 +37,51 @@ class ConjugateHierarchy
   ConjugateHierarchy() = default;
   ~ConjugateHierarchy() = default;
 
-  bool is_conjugate() const override { return true; }
-
-  //! Saves posterior hyperparameters to the corresponding class member
-  void save_posterior_hypers() {
-    posterior_hypers =
-        static_cast<Derived *>(this)->get_posterior_parameters();
-  }
-
   //! Public wrapper for marg_lpdf() methods
   virtual double get_marg_lpdf(
       const Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
 
+  //! Evaluates the log-prior predictive distribution of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   double prior_pred_lpdf(const Eigen::RowVectorXd &datum,
                          const Eigen::RowVectorXd &covariate =
                              Eigen::RowVectorXd(0)) const override {
     return get_marg_lpdf(*hypers, datum, covariate);
   }
 
+  //! Evaluates the log-conditional predictive distr. of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   double conditional_pred_lpdf(const Eigen::RowVectorXd &datum,
                                const Eigen::RowVectorXd &covariate =
                                    Eigen::RowVectorXd(0)) const override {
     return get_marg_lpdf(posterior_hypers, datum, covariate);
   }
 
+  //! Evaluates the log-prior predictive distr. of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
+  virtual Eigen::VectorXd prior_pred_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
+                                                          0)) const override;
+
+  //! Evaluates the log-prior predictive distr. of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
+  virtual Eigen::VectorXd conditional_pred_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
+                                                          0)) const override;
+
+  //! Generates new state values from the centering posterior distribution
+  //! @param update_params  Save posterior hypers after the computation?
   void sample_full_cond(bool update_params = true) override {
     if (this->card == 0) {
       // No posterior update possible
@@ -75,15 +95,14 @@ class ConjugateHierarchy
     }
   }
 
-  virtual Eigen::VectorXd prior_pred_lpdf_grid(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
-                                                          0)) const override;
+  //! Saves posterior hyperparameters to the corresponding class member
+  void save_posterior_hypers() {
+    posterior_hypers =
+        static_cast<Derived *>(this)->get_posterior_parameters();
+  }
 
-  virtual Eigen::VectorXd conditional_pred_lpdf_grid(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
-                                                          0)) const override;
+  //! Returns whether the hierarchy represents a conjugate model or not
+  bool is_conjugate() const override { return true; }
 
  protected:
   //! Evaluates the log-marginal distribution of data in a single point

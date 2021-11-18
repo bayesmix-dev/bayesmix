@@ -56,6 +56,7 @@ class LinRegUniHierarchy
   //! Initializes hierarchy hyperparameters to appropriate values
   void initialize_hypers() override;
 
+  //! Updates hyperparameter values given a vector of cluster states
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;
 
@@ -73,22 +74,31 @@ class LinRegUniHierarchy
   //! Removes every data point from this cluster
   void clear_summary_statistics();
 
+  //! Returns the dimension of the coefficients vector
+  unsigned int get_dim() const { return dim; }
+
+  //! Returns whether the hierarchy models multivariate data or not
   bool is_multivariate() const override { return false; }
 
+  //! Returns whether the hierarchy depends on covariate values or not
   bool is_dependent() const override { return true; }
-
-  unsigned int get_dim() const { return dim; }
 
   //! Computes and return posterior hypers given data currently in this cluster
   LinRegUni::Hyperparams get_posterior_parameters();
 
+  //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::ClusterState message by adding the appropriate type
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override;
 
+  //! Writes current state to a Protobuf message by pointer
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
+  //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::LinRegUni;
   }

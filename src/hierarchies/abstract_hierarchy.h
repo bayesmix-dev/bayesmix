@@ -50,7 +50,7 @@ class AbstractHierarchy {
  public:
   virtual ~AbstractHierarchy() = default;
 
-  //! Returns an independent copy of this object
+  //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractHierarchy> clone() const = 0;
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS

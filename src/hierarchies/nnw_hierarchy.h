@@ -55,15 +55,28 @@ class NNWHierarchy
   NNWHierarchy() = default;
   ~NNWHierarchy() = default;
 
+  // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
+  //! Evaluates the log-likelihood of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
   Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data,
                                  const Eigen::MatrixXd &covariates =
                                      Eigen::MatrixXd(0, 0)) const override;
 
+  //! Evaluates the log-prior predictive distr. of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
   Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
 
+  //! Evaluates the log-prior predictive distr. of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
   Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
@@ -75,6 +88,7 @@ class NNWHierarchy
   //! Initializes hierarchy hyperparameters to appropriate values
   void initialize_hypers() override;
 
+  //! Updates hyperparameter values given a vector of cluster states
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;
 
@@ -84,18 +98,25 @@ class NNWHierarchy
   //! Removes every data point from this cluster
   void clear_summary_statistics();
 
+  //! Returns whether the hierarchy models multivariate data or not
   bool is_multivariate() const override { return true; }
 
   //! Computes and return posterior hypers given data currently in this cluster
   NNW::Hyperparams get_posterior_parameters() const;
 
+  //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::ClusterState message by adding the appropriate type
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override;
 
+  //! Writes current state to a Protobuf message by pointer
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
+  //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNW;
   }
