@@ -108,6 +108,7 @@ class AbstractMixing {
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
+  //! Writes current state to a Protobuf message by pointer
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
   //! Writes current state to a Protobuf message and return a shared_ptr
