@@ -17,7 +17,7 @@ where P is either the Dirichlet process or the Pitman--Yor process
 
 - Inference is carried out using algorithms such as Algorithm 2 in [Neal (2000)](http://www.stat.columbia.edu/npbayes/papers/neal_sampling.pdf)
 
-- Serialization of the MCMC chains is possible using Google's Protocol Buffers](https://developers.google.com/protocol-buffers), aka `protobuf`
+- Serialization of the MCMC chains is possible using Google's [Protocol Buffers](https://developers.google.com/protocol-buffers) aka `protobuf`
 
 
 
