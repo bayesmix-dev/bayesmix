@@ -49,11 +49,13 @@ class AbstractMixing {
   virtual void initialize() = 0;
 
   //! Performs conditional update of state, given allocations and unique values
+  //! @param unique_values  A vector of (pointers to) Hierarchy objects
+  //! @param allocations    A vector of allocations label
   virtual void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       const std::vector<unsigned int> &allocations) = 0;
 
-  //! Public wrapper for mixing_weights() methods
+  //! Public wrapper for `mixing_weights()` methods
   Eigen::VectorXd get_mixing_weights(
       const bool log, const bool propto,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
@@ -69,7 +71,7 @@ class AbstractMixing {
     }
   };
 
-  //! Public wrapper for mass_existing_cluster() methods
+  //! Public wrapper for `mass_existing_cluster()` methods
   double get_mass_existing_cluster(
       const unsigned int n, const bool log, const bool propto,
       std::shared_ptr<AbstractHierarchy> hier,
@@ -81,7 +83,7 @@ class AbstractMixing {
     }
   }
 
-  //! Public wrapper for mass_new_cluster() methods
+  //! Public wrapper for `mass_new_cluster()` methods
   double get_mass_new_cluster(
       const unsigned int n, const bool log, const bool propto,
       const unsigned int n_clust,
@@ -105,11 +107,15 @@ class AbstractMixing {
   //! Sets pointer to the covariate matrix for the mixture model
   virtual void set_covariates(Eigen::MatrixXd *covar) = 0;
 
+  //! Read and set state values from a given Protobuf message
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! MixingState message by adding the appropriate type
   virtual std::shared_ptr<bayesmix::MixingState> get_state_proto() const = 0;
 
   //! Returns the Protobuf ID associated to this class

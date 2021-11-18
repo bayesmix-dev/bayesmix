@@ -42,6 +42,9 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
   TruncatedSBMixing() = default;
   ~TruncatedSBMixing() = default;
 
+  //! Performs conditional update of state, given allocations and unique values
+  //! @param unique_values  A vector of (pointers to) Hierarchy objects
+  //! @param allocations    A vector of allocations label
   void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       const std::vector<unsigned int> &allocations) override;
@@ -53,17 +56,24 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
   Eigen::VectorXd mixing_weights(const bool log,
                                  const bool propto) const override;
 
+  //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! MixingState message by adding the appropriate type
   std::shared_ptr<bayesmix::MixingState> get_state_proto() const override;
 
+  //! Returns the Protobuf ID associated to this class
   bayesmix::MixingId get_id() const override {
     return bayesmix::MixingId::TruncSB;
   }
 
+  //! Returns whether the mixing is conditional or marginal
   bool is_conditional() const override { return true; }
 
  protected:
+  //! Initializes state parameters to appropriate values
   void initialize_state() override;
 
   //! Returns weights in log-scale computing them from sticks

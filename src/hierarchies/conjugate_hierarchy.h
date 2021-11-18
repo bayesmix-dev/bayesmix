@@ -37,7 +37,7 @@ class ConjugateHierarchy
   ConjugateHierarchy() = default;
   ~ConjugateHierarchy() = default;
 
-  //! Public wrapper for marg_lpdf() methods
+  //! Public wrapper for `marg_lpdf()` methods
   virtual double get_marg_lpdf(
       const Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;

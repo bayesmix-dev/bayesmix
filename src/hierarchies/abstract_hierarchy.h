@@ -54,7 +54,7 @@ class AbstractHierarchy {
   virtual std::shared_ptr<AbstractHierarchy> clone() const = 0;
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
-  //! Public wrapper for like_lpdf() methods
+  //! Public wrapper for `like_lpdf()` methods
   double get_like_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
@@ -178,7 +178,7 @@ class AbstractHierarchy {
       const bool update_params = false,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
 
-  //! Public wrapper for update_summary_statistics() methods
+  //! Public wrapper for `update_summary_statistics()` methods
   void update_ss(const Eigen::RowVectorXd &datum,
                  const Eigen::RowVectorXd &covariate, bool add) {
     if (is_dependent()) {

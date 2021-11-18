@@ -82,13 +82,13 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Writes current state to a Protobuf message by pointer
   void write_state_to_proto(google::protobuf::Message *out) const override;
 
-  //! Get the struct of the current state
+  //! Returns the struct of the current state
   State get_state() const { return state; }
 
-  //! Get the struct of the current prior hyperparameters
+  //! Returns the struct of the current prior hyperparameters
   Hyperparams get_hypers() const { return *hypers; }
 
-  //! Get the struct of the current posterior hyperparameters
+  //! Returns the struct of the current posterior hyperparameters
   Hyperparams get_posterior_hypers() const { return posterior_hypers; }
 
   //! Adds a datum and its index to the hierarchy
@@ -122,7 +122,7 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
  protected:
-  //! Re-initializes the hierarchy's prior to a newly created object
+  //! Re-initializes the prior of the hierarchy to a newly created object
   void create_empty_prior() { prior.reset(new Prior); }
 
   //! Sets the cluster's cardinality
