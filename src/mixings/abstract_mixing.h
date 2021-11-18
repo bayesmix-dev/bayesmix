@@ -233,17 +233,6 @@ class AbstractMixing {
 
   //! Initializes the mixing state to appropriate values
   virtual void initialize_state() = 0;
-
-  //! Re-initializes the prior of the mixing to a newly created object
-  virtual void create_empty_prior() = 0;
-
-  //! Down-casts the given generic proto message to a MixingState proto
-  virtual bayesmix::MixingState *downcast_state(
-      google::protobuf::Message *out) const = 0;
-
-  //! Down-casts the given generic proto message to a MixingState proto
-  virtual const bayesmix::MixingState &downcast_state(
-      const google::protobuf::Message &state_) const = 0;
 };
 
 #endif  // BAYESMIX_MIXINGS_ABSTRACT_MIXING_H_

@@ -260,12 +260,6 @@ class AbstractHierarchy {
     }
   }
 
-  //! Sets the cluster's cardinality
-  virtual void set_card(const int card_) = 0;
-
-  //! Resets cardinality and data indexes of data in this cluster
-  virtual void clear_data() = 0;
-
   //! Resets summary statistics for this cluster
   virtual void clear_summary_statistics() = 0;
 
@@ -274,20 +268,6 @@ class AbstractHierarchy {
 
   //! Initializes hierarchy hyperparameters to appropriate values
   virtual void initialize_hypers() = 0;
-
-  //! Raises an error if the prior pointer is not initialized
-  virtual void check_prior_is_set() const = 0;
-
-  //! Re-initializes the prior of the hierarchy to a newly created object
-  virtual void create_empty_prior() = 0;
-
-  //! Down-casts the given generic proto message to a ClusterState proto
-  virtual bayesmix::AlgorithmState::ClusterState *downcast_state(
-      google::protobuf::Message *state_) const = 0;
-
-  //! Down-casts the given generic proto message to a ClusterState proto
-  virtual const bayesmix::AlgorithmState::ClusterState &downcast_state(
-      const google::protobuf::Message &state_) const = 0;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_ABSTRACT_HIERARCHY_H_

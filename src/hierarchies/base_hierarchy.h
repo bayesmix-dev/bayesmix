@@ -74,8 +74,9 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Returns a pointer to the Protobuf message of the prior of this cluster
   virtual google::protobuf::Message *get_mutable_prior() override {
-    if (prior == nullptr) create_empty_prior();
-
+    if (prior == nullptr) {
+      create_empty_prior();
+    }
     return prior.get();
   }
 
@@ -116,37 +117,37 @@ class BaseHierarchy : public AbstractHierarchy {
 
  protected:
   //! Raises an error if the prior pointer is not initialized
-  void check_prior_is_set() const override {
+  void check_prior_is_set() const {
     if (prior == nullptr) {
       throw std::invalid_argument("Hierarchy prior was not provided");
     }
   }
 
   //! Re-initializes the prior of the hierarchy to a newly created object
-  void create_empty_prior() override { prior.reset(new Prior); }
+  void create_empty_prior() { prior.reset(new Prior); }
 
   //! Sets the cardinality of the cluster
-  void set_card(const int card_) override {
+  void set_card(const int card_) {
     card = card_;
     log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
   }
 
-  //! Resets cardinality and data indexes of data in this cluster
-  void clear_data() override {
+  //! Resets cardinality and indexes of data in this cluster
+  void clear_data() {
     set_card(0);
     cluster_data_idx = std::set<int>();
   }
 
   //! Down-casts the given generic proto message to a ClusterState proto
   bayesmix::AlgorithmState::ClusterState *downcast_state(
-      google::protobuf::Message *state_) const override {
+      google::protobuf::Message *state_) const {
     return google::protobuf::internal::down_cast<
         bayesmix::AlgorithmState::ClusterState *>(state_);
   }
 
   //! Down-casts the given generic proto message to a ClusterState proto
   const bayesmix::AlgorithmState::ClusterState &downcast_state(
-      const google::protobuf::Message &state_) const override {
+      const google::protobuf::Message &state_) const {
     return google::protobuf::internal::down_cast<
         const bayesmix::AlgorithmState::ClusterState &>(state_);
   }
