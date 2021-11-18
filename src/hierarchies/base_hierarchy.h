@@ -56,7 +56,7 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Generates new state values from the centering prior distribution
   void sample_prior() override {
     state = static_cast<Derived *>(this)->draw(*hypers);
-  };
+  }
 
   //! Overloaded version of sample_full_cond(bool), mainly used for debugging
   virtual void sample_full_cond(
