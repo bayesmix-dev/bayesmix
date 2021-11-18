@@ -275,6 +275,9 @@ class AbstractHierarchy {
   //! Removes all indicators of data points belonging to this cluster
   virtual void clear_data() = 0;
 
+  //! Re-initializes the prior of the hierarchy to a newly created object
+  virtual void create_empty_prior() = 0;
+
   //! Down-casts the given generic proto message to a ClusterState proto
   virtual bayesmix::AlgorithmState::ClusterState *downcast_state(
       google::protobuf::Message *state_) const = 0;
