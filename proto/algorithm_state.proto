@@ -3,6 +3,8 @@ syntax = "proto3";
 import "mixing_state.proto";
 import "ls_state.proto";
 import "matrix.proto";
+import "hierarchy_prior.proto";
+import "mixing_prior.proto";
 
 package bayesmix;
 
@@ -21,4 +23,25 @@ message AlgorithmState {
   repeated int32 cluster_allocs = 2 [packed = true];
   MixingState mixing_state = 3;
   int32 iteration_num = 4;
+
+  message HierarchyHypers {
+    oneof val {
+      EmptyPrior fake_prior = 1;
+      NNIGState nnig_state = 2;
+      NNWState nnw_state = 3;
+      LinRegUniState lin_reg_uni_state = 4;
+    }
+  }
+  HierarchyHypers hierarchy_hypers = 5;
+
+  // message MixingPrior {
+  //   oneof val {
+  //     EmptyPrior fake_prior = 1;
+  //     DPPrior dp_prior = 2;
+  //     PYPrior py_prior = 3;
+  //     LogSBPrior log_sb_prior = 4;
+  //     TruncSBLogPrior trunc_sb_log_prior = 5;
+  //   }
+  // }
+  // MixingPrior mixing_prior = 6;
 }
