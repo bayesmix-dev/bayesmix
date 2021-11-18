@@ -64,7 +64,7 @@ make check
 sudo make install
 sudo ldconfig
 ```
-On Mac and Windows machines, please follow the official `protobuf` installation guide ([link](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md)) instead.
+On Mac and Windows machines, please follow the [official `protobuf` installation guide](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md) instead.
 
 Another very useful tool is [`ccache`](https://ccache.dev) that can significantly speed up the compilation process.
 
