@@ -10,8 +10,7 @@ coupled with a prior on the parameters:
 <a href="https://www.codecogs.com/eqnedit.php?latex=\theta_i&space;\sim&space;P_0" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\theta_i&space;\sim&space;P_0" title="\theta_i \sim P_0" /></a>
 
 the two quantities k (i.e. the component 'likelihood')  and P_0 define what we call a 'hierarchy'.
-In our code, we use the terms 'hierarchy', 'unique value' and 'cluster' interchangeably 
-when referring to the hierarchies.
+In our code, we use the terms 'hierarchy', 'unique value' and 'cluster' interchangeably when referring to the hierarchies.
 
 This is a basic building block of all MCMC algorithms form mixture models. Moreover, P_0 and k cannot be handled separately, since the update of parameters theta_h depends on both k and P_0.
 
@@ -27,7 +26,7 @@ The hierarchy implements all the methods needed to update theta_h: sampling from
 
 ## Main operations performed
 
-Given what we said, a hierarchy must be able to perform the following operations
+Therefore, a hierarchy must be able to perform the following operations
 
 1. Sample from the prior distribution: generate theta_h ~ P_0 [`sample_prior`]
 2. Sample from the 'full conditional' distribution: generate theta_h from the distribution 
@@ -57,22 +56,21 @@ Finally, the update involeved in the full_conditional, especially if P_0 and k a
 We employ a Curiously Recurring Template Pattern coupled with an abstract interface. 
 The code thus composes of: a virtual class defining the API, a template base class that is the base for the CRTP and derived child classes that fully specialize the template arguments.
 
-The class `AbstractHierarchy` defines the API, i.e. all the methods that need to be called 
-from outside of a Hierarchy class. 
+The class `AbstractHierarchy` defines the API, i.e. all the methods that need to be called from outside of a Hierarchy class.
 A template class `BaseHierarchy` inherits from `AbstractHierarchy` and implements some of the virtual methods in in, specifically: `sample_prior`, `sample_full_cond`, `initialize`, `add_datum`, `remove_datum`, `prior_pred_lpdf`, `conditional_pred_ldpf` `get_mutable_prior`, `like_lpdf_grid`, `prior_pred_lpdf_grid` and `conditional_pred_lpdf_grid`.
 These methods do not need to be implemented by the child classes. 
 
 Instead, child classes must implement:
 
-1. `like_lpdf`: evaluates k(x | theta_h)
+1. `like_lpdf`: evaluates k(x \| theta_h)
 2. `marg_lpdf`: evaluates m(x) given some parameters theta_h (could be both the hyperparameters in P_0 or the paramters given by the full conditionals)
 3. `draw`: samples from P_0 given the parameters
-4. `clear_summary_statistics`: clears all the summary statistics
+4. `clear_summary_statistics`
 5. `update_hypers`: performs the update of parameters in P_0 given all the theta_h's (passed as a vector of protobuf Messages)
 6. `initialize_state`: initializes the current theta_h given the hyperparameters in P_0
 7. `initialize_hypers`: initializes the hyperparameters in P_0 given their hyperprior
 8. `update_summary_statistics`: updates the summary statistics when an observation is allocated or de-allocated from the hierarchy
-9. `get_posterior_parameters`: returns the paramters of the full conditional distribution **possible only when P_0 and k are conjugate**
+9. `get_posterior_parameters`: returns the paramters of the full conditional distribution, which is **only possible when P_0 and k are conjugate**
 10. `set_state_from_proto`
 11. `write_state_to_proto`
 12. `write_hypers_to_proto`
@@ -85,5 +83,4 @@ The BaseHierarchy class takes 4 template parameters:
 3. `Hyperparams` is usually a struct representing the parameters in P_0
 4. `Prior` must be a protobuf object encoding the prior parameters.
 
-Finally, a ConjugateHierarchy takes care of the implementation of some methods that are specific to conjugate models.
-
+Finally, a `ConjugateHierarchy` takes care of the implementation of some methods that are specific to conjugate models.
