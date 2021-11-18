@@ -89,7 +89,7 @@ class ConjugateHierarchy
     } else {
       Hyperparams params =
           update_params
-              ? static_cast<Derived *>(this)->get_posterior_parameters()
+              ? static_cast<Derived *>(this)->compute_posterior_hypers()
               : posterior_hypers;
       state = static_cast<Derived *>(this)->draw(params);
     }
@@ -98,7 +98,7 @@ class ConjugateHierarchy
   //! Saves posterior hyperparameters to the corresponding class member
   void save_posterior_hypers() {
     posterior_hypers =
-        static_cast<Derived *>(this)->get_posterior_parameters();
+        static_cast<Derived *>(this)->compute_posterior_hypers();
   }
 
   //! Returns whether the hierarchy represents a conjugate model or not

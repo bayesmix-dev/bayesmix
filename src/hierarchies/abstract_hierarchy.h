@@ -137,6 +137,9 @@ class AbstractHierarchy {
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;
 
   // GETTERS AND SETTERS
+  //! Returns the Protobuf ID associated to this class
+  virtual bayesmix::HierarchyId get_id() const = 0;
+
   //! Returns the current cardinality of the cluster
   virtual int get_card() const = 0;
 
@@ -151,12 +154,6 @@ class AbstractHierarchy {
 
   //! Writes current state to a Protobuf message by pointer
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
-
-  //! Writes current state to a Protobuf message and return a shared_ptr
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! AlgoritmState::ClusterState message by adding the appropriate type
-  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
-  get_state_proto() const = 0;
 
   //! Writes current hyperparameters to a Protobuf message by pointer
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
@@ -192,13 +189,7 @@ class AbstractHierarchy {
   //! Main function that initializes members to appropriate values
   virtual void initialize() = 0;
 
-  //! Initializes state parameters to appropriate values
-  virtual void initialize_state() = 0;
-
-  //! Initializes hierarchy hyperparameters to appropriate values
-  virtual void initialize_hypers() = 0;
-
-  // FEATURES AND IDENTIFIERS
+  // HIERARCHY FEATURES
   //! Returns whether the hierarchy models multivariate data or not
   virtual bool is_multivariate() const = 0;
 
@@ -207,9 +198,6 @@ class AbstractHierarchy {
 
   //! Returns whether the hierarchy represents a conjugate model or not
   virtual bool is_conjugate() const { return false; }
-
-  //! Returns the Protobuf ID associated to this class
-  virtual bayesmix::HierarchyId get_id() const = 0;
 
  protected:
   //! Evaluates the log-likelihood of data in a single point

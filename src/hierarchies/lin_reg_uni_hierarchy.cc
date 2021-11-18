@@ -101,7 +101,7 @@ void LinRegUniHierarchy::clear_summary_statistics() {
   covar_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
 }
 
-LinRegUni::Hyperparams LinRegUniHierarchy::get_posterior_parameters() {
+LinRegUni::Hyperparams LinRegUniHierarchy::compute_posterior_hypers() const {
   if (card == 0) {  // no update possible
     return *hypers;
   }

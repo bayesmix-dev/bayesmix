@@ -45,6 +45,21 @@ class PitYorMixing
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       const std::vector<unsigned int> &allocations) override;
 
+  //! Read and set state values from a given Protobuf message
+  void set_state_from_proto(const google::protobuf::Message &state_) override;
+
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! MixingState message by adding the appropriate type
+  std::shared_ptr<bayesmix::MixingState> get_state_proto() const override;
+
+  //! Returns the Protobuf ID associated to this class
+  bayesmix::MixingId get_id() const override { return bayesmix::MixingId::PY; }
+
+  //! Returns whether the mixing is conditional or marginal
+  bool is_conditional() const override { return false; }
+
+ protected:
   //! Returns probability mass for an old cluster (for marginal mixings only)
   //! @param n          Total dataset size
   //! @param log        Whether to return logarithm-scale values or not
@@ -65,21 +80,7 @@ class PitYorMixing
                           const bool propto,
                           const unsigned int n_clust) const override;
 
-  //! Read and set state values from a given Protobuf message
-  void set_state_from_proto(const google::protobuf::Message &state_) override;
-
-  //! Writes current state to a Protobuf message and return a shared_ptr
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! MixingState message by adding the appropriate type
-  std::shared_ptr<bayesmix::MixingState> get_state_proto() const override;
-
-  //! Returns the Protobuf ID associated to this class
-  bayesmix::MixingId get_id() const override { return bayesmix::MixingId::PY; }
-
-  //! Returns whether the mixing is conditional or marginal
-  bool is_conditional() const override { return false; }
-
- protected:
+  //! Initializes state parameters to appropriate values
   void initialize_state() override;
 };
 

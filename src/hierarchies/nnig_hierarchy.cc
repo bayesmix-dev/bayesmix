@@ -205,7 +205,7 @@ void NNIGHierarchy::clear_summary_statistics() {
   data_sum_squares = 0;
 }
 
-NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
+NNIG::Hyperparams NNIGHierarchy::compute_posterior_hypers() const {
   // Initialize relevant variables
   if (card == 0) {  // no update possible
     return *hypers;

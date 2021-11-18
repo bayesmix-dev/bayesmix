@@ -56,7 +56,7 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Generates new state values from the centering prior distribution
   void sample_prior() override {
     state = static_cast<Derived *>(this)->draw(*hypers);
-  };
+  }
 
   //! Overloaded version of sample_full_cond(bool), mainly used for debugging
   virtual void sample_full_cond(
@@ -74,8 +74,9 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Returns a pointer to the Protobuf message of the prior of this cluster
   virtual google::protobuf::Message *get_mutable_prior() override {
-    if (prior == nullptr) create_empty_prior();
-
+    if (prior == nullptr) {
+      create_empty_prior();
+    }
     return prior.get();
   }
 
@@ -107,13 +108,14 @@ class BaseHierarchy : public AbstractHierarchy {
   void initialize() override {
     hypers = std::make_shared<Hyperparams>();
     check_prior_is_set();
-    static_cast<Derived *>(this)->initialize_hypers();
-    static_cast<Derived *>(this)->initialize_state();
+    initialize_hypers();
+    initialize_state();
     posterior_hypers = *hypers;
-    static_cast<Derived *>(this)->clear_data();
-    static_cast<Derived *>(this)->clear_summary_statistics();
+    clear_data();
+    clear_summary_statistics();
   }
 
+ protected:
   //! Raises an error if the prior pointer is not initialized
   void check_prior_is_set() const {
     if (prior == nullptr) {
@@ -121,22 +123,34 @@ class BaseHierarchy : public AbstractHierarchy {
     }
   }
 
- protected:
   //! Re-initializes the prior of the hierarchy to a newly created object
   void create_empty_prior() { prior.reset(new Prior); }
 
-  //! Sets the cluster's cardinality
+  //! Sets the cardinality of the cluster
   void set_card(const int card_) {
     card = card_;
-    log_card = std::log(card_);
+    log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
   }
 
-  //! Removes all indicators of data points belonging to this cluster
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::ClusterState message by adding the appropriate type
+  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
+  get_state_proto() const = 0;
+
+  //! Initializes state parameters to appropriate values
+  virtual void initialize_state() = 0;
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  virtual void initialize_hypers() = 0;
+
+  //! Resets cardinality and indexes of data in this cluster
   void clear_data() {
-    card = 0;
-    // TODO log_card?
+    set_card(0);
     cluster_data_idx = std::set<int>();
   }
+
+  virtual void clear_summary_statistics() = 0;
 
   //! Down-casts the given generic proto message to a ClusterState proto
   bayesmix::AlgorithmState::ClusterState *downcast_state(
@@ -195,8 +209,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
     const bool update_params /*= false*/,
     const Eigen::RowVectorXd &covariate /* = Eigen::RowVectorXd(0)*/) {
   static_cast<Derived *>(this)->update_ss(datum, covariate, false);
-  card -= 1;
-  log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
+  set_card(card - 1);
   auto it = cluster_data_idx.find(id);
   assert(it != cluster_data_idx.end());
   cluster_data_idx.erase(it);
@@ -248,8 +261,8 @@ template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
     const Eigen::MatrixXd &data,
     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
-  static_cast<Derived *>(this)->clear_data();
-  static_cast<Derived *>(this)->clear_summary_statistics();
+  clear_data();
+  clear_summary_statistics();
   if (covariates.cols() == 0) {
     // Pass null value as covariate
     for (int i = 0; i < data.rows(); i++) {

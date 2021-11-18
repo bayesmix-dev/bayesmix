@@ -45,9 +45,6 @@ class AbstractMixing {
   AbstractMixing() = default;
   virtual ~AbstractMixing() = default;
 
-  //! Initializes class members to appropriate values
-  virtual void initialize() = 0;
-
   //! Performs conditional update of state, given allocations and unique values
   //! @param unique_values  A vector of (pointers to) Hierarchy objects
   //! @param allocations    A vector of allocations label
@@ -69,7 +66,7 @@ class AbstractMixing {
         return mixing_weights(log, propto);
       }
     }
-  };
+  }
 
   //! Public wrapper for `mass_existing_cluster()` methods
   double get_mass_existing_cluster(
@@ -111,15 +108,14 @@ class AbstractMixing {
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
+  //! Writes current state to a Protobuf message by pointer
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
-
-  //! Writes current state to a Protobuf message and return a shared_ptr
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! MixingState message by adding the appropriate type
-  virtual std::shared_ptr<bayesmix::MixingState> get_state_proto() const = 0;
 
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::MixingId get_id() const = 0;
+
+  //! Main function that initializes members to appropriate values
+  virtual void initialize() = 0;
 
   //! Returns whether the mixing is conditional or marginal
   virtual bool is_conditional() const = 0;
@@ -142,7 +138,7 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
 
   //! Returns mixing weights (for conditional mixings only)
   //! @param log        Whether to return logarithm-scale values or not
@@ -156,7 +152,7 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
 
   //! Returns probability mass for an old cluster (for marginal mixings only)
   //! @param n          Total dataset size
@@ -175,7 +171,7 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
 
   //! Returns probability mass for an old cluster (for marginal mixings only)
   //! @param n          Total dataset size
@@ -192,7 +188,7 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
 
   //! Returns probability mass for a new cluster (for marginal mixings only)
   //! @param n          Total dataset size
@@ -211,7 +207,7 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
 
   //! Returns probability mass for a new cluster (for marginal mixings only)
   //! @param n          Total dataset size
@@ -228,7 +224,7 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
 };
 
 #endif  // BAYESMIX_MIXINGS_ABSTRACT_MIXING_H_

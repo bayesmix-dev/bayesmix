@@ -46,12 +46,6 @@ class NNIGHierarchy
   NNIGHierarchy() = default;
   ~NNIGHierarchy() = default;
 
-  //! Initializes state parameters to appropriate values
-  void initialize_state() override;
-
-  //! Initializes hierarchy hyperparameters to appropriate values
-  void initialize_hypers() override;
-
   //! Updates hyperparameter values given a vector of cluster states
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;
@@ -59,14 +53,13 @@ class NNIGHierarchy
   //! Updates state values using the given (prior or posterior) hyperparameters
   NNIG::State draw(const NNIG::Hyperparams &params);
 
-  //! Removes every data point from this cluster
-  void clear_summary_statistics();
+  //! Resets summary statistics for this cluster
+  void clear_summary_statistics() override;
 
-  //! Returns whether the hierarchy models multivariate data or not
-  bool is_multivariate() const override { return false; }
-
-  //! Computes and return posterior hypers given data currently in this cluster
-  NNIG::Hyperparams get_posterior_parameters();
+  //! Returns the Protobuf ID associated to this class
+  bayesmix::HierarchyId get_id() const override {
+    return bayesmix::HierarchyId::NNIG;
+  }
 
   //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override;
@@ -80,10 +73,11 @@ class NNIGHierarchy
   //! Writes current state to a Protobuf message by pointer
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  //! Returns the Protobuf ID associated to this class
-  bayesmix::HierarchyId get_id() const override {
-    return bayesmix::HierarchyId::NNIG;
-  }
+  //! Computes and return posterior hypers given data currently in this cluster
+  NNIG::Hyperparams compute_posterior_hypers() const;
+
+  //! Returns whether the hierarchy models multivariate data or not
+  bool is_multivariate() const override { return false; }
 
  protected:
   //! Evaluates the log-likelihood of data in a single point
@@ -103,6 +97,12 @@ class NNIGHierarchy
   //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  bool add) override;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state() override;
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  void initialize_hypers() override;
 
   //! Sum of data points currently belonging to the cluster
   double data_sum = 0;

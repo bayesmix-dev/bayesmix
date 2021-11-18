@@ -49,13 +49,6 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       const std::vector<unsigned int> &allocations) override;
 
-  //! Returns mixing weights (for conditional mixings only)
-  //! @param log        Whether to return logarithm-scale values or not
-  //! @param propto     Whether to include normalizing constants or not
-  //! @return           The vector of mixing weights
-  Eigen::VectorXd mixing_weights(const bool log,
-                                 const bool propto) const override;
-
   //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
@@ -73,6 +66,13 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
   bool is_conditional() const override { return true; }
 
  protected:
+  //! Returns mixing weights (for conditional mixings only)
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @return           The vector of mixing weights
+  Eigen::VectorXd mixing_weights(const bool log,
+                                 const bool propto) const override;
+
   //! Initializes state parameters to appropriate values
   void initialize_state() override;
 

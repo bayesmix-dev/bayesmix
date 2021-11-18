@@ -54,7 +54,7 @@ Eigen::VectorXd NNWHierarchy::conditional_pred_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
   // Custom, optimized grid method
   NNW::Hyperparams pred_params =
-      get_predictive_t_parameters(get_posterior_parameters());
+      get_predictive_t_parameters(compute_posterior_hypers());
   Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
   double logdet = 2 * log(diag.array()).sum();
 
@@ -281,7 +281,7 @@ void NNWHierarchy::clear_summary_statistics() {
   data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
 }
 
-NNW::Hyperparams NNWHierarchy::get_posterior_parameters() const {
+NNW::Hyperparams NNWHierarchy::compute_posterior_hypers() const {
   if (card == 0) {  // no update possible
     return *hypers;
   }
