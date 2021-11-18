@@ -230,9 +230,6 @@ class AbstractMixing {
       throw std::runtime_error("Not implemented");
     }
   }
-
-  //! Initializes the mixing state to appropriate values
-  virtual void initialize_state() = 0;
 };
 
 #endif  // BAYESMIX_MIXINGS_ABSTRACT_MIXING_H_

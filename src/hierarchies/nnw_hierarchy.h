@@ -90,7 +90,7 @@ class NNWHierarchy
   NNW::State draw(const NNW::Hyperparams &params);
 
   //! Resets summary statistics for this cluster
-  void clear_summary_statistics() override;
+  void clear_summary_statistics();
 
   //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
@@ -111,6 +111,12 @@ class NNWHierarchy
 
   //! Writes current state to a Protobuf message by pointer
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state();
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  void initialize_hypers();
 
   //! Returns whether the hierarchy models multivariate data or not
   bool is_multivariate() const override { return true; }
@@ -140,12 +146,6 @@ class NNWHierarchy
   //! Returns parameters for the predictive Student's t distribution
   NNW::Hyperparams get_predictive_t_parameters(
       const NNW::Hyperparams &params) const;
-
-  //! Initializes state parameters to appropriate values
-  void initialize_state() override;
-
-  //! Initializes hierarchy hyperparameters to appropriate values
-  void initialize_hypers() override;
 
   //! Dimension of data space
   unsigned int dim;

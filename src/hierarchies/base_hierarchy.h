@@ -108,11 +108,11 @@ class BaseHierarchy : public AbstractHierarchy {
   void initialize() override {
     hypers = std::make_shared<Hyperparams>();
     check_prior_is_set();
-    initialize_hypers();
-    initialize_state();
+    static_cast<Derived *>(this)->initialize_hypers();
+    static_cast<Derived *>(this)->initialize_state();
     posterior_hypers = *hypers;
     clear_data();
-    clear_summary_statistics();
+    static_cast<Derived *>(this)->clear_summary_statistics();
   }
 
  protected:

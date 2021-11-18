@@ -56,12 +56,13 @@ class PitYorMixing
   //! Returns the Protobuf ID associated to this class
   bayesmix::MixingId get_id() const override { return bayesmix::MixingId::PY; }
 
+  //! Initializes state parameters to appropriate values
+  void initialize_state();
+
   //! Returns whether the mixing is conditional or marginal
   bool is_conditional() const override { return false; }
 
  protected:
-  void initialize_state() override;
-
   //! Returns probability mass for an old cluster (for marginal mixings only)
   //! @param n          Total dataset size
   //! @param log        Whether to return logarithm-scale values or not

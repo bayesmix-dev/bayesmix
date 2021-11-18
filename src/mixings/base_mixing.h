@@ -109,7 +109,7 @@ void BaseMixing<Derived, State, Prior>::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
   }
-  initialize_state();
+  static_cast<Derived *>(this)->initialize_state();
 }
 
 #endif  // BAYESMIX_MIXINGS_BASE_MIXING_H_

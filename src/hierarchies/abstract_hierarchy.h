@@ -259,15 +259,6 @@ class AbstractHierarchy {
       throw std::runtime_error("Not implemented");
     }
   }
-
-  //! Resets summary statistics for this cluster
-  virtual void clear_summary_statistics() = 0;
-
-  //! Initializes state parameters to appropriate values
-  virtual void initialize_state() = 0;
-
-  //! Initializes hierarchy hyperparameters to appropriate values
-  virtual void initialize_hypers() = 0;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_ABSTRACT_HIERARCHY_H_

@@ -62,13 +62,13 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
     return bayesmix::MixingId::TruncSB;
   }
 
+  //! Initializes state parameters to appropriate values
+  void initialize_state();
+
   //! Returns whether the mixing is conditional or marginal
   bool is_conditional() const override { return true; }
 
  protected:
-  //! Initializes state parameters to appropriate values
-  void initialize_state() override;
-
   //! Returns mixing weights (for conditional mixings only)
   //! @param log        Whether to return logarithm-scale values or not
   //! @param propto     Whether to include normalizing constants or not

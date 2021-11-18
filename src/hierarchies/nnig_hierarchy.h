@@ -54,7 +54,7 @@ class NNIGHierarchy
   NNIG::State draw(const NNIG::Hyperparams &params);
 
   //! Resets summary statistics for this cluster
-  void clear_summary_statistics() override;
+  void clear_summary_statistics();
 
   //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
@@ -75,6 +75,12 @@ class NNIGHierarchy
 
   //! Computes and return posterior hypers given data currently in this cluster
   NNIG::Hyperparams get_posterior_parameters() const;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state();
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  void initialize_hypers();
 
   //! Returns whether the hierarchy models multivariate data or not
   bool is_multivariate() const override { return false; }
@@ -97,12 +103,6 @@ class NNIGHierarchy
   //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  bool add) override;
-
-  //! Initializes state parameters to appropriate values
-  void initialize_state() override;
-
-  //! Initializes hierarchy hyperparameters to appropriate values
-  void initialize_hypers() override;
 
   //! Sum of data points currently belonging to the cluster
   double data_sum = 0;
