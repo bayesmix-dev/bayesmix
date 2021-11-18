@@ -2,7 +2,7 @@
 
 [![Documentation Status](https://readthedocs.org/projects/bayesmix/badge/?version=latest)](https://bayesmix.readthedocs.io/en/latest/?badge=latest)
 
-`bayesmix` is a C++ library for running MCMC simulation in Bayesian mixture models.
+`bayesmix` is a C++ library for running MCMC simulations in Bayesian mixture models.
 
 Current state of the software:
 - `bayesmix` performs inference for mixture models of the kind
@@ -11,27 +11,26 @@ Current state of the software:
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=P&space;\sim&space;\Pi" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P&space;\sim&space;\Pi" title="\Pi \sim P" /></a>
 
-Where P is either the Dirichlet process or the Pitman--Yor process.
+where P is either the Dirichlet process or the Pitman--Yor process
 
 - We currently support univariate and multivariate location-scale mixture of Gaussian densities
 
-- Inference is carried out using either Algorithm 2 or Algorithm 8 in [Neal (2000)](http://www.stat.columbia.edu/npbayes/papers/neal_sampling.pdf).
+- Inference is carried out using algorithms such as Algorithm 2 in [Neal (2000)](http://www.stat.columbia.edu/npbayes/papers/neal_sampling.pdf)
 
-- Serialization of the MCMC chains is possible using [Google's protocol buffers](https://developers.google.com/protocol-buffers)
+- Serialization of the MCMC chains is possible using Google's Protocol Buffers](https://developers.google.com/protocol-buffers), aka `protobuf`
 
 
-## Installation
 
-### For end users
+# Installation
+## For end users
+**Warning**: make sure you have a recent version of `cmake` installed (at least 3.20.x) or install `protobuf` beforehand (see the section for developers)!
 
-!!! Make sure you have a recent version of cmake installed (at least 3.20.x) or install protobuf beforehand (see the section for developers)
-
-Just clone the repository with
+To install and use `bayesmix`, please clone this repository with the following command-line instruction:
 ```shell
 git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
 ```
 
-To run the executable:
+To build the executable for the main file `run.cc`, please use the following list of commands:
 ```shell
 mkdir build
 cd build
@@ -40,15 +39,17 @@ make run
 cd ..
 ```
 
-The executable `./build/run` can be used to perform all the necessary analysis. See the file `bash/run_test.sh` for examples of usage with command line arguments.
+### Tutorial
+The `build/run` executable can be used to perform all the necessary analysis, but it needs some command-line arguments to be passed.
+An example script that runs said executable by passing appropriate arguments to it is `example/tutorial/run.sh`, which you can run right out of the box from your command line to perform a first run of the library.
+In order to use your custom datasets, algorithm settings, and prior specifications, please create a copy of the above script and change the arguments as appropriate.
 
 
-### For developers
-
-
-We heavily depend on Google's [Protocol Buffers](https://github.com/protocolbuffers/protobuf). The CMakeLists.txt file is set up to install the library if it does not find it in the computer. However any call to `make clean` will uninstall it, causing a huge waste of time... so make sure to install it beforehand!
-
-On Linux machine the following will install the library
+## For developers
+We heavily depend on the `protobuf` library to move and store structured data.
+The `CMakeLists.txt` file is set up to install such library if it does not find it in the computer.
+However any call to `make clean` will uninstall it, causing a huge waste of time... so make sure to install it manually beforehand!
+You can do so as follows on a Linux machine:
 ```shell
 sudo apt-get install autoconf automake libtool curl make g++ unzip cmake
 wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protobuf-python-3.14.0.zip
@@ -57,36 +58,23 @@ cd protobuf-3.14.0/
 ./configure --prefix=/usr
 make check
 sudo make install
-sudo ldconfig # refresh shared library cache.
+sudo ldconfig
 ```
-On Mac and Windows machines, follow the official install guide ([link](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md))
+On Mac and Windows machines, please follow the official `protobuf` installation guide ([link](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md)) instead.
 
-Another very useful tool is [`ccache`](https://ccache.dev) that significantly speed up the compilation.
+Another very useful tool is [`ccache`](https://ccache.dev) that can significantly speed up the compilation process.
 
-Finally, to work with `bayesmix`, just clone the repository with
-```shell
-git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
-```
-
-To run the executable:
-```shell
-mkdir build
-cd build
-cmake ..
-make run
-cd ..
-```
-
-To run unit tests:
+Finally, to compile unit tests, please use the following commands:
 ```shell
 cd build
 cmake ..
 make test_bayesmix
-./test/test_bayesmix
+cd ..
 ```
+The corresponding executable is located at `build/test/test_bayesmix`.
 
-## Documentation
+# Documentation
 Documentation is available at https://bayesmix.readthedocs.io.
 
-## Contributions are welcome!
+# Contributions are welcome!
 Please check out [CONTRIBUTORS.md](CONTRIBUTORS.md) for details on how to collaborate with us.
