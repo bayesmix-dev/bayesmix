@@ -3,7 +3,7 @@ bayesmix/utils
 Tutorial - Univariate data
 ==========================
 
-You can run the ``bash/tutorial.sh`` script for a quick example on how to use the ``run.cc`` file.
+You can run the ``examples/tutorial/run.sh`` script for a quick example on how to use the ``run.cc`` file.
 This example uses files which are available in the ``resources/tutorial`` subfolder.
 We recommend that you open and read these files for a better understanding of how the process works.
 The aforementioned script executes the following command:
