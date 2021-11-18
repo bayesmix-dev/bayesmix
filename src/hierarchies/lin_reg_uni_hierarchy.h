@@ -66,7 +66,7 @@ class LinRegUniHierarchy
                                  bool add) override;
 
   //! Resets summary statistics for this cluster
-  void clear_summary_statistics();
+  void clear_summary_statistics() override;
 
   //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
@@ -91,12 +91,6 @@ class LinRegUniHierarchy
   //! Computes and return posterior hypers given data currently in this cluster
   LinRegUni::Hyperparams compute_posterior_hypers() const;
 
-  //! Initializes state parameters to appropriate values
-  void initialize_state();
-
-  //! Initializes hierarchy hyperparameters to appropriate values
-  void initialize_hypers();
-
   //! Returns whether the hierarchy models multivariate data or not
   bool is_multivariate() const override { return false; }
 
@@ -119,6 +113,12 @@ class LinRegUniHierarchy
   double marg_lpdf(const LinRegUni::Hyperparams &params,
                    const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state() override;
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  void initialize_hypers() override;
 
   //! Dimension of the coefficients vector
   unsigned int dim;

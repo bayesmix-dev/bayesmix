@@ -62,9 +62,6 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
     return bayesmix::MixingId::TruncSB;
   }
 
-  //! Initializes state parameters to appropriate values
-  void initialize_state();
-
   //! Returns whether the mixing is conditional or marginal
   bool is_conditional() const override { return true; }
 
@@ -75,6 +72,9 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
   //! @return           The vector of mixing weights
   Eigen::VectorXd mixing_weights(const bool log,
                                  const bool propto) const override;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state() override;
 
   //! Returns weights in log-scale computing them from sticks
   Eigen::VectorXd logweights_from_sticks() const;

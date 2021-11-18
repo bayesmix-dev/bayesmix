@@ -54,6 +54,9 @@ class BaseMixing : public AbstractMixing {
   //! Main function that initializes members to appropriate values
   void initialize() override;
 
+  //! Initializes state parameters to appropriate values
+  virtual void initialize_state() = 0;
+
  protected:
   //! Re-initializes the prior of the mixing to a newly created object
   void create_empty_prior() { prior.reset(new Prior); }
@@ -109,7 +112,7 @@ void BaseMixing<Derived, State, Prior>::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
   }
-  static_cast<Derived *>(this)->initialize_state();
+  initialize_state();
 }
 
 #endif  // BAYESMIX_MIXINGS_BASE_MIXING_H_

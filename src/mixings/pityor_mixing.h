@@ -56,9 +56,6 @@ class PitYorMixing
   //! Returns the Protobuf ID associated to this class
   bayesmix::MixingId get_id() const override { return bayesmix::MixingId::PY; }
 
-  //! Initializes state parameters to appropriate values
-  void initialize_state();
-
   //! Returns whether the mixing is conditional or marginal
   bool is_conditional() const override { return false; }
 
@@ -82,6 +79,9 @@ class PitYorMixing
   double mass_new_cluster(const unsigned int n, const bool log,
                           const bool propto,
                           const unsigned int n_clust) const override;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state() override;
 };
 
 #endif  // BAYESMIX_MIXINGS_PITYOR_MIXING_H_

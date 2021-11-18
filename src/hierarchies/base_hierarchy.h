@@ -108,11 +108,11 @@ class BaseHierarchy : public AbstractHierarchy {
   void initialize() override {
     hypers = std::make_shared<Hyperparams>();
     check_prior_is_set();
-    static_cast<Derived *>(this)->initialize_hypers();
-    static_cast<Derived *>(this)->initialize_state();
+    initialize_hypers();
+    initialize_state();
     posterior_hypers = *hypers;
     clear_data();
-    static_cast<Derived *>(this)->clear_summary_statistics();
+    clear_summary_statistics();
   }
 
  protected:
@@ -132,11 +132,19 @@ class BaseHierarchy : public AbstractHierarchy {
     log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
   }
 
+  //! Initializes state parameters to appropriate values
+  virtual void initialize_state() = 0;
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  virtual void initialize_hypers() = 0;
+
   //! Resets cardinality and indexes of data in this cluster
   void clear_data() {
     set_card(0);
     cluster_data_idx = std::set<int>();
   }
+
+  virtual void clear_summary_statistics() = 0;
 
   //! Down-casts the given generic proto message to a ClusterState proto
   bayesmix::AlgorithmState::ClusterState *downcast_state(
@@ -247,8 +255,8 @@ template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
     const Eigen::MatrixXd &data,
     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
-  static_cast<Derived *>(this)->clear_data();
-  static_cast<Derived *>(this)->clear_summary_statistics();
+  clear_data();
+  clear_summary_statistics();
   if (covariates.cols() == 0) {
     // Pass null value as covariate
     for (int i = 0; i < data.rows(); i++) {

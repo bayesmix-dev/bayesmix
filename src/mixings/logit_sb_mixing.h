@@ -67,9 +67,6 @@ class LogitSBMixing
     return acceptance_rates / n_iter;
   }
 
-  //! Initializes state parameters to appropriate values
-  void initialize_state();
-
   //! Returns whether the mixing is conditional or marginal
   bool is_conditional() const override { return true; }
 
@@ -85,6 +82,9 @@ class LogitSBMixing
   Eigen::VectorXd mixing_weights(
       const bool log, const bool propto,
       const Eigen::RowVectorXd &covariate) const override;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state() override;
 
   //! Sigmoid function
   double sigmoid(const double x) const { return 1.0 / (1.0 + std::exp(-x)); }
