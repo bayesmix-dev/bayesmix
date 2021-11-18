@@ -70,7 +70,7 @@ Instead, child classes must implement:
 6. `initialize_state`: initializes the current theta_h given the hyperparameters in P_0
 7. `initialize_hypers`: initializes the hyperparameters in P_0 given their hyperprior
 8. `update_summary_statistics`: updates the summary statistics when an observation is allocated or de-allocated from the hierarchy
-9. `get_posterior_parameters`: returns the paramters of the full conditional distribution, which is **only possible when P_0 and k are conjugate**
+9. `compute_posterior_hypers`: returns the paramters of the full conditional distribution, which is **only possible when P_0 and k are conjugate**
 10. `set_state_from_proto`
 11. `write_state_to_proto`
 12. `write_hypers_to_proto`

@@ -64,7 +64,7 @@ class GammaGammaHierarchy
   }
 
   //! Computes and return posterior hypers given data currently in this cluster
-  GammaGamma::Hyperparams get_posterior_parameters() {
+  GammaGamma::Hyperparams compute_posterior_hypers() {
     GammaGamma::Hyperparams out;
     out.shape = hypers->shape;
     out.rate_alpha = hypers->rate_alpha + hypers->shape * ndata;

@@ -98,7 +98,7 @@ class NNWHierarchy
   }
 
   //! Computes and return posterior hypers given data currently in this cluster
-  NNW::Hyperparams get_posterior_parameters() const;
+  NNW::Hyperparams compute_posterior_hypers() const;
 
   //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override;

@@ -74,7 +74,7 @@ class NNIGHierarchy
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
   //! Computes and return posterior hypers given data currently in this cluster
-  NNIG::Hyperparams get_posterior_parameters() const;
+  NNIG::Hyperparams compute_posterior_hypers() const;
 
   //! Initializes state parameters to appropriate values
   void initialize_state();

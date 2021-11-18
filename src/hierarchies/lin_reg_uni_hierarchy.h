@@ -89,7 +89,7 @@ class LinRegUniHierarchy
   unsigned int get_dim() const { return dim; }
 
   //! Computes and return posterior hypers given data currently in this cluster
-  LinRegUni::Hyperparams get_posterior_parameters() const;
+  LinRegUni::Hyperparams compute_posterior_hypers() const;
 
   //! Initializes state parameters to appropriate values
   void initialize_state();
