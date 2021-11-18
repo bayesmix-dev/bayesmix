@@ -82,8 +82,14 @@ class LinRegUniHierarchy
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override;
 
-  //! Writes current state to a Protobuf message by pointer
-  void write_hypers_to_proto(google::protobuf::Message *out) const override;
+  void set_hypers_from_proto(const google::protobuf::Message &hypers_) override;
+
+  //! Writes current value of hyperparameters to a Protobuf message and 
+  //! return a shared_ptr.
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::HierarchyHypers message by adding the appropriate type
+  std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
+  get_hypers_proto() const override;
 
   //! Returns the dimension of the coefficients vector
   unsigned int get_dim() const { return dim; }

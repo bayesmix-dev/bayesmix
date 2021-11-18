@@ -18,6 +18,8 @@ Eigen::VectorXd ConditionalAlgorithm::lpdf_from_state(
   Eigen::MatrixXd lpdf_local(grid.rows(), n_clust);
   Eigen::VectorXd lpdf_final(grid.rows());
   auto temp_hier = unique_values[0]->clone();
+  temp_hier->set_hypers_from_proto(curr_state.hierarchy_hypers());
+
   // Loop over grid points
   for (size_t i = 0; i < grid.rows(); i++) {
     // Get mixing weights for the i-th grid point
