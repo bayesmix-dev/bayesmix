@@ -54,10 +54,7 @@ class AbstractHierarchy {
   virtual std::shared_ptr<AbstractHierarchy> clone() const = 0;
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
-  //! Evaluates the log-likelihood of data in a single point
-  //! @param datum      Point which is to be evaluated
-  //! @param covariate  (Optional) covariate vector associated to datum
-  //! @return           The evaluation of the lpdf
+  //! Public wrapper for like_lpdf() methods
   double get_like_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
@@ -130,6 +127,11 @@ class AbstractHierarchy {
   //! @param update_params  Save posterior hypers after the computation?
   virtual void sample_full_cond(bool update_params = false) = 0;
 
+  //! Overloaded version of sample_full_cond(bool), mainly used for debugging
+  virtual void sample_full_cond(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
+
   //! Updates hyperparameter values given a vector of cluster states
   virtual void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;
@@ -147,23 +149,23 @@ class AbstractHierarchy {
   //! Returns a pointer to the Protobuf message of the prior of this cluster
   virtual google::protobuf::Message *get_mutable_prior() = 0;
 
-  //! Write current state to a Protobuf message by pointer
+  //! Writes current state to a Protobuf message by pointer
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
-  //! Write current state to a Protobuf message and return a shared_ptr
+  //! Writes current state to a Protobuf message and return a shared_ptr
   //! New hierarchies have to first modify the field 'oneof val' in the
   //! AlgoritmState::ClusterState message by adding the appropriate type
   virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
   get_state_proto() const = 0;
 
-  //! Write current hyperparameters to a Protobuf message by pointer
+  //! Writes current hyperparameters to a Protobuf message by pointer
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
 
   //! Read and set state values from a given Protobuf message
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
-  // MISCELLANEOUS
+  // DATA FUNCTIONS
   //! Adds a datum and its index to the hierarchy
   virtual void add_datum(
       const int id, const Eigen::RowVectorXd &datum,
@@ -186,7 +188,8 @@ class AbstractHierarchy {
     }
   }
 
-  //! Initializes class members to appropriate values
+  // INITIALIZATION FUNCTIONS
+  //! Main function that initializes members to appropriate values
   virtual void initialize() = 0;
 
   //! Initializes state parameters to appropriate values
@@ -195,6 +198,7 @@ class AbstractHierarchy {
   //! Initializes hierarchy hyperparameters to appropriate values
   virtual void initialize_hypers() = 0;
 
+  // FEATURES AND IDENTIFIERS
   //! Returns whether the hierarchy models multivariate data or not
   virtual bool is_multivariate() const = 0;
 
@@ -207,13 +211,11 @@ class AbstractHierarchy {
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::HierarchyId get_id() const = 0;
 
-  //! Overloaded version of sample_full_cond(), mainly used for debugging
-  virtual void sample_full_cond(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
-
  protected:
-  //! Private version of get_like_lpdf()
+  //! Evaluates the log-likelihood of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   virtual double like_lpdf(const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const {
     if (!is_dependent()) {
@@ -224,7 +226,9 @@ class AbstractHierarchy {
     }
   }
 
-  //! Private version of get_like_lpdf(), overloaded without covariates
+  //! Evaluates the log-likelihood of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
   virtual double like_lpdf(const Eigen::RowVectorXd &datum) const {
     if (is_dependent()) {
       throw std::runtime_error(
