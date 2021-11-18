@@ -23,10 +23,10 @@ void BlockedGibbsAlgorithm::sample_allocations() {
   for (int i = 0; i < data.rows(); i++) {
     // Compute weights
     Eigen::VectorXd logprobas =
-        mixing->get_weights(true, false, mix_covariates.row(i));
+        mixing->get_mixing_weights(true, false, mix_covariates.row(i));
     for (int j = 0; j < num_components; j++) {
       logprobas(j) +=
-          unique_values[j]->like_lpdf(data.row(i), hier_covariates.row(i));
+          unique_values[j]->get_like_lpdf(data.row(i), hier_covariates.row(i));
     }
     // Draw a NEW value for datum allocation
     unsigned int c_new =

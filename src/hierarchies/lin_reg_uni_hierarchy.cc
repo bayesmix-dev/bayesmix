@@ -10,14 +10,14 @@
 
 double LinRegUniHierarchy::like_lpdf(
     const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate) const {
   return stan::math::normal_lpdf(
       datum(0), state.regression_coeffs.dot(covariate), sqrt(state.var));
 }
 
 double LinRegUniHierarchy::marg_lpdf(
     const LinRegUni::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+    const Eigen::RowVectorXd &covariate) const {
   double sig_n = sqrt(
       (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
       params.scale / params.shape);
@@ -139,7 +139,7 @@ LinRegUniHierarchy::get_state_proto() const {
   state_.set_var(state.var);
 
   auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
-  out->mutable_uni_ls_state()->CopyFrom(state_);
+  out->mutable_lin_reg_uni_ls_state()->CopyFrom(state_);
   return out;
 }
 

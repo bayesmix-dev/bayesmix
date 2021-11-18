@@ -42,7 +42,7 @@ TEST(lpdf, nnig) {
   double prior1 = stan::math::inv_gamma_lpdf(var, alpha0, beta0);
   double prior2 = stan::math::normal_lpdf(mean, mu0, sqrt(var / lambda0));
   double prior = prior1 + prior2;
-  double like = hier.like_lpdf(datum);
+  double like = hier.get_like_lpdf(datum);
   double post1 = stan::math::inv_gamma_lpdf(var, alpha_n, beta_n);
   double post2 = stan::math::normal_lpdf(mean, mu_n, sqrt(var / lambda_n));
   double post = post1 + post2;
@@ -100,7 +100,7 @@ TEST(lpdf, nnig) {
 //   double prior1 = stan::math::wishart_lpdf(tau, nu0, tau0);
 //   double prior2 = stan::math::multi_normal_prec_lpdf(mu, mu0, tau_pr);
 //   double prior = prior1 + prior2;
-//   double like = hier.like_lpdf(datum);
+//   double like = hier.get_like_lpdf(datum);
 //   double post1 = stan::math::wishart_lpdf(tau, nu_n, tau_post);
 //   double post2 = stan::math::multi_normal_prec_lpdf(mu, mu0, tau_post);
 //   double post = post1 + post2;
@@ -185,7 +185,7 @@ TEST(lpdf, lin_reg_uni) {
   double prior1 = stan::math::inv_gamma_lpdf(var, alpha0, beta0);
   double prior2 = stan::math::multi_normal_prec_lpdf(mean, mu0, Lambda0 / var);
   double pr = prior1 + prior2;
-  double like = hier.like_lpdf(datum, cov);
+  double like = hier.get_like_lpdf(datum, cov);
   double post1 = stan::math::inv_gamma_lpdf(var, alpha_n, beta_n);
   double post2 =
       stan::math::multi_normal_prec_lpdf(mean, mu_n, Lambda_n / var);

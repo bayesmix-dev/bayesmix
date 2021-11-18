@@ -26,17 +26,19 @@
 //! flag accordingly, and can only be used with the same type of `Algorithm`
 //! object. In a conditional mixing, mixing weights for the clusters are part
 //! of the state of the algorithm. Their values are stored in some form in this
-//! class, and they can be obtained by calling the `get_weights()` method. In a
-//! marginal mixing, the actual mixing weights have been marginalized out of
-//! the model, and information related to them translates to probability masses
-//! to assign a data point to an existing cluster, or to a new one.
-//! Classes inheriting from this one must either implement the `get_weights()`
-//! method, or the `mass_existing_cluster()` and `mass_new_cluster()` methods,
-//! according to the type of mixing which is being implemented. Other
-//! required methods are `update_state()` for a conditional update of the
-//! mixing's state (if any) given allocations and unique values coming from the
-//! library's `Algorithm` classes, and read-write methods involving Protobuf
-//! objects.
+//! class, and they can be obtained by calling the `get_mixing_weights()`
+//! method. In a marginal mixing, the actual mixing weights have been
+//! marginalized out of the model, and information related to them translates
+//! to probability masses to assign a data point to an existing cluster, or to
+//! a new one. According to the type of mixing which is being implemented,
+//! classes inheriting from this one must either implement `get_weights()`, or
+//! both `mass_existing_cluster()` and `mass_new_cluster()` methods. Each of
+//! these methods has a version with covariates for dependent mixings and one
+//! without covariates; please implement the ones that reflect your mixing
+//! type. Other required methods are `update_state()` for a conditional update
+//! of the mixing state (if any) given allocations and unique values coming
+//! from the library `Algorithm` classes, and read-write methods involving
+//! Protobuf objects.
 
 class AbstractMixing {
  public:
@@ -47,47 +49,51 @@ class AbstractMixing {
   virtual void initialize() = 0;
 
   //! Performs conditional update of state, given allocations and unique values
+  //! @param unique_values  A vector of (pointers to) Hierarchy objects
+  //! @param allocations    A vector of allocations label
   virtual void update_state(
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       const std::vector<unsigned int> &allocations) = 0;
 
-  //! Returns mixing weights (for conditional mixings only)
-  virtual Eigen::VectorXd get_weights(
+  //! Public wrapper for `mixing_weights()` methods
+  Eigen::VectorXd get_mixing_weights(
       const bool log, const bool propto,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error(
-        "Cannot call get_weights() from non-conditional mixing");
+    if (!is_conditional()) {
+      throw std::runtime_error(
+          "Cannot call this function from non-conditional mixing");
+    } else {
+      if (is_dependent()) {
+        return mixing_weights(log, propto, covariate);
+      } else {
+        return mixing_weights(log, propto);
+      }
+    }
   };
 
-  //! Returns probability mass for an old cluster (for marginal mixings only)
-  //! @param n          Total dataset size
-  //! @param log        Whether to return logarithm-scale values or not
-  //! @param propto     Whether to include normalizing constants or not
-  //! @param hier       `Hierarchy` object representing the cluster
-  //! @param covariate  (Optional) covariate vector
-  //! @return           Probability value
-  virtual double mass_existing_cluster(
+  //! Public wrapper for `mass_existing_cluster()` methods
+  double get_mass_existing_cluster(
       const unsigned int n, const bool log, const bool propto,
       std::shared_ptr<AbstractHierarchy> hier,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error(
-        "Cannot call mass_existing_cluster() from non-marginal mixing");
-  };
+    if (is_dependent()) {
+      return mass_existing_cluster(n, log, propto, hier, covariate);
+    } else {
+      return mass_existing_cluster(n, log, propto, hier);
+    }
+  }
 
-  //! Returns probability mass for a new cluster (for marginal mixings only)
-  //! @param n          Total dataset size
-  //! @param log        Whether to return logarithm-scale values or not
-  //! @param propto     Whether to include normalizing constants or not
-  //! @param n_clust    Current number of clusters
-  //! @param covariate  (Optional) covariate vector
-  //! @return           Probability value
-  virtual double mass_new_cluster(
+  //! Public wrapper for `mass_new_cluster()` methods
+  double get_mass_new_cluster(
       const unsigned int n, const bool log, const bool propto,
       const unsigned int n_clust,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error(
-        "Cannot call mass_new_cluster() from non-marginal mixing");
-  };
+    if (is_dependent()) {
+      return mass_new_cluster(n, log, propto, n_clust, covariate);
+    } else {
+      return mass_new_cluster(n, log, propto, n_clust);
+    }
+  }
 
   //! Returns current number of clusters of the mixture model
   virtual unsigned int get_num_components() const = 0;
@@ -101,11 +107,15 @@ class AbstractMixing {
   //! Sets pointer to the covariate matrix for the mixture model
   virtual void set_covariates(Eigen::MatrixXd *covar) = 0;
 
+  //! Read and set state values from a given Protobuf message
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! MixingState message by adding the appropriate type
   virtual std::shared_ptr<bayesmix::MixingState> get_state_proto() const = 0;
 
   //! Returns the Protobuf ID associated to this class
@@ -115,7 +125,110 @@ class AbstractMixing {
   virtual bool is_conditional() const = 0;
 
   //! Returns whether the mixing depends on covariate values or not
-  virtual bool is_dependent() const = 0;
+  virtual bool is_dependent() const { return false; }
+
+ protected:
+  //! Returns mixing weights (for conditional mixings only)
+  //! @param log        Return logarithm-scale values?
+  //! @param propto     Return non-normalized values?
+  //! @param covariate  Covariate vector
+  //! @return           The vector of mixing weights
+  virtual Eigen::VectorXd mixing_weights(
+      const bool log, const bool propto,
+      const Eigen::RowVectorXd &covariate) const {
+    if (!is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from non-dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
+
+  //! Returns mixing weights (for conditional mixings only)
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @return           The vector of mixing weights
+  virtual Eigen::VectorXd mixing_weights(const bool log,
+                                         const bool propto) const {
+    if (is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
+
+  //! Returns probability mass for an old cluster (for marginal mixings only)
+  //! @param n          Total dataset size
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @param hier       `Hierarchy` object representing the cluster
+  //! @param covariate  Covariate vector
+  //! @return           Probability value
+  virtual double mass_existing_cluster(
+      const unsigned int n, const bool log, const bool propto,
+      std::shared_ptr<AbstractHierarchy> hier,
+      const Eigen::RowVectorXd &covariate) const {
+    if (!is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from non-dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
+
+  //! Returns probability mass for an old cluster (for marginal mixings only)
+  //! @param n          Total dataset size
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @param hier       `Hierarchy` object representing the cluster
+  //! @return           Probability value
+  virtual double mass_existing_cluster(
+      const unsigned int n, const bool log, const bool propto,
+      std::shared_ptr<AbstractHierarchy> hier) const {
+    if (is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
+
+  //! Returns probability mass for a new cluster (for marginal mixings only)
+  //! @param n          Total dataset size
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @param n_clust    Current number of clusters
+  //! @param covariate  Covariate vector
+  //! @return           Probability value
+  virtual double mass_new_cluster(const unsigned int n, const bool log,
+                                  const bool propto,
+                                  const unsigned int n_clust,
+                                  const Eigen::RowVectorXd &covariate) const {
+    if (!is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from non-dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
+
+  //! Returns probability mass for a new cluster (for marginal mixings only)
+  //! @param n          Total dataset size
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @param n_clust    Current number of clusters
+  //! @return           Probability value
+  virtual double mass_new_cluster(const unsigned int n, const bool log,
+                                  const bool propto,
+                                  const unsigned int n_clust) const {
+    if (is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from dependent mixing");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  };
 };
 
 #endif  // BAYESMIX_MIXINGS_ABSTRACT_MIXING_H_

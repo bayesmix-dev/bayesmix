@@ -112,13 +112,13 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_prior_mass(
   Eigen::VectorXd logprior(n_clust + n_aux);
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    logprior(j) =
-        mixing->mass_existing_cluster(n_data - 1, true, true, unique_values[j],
-                                      mix_covariates.row(data_idx));
+    logprior(j) = mixing->get_mass_existing_cluster(
+        n_data - 1, true, true, unique_values[j],
+        mix_covariates.row(data_idx));
   }
   // Further update with marginal components
   for (size_t j = 0; j < n_aux; j++) {
-    logprior(n_clust + j) = mixing->mass_new_cluster(
+    logprior(n_clust + j) = mixing->get_mass_new_cluster(
         n_data - 1, true, true, n_clust, mix_covariates.row(data_idx));
   }
   return logprior;
@@ -131,14 +131,14 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_lpdf(
   Eigen::VectorXd loglpdf(n_clust + n_aux);
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
-    loglpdf(j) = unique_values[j]->like_lpdf(data.row(data_idx),
-                                             hier_covariates.row(data_idx));
+    loglpdf(j) = unique_values[j]->get_like_lpdf(
+        data.row(data_idx), hier_covariates.row(data_idx));
   }
   for (size_t j = 0; j < n_aux; j++) {
     // Probability of being assigned to a newly created cluster
     loglpdf(n_clust + j) =
-        aux_unique_values[j]->like_lpdf(data.row(data_idx),
-                                        hier_covariates.row(data_idx)) -
+        aux_unique_values[j]->get_like_lpdf(data.row(data_idx),
+                                            hier_covariates.row(data_idx)) -
         log(n_aux);
   }
   return loglpdf;

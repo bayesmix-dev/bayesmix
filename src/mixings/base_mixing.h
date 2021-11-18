@@ -29,29 +29,49 @@ class BaseMixing : public AbstractMixing {
   BaseMixing() = default;
   ~BaseMixing() = default;
 
+  //! Returns the struct of the current state
   State get_state() const { return state; }
 
+  //! Returns the current number of clusters of the mixture model
   unsigned int get_num_components() const override { return num_components; }
 
-  void initialize() override;
-
+  //! Returns a pointer to the Protobuf message of the prior of this cluster
   google::protobuf::Message *get_mutable_prior() override;
 
-  void write_state_to_proto(google::protobuf::Message *out) const override;
-
+  //! Sets the current number of clusters of the mixture model
   void set_num_components(const unsigned int num_) override {
     num_components = num_;
   }
 
+  //! Sets the (pointer to the) covariate matrix for the mixture model
   void set_covariates(Eigen::MatrixXd *covar) override {
     covariates_ptr = covar;
   }
 
+  //! Writes current state to a Protobuf message by pointer
+  void write_state_to_proto(google::protobuf::Message *out) const override;
+
+  //! Main function that initializes members to appropriate values
+  void initialize() override;
+
  protected:
+  //! Re-initializes the prior of the mixing to a newly created object
   void create_empty_prior() { prior.reset(new Prior); }
 
   //! Initializes the mixing state to appropriate values
   virtual void initialize_state() = 0;
+
+  //! Down-casts the given generic proto message to a MixingState proto
+  bayesmix::MixingState *downcast_state(google::protobuf::Message *out) const {
+    return google::protobuf::internal::down_cast<bayesmix::MixingState *>(out);
+  }
+
+  //! Down-casts the given generic proto message to a MixingState proto
+  const bayesmix::MixingState &downcast_state(
+      const google::protobuf::Message &state_) const {
+    return google::protobuf::internal::down_cast<
+        const bayesmix::MixingState &>(state_);
+  }
 
   //! Converts prior from generic Protobuf message to its own type
   std::shared_ptr<Prior> cast_prior() const {
@@ -69,16 +89,6 @@ class BaseMixing : public AbstractMixing {
 
   //! Current number of clusters of the mixture model
   unsigned int num_components;
-
-  bayesmix::MixingState *downcast_state(google::protobuf::Message *out) const {
-    return google::protobuf::internal::down_cast<bayesmix::MixingState *>(out);
-  }
-
-  const bayesmix::MixingState &downcast_state(
-      const google::protobuf::Message &state_) const {
-    return google::protobuf::internal::down_cast<
-        const bayesmix::MixingState &>(state_);
-  }
 };
 
 template <class Derived, typename State, typename Prior>
@@ -91,18 +101,18 @@ BaseMixing<Derived, State, Prior>::get_mutable_prior() {
 }
 
 template <class Derived, typename State, typename Prior>
+void BaseMixing<Derived, State, Prior>::write_state_to_proto(
+    google::protobuf::Message *out) const {
+  auto outcast = downcast_state(out);
+  outcast->CopyFrom(*get_state_proto().get());
+}
+
+template <class Derived, typename State, typename Prior>
 void BaseMixing<Derived, State, Prior>::initialize() {
   if (prior == nullptr) {
     throw std::invalid_argument("Mixing prior was not provided");
   }
   initialize_state();
-}
-
-template <class Derived, typename State, typename Prior>
-void BaseMixing<Derived, State, Prior>::write_state_to_proto(
-    google::protobuf::Message *out) const {
-  auto outcast = downcast_state(out);
-  outcast->CopyFrom(*get_state_proto().get());
 }
 
 #endif  // BAYESMIX_MIXINGS_BASE_MIXING_H_

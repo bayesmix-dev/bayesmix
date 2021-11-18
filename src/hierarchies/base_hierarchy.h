@@ -36,6 +36,7 @@ class BaseHierarchy : public AbstractHierarchy {
   BaseHierarchy() = default;
   ~BaseHierarchy() = default;
 
+  //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractHierarchy> clone() const override {
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
     out->clear_data();
@@ -43,10 +44,66 @@ class BaseHierarchy : public AbstractHierarchy {
     return out;
   }
 
+  //! Evaluates the log-likelihood of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
+  virtual Eigen::VectorXd like_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
+                                                          0)) const override;
+
+  //! Generates new state values from the centering prior distribution
   void sample_prior() override {
     state = static_cast<Derived *>(this)->draw(*hypers);
   };
 
+  //! Overloaded version of sample_full_cond(bool), mainly used for debugging
+  virtual void sample_full_cond(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
+
+  //! Returns the current cardinality of the cluster
+  int get_card() const override { return card; }
+
+  //! Returns the logarithm of the current cardinality of the cluster
+  double get_log_card() const override { return log_card; }
+
+  //! Returns the indexes of data points belonging to this cluster
+  std::set<int> get_data_idx() const override { return cluster_data_idx; }
+
+  //! Returns a pointer to the Protobuf message of the prior of this cluster
+  virtual google::protobuf::Message *get_mutable_prior() override {
+    if (prior == nullptr) create_empty_prior();
+
+    return prior.get();
+  }
+
+  //! Writes current state to a Protobuf message by pointer
+  void write_state_to_proto(google::protobuf::Message *out) const override;
+
+  //! Returns the struct of the current state
+  State get_state() const { return state; }
+
+  //! Returns the struct of the current prior hyperparameters
+  Hyperparams get_hypers() const { return *hypers; }
+
+  //! Returns the struct of the current posterior hyperparameters
+  Hyperparams get_posterior_hypers() const { return posterior_hypers; }
+
+  //! Adds a datum and its index to the hierarchy
+  void add_datum(
+      const int id, const Eigen::RowVectorXd &datum,
+      const bool update_params = false,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
+
+  //! Removes a datum and its index from the hierarchy
+  void remove_datum(
+      const int id, const Eigen::RowVectorXd &datum,
+      const bool update_params = false,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
+
+  //! Main function that initializes members to appropriate values
   void initialize() override {
     hypers = std::make_shared<Hyperparams>();
     check_prior_is_set();
@@ -57,46 +114,44 @@ class BaseHierarchy : public AbstractHierarchy {
     static_cast<Derived *>(this)->clear_summary_statistics();
   }
 
-  void write_state_to_proto(google::protobuf::Message *out) const override;
-
-  void check_prior_is_set() const;
-
-  virtual google::protobuf::Message *get_mutable_prior() override {
-    if (prior == nullptr) create_empty_prior();
-
-    return prior.get();
+  //! Raises an error if the prior pointer is not initialized
+  void check_prior_is_set() const {
+    if (prior == nullptr) {
+      throw std::invalid_argument("Hierarchy prior was not provided");
+    }
   }
 
-  virtual Eigen::VectorXd like_lpdf_grid(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
-                                                          0)) const override;
-
-  virtual void sample_full_cond(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
-
-  void add_datum(
-      const int id, const Eigen::RowVectorXd &datum,
-      const bool update_params = false,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
-
-  void remove_datum(
-      const int id, const Eigen::RowVectorXd &datum,
-      const bool update_params = false,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
-
-  State get_state() const { return state; }
-  Hyperparams get_hypers() const { return *hypers; }
-  Hyperparams get_posterior_hypers() const { return posterior_hypers; }
-
-  int get_card() const override { return card; }
-
-  double get_log_card() const override { return log_card; }
-
-  std::set<int> get_data_idx() const override { return cluster_data_idx; }
-
  protected:
+  //! Re-initializes the prior of the hierarchy to a newly created object
+  void create_empty_prior() { prior.reset(new Prior); }
+
+  //! Sets the cluster's cardinality
+  void set_card(const int card_) {
+    card = card_;
+    log_card = std::log(card_);
+  }
+
+  //! Removes all indicators of data points belonging to this cluster
+  void clear_data() {
+    card = 0;
+    // TODO log_card?
+    cluster_data_idx = std::set<int>();
+  }
+
+  //! Down-casts the given generic proto message to a ClusterState proto
+  bayesmix::AlgorithmState::ClusterState *downcast_state(
+      google::protobuf::Message *state_) const {
+    return google::protobuf::internal::down_cast<
+        bayesmix::AlgorithmState::ClusterState *>(state_);
+  }
+
+  //! Down-casts the given generic proto message to a ClusterState proto
+  const bayesmix::AlgorithmState::ClusterState &downcast_state(
+      const google::protobuf::Message &state_) const {
+    return google::protobuf::internal::down_cast<
+        const bayesmix::AlgorithmState::ClusterState &>(state_);
+  }
+
   //! Container for state values
   State state;
 
@@ -117,33 +172,6 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Logarithm of current cardinality of this cluster
   double log_card = stan::math::NEGATIVE_INFTY;
-
-  //! Initialize state parameters to appropriate values
-  virtual void initialize_state() = 0;
-
-  void create_empty_prior() { prior.reset(new Prior); }
-
-  void set_card(const int card_) {
-    card = card_;
-    log_card = std::log(card_);
-  }
-
-  void clear_data() {
-    card = 0;
-    cluster_data_idx = std::set<int>();
-  }
-
-  bayesmix::AlgorithmState::ClusterState *downcast_state(
-      google::protobuf::Message *out) const {
-    return google::protobuf::internal::down_cast<
-        bayesmix::AlgorithmState::ClusterState *>(out);
-  }
-
-  const bayesmix::AlgorithmState::ClusterState &downcast_state(
-      const google::protobuf::Message &state_) const {
-    return google::protobuf::internal::down_cast<
-        const bayesmix::AlgorithmState::ClusterState &>(state_);
-  }
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
@@ -154,8 +182,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
   assert(cluster_data_idx.find(id) == cluster_data_idx.end());
   card += 1;
   log_card = std::log(card);
-  static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
-                                                          true);
+  static_cast<Derived *>(this)->update_ss(datum, covariate, true);
   cluster_data_idx.insert(id);
   if (update_params) {
     static_cast<Derived *>(this)->save_posterior_hypers();
@@ -167,8 +194,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
     const int id, const Eigen::RowVectorXd &datum,
     const bool update_params /*= false*/,
     const Eigen::RowVectorXd &covariate /* = Eigen::RowVectorXd(0)*/) {
-  static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
-                                                          false);
+  static_cast<Derived *>(this)->update_ss(datum, covariate, false);
   card -= 1;
   log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
   auto it = cluster_data_idx.find(id);
@@ -179,13 +205,6 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
   }
 }
 
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-void BaseHierarchy<Derived, State, Hyperparams, Prior>::check_prior_is_set()
-    const {
-  if (prior == nullptr) {
-    throw std::invalid_argument("Hierarchy prior was not provided");
-  }
-}
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
     google::protobuf::Message *out) const {
@@ -206,19 +225,19 @@ BaseHierarchy<Derived, State, Hyperparams, Prior>::like_lpdf_grid(
   if (covariates.cols() == 0) {
     // Pass null value as covariate
     for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived const *>(this)->like_lpdf(
+      lpdf(i) = static_cast<Derived const *>(this)->get_like_lpdf(
           data.row(i), Eigen::RowVectorXd(0));
     }
   } else if (covariates.rows() == 1) {
     // Use unique covariate
     for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived const *>(this)->like_lpdf(
+      lpdf(i) = static_cast<Derived const *>(this)->get_like_lpdf(
           data.row(i), covariates.row(0));
     }
   } else {
     // Use different covariates
     for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived const *>(this)->like_lpdf(
+      lpdf(i) = static_cast<Derived const *>(this)->get_like_lpdf(
           data.row(i), covariates.row(i));
     }
   }

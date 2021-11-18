@@ -15,16 +15,13 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-double NNWHierarchy::like_lpdf(
-    const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   return bayesmix::multi_normal_prec_lpdf(datum, state.mean, state.prec_chol,
                                           state.prec_logdet);
 }
 
-double NNWHierarchy::marg_lpdf(
-    const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+double NNWHierarchy::marg_lpdf(const NNW::Hyperparams &params,
+                               const Eigen::RowVectorXd &datum) const {
   NNW::Hyperparams pred_params = get_predictive_t_parameters(params);
   Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
   double logdet = 2 * log(diag.array()).sum();
@@ -268,9 +265,8 @@ NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
   return out;
 }
 
-void NNWHierarchy::update_summary_statistics(
-    const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate,
-    bool add) {
+void NNWHierarchy::update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                             bool add) {
   if (add) {
     data_sum += datum.transpose();
     data_sum_squares += datum.transpose() * datum;
