@@ -46,7 +46,8 @@ To perform your first run of the library right out of the box, you can call the 
 example/tutorial/run.sh
 ```
 This is an example script that runs said executable by passing appropriate arguments to it.
-In order to use your custom datasets, algorithm settings, and prior specifications, please create a copy of the above script and change the arguments as appropriate.
+In order to use your custom datasets, algorithm settings, and prior specifications, you can create a copy of the above script and change the arguments as appropriate.
+Please refer to the [documentation](#Documentation) for more information.
 
 
 ## For developers
