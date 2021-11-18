@@ -43,7 +43,7 @@ cd ..
 The `build/run` executable can be used to perform all the necessary analysis, but it needs some command-line arguments to be passed.
 To perform your first run of the library right out of the box, you can call the following script from the command line:
 ```shell
-example/tutorial/run.sh
+examples/tutorial/run.sh
 ```
 This is an example script that runs said executable by passing appropriate arguments to it.
 In order to use your custom datasets, algorithm settings, and prior specifications, you can create a copy of the above script and change the arguments as appropriate.
