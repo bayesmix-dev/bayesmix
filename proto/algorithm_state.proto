@@ -34,14 +34,4 @@ message AlgorithmState {
   }
   HierarchyHypers hierarchy_hypers = 5;
 
-  // message MixingPrior {
-  //   oneof val {
-  //     EmptyPrior fake_prior = 1;
-  //     DPPrior dp_prior = 2;
-  //     PYPrior py_prior = 3;
-  //     LogSBPrior log_sb_prior = 4;
-  //     TruncSBLogPrior trunc_sb_log_prior = 5;
-  //   }
-  // }
-  // MixingPrior mixing_prior = 6;
 }
