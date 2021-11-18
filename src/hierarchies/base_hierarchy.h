@@ -132,6 +132,12 @@ class BaseHierarchy : public AbstractHierarchy {
     log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
   }
 
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::ClusterState message by adding the appropriate type
+  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
+  get_state_proto() const = 0;
+
   //! Initializes state parameters to appropriate values
   virtual void initialize_state() = 0;
 

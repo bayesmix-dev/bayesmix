@@ -111,11 +111,6 @@ class AbstractMixing {
   //! Writes current state to a Protobuf message by pointer
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
-  //! Writes current state to a Protobuf message and return a shared_ptr
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! MixingState message by adding the appropriate type
-  virtual std::shared_ptr<bayesmix::MixingState> get_state_proto() const = 0;
-
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::MixingId get_id() const = 0;
 
