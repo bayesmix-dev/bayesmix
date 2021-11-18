@@ -45,11 +45,7 @@ class ConjugateHierarchy
         static_cast<Derived *>(this)->get_posterior_parameters();
   }
 
-  //! Evaluates the log-marginal distribution of data in a single point
-  //! @param params     Container of (prior or posterior) hyperparameter values
-  //! @param datum      Point which is to be evaluated
-  //! @param covariate  (Optional) covariate vector associated to datum
-  //! @return           The evaluation of the lpdf
+  //! Public wrapper for marg_lpdf() methods
   virtual double get_marg_lpdf(
       const Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
@@ -90,7 +86,11 @@ class ConjugateHierarchy
                                                           0)) const override;
 
  protected:
-  //! Private version of get_marg_lpdf()
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  Covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   virtual double marg_lpdf(const Hyperparams &params,
                            const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const {
@@ -102,7 +102,10 @@ class ConjugateHierarchy
     }
   }
 
-  //! Private version of get_marg_lpdf(), overloaded without covariates
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
   virtual double marg_lpdf(const Hyperparams &params,
                            const Eigen::RowVectorXd &datum) const {
     if (this->is_dependent()) {

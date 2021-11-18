@@ -94,11 +94,18 @@ class LinRegUniHierarchy
   }
 
  protected:
-  //! Private version of get_like_lpdf()
+  //! Evaluates the log-likelihood of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  Covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   double like_lpdf(const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override;
 
-  //! Private version of get_marg_lpdf()
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  Covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   double marg_lpdf(const LinRegUni::Hyperparams &params,
                    const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override;

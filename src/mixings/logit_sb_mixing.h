@@ -46,6 +46,11 @@ class LogitSBMixing
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       const std::vector<unsigned int> &allocations) override;
 
+  //! Returns mixing weights (for conditional mixings only)
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @param covariate  Covariate vector
+  //! @return           The vector of mixing weights
   Eigen::VectorXd mixing_weights(
       const bool log, const bool propto,
       const Eigen::RowVectorXd &covariate) const override;

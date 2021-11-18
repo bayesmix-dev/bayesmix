@@ -214,7 +214,7 @@ class AbstractHierarchy {
  protected:
   //! Evaluates the log-likelihood of data in a single point
   //! @param datum      Point which is to be evaluated
-  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @param covariate  Covariate vector associated to datum
   //! @return           The evaluation of the lpdf
   virtual double like_lpdf(const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const {

@@ -53,7 +53,7 @@ class AbstractMixing {
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       const std::vector<unsigned int> &allocations) = 0;
 
-  //! Returns mixing weights (for conditional mixings only)
+  //! Public wrapper for mixing_weights() methods
   Eigen::VectorXd get_mixing_weights(
       const bool log, const bool propto,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
@@ -69,13 +69,7 @@ class AbstractMixing {
     }
   };
 
-  //! Returns probability mass for an old cluster (for marginal mixings only)
-  //! @param n          Total dataset size
-  //! @param log        Whether to return logarithm-scale values or not
-  //! @param propto     Whether to include normalizing constants or not
-  //! @param hier       `Hierarchy` object representing the cluster
-  //! @param covariate  (Optional) covariate vector
-  //! @return           Probability value
+  //! Public wrapper for mass_existing_cluster() methods
   double get_mass_existing_cluster(
       const unsigned int n, const bool log, const bool propto,
       std::shared_ptr<AbstractHierarchy> hier,
@@ -87,13 +81,7 @@ class AbstractMixing {
     }
   }
 
-  //! Returns probability mass for a new cluster (for marginal mixings only)
-  //! @param n          Total dataset size
-  //! @param log        Whether to return logarithm-scale values or not
-  //! @param propto     Whether to include normalizing constants or not
-  //! @param n_clust    Current number of clusters
-  //! @param covariate  (Optional) covariate vector
-  //! @return           Probability value
+  //! Public wrapper for mass_new_cluster() methods
   double get_mass_new_cluster(
       const unsigned int n, const bool log, const bool propto,
       const unsigned int n_clust,
@@ -134,7 +122,11 @@ class AbstractMixing {
   virtual bool is_dependent() const { return false; }
 
  protected:
-  //! Private version of get_mixing_weights()
+  //! Returns mixing weights (for conditional mixings only)
+  //! @param log        Return logarithm-scale values?
+  //! @param propto     Return non-normalized values?
+  //! @param covariate  Covariate vector
+  //! @return           The vector of mixing weights
   virtual Eigen::VectorXd mixing_weights(
       const bool log, const bool propto,
       const Eigen::RowVectorXd &covariate) const {
@@ -146,7 +138,10 @@ class AbstractMixing {
     }
   };
 
-  //! Private version of get_mixing_weights(), overloaded without covariates
+  //! Returns mixing weights (for conditional mixings only)
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @return           The vector of mixing weights
   virtual Eigen::VectorXd mixing_weights(const bool log,
                                          const bool propto) const {
     if (is_dependent()) {
@@ -157,7 +152,13 @@ class AbstractMixing {
     }
   };
 
-  //! Private version of get_mass_existing_cluster()
+  //! Returns probability mass for an old cluster (for marginal mixings only)
+  //! @param n          Total dataset size
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @param hier       `Hierarchy` object representing the cluster
+  //! @param covariate  Covariate vector
+  //! @return           Probability value
   virtual double mass_existing_cluster(
       const unsigned int n, const bool log, const bool propto,
       std::shared_ptr<AbstractHierarchy> hier,
@@ -170,7 +171,12 @@ class AbstractMixing {
     }
   };
 
-  //! Private version of get_mass_existing_cluster(), without covariates
+  //! Returns probability mass for an old cluster (for marginal mixings only)
+  //! @param n          Total dataset size
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @param hier       `Hierarchy` object representing the cluster
+  //! @return           Probability value
   virtual double mass_existing_cluster(
       const unsigned int n, const bool log, const bool propto,
       std::shared_ptr<AbstractHierarchy> hier) const {
@@ -182,7 +188,13 @@ class AbstractMixing {
     }
   };
 
-  //! Private version of get_mass_new_cluster()
+  //! Returns probability mass for a new cluster (for marginal mixings only)
+  //! @param n          Total dataset size
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @param n_clust    Current number of clusters
+  //! @param covariate  Covariate vector
+  //! @return           Probability value
   virtual double mass_new_cluster(const unsigned int n, const bool log,
                                   const bool propto,
                                   const unsigned int n_clust,
@@ -195,7 +207,12 @@ class AbstractMixing {
     }
   };
 
-  //! Private version of get_mass_new_cluster(), without covariates
+  //! Returns probability mass for a new cluster (for marginal mixings only)
+  //! @param n          Total dataset size
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @param n_clust    Current number of clusters
+  //! @return           Probability value
   virtual double mass_new_cluster(const unsigned int n, const bool log,
                                   const bool propto,
                                   const unsigned int n_clust) const {

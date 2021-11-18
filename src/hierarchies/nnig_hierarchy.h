@@ -78,10 +78,15 @@ class NNIGHierarchy
   }
 
  protected:
-  //! Private version of get_like_lpdf(), overloaded without covariates
+  //! Evaluates the log-likelihood of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
   double like_lpdf(const Eigen::RowVectorXd &datum) const override;
 
-  //! Private version of get_marg_lpdf(), overloaded without covariates
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
   double marg_lpdf(const NNIG::Hyperparams &params,
                    const Eigen::RowVectorXd &datum) const override;
 

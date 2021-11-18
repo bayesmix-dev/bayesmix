@@ -40,10 +40,22 @@ class DirichletMixing
       const std::vector<std::shared_ptr<AbstractHierarchy>> &unique_values,
       const std::vector<unsigned int> &allocations) override;
 
+  //! Returns probability mass for an old cluster (for marginal mixings only)
+  //! @param n          Total dataset size
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @param hier       `Hierarchy` object representing the cluster
+  //! @return           Probability value
   double mass_existing_cluster(
       const unsigned int n, const bool log, const bool propto,
       std::shared_ptr<AbstractHierarchy> hier) const override;
 
+  //! Returns probability mass for a new cluster (for marginal mixings only)
+  //! @param n          Total dataset size
+  //! @param log        Whether to return logarithm-scale values or not
+  //! @param propto     Whether to include normalizing constants or not
+  //! @param n_clust    Current number of clusters
+  //! @return           Probability value
   double mass_new_cluster(const unsigned int n, const bool log,
                           const bool propto,
                           const unsigned int n_clust) const override;
