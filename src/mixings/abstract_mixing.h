@@ -45,8 +45,11 @@ class AbstractMixing {
   AbstractMixing() = default;
   virtual ~AbstractMixing() = default;
 
-  //! Initializes class members to appropriate values
+  //! Main function that initializes members to appropriate values
   virtual void initialize() = 0;
+
+  //! Initializes the mixing state to appropriate values
+  virtual void initialize_state() = 0;
 
   //! Performs conditional update of state, given allocations and unique values
   //! @param unique_values  A vector of (pointers to) Hierarchy objects
@@ -69,7 +72,7 @@ class AbstractMixing {
         return mixing_weights(log, propto);
       }
     }
-  };
+  }
 
   //! Public wrapper for `mass_existing_cluster()` methods
   double get_mass_existing_cluster(
@@ -142,7 +145,7 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
 
   //! Returns mixing weights (for conditional mixings only)
   //! @param log        Whether to return logarithm-scale values or not
@@ -156,7 +159,7 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
 
   //! Returns probability mass for an old cluster (for marginal mixings only)
   //! @param n          Total dataset size
@@ -175,7 +178,7 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
 
   //! Returns probability mass for an old cluster (for marginal mixings only)
   //! @param n          Total dataset size
@@ -192,7 +195,7 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
 
   //! Returns probability mass for a new cluster (for marginal mixings only)
   //! @param n          Total dataset size
@@ -211,7 +214,7 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
 
   //! Returns probability mass for a new cluster (for marginal mixings only)
   //! @param n          Total dataset size
@@ -228,7 +231,18 @@ class AbstractMixing {
     } else {
       throw std::runtime_error("Not implemented");
     }
-  };
+  }
+
+  //! Re-initializes the prior of the mixing to a newly created object
+  virtual void create_empty_prior() = 0;
+
+  //! Down-casts the given generic proto message to a MixingState proto
+  virtual bayesmix::MixingState *downcast_state(
+      google::protobuf::Message *out) const = 0;
+
+  //! Down-casts the given generic proto message to a MixingState proto
+  virtual const bayesmix::MixingState &downcast_state(
+      const google::protobuf::Message &state_) const = 0;
 };
 
 #endif  // BAYESMIX_MIXINGS_ABSTRACT_MIXING_H_

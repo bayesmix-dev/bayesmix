@@ -56,19 +56,17 @@ class BaseMixing : public AbstractMixing {
 
  protected:
   //! Re-initializes the prior of the mixing to a newly created object
-  void create_empty_prior() { prior.reset(new Prior); }
-
-  //! Initializes the mixing state to appropriate values
-  virtual void initialize_state() = 0;
+  void create_empty_prior() override { prior.reset(new Prior); }
 
   //! Down-casts the given generic proto message to a MixingState proto
-  bayesmix::MixingState *downcast_state(google::protobuf::Message *out) const {
+  bayesmix::MixingState *downcast_state(
+      google::protobuf::Message *out) const override {
     return google::protobuf::internal::down_cast<bayesmix::MixingState *>(out);
   }
 
   //! Down-casts the given generic proto message to a MixingState proto
   const bayesmix::MixingState &downcast_state(
-      const google::protobuf::Message &state_) const {
+      const google::protobuf::Message &state_) const override {
     return google::protobuf::internal::down_cast<
         const bayesmix::MixingState &>(state_);
   }

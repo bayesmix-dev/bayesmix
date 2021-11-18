@@ -125,16 +125,15 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Re-initializes the prior of the hierarchy to a newly created object
   void create_empty_prior() override { prior.reset(new Prior); }
 
-  //! Sets the cluster's cardinality
+  //! Sets the cardinality of the cluster
   void set_card(const int card_) override {
     card = card_;
-    log_card = std::log(card_);
+    log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
   }
 
   //! Removes all indicators of data points belonging to this cluster
   void clear_data() override {
-    card = 0;
-    // TODO log_card?
+    set_card(0);
     cluster_data_idx = std::set<int>();
   }
 
@@ -195,8 +194,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
     const bool update_params /*= false*/,
     const Eigen::RowVectorXd &covariate /* = Eigen::RowVectorXd(0)*/) {
   static_cast<Derived *>(this)->update_ss(datum, covariate, false);
-  card -= 1;
-  log_card = (card == 0) ? stan::math::NEGATIVE_INFTY : std::log(card);
+  set_card(card - 1);
   auto it = cluster_data_idx.find(id);
   assert(it != cluster_data_idx.end());
   cluster_data_idx.erase(it);
