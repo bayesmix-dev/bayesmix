@@ -115,7 +115,7 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   //! Raises an error if the prior pointer is not initialized
-  void check_prior_is_set() const {
+  void check_prior_is_set() const override {
     if (prior == nullptr) {
       throw std::invalid_argument("Hierarchy prior was not provided");
     }
@@ -123,16 +123,16 @@ class BaseHierarchy : public AbstractHierarchy {
 
  protected:
   //! Re-initializes the prior of the hierarchy to a newly created object
-  void create_empty_prior() { prior.reset(new Prior); }
+  void create_empty_prior() override { prior.reset(new Prior); }
 
   //! Sets the cluster's cardinality
-  void set_card(const int card_) {
+  void set_card(const int card_) override {
     card = card_;
     log_card = std::log(card_);
   }
 
   //! Removes all indicators of data points belonging to this cluster
-  void clear_data() {
+  void clear_data() override {
     card = 0;
     // TODO log_card?
     cluster_data_idx = std::set<int>();
@@ -140,14 +140,14 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Down-casts the given generic proto message to a ClusterState proto
   bayesmix::AlgorithmState::ClusterState *downcast_state(
-      google::protobuf::Message *state_) const {
+      google::protobuf::Message *state_) const override {
     return google::protobuf::internal::down_cast<
         bayesmix::AlgorithmState::ClusterState *>(state_);
   }
 
   //! Down-casts the given generic proto message to a ClusterState proto
   const bayesmix::AlgorithmState::ClusterState &downcast_state(
-      const google::protobuf::Message &state_) const {
+      const google::protobuf::Message &state_) const override {
     return google::protobuf::internal::down_cast<
         const bayesmix::AlgorithmState::ClusterState &>(state_);
   }

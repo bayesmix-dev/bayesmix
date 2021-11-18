@@ -66,7 +66,7 @@ class NNIGHierarchy
   bool is_multivariate() const override { return false; }
 
   //! Computes and return posterior hypers given data currently in this cluster
-  NNIG::Hyperparams get_posterior_parameters();
+  NNIG::Hyperparams get_posterior_parameters() const;
 
   //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override;

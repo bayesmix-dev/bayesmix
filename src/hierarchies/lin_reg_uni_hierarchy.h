@@ -84,7 +84,7 @@ class LinRegUniHierarchy
   bool is_dependent() const override { return true; }
 
   //! Computes and return posterior hypers given data currently in this cluster
-  LinRegUni::Hyperparams get_posterior_parameters();
+  LinRegUni::Hyperparams get_posterior_parameters() const;
 
   //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override;

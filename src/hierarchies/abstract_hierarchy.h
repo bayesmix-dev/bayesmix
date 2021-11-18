@@ -198,6 +198,9 @@ class AbstractHierarchy {
   //! Initializes hierarchy hyperparameters to appropriate values
   virtual void initialize_hypers() = 0;
 
+  //! Raises an error if the prior pointer is not initialized
+  virtual void check_prior_is_set() const = 0;
+
   // FEATURES AND IDENTIFIERS
   //! Returns whether the hierarchy models multivariate data or not
   virtual bool is_multivariate() const = 0;
@@ -265,6 +268,20 @@ class AbstractHierarchy {
       throw std::runtime_error("Not implemented");
     }
   }
+
+  //! Sets the cluster's cardinality
+  virtual void set_card(const int card_) = 0;
+
+  //! Removes all indicators of data points belonging to this cluster
+  virtual void clear_data() = 0;
+
+  //! Down-casts the given generic proto message to a ClusterState proto
+  virtual bayesmix::AlgorithmState::ClusterState *downcast_state(
+      google::protobuf::Message *state_) const = 0;
+
+  //! Down-casts the given generic proto message to a ClusterState proto
+  virtual const bayesmix::AlgorithmState::ClusterState &downcast_state(
+      const google::protobuf::Message &state_) const = 0;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_ABSTRACT_HIERARCHY_H_
