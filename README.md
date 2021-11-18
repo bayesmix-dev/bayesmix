@@ -53,7 +53,7 @@ In order to use your custom datasets, algorithm settings, and prior specificatio
 We heavily depend on the `protobuf` library to move and store structured data.
 The `CMakeLists.txt` file is set up to install such library if it does not find it in the computer.
 However any call to `make clean` will uninstall it, causing a huge waste of time... so make sure to install it manually beforehand!
-You can do so as follows on a Linux machine:
+If you're using a Linux machine, you can do so as follows:
 ```shell
 sudo apt-get install autoconf automake libtool curl make g++ unzip cmake
 wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protobuf-python-3.14.0.zip
@@ -64,7 +64,7 @@ make check
 sudo make install
 sudo ldconfig
 ```
-On Mac and Windows machines, please follow the [official `protobuf` installation guide](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md) instead.
+On Mac and Windows machines, please follow the steps from the [official `protobuf` installation guide](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md).
 
 Another very useful tool is [`ccache`](https://ccache.dev) that can significantly speed up the compilation process.
 
