@@ -82,12 +82,6 @@ class NNWHierarchy
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
 
-  //! Initializes state parameters to appropriate values
-  void initialize_state() override;
-
-  //! Initializes hierarchy hyperparameters to appropriate values
-  void initialize_hypers() override;
-
   //! Updates hyperparameter values given a vector of cluster states
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;
@@ -95,11 +89,13 @@ class NNWHierarchy
   //! Updates state values using the given (prior or posterior) hyperparameters
   NNW::State draw(const NNW::Hyperparams &params);
 
-  //! Removes every data point from this cluster
-  void clear_summary_statistics();
+  //! Resets summary statistics for this cluster
+  void clear_summary_statistics() override;
 
-  //! Returns whether the hierarchy models multivariate data or not
-  bool is_multivariate() const override { return true; }
+  //! Returns the Protobuf ID associated to this class
+  bayesmix::HierarchyId get_id() const override {
+    return bayesmix::HierarchyId::NNW;
+  }
 
   //! Computes and return posterior hypers given data currently in this cluster
   NNW::Hyperparams get_posterior_parameters() const;
@@ -116,10 +112,8 @@ class NNWHierarchy
   //! Writes current state to a Protobuf message by pointer
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  //! Returns the Protobuf ID associated to this class
-  bayesmix::HierarchyId get_id() const override {
-    return bayesmix::HierarchyId::NNW;
-  }
+  //! Returns whether the hierarchy models multivariate data or not
+  bool is_multivariate() const override { return true; }
 
  protected:
   //! Evaluates the log-likelihood of data in a single point
@@ -146,6 +140,12 @@ class NNWHierarchy
   //! Returns parameters for the predictive Student's t distribution
   NNW::Hyperparams get_predictive_t_parameters(
       const NNW::Hyperparams &params) const;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state() override;
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  void initialize_hypers() override;
 
   //! Dimension of data space
   unsigned int dim;

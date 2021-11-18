@@ -107,13 +107,14 @@ class BaseHierarchy : public AbstractHierarchy {
   void initialize() override {
     hypers = std::make_shared<Hyperparams>();
     check_prior_is_set();
-    static_cast<Derived *>(this)->initialize_hypers();
-    static_cast<Derived *>(this)->initialize_state();
+    initialize_hypers();
+    initialize_state();
     posterior_hypers = *hypers;
-    static_cast<Derived *>(this)->clear_data();
-    static_cast<Derived *>(this)->clear_summary_statistics();
+    clear_data();
+    clear_summary_statistics();
   }
 
+ protected:
   //! Raises an error if the prior pointer is not initialized
   void check_prior_is_set() const override {
     if (prior == nullptr) {
@@ -121,7 +122,6 @@ class BaseHierarchy : public AbstractHierarchy {
     }
   }
 
- protected:
   //! Re-initializes the prior of the hierarchy to a newly created object
   void create_empty_prior() override { prior.reset(new Prior); }
 
@@ -131,7 +131,7 @@ class BaseHierarchy : public AbstractHierarchy {
     log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
   }
 
-  //! Removes all indicators of data points belonging to this cluster
+  //! Resets cardinality and data indexes of data in this cluster
   void clear_data() override {
     set_card(0);
     cluster_data_idx = std::set<int>();

@@ -137,6 +137,9 @@ class AbstractHierarchy {
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;
 
   // GETTERS AND SETTERS
+  //! Returns the Protobuf ID associated to this class
+  virtual bayesmix::HierarchyId get_id() const = 0;
+
   //! Returns the current cardinality of the cluster
   virtual int get_card() const = 0;
 
@@ -192,16 +195,7 @@ class AbstractHierarchy {
   //! Main function that initializes members to appropriate values
   virtual void initialize() = 0;
 
-  //! Initializes state parameters to appropriate values
-  virtual void initialize_state() = 0;
-
-  //! Initializes hierarchy hyperparameters to appropriate values
-  virtual void initialize_hypers() = 0;
-
-  //! Raises an error if the prior pointer is not initialized
-  virtual void check_prior_is_set() const = 0;
-
-  // FEATURES AND IDENTIFIERS
+  // HIERARCHY FEATURES
   //! Returns whether the hierarchy models multivariate data or not
   virtual bool is_multivariate() const = 0;
 
@@ -210,9 +204,6 @@ class AbstractHierarchy {
 
   //! Returns whether the hierarchy represents a conjugate model or not
   virtual bool is_conjugate() const { return false; }
-
-  //! Returns the Protobuf ID associated to this class
-  virtual bayesmix::HierarchyId get_id() const = 0;
 
  protected:
   //! Evaluates the log-likelihood of data in a single point
@@ -272,8 +263,20 @@ class AbstractHierarchy {
   //! Sets the cluster's cardinality
   virtual void set_card(const int card_) = 0;
 
-  //! Removes all indicators of data points belonging to this cluster
+  //! Resets cardinality and data indexes of data in this cluster
   virtual void clear_data() = 0;
+
+  //! Resets summary statistics for this cluster
+  virtual void clear_summary_statistics() = 0;
+
+  //! Initializes state parameters to appropriate values
+  virtual void initialize_state() = 0;
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  virtual void initialize_hypers() = 0;
+
+  //! Raises an error if the prior pointer is not initialized
+  virtual void check_prior_is_set() const = 0;
 
   //! Re-initializes the prior of the hierarchy to a newly created object
   virtual void create_empty_prior() = 0;

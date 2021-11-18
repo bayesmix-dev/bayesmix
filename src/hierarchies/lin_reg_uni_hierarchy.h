@@ -50,12 +50,6 @@ class LinRegUniHierarchy
   LinRegUniHierarchy() = default;
   ~LinRegUniHierarchy() = default;
 
-  //! Initializes state parameters to appropriate values
-  void initialize_state() override;
-
-  //! Initializes hierarchy hyperparameters to appropriate values
-  void initialize_hypers() override;
-
   //! Updates hyperparameter values given a vector of cluster states
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;
@@ -71,20 +65,13 @@ class LinRegUniHierarchy
                                  const Eigen::RowVectorXd &covariate,
                                  bool add) override;
 
-  //! Removes every data point from this cluster
-  void clear_summary_statistics();
+  //! Resets summary statistics for this cluster
+  void clear_summary_statistics() override;
 
-  //! Returns the dimension of the coefficients vector
-  unsigned int get_dim() const { return dim; }
-
-  //! Returns whether the hierarchy models multivariate data or not
-  bool is_multivariate() const override { return false; }
-
-  //! Returns whether the hierarchy depends on covariate values or not
-  bool is_dependent() const override { return true; }
-
-  //! Computes and return posterior hypers given data currently in this cluster
-  LinRegUni::Hyperparams get_posterior_parameters() const;
+  //! Returns the Protobuf ID associated to this class
+  bayesmix::HierarchyId get_id() const override {
+    return bayesmix::HierarchyId::LinRegUni;
+  }
 
   //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override;
@@ -98,10 +85,17 @@ class LinRegUniHierarchy
   //! Writes current state to a Protobuf message by pointer
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  //! Returns the Protobuf ID associated to this class
-  bayesmix::HierarchyId get_id() const override {
-    return bayesmix::HierarchyId::LinRegUni;
-  }
+  //! Returns the dimension of the coefficients vector
+  unsigned int get_dim() const { return dim; }
+
+  //! Computes and return posterior hypers given data currently in this cluster
+  LinRegUni::Hyperparams get_posterior_parameters() const;
+
+  //! Returns whether the hierarchy models multivariate data or not
+  bool is_multivariate() const override { return false; }
+
+  //! Returns whether the hierarchy depends on covariate values or not
+  bool is_dependent() const override { return true; }
 
  protected:
   //! Evaluates the log-likelihood of data in a single point
@@ -119,6 +113,12 @@ class LinRegUniHierarchy
   double marg_lpdf(const LinRegUni::Hyperparams &params,
                    const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state() override;
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  void initialize_hypers() override;
 
   //! Dimension of the coefficients vector
   unsigned int dim;

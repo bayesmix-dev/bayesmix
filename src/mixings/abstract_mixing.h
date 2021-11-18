@@ -45,12 +45,6 @@ class AbstractMixing {
   AbstractMixing() = default;
   virtual ~AbstractMixing() = default;
 
-  //! Main function that initializes members to appropriate values
-  virtual void initialize() = 0;
-
-  //! Initializes the mixing state to appropriate values
-  virtual void initialize_state() = 0;
-
   //! Performs conditional update of state, given allocations and unique values
   //! @param unique_values  A vector of (pointers to) Hierarchy objects
   //! @param allocations    A vector of allocations label
@@ -123,6 +117,9 @@ class AbstractMixing {
 
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::MixingId get_id() const = 0;
+
+  //! Main function that initializes members to appropriate values
+  virtual void initialize() = 0;
 
   //! Returns whether the mixing is conditional or marginal
   virtual bool is_conditional() const = 0;
@@ -232,6 +229,9 @@ class AbstractMixing {
       throw std::runtime_error("Not implemented");
     }
   }
+
+  //! Initializes the mixing state to appropriate values
+  virtual void initialize_state() = 0;
 
   //! Re-initializes the prior of the mixing to a newly created object
   virtual void create_empty_prior() = 0;
