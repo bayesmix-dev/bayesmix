@@ -103,13 +103,15 @@ class NNWHierarchy
   //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
+  //! Read and set hyperparameter values from a given Protobuf message
+  void set_hypers_from_proto(
+      const google::protobuf::Message &hypers_) override;
+
   //! Writes current state to a Protobuf message and return a shared_ptr
   //! New hierarchies have to first modify the field 'oneof val' in the
   //! AlgoritmState::ClusterState message by adding the appropriate type
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override;
-
-  void set_hypers_from_proto(const google::protobuf::Message &state_) override;
 
   //! Writes current value of hyperparameters to a Protobuf message and
   //! return a shared_ptr.

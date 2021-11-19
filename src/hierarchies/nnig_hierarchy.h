@@ -64,6 +64,10 @@ class NNIGHierarchy
   //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override;
 
+  //! Read and set hyperparameter values from a given Protobuf message
+  void set_hypers_from_proto(
+      const google::protobuf::Message &hypers_) override;
+
   //! Writes current state to a Protobuf message and return a shared_ptr
   //! New hierarchies have to first modify the field 'oneof val' in the
   //! AlgoritmState::ClusterState message by adding the appropriate type
@@ -76,8 +80,6 @@ class NNIGHierarchy
   //! AlgoritmState::HierarchyHypers message by adding the appropriate type
   std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
       const override;
-
-  void set_hypers_from_proto(const google::protobuf::Message &state_) override;
 
   //! Computes and return posterior hypers given data currently in this cluster
   NNIG::Hyperparams compute_posterior_hypers() const;
