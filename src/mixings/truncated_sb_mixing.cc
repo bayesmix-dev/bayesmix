@@ -68,7 +68,7 @@ std::shared_ptr<bayesmix::MixingState> TruncatedSBMixing::get_state_proto()
   bayesmix::to_proto(state.sticks, state_.mutable_sticks());
   bayesmix::to_proto(state.logweights, state_.mutable_logweights());
 
-  auto out = std::make_unique<bayesmix::MixingState>();
+  auto out = std::make_shared<bayesmix::MixingState>();
   out->mutable_trunc_sb_state()->CopyFrom(state_);
   return out;
 }

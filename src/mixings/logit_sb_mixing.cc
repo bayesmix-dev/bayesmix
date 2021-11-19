@@ -89,7 +89,7 @@ std::shared_ptr<bayesmix::MixingState> LogitSBMixing::get_state_proto() const {
   bayesmix::to_proto(state.regression_coeffs,
                      state_.mutable_regression_coeffs());
 
-  auto out = std::make_unique<bayesmix::MixingState>();
+  auto out = std::make_shared<bayesmix::MixingState>();
   out->mutable_log_sb_state()->CopyFrom(state_);
   return out;
 }

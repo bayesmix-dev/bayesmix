@@ -138,7 +138,7 @@ LinRegUniHierarchy::get_state_proto() const {
                      state_.mutable_regression_coeffs());
   state_.set_var(state.var);
 
-  auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
+  auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
   out->mutable_lin_reg_uni_ls_state()->CopyFrom(state_);
   return out;
 }
@@ -160,7 +160,7 @@ LinRegUniHierarchy::get_hypers_proto() const {
   hypers_.set_shape(hypers->shape);
   hypers_.set_scale(hypers->scale);
 
-  auto out = std::make_unique<bayesmix::AlgorithmState::HierarchyHypers>();
+  auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
   out->mutable_lin_reg_uni_state()->CopyFrom(hypers_);
   return out;
 }

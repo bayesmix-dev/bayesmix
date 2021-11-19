@@ -322,7 +322,7 @@ NNWHierarchy::get_state_proto() const {
   bayesmix::to_proto(state.prec, state_.mutable_prec());
   bayesmix::to_proto(state.prec_chol, state_.mutable_prec_chol());
 
-  auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
+  auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
   out->mutable_multi_ls_state()->CopyFrom(state_);
   return out;
 }
@@ -344,7 +344,7 @@ NNWHierarchy::get_hypers_proto() const {
   hypers_.set_deg_free(hypers->deg_free);
   bayesmix::to_proto(hypers->scale, hypers_.mutable_scale());
 
-  auto out = std::make_unique<bayesmix::AlgorithmState::HierarchyHypers>();
+  auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
   out->mutable_nnw_state()->CopyFrom(hypers_);
   return out;
 }
