@@ -195,7 +195,9 @@ TEST(lin_reg_uni_hierarchy, misc) {
   // Extract hypers for reading test
   bayesmix::LinRegUniPrior out;
   hier.write_hypers_to_proto(&out);
+  std::cout << "fine here" << std::endl;
   ASSERT_EQ(beta0, bayesmix::to_eigen(out.fixed_values().mean()));
+  std::cout << "nope" << std::endl;
   ASSERT_EQ(Lambda0, bayesmix::to_eigen(out.fixed_values().var_scaling()));
   ASSERT_EQ(a0, out.fixed_values().shape());
   ASSERT_EQ(b0, out.fixed_values().scale());
