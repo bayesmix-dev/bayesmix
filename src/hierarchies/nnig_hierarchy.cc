@@ -239,20 +239,29 @@ NNIGHierarchy::get_state_proto() const {
   state_.set_mean(state.mean);
   state_.set_var(state.var);
 
-  auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
+  auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
   out->mutable_uni_ls_state()->CopyFrom(state_);
   return out;
 }
 
-void NNIGHierarchy::write_hypers_to_proto(
-    google::protobuf::Message *out) const {
-  bayesmix::NNIGPrior hypers_;
-  hypers_.mutable_fixed_values()->set_mean(hypers->mean);
-  hypers_.mutable_fixed_values()->set_var_scaling(hypers->var_scaling);
-  hypers_.mutable_fixed_values()->set_shape(hypers->shape);
-  hypers_.mutable_fixed_values()->set_scale(hypers->scale);
+void NNIGHierarchy::set_hypers_from_proto(
+    const google::protobuf::Message &hypers_) {
+  auto &hyperscast = downcast_hypers(hypers_).nnig_state();
+  hypers->mean = hyperscast.mean();
+  hypers->var_scaling = hyperscast.var_scaling();
+  hypers->scale = hyperscast.scale();
+  hypers->shape = hyperscast.shape();
+}
 
-  google::protobuf::internal::down_cast<bayesmix::NNIGPrior *>(out)
-      ->mutable_fixed_values()
-      ->CopyFrom(hypers_.fixed_values());
+std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
+NNIGHierarchy::get_hypers_proto() const {
+  bayesmix::NNIGState hypers_;
+  hypers_.set_mean(hypers->mean);
+  hypers_.set_var_scaling(hypers->var_scaling);
+  hypers_.set_shape(hypers->shape);
+  hypers_.set_scale(hypers->scale);
+
+  auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
+  out->mutable_nnig_state()->CopyFrom(hypers_);
+  return out;
 }

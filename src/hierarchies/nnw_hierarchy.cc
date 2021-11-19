@@ -322,24 +322,31 @@ NNWHierarchy::get_state_proto() const {
   bayesmix::to_proto(state.prec, state_.mutable_prec());
   bayesmix::to_proto(state.prec_chol, state_.mutable_prec_chol());
 
-  auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
+  auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
   out->mutable_multi_ls_state()->CopyFrom(state_);
   return out;
 }
 
-void NNWHierarchy::write_hypers_to_proto(
-    google::protobuf::Message *out) const {
-  bayesmix::NNWPrior hypers_;
-  bayesmix::to_proto(hypers->mean,
-                     hypers_.mutable_fixed_values()->mutable_mean());
-  hypers_.mutable_fixed_values()->set_var_scaling(hypers->var_scaling);
-  hypers_.mutable_fixed_values()->set_deg_free(hypers->deg_free);
-  bayesmix::to_proto(hypers->scale,
-                     hypers_.mutable_fixed_values()->mutable_scale());
+void NNWHierarchy::set_hypers_from_proto(
+    const google::protobuf::Message &hypers_) {
+  auto &hyperscast = downcast_hypers(hypers_).nnw_state();
+  hypers->mean = to_eigen(hyperscast.mean());
+  hypers->var_scaling = hyperscast.var_scaling();
+  hypers->deg_free = hyperscast.deg_free();
+  hypers->scale = to_eigen(hyperscast.scale());
+}
 
-  google::protobuf::internal::down_cast<bayesmix::NNWPrior *>(out)
-      ->mutable_fixed_values()
-      ->CopyFrom(hypers_.fixed_values());
+std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
+NNWHierarchy::get_hypers_proto() const {
+  bayesmix::NNWState hypers_;
+  bayesmix::to_proto(hypers->mean, hypers_.mutable_mean());
+  hypers_.set_var_scaling(hypers->var_scaling);
+  hypers_.set_deg_free(hypers->deg_free);
+  bayesmix::to_proto(hypers->scale, hypers_.mutable_scale());
+
+  auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
+  out->mutable_nnw_state()->CopyFrom(hypers_);
+  return out;
 }
 
 void NNWHierarchy::write_prec_to_state(const Eigen::MatrixXd &prec_,

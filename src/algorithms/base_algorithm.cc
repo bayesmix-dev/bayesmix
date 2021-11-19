@@ -172,6 +172,12 @@ bayesmix::AlgorithmState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
     unique_values[i]->write_state_to_proto(&clusval);
     iter_out.add_cluster_states()->CopyFrom(clusval);
   }
+
+  // Transcribe the hyperparameters of the hyerarchy
+  bayesmix::AlgorithmState::HierarchyHypers hyper_state;
+  unique_values[0]->write_hypers_to_proto(&hyper_state);
+  iter_out.mutable_hierarchy_hypers()->CopyFrom(hyper_state);
+
   // Transcribe mixing state
   bayesmix::MixingState mixstate;
   mixing->write_state_to_proto(&mixstate);

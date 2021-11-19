@@ -138,22 +138,29 @@ LinRegUniHierarchy::get_state_proto() const {
                      state_.mutable_regression_coeffs());
   state_.set_var(state.var);
 
-  auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
+  auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
   out->mutable_lin_reg_uni_ls_state()->CopyFrom(state_);
   return out;
 }
 
-void LinRegUniHierarchy::write_hypers_to_proto(
-    google::protobuf::Message *out) const {
-  bayesmix::LinRegUniPrior hypers_;
-  bayesmix::to_proto(hypers->mean,
-                     hypers_.mutable_fixed_values()->mutable_mean());
-  bayesmix::to_proto(hypers->var_scaling,
-                     hypers_.mutable_fixed_values()->mutable_var_scaling());
-  hypers_.mutable_fixed_values()->set_shape(hypers->shape);
-  hypers_.mutable_fixed_values()->set_scale(hypers->scale);
+void LinRegUniHierarchy::set_hypers_from_proto(
+    const google::protobuf::Message &hypers_) {
+  auto &hyperscast = downcast_hypers(hypers_).lin_reg_uni_state();
+  hypers->mean = to_eigen(hyperscast.mean());
+  hypers->var_scaling = to_eigen(hyperscast.var_scaling());
+  hypers->scale = hyperscast.scale();
+  hypers->shape = hyperscast.shape();
+}
 
-  google::protobuf::internal::down_cast<bayesmix::LinRegUniPrior *>(out)
-      ->mutable_fixed_values()
-      ->CopyFrom(hypers_.fixed_values());
+std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
+LinRegUniHierarchy::get_hypers_proto() const {
+  bayesmix::LinRegUniState hypers_;
+  bayesmix::to_proto(hypers->mean, hypers_.mutable_mean());
+  bayesmix::to_proto(hypers->var_scaling, hypers_.mutable_var_scaling());
+  hypers_.set_shape(hypers->shape);
+  hypers_.set_scale(hypers->scale);
+
+  auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
+  out->mutable_lin_reg_uni_state()->CopyFrom(hypers_);
+  return out;
 }

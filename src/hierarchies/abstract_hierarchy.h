@@ -162,6 +162,10 @@ class AbstractHierarchy {
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
+  //! Read and set hyperparameter values from a given Protobuf message
+  virtual void set_hypers_from_proto(
+      const google::protobuf::Message &state_) = 0;
+
   // DATA FUNCTIONS
   //! Adds a datum and its index to the hierarchy
   virtual void add_datum(

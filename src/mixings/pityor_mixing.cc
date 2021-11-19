@@ -65,7 +65,7 @@ std::shared_ptr<bayesmix::MixingState> PitYorMixing::get_state_proto() const {
   state_.set_strength(state.strength);
   state_.set_discount(state.discount);
 
-  auto out = std::make_unique<bayesmix::MixingState>();
+  auto out = std::make_shared<bayesmix::MixingState>();
   out->mutable_py_state()->CopyFrom(state_);
   return out;
 }

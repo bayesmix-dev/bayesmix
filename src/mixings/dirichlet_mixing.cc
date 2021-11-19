@@ -84,7 +84,7 @@ std::shared_ptr<bayesmix::MixingState> DirichletMixing::get_state_proto()
     const {
   bayesmix::DPState state_;
   state_.set_totalmass(state.totalmass);
-  auto out = std::make_unique<bayesmix::MixingState>();
+  auto out = std::make_shared<bayesmix::MixingState>();
   out->mutable_dp_state()->CopyFrom(state_);
   return out;
 }
