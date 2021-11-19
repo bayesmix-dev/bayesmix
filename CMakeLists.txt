@@ -11,7 +11,7 @@ project(bayesmix)
 
 
 set (CMAKE_CXX_STANDARD 14)
-set (CMAKE_BUILD_TYPE Release)
+set (CMAKE_BUILD_TYPE Debug)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
