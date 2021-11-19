@@ -31,6 +31,6 @@ message AlgorithmState {
       LinRegUniState lin_reg_uni_state = 3;
     }
   }
-  HierarchyHypers hierarchy_hypers = 4;
+  HierarchyHypers hierarchy_hypers = 5;
 
 }
