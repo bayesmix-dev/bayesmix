@@ -25,10 +25,10 @@ message AlgorithmState {
 
   message HierarchyHypers {
     oneof val {
-      EmptyPrior fake_prior = 0;
-      NNIGState nnig_state = 1;
-      NNWState nnw_state = 2;
-      LinRegUniState lin_reg_uni_state = 3;
+      EmptyPrior fake_prior = 1;
+      NNIGState nnig_state = 2;
+      NNWState nnw_state = 3;
+      LinRegUniState lin_reg_uni_state = 4;
     }
   }
   HierarchyHypers hierarchy_hypers = 5;
