@@ -145,7 +145,7 @@ LinRegUniHierarchy::get_state_proto() const {
 
 void LinRegUniHierarchy::set_hypers_from_proto(
     const google::protobuf::Message &hypers_) {
-  auto& hyperscast = downcast_hypers(hypers_).lin_reg_uni_state();
+  auto &hyperscast = downcast_hypers(hypers_).lin_reg_uni_state();
   hypers->mean = to_eigen(hyperscast.mean());
   hypers->var_scaling = to_eigen(hyperscast.var_scaling());
   hypers->scale = hyperscast.scale();

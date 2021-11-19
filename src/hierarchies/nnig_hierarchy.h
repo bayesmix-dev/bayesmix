@@ -70,12 +70,12 @@ class NNIGHierarchy
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override;
 
-  //! Writes current value of hyperparameters to a Protobuf message and 
+  //! Writes current value of hyperparameters to a Protobuf message and
   //! return a shared_ptr.
   //! New hierarchies have to first modify the field 'oneof val' in the
   //! AlgoritmState::HierarchyHypers message by adding the appropriate type
-  std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
-  get_hypers_proto() const override;
+  std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
+      const override;
 
   void set_hypers_from_proto(const google::protobuf::Message &state_) override;
 

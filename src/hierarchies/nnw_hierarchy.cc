@@ -329,7 +329,7 @@ NNWHierarchy::get_state_proto() const {
 
 void NNWHierarchy::set_hypers_from_proto(
     const google::protobuf::Message &hypers_) {
-  auto& hyperscast = downcast_hypers(hypers_).nnw_state();
+  auto &hyperscast = downcast_hypers(hypers_).nnw_state();
   hypers->mean = to_eigen(hyperscast.mean());
   hypers->var_scaling = hyperscast.var_scaling();
   hypers->deg_free = hyperscast.deg_free();

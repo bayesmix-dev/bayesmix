@@ -246,7 +246,7 @@ NNIGHierarchy::get_state_proto() const {
 
 void NNIGHierarchy::set_hypers_from_proto(
     const google::protobuf::Message &hypers_) {
-  auto& hyperscast = downcast_hypers(hypers_).nnig_state();
+  auto &hyperscast = downcast_hypers(hypers_).nnig_state();
   hypers->mean = hyperscast.mean();
   hypers->var_scaling = hyperscast.var_scaling();
   hypers->scale = hyperscast.scale();

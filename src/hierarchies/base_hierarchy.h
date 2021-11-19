@@ -83,7 +83,8 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Writes current state to a Protobuf message by pointer
   void write_state_to_proto(google::protobuf::Message *out) const override;
 
-  //! Writes current values of the hyperparameters to a Protobuf message by pointer
+  //! Writes current values of the hyperparameters to a Protobuf message by
+  //! pointer
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
   //! Returns the struct of the current state
@@ -144,7 +145,7 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Initializes state parameters to appropriate values
   virtual void initialize_state() = 0;
 
-  //! Writes current value of hyperparameters to a Protobuf message and 
+  //! Writes current value of hyperparameters to a Protobuf message and
   //! return a shared_ptr.
   //! New hierarchies have to first modify the field 'oneof val' in the
   //! AlgoritmState::HierarchyHypers message by adding the appropriate type
