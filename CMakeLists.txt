@@ -9,7 +9,6 @@ endif()
 
 project(bayesmix)
 
-
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_BUILD_TYPE Debug)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -21,6 +20,7 @@ add_custom_target(
  build_tbb ALL
  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/build_tbb.py
 )
+set(TBB_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/include)
 
 find_package(PkgConfig REQUIRED)
 find_package(Protobuf)
@@ -80,15 +80,16 @@ set(INCLUDE_PATHS
   ${CMAKE_CURRENT_LIST_DIR}/lib/math
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.72.0
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/include
+  ${TBB_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}
   ${protobuf_SOURCE_DIR}/src
 )
 
-
 set(LINK_LIBRARIES 
   pthread 
-  protobuf::libprotobuf)
+  protobuf::libprotobuf
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb${CMAKE_SHARED_LIBRARY_SUFFIX}  
+)
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
 file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")

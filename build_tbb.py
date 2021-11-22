@@ -1,3 +1,4 @@
+import argparse
 import os
 import platform
 import shutil
@@ -6,18 +7,26 @@ import subprocess
 # If on Linux and this script gives a "busy file" error, please run
 # bash/cleanup_tbb.sh
 
-def maybe_build_tbb():
+def maybe_build_tbb(rebuild=False):
     """Build tbb. This function is taken from
     https://github.com/stan-dev/pystan/blob/develop/setup.py"""
 
     stan_math_lib = os.path.abspath(os.path.join(os.path.dirname(
         __file__), 'lib', 'math', 'lib'))
 
-    tbb_dir = os.path.join(stan_math_lib, 'tbb')
-    tbb_dir = os.path.abspath(tbb_dir)
+    print("stan_math_lib: ", stan_math_lib)
+
+    tbb_debug = os.path.join(stan_math_lib, "tbb_debug")
+    tbb_release = os.path.join(stan_math_lib, "tbb_release")
+    tbb_dir = os.path.join(stan_math_lib, "tbb")
 
     if os.path.exists(tbb_dir):
-         return
+        if rebuild:
+            shutil.rmtree(tbb_dir)
+            shutil.rmtree(tbb_debug)
+            shutil.rmtree(tbb_release)
+        else:
+            return
 
     make = 'make' if platform.system() != 'Windows' else 'mingw32-make'
     cmd = [make]
@@ -38,9 +47,6 @@ def maybe_build_tbb():
 
     subprocess.check_call(cmd, cwd=cwd)
 
-    tbb_debug = os.path.join(stan_math_lib, "tbb_debug")
-    tbb_release = os.path.join(stan_math_lib, "tbb_release")
-    tbb_dir = os.path.join(stan_math_lib, "tbb")
 
     if not os.path.exists(tbb_dir):
         os.makedirs(tbb_dir)
@@ -55,4 +61,7 @@ def maybe_build_tbb():
 
 
 if __name__ == "__main__":
-    maybe_build_tbb()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--rebuild", type= bool, default=False)
+    args = parser.parse_args()
+    maybe_build_tbb(args.rebuild)

@@ -70,15 +70,15 @@ TEST(hierarchies, fixed_values) {
   for (size_t i = 1; i < 4; i++) {
     unique_values.push_back(hier->clone());
     unique_values[i]->write_hypers_to_proto(&prior_out);
-    ASSERT_EQ(prior.DebugString(), prior_out.nnig_state().DebugString());
+    ASSERT_EQ(prior.fixed_values().DebugString(), prior_out.nnig_state().DebugString());
   }
 
   // Check equality after update
   unique_values[0]->update_hypers(states);
-  unique_values[0]->write_hypers_to_proto(&prior);
+  unique_values[0]->write_hypers_to_proto(&prior_out);
   for (size_t i = 1; i < 4; i++) {
     unique_values[i]->write_hypers_to_proto(&prior_out);
-    ASSERT_EQ(prior.DebugString(), prior_out.nnig_state().DebugString());
+    ASSERT_EQ(prior.fixed_values().DebugString(), prior_out.nnig_state().DebugString());
   }
 }
 
