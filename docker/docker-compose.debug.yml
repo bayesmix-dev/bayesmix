@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  bayesmixorigin:
+    image: bayesmixorigin
+    build:
+      context: .
+      dockerfile: ./Dockerfile
