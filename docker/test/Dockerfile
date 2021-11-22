@@ -1,7 +1,5 @@
-FROM mberaha/bayesmix-env:latest
+FROM mberaha/bayesmix-base:latest
 
-
-RUN ls /usr/bayesmix
 
 COPY cmake /usr/bayesmix/cmake
 COPY proto /usr/bayesmix/proto
