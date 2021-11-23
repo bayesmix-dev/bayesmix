@@ -11,6 +11,8 @@
 #include "src/utils/proto_utils.h"
 
 TEST(lpdf, nnig) {
+  ASSERT_DOUBLE_EQ(2.0, 1.0);
+
   NNIGHierarchy hier;
   bayesmix::NNIGPrior hier_prior;
   double mu0 = 5.0;
