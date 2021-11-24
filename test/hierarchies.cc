@@ -193,12 +193,12 @@ TEST(lin_reg_uni_hierarchy, misc) {
   hier.get_mutable_prior()->CopyFrom(prior);
   hier.initialize();
   // Extract hypers for reading test
-  bayesmix::LinRegUniPrior out;
+  bayesmix::AlgorithmState::HierarchyHypers out;
   hier.write_hypers_to_proto(&out);
-  ASSERT_EQ(beta0, bayesmix::to_eigen(out.fixed_values().mean()));
-  ASSERT_EQ(Lambda0, bayesmix::to_eigen(out.fixed_values().var_scaling()));
-  ASSERT_EQ(a0, out.fixed_values().shape());
-  ASSERT_EQ(b0, out.fixed_values().scale());
+  ASSERT_EQ(beta0, bayesmix::to_eigen(out.lin_reg_uni_state().mean()));
+  ASSERT_EQ(Lambda0, bayesmix::to_eigen(out.lin_reg_uni_state().var_scaling()));
+  ASSERT_EQ(a0, out.lin_reg_uni_state().shape());
+  ASSERT_EQ(b0, out.lin_reg_uni_state().scale());
   // Add data
   for (int i = 0; i < n; i++) {
     hier.add_datum(i, data.row(i), false, cov.row(i));

@@ -5,13 +5,14 @@ import "matrix.proto";
 
 package bayesmix;
 
-message NNIGPrior {
-  message FixedValues {
+message NNIGState {
     double mean = 1;
     double var_scaling = 2;
     double shape = 3;
     double scale = 4;
-  }
+}
+
+message NNIGPrior {
 
   message NormalMeanPrior {
     UniNormalDistribution mean_prior = 1;
@@ -28,20 +29,20 @@ message NNIGPrior {
   }
 
   oneof prior {
-    FixedValues fixed_values = 1;
+    NNIGState fixed_values = 1;
     NormalMeanPrior normal_mean_prior = 2;
     NGGPrior ngg_prior = 3;
   }
 }
 
+message NNWState {
+  Vector mean = 1;
+  double var_scaling = 2;
+  double deg_free = 3;
+  Matrix scale = 4;
+}
 
 message NNWPrior {
-  message FixedValues {
-    Vector mean = 1;
-    double var_scaling = 2;
-    double deg_free = 3;
-    Matrix scale = 4;
-  }
 
   message NormalMeanPrior {
     MultiNormalDistribution mean_prior = 1;
@@ -58,23 +59,24 @@ message NNWPrior {
   }
 
   oneof prior {
-    FixedValues fixed_values = 1;
+    NNWState fixed_values = 1;
     NormalMeanPrior normal_mean_prior = 2;
     NGIWPrior ngiw_prior = 3;
   }
 }
 
 
-message LinRegUniPrior {
-  message FixedValues {
-    Vector mean = 1;
-    Matrix var_scaling = 2;
-    double shape = 3;
-    double scale = 4;
-  }
+message LinRegUniState {
+  Vector mean = 1;
+  Matrix var_scaling = 2;
+  double shape = 3;
+  double scale = 4;
+}
 
+
+message LinRegUniPrior {
   oneof prior {
-    FixedValues fixed_values = 1;
+    LinRegUniState fixed_values = 1;
   }
 }
 

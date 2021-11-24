@@ -50,17 +50,20 @@ class AbstractHierarchy {
  public:
   virtual ~AbstractHierarchy() = default;
 
-  //! Returns an independent copy of this object
+  //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractHierarchy> clone() const = 0;
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
-  //! Evaluates the log-likelihood of data in a single point
-  //! @param datum      Point which is to be evaluated
-  //! @param covariate  (Optional) covariate vector associated to datum
-  //! @return           The evaluation of the lpdf
-  virtual double like_lpdf(
+  //! Public wrapper for `like_lpdf()` methods
+  double get_like_lpdf(
       const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const = 0;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
+    if (is_dependent()) {
+      return like_lpdf(datum, covariate);
+    } else {
+      return like_lpdf(datum);
+    }
+  }
 
   //! Evaluates the log-prior predictive distribution of data in a single point
   //! @param datum      Point which is to be evaluated
@@ -70,7 +73,7 @@ class AbstractHierarchy {
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     throw std::runtime_error(
-        "Cannot call prior_pred_lpdf() from a non-conjugate hieararchy");
+        "Cannot call prior_pred_lpdf() from a non-conjugate hierarchy");
   }
 
   //! Evaluates the log-conditional predictive distr. of data in a single point
@@ -81,7 +84,7 @@ class AbstractHierarchy {
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     throw std::runtime_error(
-        "Cannot call conditional_pred_lpdf() from a non-conjugate hieararchy");
+        "Cannot call conditional_pred_lpdf() from a non-conjugate hierarchy");
   }
 
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
@@ -101,7 +104,7 @@ class AbstractHierarchy {
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     throw std::runtime_error(
-        "Cannot call prior_pred_lpdf_grid() from a non-conjugate hieararchy");
+        "Cannot call prior_pred_lpdf_grid() from a non-conjugate hierarchy");
   }
 
   //! Evaluates the log-prior predictive distr. of data in a grid of points
@@ -113,7 +116,7 @@ class AbstractHierarchy {
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     throw std::runtime_error(
         "Cannot call conditional_pred_lpdf_grid() from a non-conjugate "
-        "hieararchy");
+        "hierarchy");
   }
 
   // SAMPLING FUNCTIONS
@@ -124,11 +127,19 @@ class AbstractHierarchy {
   //! @param update_params  Save posterior hypers after the computation?
   virtual void sample_full_cond(bool update_params = false) = 0;
 
+  //! Overloaded version of sample_full_cond(bool), mainly used for debugging
+  virtual void sample_full_cond(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
+
   //! Updates hyperparameter values given a vector of cluster states
   virtual void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;
 
   // GETTERS AND SETTERS
+  //! Returns the Protobuf ID associated to this class
+  virtual bayesmix::HierarchyId get_id() const = 0;
+
   //! Returns the current cardinality of the cluster
   virtual int get_card() const = 0;
 
@@ -141,23 +152,21 @@ class AbstractHierarchy {
   //! Returns a pointer to the Protobuf message of the prior of this cluster
   virtual google::protobuf::Message *get_mutable_prior() = 0;
 
-  //! Write current state to a Protobuf message by pointer
+  //! Writes current state to a Protobuf message by pointer
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
-  //! Write current state to a Protobuf message and return a shared_ptr
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! AlgoritmState::ClusterState message by adding the appropriate type
-  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
-  get_state_proto() const = 0;
-
-  //! Write current hyperparameters to a Protobuf message by pointer
+  //! Writes current hyperparameters to a Protobuf message by pointer
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
 
   //! Read and set state values from a given Protobuf message
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
-  // MISCELLANEOUS
+  //! Read and set hyperparameter values from a given Protobuf message
+  virtual void set_hypers_from_proto(
+      const google::protobuf::Message &state_) = 0;
+
+  // DATA FUNCTIONS
   //! Adds a datum and its index to the hierarchy
   virtual void add_datum(
       const int id, const Eigen::RowVectorXd &datum,
@@ -170,9 +179,21 @@ class AbstractHierarchy {
       const bool update_params = false,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
 
-  //! Initializes class members to appropriate values
+  //! Public wrapper for `update_summary_statistics()` methods
+  void update_ss(const Eigen::RowVectorXd &datum,
+                 const Eigen::RowVectorXd &covariate, bool add) {
+    if (is_dependent()) {
+      return update_summary_statistics(datum, covariate, add);
+    } else {
+      return update_summary_statistics(datum, add);
+    }
+  }
+
+  // INITIALIZATION FUNCTIONS
+  //! Main function that initializes members to appropriate values
   virtual void initialize() = 0;
 
+  // HIERARCHY FEATURES
   //! Returns whether the hierarchy models multivariate data or not
   virtual bool is_multivariate() const = 0;
 
@@ -182,13 +203,60 @@ class AbstractHierarchy {
   //! Returns whether the hierarchy represents a conjugate model or not
   virtual bool is_conjugate() const { return false; }
 
-  //! Returns the Protobuf ID associated to this class
-  virtual bayesmix::HierarchyId get_id() const = 0;
+ protected:
+  //! Evaluates the log-likelihood of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  Covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate) const {
+    if (!is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from a non-dependent hierarchy");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  }
 
-  //! Overloaded version of sample_full_cond(), mainly used for debugging
-  virtual void sample_full_cond(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) = 0;
+  //! Evaluates the log-likelihood of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
+  virtual double like_lpdf(const Eigen::RowVectorXd &datum) const {
+    if (is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from a dependent hierarchy");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  }
+
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param covariate  Covariate vector associated to datum
+  //! @param add        Whether the datum is being added or removed
+  virtual void update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                         const Eigen::RowVectorXd &covariate,
+                                         bool add) {
+    if (!is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from a non-dependent hierarchy");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  }
+
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param add        Whether the datum is being added or removed
+  virtual void update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                         bool add) {
+    if (is_dependent()) {
+      throw std::runtime_error(
+          "Cannot call this function from a dependent hierarchy");
+    } else {
+      throw std::runtime_error("Not implemented");
+    }
+  }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_ABSTRACT_HIERARCHY_H_

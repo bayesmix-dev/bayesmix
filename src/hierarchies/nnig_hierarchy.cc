@@ -11,15 +11,12 @@
 #include "ls_state.pb.h"
 #include "src/utils/rng.h"
 
-double NNIGHierarchy::like_lpdf(
-    const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
-double NNIGHierarchy::marg_lpdf(
-    const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+double NNIGHierarchy::marg_lpdf(const NNIG::Hyperparams &params,
+                                const Eigen::RowVectorXd &datum) const {
   double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
                       (params.shape * params.var_scaling));
   return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
@@ -192,9 +189,8 @@ NNIG::State NNIGHierarchy::draw(const NNIG::Hyperparams &params) {
   return out;
 }
 
-void NNIGHierarchy::update_summary_statistics(
-    const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate,
-    bool add) {
+void NNIGHierarchy::update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                              bool add) {
   if (add) {
     data_sum += datum(0);
     data_sum_squares += datum(0) * datum(0);
@@ -209,7 +205,7 @@ void NNIGHierarchy::clear_summary_statistics() {
   data_sum_squares = 0;
 }
 
-NNIG::Hyperparams NNIGHierarchy::get_posterior_parameters() {
+NNIG::Hyperparams NNIGHierarchy::compute_posterior_hypers() const {
   // Initialize relevant variables
   if (card == 0) {  // no update possible
     return *hypers;
@@ -243,20 +239,29 @@ NNIGHierarchy::get_state_proto() const {
   state_.set_mean(state.mean);
   state_.set_var(state.var);
 
-  auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
+  auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
   out->mutable_uni_ls_state()->CopyFrom(state_);
   return out;
 }
 
-void NNIGHierarchy::write_hypers_to_proto(
-    google::protobuf::Message *out) const {
-  bayesmix::NNIGPrior hypers_;
-  hypers_.mutable_fixed_values()->set_mean(hypers->mean);
-  hypers_.mutable_fixed_values()->set_var_scaling(hypers->var_scaling);
-  hypers_.mutable_fixed_values()->set_shape(hypers->shape);
-  hypers_.mutable_fixed_values()->set_scale(hypers->scale);
+void NNIGHierarchy::set_hypers_from_proto(
+    const google::protobuf::Message &hypers_) {
+  auto &hyperscast = downcast_hypers(hypers_).nnig_state();
+  hypers->mean = hyperscast.mean();
+  hypers->var_scaling = hyperscast.var_scaling();
+  hypers->scale = hyperscast.scale();
+  hypers->shape = hyperscast.shape();
+}
 
-  google::protobuf::internal::down_cast<bayesmix::NNIGPrior *>(out)
-      ->mutable_fixed_values()
-      ->CopyFrom(hypers_.fixed_values());
+std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
+NNIGHierarchy::get_hypers_proto() const {
+  bayesmix::NNIGState hypers_;
+  hypers_.set_mean(hypers->mean);
+  hypers_.set_var_scaling(hypers->var_scaling);
+  hypers_.set_shape(hypers->shape);
+  hypers_.set_scale(hypers->scale);
+
+  auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
+  out->mutable_nnig_state()->CopyFrom(hypers_);
+  return out;
 }

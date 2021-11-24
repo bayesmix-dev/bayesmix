@@ -47,8 +47,7 @@ void DirichletMixing::update_state(
 
 double DirichletMixing::mass_existing_cluster(
     const unsigned int n, const bool log, const bool propto,
-    std::shared_ptr<AbstractHierarchy> hier,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+    std::shared_ptr<AbstractHierarchy> hier) const {
   double out;
   if (log) {
     out = hier->get_log_card();
@@ -60,10 +59,9 @@ double DirichletMixing::mass_existing_cluster(
   return out;
 }
 
-double DirichletMixing::mass_new_cluster(
-    const unsigned int n, const bool log, const bool propto,
-    const unsigned int n_clust,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+double DirichletMixing::mass_new_cluster(const unsigned int n, const bool log,
+                                         const bool propto,
+                                         const unsigned int n_clust) const {
   double out;
   if (log) {
     out = state.logtotmass;
@@ -86,7 +84,7 @@ std::shared_ptr<bayesmix::MixingState> DirichletMixing::get_state_proto()
     const {
   bayesmix::DPState state_;
   state_.set_totalmass(state.totalmass);
-  auto out = std::make_unique<bayesmix::MixingState>();
+  auto out = std::make_shared<bayesmix::MixingState>();
   out->mutable_dp_state()->CopyFrom(state_);
   return out;
 }

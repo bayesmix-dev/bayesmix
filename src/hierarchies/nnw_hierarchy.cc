@@ -15,16 +15,13 @@
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-double NNWHierarchy::like_lpdf(
-    const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+double NNWHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   return bayesmix::multi_normal_prec_lpdf(datum, state.mean, state.prec_chol,
                                           state.prec_logdet);
 }
 
-double NNWHierarchy::marg_lpdf(
-    const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+double NNWHierarchy::marg_lpdf(const NNW::Hyperparams &params,
+                               const Eigen::RowVectorXd &datum) const {
   NNW::Hyperparams pred_params = get_predictive_t_parameters(params);
   Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
   double logdet = 2 * log(diag.array()).sum();
@@ -57,7 +54,7 @@ Eigen::VectorXd NNWHierarchy::conditional_pred_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
   // Custom, optimized grid method
   NNW::Hyperparams pred_params =
-      get_predictive_t_parameters(get_posterior_parameters());
+      get_predictive_t_parameters(compute_posterior_hypers());
   Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
   double logdet = 2 * log(diag.array()).sum();
 
@@ -268,9 +265,8 @@ NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
   return out;
 }
 
-void NNWHierarchy::update_summary_statistics(
-    const Eigen::RowVectorXd &datum, const Eigen::RowVectorXd &covariate,
-    bool add) {
+void NNWHierarchy::update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                             bool add) {
   if (add) {
     data_sum += datum.transpose();
     data_sum_squares += datum.transpose() * datum;
@@ -285,7 +281,7 @@ void NNWHierarchy::clear_summary_statistics() {
   data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
 }
 
-NNW::Hyperparams NNWHierarchy::get_posterior_parameters() const {
+NNW::Hyperparams NNWHierarchy::compute_posterior_hypers() const {
   if (card == 0) {  // no update possible
     return *hypers;
   }
@@ -326,24 +322,31 @@ NNWHierarchy::get_state_proto() const {
   bayesmix::to_proto(state.prec, state_.mutable_prec());
   bayesmix::to_proto(state.prec_chol, state_.mutable_prec_chol());
 
-  auto out = std::make_unique<bayesmix::AlgorithmState::ClusterState>();
+  auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
   out->mutable_multi_ls_state()->CopyFrom(state_);
   return out;
 }
 
-void NNWHierarchy::write_hypers_to_proto(
-    google::protobuf::Message *out) const {
-  bayesmix::NNWPrior hypers_;
-  bayesmix::to_proto(hypers->mean,
-                     hypers_.mutable_fixed_values()->mutable_mean());
-  hypers_.mutable_fixed_values()->set_var_scaling(hypers->var_scaling);
-  hypers_.mutable_fixed_values()->set_deg_free(hypers->deg_free);
-  bayesmix::to_proto(hypers->scale,
-                     hypers_.mutable_fixed_values()->mutable_scale());
+void NNWHierarchy::set_hypers_from_proto(
+    const google::protobuf::Message &hypers_) {
+  auto &hyperscast = downcast_hypers(hypers_).nnw_state();
+  hypers->mean = to_eigen(hyperscast.mean());
+  hypers->var_scaling = hyperscast.var_scaling();
+  hypers->deg_free = hyperscast.deg_free();
+  hypers->scale = to_eigen(hyperscast.scale());
+}
 
-  google::protobuf::internal::down_cast<bayesmix::NNWPrior *>(out)
-      ->mutable_fixed_values()
-      ->CopyFrom(hypers_.fixed_values());
+std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
+NNWHierarchy::get_hypers_proto() const {
+  bayesmix::NNWState hypers_;
+  bayesmix::to_proto(hypers->mean, hypers_.mutable_mean());
+  hypers_.set_var_scaling(hypers->var_scaling);
+  hypers_.set_deg_free(hypers->deg_free);
+  bayesmix::to_proto(hypers->scale, hypers_.mutable_scale());
+
+  auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
+  out->mutable_nnw_state()->CopyFrom(hypers_);
+  return out;
 }
 
 void NNWHierarchy::write_prec_to_state(const Eigen::MatrixXd &prec_,

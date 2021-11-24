@@ -55,77 +55,105 @@ class NNWHierarchy
   NNWHierarchy() = default;
   ~NNWHierarchy() = default;
 
-  double like_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate =
-                       Eigen::RowVectorXd(0)) const override;
-
-  //! Evaluates the log-marginal distribution of data in a single point
-  //! @param params     Container of (prior or posterior) hyperparameter values
-  //! @param datum      Point which is to be evaluated
-  //! @param covariate  (Optional) covariate vector associated to datum
-  //! @return           The evaluation of the lpdf
-  double marg_lpdf(
-      const NNW::Hyperparams &params, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
-
+  // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
+  //! Evaluates the log-likelihood of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
   Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data,
                                  const Eigen::MatrixXd &covariates =
                                      Eigen::MatrixXd(0, 0)) const override;
 
+  //! Evaluates the log-prior predictive distr. of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
   Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
 
+  //! Evaluates the log-prior predictive distr. of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
   Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
                                                           0)) const override;
 
-  void initialize_state() override;
-
-  void initialize_hypers();
-
+  //! Updates hyperparameter values given a vector of cluster states
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;
 
   //! Updates state values using the given (prior or posterior) hyperparameters
   NNW::State draw(const NNW::Hyperparams &params);
 
-  //! Updates cluster statistics when a datum is added or removed from it
-  //! @param datum      Data point which is being added or removed
-  //! @param covariate  Covariate vector associated to datum
-  //! @param add        Whether the datum is being added or removed
-  void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                 const Eigen::RowVectorXd &covariate,
-                                 bool add);
+  //! Resets summary statistics for this cluster
+  void clear_summary_statistics() override;
 
-  //! Removes every data point from this cluster
-  void clear_summary_statistics();
-
-  bool is_multivariate() const override { return true; }
-
-  //! Computes and return posterior hypers given data currently in this cluster
-  NNW::Hyperparams get_posterior_parameters() const;
-
-  void set_state_from_proto(const google::protobuf::Message &state_) override;
-
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
-      const override;
-
-  void write_hypers_to_proto(google::protobuf::Message *out) const override;
-
+  //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNW;
   }
 
+  //! Computes and return posterior hypers given data currently in this cluster
+  NNW::Hyperparams compute_posterior_hypers() const;
+
+  //! Read and set state values from a given Protobuf message
+  void set_state_from_proto(const google::protobuf::Message &state_) override;
+
+  //! Read and set hyperparameter values from a given Protobuf message
+  void set_hypers_from_proto(
+      const google::protobuf::Message &hypers_) override;
+
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::ClusterState message by adding the appropriate type
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
+      const override;
+
+  //! Writes current value of hyperparameters to a Protobuf message and
+  //! return a shared_ptr.
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::HierarchyHypers message by adding the appropriate type
+  std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
+      const override;
+
+  //! Returns whether the hierarchy models multivariate data or not
+  bool is_multivariate() const override { return true; }
+
  protected:
+  //! Evaluates the log-likelihood of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
+  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
+
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
+  double marg_lpdf(const NNW::Hyperparams &params,
+                   const Eigen::RowVectorXd &datum) const override;
+
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param add        Whether the datum is being added or removed
+  void update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                 bool add) override;
+
   //! Writes prec and its utilities to the given state object by pointer
   void write_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);
 
   //! Returns parameters for the predictive Student's t distribution
   NNW::Hyperparams get_predictive_t_parameters(
       const NNW::Hyperparams &params) const;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state() override;
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  void initialize_hypers() override;
 
   //! Dimension of data space
   unsigned int dim;

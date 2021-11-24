@@ -46,57 +46,72 @@ class NNIGHierarchy
   NNIGHierarchy() = default;
   ~NNIGHierarchy() = default;
 
-  double like_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate =
-                       Eigen::RowVectorXd(0)) const override;
-
-  //! Evaluates the log-marginal distribution of data in a single point
-  //! @param params     Container of (prior or posterior) hyperparameter values
-  //! @param datum      Point which is to be evaluated
-  //! @param covariate  (Optional) covariate vector associated to datum
-  //! @return           The evaluation of the lpdf
-  double marg_lpdf(
-      const NNIG::Hyperparams &params, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const;
-
-  void initialize_state() override;
-
-  void initialize_hypers();
-
+  //! Updates hyperparameter values given a vector of cluster states
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;
 
   //! Updates state values using the given (prior or posterior) hyperparameters
   NNIG::State draw(const NNIG::Hyperparams &params);
 
-  //! Updates cluster statistics when a datum is added or removed from it
-  //! @param datum      Data point which is being added or removed
-  //! @param covariate  Covariate vector associated to datum
-  //! @param add        Whether the datum is being added or removed
-  void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                 const Eigen::RowVectorXd &covariate,
-                                 bool add);
+  //! Resets summary statistics for this cluster
+  void clear_summary_statistics() override;
 
-  //! Removes every data point from this cluster
-  void clear_summary_statistics();
-
-  bool is_multivariate() const override { return false; }
-
-  //! Computes and return posterior hypers given data currently in this cluster
-  NNIG::Hyperparams get_posterior_parameters();
-
-  void set_state_from_proto(const google::protobuf::Message &state_) override;
-
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
-      const override;
-
-  void write_hypers_to_proto(google::protobuf::Message *out) const override;
-
+  //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNIG;
   }
 
+  //! Read and set state values from a given Protobuf message
+  void set_state_from_proto(const google::protobuf::Message &state_) override;
+
+  //! Read and set hyperparameter values from a given Protobuf message
+  void set_hypers_from_proto(
+      const google::protobuf::Message &hypers_) override;
+
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::ClusterState message by adding the appropriate type
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
+      const override;
+
+  //! Writes current value of hyperparameters to a Protobuf message and
+  //! return a shared_ptr.
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::HierarchyHypers message by adding the appropriate type
+  std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
+      const override;
+
+  //! Computes and return posterior hypers given data currently in this cluster
+  NNIG::Hyperparams compute_posterior_hypers() const;
+
+  //! Returns whether the hierarchy models multivariate data or not
+  bool is_multivariate() const override { return false; }
+
  protected:
+  //! Evaluates the log-likelihood of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
+  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
+
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
+  double marg_lpdf(const NNIG::Hyperparams &params,
+                   const Eigen::RowVectorXd &datum) const override;
+
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param add        Whether the datum is being added or removed
+  void update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                 bool add) override;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state() override;
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  void initialize_hypers() override;
+
   //! Sum of data points currently belonging to the cluster
   double data_sum = 0;
 
