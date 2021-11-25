@@ -14,8 +14,7 @@ def build_bayesmix(nproc):
     subprocess.run(cmake_cmd.split(),cwd=build_dir)
     run_cmd = "make run -j{}".format(nproc)
     subprocess.run(run_cmd.split(), cwd=build_dir)
-    bm_exe = os.path.join(build_dir, 'run')
-    print("Bayesmix executable is '{0}', \nexport the environment"
+    print("Bayesmix executable is in '{0}', \nexport the environment"
            " variable BAYESMIX_HOME={0}".format(build_dir))
 
 
