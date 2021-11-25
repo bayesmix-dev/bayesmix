@@ -57,9 +57,12 @@ int main(int argc, char *argv[]) {
   auto hier = factory_hier.create_object(hier_type);
   auto mixing = factory_mixing.create_object(mix_type);
   BaseCollector *coll;
-  if (collname == "") {
+  if (collname == "memory") {
+    std::cout << "Creating MemoryCollector" << std::endl;
     coll = new MemoryCollector();
   } else {
+    std::cout << "Creating FileCollector, writing to file: " << collname
+              << std::endl;
     coll = new FileCollector(collname);
   }
 
