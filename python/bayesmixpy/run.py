@@ -1,12 +1,36 @@
 import os
 import shutil
+import subprocess
 import numpy as np
 
 from tempfile import TemporaryDirectory
+from pathlib import Path
 
 
 BAYESMIX_EXE = os.environ["BAYESMIX_EXE"]
-RUN_CMD = BAYESMIX_EXE + "{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}"
+RUN_CMD = BAYESMIX_EXE + " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}"
+
+
+def _is_file(a: str):
+    p = Path(a)
+    return p.exists() and p.is_file()
+
+
+def _maybe_print_to_file(maybe_proto: str, proto_name: str, out_dir: str):
+    """If maybe_proto is a file, returns the file name.
+    If maybe_proto is a string representing a message, prints the message to
+    a file and returns the file name.
+    """
+    if _is_file(maybe_proto):
+        return maybe_proto
+
+    proto_file = os.path.join(out_dir, proto_name + ".asciipb")
+    with open(proto_file, "w") as f:
+        print(maybe_proto, file=f)
+
+    return proto_file
+
+
 
 def get_filenames(outdir):
     data = os.path.join(outdir, 'data.csv')
@@ -19,39 +43,70 @@ def get_filenames(outdir):
 def run_mcmc(
         hierarchy: str,
         mixing: str,
-        algorithm: str,
         data: np.array,
         dens_grid: np.array,
-        hier_params: str = None,
-        mix_params: str = None,
-        algo_params: str = None,
-        n_iter: int = 2000,
-        n_burn: int = 1000,
-        n_thin: int = 1,
+        hier_params: str,
+        mix_params: str,
+        algo_params: str,
         out_dir: str = None):
 
     if out_dir is None:
-        out_dir = TemporaryDirectory()
+        out_dir = TemporaryDirectory().name
+        os.makedirs(out_dir, exist_ok=True)
         remove_out_dir = True
     else:
         remove_out_dir = False
 
-    data_file, dens_file, nclus_file, clus_file = get_filenames(out_dir)
+    data_file, dens_grid_file, nclus_file, clus_file = get_filenames(out_dir)
     np.savetxt(data_file, data, delimiter=',')
-    np.savetxt(dens_file, dens_grid, delimiter=',')
+    np.savetxt(dens_grid_file, dens_grid, delimiter=',')
 
-    # TODO: handle default hier_params, mix_params, algo_params!!
+    hier_params_file = _maybe_print_to_file(hier_params, "hier_params", out_dir)
+    mix_params_file = _maybe_print_to_file(mix_params, "mix_params", out_dir)
+    algo_params_file = _maybe_print_to_file(algo_params, "algo_params", out_dir)
+
+    eval_dens_file = os.path.join(out_dir, "eval_dens.csv")
 
     cmd = RUN_CMD.format(
-        hierarchy,
-    )
+        algo_params_file,
+        hierarchy, hier_params_file,
+        mixing, mix_params_file,
+        'memory',
+        data_file,
+        dens_grid_file,
+        eval_dens_file,
+        nclus_file,
+        clus_file)
+
+    try:
+        proc = subprocess.Popen(
+            cmd.split(),
+            bufsize=1,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            env=os.environ,
+            universal_newlines=True,
+        )
+        while proc.poll() is None:
+            if proc.stdout is not None:
+                line = proc.stdout.readline()
+                line = line.strip()
+                if line.startswith(("[>", "[=")):
+                    print("\r{0}".format(line), end=' ', flush=True)
+                else:
+                    print("{0}".format(line))
+    except OSError as e:
+        msg = 'Failed with error {}\n'.format(str(e))
+        if remove_out_dir:
+            shutil.rmtree(out_dir, ignore_errors=True)
+        raise RuntimeError(msg) from e
+
+    eval_dens = np.loadtxt(eval_dens_file, delimiter=',')
+    nclus = np.loadtxt(nclus_file, delimiter=',')
+    clus = np.loadtxt(clus_file, delimiter=',')
 
     if remove_out_dir:
         shutil.rmtree(out_dir, ignore_errors=True)
-    
 
-
-
-
-
-
+    return eval_dens, nclus, clus
