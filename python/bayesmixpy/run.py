@@ -6,8 +6,10 @@ import numpy as np
 from tempfile import TemporaryDirectory
 from pathlib import Path
 
+from .shell_utils import run_shell
 
-BAYESMIX_EXE = os.environ["BAYESMIX_EXE"]
+
+BAYESMIX_EXE = os.environ.get("BAYESMIX_EXE", default="")
 RUN_CMD = BAYESMIX_EXE + " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}"
 
 
@@ -16,7 +18,9 @@ def _is_file(a: str):
     return p.exists() and p.is_file()
 
 
-def _maybe_print_to_file(maybe_proto: str, proto_name: str, out_dir: str):
+def _maybe_print_to_file(maybe_proto: str,
+                         proto_name: str = None,
+                         out_dir: str = None):
     """If maybe_proto is a file, returns the file name.
     If maybe_proto is a string representing a message, prints the message to
     a file and returns the file name.
@@ -79,23 +83,7 @@ def run_mcmc(
         clus_file)
 
     try:
-        proc = subprocess.Popen(
-            cmd.split(),
-            bufsize=1,
-            stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            env=os.environ,
-            universal_newlines=True,
-        )
-        while proc.poll() is None:
-            if proc.stdout is not None:
-                line = proc.stdout.readline()
-                line = line.strip()
-                if line.startswith(("[>", "[=")):
-                    print("\r{0}".format(line), end=' ', flush=True)
-                else:
-                    print("{0}".format(line))
+        run_shell(cmd, flush_startswith=("[>", "[="))
     except OSError as e:
         msg = 'Failed with error {}\n'.format(str(e))
         if remove_out_dir:
