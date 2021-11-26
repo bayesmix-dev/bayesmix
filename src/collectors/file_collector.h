@@ -4,6 +4,8 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/message.h>
 
+#include <future>
+
 #include "base_collector.h"
 
 //! Class for a collector that writes its content to a file.
@@ -20,7 +22,8 @@
 
 class FileCollector : public BaseCollector {
  public:
-  FileCollector(const std::string &filename_) : filename(filename_) {}
+  FileCollector(const std::string &filename_, int chunk_size = 100)
+      : filename(filename_), chunk_size(chunk_size) {}
 
   ~FileCollector() {
     if (is_open_write) {
@@ -50,11 +53,24 @@ class FileCollector : public BaseCollector {
 
   bool next_state(google::protobuf::Message *out) override;
 
+  void populate_buffer(google::protobuf::Message *base_msg);
+
   //! Unix file descriptor for reading mode
   int infd;
 
   //! Unix file descriptor for writing mode
   int outfd;
+
+  int chunk_size;
+
+  int curr_buffer_pos;
+
+  std::vector<std::future<
+      std::tuple<std::shared_ptr<google::protobuf::Message>, bool>>>
+      msg_buffer;
+
+  std::tuple<std::shared_ptr<google::protobuf::Message>, bool> read_one(
+      google::protobuf::Message *base_msg);
 
   //! Pointer to a reading file stream
   google::protobuf::io::FileInputStream *fin;
