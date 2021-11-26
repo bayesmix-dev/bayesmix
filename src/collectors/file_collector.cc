@@ -53,14 +53,49 @@ void FileCollector::close_reading() {
 bool FileCollector::next_state(google::protobuf::Message *out) {
   if (!is_open_read) {
     open_for_reading();
+    populate_buffer(out);
   }
+
   curr_iter++;
-  //! Parse Protobuf object and get exit code
-  bool keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(
-      out, fin, nullptr);
+  curr_buffer_pos++;
+
+  if (curr_buffer_pos == chunk_size) {
+    populate_buffer(out);
+  }
+
+  std::tuple<std::shared_ptr<google::protobuf::Message>, bool> msg_tuple =
+      msg_buffer[curr_buffer_pos].get();
+
+  out->CopyFrom(*std::get<0>(msg_tuple));
+  bool keep = std::get<1>(msg_tuple);
+
   if (!keep) {
     curr_iter = 0;
+    curr_buffer_pos = 0;
     close_reading();
   }
+
   return keep;
+}
+
+void FileCollector::populate_buffer(google::protobuf::Message *base_msg) {
+  msg_buffer = std::vector<std::future<
+      std::tuple<std::shared_ptr<google::protobuf::Message>, bool>>>();
+
+  curr_buffer_pos = 0;
+  for (int i = 0; i < chunk_size; i++) {
+    std::future<std::tuple<std::shared_ptr<google::protobuf::Message>, bool>>
+        future_msg = std::async(std::launch::deferred,
+                                &FileCollector::read_one, this, base_msg);
+
+    msg_buffer.push_back(std::move(future_msg));
+  }
+}
+
+std::tuple<std::shared_ptr<google::protobuf::Message>, bool>
+FileCollector::read_one(google::protobuf::Message *base_msg) {
+  std::shared_ptr<google::protobuf::Message> msg(base_msg->New());
+  bool keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(
+      msg.get(), fin, nullptr);
+  return std::make_tuple(msg, keep);
 }
