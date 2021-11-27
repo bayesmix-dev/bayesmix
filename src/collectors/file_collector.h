@@ -4,23 +4,23 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/message.h>
 
+#include <future>
+
 #include "base_collector.h"
 
-//! Class for a collector that writes its content to a file.
+//! Class for a collector that writes (and reads) its content to a file.
 
-//! This is a type of collector that writes each state passed to it to a binary
-//! file. Unlike the memory collector, the contents of this collector are
-//! permanent, because every state collected by it remains ever after the
-//! termination of the main that created it, in Protobuf form, in the
-//! corresponding file. This approach is mandatory, for instance, if different
-//! main programs are used both to run the algorithm and the estimates.
-//! Therefore, a file collector has both a reading and a writing mode.
-//! For more information about collectors, please refer to the `BaseCollector`
-//! base class.
+//! An instance of FileCollector saves a sequence of Protobuf objects to a file
+//! and is able to read them back, returning them one by one. When writing to
+//! the file, the objects are simply serialized into bytes. When reading, for
+//! efficiency's sake, we instead read a chunk of 'chunk_size' objects and
+//! deserialized them into a buffer, asynchronously. When the buffer has been
+//! read, we erase it and fill it again with the next chunk of objects.
 
 class FileCollector : public BaseCollector {
  public:
-  FileCollector(const std::string &filename_) : filename(filename_) {}
+  FileCollector(const std::string &filename_, int chunk_size = 100)
+      : filename(filename_), chunk_size(chunk_size) {}
 
   ~FileCollector() {
     if (is_open_write) {
@@ -50,11 +50,30 @@ class FileCollector : public BaseCollector {
 
   bool next_state(google::protobuf::Message *out) override;
 
+  //! Populates the buffer with the next chunk of objects.
+  void populate_buffer(google::protobuf::Message *base_msg);
+
   //! Unix file descriptor for reading mode
   int infd;
 
   //! Unix file descriptor for writing mode
   int outfd;
+
+  int chunk_size;
+
+  int curr_buffer_pos;
+
+  //! Buffer of std::future objects, one per message. std::future is needed
+  //! to perform the reading asynchronously.
+  std::vector<std::future<
+      std::tuple<std::shared_ptr<google::protobuf::Message>, bool>>>
+      msg_buffer;
+
+  //! Reads one message from the file and returns a tuple containing (a shared
+  //! ptr to) the message and a bool indicating whether the message was
+  //! successfully read.
+  std::tuple<std::shared_ptr<google::protobuf::Message>, bool> read_one(
+      google::protobuf::Message *base_msg);
 
   //! Pointer to a reading file stream
   google::protobuf::io::FileInputStream *fin;

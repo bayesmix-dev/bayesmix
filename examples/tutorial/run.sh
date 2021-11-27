@@ -22,6 +22,6 @@ build/run \
   "memory" \
   resources/tutorial/data.csv \
   resources/tutorial/grid.csv \
-  resources/tutorial/out/density.csv \
+  resources/tutorial/out/density_file.csv \
   resources/tutorial/out/numclust.csv \
   resources/tutorial/out/clustering.csv
