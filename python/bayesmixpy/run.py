@@ -25,6 +25,7 @@ def _maybe_print_to_file(maybe_proto: str,
         return maybe_proto
 
     proto_file = os.path.join(out_dir, proto_name + ".asciipb")
+
     with open(proto_file, "w") as f:
         print(maybe_proto, file=f)
 
@@ -81,7 +82,10 @@ def run_mcmc(
     clus: the best clustering obtained by minimizing Binder's loss function.
     """
 
-    BAYESMIX_EXE = os.environ.get("BAYESMIX_EXE", default="")
+    BAYESMIX_EXE = os.environ.get("BAYESMIX_EXE", default=None)
+    if BAYESMIX_EXE is None:
+        raise ValueError("BAYESMIX_EXE environment variable not set")
+
     RUN_CMD = BAYESMIX_EXE + " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}"
 
 
@@ -99,7 +103,6 @@ def run_mcmc(
     hier_params_file = _maybe_print_to_file(hier_params, "hier_params", out_dir)
     mix_params_file = _maybe_print_to_file(mix_params, "mix_params", out_dir)
     algo_params_file = _maybe_print_to_file(algo_params, "algo_params", out_dir)
-
     eval_dens_file = os.path.join(out_dir, "eval_dens.csv")
 
     cmd = RUN_CMD.format(

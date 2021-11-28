@@ -9,7 +9,7 @@ path = pathlib.Path(HERE)
 BAYESMIX_HOME = path.resolve().parents[1]
 
 
-def build_bayesmix(nproc):
+def build_bayesmix(nproc=1):
     print("Building the Bayesmix executable")
     build_dir = os.path.join(BAYESMIX_HOME, 'build')
     os.makedirs(build_dir, exist_ok=True)
