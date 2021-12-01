@@ -21,7 +21,7 @@ TEST(nnighierarchy, draw) {
   prior.mutable_fixed_values()->set_mean(mu0);
   prior.mutable_fixed_values()->set_var_scaling(lambda0);
   prior.mutable_fixed_values()->set_shape(alpha0);
-  prior.mutable_fixed_values()->set_scale(beta0);
+  prior.mutable_fixed_values()->set_rate(beta0);
   hier->get_mutable_prior()->CopyFrom(prior);
   hier->initialize();
 
@@ -47,7 +47,7 @@ TEST(nnighierarchy, sample_given_data) {
   prior.mutable_fixed_values()->set_mean(mu0);
   prior.mutable_fixed_values()->set_var_scaling(lambda0);
   prior.mutable_fixed_values()->set_shape(alpha0);
-  prior.mutable_fixed_values()->set_scale(beta0);
+  prior.mutable_fixed_values()->set_rate(beta0);
   hier->get_mutable_prior()->CopyFrom(prior);
 
   hier->initialize();
@@ -189,16 +189,17 @@ TEST(lin_reg_uni_hierarchy, misc) {
   *prior.mutable_fixed_values()->mutable_mean() = beta0_proto;
   *prior.mutable_fixed_values()->mutable_var_scaling() = Lambda0_proto;
   prior.mutable_fixed_values()->set_shape(a0);
-  prior.mutable_fixed_values()->set_scale(b0);
+  prior.mutable_fixed_values()->set_rate(b0);
   hier.get_mutable_prior()->CopyFrom(prior);
   hier.initialize();
   // Extract hypers for reading test
   bayesmix::AlgorithmState::HierarchyHypers out;
   hier.write_hypers_to_proto(&out);
   ASSERT_EQ(beta0, bayesmix::to_eigen(out.lin_reg_uni_state().mean()));
-  ASSERT_EQ(Lambda0, bayesmix::to_eigen(out.lin_reg_uni_state().var_scaling()));
+  ASSERT_EQ(Lambda0,
+            bayesmix::to_eigen(out.lin_reg_uni_state().var_scaling()));
   ASSERT_EQ(a0, out.lin_reg_uni_state().shape());
-  ASSERT_EQ(b0, out.lin_reg_uni_state().scale());
+  ASSERT_EQ(b0, out.lin_reg_uni_state().rate());
   // Add data
   for (int i = 0; i < n; i++) {
     hier.add_datum(i, data.row(i), false, cov.row(i));

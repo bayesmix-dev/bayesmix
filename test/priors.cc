@@ -56,7 +56,7 @@ TEST(hierarchies, fixed_values) {
   prior.mutable_fixed_values()->set_mean(5.0);
   prior.mutable_fixed_values()->set_var_scaling(0.1);
   prior.mutable_fixed_values()->set_shape(2.0);
-  prior.mutable_fixed_values()->set_scale(2.0);
+  prior.mutable_fixed_values()->set_rate(2.0);
 
   auto hier = std::make_shared<NNIGHierarchy>();
   hier->get_mutable_prior()->CopyFrom(prior);
@@ -70,7 +70,8 @@ TEST(hierarchies, fixed_values) {
   for (size_t i = 1; i < 4; i++) {
     unique_values.push_back(hier->clone());
     unique_values[i]->write_hypers_to_proto(&prior_out);
-    ASSERT_EQ(prior.fixed_values().DebugString(), prior_out.nnig_state().DebugString());
+    ASSERT_EQ(prior.fixed_values().DebugString(),
+              prior_out.nnig_state().DebugString());
   }
 
   // Check equality after update
@@ -78,7 +79,8 @@ TEST(hierarchies, fixed_values) {
   unique_values[0]->write_hypers_to_proto(&prior_out);
   for (size_t i = 1; i < 4; i++) {
     unique_values[i]->write_hypers_to_proto(&prior_out);
-    ASSERT_EQ(prior.fixed_values().DebugString(), prior_out.nnig_state().DebugString());
+    ASSERT_EQ(prior.fixed_values().DebugString(),
+              prior_out.nnig_state().DebugString());
   }
 }
 
@@ -117,8 +119,7 @@ TEST(hierarchies, normal_mean_prior) {
 
   hier.update_hypers(states);
   hier.write_hypers_to_proto(&prior_out);
-  Eigen::Vector2d mean_out =
-      bayesmix::to_eigen(prior_out.nnw_state().mean());
+  Eigen::Vector2d mean_out = bayesmix::to_eigen(prior_out.nnw_state().mean());
   std::cout << "             after = " << mean_out(0) << " " << mean_out(1)
             << std::endl;
   assert(mu00(0) < mean_out(0) && mu00(1) < mean_out(1));

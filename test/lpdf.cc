@@ -20,7 +20,7 @@ TEST(lpdf, nnig) {
   hier_prior.mutable_fixed_values()->set_mean(mu0);
   hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
   hier_prior.mutable_fixed_values()->set_shape(alpha0);
-  hier_prior.mutable_fixed_values()->set_scale(beta0);
+  hier_prior.mutable_fixed_values()->set_rate(beta0);
   hier.get_mutable_prior()->CopyFrom(hier_prior);
   hier.initialize();
 
@@ -164,7 +164,7 @@ TEST(lpdf, lin_reg_uni) {
   *prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
   *prior.mutable_fixed_values()->mutable_var_scaling() = Lambda0_proto;
   prior.mutable_fixed_values()->set_shape(alpha0);
-  prior.mutable_fixed_values()->set_scale(beta0);
+  prior.mutable_fixed_values()->set_rate(beta0);
   // Initialize hierarchy
   hier.get_mutable_prior()->CopyFrom(prior);
   hier.initialize();

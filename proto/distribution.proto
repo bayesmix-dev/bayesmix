@@ -78,7 +78,7 @@ message NWDistribution {
  */
 message MultiNormalIGDistribution {
   Vector mean = 1;
-  double var_scaling = 2;
+  Matrix var_scaling = 2;
   double shape = 3;
   double rate = 4;
 }
