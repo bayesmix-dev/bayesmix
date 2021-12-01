@@ -38,7 +38,6 @@ There are currently three submodules to the ``bayesmix`` library, represented by
    hierarchies
    mixings
    collectors
-   protos
    utils
 
 
