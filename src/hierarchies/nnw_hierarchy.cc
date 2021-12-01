@@ -338,7 +338,7 @@ void NNWHierarchy::set_hypers_from_proto(
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
 NNWHierarchy::get_hypers_proto() const {
-  bayesmix::NNWState hypers_;
+  bayesmix::NWDistribution hypers_;
   bayesmix::to_proto(hypers->mean, hypers_.mutable_mean());
   hypers_.set_var_scaling(hypers->var_scaling);
   hypers_.set_deg_free(hypers->deg_free);

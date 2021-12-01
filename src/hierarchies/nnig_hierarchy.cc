@@ -17,7 +17,7 @@ double NNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
 
 double NNIGHierarchy::marg_lpdf(const NNIG::Hyperparams &params,
                                 const Eigen::RowVectorXd &datum) const {
-  double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
+  double sig_n = sqrt(params.rate * (params.var_scaling + 1) /
                       (params.shape * params.var_scaling));
   return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
                                     sig_n);
@@ -25,7 +25,7 @@ double NNIGHierarchy::marg_lpdf(const NNIG::Hyperparams &params,
 
 void NNIGHierarchy::initialize_state() {
   state.mean = hypers->mean;
-  state.var = hypers->scale / (hypers->shape + 1);
+  state.var = hypers->rate / (hypers->shape + 1);
 }
 
 void NNIGHierarchy::initialize_hypers() {
@@ -34,7 +34,7 @@ void NNIGHierarchy::initialize_hypers() {
     hypers->mean = prior->fixed_values().mean();
     hypers->var_scaling = prior->fixed_values().var_scaling();
     hypers->shape = prior->fixed_values().shape();
-    hypers->scale = prior->fixed_values().scale();
+    hypers->rate = prior->fixed_values().rate();
     // Check validity
     if (hypers->var_scaling <= 0) {
       throw std::invalid_argument("Variance-scaling parameter must be > 0");
@@ -42,8 +42,8 @@ void NNIGHierarchy::initialize_hypers() {
     if (hypers->shape <= 0) {
       throw std::invalid_argument("Shape parameter must be > 0");
     }
-    if (hypers->scale <= 0) {
-      throw std::invalid_argument("Scale parameter must be > 0");
+    if (hypers->rate <= 0) {
+      throw std::invalid_argument("Rate parameter must be > 0");
     }
   }
 
@@ -52,7 +52,7 @@ void NNIGHierarchy::initialize_hypers() {
     hypers->mean = prior->normal_mean_prior().mean_prior().mean();
     hypers->var_scaling = prior->normal_mean_prior().var_scaling();
     hypers->shape = prior->normal_mean_prior().shape();
-    hypers->scale = prior->normal_mean_prior().scale();
+    hypers->rate = prior->normal_mean_prior().rate();
     // Check validity
     if (hypers->var_scaling <= 0) {
       throw std::invalid_argument("Variance-scaling parameter must be > 0");
@@ -60,8 +60,8 @@ void NNIGHierarchy::initialize_hypers() {
     if (hypers->shape <= 0) {
       throw std::invalid_argument("Shape parameter must be > 0");
     }
-    if (hypers->scale <= 0) {
-      throw std::invalid_argument("Scale parameter must be > 0");
+    if (hypers->rate <= 0) {
+      throw std::invalid_argument("Rate parameter must be > 0");
     }
   }
 
@@ -74,8 +74,8 @@ void NNIGHierarchy::initialize_hypers() {
     double alpha00 = prior->ngg_prior().var_scaling_prior().shape();
     double beta00 = prior->ngg_prior().var_scaling_prior().rate();
     // for beta0
-    double a00 = prior->ngg_prior().scale_prior().shape();
-    double b00 = prior->ngg_prior().scale_prior().rate();
+    double a00 = prior->ngg_prior().rate_prior().shape();
+    double b00 = prior->ngg_prior().rate_prior().rate();
     // for alpha0
     double alpha0 = prior->ngg_prior().shape();
     // Check validity
@@ -101,7 +101,7 @@ void NNIGHierarchy::initialize_hypers() {
     hypers->mean = mu00;
     hypers->var_scaling = alpha00 / beta00;
     hypers->shape = alpha0;
-    hypers->scale = a00 / b00;
+    hypers->rate = a00 / b00;
   }
 
   else {
@@ -148,8 +148,8 @@ void NNIGHierarchy::update_hypers(
     double alpha00 = prior->ngg_prior().var_scaling_prior().shape();
     double beta00 = prior->ngg_prior().var_scaling_prior().rate();
     // for tau0
-    double a00 = prior->ngg_prior().scale_prior().shape();
-    double b00 = prior->ngg_prior().scale_prior().rate();
+    double a00 = prior->ngg_prior().rate_prior().shape();
+    double b00 = prior->ngg_prior().rate_prior().rate();
     // Compute posterior hyperparameters
     double b_n = 0.0;
     double num = 0.0;
@@ -172,7 +172,7 @@ void NNIGHierarchy::update_hypers(
     // Update hyperparameters with posterior random Gibbs sampling
     hypers->mean = stan::math::normal_rng(mu_n, sig_n, rng);
     hypers->var_scaling = stan::math::gamma_rng(alpha_n, beta_n, rng);
-    hypers->scale = stan::math::gamma_rng(a_n, b_n, rng);
+    hypers->rate = stan::math::gamma_rng(a_n, b_n, rng);
   }
 
   else {
@@ -183,7 +183,7 @@ void NNIGHierarchy::update_hypers(
 NNIG::State NNIGHierarchy::draw(const NNIG::Hyperparams &params) {
   auto &rng = bayesmix::Rng::Instance().get();
   NNIG::State out;
-  out.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+  out.var = stan::math::inv_gamma_rng(params.shape, params.rate, rng);
   out.mean = stan::math::normal_rng(params.mean,
                                     sqrt(state.var / params.var_scaling), rng);
   return out;
@@ -218,10 +218,10 @@ NNIG::Hyperparams NNIGHierarchy::compute_posterior_hypers() const {
                      (hypers->var_scaling + card);
   post_params.var_scaling = hypers->var_scaling + card;
   post_params.shape = hypers->shape + 0.5 * card;
-  post_params.scale = hypers->scale + 0.5 * ss +
-                      0.5 * hypers->var_scaling * card *
-                          (y_bar - hypers->mean) * (y_bar - hypers->mean) /
-                          (card + hypers->var_scaling);
+  post_params.rate = hypers->rate + 0.5 * ss +
+                     0.5 * hypers->var_scaling * card *
+                         (y_bar - hypers->mean) * (y_bar - hypers->mean) /
+                         (card + hypers->var_scaling);
   return post_params;
 }
 
@@ -249,17 +249,17 @@ void NNIGHierarchy::set_hypers_from_proto(
   auto &hyperscast = downcast_hypers(hypers_).nnig_state();
   hypers->mean = hyperscast.mean();
   hypers->var_scaling = hyperscast.var_scaling();
-  hypers->scale = hyperscast.scale();
+  hypers->rate = hyperscast.rate();
   hypers->shape = hyperscast.shape();
 }
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
 NNIGHierarchy::get_hypers_proto() const {
-  bayesmix::NNIGState hypers_;
+  bayesmix::NIGDistribution hypers_;
   hypers_.set_mean(hypers->mean);
   hypers_.set_var_scaling(hypers->var_scaling);
   hypers_.set_shape(hypers->shape);
-  hypers_.set_scale(hypers->scale);
+  hypers_.set_rate(hypers->rate);
 
   auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
   out->mutable_nnig_state()->CopyFrom(hypers_);

@@ -4,27 +4,81 @@ import "matrix.proto";
 
 package bayesmix;
 
+/*
+ * Parameters defining a univariate normal distribution
+ */
 message UniNormalDistribution {
   double mean = 1;
   double var = 2;
 }
 
+/*
+ * Parameters defining a multivariate normal distribution
+ */
 message MultiNormalDistribution {
   Vector mean = 1;
   Matrix var = 2;
 }
 
+/*
+ * Parameters defining a gamma distribution with density
+ * f(x) = x^(shape-1) * exp(-rate * x) / Gamma(shape)
+ */
 message GammaDistribution {
   double shape = 1;
   double rate = 2;
 }
 
+/*
+ * Parameters defining and Inverse Wishart distribution
+ */
 message InvWishartDistribution {
   double deg_free = 1;
   Matrix scale = 2;
 }
 
+/*
+ * Parameters defining a beta distribution
+ */
 message BetaDistribution {
   double shape_a = 1;
   double shape_b = 2;
+}
+
+/*
+ * Parameters of a  Normal Inverse-Gamma distribution
+ * with density
+ * f(x, y) = N(x | mu, y/var_scaling) * IG(y | shape, rate)
+ */
+message NIGDistribution {
+  double mean = 1;
+  double var_scaling = 2;
+  double shape = 3;
+  double rate = 4;
+}
+
+/*
+ * Parameters of a Normal Wishart distribution
+ * with density
+ * f(x, y) = N(x | mu, (y * var_scaling)^{-1}) * IW(y | deg_free, scale)
+ * where x is a vector and y is a matrix (spd)
+ */
+message NWDistribution {
+  Vector mean = 1;
+  double var_scaling = 2;
+  double deg_free = 3;
+  Matrix scale = 4;
+}
+
+
+/*
+ * Parameters for the Normal Inverse Gamma distribution commonly employed in
+ * linear regression models, with density
+ * f(beta, var) = N(beta | mean, var * var_scaling^{-1}) * IG(var | shape, rate)
+ */
+message MultiNormalIGDistribution {
+  Vector mean = 1;
+  double var_scaling = 2;
+  double shape = 3;
+  double rate = 4;
 }

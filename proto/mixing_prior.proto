@@ -1,59 +1,69 @@
 syntax = "proto3";
 
 import "distribution.proto";
+import "mixing_state.proto";
 
 package bayesmix;
 
-message DPPrior {
-  message FixedValue {
-    double totalmass = 1;
-  }
 
+/*
+ * Prior for the concentration parameter of a Dirichlet process
+ */
+message DPPrior {
   message GammaPrior {
     GammaDistribution totalmass_prior = 1;
   }
 
   oneof totalmass {
-    FixedValue fixed_value = 1;
-    GammaPrior gamma_prior = 2;
+    DPState fixed_value = 1; // No prior, just a fixed value
+    GammaPrior gamma_prior = 2; // Gamma prior on the total mass
   }
 }
 
+/*
+ * Prior for the strength and discount parameters of a Pitman-Yor process.
+ * For the moment, we only suppeort fixed values
+ */
 message PYPrior {
-  message FixedValues {
-    double strength = 1;
-    double discount = 2;
-  }
-
   oneof totalmass {
-    FixedValues fixed_values = 1;
+    PYState fixed_values = 1;
   }
 }
 
+/*
+ * Definition of the parameters of a Logit-Stick Breaking process.
+ */
 message LogSBPrior {
   oneof coeff {
-    MultiNormalDistribution normal_prior = 1;
+    MultiNormalDistribution normal_prior = 1; // Normal prior on the regression coefficients
   }
-  double step_size = 2;  // TODO move?
-  uint32 num_components = 3;
+  double step_size = 2;  // Steps size for the MALA algorithm used for posterior inference (TODO: move?)
+  uint32 num_components = 3; // Number of components in the process
 }
 
+
+/*
+ * Definition of the parameters of a truncated Stick-Breaking process
+ */
 message TruncSBPrior {
   message BetaPriors {
+    // General stick-breaking distributions
     repeated BetaDistribution beta_distributions = 1;
   }
   message DPPrior {
+    // Truncated Dirichlet process
     double totalmass = 1;
   }
   message PYPrior {
+    // Truncated Pitman-Yor process
     double strength = 1;
     double discount = 2;
   }
 
   oneof prior {
-    BetaPriors beta_priors = 1;
-    DPPrior dp_prior = 2;
-    PYPrior py_prior = 3;
+    BetaPriors beta_priors = 1; // General stick-breaking distributions
+    DPPrior dp_prior = 2; // Truncated Dirichlet process
+    PYPrior py_prior = 3; // Truncated Pitman-Yor process
   }
-  uint32 num_components = 4;
+  uint32 num_components = 4; // Number of components in the process
 }

@@ -154,7 +154,7 @@ void LinRegUniHierarchy::set_hypers_from_proto(
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
 LinRegUniHierarchy::get_hypers_proto() const {
-  bayesmix::LinRegUniState hypers_;
+  bayesmix::MultiNormalIGDistribution hypers_;
   bayesmix::to_proto(hypers->mean, hypers_.mutable_mean());
   bayesmix::to_proto(hypers->var_scaling, hypers_.mutable_var_scaling());
   hypers_.set_shape(hypers->shape);

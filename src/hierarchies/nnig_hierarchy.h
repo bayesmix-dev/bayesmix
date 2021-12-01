@@ -34,7 +34,7 @@ struct State {
 
 //! Custom container for Hyperparameters values
 struct Hyperparams {
-  double mean, var_scaling, shape, scale;
+  double mean, var_scaling, shape, rate;
 };
 
 };  // namespace NNIG

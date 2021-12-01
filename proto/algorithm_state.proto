@@ -4,33 +4,45 @@ import "mixing_state.proto";
 import "ls_state.proto";
 import "matrix.proto";
 import "hierarchy_prior.proto";
+import "distribution.proto";
 
 package bayesmix;
 
+
+/*
+ * This message represents the state of a Gibbs sampler for
+ * a mixture model. All algorithms must be able to handle this
+ * message, by filling it with the current state of the sampler
+ * the `get_state_as_proto`.
+ */
 message AlgorithmState {
   message ClusterState {
+    // Represents the state of a single cluster of component of
+    // the mixture model. The first fieald just a `oneof` wrapper
+    // around the different possible states.
     oneof val {
-      UniLSState uni_ls_state = 1;
-      MultiLSState multi_ls_state = 2;
-      LinRegUniLSState lin_reg_uni_ls_state = 4;
-      Vector general_state = 5;
+      UniLSState uni_ls_state = 1; // State of a univariate location-scale family
+      MultiLSState multi_ls_state = 2; // State of a multivariate location-scale family
+      LinRegUniLSState lin_reg_uni_ls_state = 4; // State of a linear regression univariate location-scale family
+      Vector general_state = 5; // Just a vector of doubles
     }
-    int32 cardinality = 3;
+    int32 cardinality = 3; // How many observations are in this cluster
   }
 
-  repeated ClusterState cluster_states = 1;
-  repeated int32 cluster_allocs = 2 [packed = true];
-  MixingState mixing_state = 3;
-  int32 iteration_num = 4;
+  repeated ClusterState cluster_states = 1; // The state of each cluster
+  repeated int32 cluster_allocs = 2 [packed = true]; // Vector of allocations into clusters, one for each observation
+  MixingState mixing_state = 3; // The state of the `Mixing`
+  int32 iteration_num = 4; // The iteration number
 
   message HierarchyHypers {
+    // Current values of the Hyperparameters of the Hierarchy
     oneof val {
       EmptyPrior fake_prior = 1;
-      NNIGState nnig_state = 2;
-      NNWState nnw_state = 3;
-      LinRegUniState lin_reg_uni_state = 4;
+      NIGDistribution nnig_state = 2;
+      NWDistribution nnw_state = 3;
+      MultiNormalIGDistribution lin_reg_uni_state = 4;
     }
   }
-  HierarchyHypers hierarchy_hypers = 5;
+  HierarchyHypers hierarchy_hypers = 5; // The current values of the hyperparameters of the hierarchy
 
 }
