@@ -38,7 +38,7 @@ struct Hyperparams {
   Eigen::MatrixXd var_scaling;
   Eigen::MatrixXd var_scaling_inv;
   double shape;
-  double rate;
+  double scale;
 };
 }  // namespace LinRegUni
 

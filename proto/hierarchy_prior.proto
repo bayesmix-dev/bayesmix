@@ -14,20 +14,20 @@ message NNIGPrior {
     UniNormalDistribution mean_prior = 1;
     double var_scaling = 2;
     double shape = 3;
-    double rate = 4;
+    double scale = 4;
   }
 
   message NGGPrior {
     UniNormalDistribution mean_prior = 1;
     GammaDistribution var_scaling_prior = 2;
     double shape = 3;
-    GammaDistribution rate_prior = 4;
+    GammaDistribution scale_prior = 4;
   }
 
   oneof prior {
     NIGDistribution fixed_values = 1; // no prior, just fixed values
     NormalMeanPrior normal_mean_prior = 2; // prior on the mean
-    NGGPrior ngg_prior = 3; // prior on the mean, var_scaling, and rate
+    NGGPrior ngg_prior = 3; // prior on the mean, var_scaling, and scale
   }
 }
 

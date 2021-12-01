@@ -56,7 +56,7 @@ TEST(hierarchies, fixed_values) {
   prior.mutable_fixed_values()->set_mean(5.0);
   prior.mutable_fixed_values()->set_var_scaling(0.1);
   prior.mutable_fixed_values()->set_shape(2.0);
-  prior.mutable_fixed_values()->set_rate(2.0);
+  prior.mutable_fixed_values()->set_scale(2.0);
 
   auto hier = std::make_shared<NNIGHierarchy>();
   hier->get_mutable_prior()->CopyFrom(prior);

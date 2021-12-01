@@ -20,14 +20,14 @@ double LinRegUniHierarchy::marg_lpdf(
     const Eigen::RowVectorXd &covariate) const {
   double sig_n = sqrt(
       (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
-      params.rate / params.shape);
+      params.scale / params.shape);
   return stan::math::student_t_lpdf(datum(0), 2 * params.shape,
                                     covariate.dot(params.mean), sig_n);
 }
 
 void LinRegUniHierarchy::initialize_state() {
   state.regression_coeffs = hypers->mean;
-  state.var = hypers->rate / (hypers->shape + 1);
+  state.var = hypers->scale / (hypers->shape + 1);
 }
 
 void LinRegUniHierarchy::initialize_hypers() {
@@ -39,7 +39,7 @@ void LinRegUniHierarchy::initialize_hypers() {
         bayesmix::to_eigen(prior->fixed_values().var_scaling());
     hypers->var_scaling_inv = stan::math::inverse_spd(hypers->var_scaling);
     hypers->shape = prior->fixed_values().shape();
-    hypers->rate = prior->fixed_values().rate();
+    hypers->scale = prior->fixed_values().scale();
     // Check validity
     if (dim != hypers->var_scaling.rows()) {
       throw std::invalid_argument(
@@ -49,8 +49,8 @@ void LinRegUniHierarchy::initialize_hypers() {
     if (hypers->shape <= 0) {
       throw std::invalid_argument("Shape parameter must be > 0");
     }
-    if (hypers->rate <= 0) {
-      throw std::invalid_argument("rate parameter must be > 0");
+    if (hypers->scale <= 0) {
+      throw std::invalid_argument("scale parameter must be > 0");
     }
   }
 
@@ -75,7 +75,7 @@ LinRegUni::State LinRegUniHierarchy::draw(
     const LinRegUni::Hyperparams &params) {
   auto &rng = bayesmix::Rng::Instance().get();
   LinRegUni::State out;
-  out.var = stan::math::inv_gamma_rng(params.shape, params.rate, rng);
+  out.var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
   out.regression_coeffs = stan::math::multi_normal_prec_rng(
       params.mean, params.var_scaling / out.var, rng);
   return out;
@@ -113,8 +113,8 @@ LinRegUni::Hyperparams LinRegUniHierarchy::compute_posterior_hypers() const {
   post_params.mean =
       llt.solve(mixed_prod + hypers->var_scaling * hypers->mean);
   post_params.shape = hypers->shape + 0.5 * card;
-  post_params.rate =
-      hypers->rate +
+  post_params.scale =
+      hypers->scale +
       0.5 * (data_sum_squares +
              hypers->mean.transpose() * hypers->var_scaling * hypers->mean -
              post_params.mean.transpose() * post_params.var_scaling *
@@ -148,7 +148,7 @@ void LinRegUniHierarchy::set_hypers_from_proto(
   auto &hyperscast = downcast_hypers(hypers_).lin_reg_uni_state();
   hypers->mean = bayesmix::to_eigen(hyperscast.mean());
   hypers->var_scaling = bayesmix::to_eigen(hyperscast.var_scaling());
-  hypers->rate = hyperscast.rate();
+  hypers->scale = hyperscast.scale();
   hypers->shape = hyperscast.shape();
 }
 
@@ -158,7 +158,7 @@ LinRegUniHierarchy::get_hypers_proto() const {
   bayesmix::to_proto(hypers->mean, hypers_.mutable_mean());
   bayesmix::to_proto(hypers->var_scaling, hypers_.mutable_var_scaling());
   hypers_.set_shape(hypers->shape);
-  hypers_.set_rate(hypers->rate);
+  hypers_.set_scale(hypers->scale);
 
   auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
   out->mutable_lin_reg_uni_state()->CopyFrom(hypers_);

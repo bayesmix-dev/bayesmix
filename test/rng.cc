@@ -60,7 +60,7 @@ TEST(rng, test3) {
   hier_prior.mutable_fixed_values()->set_mean(0.0);
   hier_prior.mutable_fixed_values()->set_var_scaling(0.1);
   hier_prior.mutable_fixed_values()->set_shape(2.0);
-  hier_prior.mutable_fixed_values()->set_rate(2.0);
+  hier_prior.mutable_fixed_values()->set_scale(2.0);
   hierarchy.get_mutable_prior()->CopyFrom(hier_prior);
   hierarchy.initialize();
 
