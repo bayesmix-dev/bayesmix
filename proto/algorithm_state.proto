@@ -13,7 +13,7 @@ package bayesmix;
  * This message represents the state of a Gibbs sampler for
  * a mixture model. All algorithms must be able to handle this
  * message, by filling it with the current state of the sampler
- * the `get_state_as_proto`.
+ * in the `get_state_as_proto` method.
  */
 message AlgorithmState {
   message ClusterState {
