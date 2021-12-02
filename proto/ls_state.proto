@@ -15,7 +15,7 @@ message UniLSState {
 /*
  * Parameters of a multivariate location-scale family of distributions,
  * parameterized by mean and precision (inverse of variance). For
- * convenience, we also store the cholesky factor precision matrix.
+ * convenience, we also store the Cholesky factor of the precision matrix.
  */
 message MultiLSState {
   Vector mean = 1;
