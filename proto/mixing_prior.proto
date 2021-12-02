@@ -22,7 +22,7 @@ message DPPrior {
 
 /*
  * Prior for the strength and discount parameters of a Pitman-Yor process.
- * For the moment, we only suppeort fixed values
+ * For the moment, we only support fixed values
  */
 message PYPrior {
   oneof totalmass {
