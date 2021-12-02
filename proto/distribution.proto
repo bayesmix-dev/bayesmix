@@ -30,7 +30,7 @@ message GammaDistribution {
 }
 
 /*
- * Parameters defining and Inverse Wishart distribution
+ * Parameters defining an Inverse Wishart distribution
  */
 message InvWishartDistribution {
   double deg_free = 1;

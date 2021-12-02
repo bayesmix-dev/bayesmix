@@ -143,7 +143,7 @@ TEST(lpdf, lin_reg_uni) {
   bayesmix::LinRegUniPrior prior;
   int dim = 3;
 
-  // Genescale data
+  // Generate data
   Eigen::VectorXd datum(1);
   datum << 1.5;
   Eigen::VectorXd cov = Eigen::VectorXd::Random(dim);

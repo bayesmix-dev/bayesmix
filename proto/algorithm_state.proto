@@ -18,7 +18,7 @@ package bayesmix;
 message AlgorithmState {
   message ClusterState {
     // Represents the state of a single cluster of component of
-    // the mixture model. The first fieald just a `oneof` wrapper
+    // the mixture model. The first field is just a `oneof` wrapper
     // around the different possible states.
     oneof val {
       UniLSState uni_ls_state = 1; // State of a univariate location-scale family
