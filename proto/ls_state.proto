@@ -5,7 +5,7 @@ import "matrix.proto";
 package bayesmix;
 
 /*
- * Parameters of a univaraite location-scale family of distributions.
+ * Parameters of a univariate location-scale family of distributions.
  */
 message UniLSState {
   double mean = 1;
