@@ -46,7 +46,7 @@ else()
   add_custom_target(document_protos
       COMMAND ${DOCKER_EXECUTABLE} run --platform linux/amd64 --rm
         -v ${BASEPATH}/docs:/out -v ${PROTO_DIR}:/protos
-        pseudomuto/protoc-gen-doc -I${PROTO_DIR} --doc_opt=html,protos.html
+        pseudomuto/protoc-gen-doc --doc_opt=html,protos.html
   )
 endif()
 
