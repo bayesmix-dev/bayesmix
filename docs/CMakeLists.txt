@@ -39,12 +39,12 @@ if (protoc-plugin)
     ${PROTO_DIR}/*.proto
   )
 else()
-  find_program(Docker_EXECUTABLE docker)
-  if(NOT Docker_EXECUTABLE)
+  find_program(DOCKER_EXECUTABLE docker)
+  if(NOT DOCKER_EXECUTABLE)
       message(FATAL_ERROR "Cannot find the docker executable!")
   endif()
   add_custom_target(document_protos
-      COMMAND /usr/local/bin/docker run --platform linux/amd64 --rm
+      COMMAND ${DOCKER_EXECUTABLE} run --platform linux/amd64 --rm
         -v ${BASEPATH}/docs:/out -v ${PROTO_DIR}:/protos
         pseudomuto/protoc-gen-doc -I${PROTO_DIR} --doc_opt=html,protos.html
   )
