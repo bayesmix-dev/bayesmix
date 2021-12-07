@@ -34,7 +34,7 @@ To build the executable for the main file `run.cc`, please use the following lis
 ```shell
 mkdir build
 cd build
-cmake .. -DDISABLE_DOCS -DDISABLE_BENCHMARKS -DDISABLE_TESTS
+cmake .. -DDISABLE_DOCS=on -DDISABLE_BENCHMARKS=on -DDISABLE_TESTS=on
 make run
 cd ..
 ```
