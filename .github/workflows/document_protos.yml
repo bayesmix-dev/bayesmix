@@ -13,11 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: check pwd
+        run: echo $(pwd)
+
       - name: build_html
-        run: docker run --rm --platform linux/amd64 \
-          -v $(pwd)/docs:/out \
-          -v $(pwd)/proto:/protos \
-          pseudomuto/protoc-gen-doc --doc_opt=html,protos.html
+        run: docker run --rm --platform linux/amd64  -v $(pwd)/docs:/out -v $(pwd)/proto:/protos pseudomuto/protoc-gen-doc --doc_opt=html,protos.html
 
       - name: switching from HTTPS to SSH
         run: git remote set-url origin ${{ secrets.ssh }}
