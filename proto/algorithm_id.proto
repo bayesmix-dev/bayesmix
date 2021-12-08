@@ -16,6 +16,6 @@ enum AlgorithmId {
     Neal3 = 2; // Neal's Algorithm 3, see [1]
     Neal8 = 3; // Neal's Algorithm 8, see [1]
     BlockedGibbs = 4; // Ishwaran and James Blocked Gibbs, see [2]
-    SplitMerge = 5; // Jain and Neal's Split&Merge, see [3]
-    Slice = 6; // Slice sampling, see [4]
+    SplitMerge = 5; // Jain and Neal's Split&Merge, see [3]. NOT IMPLEMENTED YET!
+    Slice = 6; // Slice sampling, see [4].  NOT IMPLEMENTED YET!
 }
