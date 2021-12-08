@@ -3,6 +3,7 @@ name: document_protos
 on:
   pull_request:
     branches: [master]
+    paths: **.proto
 
   workflow_dispatch:
 
