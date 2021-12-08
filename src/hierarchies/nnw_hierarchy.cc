@@ -309,7 +309,7 @@ void NNWHierarchy::set_state_from_proto(
   auto &statecast = downcast_state(state_);
   state.mean = to_eigen(statecast.multi_ls_state().mean());
   state.prec = to_eigen(statecast.multi_ls_state().prec());
-  state.prec_chol = to_eigen(statecast.multi_ls_state().prec());
+  state.prec_chol = to_eigen(statecast.multi_ls_state().prec_chol());
   Eigen::VectorXd diag = state.prec_chol.diagonal();
   state.prec_logdet = 2 * log(diag.array()).sum();
   set_card(statecast.cardinality());
