@@ -1,0 +1,41 @@
+name: document_protos
+
+on:
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: build_html
+        run: docker run --rm --platform linux/amd64 \
+          -v $(pwd)/docs:/out \
+          -v $(pwd)/proto:/protos \
+          pseudomuto/protoc-gen-doc --doc_opt=html,protos.html 
+          
+      - name: switching from HTTPS to SSH
+        run: git remote set-url origin ${{ secrets.ssh }}
+
+      - name: check for changes
+        run: git status
+
+      - name: stage changed files
+        run: git add .
+
+      - name: commit changed files
+        run: git commit -m "Auto updating docs/protos.html"
+
+      - name: test branch
+        run: echo running on ${{ github.head_ref }}
+
+      - name: fetch
+        run: git fetch origin ${{ github.head_ref }}
+
+      - name: push
+        run: git push origin ${{ github.head_ref }}
