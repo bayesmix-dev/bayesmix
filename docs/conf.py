@@ -30,10 +30,7 @@ if read_the_docs_build:
     configureDoxyfile(input_dir, output_dir)
     subprocess.call('doxygen', shell=True)
     breathe_projects['bayesmix'] = output_dir + '/xml'
-    protoc_gen_cmd = "docker run --rm --platform linux/amd64 " + \
-        "-v {0}/docs:/out -v {0}/proto:/protos ".format(HOME_DIR) + \
-        "pseudomuto/protoc-gen-doc --doc_opt=html,protos.html"
-    subprocess.call(protoc_gen_cmd.split(" "))
+
 
 project = 'bayesmix'
 copyright = '2021, Guindani, B. and Beraha, M.'
