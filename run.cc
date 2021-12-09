@@ -22,7 +22,7 @@ bool check_args(argparse::ArgumentParser args) {
   if (args["--collname"] != std::string("memory")) {
     check_file_is_writeable(args.get<std::string>("--collname"));
   }
-  if (args["--grid_file"] != std::string("")) {
+  if (args["--gridfile"] != std::string("")) {
     check_file_is_writeable(args.get<std::string>("--densfile"));
   }
   if (args["--nclufile"] != std::string("")) {
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
       .required()
       .help("Path to a .csv file containing the observations (one per row)");
 
-  args.add_argument("--grid_file")
+  args.add_argument("--gridfile")
       .default_value("")
       .help(
           "(Optional) Path to a csv file containin a grid of points where to "

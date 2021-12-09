@@ -16,12 +16,12 @@
 #   [mixing_grid_covariates_file]
 
 build/run \
-  resources/tutorial/algo.asciipb \
-  NNIG resources/tutorial/nnig_ngg.asciipb \
-  DP   resources/tutorial/dp_gamma.asciipb \
-  "memory" \
-  resources/tutorial/data.csv \
-  resources/tutorial/grid.csv \
-  resources/tutorial/out/density_file.csv \
-  resources/tutorial/out/numclust.csv \
-  resources/tutorial/out/clustering.csv
+  --algo_params_file resources/tutorial/algo.asciipb \
+  --hier_type NNIG --hier_args resources/tutorial/nnig_ngg.asciipb \
+  --mix_type DP --mix_args resources/tutorial/dp_gamma.asciipb \
+  --collname resources/tutorial/out/chains.recordio \
+  --datafile resources/tutorial/data.csv \
+  --gridfile resources/tutorial/grid.csv \
+  --densfile resources/tutorial/out/density_file.csv \
+  --nclufile resources/tutorial/out/numclust.csv \
+  --clusfile resources/tutorial/out/clustering.csv
