@@ -3,83 +3,174 @@
 #include <fstream>
 #include <iostream>
 
+#include "lib/argparse/argparse.h"
 #include "src/includes.h"
 
-int main(int argc, char *argv[]) {
-  std::cout << "Running run.cc" << std::endl;
-
-  // Get console parameters
-  std::string algo_params_file = argv[1];
-  std::string hier_type = argv[2];
-  std::string hier_args = argv[3];
-  std::string mix_type = argv[4];
-  std::string mix_args = argv[5];
-  std::string collname = argv[6];
-  std::string datafile = argv[7];
-  std::string gridfile = argv[8];
-  std::string densfile = argv[9];
-  std::string nclufile = argv[10];
-  std::string clusfile = argv[11];
-  std::string hier_cov_file;
-  std::string hier_grid_cov_file;
-  std::string mix_cov_file;
-  std::string mix_grid_cov_file;
-  if (argc >= 14) {
-    hier_cov_file = argv[12];
-    hier_grid_cov_file = argv[13];
-  }
-  if (argc >= 16) {
-    mix_cov_file = argv[14];
-    mix_grid_cov_file = argv[15];
-  }
-
-  // Check whether we can write to output files
+bool check_file_is_writeable(std::string filename) {
   std::ofstream ofstr;
-  for (int i = 9; i < 12; i++) {
-    ofstr.open(argv[i]);
-    if (ofstr.fail()) {
-      std::cerr << "Error: cannot write to " << argv[i] << std::endl;
-      ofstr.close();
-      return 1;
-    }
+  ofstr.open(filename);
+  if (ofstr.fail()) {
+    std::cerr << "Error: cannot write to " << filename << std::endl;
     ofstr.close();
+    return false;
   }
+  ofstr.close();
+  return true;
+}
+
+bool check_args(argparse::ArgumentParser args) {
+  if (args["--collname"] != std::string("memory")) {
+    check_file_is_writeable(args.get<std::string>("--collname"));
+  }
+  if (args["--grid_file"] != std::string("")) {
+    check_file_is_writeable(args.get<std::string>("--densfile"));
+  }
+  if (args["--nclufile"] != std::string("")) {
+    check_file_is_writeable(args.get<std::string>("--nclufile"));
+  }
+  if (args["--clusfile"] != std::string("")) {
+    check_file_is_writeable(args.get<std::string>("--clusfile"));
+  }
+
+  return true;
+}
+
+int main(int argc, char *argv[]) {
+  argparse::ArgumentParser args("bayesmix::run");
+
+  args.add_argument("--algo_params_file")
+      .required()
+      .help(
+          "asciipb file with the parameters of the algorithm, see "
+          "the file proto/algorithm_params.proto");
+
+  args.add_argument("--hier_type")
+      .required()
+      .help(
+          "enum string of the hierarchy, see the file "
+          "proto/hierarchy_id.proto");
+
+  args.add_argument("--hier_args")
+      .required()
+      .help(
+          "asciipb file with the parameters of the hierarchy, see "
+          "the file proto/hierarchy_prior.proto");
+
+  args.add_argument("--mix_type")
+      .required()
+      .help("enum string of the mixing, see the file proto/minxing_id.proto");
+
+  args.add_argument("--mix_args")
+      .required()
+      .help(
+          "asciipb file with the parameters of the mixing, see "
+          "the file proto/mixing_prior.proto");
+
+  args.add_argument("--collname")
+      .required()
+      .default_value("memory")
+      .help("If not 'memory', the path where to save the MCMC chains");
+
+  args.add_argument("--datafile")
+      .required()
+      .help("Path to a .csv file containing the observations (one per row)");
+
+  args.add_argument("--grid_file")
+      .default_value("")
+      .help(
+          "(Optional) Path to a csv file containin a grid of points where to "
+          "evaluate the (log) predictive density");
+
+  args.add_argument("--densfile")
+      .default_value("")
+      .help(
+          "(Optional) Where to store the output of the (log) predictive "
+          "density");
+
+  args.add_argument("--nclufile")
+      .default_value("")
+      .help(
+          "(Optional) Where to store the MCMC chain of the number of "
+          "clusters");
+
+  args.add_argument("--clusfile")
+      .default_value("")
+      .help(
+          "(Optional) Where to store the MCMC chain of the cluster "
+          "allocations");
+
+  args.add_argument("--hier_cov_file")
+      .default_value("")
+      .help(
+          "(Optional) Only for dependent models. Path to a csv file with the "
+          "covariates used in the hierarchy");
+
+  args.add_argument("--hier_grid_cov_file")
+      .default_value("")
+      .help(
+          "(Optional) Only for dependent models and when 'gridfile' is not "
+          "empty. "
+          "Path to a csv file with the values covariates used in the "
+          "hierarchy "
+          "on which to evaluate the (log) predictive density");
+
+  args.add_argument("--mix_cov_file")
+      .default_value("")
+      .help(
+          "(Optional) Only for dependent models. Path to a csv file with the "
+          "covariates used in the mixing");
+
+  args.add_argument("--mix_grid_cov_file")
+      .default_value("")
+      .help(
+          "(Optional) Only for dependent models and when 'gridfile' is not "
+          "empty. "
+          "Path to a csv file with the values covariates used in the mixing "
+          "on which to evaluate the (log) predictive density");
+
+  try {
+    args.parse_args(argc, argv);
+  } catch (const std::runtime_error &err) {
+    std::cerr << err.what() << std::endl;
+    std::cerr << args;
+    std::exit(1);
+  }
+
+  std::cout << "Running run.cc" << std::endl;
+  check_args(args);
 
   // Read algorithm settings proto
   bayesmix::AlgorithmParams algo_proto;
-  bayesmix::read_proto_from_file(algo_params_file, &algo_proto);
+  bayesmix::read_proto_from_file(args.get<std::string>("--algo_params_file"),
+                                 &algo_proto);
 
   // Create factories and objects
   auto &factory_algo = AlgorithmFactory::Instance();
   auto &factory_hier = HierarchyFactory::Instance();
   auto &factory_mixing = MixingFactory::Instance();
   auto algo = factory_algo.create_object(algo_proto.algo_id());
-  auto hier = factory_hier.create_object(hier_type);
-  auto mixing = factory_mixing.create_object(mix_type);
+  auto hier = factory_hier.create_object(args.get<std::string>("--hier_type"));
+  auto mixing =
+      factory_mixing.create_object(args.get<std::string>("--mix_type"));
+
   BaseCollector *coll;
-  if (collname == "memory") {
+  if (args["--collname"] == std::string("memory")) {
     std::cout << "Creating MemoryCollector" << std::endl;
     coll = new MemoryCollector();
   } else {
-    std::cout << "Creating FileCollector, writing to file: " << collname
-              << std::endl;
-    coll = new FileCollector(collname);
+    std::cout << "Creating FileCollector, writing to file: "
+              << args.get<std::string>("--collname") << std::endl;
+    coll = new FileCollector(args.get<std::string>("--collname"));
   }
 
-  bayesmix::read_proto_from_file(mix_args, mixing->get_mutable_prior());
-  bayesmix::read_proto_from_file(hier_args, hier->get_mutable_prior());
+  bayesmix::read_proto_from_file(args.get<std::string>("--mix_args"),
+                                 mixing->get_mutable_prior());
+  bayesmix::read_proto_from_file(args.get<std::string>("--hier_args"),
+                                 hier->get_mutable_prior());
 
   // Read data matrices
-  Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
-  Eigen::MatrixXd grid = bayesmix::read_eigen_matrix(gridfile);
-  Eigen::MatrixXd hier_cov_grid = Eigen::RowVectorXd(0);
-  Eigen::MatrixXd mix_cov_grid = Eigen::RowVectorXd(0);
-  if (hier->is_dependent()) {
-    hier_cov_grid = bayesmix::read_eigen_matrix(hier_grid_cov_file);
-  }
-  if (mixing->is_dependent()) {
-    mix_cov_grid = bayesmix::read_eigen_matrix(mix_grid_cov_file);
-  }
+  Eigen::MatrixXd data =
+      bayesmix::read_eigen_matrix(args.get<std::string>("--datafile"));
 
   // Set algorithm parameters
   algo->read_params_from_proto(algo_proto);
@@ -91,42 +182,69 @@ int main(int argc, char *argv[]) {
 
   // Read and set covariates
   if (hier->is_dependent()) {
-    Eigen::MatrixXd hier_cov = bayesmix::read_eigen_matrix(hier_cov_file);
+    Eigen::MatrixXd hier_cov =
+        bayesmix::read_eigen_matrix(args.get<std::string>("--hier_cov_file"));
     algo->set_hier_covariates(hier_cov);
   }
+
   if (mixing->is_dependent()) {
-    Eigen::MatrixXd mix_cov = bayesmix::read_eigen_matrix(mix_cov_file);
+    Eigen::MatrixXd mix_cov =
+        bayesmix::read_eigen_matrix(args.get<std::string>("--mix_cov_file"));
     algo->set_mix_covariates(mix_cov);
   }
 
-  // Run algorithm and density evaluation
+  // Run algorithm
   algo->run(coll);
-  std::cout << "Computing log-density..." << std::endl;
-  Eigen::MatrixXd dens =
-      algo->eval_lpdf(coll, grid, hier_cov_grid, mix_cov_grid);
-  bayesmix::write_matrix_to_file(dens, densfile);
-  std::cout << "Successfully wrote density to " << densfile << std::endl;
 
-  // Collect mixing and cluster states
-  Eigen::MatrixXd clusterings(coll->get_size(), data.rows());
-  Eigen::VectorXd num_clust(coll->get_size());
-  for (int i = 0; i < coll->get_size(); i++) {
-    bayesmix::AlgorithmState state;
-    coll->get_next_state(&state);
-    for (int j = 0; j < data.rows(); j++) {
-      clusterings(i, j) = state.cluster_allocs(j);
+  if (args["--gridfile"] != std::string("")) {
+    Eigen::MatrixXd grid =
+        bayesmix::read_eigen_matrix(args.get<std::string>("--gridfile"));
+    Eigen::MatrixXd hier_cov_grid = Eigen::RowVectorXd(0);
+    Eigen::MatrixXd mix_cov_grid = Eigen::RowVectorXd(0);
+    if (hier->is_dependent()) {
+      hier_cov_grid = bayesmix::read_eigen_matrix(
+          args.get<std::string>("--hier_grid_cov_file"));
     }
-    num_clust(i) = state.cluster_states_size();
+    if (mixing->is_dependent()) {
+      mix_cov_grid = bayesmix::read_eigen_matrix(
+          args.get<std::string>("--mix_grid_cov_file"));
+    }
+
+    std::cout << "Computing log-density..." << std::endl;
+    Eigen::MatrixXd dens =
+        algo->eval_lpdf(coll, grid, hier_cov_grid, mix_cov_grid);
+    bayesmix::write_matrix_to_file(dens, args.get<std::string>("--densfile"));
+    std::cout << "Successfully wrote density to "
+              << args.get<std::string>("--densfile") << std::endl;
   }
-  // Write collected data to files
-  bayesmix::write_matrix_to_file(num_clust, nclufile);
-  std::cout << "Successfully wrote cluster sizes to " << nclufile << std::endl;
-  // Compute cluster estimate
-  std::cout << "Computing cluster estimate..." << std::endl;
-  Eigen::VectorXd clust_est = bayesmix::cluster_estimate(clusterings);
-  std::cout << "Done" << std::endl;
-  bayesmix::write_matrix_to_file(clust_est, clusfile);
-  std::cout << "Successfully wrote clustering to " << clusfile << std::endl;
+
+  if ((args["--nclufile"] != std::string("")) ||
+      (args["--clusfile"] != std::string(""))) {
+    Eigen::MatrixXd clusterings(coll->get_size(), data.rows());
+    Eigen::VectorXd num_clust(coll->get_size());
+    for (int i = 0; i < coll->get_size(); i++) {
+      bayesmix::AlgorithmState state;
+      coll->get_next_state(&state);
+      for (int j = 0; j < data.rows(); j++) {
+        clusterings(i, j) = state.cluster_allocs(j);
+      }
+      num_clust(i) = state.cluster_states_size();
+    }
+
+    if (args["--nclufile"] != std::string("")) {
+      bayesmix::write_matrix_to_file(num_clust,
+                                     args.get<std::string>("--nclufile"));
+      std::cout << "Successfully wrote number of clusters to "
+                << args.get<std::string>("--nclufile") << std::endl;
+    }
+
+    if (args["--clusfile"] != std::string("")) {
+      bayesmix::write_matrix_to_file(clusterings,
+                                     args.get<std::string>("--clusfile"));
+      std::cout << "Successfully wrote cluster allocations to "
+                << args.get<std::string>("--clusfile") << std::endl;
+    }
+  }
 
   std::cout << "End of run.cc" << std::endl;
   delete coll;

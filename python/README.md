@@ -27,7 +27,7 @@ n_proc = 4 # number of processors for building in parallel
 build_bayesmix(n_proc)
 ```
 
-this will print out the installation log and, if installation was successful, the following message
+this will print out the installation log and, if the installation was successful, the following message
 
 ```
 Bayesmix executable is in '<BAYESMIX_HOME_REPO>/build',
@@ -40,7 +40,7 @@ Hence, for running the MCMC chain you should export the `BAYESMIX_EXE` environme
 BAYESMIX_EXE=<BAYESMIX_HOME_REPO>build/run
 ```
 
-in your .bashrc file (or .zshrc if you are a MacOs user), or everytime you use bayesmixpy you can add the following lines on top of your Python script/notebook
+in your .bashrc file (or .zshrc if you are a MacOs user), or every time you use bayesmixpy, you can add the following lines on top of your Python script/notebook
 
 ```
 import os

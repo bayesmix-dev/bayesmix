@@ -9,7 +9,7 @@ endif()
 
 project(bayesmix)
 
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_BUILD_TYPE Debug)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize")
@@ -27,7 +27,7 @@ find_package(Protobuf)
 
 if (NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
   if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
-    message(FATAL_ERROR 
+    message(FATAL_ERROR
             "Your cmake version is too old: either install a newer version (>=3.20)"
             " or install google's protocol buffer (protobuf) library by hand.")
   endif()
@@ -85,10 +85,10 @@ set(INCLUDE_PATHS
   ${protobuf_SOURCE_DIR}/src
 )
 
-set(LINK_LIBRARIES 
-  pthread 
+set(LINK_LIBRARIES
+  pthread
   protobuf::libprotobuf
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb${CMAKE_SHARED_LIBRARY_SUFFIX}  
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb/libtbb${CMAKE_SHARED_LIBRARY_SUFFIX}
 )
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 

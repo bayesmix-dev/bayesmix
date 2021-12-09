@@ -55,8 +55,10 @@ def run_mcmc(
     Run the MCMC sampling by calling the Bayesmix executable from a subprocess.
     Arguments
     ---------
-    hierarchy: the id of the hyerarchy. Must be one of ["NNIG", "NNW", "LinRegUni"]
-    mixing: the id of the mixing. Must be one of ["DP", "PY", "LogSB", "TruncSB"]
+    hierarchy: the id of the hyerarchy. Must be one of the 'Name' in
+        https://bayesmix.readthedocs.io/en/latest/protos.html#hierarchy_id.proto
+    mixing: the id of the mixing. Must be one of the 'Name' in
+        https://bayesmix.readthedocs.io/en/latest/protos.html#mixing_id.proto
     data: a numpy array of shape (n_samples, dim)
     hier_params: a text string containing the hyperparameters of the hierarchy or
         a file name where the hyperparameters are stored. A protobuf message of the
