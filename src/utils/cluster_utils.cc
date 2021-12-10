@@ -20,8 +20,8 @@ Eigen::MatrixXd bayesmix::posterior_similarity(
   return mean_diss / alloc_chain.rows();
 }
 
-Eigen::VectorXd bayesmix::cluster_estimate(
-    const Eigen::MatrixXd &alloc_chain) {
+Eigen::VectorXi bayesmix::cluster_estimate(
+    const Eigen::MatrixXi &alloc_chain) {
   // Initialize objects
   unsigned n_iter = alloc_chain.rows();
   unsigned int n_data = alloc_chain.cols();
@@ -30,7 +30,8 @@ Eigen::VectorXd bayesmix::cluster_estimate(
 
   // Compute mean
   std::cout << "(Computing mean dissimilarity... " << std::flush;
-  Eigen::MatrixXd mean_diss = bayesmix::posterior_similarity(alloc_chain);
+  Eigen::MatrixXd mean_diss = bayesmix::posterior_similarity(
+    alloc_chain.cast<double>());
   std::cout << "Done)" << std::endl;
 
   // Compute Frobenius norm error of all iterations
@@ -38,7 +39,7 @@ Eigen::VectorXd bayesmix::cluster_estimate(
   for (int k = 0; k < n_iter; k++) {
     for (int i = 0; i < n_data; i++) {
       for (int j = 0; j < i; j++) {
-        int x = (alloc_chain(k, i) == alloc_chain(k, j));
+        double x = (alloc_chain(k, i) == alloc_chain(k, j));
         errors(k) += (x - mean_diss(i, j)) * (x - mean_diss(i, j));
       }
     }
