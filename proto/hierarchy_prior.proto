@@ -68,6 +68,20 @@ message LinRegUniPrior {
   }
 }
 
+message MFAState {
+  Vector mutilde = 1;
+  Vector beta = 2;
+  double phi = 3;
+  double alpha0 = 4;
+  uint32 q = 5; 
+}
+
+message MFAPrior {
+  oneof prior {
+    LinRegUniState fixed_values = 1;
+  }
+}
+
 message EmptyPrior {
   double fake_field = 1;
 }
