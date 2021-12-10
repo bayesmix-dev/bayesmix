@@ -309,7 +309,7 @@ void NNWHierarchy::set_state_from_proto(
   auto &statecast = downcast_state(state_);
   state.mean = to_eigen(statecast.multi_ls_state().mean());
   state.prec = to_eigen(statecast.multi_ls_state().prec());
-  state.prec_chol = to_eigen(statecast.multi_ls_state().prec());
+  state.prec_chol = to_eigen(statecast.multi_ls_state().prec_chol());
   Eigen::VectorXd diag = state.prec_chol.diagonal();
   state.prec_logdet = 2 * log(diag.array()).sum();
   set_card(statecast.cardinality());
@@ -338,7 +338,7 @@ void NNWHierarchy::set_hypers_from_proto(
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
 NNWHierarchy::get_hypers_proto() const {
-  bayesmix::NNWState hypers_;
+  bayesmix::NWDistribution hypers_;
   bayesmix::to_proto(hypers->mean, hypers_.mutable_mean());
   hypers_.set_var_scaling(hypers->var_scaling);
   hypers_.set_deg_free(hypers->deg_free);

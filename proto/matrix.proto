@@ -2,14 +2,20 @@ syntax = "proto3";
 
 package bayesmix;
 
+/*
+ * Message representing a vector of doubles.
+ */
 message Vector {
-  int32 size = 1;
-  repeated double data = 2 [packed = true];
+  int32 size = 1; // number of elements in the vector
+  repeated double data = 2 [packed = true]; // vector elements
 }
 
+/*
+ * Message representing a matrix of doubles.
+ */
 message Matrix {
-  int32 rows = 1;
-  int32 cols = 2;
-  repeated double data = 3 [packed = true];
-  bool rowmajor = 4;
+  int32 rows = 1; // number of rows
+  int32 cols = 2; // number of columns
+  repeated double data = 3 [packed = true]; // matrix elements
+  bool rowmajor = 4; // if true, the data is read in row-major order
 }

@@ -4,7 +4,6 @@ find_package(Sphinx REQUIRED)
 # Find all the public headers
 get_target_property(BAYESMIX_PUBLIC_HEADER_DIR bayesmix INTERFACE_INCLUDE_DIRECTORIES)
 file(GLOB_RECURSE BAYESMIX_PUBLIC_HEADERS ${PROJECT_SOURCE_DIR}/src/*.h)
-message("BAYESMIX_PUBLIC_HEADERS: ${BAYESMIX_PUBLIC_HEADERS}")
 
 set(DOXYGEN_INPUT_DIR ${PROJECT_SOURCE_DIR}/src)
 set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen)
@@ -29,6 +28,28 @@ add_custom_command(OUTPUT ${DOXYGEN_INDEX_FILE}
 # Nice named target so we can run the job easily
 add_custom_target(Doxygen ALL DEPENDS ${DOXYGEN_INDEX_FILE})
 
+find_program(protoc-plugin protoc-gen-doc)
+message("protoc-plugin: " ${protoc-plugin})
+if (protoc-plugin)
+  add_custom_target(document_protos
+    COMMAND protobuf::protoc -I${PROTO_DIR}
+    --plugin=protoc-gen-doc=${protoc-plugin}
+    --doc_out=${CMAKE_CURRENT_LIST_DIR}
+    --doc_opt=html,protos.html
+    ${PROTO_DIR}/*.proto
+  )
+else()
+  find_program(DOCKER_EXECUTABLE docker)
+  if(NOT DOCKER_EXECUTABLE)
+      message(FATAL_ERROR "Cannot find the docker executable!")
+  endif()
+  add_custom_target(document_protos
+      COMMAND ${DOCKER_EXECUTABLE} run --platform linux/amd64 --rm
+        -v ${BASEPATH}/docs:/out -v ${PROTO_DIR}:/protos
+        pseudomuto/protoc-gen-doc --doc_opt=html,protos.html
+  )
+endif()
+
 set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
 set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
 set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
@@ -38,7 +59,7 @@ set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 # - Our doc files have been updated
 # - The Sphinx config has been updated
 add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
-                   COMMAND 
+                   COMMAND
                      ${SPHINX_EXECUTABLE} -b html
                      # Tell Breathe where to find the Doxygen output
                      -Dbreathe_projects.bayesmix=${DOXYGEN_OUTPUT_DIR}/xml
@@ -48,6 +69,7 @@ add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
                    # Other docs files you want to track should go here (or in some variable)
                    ${CMAKE_CURRENT_SOURCE_DIR}/index.rst
                    ${DOXYGEN_INDEX_FILE}
+                   ${CMAKE_CURRENT_SOURCE_DIR}/protos.html
                    MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
                    COMMENT "Generating documentation with Sphinx")
 
@@ -57,4 +79,9 @@ add_custom_target(Sphinx ALL DEPENDS ${SPHINX_INDEX_FILE})
 # Add an install target to install the docs
 include(GNUInstallDirs)
 install(DIRECTORY ${SPHINX_BUILD}
-DESTINATION ${CMAKE_INSTALL_DOCDIR})
+  DESTINATION ${CMAKE_INSTALL_DOCDIR})
+
+add_custom_target(document_bayesmix)
+add_dependencies(document_bayesmix document_protos)
+add_dependencies(document_bayesmix Doxygen)
+add_dependencies(document_bayesmix Sphinx)
