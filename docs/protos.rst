@@ -3,7 +3,7 @@ bayesmix/protos
 Protos
 ======
 
-This library depends on Google's `Protocol Buffers https://developers.google.com/protocol-buffers`_ , also known as ``protobuf``, which provides a convenient way to define classes that represent structured data.
+This library depends on Google's `Protocol Buffers <https://developers.google.com/protocol-buffers>`_, also known as ``protobuf``, which provides a convenient way to define classes that represent structured data.
 Special classes henceforth referred to as ``protobuf`` messages, or protos for short, can be defined in ``.proto`` files. A special compiler, ``protoc``, is automatically called by the library to generate C++ and/or Python classes for each message.
 The ``protobuf`` runtime library provides fast serialization of messages into bytes, which can be used to save objects to disk or pass serialized objects from one language to another.
 

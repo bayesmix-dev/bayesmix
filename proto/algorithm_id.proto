@@ -8,7 +8,7 @@ package bayesmix;
  * [1] R. M. Neal, Markov Chain Sampling Methods for  Dirichlet Process Mixture Models. JCGS(2000)
  * [2] H. Ishwaran and L. F. James, Gibbs Sampling Methods for Stick-Breaking Priors. JASA(2001)
  * [3] S. Jain and R. M. Neal,  A Split-Merge Markov Chain Monte Carlo Procedure for the Dirichlet Process Mixture Model. JCGS (2004)
- * [4] M. Kalli, J. Griffin and S. G. Walker, Slice sampling mixture models.enum Stat and Comp. (2011)
+ * [4] M. Kalli, J. Griffin and S. G. Walker, Slice sampling mixture models. Stat and Comp. (2011)
  */
 enum AlgorithmId {
     UNKNOWN_ALGORITHM = 0;
