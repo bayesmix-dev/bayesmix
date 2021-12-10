@@ -2,12 +2,20 @@ syntax = "proto3";
 
 package bayesmix;
 
+/*
+ * Enum for the different types of algorithms.
+ * References
+ * [1] R. M. Neal, Markov Chain Sampling Methods for  Dirichlet Process Mixture Models. JCGS(2000)
+ * [2] H. Ishwaran and L. F. James, Gibbs Sampling Methods for Stick-Breaking Priors. JASA(2001)
+ * [3] S. Jain and R. M. Neal,  A Split-Merge Markov Chain Monte Carlo Procedure for the Dirichlet Process Mixture Model. JCGS (2004)
+ * [4] M. Kalli, J. Griffin and S. G. Walker, Slice sampling mixture models. Stat and Comp. (2011)
+ */
 enum AlgorithmId {
     UNKNOWN_ALGORITHM = 0;
-    Neal2 = 1;
-    Neal3 = 2;
-    Neal8 = 3;
-    BlockedGibbs = 4;
-    SplitMerge = 5;
-    Slice = 6;
+    Neal2 = 1; // Neal's Algorithm 2, see [1]
+    Neal3 = 2; // Neal's Algorithm 3, see [1]
+    Neal8 = 3; // Neal's Algorithm 8, see [1]
+    BlockedGibbs = 4; // Ishwaran and James Blocked Gibbs, see [2]
+    SplitMerge = 5; // Jain and Neal's Split&Merge, see [3]. NOT IMPLEMENTED YET!
+    Slice = 6; // Slice sampling, see [4].  NOT IMPLEMENTED YET!
 }

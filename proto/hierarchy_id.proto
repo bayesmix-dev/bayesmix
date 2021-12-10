@@ -2,9 +2,12 @@ syntax = "proto3";
 
 package bayesmix;
 
+/*
+ * Enum for the different types of Hierarchy.
+ */
 enum HierarchyId {
     UNKNOWN_HIERARCHY = 0;
-    NNIG = 1;
-    NNW = 2;
-    LinRegUni = 3;
+    NNIG = 1; // Normal - Normal Inverse Gamma
+    NNW = 2; // Normal - Normal Wishart
+    LinRegUni = 3; // Linear Regression (univariate response)
 }
