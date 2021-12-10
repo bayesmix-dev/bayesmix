@@ -30,8 +30,8 @@ Eigen::VectorXi bayesmix::cluster_estimate(
 
   // Compute mean
   std::cout << "(Computing mean dissimilarity... " << std::flush;
-  Eigen::MatrixXd mean_diss = bayesmix::posterior_similarity(
-    alloc_chain.cast<double>());
+  Eigen::MatrixXd mean_diss =
+      bayesmix::posterior_similarity(alloc_chain.cast<double>());
   std::cout << "Done)" << std::endl;
 
   // Compute Frobenius norm error of all iterations
