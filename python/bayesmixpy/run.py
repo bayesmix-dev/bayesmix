@@ -38,7 +38,8 @@ def _get_filenames(outdir):
     dens_grid = os.path.join(outdir, 'dens_grid.csv')
     n_clus = os.path.join(outdir, 'n_clus.csv')
     clus = os.path.join(outdir, 'clus.csv')
-    return data, dens_grid, n_clus, clus
+    best_clus = os.path.join(outdir, 'best_clus.csv')
+    return data, dens_grid, n_clus, clus, best_clus
 
 
 def run_mcmc(
@@ -49,7 +50,10 @@ def run_mcmc(
         mix_params: str,
         algo_params: str,
         dens_grid: np.array = None,
-        out_dir: str = None):
+        out_dir: str = None,
+        return_clusters: bool = True,
+        return_best_clus: bool = True,
+        return_num_clusters: bool = True):
 
     """
     Run the MCMC sampling by calling the Bayesmix executable from a subprocess.
@@ -75,20 +79,32 @@ def run_mcmc(
         the density. If None, the density will not be evaluated.
     out_dir: if not None, where to store the output. If None, a temporary directory
         will be created and destroyed after the sampling is finished.
+    return_clusters: if True, returns the chain of the cluster allocations.
+    return_best_clus: if True, returns the best cluster allocation obtained
+        by minimizing the Binder loss function over the visited partitions
+        during the MCMC sampling.
+    return_num_clusters: if True, returns the chain of the number of clusters.
 
     Returns
     -------
     eval_dens: a numpy array of shape (n_samples, n_dens_grid_points):
         for each iteration, the mixture density evaluated at the points in dens_grid.
     n_clus: a numpy array of shape (n_samples,): the number of clusters for each iteration.
-    clus: the best clustering obtained by minimizing Binder's loss function.
+        Only if return_num_clusters is True.
+    clus_chain: a numpy array of shape (n_samples, n_data): the cluster allocation for
+        each iteration. Only if return_clusters is True.
+    best_clus: the best clustering obtained by minimizing Binder's loss function.
+        Only if return_best_clus is True.
     """
 
     BAYESMIX_EXE = os.environ.get("BAYESMIX_EXE", default=None)
     if BAYESMIX_EXE is None:
         raise ValueError("BAYESMIX_EXE environment variable not set")
 
-    RUN_CMD = BAYESMIX_EXE + " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}"
+    RUN_CMD = BAYESMIX_EXE + """ --algo_params_file {0} --hier_type {1} --hier_args {2} \
+                                 --mix_type {3} --mix_args {4} --collname {5} \
+                                 --datafile {6} --gridfile {7} --densfile {8} \
+                                 --nclufile {9} --clusfile {10} --bestclusfile {11}"""
 
 
     if out_dir is None:
@@ -98,14 +114,27 @@ def run_mcmc(
     else:
         remove_out_dir = False
 
-    data_file, dens_grid_file, nclus_file, clus_file = _get_filenames(out_dir)
-    np.savetxt(data_file, data, delimiter=',')
-    np.savetxt(dens_grid_file, dens_grid, delimiter=',')
-
+    data_file, dens_grid_file, nclus_file, clus_file, best_clus_file = _get_filenames(out_dir)
     hier_params_file = _maybe_print_to_file(hier_params, "hier_params", out_dir)
     mix_params_file = _maybe_print_to_file(mix_params, "mix_params", out_dir)
     algo_params_file = _maybe_print_to_file(algo_params, "algo_params", out_dir)
     eval_dens_file = os.path.join(out_dir, "eval_dens.csv")
+
+    np.savetxt(data_file, data, delimiter=',')
+    if dens_grid is None:
+        dens_grid_file = '\"\"'
+        eval_dens_file = '\"\"'
+    else:
+        np.savetxt(dens_grid_file, dens_grid, delimiter=',')
+
+    if not return_clusters:
+        clus_file = '\"\"'
+
+    if not return_num_clusters:
+        nclus_file = '\"\"'
+
+    if not return_best_clus:
+        best_clus_file = '\"\"'
 
     cmd = RUN_CMD.format(
         algo_params_file,
@@ -116,7 +145,8 @@ def run_mcmc(
         dens_grid_file,
         eval_dens_file,
         nclus_file,
-        clus_file)
+        clus_file,
+        best_clus_file)
 
     try:
         run_shell(cmd, flush_startswith=("[>", "[="))
@@ -126,11 +156,25 @@ def run_mcmc(
             shutil.rmtree(out_dir, ignore_errors=True)
         raise RuntimeError(msg) from e
 
-    eval_dens = np.loadtxt(eval_dens_file, delimiter=',')
-    nclus = np.loadtxt(nclus_file, delimiter=',')
-    clus = np.loadtxt(clus_file, delimiter=',')
+    eval_dens = None
+    if dens_grid is not None:
+        eval_dens = np.loadtxt(eval_dens_file, delimiter=',')
+
+    nclus = None
+    if return_num_clusters:
+        nclus = np.loadtxt(nclus_file, delimiter=',')
+
+    clus = None
+    if return_clusters:
+        clus = np.loadtxt(clus_file, delimiter=',')
+
+    best_clus = None
+    if return_best_clus:
+        best_clus = np.loadtxt(best_clus_file, delimiter=',')
 
     if remove_out_dir:
         shutil.rmtree(out_dir, ignore_errors=True)
 
-    return eval_dens, nclus, clus
+    out = (eval_dens, nclus, clus, best_clus)
+    out = tuple(filter(lambda x: x is not None, out))
+    return out

@@ -22,13 +22,13 @@ bool check_args(argparse::ArgumentParser args) {
   if (args["--collname"] != std::string("memory")) {
     check_file_is_writeable(args.get<std::string>("--collname"));
   }
-  if (args["--gridfile"] != std::string("")) {
+  if (args["--gridfile"] != std::string("\"\"")) {
     check_file_is_writeable(args.get<std::string>("--densfile"));
   }
-  if (args["--nclufile"] != std::string("")) {
+  if (args["--nclufile"] != std::string("\"\"")) {
     check_file_is_writeable(args.get<std::string>("--nclufile"));
   }
-  if (args["--clusfile"] != std::string("")) {
+  if (args["--clusfile"] != std::string("\"\"")) {
     check_file_is_writeable(args.get<std::string>("--clusfile"));
   }
 
@@ -76,37 +76,43 @@ int main(int argc, char *argv[]) {
       .help("Path to a .csv file containing the observations (one per row)");
 
   args.add_argument("--gridfile")
-      .default_value("")
+      .default_value(std::string("\"\""))
       .help(
           "(Optional) Path to a csv file containin a grid of points where to "
           "evaluate the (log) predictive density");
 
   args.add_argument("--densfile")
-      .default_value("")
+      .default_value(std::string("\"\""))
       .help(
           "(Optional) Where to store the output of the (log) predictive "
           "density");
 
   args.add_argument("--nclufile")
-      .default_value("")
+      .default_value(std::string("\"\""))
       .help(
           "(Optional) Where to store the MCMC chain of the number of "
           "clusters");
 
   args.add_argument("--clusfile")
-      .default_value("")
+      .default_value(std::string("\"\""))
       .help(
           "(Optional) Where to store the MCMC chain of the cluster "
           "allocations");
 
+  args.add_argument("--bestclusfile")
+      .default_value(std::string("\"\""))
+      .help(
+          "(Optional) Where to store the best cluster allocation found by "
+          "minimizing the Binder loss funciton over the visited partitions");
+
   args.add_argument("--hier_cov_file")
-      .default_value("")
+      .default_value(std::string("\"\""))
       .help(
           "(Optional) Only for dependent models. Path to a csv file with the "
           "covariates used in the hierarchy");
 
   args.add_argument("--hier_grid_cov_file")
-      .default_value("")
+      .default_value(std::string("\"\""))
       .help(
           "(Optional) Only for dependent models and when 'gridfile' is not "
           "empty. "
@@ -115,13 +121,13 @@ int main(int argc, char *argv[]) {
           "on which to evaluate the (log) predictive density");
 
   args.add_argument("--mix_cov_file")
-      .default_value("")
+      .default_value(std::string("\"\""))
       .help(
           "(Optional) Only for dependent models. Path to a csv file with the "
           "covariates used in the mixing");
 
   args.add_argument("--mix_grid_cov_file")
-      .default_value("")
+      .default_value(std::string("\"\""))
       .help(
           "(Optional) Only for dependent models and when 'gridfile' is not "
           "empty. "
@@ -196,7 +202,7 @@ int main(int argc, char *argv[]) {
   // Run algorithm
   algo->run(coll);
 
-  if (args["--gridfile"] != std::string("")) {
+  if (args["--gridfile"] != std::string("\"\"")) {
     Eigen::MatrixXd grid =
         bayesmix::read_eigen_matrix(args.get<std::string>("--gridfile"));
     Eigen::MatrixXd hier_cov_grid = Eigen::RowVectorXd(0);
@@ -218,10 +224,11 @@ int main(int argc, char *argv[]) {
               << args.get<std::string>("--densfile") << std::endl;
   }
 
-  if ((args["--nclufile"] != std::string("")) ||
-      (args["--clusfile"] != std::string(""))) {
-    Eigen::MatrixXd clusterings(coll->get_size(), data.rows());
-    Eigen::VectorXd num_clust(coll->get_size());
+  if ((args.get<std::string>("--nclufile") != std::string("\"\"")) ||
+      (args.get<std::string>("--clusfile") != std::string("\"\"")) ||
+      (args.get<std::string>("--bestclusfile") != std::string("\"\""))) {
+    Eigen::MatrixXi clusterings(coll->get_size(), data.rows());
+    Eigen::VectorXi num_clust(coll->get_size());
     for (int i = 0; i < coll->get_size(); i++) {
       bayesmix::AlgorithmState state;
       coll->get_next_state(&state);
@@ -231,18 +238,26 @@ int main(int argc, char *argv[]) {
       num_clust(i) = state.cluster_states_size();
     }
 
-    if (args["--nclufile"] != std::string("")) {
+    if (args.get<std::string>("--nclufile") != std::string("\"\"")) {
       bayesmix::write_matrix_to_file(num_clust,
                                      args.get<std::string>("--nclufile"));
       std::cout << "Successfully wrote number of clusters to "
                 << args.get<std::string>("--nclufile") << std::endl;
     }
 
-    if (args["--clusfile"] != std::string("")) {
+    if (args.get<std::string>("--clusfile") != std::string("\"\"")) {
       bayesmix::write_matrix_to_file(clusterings,
                                      args.get<std::string>("--clusfile"));
       std::cout << "Successfully wrote cluster allocations to "
                 << args.get<std::string>("--clusfile") << std::endl;
+    }
+
+    if (args.get<std::string>("--bestclusfile") != std::string("\"\"")) {
+      Eigen::VectorXi best_clus = bayesmix::cluster_estimate(clusterings);
+      bayesmix::write_matrix_to_file(best_clus,
+                                     args.get<std::string>("--bestclusfile"));
+      std::cout << "Successfully wrote best cluster allocations to "
+                << args.get<std::string>("--bestclusfile") << std::endl;
     }
   }
 
