@@ -98,11 +98,9 @@ void MFAHierarchy::update_summary_statistics(const Eigen::RowVectorXd& datum,
                                              bool add) {
   if (add) {
     data_sum += datum;
-    data_sum_squares += datum.cwiseProduct(datum);
     data.push_back(datum);
   } else {
     data_sum -= datum;
-    data_sum_squares -= datum.cwiseProduct(datum);
     auto pos = std::find(data.begin(), data.end(), datum);
     data.erase(pos);
   }
@@ -110,7 +108,6 @@ void MFAHierarchy::update_summary_statistics(const Eigen::RowVectorXd& datum,
 
 void MFAHierarchy::clear_summary_statistics() {
   data_sum = Eigen::VectorXd::Zero(p);
-  data_sum_squares = Eigen::VectorXd::Zero(p);
   data.clear();
 }
 
@@ -119,8 +116,8 @@ void MFAHierarchy::set_state_from_proto(
   auto& statecast = downcast_state(state_);
   state.mu = statecast.mfa_state().mu();
   state.psi = statecast.mfa_state().psi();
-  state.Eta = statecast.mfa_state().eta();
-  state.Lambda = statecast.mfa_state().lambda();
+  state.Eta = statecast.mfa_state().Eta();
+  state.Lambda = statecast.mfa_state().Lambda();
   set_card(statecast.cardinality());
 }
 
@@ -165,26 +162,16 @@ void MFAHierarchy::sample_full_cond(bool update_params = false) override {
     // No posterior update possible
     static_cast<Derived*>(this)->sample_prior();
   } else {
-    std::shared_ptr<State> newstate = nullptr;
+ 
+    sample_Eta();
+    sample_mu();
+    sample_psi();
+    sample_Lambda();
 
-    if (update_params)
-      newstate = &state;
-    else
-      newstate = new State;
-
-    sample_Eta(*newstate);
-
-    sample_mu(*newstate);
-
-    sample_psi(*newstate);
-
-    sample_Lambda(*newstate);
-
-    if (!update_params) state = *newstate;
   }
 }
 
-void MFAHierarchy::sample_Eta(State& newstate) const {
+void MFAHierarchy::sample_Eta() const {
   auto& rng = bayesmix::Rng::Instance().get();
 
   Eigen::MatrixXd Sigmaeta =
@@ -194,7 +181,7 @@ void MFAHierarchy::sample_Eta(State& newstate) const {
           .inverse();
 
   for (size_t i = 0; i < card; i++) {
-    newstate.Eta.row(i) = stan::math::multi_normal_rng(
+    state.Eta.row(i) = stan::math::multi_normal_rng(
         Sigmaeta * state.Lambda.transpose() *
             Eigen::MatrixXd(psi.cwiseInverse()).asDiagonal() *
             (data[i] - state.mu),
@@ -202,7 +189,7 @@ void MFAHierarchy::sample_Eta(State& newstate) const {
   }
 }
 
-void MFAHierarchy::sample_mu(State& newstate) const {
+void MFAHierarchy::sample_mu() const {
   auto& rng = bayesmix::Rng::Instance().get();
 
   Eigen::MatrixXd Sigmamu =
@@ -216,14 +203,14 @@ void MFAHierarchy::sample_mu(State& newstate) const {
     Somma += state.Lambda * state.Eta.row(i);
   }
 
-  newstate.mu = stan::math::multi_normal_rng(
+  state.mu = stan::math::multi_normal_rng(
       Sigmamu * (hypers->phi * hypers->mutilde +
                  Eigen::MatrixXd(psi.cwiseInverse()).asDiagonal() *
                      (data_sum - Somma)),
       Sigmamu, rng);
 }
 
-void MFAHierarchy::sample_Lambda(State& newstate) const {
+void MFAHierarchy::sample_Lambda() const {
   auto& rng = bayesmix::Rng::Instance().get();
 
   for (size_t j = 0; j < p; j++) {
@@ -232,14 +219,14 @@ void MFAHierarchy::sample_Lambda(State& newstate) const {
          state.Eta.transpose() / state.psi[j] * state.Eta)
             .inverse();
 
-    newstate.Lambda.row(j) = stan::math::multi_normal_rng(
+    state.Lambda.row(j) = stan::math::multi_normal_rng(
         Sigmalambda * state.Eta.transpose() / state.psi[j] *
             (data.col(j) - state.mu[j]),
         Sigmalambda, rng);
   }
 }
 
-void MFAHierarchy::sample_psi(State& newstate) const {
+void MFAHierarchy::sample_psi() const {
   auto& rng = bayesmix::Rng::Instance().get();
 
   for (size_t j = 0; j < p; j++) {
@@ -249,7 +236,7 @@ void MFAHierarchy::sample_psi(State& newstate) const {
                      state.Lambda.row(j).dot(state.Eta.row(i))),
                     2);
     }
-    newstate.psi[j] = stan::math::inv_gamma_rng(hypers->alpha0 + card / 2,
+    state.psi[j] = stan::math::inv_gamma_rng(hypers->alpha0 + card / 2,
                                                 hypers->beta[j] + S / 2, rng);
   }
 }

@@ -99,25 +99,22 @@ class MFAHierarchy
   //! @param update_params  Save posterior hypers after the computation?
   void sample_full_cond(bool update_params = true) override;
 
-  void sample_Eta(State& newstate) const;
+  void sample_Eta() const;
 
-  void sample_mu(State& newstate) const;
+  void sample_mu() const;
 
-  void sample_psi(State& newstate) const;
+  void sample_psi() const;
 
-  void sample_Lambda(State& newstate) const;
+  void sample_Lambda() const;
 
   //! Sum of data points currently belonging to the cluster
   Eigen::VectorXd data_sum = 0;
 
-  //! Sum of squared data points currently belonging to the cluster
-  Eigen::VectorXd data_sum_squares = 0;
-
   //! Number of initial variables
   size_t p;
 
-  //! Deque of data points currently belonging to the cluster
-  std::deque<Eigen::RowVectorXd> data;
+  //! Vector of data points currently belonging to the cluster
+  std::vector<Eigen::RowVectorXd> data;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_MFA_HIERARCHY_H_
