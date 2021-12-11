@@ -10,9 +10,13 @@ from .shell_utils import run_shell
 
 
 def _is_file(a: str):
-    p = Path(a)
-    return p.exists() and p.is_file()
-
+    out = False
+    try:
+        p = Path(a)
+        out = p.exists() and p.is_file()
+    except:
+        out = False
+    return out
 
 def _maybe_print_to_file(maybe_proto: str,
                          proto_name: str = None,
@@ -114,18 +118,19 @@ def run_mcmc(
     else:
         remove_out_dir = False
 
-    data_file, dens_grid_file, nclus_file, clus_file, best_clus_file = _get_filenames(out_dir)
+    data_file, dens_grid_file, nclus_file, clus_file, best_clus_file = \
+        _get_filenames(out_dir)
     hier_params_file = _maybe_print_to_file(hier_params, "hier_params", out_dir)
     mix_params_file = _maybe_print_to_file(mix_params, "mix_params", out_dir)
     algo_params_file = _maybe_print_to_file(algo_params, "algo_params", out_dir)
     eval_dens_file = os.path.join(out_dir, "eval_dens.csv")
 
-    np.savetxt(data_file, data, delimiter=',')
+    np.savetxt(data_file, data, fmt='%1.5f')
     if dens_grid is None:
         dens_grid_file = '\"\"'
         eval_dens_file = '\"\"'
     else:
-        np.savetxt(dens_grid_file, dens_grid, delimiter=',')
+        np.savetxt(dens_grid_file, dens_grid, fmt='%1.5f')
 
     if not return_clusters:
         clus_file = '\"\"'
