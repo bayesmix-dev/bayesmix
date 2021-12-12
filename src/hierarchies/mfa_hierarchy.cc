@@ -145,7 +145,7 @@ void MFAHierarchy::set_hypers_from_proto(
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
 MFAHierarchy::get_hypers_proto() const {
-  bayesmix::MFAState hypers_;
+  bayesmix::MFAPrior hypers_;
   hypers_.set_mutilde(hypers->mutilde);
   hypers_.set_alpha0(hypers->alpha0);
   hypers_.set_beta(hypers->beta);
@@ -162,12 +162,10 @@ void MFAHierarchy::sample_full_cond(bool update_params = false) override {
     // No posterior update possible
     static_cast<Derived*>(this)->sample_prior();
   } else {
- 
     sample_Eta();
     sample_mu();
     sample_psi();
     sample_Lambda();
-
   }
 }
 
@@ -237,6 +235,6 @@ void MFAHierarchy::sample_psi() const {
                     2);
     }
     state.psi[j] = stan::math::inv_gamma_rng(hypers->alpha0 + card / 2,
-                                                hypers->beta[j] + S / 2, rng);
+                                             hypers->beta[j] + S / 2, rng);
   }
 }

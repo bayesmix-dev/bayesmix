@@ -6,6 +6,7 @@
 #include "algorithm_state.pb.h"
 #include "ls_state.pb.h"
 #include "src/hierarchies/lin_reg_uni_hierarchy.h"
+#include "src/hierarchies/mfa_hierarchy.h"
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/hierarchies/nnw_hierarchy.h"
 #include "src/utils/proto_utils.h"
@@ -218,4 +219,38 @@ TEST(lin_reg_uni_hierarchy, misc) {
   for (int i = 0; i < dim; i++) {
     ASSERT_GT(state.regression_coeffs(i), beta0(i));
   }
+}
+
+TEST(mfahierarchy, draw) {
+  auto hier = std::make_shared<MFAHierarchy>();
+  bayesmix::MFAPrior prior;
+  Eigen::Vector2d mutilde;
+  mutilde << 3.0, 3.0;
+  bayesmix::Vector mutilde_proto;
+  bayesmix::to_proto(mutilde, &mutilde_proto);
+  int q = 2;
+  double phi = 5.0;
+  double alpha0 = 5.0;
+  Eigen::Vector2d beta;
+  beta << 3.0, 3.0;
+  bayesmix::Vector beta_proto;
+  bayesmix::to_proto(beta, &beta_proto);
+  *prior.mutable_fixed_values()->mutable_mutilde() = mutilde_proto;
+  prior.mutable_fixed_values()->set_phi(phi);
+  prior.mutable_fixed_values()->set_alpha0(alpha0);
+  prior.mutable_fixed_values()->set_q(q);
+  *prior.mutable_fixed_values()->mutable_beta() = beta_proto;
+  hier->get_mutable_prior()->CopyFrom(prior);
+  hier->initialize();
+
+  auto hier2 = hier->clone();
+  hier2->sample_prior();
+
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
+  hier->write_state_to_proto(clusval);
+  hier2->write_state_to_proto(clusval2);
+
+  ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }

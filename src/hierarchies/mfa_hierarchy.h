@@ -99,6 +99,11 @@ class MFAHierarchy
   //! @param update_params  Save posterior hypers after the computation?
   void sample_full_cond(bool update_params = true) override;
 
+  //! Saves posterior hyperparameters to the corresponding class member
+  void save_posterior_hypers() {
+    posterior_hypers = static_cast<Derived*>(this)->compute_posterior_hypers();
+  }
+
   void sample_Eta() const;
 
   void sample_mu() const;
@@ -108,7 +113,7 @@ class MFAHierarchy
   void sample_Lambda() const;
 
   //! Sum of data points currently belonging to the cluster
-  Eigen::VectorXd data_sum = 0;
+  Eigen::VectorXd data_sum;
 
   //! Number of initial variables
   size_t p;
