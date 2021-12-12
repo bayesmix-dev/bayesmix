@@ -43,7 +43,7 @@ this will print out the installation log and, if the installation was successful
 
 Hence, for running the MCMC chain you should export the `BAYESMIX_EXE` environment variable. This can be done once and for all by copying
 
-.. code-block:: shell 
+.. code-block:: shell
 
   BAYESMIX_EXE=<BAYESMIX_HOME_REPO>build/run
 

@@ -61,44 +61,65 @@ def run_mcmc(
 
     """
     Run the MCMC sampling by calling the Bayesmix executable from a subprocess.
-    Arguments
-    ---------
-    hierarchy: the id of the hyerarchy. Must be one of the 'Name' in
+
+    Parameters
+    ----------
+
+    hierarchy: str.
+        The id of the hyerarchy. Must be one of the 'Name' in
         https://bayesmix.readthedocs.io/en/latest/protos.html#hierarchy_id.proto
-    mixing: the id of the mixing. Must be one of the 'Name' in
+    mixing: str.
+        The id of the mixing. Must be one of the 'Name' in
         https://bayesmix.readthedocs.io/en/latest/protos.html#mixing_id.proto
-    data: a numpy array of shape (n_samples, dim)
-    hier_params: a text string containing the hyperparameters of the hierarchy or
+    data: np.array of shape (n_samples, n_dim).
+        Observations on which to fit the model.
+    hier_params: str.
+        A text string containing the hyperparameters of the hierarchy or
         a file name where the hyperparameters are stored. A protobuf message of the
         corresponding type will be created and populated with the parameters.
         See the file hierarchy_prior.proto for the corresponding message.
-    mix_params: a text string containing the hyperparameters of the mixing or
+    mix_params: str.
+        A text string containing the hyperparameters of the mixing or
         a file name where the hyperparameters are stored. A protobuf message of the
         corresponding type will be created and populated with the parameters.
         See the file mixing_prior.proto for the corresponding message.
-    algo_params: a text string containing the hyperparameters of the algorithm or
+    algo_params: str.
+        A text string containing the hyperparameters of the algorithm or
         a file name where the hyperparameters are stored.
         See the file algorithm_params.proto for the corresponding message.
-    dens_grid: a numpy array of shape (n_dens_grid_points,): points where to evaluate
-        the density. If None, the density will not be evaluated.
-    out_dir: if not None, where to store the output. If None, a temporary directory
+    dens_grid: np.array of shape (n_dens_grid_points,).
+        Rpoints where to evaluate the density.
+        If None, the density will not be evaluated.
+    out_dir: str.
+        If not None, where to store the output. If None, a temporary directory
         will be created and destroyed after the sampling is finished.
-    return_clusters: if True, returns the chain of the cluster allocations.
-    return_best_clus: if True, returns the best cluster allocation obtained
+    return_clusters: bool.
+        If True, returns the chain of the cluster allocations.
+    return_best_clus: bool.
+        If True, returns the best cluster allocation obtained
         by minimizing the Binder loss function over the visited partitions
         during the MCMC sampling.
-    return_num_clusters: if True, returns the chain of the number of clusters.
+    return_num_clusters: bool.
+        If True, returns the chain of the number of clusters.
+
+
 
     Returns
     -------
-    eval_dens: a numpy array of shape (n_samples, n_dens_grid_points):
-        for each iteration, the mixture density evaluated at the points in dens_grid.
-    n_clus: a numpy array of shape (n_samples,): the number of clusters for each iteration.
+
+    eval_dens: np.array of shape (n_samples, n_dens_grid_points).
+        Only if eval_dens==True. For each iteration, the mixture density
+        evaluated at the points in dens_grid.
+    n_clus: np.array of shape (n_samples,).
         Only if return_num_clusters is True.
-    clus_chain: a numpy array of shape (n_samples, n_data): the cluster allocation for
-        each iteration. Only if return_clusters is True.
-    best_clus: the best clustering obtained by minimizing Binder's loss function.
-        Only if return_best_clus is True.
+        The number of clusters for each iteration.
+    clus_chain: np.array shape (n_samples, n_data).
+        Only if return_clusters is True. The cluster allocation for
+        each iteration.
+    best_clus: np.array of shape (n_data,).
+        Only if return_best_clus is True. The best clustering obtained
+        by minimizing Binder's loss function.
+
     """
 
     BAYESMIX_EXE = os.environ.get("BAYESMIX_EXE", default=None)

@@ -50,6 +50,14 @@ Tutorials
 :doc:`tutorial`
 
 
+Python interface
+================
+
+.. toctree::
+   :maxdepth: 1
+
+   python_interface
+
 
 Indices and tables
 ==================

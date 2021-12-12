@@ -10,6 +10,17 @@ BAYESMIX_HOME = path.resolve().parents[1]
 
 
 def build_bayesmix(nproc=1):
+    """
+    Builds the BayesMix executable. After the build, if no error has occurred,
+    it prints out the path to the executable. Save the path into the environment
+    variable BAYESMIX_EXE.
+
+    Parameters
+    ----------
+
+    nproc : int
+        Number of processes to use for parallel compilation.
+    """
     print("Building the Bayesmix executable")
     build_dir = os.path.join(BAYESMIX_HOME, 'build')
     os.makedirs(build_dir, exist_ok=True)
