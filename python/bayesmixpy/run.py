@@ -103,7 +103,6 @@ def run_mcmc(
         If True, returns the chain of the number of clusters.
 
 
-
     Returns
     -------
 
