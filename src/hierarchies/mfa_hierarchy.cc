@@ -23,17 +23,17 @@ MFA::State MFAHierarchy::draw(const MFA::Hyperparams& params) {
   MFA::State out;
 
   for (size_t j = 0; j < p; j++) {
-    out.mu[j] = stan::math::normal_prec_rng(params.mutilde[j],
-                                            1 / sqrt(params.phi), rng);
+    out.mu[j] =
+        stan::math::normal_rng(params.mutilde[j], sqrt(params.phi), rng);
     out.psi[j] = stan::math::inv_gamma_rng(params.alpha0, params.beta[j], rng);
     for (size_t i = 0; i < params.q; j++) {
-      out.Lambda[j, i] = stan::math::normal_prec_rng(0, 1, rng);
+      out.Lambda[j, i] = stan::math::normal_rng(0, 1, rng);
     }
   }
 
   for (size_t i = 0; i < card; i++) {
     for (size_t j = 0; j < params.q; j++) {
-      out.Eta[j, i] = stan::math::normal_prec_rng(0, 1, rng);
+      out.Eta[j, i] = stan::math::normal_rng(0, 1, rng);
     }
   }
 
@@ -69,10 +69,10 @@ void MFAHierarchy::initialize_hypers() {
     if (hypers->alpha0 <= 0) {
       throw std::invalid_argument("Scale parameter must be > 0");
     }
-    if (phi->beta <= 0) {
+    if (hypers->phi <= 0) {  // TODO check
       throw std::invalid_argument("Diffusion parameter must be > 0");
     }
-    if (phi->q <= 0) {
+    if (hypers->q <= 0) {
       throw std::invalid_argument("Number of factors must be > 0");
     }
   }
@@ -173,7 +173,7 @@ void MFAHierarchy::sample_Eta() const {
   auto& rng = bayesmix::Rng::Instance().get();
 
   Eigen::MatrixXd Sigmaeta =
-      (Eigen::MatrixXd::Identity(hypers->q, q) +
+      (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
        state.Lambda.transpose() *
            Eigen::MatrixXd(psi.cwiseInverse()).asDiagonal() * state.Lambda)
           .inverse();
@@ -213,7 +213,7 @@ void MFAHierarchy::sample_Lambda() const {
 
   for (size_t j = 0; j < p; j++) {
     Eigen::MatrixXd Sigmalambda =
-        (Eigen::MatrixXd::Identity(hypers->q, q) +
+        (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
          state.Eta.transpose() / state.psi[j] * state.Eta)
             .inverse();
 
