@@ -77,6 +77,17 @@ class MFAHierarchy
   //! Returns whether the hierarchy models multivariate data or not
   bool is_multivariate() const override { return true; }
 
+  //! Saves posterior hyperparameters to the corresponding class member
+  void save_posterior_hypers() {
+    // TODO
+    /* posterior_hypers =
+        static_cast<Derived *>(this)->compute_posterior_hypers();*/
+  }
+
+  //! Generates new state values from the centering posterior distribution
+  //! @param update_params  Save posterior hypers after the computation?
+  void sample_full_cond(bool update_params = true) override;
+
  protected:
   //! Evaluates the log-likelihood of data in a single point
   //! @param datum      Point which is to be evaluated
@@ -94,15 +105,6 @@ class MFAHierarchy
 
   //! Initializes hierarchy hyperparameters to appropriate values
   void initialize_hypers() override;
-
-  //! Generates new state values from the centering posterior distribution
-  //! @param update_params  Save posterior hypers after the computation?
-  void sample_full_cond(bool update_params = true) override;
-
-  //! Saves posterior hyperparameters to the corresponding class member
-  void save_posterior_hypers() {
-    posterior_hypers = static_cast<Derived*>(this)->compute_posterior_hypers();
-  }
 
   void sample_Eta() const;
 
