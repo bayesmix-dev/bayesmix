@@ -127,8 +127,8 @@ MFAHierarchy::get_state_proto() const {
   bayesmix::MFAState state_;
   bayesmix::to_proto(state.mu, state_.mutable_mu());
   bayesmix::to_proto(state.psi, state_.mutable_psi());
-  bayesmix::to_proto(state.eta, state_.mutable_eta());
-  bayesmix::to_proto(state.lambda, state_.mutable_lambda());
+  bayesmix::to_proto(state.Eta, state_.mutable_eta());
+  bayesmix::to_proto(state.Lambda, state_.mutable_lambda());
 
   auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
   out->mutable_mfa_state()->CopyFrom(state_);
@@ -138,26 +138,28 @@ MFAHierarchy::get_state_proto() const {
 void MFAHierarchy::set_hypers_from_proto(
     const google::protobuf::Message& hypers_) {
   auto& hyperscast = downcast_hypers(hypers_).mfa_state();
-  hypers->mutilde = hyperscast.mutilde();
+  hypers->mutilde = bayesmix::to_eigen(hyperscast.mutilde());
   hypers->alpha0 = hyperscast.alpha0();
-  hypers->beta = hyperscast.beta();
+  hypers->beta = bayesmix::to_eigen(hyperscast.beta());
   hypers->phi = hyperscast.phi();
+  hypers->q = hyperscast.q();
 }
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
 MFAHierarchy::get_hypers_proto() const {
-  bayesmix::MFAPrior hypers_;
-  hypers_.set_mutilde(hypers->mutilde);
+  bayesmix::MFAState2 hypers_;  // TODO change name
+  bayesmix::to_proto(hypers->mutilde, hypers_.mutable_mutilde());
+  bayesmix::to_proto(hypers->beta, hypers_.mutable_beta());
   hypers_.set_alpha0(hypers->alpha0);
-  hypers_.set_beta(hypers->beta);
   hypers_.set_phi(hypers->phi);
+  hypers_.set_q(hypers->q);
 
   auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
   out->mutable_mfa_state()->CopyFrom(hypers_);
   return out;
 }
 
-void MFAHierarchy::sample_full_cond(bool update_params = false) override {
+void MFAHierarchy::sample_full_cond(bool update_params) {
   assert(update_params != true);  // should never be true
   if (this->card == 0) {
     // No posterior update possible
