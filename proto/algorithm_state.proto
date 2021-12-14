@@ -25,6 +25,7 @@ message AlgorithmState {
       MultiLSState multi_ls_state = 2; // State of a multivariate location-scale family
       LinRegUniLSState lin_reg_uni_ls_state = 4; // State of a linear regression univariate location-scale family
       Vector general_state = 5; // Just a vector of doubles
+      MFAState mfa_state = 6; // State of a linear regression univariate location-scale family
     }
     int32 cardinality = 3; // How many observations are in this cluster
   }

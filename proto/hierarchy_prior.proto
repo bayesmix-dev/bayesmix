@@ -73,7 +73,7 @@ message LinRegUniPrior {
  */
 
  message MFAState2 {
-   Vector mutilde = 1;
+  Vector mutilde = 1;
   Vector beta = 2;
   double phi = 3;
   double alpha0 = 4;

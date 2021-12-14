@@ -86,7 +86,7 @@ class MFAHierarchy
 
   //! Generates new state values from the centering posterior distribution
   //! @param update_params  Save posterior hypers after the computation?
-  void sample_full_cond(bool update_params = true) override;
+  void sample_full_cond(bool update_params = false) override;
 
  protected:
   //! Evaluates the log-likelihood of data in a single point
