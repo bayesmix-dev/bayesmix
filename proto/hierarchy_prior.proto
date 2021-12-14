@@ -68,11 +68,8 @@ message LinRegUniPrior {
   }
 }
 
-/*
- * did not compile with MFAState because declared in ls_state.proto
- */
 
- message MFAState2 {
+ message MFAPriorDistribution {
   Vector mutilde = 1;
   Vector beta = 2;
   double phi = 3;
@@ -83,7 +80,7 @@ message LinRegUniPrior {
 
 message MFAPrior {
   oneof prior {
-    MFAState2 fixed_values = 1;
+    MFAPriorDistribution fixed_values = 1;
   }
 }
 
