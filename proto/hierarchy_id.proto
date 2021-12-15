@@ -7,4 +7,5 @@ enum HierarchyId {
     NNIG = 1;
     NNW = 2;
     LinRegUni = 3;
+    LapNIG = 4;
 }

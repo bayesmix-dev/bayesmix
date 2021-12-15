@@ -128,7 +128,7 @@ endif()
 
 
 # Build library object
-add_library(bayesmix OBJECT)
+add_library(bayesmix OBJECT src/hierarchies/lapnig_hierarchy.cc src/hierarchies/lapnig_hierarchy.h)
 add_dependencies(bayesmix build_tbb)
 target_sources(bayesmix PUBLIC ${PROTO_SRCS} ${PROTO_HDRS})
 add_subdirectory(src)    # source files
