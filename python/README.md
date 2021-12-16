@@ -115,4 +115,4 @@ init_num_clusters: 3
 """
 ```
 
-Se the notebook in `notebooks/gaussian_mix_uni.ipynb` for a concrete usage example
+See the notebook in `notebooks/gaussian_mix_uni.ipynb` for a concrete usage example
