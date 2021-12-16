@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
   args.add_argument("--mix_type")
       .required()
-      .help("enum string of the mixing, see the file proto/minxing_id.proto");
+      .help("enum string of the mixing, see the file proto/mixing_id.proto");
 
   args.add_argument("--mix_args")
       .required()
