@@ -67,22 +67,24 @@ def run_mcmc(
 
     hierarchy: str.
         The id of the hyerarchy. Must be one of the 'Name' in
-        https://bayesmix.readthedocs.io/en/latest/protos.html#hierarchy_id.proto
+        http://bayesmix.readthedocs.io/en/latest/protos.html#hierarchy_id.proto
     mixing: str.
         The id of the mixing. Must be one of the 'Name' in
-        https://bayesmix.readthedocs.io/en/latest/protos.html#mixing_id.proto
+        http://bayesmix.readthedocs.io/en/latest/protos.html#mixing_id.proto
     data: np.array of shape (n_samples, n_dim).
         Observations on which to fit the model.
     hier_params: str.
         A text string containing the hyperparameters of the hierarchy or
-        a file name where the hyperparameters are stored. A protobuf message of the
-        corresponding type will be created and populated with the parameters.
-        See the file hierarchy_prior.proto for the corresponding message.
+        a file name where the hyperparameters are stored. A protobuf message of
+        the corresponding type will be created and populated with the
+        parameters. See the file hierarchy_prior.proto for the corresponding
+        message.
     mix_params: str.
         A text string containing the hyperparameters of the mixing or
-        a file name where the hyperparameters are stored. A protobuf message of the
-        corresponding type will be created and populated with the parameters.
-        See the file mixing_prior.proto for the corresponding message.
+        a file name where the hyperparameters are stored. A protobuf message of
+        the corresponding type will be created and populated with the
+        parameters. See the file mixing_prior.proto for the corresponding
+        message.
     algo_params: str.
         A text string containing the hyperparameters of the algorithm or
         a file name where the hyperparameters are stored.
@@ -107,28 +109,28 @@ def run_mcmc(
     -------
 
     eval_dens: np.array of shape (n_samples, n_dens_grid_points).
-        Only if eval_dens==True. For each iteration, the mixture density
-        evaluated at the points in dens_grid.
+        For each iteration, the mixture density evaluated at the points in
+        dens_grid. None if eval_dens is False.
     n_clus: np.array of shape (n_samples,).
-        Only if return_num_clusters is True.
-        The number of clusters for each iteration.
+        The number of clusters for each iteration. None if return_num_clusters
+        is False.
     clus_chain: np.array shape (n_samples, n_data).
-        Only if return_clusters is True. The cluster allocation for
-        each iteration.
+        The cluster allocation for each iteration. None if return_clusters is
+        False.
     best_clus: np.array of shape (n_data,).
-        Only if return_best_clus is True. The best clustering obtained
-        by minimizing Binder's loss function.
-
+        The best clustering obtained by minimizing Binder's loss function. None
+        if return_best_clus is False.
     """
 
     BAYESMIX_EXE = os.environ.get("BAYESMIX_EXE", default=None)
     if BAYESMIX_EXE is None:
         raise ValueError("BAYESMIX_EXE environment variable not set")
 
-    RUN_CMD = BAYESMIX_EXE + """ --algo_params_file {0} --hier_type {1} --hier_args {2} \
-                                 --mix_type {3} --mix_args {4} --collname {5} \
-                                 --datafile {6} --gridfile {7} --densfile {8} \
-                                 --nclufile {9} --clusfile {10} --bestclusfile {11}"""
+    RUN_CMD = BAYESMIX_EXE + """ --algo_params_file {0} --hier_type {1} \
+                                 --hier_args {2} --mix_type {3} \
+                                 --mix_args {4} --collname {5} --datafile {6} \
+                                 --gridfile {7} --densfile {8} --nclufile {9} \
+                                 --clusfile {10} --bestclusfile {11}"""
 
 
     if out_dir is None:
@@ -140,9 +142,11 @@ def run_mcmc(
 
     data_file, dens_grid_file, nclus_file, clus_file, best_clus_file = \
         _get_filenames(out_dir)
-    hier_params_file = _maybe_print_to_file(hier_params, "hier_params", out_dir)
+    hier_params_file = _maybe_print_to_file(hier_params, "hier_params",
+                                            out_dir)
     mix_params_file = _maybe_print_to_file(mix_params, "mix_params", out_dir)
-    algo_params_file = _maybe_print_to_file(algo_params, "algo_params", out_dir)
+    algo_params_file = _maybe_print_to_file(algo_params, "algo_params",
+                                            out_dir)
     eval_dens_file = os.path.join(out_dir, "eval_dens.csv")
 
     np.savetxt(data_file, data, fmt='%1.5f')
@@ -200,6 +204,4 @@ def run_mcmc(
     if remove_out_dir:
         shutil.rmtree(out_dir, ignore_errors=True)
 
-    out = (eval_dens, nclus, clus, best_clus)
-    out = tuple(filter(lambda x: x is not None, out))
-    return out
+    return eval_dens, nclus, clus, best_clus
