@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
 build/run_mcmc \
-  --algo_params_file resources/tutorial/algo.asciipb \
-  --hier_type NNIG --hier_args resources/tutorial/nnig_ngg.asciipb \
-  --mix_type DP --mix_args resources/tutorial/dp_gamma.asciipb \
-  --collname resources/tutorial/out/chains.recordio \
-  --datafile resources/tutorial/data.csv \
-  --gridfile resources/tutorial/grid.csv \
-  --densfile resources/tutorial/out/density_file.csv \
-  --nclufile resources/tutorial/out/numclust.csv \
-  --clusfile resources/tutorial/out/clustering.csv
+  --algo-params-file resources/tutorial/algo.asciipb \
+  --hier-type NNIG --hier-args resources/tutorial/nnig_ngg.asciipb \
+  --mix-type DP --mix-args resources/tutorial/dp_gamma.asciipb \
+  --coll-name resources/tutorial/out/chains.recordio \
+  --data-file resources/tutorial/data.csv \
+  --grid-file resources/tutorial/grid.csv \
+  --dens-file resources/tutorial/out/density_file.csv \
+  --n-cl-file resources/tutorial/out/numclust.csv \
+  --clus-file resources/tutorial/out/clustering.csv \
+  #--best-clus-file resources/tutorial/out/best_clustering.csv

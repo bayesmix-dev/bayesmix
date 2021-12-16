@@ -126,11 +126,12 @@ def run_mcmc(
     if BAYESMIX_EXE is None:
         raise ValueError("BAYESMIX_EXE environment variable not set")
 
-    RUN_CMD = BAYESMIX_EXE + """ --algo_params_file {0} --hier_type {1} \
-                                 --hier_args {2} --mix_type {3} \
-                                 --mix_args {4} --collname {5} --datafile {6} \
-                                 --gridfile {7} --densfile {8} --nclufile {9} \
-                                 --clusfile {10} --bestclusfile {11}"""
+    RUN_CMD = BAYESMIX_EXE + """ --algo-params-file {0} --hier-type {1} \
+                                 --hier-args {2} --mix-type {3} \
+                                 --mix-args {4} --coll-name {5} \
+                                 --data-file {6} --grid-file {7} \
+                                 --dens-file {8} --n-cl-file {9} \
+                                 --clus-file {10} --best-clus-file {11}"""
 
 
     if out_dir is None:
