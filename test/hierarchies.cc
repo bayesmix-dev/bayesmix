@@ -11,6 +11,7 @@
 #include "src/hierarchies/nnw_hierarchy.h"
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
+#include <iostream>
 
 TEST(nnighierarchy, draw) {
   auto hier = std::make_shared<NNIGHierarchy>();
@@ -224,15 +225,15 @@ TEST(lin_reg_uni_hierarchy, misc) {
 TEST(mfahierarchy, draw) {
   auto hier = std::make_shared<MFAHierarchy>();
   bayesmix::MFAPrior prior;
-  Eigen::Vector2d mutilde;
-  mutilde << 3.0, 3.0;
+  Eigen::VectorXd mutilde(4);
+  mutilde << 3.0, 3.0, 4.0, 1.0;
   bayesmix::Vector mutilde_proto;
   bayesmix::to_proto(mutilde, &mutilde_proto);
   int q = 2;
-  double phi = 5.0;
+  double phi = 1.0;
   double alpha0 = 5.0;
-  Eigen::Vector2d beta;
-  beta << 3.0, 3.0;
+  Eigen::VectorXd beta(4);
+  beta << 3.0, 3.0, 2.0, 2.1;
   bayesmix::Vector beta_proto;
   bayesmix::to_proto(beta, &beta_proto);
   *prior.mutable_fixed_values()->mutable_mutilde() = mutilde_proto;

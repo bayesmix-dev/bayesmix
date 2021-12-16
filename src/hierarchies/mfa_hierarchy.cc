@@ -4,6 +4,7 @@
 
 #include <Eigen/Dense>
 #include <cassert>
+#include <iostream>
 #include <stan/math/prim/prob.hpp>
 #include <vector>
 
@@ -22,19 +23,25 @@ double MFAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
 MFA::State MFAHierarchy::draw(const MFA::Hyperparams& params) {
   auto& rng = bayesmix::Rng::Instance().get();
   MFA::State out;
+  out.mu = params.mutilde;
+  out.psi = params.beta / (params.alpha0 + 1.);
+  out.Eta = Eigen::MatrixXd::Zero(card, params.q);
+  out.Lambda = Eigen::MatrixXd::Zero(p, params.q);
 
   for (size_t j = 0; j < p; j++) {
     out.mu[j] =
         stan::math::normal_rng(params.mutilde[j], sqrt(params.phi), rng);
+
     out.psi[j] = stan::math::inv_gamma_rng(params.alpha0, params.beta[j], rng);
-    for (size_t i = 0; i < params.q; j++) {
+
+    for (size_t i = 0; i < params.q; i++) {
       out.Lambda(j, i) = stan::math::normal_rng(0, 1, rng);
     }
   }
 
   for (size_t i = 0; i < card; i++) {
     for (size_t j = 0; j < params.q; j++) {
-      out.Eta(j, i) = stan::math::normal_rng(0, 1, rng);
+      out.Eta(i, j) = stan::math::normal_rng(0, 1, rng);
     }
   }
 
@@ -64,9 +71,9 @@ void MFAHierarchy::initialize_hypers() {
           "Hyperparameters dimensions are not consistent");
     }
 
-    if (hypers->beta <= 0) { //TODO check for vector not double
-      throw std::invalid_argument("Shape parameter must be > 0");
-    }
+    // if (hypers->beta <= 0) { //TODO check for vector not double
+    // throw std::invalid_argument("Shape parameter must be > 0");
+    //}
     if (hypers->alpha0 <= 0) {
       throw std::invalid_argument("Scale parameter must be > 0");
     }
@@ -147,7 +154,7 @@ void MFAHierarchy::set_hypers_from_proto(
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
 MFAHierarchy::get_hypers_proto() const {
-  bayesmix::MFAPriorDistribution hypers_;  // TODO change name
+  bayesmix::MFAPriorDistribution hypers_;
   bayesmix::to_proto(hypers->mutilde, hypers_.mutable_mutilde());
   bayesmix::to_proto(hypers->beta, hypers_.mutable_beta());
   hypers_.set_alpha0(hypers->alpha0);
@@ -177,65 +184,74 @@ void MFAHierarchy::sample_Eta() const {
 
   Eigen::MatrixXd Sigmaeta(
       (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
-       state.Lambda.transpose()*Eigen::MatrixXd(state.psi.cwiseInverse()).asDiagonal()*state.Lambda).inverse());
+       state.Lambda.transpose() *
+           Eigen::MatrixXd(state.psi.cwiseInverse()).asDiagonal() *
+           state.Lambda)
+          .inverse());
 
-  for (size_t i = 0; i < card; i++) {
-    state.Eta.row(i) = stan::math::multi_normal_rng( //return è std::vector da risolvere
-        Sigmaeta * state.Lambda.transpose() *
-            Eigen::MatrixXd(state.psi.cwiseInverse()).asDiagonal() *
-            (data[i] - state.mu),
-        Sigmaeta.ldlt(), rng);
-  }
+  // for (size_t i = 0; i < card; i++) {
+  // state.Eta.row(i) = stan::math::multi_normal_rng( //return è std::vector da
+  // risolvere
+  //  Sigmaeta * state.Lambda.transpose() *
+  //    Eigen::MatrixXd(state.psi.cwiseInverse()).asDiagonal() *
+  //  (data[i] - state.mu),
+  // Sigmaeta.ldlt(), rng);
+  //}
 }
 
 void MFAHierarchy::sample_mu() const {
   auto& rng = bayesmix::Rng::Instance().get();
 
-  Eigen::MatrixXd Sigmamu =
-      (hypers->phi * Eigen::MatrixXd::Identity(p, p) +//problema su questo +, risolvere tipi
-       card * Eigen::MatrixXd(state.psi.cwiseInverse()).asDiagonal())
-          .inverse();
+  // Eigen::MatrixXd Sigmamu =
+  //(hypers->phi * Eigen::MatrixXd::Identity(p, p) +//problema su questo +,
+  //risolvere tipi
+  // card * Eigen::MatrixXd(state.psi.cwiseInverse()).asDiagonal())
+  //   .inverse();
 
-  Eigen::VectorXd Somma = Eigen::VectorXd::Zero(p);
+  // Eigen::VectorXd Somma = Eigen::VectorXd::Zero(p);
 
-  for (size_t i = 0; i < card; i++) {
-    Somma += state.Lambda * state.Eta.row(i);
-  }
+  // for (size_t i = 0; i < card; i++) {
+  //  Somma += state.Lambda * state.Eta.row(i);
+  //}
 
-  state.mu = stan::math::multi_normal_rng(//return è std::vector da risolvere
-      Sigmamu * (hypers->phi * hypers->mutilde +
-                 Eigen::MatrixXd(state.psi.cwiseInverse()).asDiagonal() *
-                     (data_sum - Somma)),
-      Sigmamu, rng);
+  // state.mu = stan::math::multi_normal_rng(//return è std::vector da
+  // risolvere
+  //    Sigmamu * (hypers->phi * hypers->mutilde +
+  //              Eigen::MatrixXd(state.psi.cwiseInverse()).asDiagonal() *
+  //                 (data_sum - Somma)),
+  // Sigmamu, rng);
 }
 
 void MFAHierarchy::sample_Lambda() const {
   auto& rng = bayesmix::Rng::Instance().get();
 
-  for (size_t j = 0; j < p; j++) {
-    Eigen::MatrixXd Sigmalambda =
-        (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
-         state.Eta.transpose() / state.psi[j] * state.Eta)
-            .inverse();
+  // for (size_t j = 0; j < p; j++) {
+  // Eigen::MatrixXd Sigmalambda =
+  //   (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
+  //   state.Eta.transpose() / state.psi[j] * state.Eta)
+  //     .inverse();
 
-    state.Lambda.row(j) = stan::math::multi_normal_rng(
-        Sigmalambda * state.Eta.transpose() / state.psi[j] *
-            (data.col(j) - state.mu[j]),//data col j, rendere data Eigen Matrix per accesso per colonne?
-        Sigmalambda, rng);
-  }
+  // state.Lambda.row(j) = stan::math::multi_normal_rng(
+  //  Sigmalambda * state.Eta.transpose() / state.psi[j] *
+  //      (data.col(j) - state.mu[j]),//data col j, rendere data Eigen Matrix
+  //      per accesso per colonne?
+  // Sigmalambda, rng);
+  //}
 }
 
 void MFAHierarchy::sample_psi() const {
-  auto& rng = bayesmix::Rng::Instance().get();
+  // auto& rng = bayesmix::Rng::Instance().get();
 
-  for (size_t j = 0; j < p; j++) {
-    double S = 0;
-    for (size_t i = 0; i < card; i++) {
-      S += std::pow((data[i, j] - state.mu[j] -//problema su questo -, risolvere tipi
-                     state.Lambda.row(j).dot(state.Eta.row(i))),
-                    2);
-    }
-    state.psi[j] = stan::math::inv_gamma_rng(hypers->alpha0 + card / 2,
-                                             hypers->beta[j] + S / 2, rng);//problema tipo return
-  }
+  // for (size_t j = 0; j < p; j++) {
+  //  double S = 0;
+  // for (size_t i = 0; i < card; i++) {
+  // S += std::pow((data[i, j] - state.mu[j] -//problema su questo -, risolvere
+  // tipi
+  //              state.Lambda.row(j).dot(state.Eta.row(i))),
+  //               2);
+  //}
+  // state.psi[j] = stan::math::inv_gamma_rng(hypers->alpha0 + card / 2,
+  //                                         hypers->beta[j] + S / 2,
+  //                                         rng);//problema tipo return
+  // }
 }
