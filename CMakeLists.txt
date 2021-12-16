@@ -142,10 +142,10 @@ add_library(bayesmixlib $<TARGET_OBJECTS:bayesmix>)
 
 if (BUILD_RUN)
   # Build run executable
-  add_executable(run $<TARGET_OBJECTS:bayesmix> run.cc)
-  target_include_directories(run PUBLIC ${INCLUDE_PATHS})
-  target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
-  target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
+  add_executable(run_mcmc $<TARGET_OBJECTS:bayesmix> run_mcmc.cc)
+  target_include_directories(run_mcmc PUBLIC ${INCLUDE_PATHS})
+  target_link_libraries(run_mcmc PUBLIC ${LINK_LIBRARIES})
+  target_compile_options(run_mcmc PUBLIC ${COMPILE_OPTIONS})
 endif()
 
 if (NOT DISABLE_TESTS)

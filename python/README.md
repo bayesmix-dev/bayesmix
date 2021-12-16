@@ -31,20 +31,20 @@ this will print out the installation log and, if the installation was successful
 
 ```
 Bayesmix executable is in '<BAYESMIX_HOME_REPO>/build',
-export the environment variable BAYESMIX_EXE=<BAYESMIX_HOME_REPO>build/run
+export the environment variable BAYESMIX_EXE=<BAYESMIX_HOME_REPO>build/run_mcmc
 ```
 
 Hence, for running the MCMC chain you should export the `BAYESMIX_EXE` environment variable. This can be done once and for all by copying
 
 ```
-BAYESMIX_EXE=<BAYESMIX_HOME_REPO>build/run
+BAYESMIX_EXE=<BAYESMIX_HOME_REPO>build/run_mcmc
 ```
 
 in your .bashrc file (or .zshrc if you are a MacOs user), or every time you use bayesmixpy, you can add the following lines on top of your Python script/notebook
 
 ```
 import os
-os.environ["BAYESMIX_EXE"] = <BAYESMIX_HOME_REPO>build/run
+os.environ["BAYESMIX_EXE"] = <BAYESMIX_HOME_REPO>build/run_mcmc
 
 from bayesmixpy import run_mcmc
 ....

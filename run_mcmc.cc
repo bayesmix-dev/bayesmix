@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
     std::exit(1);
   }
 
-  std::cout << "Running run.cc" << std::endl;
+  std::cout << "Running run_mcmc.cc" << std::endl;
   check_args(args);
 
   // Read algorithm settings proto
@@ -261,7 +261,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  std::cout << "End of run.cc" << std::endl;
+  std::cout << "End of run_mcmc.cc" << std::endl;
   delete coll;
   return 0;
 }
