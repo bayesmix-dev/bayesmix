@@ -106,13 +106,13 @@ class MFAHierarchy
   //! Initializes hierarchy hyperparameters to appropriate values
   void initialize_hypers() override;
 
-  void sample_Eta() const;
+  void sample_Eta();
 
-  void sample_mu() const;
+  void sample_mu();
 
-  void sample_psi() const;
+  void sample_psi();
 
-  void sample_Lambda() const;
+  void sample_Lambda();
 
   //! Sum of data points currently belonging to the cluster
   Eigen::VectorXd data_sum;
@@ -121,7 +121,7 @@ class MFAHierarchy
   size_t p;
 
   //! Vector of data points currently belonging to the cluster
-  std::vector<Eigen::RowVectorXd> data;
+  std::vector<Eigen::VectorXd> data;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_MFA_HIERARCHY_H_
