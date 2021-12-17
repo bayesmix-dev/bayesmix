@@ -14,7 +14,7 @@ def _is_file(a: str):
     try:
         p = Path(a)
         out = p.exists() and p.is_file()
-    except:
+    except Exception as e:
         out = False
     return out
 
