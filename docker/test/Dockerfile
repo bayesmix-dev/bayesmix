@@ -7,7 +7,7 @@ COPY resources /usr/bayesmix/resources
 COPY src /usr/bayesmix/src
 COPY test /usr/bayesmix/test
 COPY CMakeLists.txt /usr/bayesmix/CMakeLists.txt
-COPY *.cc /usr/bayesmix
+COPY *.cc /usr/bayesmix/
 
 WORKDIR /usr/bayesmix
 
