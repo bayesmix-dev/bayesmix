@@ -202,9 +202,8 @@ void MFAHierarchy::sample_mu() {
   auto& rng = bayesmix::Rng::Instance().get();
 
   Eigen::MatrixXd Sigmamu =
-      (hypers->phi *
-           Eigen::MatrixXd::Identity(p, p) +  // problema su questo +,
-       // risolvere tipi
+      (hypers->phi * Eigen::MatrixXd::Identity(p, p) +
+
        card *
            Eigen::MatrixXd(state.psi.cwiseInverse().asDiagonal()).inverse());
 
@@ -223,8 +222,8 @@ void MFAHierarchy::sample_mu() {
 
 void MFAHierarchy::sample_Lambda() {
   auto& rng = bayesmix::Rng::Instance().get();
-  Eigen::MatrixXd datamatrix(p,card);
-  for (size_t i = 0; i < card; i++){
+  Eigen::MatrixXd datamatrix(p, card);
+  for (size_t i = 0; i < card; i++) {
     datamatrix.col(i) = data[i];
   }
   for (size_t j = 0; j < p; j++) {
@@ -232,10 +231,12 @@ void MFAHierarchy::sample_Lambda() {
         (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
          state.Eta.transpose() / state.psi[j] * state.Eta)
             .inverse();
-
+    Eigen::VectorXd vectortemp(datamatrix.row(j));
     state.Lambda.row(j) = stan::math::multi_normal_rng(
-        //Sigmalambda*state.Eta.transpose()*(datamatrix.row(j)-Eigen::VectorXd::Constant(card,state.mu[j]))/state.psi[j]
-            Eigen::VectorXd::Constant(hypers->q,state.mu[j]), Sigmalambda, rng);
+        Sigmalambda * state.Eta.transpose() *
+            (vectortemp - Eigen::VectorXd::Constant(card, state.mu[j])) /
+            state.psi[j],
+        Sigmalambda, rng);
   }
 }
 
@@ -245,14 +246,12 @@ void MFAHierarchy::sample_psi() {
   for (size_t j = 0; j < p; j++) {
     double S = 0;
     for (size_t i = 0; i < card; i++) {
-      S += std::pow(
-          (data[i][j] - state.mu[j] -  // problema su questo -, risolvere
-           // tipi
-           state.Lambda.row(j).dot(state.Eta.row(i))),
-          2);
+      S += std::pow((data[i][j] - state.mu[j] -
+
+                     state.Lambda.row(j).dot(state.Eta.row(i))),
+                    2);
     }
     state.psi[j] = stan::math::inv_gamma_rng(hypers->alpha0 + card / 2,
-                                             hypers->beta[j] + S / 2,
-                                             rng);  // problema tipo return
+                                             hypers->beta[j] + S / 2, rng);
   }
 }
