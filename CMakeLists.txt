@@ -18,21 +18,18 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 # Require PkgConfig
 find_package(PkgConfig REQUIRED)
 
-# Check if TBB is present in system
-find_package(TBB CONFIG)
-if(NOT TBB_FOUND AND NOT TARGET TBB::tbb)
-	message(STATUS "Use math TBB")
-	# Define TBB_ROOT Folder
-	set(TBB_ROOT ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb) 
-	file(COPY ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2019_U8/ DESTINATION ${TBB_ROOT})
-	# Build TBB Library with CMake Integration
-	include(${TBB_ROOT}/cmake/TBBBuild.cmake)
-	list(APPEND MAKE_ARGS "tbb_build_dir=${TBB_ROOT}")
-	list(APPEND MAKE_ARGS "tbb_build_prefix=tbb")
-	tbb_build(TBB_ROOT ${TBB_ROOT} CONFIG_DIR TBB_DIR MAKE_ARGS ${MAKE_ARGS})
-	# Re-Require TBB library (for compile / link options)
-	find_package(TBB)
-endif()
+# TBB CMake integration
+message(STATUS "Using math TBB")
+# Define TBB_ROOT Folder
+set(TBB_ROOT ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb) 
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2019_U8/ DESTINATION ${TBB_ROOT})
+# Build TBB Library with CMake Integration
+include(${TBB_ROOT}/cmake/TBBBuild.cmake)
+list(APPEND MAKE_ARGS "tbb_build_dir=${TBB_ROOT}")
+list(APPEND MAKE_ARGS "tbb_build_prefix=tbb")
+tbb_build(TBB_ROOT ${TBB_ROOT} CONFIG_DIR TBB_DIR MAKE_ARGS ${MAKE_ARGS})
+# Require TBB library (for compile / link options)
+find_package(TBB)
 
 # Check if Protobuf is present in system
 find_package(Protobuf)
