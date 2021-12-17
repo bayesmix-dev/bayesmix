@@ -4,6 +4,8 @@
 #include <Eigen/Dense>
 #include <stan/math/prim/prob.hpp>
 #include <vector>
+#include <cmath>
+#include <algorithm>
 
 #include "algorithm_state.pb.h"
 #include "hierarchy_prior.pb.h"
@@ -33,14 +35,13 @@ double LapNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
 }
 
 
-void LapNIGHierarchy::update_summary_statistics(const Eigen::RowVectorXd &datum,
+void LapNIGHierarchy::update_summary_statistics(const Eis
                                                 bool add) {
   if (add) {
-    data_sum += datum(0);
-    data_sum_squares += datum(0) * datum(0);
+    cluster_data_values.insert(datum);
   } else {
-    data_sum -= datum(0);
-    data_sum_squares -= datum(0) * datum(0);
+    auto it = cluster_data_values.find(datum);
+    cluster_data_values.erase(it);
   }
 }
 
@@ -237,4 +238,67 @@ LapNIG::State LapNIGHierarchy::draw(const LapNIG::Hyperparams &params) {
   out.mean = stan::math::normal_rng(params.mean,
                                     sqrt(params.var_scaling), rng);
   return out;
+}
+
+void LapNIGHierarchy::update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                              bool add) {
+  if (add) {
+    cluster_data_values.insert(datum);
+  } else {
+    auto it = cluster_data_values.find(datum);
+    cluster_data_values.erase(it);
+  }
+}
+
+
+void LapNIGHierarchy::sample_full_cond(bool update_params) {
+  if (this->card == 0) {
+    // No posterior update possible
+    static_cast<Derived *>(this)->sample_prior();
+  } else {
+      auto &rng = bayesmix::Rng::Instance().get();
+      double candidate_mean = state.mean + stan::math::normal_rng(0,sqrt(2*params.var_scaling), rng);
+      double candidate_log_scale = std::log(state.scale) +
+                                   stan::math::normal_rng(0,sqrt(2*std::log(params.scale*params.scale/
+                                                                  (params.shape-1)*(params.shape-1)*(params.shape-2))), rng);
+      double pi_curr{}, pi_cand{};
+
+      double cand_sum = 0;
+      for(auto & elem: cluster_data_values){
+        cand_sum += std::abs(elem(0,0) - candidate_mean); // MODIFY IN THE FUTURE !!!
+      }
+      double candidate_scale = std::exp(candidate_log_scale);
+      pi_cand = 1 / 2 / candidate_scale *
+                std::exp(-1 / 2 / candidate_scale * cand_sum) *
+                std::exp(-1 / 2 / params.var_scaling / params.var_scaling *
+                         (candidate_mean - params.mean) *
+                         (candidate_mean - params.mean)) *
+                std::pow(1 / candidate_scale, params.shape + 2) *
+                std::exp(-params.scale / candidate_scale);
+
+      double curr_sum = 0;
+      double curr_mean = state.mean;
+      double curr_scale = state.scale;
+      double curr_log_scale = std::log(state.scale);
+      for(auto & elem: cluster_data_values){
+        curr_sum += std::abs(elem(0,0) - curr_mean); // MODIFY IN THE FUTURE !!!
+      }
+      pi_curr = 1/2/curr_scale * std::exp(-1/2/curr_scale*curr_sum) *
+                std::exp(-1/2/params.var_scaling/params.var_scaling
+                         *(curr_mean-params.mean)*(curr_mean-params.mean))*
+                std::pow(1/curr_scale,params.shape+2) * std::exp(-params.scale/curr_scale);
+
+      double alpha;
+      alpha = std::min<double>((pi_cand / pi_curr), 1);
+
+      bool accept = stan::math::bernoulli_rng(alpha,rng);
+
+      if(accept){
+        state.mean = candidate_mean;
+        state.scale = candidate_scale;
+      }
+      else{
+        ;
+      }
+  }
 }

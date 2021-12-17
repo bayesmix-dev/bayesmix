@@ -7,6 +7,7 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <vector>
+#include <set>
 
 #include "algorithm_state.pb.h"
 #include "base_hierarchy.h"
@@ -99,11 +100,16 @@ class LapNIGHierarchy
   //! Initializes state parameters to appropriate values
   void initialize_state() override;
 
+
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;
 
   //! Updates state values using the given (prior or posterior) hyperparameters
   LapNIG::State draw(const LapNIG::Hyperparams &params);
+
+  //! Generates new state values from the centering posterior distribution
+  //! @param update_params  Save posterior hypers after the computation?
+  void sample_full_cond(bool update_params = false) override;
 
 
  protected:
@@ -113,6 +119,10 @@ class LapNIGHierarchy
 
   //! Sum of squared data points currently belonging to the cluster
   double data_sum_squares = 0;
+
+  //! Set of values of data points belonging to this cluster
+  std::set<Eigen::RowVectorXd> cluster_data_values;
+  //std::set<double> cluster_data_values;
 
 
 };
