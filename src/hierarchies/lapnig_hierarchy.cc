@@ -243,53 +243,69 @@ LapNIG::State LapNIGHierarchy::draw(const LapNIG::Hyperparams &params) {
 void LapNIGHierarchy::update_summary_statistics(const Eigen::RowVectorXd &datum,
                                               bool add) {
   if (add) {
-    cluster_data_values.insert(datum);
+
+    cluster_data_values.insert(datum); // add the datum to cluster_data_values, needed to compute the full_cond
+
   } else {
+
     auto it = cluster_data_values.find(datum);
     cluster_data_values.erase(it);
+
   }
 }
 
 
 void LapNIGHierarchy::sample_full_cond(bool update_params) {
+
   if (this->card == 0) {
     // No posterior update possible
     static_cast<Derived *>(this)->sample_prior();
+
   } else {
+
+      // Random generator
       auto &rng = bayesmix::Rng::Instance().get();
+
+      // Candidate mean and candidate log_scale
       double candidate_mean = state.mean + stan::math::normal_rng(0,sqrt(2*params.var_scaling), rng);
       double candidate_log_scale = std::log(state.scale) +
                                    stan::math::normal_rng(0,sqrt(2*std::log(params.scale*params.scale/
                                                                   (params.shape-1)*(params.shape-1)*(params.shape-2))), rng);
-      double pi_curr{}, pi_cand{};
-
-      double cand_sum = 0;
-      for(auto & elem: cluster_data_values){
-        cand_sum += std::abs(elem(0,0) - candidate_mean); // MODIFY IN THE FUTURE !!!
-      }
       double candidate_scale = std::exp(candidate_log_scale);
-      pi_cand = 1 / 2 / candidate_scale *
-                std::exp(-1 / 2 / candidate_scale * cand_sum) *
+
+      //MH step
+
+      double pi_current{}, pi_candidate{}; // posterior of current state and candidate state
+
+      double candidate_sum = 0; // Sum of absolute values of data - candidate_mean
+      for(auto & elem: cluster_data_values){
+        candidate_sum += std::abs(elem(0,0) - candidate_mean); // MODIFY IN THE FUTURE FOR MULTIVARIATE CASE!!!
+      }
+
+      pi_candidate = 1 / 2 / candidate_scale *
+                std::exp(-1 / 2 / candidate_scale * candidate_sum) *
                 std::exp(-1 / 2 / params.var_scaling / params.var_scaling *
                          (candidate_mean - params.mean) *
                          (candidate_mean - params.mean)) *
                 std::pow(1 / candidate_scale, params.shape + 2) *
                 std::exp(-params.scale / candidate_scale);
 
-      double curr_sum = 0;
-      double curr_mean = state.mean;
-      double curr_scale = state.scale;
-      double curr_log_scale = std::log(state.scale);
+      double current_sum = 0; // Sum of absolute values of data - candidate_mean
+
+      double current_mean = state.mean;
+      double current_scale = state.scale;
+      double current_log_scale = std::log(state.scale);
+
       for(auto & elem: cluster_data_values){
-        curr_sum += std::abs(elem(0,0) - curr_mean); // MODIFY IN THE FUTURE !!!
+        current_sum += std::abs(elem(0,0) - current_mean); // MODIFY IN THE FUTURE FOR MULTIVARIATE CASE!!!
       }
-      pi_curr = 1/2/curr_scale * std::exp(-1/2/curr_scale*curr_sum) *
+      pi_current = 1/2/current_scale * std::exp(-1/2/current_scale*current_sum) *
                 std::exp(-1/2/params.var_scaling/params.var_scaling
-                         *(curr_mean-params.mean)*(curr_mean-params.mean))*
-                std::pow(1/curr_scale,params.shape+2) * std::exp(-params.scale/curr_scale);
+                         *(current_mean-params.mean)*(current_mean-params.mean))*
+                std::pow(1/current_scale,params.shape+2) * std::exp(-params.scale/current_scale);
 
       double alpha;
-      alpha = std::min<double>((pi_cand / pi_curr), 1);
+      alpha = std::min<double>((pi_candidate / pi_current), 1);
 
       bool accept = stan::math::bernoulli_rng(alpha,rng);
 
