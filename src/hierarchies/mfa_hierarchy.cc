@@ -172,10 +172,15 @@ void MFAHierarchy::sample_full_cond(bool update_params) {
     // No posterior update possible
     sample_prior();
   } else {
+    std::cout << "Eta" << std::endl;
     sample_Eta();
+    std::cout << "mu" << std::endl;
     sample_mu();
+    std::cout << "psi" << std::endl;
     sample_psi();
+    std::cout << "lambda" << std::endl;
     sample_Lambda();
+    std::cout << "end" << std::endl;
   }
 }
 

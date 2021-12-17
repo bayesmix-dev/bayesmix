@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <Eigen/Dense>
+#include <iostream>
 #include <stan/math/prim.hpp>
 
 #include "algorithm_state.pb.h"
@@ -11,7 +12,6 @@
 #include "src/hierarchies/nnw_hierarchy.h"
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
-#include <iostream>
 
 TEST(nnighierarchy, draw) {
   auto hier = std::make_shared<NNIGHierarchy>();
@@ -247,6 +247,46 @@ TEST(mfahierarchy, draw) {
   auto hier2 = hier->clone();
   hier2->sample_prior();
 
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
+  hier->write_state_to_proto(clusval);
+  hier2->write_state_to_proto(clusval2);
+
+  ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+}
+
+TEST(mfahierarchy, sample_given_data) {
+  auto hier = std::make_shared<MFAHierarchy>();
+  bayesmix::MFAPrior prior;
+  Eigen::VectorXd mutilde(4);
+  mutilde << 3.0, 3.0, 4.0, 1.0;
+  bayesmix::Vector mutilde_proto;
+  bayesmix::to_proto(mutilde, &mutilde_proto);
+  int q = 2;
+  double phi = 1.0;
+  double alpha0 = 5.0;
+  Eigen::VectorXd beta(4);
+  beta << 3.0, 3.0, 2.0, 2.1;
+  bayesmix::Vector beta_proto;
+  bayesmix::to_proto(beta, &beta_proto);
+  *prior.mutable_fixed_values()->mutable_mutilde() = mutilde_proto;
+  prior.mutable_fixed_values()->set_phi(phi);
+  prior.mutable_fixed_values()->set_alpha0(alpha0);
+  prior.mutable_fixed_values()->set_q(q);
+  *prior.mutable_fixed_values()->mutable_beta() = beta_proto;
+  hier->get_mutable_prior()->CopyFrom(prior);
+  hier->initialize();
+
+  Eigen::RowVectorXd datum1(4);
+  Eigen::RowVectorXd datum2(4);
+  datum1 << 1.0, 2.0, 3.0, 4.0;
+  datum2 << 2.0, 4.0, 6.0, 8.0;
+
+  auto hier2 = hier->clone();
+  hier2->add_datum(0, datum1, false);
+  hier2->add_datum(1, datum2, false);
+  hier2->sample_full_cond();
   bayesmix::AlgorithmState out;
   bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
   bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
