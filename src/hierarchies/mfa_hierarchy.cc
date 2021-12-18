@@ -241,15 +241,17 @@ void MFAHierarchy::sample_mu() {
            Eigen::MatrixXd(state.psi.cwiseInverse().asDiagonal()).inverse());
 
   Eigen::VectorXd Somma = Eigen::VectorXd::Zero(p);
-  Eigen::VectorXd mumean =
-      Sigmamu * (hypers->phi * hypers->mutilde +
-                 Eigen::MatrixXd(state.psi.cwiseInverse().asDiagonal()) *
-                     data_sum);
 
   for (size_t i = 0; i < card; i++) {
     Eigen::VectorXd riga = state.Eta.row(i);
     Somma += state.Lambda * riga;
   }
+
+  Eigen::VectorXd mumean =
+      Sigmamu * (hypers->phi * hypers->mutilde +
+                 Eigen::MatrixXd(state.psi.cwiseInverse().asDiagonal()) *
+                     (data_sum - Somma));
+
 
   state.mu = stan::math::multi_normal_rng(mumean, Sigmamu, rng);
 }
