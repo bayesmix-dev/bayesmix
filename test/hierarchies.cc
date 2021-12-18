@@ -283,9 +283,10 @@ TEST(mfahierarchy, sample_given_data) {
   datum1 << 1.0, 2.0, 3.0, 4.0;
   datum2 << 2.0, 4.0, 6.0, 8.0;
 
-  auto hier2 = hier->clone(); // QUESTO NON FA QUELLO CHE DOVREBBE
+  auto hier2 = hier->clone();
   hier2->add_datum(0, datum1, false); 
-  hier2->add_datum(1, datum2, false); 
+  hier2->add_datum(1, datum2, false);
+  std::cout << (hier2->data)[0] << std::endl;
   hier2->sample_full_cond(); 
   bayesmix::AlgorithmState out;
   bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
