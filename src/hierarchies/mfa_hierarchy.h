@@ -88,6 +88,9 @@ class MFAHierarchy
   //! @param update_params  Save posterior hypers after the computation?
   void sample_full_cond(bool update_params = false) override;
 
+  //! Vector of data points currently belonging to the cluster
+  std::vector<Eigen::VectorXd> data;
+
  protected:
   //! Evaluates the log-likelihood of data in a single point
   //! @param datum      Point which is to be evaluated
@@ -120,8 +123,7 @@ class MFAHierarchy
   //! Number of initial variables
   size_t p;
 
-  //! Vector of data points currently belonging to the cluster
-  std::vector<Eigen::VectorXd> data;
+  
 };
 
 #endif  // BAYESMIX_HIERARCHIES_MFA_HIERARCHY_H_

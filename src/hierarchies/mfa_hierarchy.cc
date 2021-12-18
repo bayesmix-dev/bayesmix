@@ -194,10 +194,26 @@ void MFAHierarchy::sample_Eta() {
            state.Lambda)
           .inverse());
 
+  Eigen::MatrixXd temp(state.psi.cwiseInverse().asDiagonal());
+/*
+  std::cout << "Sigmaeta: " << Sigmaeta.rows() << ", " << Sigmaeta.cols() << std::endl;
+  std::cout << "temp: " << temp.rows() << ", " << temp.cols() << std::endl;
+  std::cout << "lambda: " << state.Lambda.rows() << ", " << state.Lambda.cols() << std::endl;
+  Eigen::VectorXd difference = data[0] - state.mu;
+  std::cout << "difference: " << difference.size() << std::endl;
+
+  std::cout << stan::math::multi_normal_rng(
+        Sigmaeta * (state.Lambda.transpose()) * 
+            temp * 
+            difference, Sigmaeta, rng) << std::endl;
+
+  std::cout << "Eta: " << state.Eta.rows() << ", " << state.Eta.cols() << std::endl;
+*/
+  state.Eta.resize(card, state.Eta.cols());
   for (size_t i = 0; i < card; i++) {
     state.Eta.row(i) = (stan::math::multi_normal_rng(
-        Sigmaeta * (state.Lambda.transpose()) *
-            Eigen::MatrixXd(state.psi.cwiseInverse().asDiagonal()) *
+        Sigmaeta * (state.Lambda.transpose()) * 
+            temp * 
             (data[i] - state.mu),
         Sigmaeta, rng));
   }
