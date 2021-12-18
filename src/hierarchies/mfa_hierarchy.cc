@@ -209,7 +209,16 @@ void MFAHierarchy::sample_Eta() {
 
   std::cout << "Eta: " << state.Eta.rows() << ", " << state.Eta.cols() << std::endl;
 */
-  state.Eta.resize(card, state.Eta.cols());
+  // DA SISTEMARE INIZIALLIZZANDO OGNI VOLTA CORRETTAMENTE GLI ELEMENTI MANCANTI
+  if (state.Eta.rows() != card) {
+    state.Eta.resize(card, state.Eta.cols());
+    // PER ORA INIZIALIZZO COSI'
+    for (size_t i = 0; i < card; i++) {
+      for (size_t j = 0; j < state.Eta.cols(); j++) {
+        state.Eta(i, j) = stan::math::normal_rng(0, 1, rng);
+      }
+    }
+  }
   for (size_t i = 0; i < card; i++) {
     state.Eta.row(i) = (stan::math::multi_normal_rng(
         Sigmaeta * (state.Lambda.transpose()) * 
