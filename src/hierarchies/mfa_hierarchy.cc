@@ -195,7 +195,7 @@ void MFAHierarchy::sample_Eta() {
           .inverse());
 
   Eigen::MatrixXd temp(state.psi.cwiseInverse().asDiagonal());
-/*
+  /*
   std::cout << "Sigmaeta: " << Sigmaeta.rows() << ", " << Sigmaeta.cols() << std::endl;
   std::cout << "temp: " << temp.rows() << ", " << temp.cols() << std::endl;
   std::cout << "lambda: " << state.Lambda.rows() << ", " << state.Lambda.cols() << std::endl;
@@ -208,16 +208,19 @@ void MFAHierarchy::sample_Eta() {
             difference, Sigmaeta, rng) << std::endl;
 
   std::cout << "Eta: " << state.Eta.rows() << ", " << state.Eta.cols() << std::endl;
-*/
+  */
   // DA SISTEMARE INIZIALLIZZANDO OGNI VOLTA CORRETTAMENTE GLI ELEMENTI MANCANTI
   if (state.Eta.rows() != card) {
     state.Eta.resize(card, state.Eta.cols());
     // PER ORA INIZIALIZZO COSI'
+    /*
     for (size_t i = 0; i < card; i++) {
       for (size_t j = 0; j < state.Eta.cols(); j++) {
         state.Eta(i, j) = stan::math::normal_rng(0, 1, rng);
       }
     }
+    */
+    state.Eta = Eigen::MatrixXd::Zero(card, state.Eta.cols());
   }
   for (size_t i = 0; i < card; i++) {
     state.Eta.row(i) = (stan::math::multi_normal_rng(
@@ -241,10 +244,11 @@ void MFAHierarchy::sample_mu() {
   Eigen::VectorXd mumean =
       Sigmamu * (hypers->phi * hypers->mutilde +
                  Eigen::MatrixXd(state.psi.cwiseInverse().asDiagonal()) *
-                     (data_sum - Somma));
+                     data_sum);
 
   for (size_t i = 0; i < card; i++) {
-    Somma += state.Lambda * state.Eta.row(i);
+    Eigen::VectorXd riga = state.Eta.row(i);
+    Somma += state.Lambda * riga;
   }
 
   state.mu = stan::math::multi_normal_rng(mumean, Sigmamu, rng);
