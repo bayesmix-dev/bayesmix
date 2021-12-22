@@ -17,7 +17,7 @@
 
 build/run \
   examples/examples_mfa_hierarchy/in/algo.asciipb \
-  NNIG examples/examples_mfa_hierarchy/in/nnig_ngg.asciipb \
+  MFA examples/examples_mfa_hierarchy/in/nnig_ngg.asciipb \
   DP   examples/examples_mfa_hierarchy/in/dp_gamma.asciipb \
   examples/examples_mfa_hierarchy/out/chains.recordio \
   examples/examples_mfa_hierarchy/in/data.csv \

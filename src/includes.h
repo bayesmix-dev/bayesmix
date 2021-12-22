@@ -11,6 +11,7 @@
 #include "collectors/memory_collector.h"
 #include "hierarchies/lin_reg_uni_hierarchy.h"
 #include "hierarchies/load_hierarchies.h"
+#include "hierarchies/mfa_hierarchy.h"
 #include "hierarchies/nnig_hierarchy.h"
 #include "hierarchies/nnw_hierarchy.h"
 #include "mixings/dirichlet_mixing.h"
