@@ -9,8 +9,10 @@ endif()
 
 project(bayesmix)
 
-set(CMAKE_CXX_STANDARD 14)
+
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
+
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
@@ -35,7 +37,7 @@ find_package(TBB)
 find_package(Protobuf)
 if (NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
   if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
-    message(FATAL_ERROR 
+    message(FATAL_ERROR
             "Your cmake version is too old: either install a newer version (>=3.20)"
             " or install google's protocol buffer (protobuf) library by hand.")
   endif()
@@ -93,6 +95,7 @@ set(INCLUDE_PATHS
   ${protobuf_SOURCE_DIR}/src
 )
 
+
 set(LINK_LIBRARIES 
 	pthread 
 	protobuf::libprotobuf
@@ -148,10 +151,10 @@ add_library(bayesmixlib $<TARGET_OBJECTS:bayesmix>)
 
 if (BUILD_RUN)
   # Build run executable
-  add_executable(run $<TARGET_OBJECTS:bayesmix> run.cc)
-  target_include_directories(run PUBLIC ${INCLUDE_PATHS})
-  target_link_libraries(run PUBLIC ${LINK_LIBRARIES})
-  target_compile_options(run PUBLIC ${COMPILE_OPTIONS})
+  add_executable(run_mcmc $<TARGET_OBJECTS:bayesmix> run_mcmc.cc)
+  target_include_directories(run_mcmc PUBLIC ${INCLUDE_PATHS})
+  target_link_libraries(run_mcmc PUBLIC ${LINK_LIBRARIES})
+  target_compile_options(run_mcmc PUBLIC ${COMPILE_OPTIONS})
 endif()
 
 if (NOT DISABLE_TESTS)

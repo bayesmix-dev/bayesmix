@@ -7,7 +7,7 @@
 #include "src/utils/eigen_utils.h"
 
 int main(int argc, char *argv[]) {
-  std::cout << "Running dependent_run.cc" << std::endl;
+  std::cout << "Running dependent_run_mcmc.cc" << std::endl;
 
   // Get console parameters
   std::string algo_params_file = argv[1];
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
   bayesmix::write_matrix_to_file(dens, densfile);
   std::cout << "Successfully wrote densities to " << densfile << std::endl;
 
-  std::cout << "End of dependent_run.cc" << std::endl;
+  std::cout << "End of dependent_run_mcmc.cc" << std::endl;
   delete coll;
   return 0;
 }
