@@ -26,11 +26,13 @@ where P is either the Dirichlet process or the Pitman--Yor process
 
 **Warning**: make sure you have a recent version of `cmake` installed (at least 3.20.x) or install `protobuf` beforehand (see the section for developers)!
 
-To install and use `bayesmix`, please clone this repository with the following command-line instruction:
+To install and use `bayesmix`, please `cd` to the folder to which you wish to install it, and clone this repository with the following command-line instruction:
 
 ```shell
 git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
 ```
+
+Then, by using `cd bayesmix`, you will enter the newly downloaded folder.
 
 To build the executable for the main file `run_mcmc.cc`, please use the following list of commands:
 
