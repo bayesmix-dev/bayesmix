@@ -1,27 +1,13 @@
 #!/usr/bin/env bash
 
-# build/run \
-#   algorithm_settings_file \
-#   hierarchy_type  hierarchy_prior_file \
-#   mixing_type  mixing_prior_file \
-#   collector_name \
-#   data_file \
-#   grid_file \
-#   density_output_file \
-#   numclust_output_file \
-#   clustering_output_file \
-#   [hierarchy_covariates_file] \
-#   [hierarchy_grid_covariates_file] \
-#   [mixing_covariates_file] \
-#   [mixing_grid_covariates_file]
-
-build/run \
-  resources/tutorial/algo.asciipb \
-  NNIG resources/tutorial/nnig_ngg.asciipb \
-  DP   resources/tutorial/dp_gamma.asciipb \
-  resources/tutorial/out/chains.recordio \
-  resources/tutorial/data.csv \
-  resources/tutorial/grid.csv \
-  resources/tutorial/out/density_file.csv \
-  resources/tutorial/out/numclust.csv \
-  resources/tutorial/out/clustering.csv
+build/run_mcmc \
+  --algo-params-file resources/tutorial/algo.asciipb \
+  --hier-type NNIG --hier-args resources/tutorial/nnig_ngg.asciipb \
+  --mix-type DP --mix-args resources/tutorial/dp_gamma.asciipb \
+  --coll-name resources/tutorial/out/chains.recordio \
+  --data-file resources/tutorial/data.csv \
+  --grid-file resources/tutorial/grid.csv \
+  --dens-file resources/tutorial/out/density_file.csv \
+  --n-cl-file resources/tutorial/out/numclust.csv \
+  --clus-file resources/tutorial/out/clustering.csv \
+  #--best-clus-file resources/tutorial/out/best_clustering.csv

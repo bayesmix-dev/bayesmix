@@ -2,10 +2,10 @@ import os
 import sys
 import subprocess
 sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../python'))
+sys.path.insert(0, os.path.abspath('../python/bayesmixpy'))
 
-HOME_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-HOME_DIR = os.path.abspath(HOME_DIR)
-print("HOME_DIR: " + HOME_DIR)
 
 def configureDoxyfile(input_dir, output_dir):
     with open('Doxyfile.in', 'r') as file :
@@ -43,6 +43,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.mathjax',
+    'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.imgmath',
     'sphinx.ext.todo',

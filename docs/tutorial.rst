@@ -3,14 +3,14 @@ bayesmix/utils
 Tutorial - Univariate data
 ==========================
 
-You can run the ``examples/tutorial/run.sh`` script for a quick example on how to use the ``run.cc`` file.
+You can run the ``examples/tutorial/run.sh`` script for a quick example on how to use the ``run_mcmc.cc`` file.
 This example uses files which are available in the ``resources/tutorial`` subfolder.
 We recommend that you open and read these files for a better understanding of how the process works.
 The aforementioned script executes the following command:
 
 .. code-block:: shell
 
-  build/run \
+  build/run_mcmc \
     resources/tutorial/algo.asciipb \
     NNIG resources/tutorial/nnig_ngg.asciipb \
     DP   resources/tutorial/dp_gamma.asciipb \
@@ -26,7 +26,7 @@ In general, the pattern to use the executable is:
 
 .. code-block:: shell
 
-  build/run \
+  build/run_mcmc \
     algorithm_settings_file \
     hierarchy_type  hierarchy_prior_file \
     mixing_type  mixing_prior_file \
@@ -50,7 +50,7 @@ Due to the large number of parameters, it is recommended that such a command is 
 Arguments
 ---------
 
-The arguments which must be provided to the ``build/run`` executable are:
+The arguments which must be provided to the ``build/run_mcmc`` executable are:
 
 * ``algorithm_settings_file``: the text file that contains algorithm parameters, such as the actual algorithm to be used and the number of MCMC iterations
 * ``hierarchy_type``: the identifier for the type of hierarchy to be used. In the above case we use a Normal-Normal-InverseGamma (NNIG) hierarchy
@@ -75,7 +75,7 @@ The output of the program should look something like this:
 
 .. code-block:: shell
 
-  Running run.cc
+  Running run_mcmc.cc
   Initializing... Done
   Running Neal3 algorithm with NNIG hierarchies, DP mixing...
   [============================================================] 100% 0.157s
@@ -90,7 +90,7 @@ The output of the program should look something like this:
   [============================================================] 100% 0.056s
   Done
   Successfully wrote clustering to resources/tutorial/out/clustering.csv
-  End of run.cc
+  End of run_mcmc.cc
 
 This means that the output has been written into the indicated files.
 You can open them with your favorite CSV reader, or manipulate them with Python libraries in order to make plots, or whatever you wish.
