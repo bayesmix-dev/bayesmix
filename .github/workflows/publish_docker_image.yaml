@@ -28,7 +28,7 @@ jobs:
           context: .
           push: true
           file: docker/base/Dockerfile
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.metadata_base.outputs.tags }}
           labels: mberaha/bayesmix_base:latest
           
       - name: Extract metadata bayesmix_test repo
@@ -43,5 +43,5 @@ jobs:
           context: .
           push: true
           file: docker/test/Dockerfile
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.metadata_test.outputs.tags }}
           labels: mberaha/bayesmix_test:latest   
