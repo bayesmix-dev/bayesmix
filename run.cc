@@ -68,7 +68,9 @@ int main(int argc, char *argv[]) {
 
   // Read data matrices
   Eigen::MatrixXd data = bayesmix::read_eigen_matrix(datafile);
+  data.conservativeResize(data.rows(),data.cols()-1);
   Eigen::MatrixXd grid = bayesmix::read_eigen_matrix(gridfile);
+  grid.conservativeResize(grid.rows(),grid.cols()-1);
   Eigen::MatrixXd hier_cov_grid = Eigen::RowVectorXd(0);
   Eigen::MatrixXd mix_cov_grid = Eigen::RowVectorXd(0);
   if (hier->is_dependent()) {

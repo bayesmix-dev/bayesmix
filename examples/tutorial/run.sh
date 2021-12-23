@@ -17,7 +17,7 @@
 
 build/run \
   resources/tutorial/algo.asciipb \
-  NNIG resources/tutorial/nnig_ngg.asciipb \
+  MFA resources/tutorial/nnig_ngg.asciipb \
   DP   resources/tutorial/dp_gamma.asciipb \
   resources/tutorial/out/chains.recordio \
   resources/tutorial/data.csv \

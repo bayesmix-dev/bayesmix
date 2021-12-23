@@ -12,6 +12,8 @@
 #include "src/hierarchies/nnw_hierarchy.h"
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
+#include "src/includes.h"
+
 
 TEST(nnighierarchy, draw) {
   auto hier = std::make_shared<NNIGHierarchy>();
@@ -294,4 +296,59 @@ TEST(mfahierarchy, sample_given_data) {
   hier2->write_state_to_proto(clusval2);
 
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+}
+
+TEST(mfahierarchy, sample_full_cond) {
+  auto hier = std::make_shared<MFAHierarchy>();
+  bayesmix::MFAPrior prior;
+  Eigen::VectorXd mutilde(10);
+  mutilde << 1.1, 2.2, 3.1, 4.1, 4.8, 6.1, 6.9, 8.2, 9.0, 10.2;
+  bayesmix::Vector mutilde_proto;
+  bayesmix::to_proto(mutilde, &mutilde_proto);
+  int q = 5;
+  double phi = 1.0;
+  double alpha0 = 2.0;
+  Eigen::VectorXd beta(10);
+  beta << 1, 1, 1, 1, 1, 1 , 1, 1 ,1 ,1;
+  bayesmix::Vector beta_proto;
+  bayesmix::to_proto(beta, &beta_proto);
+  *prior.mutable_fixed_values()->mutable_mutilde() = mutilde_proto;
+  prior.mutable_fixed_values()->set_phi(phi);
+  prior.mutable_fixed_values()->set_alpha0(alpha0);
+  prior.mutable_fixed_values()->set_q(q);
+  *prior.mutable_fixed_values()->mutable_beta() = beta_proto;
+  hier->get_mutable_prior()->CopyFrom(prior);
+  hier->initialize();
+
+  Eigen::MatrixXd data = bayesmix::read_eigen_matrix("/home/giacomodecarlo/Desktop/bayesmix/examples/examples_mfa_hierarchy/in/data.csv");
+  data.conservativeResize(data.rows(),data.cols()-1);
+
+  for(unsigned int i = 0; i<data.rows(); i++){
+    Eigen::RowVectorXd row = data.row(i);
+    hier->add_datum(i, row, false);
+  }
+  
+  Eigen::MatrixXd musamplato(500,10);
+  Eigen::MatrixXd psisamplato(500,10);
+
+
+  for(unsigned int i = 0; i<500; i++){
+    hier->sample_full_cond();
+    MFA::State stato = hier->get_state();
+    psisamplato.row(i) = stato.psi;
+
+  }
+
+  bayesmix::write_matrix_to_file(psisamplato, "/home/giacomodecarlo/Desktop/bayesmix/examples/examples_mfa_hierarchy/out/psisamplato.csv");
+
+  std::cout << musamplato << std::endl;
+
+
+
+
+
+
+
+
+  //ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }

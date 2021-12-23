@@ -172,15 +172,10 @@ void MFAHierarchy::sample_full_cond(bool update_params) {
     // No posterior update possible
     sample_prior();
   } else {
-    std::cout << "Eta" << std::endl;
     sample_Eta();
-    std::cout << "mu" << std::endl;
     sample_mu();
-    std::cout << "psi" << std::endl;
     sample_psi();
-    std::cout << "lambda" << std::endl;
     sample_Lambda();
-    std::cout << "end" << std::endl;
   }
 }
 
@@ -238,7 +233,7 @@ void MFAHierarchy::sample_mu() {
       (hypers->phi * Eigen::MatrixXd::Identity(p, p) +
 
        card *
-           Eigen::MatrixXd(state.psi.cwiseInverse().asDiagonal()).inverse());
+           Eigen::MatrixXd(state.psi.cwiseInverse().asDiagonal())).inverse();
 
   Eigen::VectorXd Somma = Eigen::VectorXd::Zero(p);
 
@@ -246,7 +241,7 @@ void MFAHierarchy::sample_mu() {
     Eigen::VectorXd riga = state.Eta.row(i);
     Somma += state.Lambda * riga;
   }
-
+  //std::cout << "Somma dei dati"<< Somma << "Fine"<< std::endl;
   Eigen::VectorXd mumean =
       Sigmamu * (hypers->phi * hypers->mutilde +
                  Eigen::MatrixXd(state.psi.cwiseInverse().asDiagonal()) *
