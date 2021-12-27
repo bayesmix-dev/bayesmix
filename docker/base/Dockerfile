@@ -3,8 +3,6 @@ FROM mberaha/bayesmix-env:latest
 COPY . /usr/bayesmix
 WORKDIR /usr/bayesmix
 
-RUN python3 build_tbb.py --rebuild=True
-
 RUN rm -rf build_
 
 RUN mkdir build_ && cd build_ && cmake -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON .. && make test_bayesmix
