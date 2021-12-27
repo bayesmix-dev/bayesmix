@@ -9,4 +9,6 @@ target_sources(bayesmix
     nnig_hierarchy.cc
     nnw_hierarchy.h
     nnw_hierarchy.cc
+    nnxig_hierarchy.h
+    nnxig_hierarchy.cc
 )
