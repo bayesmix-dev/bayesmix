@@ -1,0 +1,15 @@
+ngg_prior {
+  mean_prior {
+    mean: 5.5
+    scale: 2.25
+  }
+  var_scaling_prior {
+    shape: 0.2
+    rate: 0.6
+  }
+  shape: 1.5
+  scale_prior {
+    shape: 4.0
+    rate: 2.0
+  }
+}
