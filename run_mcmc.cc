@@ -22,7 +22,7 @@ bool check_args(argparse::ArgumentParser args) {
   if (args["--coll-name"] != std::string("memory")) {
     check_file_is_writeable(args.get<std::string>("--coll-name"));
   }
-  if (args["--grid-file"] != std::string("\"\"")) {
+  if (args["--dens-file"] != std::string("\"\"")) {
     check_file_is_writeable(args.get<std::string>("--dens-file"));
   }
   if (args["--n-cl-file"] != std::string("\"\"")) {
@@ -30,6 +30,9 @@ bool check_args(argparse::ArgumentParser args) {
   }
   if (args["--clus-file"] != std::string("\"\"")) {
     check_file_is_writeable(args.get<std::string>("--clus-file"));
+  }
+  if (args["--best-clus-file"] != std::string("\"\"")) {
+    check_file_is_writeable(args.get<std::string>("--best-clus-file"));
   }
 
   return true;
