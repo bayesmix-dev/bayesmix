@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
   args.add_argument("--grid-file")
       .default_value(std::string("\"\""))
       .help(
-          "(Optional) Path to a csv file containin a grid of points where to "
+          "(Optional) Path to a csv file containing a grid of points where to "
           "evaluate the (log) predictive density");
 
   args.add_argument("--dens-file")
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
       .default_value(std::string("\"\""))
       .help(
           "(Optional) Where to store the best cluster allocation found by "
-          "minimizing the Binder loss funciton over the visited partitions");
+          "minimizing the Binder loss function over the visited partitions");
 
   args.add_argument("--hier-cov-file")
       .default_value(std::string("\"\""))
@@ -202,7 +202,8 @@ int main(int argc, char *argv[]) {
   // Run algorithm
   algo->run(coll);
 
-  if (args["--grid-file"] != std::string("\"\"")) {
+  if (args["--grid-file"] != std::string("\"\"") &&
+      args["--dens-file"] != std::string("\"\"")) {
     Eigen::MatrixXd grid =
         bayesmix::read_eigen_matrix(args.get<std::string>("--grid-file"));
     Eigen::MatrixXd hier_cov_grid = Eigen::RowVectorXd(0);
