@@ -16,7 +16,7 @@ void LapNIGHierarchy::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast = downcast_state(state_);
   state.mean = statecast.uni_ls_state().mean();
-  state.scale = statecast.uni_ls_state().scale();
+  state.scale = statecast.uni_ls_state().var(); // ??? changed from scale to var
   set_card(statecast.cardinality());
 }
 
@@ -32,17 +32,6 @@ void LapNIGHierarchy::set_hypers_from_proto(
 double LapNIGHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
   return stan::math::double_exponential_lpdf(datum(0), state.mean,
                                              state.scale);
-}
-
-
-void LapNIGHierarchy::update_summary_statistics(const Eis
-                                                bool add) {
-  if (add) {
-    cluster_data_values.insert(datum);
-  } else {
-    auto it = cluster_data_values.find(datum);
-    cluster_data_values.erase(it);
-  }
 }
 
 std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
@@ -244,12 +233,12 @@ void LapNIGHierarchy::update_summary_statistics(const Eigen::RowVectorXd &datum,
                                               bool add) {
   if (add) {
 
-    cluster_data_values.insert(datum); // add the datum to cluster_data_values, needed to compute the full_cond
+    cluster_data_values.push_back(datum); // add the datum to cluster_data_values, needed to compute the full_cond
 
   } else {
 
-    auto it = cluster_data_values.find(datum);
-    cluster_data_values.erase(it);
+    auto it = std::find(cluster_data_values.begin(), cluster_data_values.end(), datum);
+    cluster_data_values.erase(it);  // SLOW !!
 
   }
 }
@@ -259,7 +248,8 @@ void LapNIGHierarchy::sample_full_cond(bool update_params) {
 
   if (this->card == 0) {
     // No posterior update possible
-    static_cast<Derived *>(this)->sample_prior();
+    //static_cast<Derived *>(this)->sample_prior(); //?? need to think about this
+    this->sample_prior();
 
   } else {
 
@@ -267,10 +257,10 @@ void LapNIGHierarchy::sample_full_cond(bool update_params) {
       auto &rng = bayesmix::Rng::Instance().get();
 
       // Candidate mean and candidate log_scale
-      double candidate_mean = state.mean + stan::math::normal_rng(0,sqrt(2*params.var_scaling), rng);
+      double candidate_mean = state.mean + stan::math::normal_rng(0,sqrt(2*hypers->var_scaling), rng);
       double candidate_log_scale = std::log(state.scale) +
-                                   stan::math::normal_rng(0,sqrt(2*std::log(params.scale*params.scale/
-                                                                  (params.shape-1)*(params.shape-1)*(params.shape-2))), rng);
+                                   stan::math::normal_rng(0,sqrt(2*std::log(hypers->scale*hypers->scale/
+                                                                  (hypers->shape-1)*(hypers->shape-1)*(hypers->shape-2))), rng);
       double candidate_scale = std::exp(candidate_log_scale);
 
       //MH step
@@ -284,11 +274,11 @@ void LapNIGHierarchy::sample_full_cond(bool update_params) {
 
       pi_candidate = 1 / 2 / candidate_scale *
                 std::exp(-1 / 2 / candidate_scale * candidate_sum) *
-                std::exp(-1 / 2 / params.var_scaling / params.var_scaling *
-                         (candidate_mean - params.mean) *
-                         (candidate_mean - params.mean)) *
-                std::pow(1 / candidate_scale, params.shape + 2) *
-                std::exp(-params.scale / candidate_scale);
+                std::exp(-1 / 2 / hypers->var_scaling / hypers->var_scaling *
+                         (candidate_mean - hypers->mean) *
+                         (candidate_mean - hypers->mean)) *
+                std::pow(1 / candidate_scale, hypers->shape + 2) *
+                std::exp(-hypers->scale / candidate_scale);
 
       double current_sum = 0; // Sum of absolute values of data - candidate_mean
 
@@ -300,9 +290,9 @@ void LapNIGHierarchy::sample_full_cond(bool update_params) {
         current_sum += std::abs(elem(0,0) - current_mean); // MODIFY IN THE FUTURE FOR MULTIVARIATE CASE!!!
       }
       pi_current = 1/2/current_scale * std::exp(-1/2/current_scale*current_sum) *
-                std::exp(-1/2/params.var_scaling/params.var_scaling
-                         *(current_mean-params.mean)*(current_mean-params.mean))*
-                std::pow(1/current_scale,params.shape+2) * std::exp(-params.scale/current_scale);
+                std::exp(-1/2/hypers->var_scaling/hypers->var_scaling
+                         *(current_mean-hypers->mean)*(current_mean-hypers->mean))*
+                std::pow(1/current_scale,hypers->shape+2) * std::exp(-hypers->scale/current_scale);
 
       double alpha;
       alpha = std::min<double>((pi_candidate / pi_current), 1);

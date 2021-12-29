@@ -78,19 +78,6 @@ class LapNIGHierarchy
   std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
       const override;
 
-  //! Writes current state to a Protobuf message and return a shared_ptr
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! AlgoritmState::ClusterState message by adding the appropriate type
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
-      const override;
-
-  //! Writes current value of hyperparameters to a Protobuf message and
-  //! return a shared_ptr.
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! AlgoritmState::HierarchyHypers message by adding the appropriate type
-  std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
-      const override;
-
   //! Resets summary statistics for this cluster
   void clear_summary_statistics() override;
 
@@ -121,7 +108,8 @@ class LapNIGHierarchy
   double data_sum_squares = 0;
 
   //! Set of values of data points belonging to this cluster
-  std::set<Eigen::RowVectorXd> cluster_data_values;
+  std::vector<Eigen::RowVectorXd> cluster_data_values;
+  //std::set<Eigen::RowVectorXd> cluster_data_values;
   //std::set<double> cluster_data_values;
 
 
