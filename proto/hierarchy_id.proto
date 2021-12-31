@@ -10,4 +10,5 @@ enum HierarchyId {
     NNIG = 1; // Normal - Normal Inverse Gamma
     NNW = 2; // Normal - Normal Wishart
     LinRegUni = 3; // Linear Regression (univariate response)
+    NNxIG = 4; // Normal - Normal x Inverse Gamma
 }
