@@ -1,5 +1,7 @@
 bayesmix/protos
 
+.. _protos:
+
 Protos
 ======
 
