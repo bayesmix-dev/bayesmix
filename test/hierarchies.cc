@@ -10,10 +10,9 @@
 #include "src/hierarchies/mfa_hierarchy.h"
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/hierarchies/nnw_hierarchy.h"
+#include "src/includes.h"
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
-#include "src/includes.h"
-
 
 TEST(nnighierarchy, draw) {
   auto hier = std::make_shared<NNIGHierarchy>();
@@ -309,7 +308,7 @@ TEST(mfahierarchy, sample_full_cond) {
   double phi = 1.0;
   double alpha0 = 2.0;
   Eigen::VectorXd beta(10);
-  beta << 1, 1, 1, 1, 1, 1 , 1, 1 ,1 ,1;
+  beta << 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
   bayesmix::Vector beta_proto;
   bayesmix::to_proto(beta, &beta_proto);
   *prior.mutable_fixed_values()->mutable_mutilde() = mutilde_proto;
@@ -320,35 +319,28 @@ TEST(mfahierarchy, sample_full_cond) {
   hier->get_mutable_prior()->CopyFrom(prior);
   hier->initialize();
 
-  Eigen::MatrixXd data = bayesmix::read_eigen_matrix("/home/giacomodecarlo/Desktop/bayesmix/examples/examples_mfa_hierarchy/in/data.csv");
-  data.conservativeResize(data.rows(),data.cols()-1);
+  Eigen::MatrixXd data =
+      bayesmix::read_eigen_matrix("../examples/mfa_hierarchy/in/data.csv");
+  data.conservativeResize(data.rows(), data.cols() - 1);
 
-  for(unsigned int i = 0; i<data.rows(); i++){
+  for (unsigned int i = 0; i < data.rows(); i++) {
     Eigen::RowVectorXd row = data.row(i);
     hier->add_datum(i, row, false);
   }
-  
-  Eigen::MatrixXd musamplato(500,10);
-  Eigen::MatrixXd psisamplato(500,10);
 
+  Eigen::MatrixXd musamplato(500, 10);
+  Eigen::MatrixXd psisamplato(500, 10);
 
-  for(unsigned int i = 0; i<500; i++){
+  for (unsigned int i = 0; i < 500; i++) {
     hier->sample_full_cond();
     MFA::State stato = hier->get_state();
     psisamplato.row(i) = stato.psi;
-
   }
 
-  bayesmix::write_matrix_to_file(psisamplato, "/home/giacomodecarlo/Desktop/bayesmix/examples/examples_mfa_hierarchy/out/psisamplato.csv");
+  bayesmix::write_matrix_to_file(
+      psisamplato, "../examples/mfa_hierarchy/out/psisamplato.csv");
 
   std::cout << musamplato << std::endl;
 
-
-
-
-
-
-
-
-  //ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+  // ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
