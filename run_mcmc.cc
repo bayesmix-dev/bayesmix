@@ -204,7 +204,6 @@ int main(int argc, char *argv[]) {
 
   // Run algorithm
   algo->run(coll);
-  std::cout << "Algo" << std::endl;
   if (args["--grid-file"] != std::string("\"\"") &&
       args["--dens-file"] != std::string("\"\"")) {
     Eigen::MatrixXd grid =

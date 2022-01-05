@@ -41,7 +41,6 @@ void Neal8Algorithm::print_startup_message() const {
 void Neal8Algorithm::sample_allocations() {
   // Initialize relevant values
   unsigned int n_data = data.rows();
-
   auto &rng = bayesmix::Rng::Instance().get();
 
   // Loop over data points
@@ -66,11 +65,9 @@ void Neal8Algorithm::sample_allocations() {
     for (size_t j = singleton; j < n_aux; j++) {
       aux_unique_values[j]->sample_prior();
     }
-
     // Compute probabilities of clusters in log-space
     Eigen::VectorXd logprobas =
         get_cluster_prior_mass(i) + get_cluster_lpdf(i);
-
     // Draw a NEW value for datum allocation
     unsigned int c_new =
         bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
