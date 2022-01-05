@@ -1,1 +1,4 @@
-target_sources(bayesmix PUBLIC factory.h)
+target_sources(bayesmix
+  PUBLIC
+    factory.h
+)

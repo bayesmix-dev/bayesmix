@@ -1,4 +1,4 @@
-#Bayesian Hierarchical Models : a Curiously Recurring Template Pattern approach
+# Bayesian Hierarchical Models: a Curiously Recurring Template Pattern approach
 
 ## Overview: mixture models
 
