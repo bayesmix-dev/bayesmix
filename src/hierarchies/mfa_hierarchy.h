@@ -20,7 +20,8 @@ namespace MFA {
 //! Custom container for State values
 struct State {
   Eigen::VectorXd mu, psi;
-  Eigen::MatrixXd Eta, Lambda;
+  Eigen::MatrixXd eta, lambda;
+  Eigen::MatrixXd psi_inverse;
 };
 
 //! Custom container for Hyperparameters values
@@ -106,13 +107,13 @@ class MFAHierarchy
   //! Initializes hierarchy hyperparameters to appropriate values
   void initialize_hypers() override;
 
-  void sample_Eta();
+  void sample_eta();
 
   void sample_mu();
 
   void sample_psi();
 
-  void sample_Lambda();
+  void sample_lambda();
 
   //! Sum of data points currently belonging to the cluster
   Eigen::VectorXd data_sum;
