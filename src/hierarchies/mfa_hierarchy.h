@@ -107,19 +107,23 @@ class MFAHierarchy
   //! Initializes hierarchy hyperparameters to appropriate values
   void initialize_hypers() override;
 
+  //! Gibbs sampling step for state variable eta
   void sample_eta();
 
+  //! Gibbs sampling step for state variable mu
   void sample_mu();
 
+  //! Gibbs sampling step for state variable psi
   void sample_psi();
 
+  //! Gibbs sampling step for state variable lambda
   void sample_lambda();
 
   //! Sum of data points currently belonging to the cluster
   Eigen::VectorXd data_sum;
 
-  //! Number of initial variables
-  size_t p;
+  //! Number of variables for each datum
+  size_t dim;
 
   //! Vector of data points currently belonging to the cluster
   std::vector<Eigen::VectorXd> data;

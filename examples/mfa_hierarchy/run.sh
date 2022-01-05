@@ -28,7 +28,7 @@
 
   build/run_mcmc \
   --algo-params-file examples/mfa_hierarchy/in/algo.asciipb \
-  --hier-type MFA --hier-args examples/mfa_hierarchy/in/nnig_ngg.asciipb \
+  --hier-type MFA --hier-args examples/mfa_hierarchy/in/mfa.asciipb \
   --mix-type DP --mix-args examples/mfa_hierarchy/in/dp_gamma.asciipb \
   --coll-name examples/mfa_hierarchy/out/chains.recordio \
   --data-file examples/mfa_hierarchy/in/data.csv \

@@ -321,7 +321,6 @@ TEST(mfahierarchy, sample_full_cond) {
 
   Eigen::MatrixXd data =
       bayesmix::read_eigen_matrix("../examples/mfa_hierarchy/in/data.csv");
-  data.conservativeResize(data.rows(), data.cols() - 1);
 
   for (unsigned int i = 0; i < data.rows(); i++) {
     Eigen::RowVectorXd row = data.row(i);
@@ -337,10 +336,10 @@ TEST(mfahierarchy, sample_full_cond) {
     psisamplato.row(i) = stato.psi;
   }
 
-  bayesmix::write_matrix_to_file(
-      psisamplato, "../examples/mfa_hierarchy/out/psisamplato.csv");
+  //bayesmix::write_matrix_to_file(
+    //  psisamplato, "../examples/mfa_hierarchy/out/psisamplato.csv");
 
-  std::cout << musamplato << std::endl;
+  //std::cout << musamplato << std::endl;
 
   // ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
