@@ -25,7 +25,7 @@ def build_bayesmix(nproc=1):
     build_dir = os.path.join(BAYESMIX_HOME, 'build')
     os.makedirs(build_dir, exist_ok=True)
     cmake_cmd = "cmake .. -DDISABLE_DOCS=TRUE -DDISABLE_BENCHMARKS=TRUE " + \
-        "-DDISABLE_TESTS=TRUE"
+        "-DDISABLE_TESTS=TRUE -DCMAKE_BUILD_TYPE=Release"
     try:
         run_shell(cmake_cmd, cwd=build_dir)
     except subprocess.CalledProcessError as e:
@@ -34,7 +34,7 @@ def build_bayesmix(nproc=1):
               " been installed!")
         return
 
-    run_cmd = "make run -j{}".format(nproc)
+    run_cmd = "make run_mcmc -j{}".format(nproc)
     try:
         run_shell(run_cmd, cwd=build_dir)
     except subprocess.CalledProcessError as e:
@@ -44,7 +44,7 @@ def build_bayesmix(nproc=1):
         return
 
     print("Bayesmix executable is in '{0}', \nexport the environment"
-           " variable BAYESMIX_EXE={0}/{1}".format(build_dir, "run"))
+           " variable BAYESMIX_EXE={0}/{1}".format(build_dir, "run_mcmc"))
     return True
 
 if __name__ == '__main__':
