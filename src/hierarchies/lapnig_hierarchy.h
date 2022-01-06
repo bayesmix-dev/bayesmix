@@ -30,7 +30,7 @@ struct Hyperparams {
 
 class LapNIGHierarchy
     : public BaseHierarchy<LapNIGHierarchy, LapNIG::State, LapNIG::Hyperparams,
-                           bayesmix::NNIGPrior> { // Prior ? //
+                           bayesmix::LapNIGPrior> { // Prior ? //
  public:
   LapNIGHierarchy() = default;
   ~LapNIGHierarchy() = default;

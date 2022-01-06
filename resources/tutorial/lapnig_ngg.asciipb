@@ -1,7 +1,7 @@
 ngg_prior {
   mean_prior {
     mean: 5.5
-    scale: 2.25
+    var: 2.25
   }
   var_scaling_prior {
     shape: 0.2

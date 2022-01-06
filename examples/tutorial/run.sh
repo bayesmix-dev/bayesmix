@@ -17,7 +17,7 @@
 
 build/run \
   resources/tutorial/algo.asciipb \
-  LapNIG resources/tutorial/lapnig_ngg.asciipb \
+  LapNIG resources/tutorial/lapnig_fixed.asciipb \
   DP   resources/tutorial/dp_gamma.asciipb \
   resources/tutorial/out/chains.recordio \
   resources/tutorial/data.csv \
