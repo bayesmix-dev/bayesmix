@@ -21,6 +21,7 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/bayesmix/lib/math/lib/tbb/
 
 ENV BAYESMIX_EXE=build_/run_mcmc
 WORKDIR /usr/bayesmix/python
+RUN python3 -m pip install .
 RUN ls
 RUN ls tests
 CMD ["pytest"]
