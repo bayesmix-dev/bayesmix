@@ -20,10 +20,8 @@ RUN cd build_ && cmake -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON .. && make test
 RUN cd build_ && make run_mcmc
 
 ENV BAYESMIX_EXE=/usr/bayesmix/build_/run_mcmc
-WORKDIR /usr/bayesmix/python
-RUN python3 -m pip install .
-RUN ls
-RUN ls tests
-CMD ["pytest"]
+RUN cd python && python3 -m pip install .
+
+CMD ["./build_/test/test_bayesmix; pytest python"]
 
 LABEL Name=test_bayesmix Version=0.0.1
