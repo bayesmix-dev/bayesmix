@@ -16,11 +16,13 @@ RUN python3 -m pip install pytest
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/bayesmix/lib/math/lib/tbb/
 
-RUN cd build_ && cmake -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON .. && make test_bayesmix
-RUN cd build_ && make run_mcmc
+# RUN cd build_ && cmake -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON .. && make test_bayesmix
+# RUN cd build_ && make run_mcmc
 
 ENV BAYESMIX_EXE=build_/run_mcmc
-WORKDIR /usr/bayesmix/python;
+WORKDIR /usr/bayesmix/python
+RUN ls
+RUN ls tests
 CMD ["pytest"]
 
 
