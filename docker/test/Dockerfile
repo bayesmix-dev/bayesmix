@@ -1,14 +1,14 @@
 FROM mberaha/bayesmix-base
 
-# COPY cmake /usr/bayesmix/cmake
-# COPY proto /usr/bayesmix/proto
-# COPY resources /usr/bayesmix/resources
-# COPY src /usr/bayesmix/src
-# COPY test /usr/bayesmix/test
+COPY cmake /usr/bayesmix/cmake
+COPY proto /usr/bayesmix/proto
+COPY resources /usr/bayesmix/resources
+COPY src /usr/bayesmix/src
+COPY test /usr/bayesmix/test
 COPY python /usr/bayesmix/python
-# COPY CMakeLists.txt /usr/bayesmix/CMakeLists.txt
-# COPY lib/argparse /usr/bayesmix/lib/argparse
-# COPY *.cc /usr/bayesmix/
+COPY CMakeLists.txt /usr/bayesmix/CMakeLists.txt
+COPY lib/argparse /usr/bayesmix/lib/argparse
+COPY *.cc /usr/bayesmix/
 
 WORKDIR /usr/bayesmix
 
@@ -16,17 +16,14 @@ RUN python3 -m pip install pytest
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/bayesmix/lib/math/lib/tbb/
 
-# RUN cd build_ && cmake -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON .. && make test_bayesmix
-# RUN cd build_ && make run_mcmc
+RUN cd build_ && cmake -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON .. && make test_bayesmix
+RUN cd build_ && make run_mcmc
 
 ENV BAYESMIX_EXE=build_/run_mcmc
 WORKDIR /usr/bayesmix/python
 RUN python3 -m pip install .
 RUN ls
 RUN ls tests
-CMD ["pytest"]
-
-
-# CMD ["./build_/test/test_bayesmix; cd python; BAYESMIX_EXE=../build_/run_mcmc pytest"]
+CMD ["pytest; cd /usr/bayesmix; ./_build_/test/test_bayesmix"]
 
 LABEL Name=test_bayesmix Version=0.0.1

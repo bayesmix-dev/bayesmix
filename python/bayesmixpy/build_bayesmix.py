@@ -9,7 +9,7 @@ path = pathlib.Path(HERE)
 BAYESMIX_HOME = path.resolve().parents[1]
 
 
-def build_bayesmix(nproc=1):
+def build_bayesmix(nproc=1, build_dirname="build"):
     """
     Builds the BayesMix executable. After the build, if no error has occurred,
     it prints out the path to the executable. Save the path into the environment
@@ -22,7 +22,7 @@ def build_bayesmix(nproc=1):
         Number of processes to use for parallel compilation.
     """
     print("Building the Bayesmix executable")
-    build_dir = os.path.join(BAYESMIX_HOME, 'build')
+    build_dir = os.path.join(BAYESMIX_HOME, build_dirname)
     os.makedirs(build_dir, exist_ok=True)
     cmake_cmd = "cmake .. -DDISABLE_DOCS=TRUE -DDISABLE_BENCHMARKS=TRUE " + \
         "-DDISABLE_TESTS=TRUE -DCMAKE_BUILD_TYPE=Release"
