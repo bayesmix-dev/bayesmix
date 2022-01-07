@@ -5,6 +5,7 @@ COPY proto /usr/bayesmix/proto
 COPY resources /usr/bayesmix/resources
 COPY src /usr/bayesmix/src
 COPY test /usr/bayesmix/test
+COPY python /usr/bayesmix/python
 COPY CMakeLists.txt /usr/bayesmix/CMakeLists.txt
 COPY lib/argparse /usr/bayesmix/lib/argparse
 COPY *.cc /usr/bayesmix/
