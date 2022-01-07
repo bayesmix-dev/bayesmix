@@ -24,6 +24,6 @@ WORKDIR /usr/bayesmix/python
 RUN python3 -m pip install .
 RUN ls
 RUN ls tests
-CMD ["pytest; cd /usr/bayesmix; ./_build_/test/test_bayesmix"]
+CMD ["pytest"]
 
 LABEL Name=test_bayesmix Version=0.0.1
