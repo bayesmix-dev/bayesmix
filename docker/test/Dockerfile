@@ -11,7 +11,7 @@ COPY *.cc /usr/bayesmix/
 
 WORKDIR /usr/bayesmix
 
-RUN ls lib/
+RUN python3 -m pip install pytest
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/bayesmix/lib/math/lib/tbb/
 
