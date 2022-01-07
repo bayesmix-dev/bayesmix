@@ -38,8 +38,8 @@ def test_run_mcmc():
     grid = get_grid()
 
     eval_dens, nclus, clus, best_clus = run_mcmc(
-            "NNIG", "DP", data, GO_PARAMS, DP_PARAMS, 
-            ALGO_PARAMS, grid, return_clusters=False, 
+            "NNIG", "DP", data, GO_PARAMS, DP_PARAMS,
+            ALGO_PARAMS, grid, return_clusters=False,
             return_num_clusters=False, return_best_clus=False)
 
     assert eval_dens.shape[0] == 5
@@ -49,8 +49,8 @@ def test_run_mcmc():
     assert best_clus is None
 
     eval_dens, nclus, clus, best_clus = run_mcmc(
-            "NNIG", "DP", data, GO_PARAMS, DP_PARAMS, 
-            ALGO_PARAMS, None, return_clusters=False, 
+            "NNIG", "DP", data, GO_PARAMS, DP_PARAMS,
+            ALGO_PARAMS, None, return_clusters=False,
             return_num_clusters=True, return_best_clus=False)
 
     assert eval_dens is None
@@ -60,8 +60,8 @@ def test_run_mcmc():
     assert best_clus is None
 
     eval_dens, nclus, clus, best_clus = run_mcmc(
-            "NNIG", "DP", data, GO_PARAMS, DP_PARAMS, 
-            ALGO_PARAMS, None, return_clusters=True, 
+            "NNIG", "DP", data, GO_PARAMS, DP_PARAMS,
+            ALGO_PARAMS, None, return_clusters=True,
             return_num_clusters=False, return_best_clus=False)
 
     assert eval_dens is None
@@ -72,8 +72,8 @@ def test_run_mcmc():
     assert best_clus is None
 
     eval_dens, nclus, clus, best_clus = run_mcmc(
-            "NNIG", "DP", data, GO_PARAMS, DP_PARAMS, 
-            ALGO_PARAMS, None, return_clusters=False, 
+            "NNIG", "DP", data, GO_PARAMS, DP_PARAMS,
+            ALGO_PARAMS, None, return_clusters=False,
             return_num_clusters=False, return_best_clus=True)
 
     assert eval_dens is None
@@ -81,4 +81,3 @@ def test_run_mcmc():
     assert clus is None
     assert best_clus is not None
     assert len(best_clus) == len(data)
-
