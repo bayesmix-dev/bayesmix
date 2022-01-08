@@ -22,6 +22,4 @@ RUN cd build_ && make run_mcmc
 ENV BAYESMIX_EXE=/usr/bayesmix/build_/run_mcmc
 RUN cd python && python3 -m pip install .
 
-CMD ["./build_/test/test_bayesmix; pytest python"]
-
 LABEL Name=test_bayesmix Version=0.0.1
