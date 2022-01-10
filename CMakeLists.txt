@@ -169,4 +169,10 @@ if (NOT DISABLE_DOCS)
   add_subdirectory(docs)
 endif()
 
-add_subdirectory(examples)
+if (NOT DISABLE_PLOTS)
+  add_subdirectory(plots)
+endif()
+
+if (NOT DISABLE_EXAMPLES)
+  add_subdirectory(examples)
+endif()
