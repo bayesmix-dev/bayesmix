@@ -10,19 +10,16 @@ int main(int argc, char const *argv[]) {
       .required()
       .help(
           "Path to a .csv file containing the grid of points (one per row) "
-          "on which the (log) predictive density has been evaluated");
+          "on which the log-density has been evaluated");
 
   args.add_argument("--dens-file")
       .required()
       .help(
-          "Path to a .csv file containing the evaluations of the (log) "
-          "predictive density");
+          "Path to a .csv file containing the evaluations of the log-density");
 
-  args.add_argument("--dens-file")
-      .default_value(std::string("\"\""))
-      .help(
-          "(Optional) Where to store the output of the (log) predictive "
-          "density");
+  // args.add_argument("--dens-file")
+  //     .default_value(std::string("\"\""))
+  //     .help("...");
 
   try {
     args.parse_args(argc, argv);
@@ -33,5 +30,20 @@ int main(int argc, char const *argv[]) {
   }
 
   std::cout << "Running plot_mcmc.cc" << std::endl;
+
+  // Read relevant matrices
+  std::cout << "Reading " << args.get<std::string>("--grid-file") << "..."
+            << std::endl;
+  Eigen::MatrixXd grid =
+      bayesmix::read_eigen_matrix(args.get<std::string>("--grid-file"));
+  std::cout << "Reading " << args.get<std::string>("--dens-file") << "..."
+            << std::endl;
+  Eigen::MatrixXd dens =
+      bayesmix::read_eigen_matrix(args.get<std::string>("--dens-file"));
+
+  // Go from log-density to density
+  std::cout << "Turning log-density into density..." << std::endl;
+  dens = dens.array().exp();
+
   std::cout << "End of plot_mcmc.cc" << std::endl;
 }
