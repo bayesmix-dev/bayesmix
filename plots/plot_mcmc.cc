@@ -44,6 +44,7 @@ int main(int argc, char const *argv[]) {
   // Go from log-density to density
   std::cout << "Turning log-density into density..." << std::endl;
   dens = dens.array().exp();
+  // TODO get mean of resulting matrix
 
   std::cout << "End of plot_mcmc.cc" << std::endl;
 }
