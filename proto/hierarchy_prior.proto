@@ -38,31 +38,14 @@ message NNIGPrior {
 
 message LapNIGState {
     double mean = 1;
-    double var_scaling = 2;
+    double var = 2;
     double shape = 3;
     double scale = 4;
 }
 
 message LapNIGPrior {
-
-  message NormalMeanPrior {
-    UniNormalDistribution mean_prior = 1;
-    double var_scaling = 2;
-    double shape = 3;
-    double scale = 4;
-  }
-
-  message NGGPrior {
-    UniNormalDistribution mean_prior = 1;
-    GammaDistribution var_scaling_prior = 2;
-    double shape = 3;
-    GammaDistribution scale_prior = 4;
-  }
-
   oneof prior {
     LapNIGState fixed_values = 1;
-    NormalMeanPrior normal_mean_prior = 2;
-    NGGPrior ngg_prior = 3;
   }
 }
 

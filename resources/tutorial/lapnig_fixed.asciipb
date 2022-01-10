@@ -1,6 +1,6 @@
 fixed_values {
-  mean: 5.5
-  var_scaling:3
-  shape: 1.5
-  scale:2
+  mean: 25
+  var:20
+  shape:2
+  scale:1
 }

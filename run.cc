@@ -96,13 +96,23 @@ int main(int argc, char *argv[]) {
     algo->set_mix_covariates(mix_cov);
   }
 
+
   // Run algorithm and density evaluation
   algo->run(coll);
+
+  //
+  if (hier_type == "LapNIG") {
+    std::cout << "Acceptance rate of the MH: "
+              << (float) LapNIGHierarchy::accepted_/LapNIGHierarchy::iter_
+              << std::endl;
+  }
+
   std::cout << "Computing log-density..." << std::endl;
   Eigen::MatrixXd dens =
       algo->eval_lpdf(coll, grid, hier_cov_grid, mix_cov_grid);
   bayesmix::write_matrix_to_file(dens, densfile);
   std::cout << "Successfully wrote density to " << densfile << std::endl;
+
 
   // Collect mixing and cluster states
   Eigen::MatrixXd clusterings(coll->get_size(), data.rows());

@@ -29,6 +29,7 @@ message AlgorithmState {
       NNIGState nnig_state = 2;
       NNWState nnw_state = 3;
       LinRegUniState lin_reg_uni_state = 4;
+      LapNIGState lapnig_state = 5;
     }
   }
   HierarchyHypers hierarchy_hypers = 5;

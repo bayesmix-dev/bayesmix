@@ -23,7 +23,7 @@ struct State {
 
 //! Custom container for Hyperparameters values
 struct Hyperparams {
-  double mean, var_scaling, shape, scale;
+  double mean, var, shape, scale;
 };
 }
 
@@ -32,9 +32,12 @@ class LapNIGHierarchy
     : public BaseHierarchy<LapNIGHierarchy, LapNIG::State, LapNIG::Hyperparams,
                            bayesmix::LapNIGPrior> { // Prior ? //
  public:
+  //! Counters for tracking acceptance rate in MH step
+  static unsigned int accepted_;
+  static unsigned int iter_;
+
   LapNIGHierarchy() = default;
   ~LapNIGHierarchy() = default;
-
   //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::LapNIG;
@@ -101,17 +104,8 @@ class LapNIGHierarchy
 
  protected:
 
-  //! Sum of data points currently belonging to the cluster
-  double data_sum = 0;
-
-  //! Sum of squared data points currently belonging to the cluster
-  double data_sum_squares = 0;
-
   //! Set of values of data points belonging to this cluster
-  std::vector<Eigen::RowVectorXd> cluster_data_values;
-  //std::set<Eigen::RowVectorXd> cluster_data_values;
-  //std::set<double> cluster_data_values;
-
+  std::list<Eigen::RowVectorXd> cluster_data_values;
 
 };
 #endif  // BAYESMIX_LAPNIG_HIERARCHY_H
