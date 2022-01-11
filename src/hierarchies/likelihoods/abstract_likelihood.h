@@ -35,10 +35,13 @@ class AbstractLikelihood {
 
   virtual bool is_multivariate() const = 0;
 
-  virtual bool is_dependent() const { return false; }
+  virtual bool is_dependent() const = 0;
 
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
+
+  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
+  get_state_proto() const = 0;
 
   void update_sum_stats(const Eigen::RowVectorXd &datum,
                         const Eigen::RowVectorXd &covariate, bool add) {
@@ -48,6 +51,8 @@ class AbstractLikelihood {
       return update_summary_statistics(datum, add);
     }
   }
+
+  virtual void clear_summary_statistics() = 0;
 
  protected:
   virtual double compute_lpdf(const Eigen::RowVectorXd &datum) const {
