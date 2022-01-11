@@ -12,3 +12,5 @@ target_sources(bayesmix
     nnxig_hierarchy.h
     nnxig_hierarchy.cc
 )
+
+add_subdirectory(likelihoods)
