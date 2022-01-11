@@ -10,11 +10,12 @@
 
 namespace bayesmix {
 //! Returns an Eigen matrix after reading it from a file
-Eigen::MatrixXd read_eigen_matrix(const std::string &filename);
+Eigen::MatrixXd read_eigen_matrix(const std::string &filename,
+                                  const char delim = ',');
 
 //! Writes the given Eigen matrix to a text file
 void write_matrix_to_file(const Eigen::MatrixXd &mat,
-                          const std::string &filename);
+                          const std::string &filename, const char delim = ',');
 }  // namespace bayesmix
 
 #endif  // BAYESMIX_UTILS_IO_UTILS_H_
