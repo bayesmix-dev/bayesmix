@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 bayesmix: a nonparametric C++ library for mixture models
-============
+========================================================
 
 .. image:: ../resources/logo_full.svg
    :width: 250px
@@ -27,7 +27,9 @@ There are currently three submodules to the ``bayesmix`` library, represented by
 
 - ``Algorithms``
 - ``Hierarchies``
-- ``Mixings``.
+- ``Mixings``
+
+Further, we employ Protocol buffers for several purposes, including serialization. The list of all protos with their docs is available in the ``protos`` link below.
 
 .. toctree::
    :maxdepth: 1
@@ -37,6 +39,7 @@ There are currently three submodules to the ``bayesmix`` library, represented by
    hierarchies
    mixings
    collectors
+   protos
    utils
 
 
@@ -46,6 +49,14 @@ Tutorials
 
 :doc:`tutorial`
 
+
+Python interface
+================
+
+.. toctree::
+   :maxdepth: 1
+
+   python_interface
 
 
 Indices and tables

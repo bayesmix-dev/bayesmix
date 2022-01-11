@@ -5,13 +5,9 @@ import "matrix.proto";
 
 package bayesmix;
 
-message NNIGState {
-    double mean = 1;
-    double var_scaling = 2;
-    double shape = 3;
-    double scale = 4;
-}
-
+/*
+ * Prior for the parameters of the base measure in a Normal-Normal Inverse Gamma hierarchy
+ */
 message NNIGPrior {
 
   message NormalMeanPrior {
@@ -29,13 +25,15 @@ message NNIGPrior {
   }
 
   oneof prior {
-    NNIGState fixed_values = 1;
-    NormalMeanPrior normal_mean_prior = 2;
-    NGGPrior ngg_prior = 3;
+    NIGDistribution fixed_values = 1; // no prior, just fixed values
+    NormalMeanPrior normal_mean_prior = 2; // prior on the mean
+    NGGPrior ngg_prior = 3; // prior on the mean, var_scaling, and scale
   }
 }
 
-
+/*
+ * Prior for the parameters of the base measure in a Laplace - Normal Inverse Gamma hierarchy
+ */
 message LapNIGState {
     double mean = 1;
     double var = 2;
@@ -56,6 +54,9 @@ message NNWState {
   Matrix scale = 4;
 }
 
+/*
+ * Prior for the parameters of the base measure in a Normal-Normal Wishart hierarchy
+ */
 message NNWPrior {
 
   message NormalMeanPrior {
@@ -73,24 +74,20 @@ message NNWPrior {
   }
 
   oneof prior {
-    NNWState fixed_values = 1;
-    NormalMeanPrior normal_mean_prior = 2;
-    NGIWPrior ngiw_prior = 3;
+    NWDistribution fixed_values = 1; // no prior, just fixed values
+    NormalMeanPrior normal_mean_prior = 2; // prior on the mean
+    NGIWPrior ngiw_prior = 3; // prior on the mean, var_scaling, and scale
   }
 }
 
 
-message LinRegUniState {
-  Vector mean = 1;
-  Matrix var_scaling = 2;
-  double shape = 3;
-  double scale = 4;
-}
-
-
+/*
+ * Prior for the parameters of the base measure in a Normal mixture model with a covariate-dependent
+ * location.
+ */
 message LinRegUniPrior {
   oneof prior {
-    LinRegUniState fixed_values = 1;
+    MultiNormalIGDistribution fixed_values = 1;
   }
 }
 

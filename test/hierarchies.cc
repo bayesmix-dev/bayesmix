@@ -196,7 +196,8 @@ TEST(lin_reg_uni_hierarchy, misc) {
   bayesmix::AlgorithmState::HierarchyHypers out;
   hier.write_hypers_to_proto(&out);
   ASSERT_EQ(beta0, bayesmix::to_eigen(out.lin_reg_uni_state().mean()));
-  ASSERT_EQ(Lambda0, bayesmix::to_eigen(out.lin_reg_uni_state().var_scaling()));
+  ASSERT_EQ(Lambda0,
+            bayesmix::to_eigen(out.lin_reg_uni_state().var_scaling()));
   ASSERT_EQ(a0, out.lin_reg_uni_state().shape());
   ASSERT_EQ(b0, out.lin_reg_uni_state().scale());
   // Add data

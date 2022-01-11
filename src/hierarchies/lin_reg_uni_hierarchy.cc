@@ -50,7 +50,7 @@ void LinRegUniHierarchy::initialize_hypers() {
       throw std::invalid_argument("Shape parameter must be > 0");
     }
     if (hypers->scale <= 0) {
-      throw std::invalid_argument("Scale parameter must be > 0");
+      throw std::invalid_argument("scale parameter must be > 0");
     }
   }
 
@@ -146,15 +146,15 @@ LinRegUniHierarchy::get_state_proto() const {
 void LinRegUniHierarchy::set_hypers_from_proto(
     const google::protobuf::Message &hypers_) {
   auto &hyperscast = downcast_hypers(hypers_).lin_reg_uni_state();
-  hypers->mean = to_eigen(hyperscast.mean());
-  hypers->var_scaling = to_eigen(hyperscast.var_scaling());
+  hypers->mean = bayesmix::to_eigen(hyperscast.mean());
+  hypers->var_scaling = bayesmix::to_eigen(hyperscast.var_scaling());
   hypers->scale = hyperscast.scale();
   hypers->shape = hyperscast.shape();
 }
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
 LinRegUniHierarchy::get_hypers_proto() const {
-  bayesmix::LinRegUniState hypers_;
+  bayesmix::MultiNormalIGDistribution hypers_;
   bayesmix::to_proto(hypers->mean, hypers_.mutable_mean());
   bayesmix::to_proto(hypers->var_scaling, hypers_.mutable_var_scaling());
   hypers_.set_shape(hypers->shape);
