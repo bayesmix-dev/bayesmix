@@ -20,7 +20,7 @@ build/run \
   LapNIG resources/tutorial/lapnig_fixed.asciipb \
   DP   resources/tutorial/dp_gamma.asciipb \
   resources/tutorial/out/chains.recordio \
-  resources/tutorial/tutorial.csv \
+  resources/tutorial/data.csv \
   resources/tutorial/grid.csv \
   resources/tutorial/out/density_file.csv \
   resources/tutorial/out/numclust.csv \

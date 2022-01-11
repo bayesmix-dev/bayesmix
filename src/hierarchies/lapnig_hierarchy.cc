@@ -146,7 +146,7 @@ void LapNIGHierarchy::sample_full_cond(bool update_params) {
       // Candidate mean and candidate log_scale
       double candidate_mean_step_var{2*hypers->var}; // 0.5 * Variance of the mean distribution
 
-      double candidate_log_scale_step_var{10*boost::math::trigamma(2*hypers->shape)};  // 0.5 * Variance of log-gamma distribution
+      double candidate_log_scale_step_var{2*boost::math::trigamma(2*hypers->shape)};  // 0.5 * Variance of log-gamma distribution
 
       double candidate_mean = state.mean + stan::math::normal_rng(0,sqrt(candidate_mean_step_var), rng);
 
