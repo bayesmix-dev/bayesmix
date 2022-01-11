@@ -43,7 +43,7 @@ void NNIGHierarchy::initialize_hypers() {
       throw std::invalid_argument("Shape parameter must be > 0");
     }
     if (hypers->scale <= 0) {
-      throw std::invalid_argument("Scale parameter must be > 0");
+      throw std::invalid_argument("scale parameter must be > 0");
     }
   }
 
@@ -61,7 +61,7 @@ void NNIGHierarchy::initialize_hypers() {
       throw std::invalid_argument("Shape parameter must be > 0");
     }
     if (hypers->scale <= 0) {
-      throw std::invalid_argument("Scale parameter must be > 0");
+      throw std::invalid_argument("scale parameter must be > 0");
     }
   }
 
@@ -86,13 +86,13 @@ void NNIGHierarchy::initialize_hypers() {
       throw std::invalid_argument("Shape parameter must be > 0");
     }
     if (beta00 <= 0) {
-      throw std::invalid_argument("Rate parameter must be > 0");
+      throw std::invalid_argument("scale parameter must be > 0");
     }
     if (a00 <= 0) {
       throw std::invalid_argument("Shape parameter must be > 0");
     }
     if (b00 <= 0) {
-      throw std::invalid_argument("Rate parameter must be > 0");
+      throw std::invalid_argument("scale parameter must be > 0");
     }
     if (alpha0 <= 0) {
       throw std::invalid_argument("Shape parameter must be > 0");
@@ -255,7 +255,7 @@ void NNIGHierarchy::set_hypers_from_proto(
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
 NNIGHierarchy::get_hypers_proto() const {
-  bayesmix::NNIGState hypers_;
+  bayesmix::NIGDistribution hypers_;
   hypers_.set_mean(hypers->mean);
   hypers_.set_var_scaling(hypers->var_scaling);
   hypers_.set_shape(hypers->shape);

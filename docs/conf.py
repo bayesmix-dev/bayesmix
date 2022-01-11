@@ -2,6 +2,10 @@ import os
 import sys
 import subprocess
 sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../python'))
+sys.path.insert(0, os.path.abspath('../python/bayesmixpy'))
+
 
 def configureDoxyfile(input_dir, output_dir):
     with open('Doxyfile.in', 'r') as file :
@@ -18,6 +22,7 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 breathe_projects = { "bayesmix": "../build/docs/docs/doxygen/xml " }
 breathe_default_project = "bayesmix"
+
 
 if read_the_docs_build:
     input_dir = '../src'
@@ -38,8 +43,9 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.mathjax',
+    'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-    'sphinx.ext.imgmath', 
+    'sphinx.ext.imgmath',
     'sphinx.ext.todo',
     'breathe',
 ]

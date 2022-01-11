@@ -26,19 +26,21 @@ Moreover, the following utilities are needed:
 8. write the values of the hyperparameters in :math:`P_0` to a Protobuf message [``write_hypers_to_proto``]
 
 
-In each hierarchy, we also keep track of which data points are allocated to the hierarchy. 
+In each hierarchy, we also keep track of which data points are allocated to the hierarchy.
 For this purpose ``add_datum`` and ``remove_datum`` are employed.
 Finally, the update involeved in the full-conditional, especially if :math:`P_0` and :math:`k` are conjugate an semi-conjugate can be performed efficiently from a set of sufficient statistics, hence when ``add_datum`` or ``remove_datum`` are invoked, the method ``update_summary_statistics`` is called.
 
+
+.. _hierarchies-crtp:
 
 --------------
 Code structure
 --------------
 
-We employ a Curiously Recurring Template Pattern (CRTP) coupled with an abstract interface, similarly to the ``Mixing`` class. 
+We employ a Curiously Recurring Template Pattern (CRTP) coupled with an abstract interface, similarly to the ``Mixing`` class.
 The code thus composes of: a virtual class defining the API, a template base class that is the base for the CRTP and derived child classes that fully specialize the template arguments.
-The class ``AbstractHierarchy`` defines the API, i.e. all the methods that need to be called from outside of a ``Hierarchy`` class. 
-A template class ``BaseHierarchy`` inherits from ``AbstractHierarchy`` and implements some of the necessary virtual methods, which need not be implemented by the child classes. 
+The class ``AbstractHierarchy`` defines the API, i.e. all the methods that need to be called from outside of a ``Hierarchy`` class.
+A template class ``BaseHierarchy`` inherits from ``AbstractHierarchy`` and implements some of the necessary virtual methods, which need not be implemented by the child classes.
 
 Instead, child classes must implement:
 
