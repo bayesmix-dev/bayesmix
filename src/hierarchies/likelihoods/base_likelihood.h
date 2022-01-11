@@ -16,10 +16,9 @@ template <class Derived, typename State>
 class BaseLikelihood : public AbstractLikelihood {
  public:
   BaseLikelihood() = default;
-
   ~BaseLikelihood() = default;
 
-  virtual std::shared_ptr<AbstractHierarchy> clone() const override {
+  virtual std::shared_ptr<AbstractLikelihood> clone() const override {
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
     out->clear_data();
     out->clear_summary_statistics();
@@ -30,23 +29,24 @@ class BaseLikelihood : public AbstractLikelihood {
                                     const Eigen::MatrixXd &covariates =
                                         Eigen::MatrixXd(0, 0)) const override;
 
-  int get_card() const override { return card; }
+  int get_card() const { return card; }
 
-  double get_log_card() const override { return log_card; }
+  double get_log_card() const { return log_card; }
 
-  std::set<int> get_data_idx() const override { return cluster_data_idx; }
+  std::set<int> get_data_idx() const { return cluster_data_idx; }
 
-  void write_state_to_proto(google::protobuf::Message *out) const override;
+  void write_state_to_proto(
+      google::protobuf::Message *out) const;  // override;
 
   State get_state() const { return state; }
 
-  void add_datum(
-      const int id, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
+  void add_datum(const int id, const Eigen::RowVectorXd &datum,
+                 const Eigen::RowVectorXd &covariate =
+                     Eigen::RowVectorXd(0));  // override;
 
-  void remove_datum(
-      const int id, const Eigen::RowVectorXd &datum,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
+  void remove_datum(const int id, const Eigen::RowVectorXd &datum,
+                    const Eigen::RowVectorXd &covariate =
+                        Eigen::RowVectorXd(0));  // override;
 
  protected:
   void set_card(const int card_) {
@@ -54,15 +54,10 @@ class BaseLikelihood : public AbstractLikelihood {
     log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
   }
 
-  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
-  get_state_proto() const = 0;
-
   void clear_data() {
     set_card(0);
     cluster_data_idx = std::set<int>();
   }
-
-  virtual void clear_summary_statistics() = 0;
 
   bayesmix::AlgorithmState::ClusterState *downcast_state(
       google::protobuf::Message *state_) const {
