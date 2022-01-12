@@ -97,6 +97,11 @@ int main(int argc, char const *argv[]) {
       std::vector<double> mean_dens_vec(mean_dens.data(),
                                         mean_dens.data() + n_points);
       matplot::plot(grid_vec, mean_dens_vec);
+      std::stringstream title;
+      title << "Density estimation on " << n_iters << " iterations";
+      matplot::title(title.str());
+      matplot::xlabel("Grid");
+      matplot::ylabel("Density");
       matplot::save("density.png");
     }
     // Plot 2D density
@@ -112,14 +117,19 @@ int main(int argc, char const *argv[]) {
     iters_vec[i] = i;
   }
   matplot::plot(iters_vec, num_clus_vec);
+  matplot::title("Traceplot of number of clusters from the MCMC");
+  matplot::xlabel("MCMC iterations");
+  matplot::ylabel("Number of clusters");
   matplot::save("traceplot.png");
 
   // Make histogram of number of clusters
   matplot::hist(num_clus_vec);
+  matplot::title("Distribution of number of clusters from the MCMC");
+  matplot::xlabel("Number of clusters");
+  matplot::ylabel("Absolute frequency in the MCMC");
   matplot::save("hist.png");
 
   // TODO custom path (including extension) of output plot files
-  // TODO title, axis labels, and other goodies
 
   std::cout << "End of plot_mcmc.cc" << std::endl;
 }
