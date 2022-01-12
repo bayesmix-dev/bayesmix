@@ -18,7 +18,7 @@ class AbstractPriorModel {
 
   virtual double lpdf() = 0;
 
-  // Da pensare, come restituisco lo stato?
+  // Da pensare, come restituisco lo stato? magari un pointer?
   virtual void sample() = 0;
 
   virtual void update_hypers(
