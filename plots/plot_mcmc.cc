@@ -4,10 +4,17 @@
 #include "../src/utils/io_utils.h"
 
 bool check_args(const argparse::ArgumentParser &args) {
-  // if (args["--coll-name"] != std::string("memory")) {
-  //   bayesmix::check_file_is_writeable(args.get<std::string>("--coll-name"));
-  // }
-  // TODO
+  if (args["--dens-plot"] != std::string("\"\"")) {
+    bayesmix::check_file_is_writeable(args.get<std::string>("--dens-plot"));
+  }
+  if (args["--n-cl-trace-plot"] != std::string("\"\"")) {
+    bayesmix::check_file_is_writeable(
+        args.get<std::string>("--n-cl-trace-plot"));
+  }
+  if (args["--n-cl-hist-plot"] != std::string("\"\"")) {
+    bayesmix::check_file_is_writeable(
+        args.get<std::string>("--n-cl-hist-plot"));
+  }
   return true;
 }
 
@@ -15,25 +22,37 @@ int main(int argc, char const *argv[]) {
   argparse::ArgumentParser args("bayesmix::plot");
 
   args.add_argument("--grid-file")
-      .required()
+      .default_value(std::string("\"\""))
       .help(
           "Path to a .csv file containing the grid of points (one per row) "
           "on which the log-density has been evaluated");
 
   args.add_argument("--dens-file")
-      .required()
+      .default_value(std::string("\"\""))
       .help(
           "Path to a .csv file containing the evaluations of the log-density");
 
   args.add_argument("--n-cl-file")
-      .required()
+      .default_value(std::string("\"\""))
       .help(
           "Path to a .csv file containing the number of clusters "
           "(one per row) at each iteration");
 
-  // args.add_argument("--dens-file")
-  //     .default_value(std::string("\"\""))
-  //     .help("...");
+  args.add_argument("--dens-plot")
+      .default_value(std::string("\"\""))
+      .help("File to which to save the density plot");
+
+  args.add_argument("--n-cl-trace-plot")
+      .default_value(std::string("\"\""))
+      .help(
+          "File to which to save the traceplot of the number of clusters "
+          "in the MCMC chain");
+
+  args.add_argument("--n-cl-hist-plot")
+      .default_value(std::string("\"\""))
+      .help(
+          "File to which to save the histogram of the number of clusters "
+          "in the MCMC chain");
 
   try {
     args.parse_args(argc, argv);
@@ -85,10 +104,9 @@ int main(int argc, char const *argv[]) {
               << "be plotted" << std::endl;
   } else {
     // Go from log-densities to mean density
-    std::cout << "Turning log-density into density..." << std::endl;
-    dens = dens.array().exp();
     std::cout << "Computing mean density across " << n_iters << " rows..."
               << std::endl;
+    dens = dens.array().exp();
     Eigen::MatrixXd mean_dens = dens.colwise().mean();
 
     // Plot 1D density
@@ -102,7 +120,9 @@ int main(int argc, char const *argv[]) {
       matplot::title(title.str());
       matplot::xlabel("Grid");
       matplot::ylabel("Density");
-      matplot::save("density.png");
+      matplot::save(args.get<std::string>("--dens-plot"));
+      std::cout << "Saved density plot to "
+                << args.get<std::string>("--dens-plot") << std::endl;
     }
     // Plot 2D density
     else {
@@ -120,16 +140,20 @@ int main(int argc, char const *argv[]) {
   matplot::title("Traceplot of number of clusters from the MCMC");
   matplot::xlabel("MCMC iterations");
   matplot::ylabel("Number of clusters");
-  matplot::save("traceplot.png");
+  matplot::save(args.get<std::string>("--n-cl-trace-plot"));
+  std::cout << "Saved traceplot to "
+            << args.get<std::string>("--n-cl-trace-plot") << std::endl;
 
   // Make histogram of number of clusters
   matplot::hist(num_clus_vec);
   matplot::title("Distribution of number of clusters from the MCMC");
   matplot::xlabel("Number of clusters");
   matplot::ylabel("Absolute frequency in the MCMC");
-  matplot::save("hist.png");
+  matplot::save(args.get<std::string>("--n-cl-hist-plot"));
+  std::cout << "Saved traceplot to "
+            << args.get<std::string>("--n-cl-hist-plot") << std::endl;
 
-  // TODO custom path (including extension) of output plot files
+  // TODO if-clauses for all plots
 
   std::cout << "End of plot_mcmc.cc" << std::endl;
 }
