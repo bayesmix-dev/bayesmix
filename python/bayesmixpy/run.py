@@ -150,12 +150,12 @@ def run_mcmc(
                                             out_dir)
     eval_dens_file = os.path.join(out_dir, "eval_dens.csv")
 
-    np.savetxt(data_file, data, fmt='%1.5f')
+    np.savetxt(data_file, data, fmt='%1.5f', delimiter=',')
     if dens_grid is None:
         dens_grid_file = '\"\"'
         eval_dens_file = '\"\"'
     else:
-        np.savetxt(dens_grid_file, dens_grid, fmt='%1.5f')
+        np.savetxt(dens_grid_file, dens_grid, fmt='%1.5f', delimiter=',')
 
     if not return_clusters:
         clus_file = '\"\"'
