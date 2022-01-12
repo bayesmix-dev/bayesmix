@@ -82,7 +82,6 @@ int main(int argc, char const *argv[]) {
   // TODO custom path (including extension) of output plot files
   // TODO title, axis labels, and other goodies
   // TODO 1D and 2D density cases
-  // TODO traceplot for the MCMC chain of the number of clusters
   // TODO barplot of the distribution of the number of clusters
 
   std::cout << "End of plot_mcmc.cc" << std::endl;
