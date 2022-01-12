@@ -41,10 +41,26 @@ int main(int argc, char const *argv[]) {
   Eigen::MatrixXd dens =
       bayesmix::read_eigen_matrix(args.get<std::string>("--dens-file"));
 
-  // Go from log-density to density
+  // Go from log-densities to mean density
   std::cout << "Turning log-density into density..." << std::endl;
   dens = dens.array().exp();
-  // TODO get mean of resulting matrix
+  std::cout << "Computing mean density across " << dens.rows() << " rows..."
+            << std::endl;
+  Eigen::MatrixXd mean_dens = dens.colwise().mean();
+
+  // Plot density
+  std::vector<double> grid_vec(grid.data(), grid.data() + dens.cols());
+  std::vector<double> mean_dens_vec(mean_dens.data(),
+                                    mean_dens.data() + mean_dens.cols());
+  matplot::plot(grid_vec, mean_dens_vec);
+  matplot::save("density.png");
+
+  // TODO custom path (including extension) of output plot files
+  // TODO title and other goodies
+  // TODO check consistent dimensions
+  // TODO 1D and 2D density cases
+  // TODO traceplot for the MCMC chain of the number of clusters
+  // TODO barplot of the distribution of the number of clusters
 
   std::cout << "End of plot_mcmc.cc" << std::endl;
 }
