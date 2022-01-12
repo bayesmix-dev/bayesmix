@@ -13,19 +13,22 @@ TEST(uni_norm_likelihood, state_setget) {
   // Instance
   auto like = std::make_shared<UniNormLikelihood>();
 
-  // Set state from proto
+  // Prepare buffers
   bayesmix::UniLSState state_;
-  bayesmix::AlgorithmState::ClusterState clust_state_;
+  bayesmix::AlgorithmState::ClusterState set_state_;
+  bayesmix::AlgorithmState::ClusterState got_state_;
+
+  // Prepare state
   state_.set_mean(5.23);
   state_.set_var(1.02);
-  clust_state_.mutable_uni_ls_state()->CopyFrom(state_);
-  like->set_state_from_proto(clust_state_);
+  set_state_.mutable_uni_ls_state()->CopyFrom(state_);
 
-  // Get state proto
-  auto out = like->get_state_proto();
+  // Set and get the state
+  like->set_state_from_proto(set_state_);
+  like->write_state_to_proto(&got_state_);
 
   // Check if they coincides
-  ASSERT_EQ(out->DebugString(), clust_state_.DebugString());
+  ASSERT_EQ(got_state_.DebugString(), set_state_.DebugString());
 }
 
 TEST(uni_norm_likelihood, data_addremove) {

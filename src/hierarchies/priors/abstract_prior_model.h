@@ -14,9 +14,12 @@ class AbstractPriorModel {
  public:
   virtual ~AbstractPriorModel() = default;
 
+  virtual std::shared_ptr<AbstractPriorModel> clone() const = 0;
+
   virtual double lpdf() = 0;
 
-  virtual void sample_prior() = 0;
+  // Da pensare, come restituisco lo stato?
+  virtual void sample() = 0;
 
   virtual void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;

@@ -35,18 +35,17 @@ class BaseLikelihood : public AbstractLikelihood {
 
   std::set<int> get_data_idx() const { return cluster_data_idx; }
 
-  void write_state_to_proto(
-      google::protobuf::Message *out) const;  // override;
+  void write_state_to_proto(google::protobuf::Message *out) const override;
 
   State get_state() const { return state; }
 
-  void add_datum(const int id, const Eigen::RowVectorXd &datum,
-                 const Eigen::RowVectorXd &covariate =
-                     Eigen::RowVectorXd(0));  // override;
+  void add_datum(
+      const int id, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
 
-  void remove_datum(const int id, const Eigen::RowVectorXd &datum,
-                    const Eigen::RowVectorXd &covariate =
-                        Eigen::RowVectorXd(0));  // override;
+  void remove_datum(
+      const int id, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
 
  protected:
   void set_card(const int card_) {

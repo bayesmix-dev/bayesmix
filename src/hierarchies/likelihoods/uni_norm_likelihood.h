@@ -20,11 +20,11 @@ class UniNormLikelihood
   bool is_multivariate() const override { return false; };
   bool is_dependent() const override { return false; };
   void set_state_from_proto(const google::protobuf::Message &state_) override;
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
-      const override;
   void clear_summary_statistics() override;
 
  protected:
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
+      const override;
   double compute_lpdf(const Eigen::RowVectorXd &datum) const override;
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  bool add) override;

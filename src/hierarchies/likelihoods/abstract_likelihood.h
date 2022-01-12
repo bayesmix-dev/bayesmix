@@ -18,6 +18,7 @@ class AbstractLikelihood {
  public:
   virtual ~AbstractLikelihood() = default;
 
+  // IMPLEMENTED in BaseLikelihood
   virtual std::shared_ptr<AbstractLikelihood> clone() const = 0;
 
   double lpdf(const Eigen::RowVectorXd &datum,
@@ -40,8 +41,18 @@ class AbstractLikelihood {
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
-  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
-  get_state_proto() const = 0;
+  // IMPLEMENTED in BaseLikelihood
+  virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
+
+  // IMPLEMENTED in BaseLikelihood
+  virtual void add_datum(
+      const int id, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
+
+  // IMPLEMENTED in BaseLikelihood
+  virtual void remove_datum(
+      const int id, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
 
   void update_sum_stats(const Eigen::RowVectorXd &datum,
                         const Eigen::RowVectorXd &covariate, bool add) {
@@ -55,6 +66,9 @@ class AbstractLikelihood {
   virtual void clear_summary_statistics() = 0;
 
  protected:
+  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
+  get_state_proto() const = 0;
+
   virtual double compute_lpdf(const Eigen::RowVectorXd &datum) const {
     if (is_dependent()) {
       throw std::runtime_error(
