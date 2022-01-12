@@ -48,11 +48,6 @@ class BasePriorModel : public AbstractPriorModel {
 
   void create_empty_prior() { prior.reset(new Prior); }
 
-  virtual std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
-  get_hypers_proto() const = 0;
-
-  virtual void initialize_hypers() = 0;
-
   bayesmix::AlgorithmState::HierarchyHypers *downcast_hypers(
       google::protobuf::Message *state_) const {
     return google::protobuf::internal::down_cast<

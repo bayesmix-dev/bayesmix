@@ -32,6 +32,12 @@ class AbstractPriorModel {
       const google::protobuf::Message &state_) = 0;
 
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
+
+ protected:
+  virtual std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
+  get_hypers_proto() const = 0;
+
+  virtual void initialize_hypers() = 0;
 };
 
 #endif
