@@ -79,6 +79,8 @@ int main(int argc, char const *argv[]) {
   matplot::plot(iters_vec, num_clus_vec);
   matplot::save("traceplot.png");
 
+  // TODO move writeable function to utils
+  // TODO add check with writeable function
   // TODO custom path (including extension) of output plot files
   // TODO title, axis labels, and other goodies
   // TODO 1D and 2D density cases
