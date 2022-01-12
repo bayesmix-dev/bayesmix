@@ -3,18 +3,6 @@
 #include "../lib/argparse/argparse.h"
 #include "../src/utils/io_utils.h"
 
-bool check_args(const argparse::ArgumentParser &args) {
-  if (args["--n-cl-trace-plot"] != std::string("\"\"")) {
-    bayesmix::check_file_is_writeable(
-        args.get<std::string>("--n-cl-trace-plot"));
-  }
-  if (args["--n-cl-hist-plot"] != std::string("\"\"")) {
-    bayesmix::check_file_is_writeable(
-        args.get<std::string>("--n-cl-hist-plot"));
-  }
-  return true;
-}
-
 int main(int argc, char const *argv[]) {
   argparse::ArgumentParser args("bayesmix::plot");
 
@@ -60,7 +48,6 @@ int main(int argc, char const *argv[]) {
   }
 
   std::cout << "Running plot_mcmc.cc" << std::endl;
-  check_args(args);
 
   // DENSITY PLOT
   std::string grid_file = args.get<std::string>("--grid-file");
