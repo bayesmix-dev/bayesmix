@@ -7,6 +7,7 @@ bool check_args(const argparse::ArgumentParser &args) {
   // if (args["--coll-name"] != std::string("memory")) {
   //   bayesmix::check_file_is_writeable(args.get<std::string>("--coll-name"));
   // }
+  // TODO
   return true;
 }
 
@@ -61,22 +62,48 @@ int main(int argc, char const *argv[]) {
   int dim = grid.cols();
   int n_points = grid.rows();
   int n_iters = dens.rows();
-  // TODO check number of points: grid.rows() == dens.cols()
-  // TODO check number of iterations: dens.rows() == num_clus.rows()
 
-  // Go from log-densities to mean density
-  std::cout << "Turning log-density into density..." << std::endl;
-  dens = dens.array().exp();
-  std::cout << "Computing mean density across " << n_iters << " rows..."
-            << std::endl;
-  Eigen::MatrixXd mean_dens = dens.colwise().mean();
+  // Check that matrix dimensions are consistent
+  if (n_points != dens.cols()) {
+    std::stringstream msg;
+    msg << "Matrix dimensions are not consistent: rows of grid = " << n_points
+        << " should be equal to columns of density = " << dens.cols();
+    throw std::invalid_argument(msg.str());
+  }
+  if (n_iters != num_clus.rows()) {
+    std::stringstream msg;
+    msg << "Matrix dimensions are not consistent: rows of density = "
+        << n_iters << " should be equal to rows of number of clusters = "
+        << num_clus.rows();
+    throw std::invalid_argument(msg.str());
+  }
 
-  // Make plot of density
-  std::vector<double> grid_vec(grid.data(), grid.data() + n_points);
-  std::vector<double> mean_dens_vec(mean_dens.data(),
-                                    mean_dens.data() + n_points);
-  matplot::plot(grid_vec, mean_dens_vec);
-  matplot::save("density.png");
+  // DENSITY PLOT
+  // Check that grid has appropriate dimensions
+  if (dim != 1 and dim != 2) {
+    std::cout << "Grid has dimension " << dim << ", its density will not "
+              << "be plotted" << std::endl;
+  } else {
+    // Go from log-densities to mean density
+    std::cout << "Turning log-density into density..." << std::endl;
+    dens = dens.array().exp();
+    std::cout << "Computing mean density across " << n_iters << " rows..."
+              << std::endl;
+    Eigen::MatrixXd mean_dens = dens.colwise().mean();
+
+    // Plot 1D density
+    if (dim == 1) {
+      std::vector<double> grid_vec(grid.data(), grid.data() + n_points);
+      std::vector<double> mean_dens_vec(mean_dens.data(),
+                                        mean_dens.data() + n_points);
+      matplot::plot(grid_vec, mean_dens_vec);
+      matplot::save("density.png");
+    }
+    // Plot 2D density
+    else {
+      // TODO
+    }
+  }
 
   // Make traceplot of number of clusters
   std::vector<double> num_clus_vec(num_clus.data(), num_clus.data() + n_iters);
@@ -91,11 +118,8 @@ int main(int argc, char const *argv[]) {
   matplot::hist(num_clus_vec);
   matplot::save("hist.png");
 
-  // TODO move writeable function to utils
-  // TODO add check with writeable function
   // TODO custom path (including extension) of output plot files
   // TODO title, axis labels, and other goodies
-  // TODO 1D and 2D density cases
 
   std::cout << "End of plot_mcmc.cc" << std::endl;
 }
