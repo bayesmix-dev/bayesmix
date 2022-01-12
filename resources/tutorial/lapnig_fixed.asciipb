@@ -1,6 +1,8 @@
 fixed_values {
   mean: 0
-  var:20
-  shape:2
-  scale:1
+  var: 20
+  shape: 2
+  scale: 1
+  mh_mean_var: 60;
+  mh_log_scale_var: 1.3;
 }

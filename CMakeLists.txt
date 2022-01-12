@@ -139,7 +139,6 @@ if(HAS_PARENT)
 endif()
 
 # Build library object
-#add_dependencies(bayesmix build_tbb)
 add_library(bayesmix OBJECT)
 target_sources(bayesmix PUBLIC ${PROTO_SRCS} ${PROTO_HDRS})
 add_subdirectory(src)    # source files

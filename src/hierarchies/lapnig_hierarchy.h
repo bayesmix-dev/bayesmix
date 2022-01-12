@@ -1,4 +1,3 @@
-
 #ifndef BAYESMIX_LAPNIG_HIERARCHY_H
 #define BAYESMIX_LAPNIG_HIERARCHY_H
 
@@ -6,14 +5,13 @@
 
 #include <Eigen/Dense>
 #include <memory>
-#include <vector>
 #include <set>
+#include <vector>
 
 #include "algorithm_state.pb.h"
 #include "base_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
-
 
 namespace LapNIG {
 //! Custom container for State values
@@ -23,21 +21,21 @@ struct State {
 
 //! Custom container for Hyperparameters values
 struct Hyperparams {
-  double mean, var, shape, scale;
+  double mean, var, shape, scale, mh_log_scale_var, mh_mean_var;
 };
-}
-
+}  // namespace LapNIG
 
 class LapNIGHierarchy
     : public BaseHierarchy<LapNIGHierarchy, LapNIG::State, LapNIG::Hyperparams,
-                           bayesmix::LapNIGPrior> { // Prior ? //
+                           bayesmix::LapNIGPrior> {
  public:
+  LapNIGHierarchy() = default;
+  ~LapNIGHierarchy() = default;
+
   //! Counters for tracking acceptance rate in MH step
   static unsigned int accepted_;
   static unsigned int iter_;
 
-  LapNIGHierarchy() = default;
-  ~LapNIGHierarchy() = default;
   //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::LapNIG;
@@ -50,23 +48,10 @@ class LapNIGHierarchy
   void set_hypers_from_proto(
       const google::protobuf::Message &hypers_) override;
 
-  void save_posterior_hypers() {
-    throw std::runtime_error("Not implemented");
-  }
+  void save_posterior_hypers() { throw std::runtime_error("Not implemented"); }
 
   //! Returns whether the hierarchy models multivariate data or not
   bool is_multivariate() const override { return false; }
-
-  //! Evaluates the log-likelihood of data in a single point
-  //! @param datum      Point which is to be evaluated
-  //! @return           The evaluation of the lpdf
-  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
-
-  //! Updates cluster statistics when a datum is added or removed from it
-  //! @param datum      Data point which is being added or removed
-  //! @param add        Whether the datum is being added or removed
-  void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                 bool add) override;
 
   //! Writes current state to a Protobuf message and return a shared_ptr
   //! New hierarchies have to first modify the field 'oneof val' in the
@@ -84,13 +69,7 @@ class LapNIGHierarchy
   //! Resets summary statistics for this cluster
   void clear_summary_statistics() override;
 
-  //! Initializes hierarchy hyperparameters to appropriate values
-  void initialize_hypers() override;
-
-  //! Initializes state parameters to appropriate values
-  void initialize_state() override;
-
-
+  //! Updates hyperparameter values given a vector of cluster states
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;
 
@@ -101,11 +80,38 @@ class LapNIGHierarchy
   //! @param update_params  Save posterior hypers after the computation?
   void sample_full_cond(bool update_params = false) override;
 
-
  protected:
-
   //! Set of values of data points belonging to this cluster
   std::list<Eigen::RowVectorXd> cluster_data_values;
 
+  //! Samples from the proposal distribution
+  Eigen::VectorXd propose_rwmh(const Eigen::VectorXd &curr_vals);
+
+  //! Evaluates the prior given the mean and log of the scale (beware of the
+  //! change of variables!
+  double eval_prior_lpdf_unconstrained(
+      Eigen::VectorXd unconstrained_parameters);
+
+  //! Evaluates the (sum of the) log likelihood for all the observations in the
+  //! cluster
+  double eval_like_lpdf_unconstrained(
+      Eigen::VectorXd unconstrained_parameters);
+
+  //! Evaluates the log-likelihood of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
+  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
+
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param add        Whether the datum is being added or removed
+  void update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                 bool add) override;
+
+  //! Initializes hierarchy hyperparameters to appropriate values
+  void initialize_hypers() override;
+
+  //! Initializes state parameters to appropriate values
+  void initialize_state() override;
 };
 #endif  // BAYESMIX_LAPNIG_HIERARCHY_H

@@ -39,6 +39,8 @@ message LapNIGState {
     double var = 2;
     double shape = 3;
     double scale = 4;
+    double mh_mean_var = 5;
+    double mh_log_scale_var = 6;
 }
 
 message LapNIGPrior {
