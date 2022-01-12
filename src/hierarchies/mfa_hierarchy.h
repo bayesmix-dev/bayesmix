@@ -11,6 +11,7 @@
 #include "base_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
+#include "src/utils/distributions.h"
 
 //! Mixture of Factor Analysers hierarchy for multivariate data.
 
@@ -21,7 +22,7 @@ namespace MFA {
 struct State {
   Eigen::VectorXd mu, psi;
   Eigen::MatrixXd eta, lambda;
-  Eigen::MatrixXd psi_inverse;
+  Eigen::DiagonalMatrix<double,Eigen::Dynamic> psi_inverse;
 };
 
 //! Custom container for Hyperparameters values

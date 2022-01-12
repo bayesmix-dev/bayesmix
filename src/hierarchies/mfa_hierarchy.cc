@@ -17,7 +17,7 @@
 double MFAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
   return stan::math::multi_normal_lpdf(
       datum, state.mu,
-      state.lambda * state.lambda.transpose() +
+      state.lambda * state.lambda.transpose() + 
           Eigen::MatrixXd(state.psi.asDiagonal()));
 }
 
@@ -46,7 +46,7 @@ MFA::State MFAHierarchy::draw(const MFA::Hyperparams& params) {
     }
   }
 
-  out.psi_inverse = Eigen::MatrixXd(out.psi.cwiseInverse().asDiagonal());
+  out.psi_inverse = out.psi.cwiseInverse().asDiagonal();
 
   return out;
 }
@@ -56,7 +56,7 @@ void MFAHierarchy::initialize_state() {
   state.psi = hypers->beta / (hypers->alpha0 + 1.);
   state.eta = Eigen::MatrixXd::Zero(card, hypers->q);
   state.lambda = Eigen::MatrixXd::Zero(dim, hypers->q);
-  state.psi_inverse = Eigen::MatrixXd(state.psi.cwiseInverse().asDiagonal());
+  state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
 }
 
 void MFAHierarchy::initialize_hypers() {
@@ -131,7 +131,7 @@ void MFAHierarchy::set_state_from_proto(
   state.psi = bayesmix::to_eigen(statecast.mfa_state().psi());
   state.eta = bayesmix::to_eigen(statecast.mfa_state().eta());
   state.lambda = bayesmix::to_eigen(statecast.mfa_state().lambda());
-  state.psi_inverse = bayesmix::to_eigen(statecast.mfa_state().psi_inverse());
+  state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
   set_card(statecast.cardinality());
 }
 
@@ -143,6 +143,7 @@ MFAHierarchy::get_state_proto() const {
   bayesmix::to_proto(state.eta, state_.mutable_eta());
   bayesmix::to_proto(state.lambda, state_.mutable_lambda());
   bayesmix::to_proto(state.psi_inverse, state_.mutable_psi_inverse());
+
 
   auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
   out->mutable_mfa_state()->CopyFrom(state_);
@@ -187,30 +188,30 @@ void MFAHierarchy::sample_full_cond(bool update_params) {
 
 void MFAHierarchy::sample_eta() {
   auto& rng = bayesmix::Rng::Instance().get();
-  auto llt = (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
+  auto sigma_eta_inv_llt = (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
               state.lambda.transpose() * state.psi_inverse * state.lambda)
                  .llt();
   Eigen::MatrixXd sigma_eta(
-      llt.solve(Eigen::MatrixXd::Identity(hypers->q, hypers->q)));
+      sigma_eta_inv_llt.solve(Eigen::MatrixXd::Identity(hypers->q, hypers->q)));
 
   if (state.eta.rows() != card) {
     state.eta.resize(card, state.eta.cols());
     state.eta = Eigen::MatrixXd::Zero(card, state.eta.cols());
   }
+  Eigen::MatrixXd temp_product(sigma_eta * (state.lambda.transpose()) * state.psi_inverse);
   for (size_t i = 0; i < card; i++) {
-    state.eta.row(i) = (stan::math::multi_normal_rng(
-        sigma_eta * (state.lambda.transpose()) * state.psi_inverse *
-            (data[i] - state.mu),
-        sigma_eta, rng));
+    state.eta.row(i) = (bayesmix::multi_normal_prec_chol_rng(
+        temp_product * (data[i] - state.mu),
+        sigma_eta_inv_llt.matrixL(), rng));
   }
 }
 
 void MFAHierarchy::sample_mu() {
   auto& rng = bayesmix::Rng::Instance().get();
-  auto llt = (hypers->phi * Eigen::MatrixXd::Identity(dim, dim) +
-              card * state.psi_inverse)
-                 .llt();
-  Eigen::MatrixXd sigma_mu = llt.solve(Eigen::MatrixXd::Identity(dim, dim));
+  Eigen::DiagonalMatrix<double,Eigen::Dynamic> sigma_mu;
+  
+  sigma_mu.diagonal() = (card * state.psi_inverse.diagonal().array() + hypers->phi).cwiseInverse();
+  
 
   Eigen::VectorXd sum = Eigen::VectorXd::Zero(dim);
 
@@ -221,7 +222,7 @@ void MFAHierarchy::sample_mu() {
   Eigen::VectorXd mumean = sigma_mu * (hypers->phi * hypers->mutilde +
                                        state.psi_inverse * (data_sum - sum));
 
-  state.mu = stan::math::multi_normal_rng(mumean, sigma_mu, rng);
+  state.mu = bayesmix::multi_normal_diag_rng(mumean, sigma_mu, rng);
 }
 
 void MFAHierarchy::sample_lambda() {
@@ -230,18 +231,19 @@ void MFAHierarchy::sample_lambda() {
   for (size_t i = 0; i < card; i++) {
     data_matrix.col(i) = data[i];
   }
+
   for (size_t j = 0; j < dim; j++) {
-    auto llt = (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
+    auto sigma_lambda_inv_llt = (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
                 state.eta.transpose() / state.psi[j] * state.eta)
                    .llt();
     Eigen::MatrixXd sigma_lambda =
-        llt.solve(Eigen::MatrixXd::Identity(hypers->q, hypers->q));
+        sigma_lambda_inv_llt.solve(Eigen::MatrixXd::Identity(hypers->q, hypers->q));
     Eigen::VectorXd vectortemp(data_matrix.row(j));
-    state.lambda.row(j) = stan::math::multi_normal_rng(
+    state.lambda.row(j) = bayesmix::multi_normal_prec_chol_rng(
         sigma_lambda * state.eta.transpose() *
             (vectortemp - Eigen::VectorXd::Constant(card, state.mu[j])) /
             state.psi[j],
-        sigma_lambda, rng);
+        sigma_lambda_inv_llt.matrixL(), rng);
   }
 }
 
@@ -258,5 +260,5 @@ void MFAHierarchy::sample_psi() {
     state.psi[j] = stan::math::inv_gamma_rng(hypers->alpha0 + card / 2,
                                              hypers->beta[j] + sum / 2, rng);
   }
-  state.psi_inverse = Eigen::MatrixXd(state.psi.cwiseInverse().asDiagonal());
+  state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
 }

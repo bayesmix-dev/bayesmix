@@ -6,7 +6,7 @@ algo_id: "Neal8"
 rng_seed: 20201124
 
 # Number of iterations of the algorithm
-iterations: 1000
+iterations: 10
 
 # Number of initial iterations discarded by the algorithm
 burnin: 0
