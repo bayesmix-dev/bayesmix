@@ -6,33 +6,22 @@
 #include "lib/argparse/argparse.h"
 #include "src/includes.h"
 
-bool check_file_is_writeable(std::string filename) {
-  std::ofstream ofstr;
-  ofstr.open(filename);
-  if (ofstr.fail()) {
-    std::cerr << "Error: cannot write to " << filename << std::endl;
-    ofstr.close();
-    return false;
-  }
-  ofstr.close();
-  return true;
-}
-
-bool check_args(argparse::ArgumentParser args) {
+bool check_args(const argparse::ArgumentParser &args) {
   if (args["--coll-name"] != std::string("memory")) {
-    check_file_is_writeable(args.get<std::string>("--coll-name"));
+    bayesmix::check_file_is_writeable(args.get<std::string>("--coll-name"));
   }
   if (args["--dens-file"] != std::string("\"\"")) {
-    check_file_is_writeable(args.get<std::string>("--dens-file"));
+    bayesmix::check_file_is_writeable(args.get<std::string>("--dens-file"));
   }
   if (args["--n-cl-file"] != std::string("\"\"")) {
-    check_file_is_writeable(args.get<std::string>("--n-cl-file"));
+    bayesmix::check_file_is_writeable(args.get<std::string>("--n-cl-file"));
   }
   if (args["--clus-file"] != std::string("\"\"")) {
-    check_file_is_writeable(args.get<std::string>("--clus-file"));
+    bayesmix::check_file_is_writeable(args.get<std::string>("--clus-file"));
   }
   if (args["--best-clus-file"] != std::string("\"\"")) {
-    check_file_is_writeable(args.get<std::string>("--best-clus-file"));
+    bayesmix::check_file_is_writeable(
+        args.get<std::string>("--best-clus-file"));
   }
 
   return true;

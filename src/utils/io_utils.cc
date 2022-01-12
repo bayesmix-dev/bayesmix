@@ -2,6 +2,19 @@
 
 #include <Eigen/Dense>
 #include <fstream>
+#include <iostream>
+
+bool bayesmix::check_file_is_writeable(const std::string &filename) {
+  std::ofstream ofstr;
+  ofstr.open(filename);
+  if (ofstr.fail()) {
+    std::cerr << "Error: cannot write to " << filename << std::endl;
+    ofstr.close();
+    return false;
+  }
+  ofstr.close();
+  return true;
+}
 
 Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename,
                                             const char delim /* = ','*/) {

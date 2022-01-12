@@ -3,6 +3,13 @@
 #include "../lib/argparse/argparse.h"
 #include "../src/utils/io_utils.h"
 
+bool check_args(const argparse::ArgumentParser &args) {
+  // if (args["--coll-name"] != std::string("memory")) {
+  //   bayesmix::check_file_is_writeable(args.get<std::string>("--coll-name"));
+  // }
+  return true;
+}
+
 int main(int argc, char const *argv[]) {
   argparse::ArgumentParser args("bayesmix::plot");
 
@@ -36,6 +43,7 @@ int main(int argc, char const *argv[]) {
   }
 
   std::cout << "Running plot_mcmc.cc" << std::endl;
+  check_args(args);
 
   // Read relevant matrices
   std::cout << "Reading " << args.get<std::string>("--grid-file") << "..."

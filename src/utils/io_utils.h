@@ -9,6 +9,9 @@
 #define MAXBUFSIZE ((int)1e6)
 
 namespace bayesmix {
+//! Checks whether the given file is available for writing
+bool check_file_is_writeable(const std::string &filename);
+
 //! Returns an Eigen matrix after reading it from a file
 Eigen::MatrixXd read_eigen_matrix(const std::string &filename,
                                   const char delim = ',');
