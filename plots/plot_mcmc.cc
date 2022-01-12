@@ -63,7 +63,7 @@ int main(int argc, char const *argv[]) {
             << std::endl;
   Eigen::MatrixXd mean_dens = dens.colwise().mean();
 
-  // Plot density
+  // Make plot of density
   std::vector<double> grid_vec(grid.data(), grid.data() + n_points);
   std::vector<double> mean_dens_vec(mean_dens.data(),
                                     mean_dens.data() + n_points);
@@ -79,12 +79,15 @@ int main(int argc, char const *argv[]) {
   matplot::plot(iters_vec, num_clus_vec);
   matplot::save("traceplot.png");
 
+  // Make histogram of number of clusters
+  matplot::hist(num_clus_vec);
+  matplot::save("hist.png");
+
   // TODO move writeable function to utils
   // TODO add check with writeable function
   // TODO custom path (including extension) of output plot files
   // TODO title, axis labels, and other goodies
   // TODO 1D and 2D density cases
-  // TODO barplot of the distribution of the number of clusters
 
   std::cout << "End of plot_mcmc.cc" << std::endl;
 }
