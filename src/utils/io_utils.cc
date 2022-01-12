@@ -3,26 +3,26 @@
 #include <Eigen/Dense>
 #include <fstream>
 
-Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename) {
+Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename,
+                                            const char delim /* = ','*/) {
   // Initialize objects
   unsigned int cols = 0, rows = 0;
   double buffer[MAXBUFSIZE];
-  std::ifstream istr(filename);
-  if (!istr.is_open()) {
+  std::ifstream filestream(filename);
+  if (!filestream.is_open()) {
     std::string err = "File " + filename + " does not exist";
     throw std::invalid_argument(err);
   }
 
   // Loop over file lines
-  while (!istr.eof()) {
-    std::string line;
-    getline(istr, line);
-
+  std::string line, entry;
+  while (getline(filestream, line, '\n')) {
     unsigned int temp = 0;
-    std::stringstream stream(line);
-    while (!stream.eof()) {
+    std::stringstream linestream(line);
+    while (getline(linestream, entry, delim)) {
       // Place read values into the buffer array
-      stream >> buffer[cols * rows + temp++];
+      std::stringstream entrystream(entry);
+      entrystream >> buffer[cols * rows + temp++];
     }
     if (temp == 0) {
       continue;
@@ -33,8 +33,7 @@ Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename) {
     rows++;
   }
 
-  istr.close();
-  rows--;
+  filestream.close();
 
   // Fill an Eigen Matrix with values from the buffer array
   Eigen::MatrixXd mat(rows, cols);
@@ -47,9 +46,12 @@ Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename) {
 };
 
 void bayesmix::write_matrix_to_file(const Eigen::MatrixXd &mat,
-                                    const std::string &filename) {
+                                    const std::string &filename,
+                                    const char delim /*= ','*/) {
   using namespace Eigen;
-  const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ",", "\n");
+  std::string del;
+  del = delim;
+  const IOFormat CSVFormat(StreamPrecision, DontAlignCols, del, "\n");
   std::ofstream file(filename.c_str());
   file << mat.format(CSVFormat);
 }
