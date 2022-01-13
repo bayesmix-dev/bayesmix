@@ -9,7 +9,7 @@
 #include "src/hierarchies/likelihoods/uni_norm_likelihood.h"
 #include "src/utils/rng.h"
 
-TEST(uni_norm_likelihood, state_setget) {
+TEST(uni_norm_likelihood, set_get_state) {
   // Instance
   auto like = std::make_shared<UniNormLikelihood>();
 
@@ -31,7 +31,7 @@ TEST(uni_norm_likelihood, state_setget) {
   ASSERT_EQ(got_state_.DebugString(), set_state_.DebugString());
 }
 
-TEST(uni_norm_likelihood, data_addremove) {
+TEST(uni_norm_likelihood, add_remove_data) {
   // Instance
   auto like = std::make_shared<UniNormLikelihood>();
 
