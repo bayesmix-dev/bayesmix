@@ -217,9 +217,9 @@ int main(int argc, char *argv[]) {
               << args.get<std::string>("--dens-file") << std::endl;
   }
 
-  if ((args.get<std::string>("--n-cl-file") != std::string("\"\"")) ||
-      (args.get<std::string>("--clus-file") != std::string("\"\"")) ||
-      (args.get<std::string>("--best-clus-file") != std::string("\"\""))) {
+  if ((args["--n-cl-file"] != std::string("\"\"")) ||
+      (args["--clus-file"] != std::string("\"\"")) ||
+      (args["--best-clus-file"] != std::string("\"\""))) {
     Eigen::MatrixXi clusterings(coll->get_size(), data.rows());
     Eigen::VectorXi num_clust(coll->get_size());
     for (int i = 0; i < coll->get_size(); i++) {
@@ -231,21 +231,21 @@ int main(int argc, char *argv[]) {
       num_clust(i) = state.cluster_states_size();
     }
 
-    if (args.get<std::string>("--n-cl-file") != std::string("\"\"")) {
+    if (args["--n-cl-file"] != std::string("\"\"")) {
       bayesmix::write_matrix_to_file(num_clust,
                                      args.get<std::string>("--n-cl-file"));
       std::cout << "Successfully wrote number of clusters to "
                 << args.get<std::string>("--n-cl-file") << std::endl;
     }
 
-    if (args.get<std::string>("--clus-file") != std::string("\"\"")) {
+    if (args["--clus-file"] != std::string("\"\"")) {
       bayesmix::write_matrix_to_file(clusterings,
                                      args.get<std::string>("--clus-file"));
       std::cout << "Successfully wrote cluster allocations to "
                 << args.get<std::string>("--clus-file") << std::endl;
     }
 
-    if (args.get<std::string>("--best-clus-file") != std::string("\"\"")) {
+    if (args["--best-clus-file"] != std::string("\"\"")) {
       Eigen::VectorXi best_clus = bayesmix::cluster_estimate(clusterings);
       bayesmix::write_matrix_to_file(
           best_clus, args.get<std::string>("--best-clus-file"));
