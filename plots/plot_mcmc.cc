@@ -3,38 +3,40 @@
 #include "../lib/argparse/argparse.h"
 #include "../src/utils/io_utils.h"
 
+#define EMPTYSTR std::string("\"\"")
+
 int main(int argc, char const *argv[]) {
   argparse::ArgumentParser args("bayesmix::plot");
 
   args.add_argument("--grid-file")
-      .default_value(std::string("\"\""))
+      .default_value(EMPTYSTR)
       .help(
           "Path to a .csv file containing the grid of points (one per row) "
           "on which the log-density has been evaluated");
 
   args.add_argument("--dens-file")
-      .default_value(std::string("\"\""))
+      .default_value(EMPTYSTR)
       .help(
           "Path to a .csv file containing the evaluations of the log-density");
 
   args.add_argument("--n-cl-file")
-      .default_value(std::string("\"\""))
+      .default_value(EMPTYSTR)
       .help(
           "Path to a .csv file containing the number of clusters "
           "(one per row) at each iteration");
 
   args.add_argument("--dens-plot")
-      .default_value(std::string("\"\""))
+      .default_value(EMPTYSTR)
       .help("File to which to save the density plot");
 
   args.add_argument("--n-cl-trace-plot")
-      .default_value(std::string("\"\""))
+      .default_value(EMPTYSTR)
       .help(
           "File to which to save the traceplot of the number of clusters "
           "in the MCMC chain");
 
   args.add_argument("--n-cl-hist-plot")
-      .default_value(std::string("\"\""))
+      .default_value(EMPTYSTR)
       .help(
           "File to which to save the histogram of the number of clusters "
           "in the MCMC chain");
@@ -142,8 +144,6 @@ int main(int argc, char const *argv[]) {
     std::cout << "Saved histogram to " << ncl_hist_plot << std::endl;
   }
 
-  // TODO args.get vs []
-  // TODO "" vs std::string("\"\"")
   // TODO check that removing arguments still works
 
   std::cout << "End of plot_mcmc.cc" << std::endl;
