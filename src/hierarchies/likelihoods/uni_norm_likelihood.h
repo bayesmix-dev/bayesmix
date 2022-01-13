@@ -26,11 +26,10 @@ class UniNormLikelihood
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override;
   double compute_lpdf(const Eigen::RowVectorXd &datum) const override;
-  void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                 bool add) override;
+  void update_sum_stats(const Eigen::RowVectorXd &datum, bool add) override;
 
   double data_sum = 0;
   double data_sum_squares = 0;
 };
 
-#endif
+#endif  // BAYESMIX_HIERARCHIES_UNI_NORM_LIKELIHOOD_H_

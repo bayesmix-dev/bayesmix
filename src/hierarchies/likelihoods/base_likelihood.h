@@ -86,7 +86,8 @@ void BaseLikelihood<Derived, State>::add_datum(
   assert(cluster_data_idx.find(id) == cluster_data_idx.end());
   card += 1;
   log_card = std::log(card);
-  static_cast<Derived *>(this)->update_sum_stats(datum, covariate, true);
+  static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
+                                                          true);
   cluster_data_idx.insert(id);
 }
 
@@ -94,7 +95,8 @@ template <class Derived, typename State>
 void BaseLikelihood<Derived, State>::remove_datum(
     const int id, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate) {
-  static_cast<Derived *>(this)->update_sum_stats(datum, covariate, false);
+  static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
+                                                          false);
   set_card(card - 1);
   auto it = cluster_data_idx.find(id);
   assert(it != cluster_data_idx.end());
@@ -137,4 +139,4 @@ Eigen::VectorXd BaseLikelihood<Derived, State>::lpdf_grid(
   return lpdf;
 }
 
-#endif
+#endif  // BAYESMIX_HIERARCHIES_BASE_LIKELIHOOD_H_

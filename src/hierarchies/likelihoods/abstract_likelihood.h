@@ -54,12 +54,13 @@ class AbstractLikelihood {
       const int id, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
 
-  void update_sum_stats(const Eigen::RowVectorXd &datum,
-                        const Eigen::RowVectorXd &covariate, bool add) {
+  void update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                 const Eigen::RowVectorXd &covariate,
+                                 bool add) {
     if (is_dependent()) {
-      return update_summary_statistics(datum, covariate, add);
+      return update_sum_stats(datum, covariate, add);
     } else {
-      return update_summary_statistics(datum, add);
+      return update_sum_stats(datum, add);
     }
   }
 
@@ -88,8 +89,7 @@ class AbstractLikelihood {
     }
   }
 
-  virtual void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                         bool add) {
+  virtual void update_sum_stats(const Eigen::RowVectorXd &datum, bool add) {
     if (is_dependent()) {
       throw std::runtime_error(
           "Cannot call this function from a dependent hierarchy");
@@ -98,9 +98,9 @@ class AbstractLikelihood {
     }
   }
 
-  virtual void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                         const Eigen::RowVectorXd &covariate,
-                                         bool add) {
+  virtual void update_sum_stats(const Eigen::RowVectorXd &datum,
+                                const Eigen::RowVectorXd &covariate,
+                                bool add) {
     if (!is_dependent()) {
       throw std::runtime_error(
           "Cannot call this function from a non-dependent hierarchy");
@@ -110,4 +110,4 @@ class AbstractLikelihood {
   }
 };
 
-#endif
+#endif  // BAYESMIX_HIERARCHIES_ABSTRACT_LIKELIHOOD_H_
