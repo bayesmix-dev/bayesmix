@@ -58,8 +58,8 @@ class BasePriorModel : public AbstractPriorModel {
         const bayesmix::AlgorithmState::HierarchyHypers &>(state_);
   }
 
-  HyperParams hypers;  // std::shared_ptr<HyperParams> hypers;
-  std::shared_ptr<Prior> prior;
+  std::shared_ptr<HyperParams> hypers = std::make_shared<HyperParams>();
+  std::shared_ptr<Prior> prior = std::make_shared<Prior>();
 };
 
 template <class Derived, typename HyperParams, typename Prior>
