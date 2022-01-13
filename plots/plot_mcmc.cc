@@ -145,7 +145,5 @@ int main(int argc, char const *argv[]) {
     std::cout << "Saved histogram to " << ncl_hist_plot << std::endl;
   }
 
-  // TODO check that removing arguments still works
-
   std::cout << "End of plot_mcmc.cc" << std::endl;
 }
