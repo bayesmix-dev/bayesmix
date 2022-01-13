@@ -55,7 +55,8 @@ int main(int argc, char const *argv[]) {
   std::string grid_file = args.get<std::string>("--grid-file");
   std::string dens_file = args.get<std::string>("--dens-file");
   std::string dens_plot = args.get<std::string>("--dens-plot");
-  if (grid_file != "" and dens_file != "" and dens_plot != "") {
+  if (grid_file != EMPTYSTR and dens_file != EMPTYSTR and
+      dens_plot != EMPTYSTR) {
     bayesmix::check_file_is_writeable(dens_plot);
 
     // Read relevant matrices
@@ -111,7 +112,7 @@ int main(int argc, char const *argv[]) {
   std::string ncl_hist_plot = args.get<std::string>("--n-cl-hist-plot");
 
   // TRACEPLOT OF NUMBER OF CLUSTERS
-  if (ncl_file != "" and ncl_trace_plot != "") {
+  if (ncl_file != EMPTYSTR and ncl_trace_plot != EMPTYSTR) {
     bayesmix::check_file_is_writeable(ncl_trace_plot);
     Eigen::MatrixXd num_clus = bayesmix::read_eigen_matrix(ncl_file);
     int n_iters = num_clus.rows();
@@ -130,7 +131,7 @@ int main(int argc, char const *argv[]) {
   }
 
   // HISTOGRAM OF NUMBER OF CLUSTERS
-  if (ncl_file != "" and ncl_hist_plot != "") {
+  if (ncl_file != EMPTYSTR and ncl_hist_plot != EMPTYSTR) {
     bayesmix::check_file_is_writeable(ncl_hist_plot);
     Eigen::MatrixXd num_clus = bayesmix::read_eigen_matrix(ncl_file);
     int n_iters = num_clus.rows();
