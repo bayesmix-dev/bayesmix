@@ -14,3 +14,4 @@ target_sources(bayesmix
 )
 
 add_subdirectory(likelihoods)
+add_subdirectory(priors)
