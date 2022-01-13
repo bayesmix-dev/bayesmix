@@ -29,6 +29,7 @@ add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   # rng.cc
   # logit_sb.cc
   likelihoods.cc
+  prior_models.cc
 )
 
 target_include_directories(test_bayesmix PUBLIC ${INCLUDE_PATHS})
