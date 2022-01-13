@@ -41,6 +41,8 @@ int main(int argc, char const *argv[]) {
           "File to which to save the histogram of the number of clusters "
           "in the MCMC chain");
 
+  std::cout << "Running plot_mcmc.cc" << std::endl;
+
   try {
     args.parse_args(argc, argv);
   } catch (const std::runtime_error &err) {
@@ -48,8 +50,6 @@ int main(int argc, char const *argv[]) {
     std::cerr << args;
     std::exit(1);
   }
-
-  std::cout << "Running plot_mcmc.cc" << std::endl;
 
   // DENSITY PLOT
   std::string grid_file = args.get<std::string>("--grid-file");

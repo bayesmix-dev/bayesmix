@@ -8,9 +8,8 @@ bool bayesmix::check_file_is_writeable(const std::string &filename) {
   std::ofstream ofstr;
   ofstr.open(filename);
   if (ofstr.fail()) {
-    std::cerr << "Error: cannot write to " << filename << std::endl;
     ofstr.close();
-    return false;
+    throw std::invalid_argument("Cannot write to " + filename);
   }
   ofstr.close();
   return true;

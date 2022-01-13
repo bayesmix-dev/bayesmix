@@ -128,6 +128,8 @@ int main(int argc, char *argv[]) {
           "Path to a csv file with the values covariates used in the mixing "
           "on which to evaluate the (log) predictive density");
 
+  std::cout << "Running run_mcmc.cc" << std::endl;
+
   try {
     args.parse_args(argc, argv);
   } catch (const std::runtime_error &err) {
@@ -135,8 +137,6 @@ int main(int argc, char *argv[]) {
     std::cerr << args;
     std::exit(1);
   }
-
-  std::cout << "Running run_mcmc.cc" << std::endl;
   check_args(args);
 
   // Read algorithm settings proto
