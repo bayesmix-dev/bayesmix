@@ -65,9 +65,10 @@ Eigen::VectorXd multi_normal_prec_lpdf_grid(const Eigen::MatrixXd &data,
  * @rng          Random number generator
  * @return       multivariate normal r.v.
  */
-Eigen::VectorXd multi_normal_diag_rng(const Eigen::VectorXd &mean,
-                                      const Eigen::DiagonalMatrix<double,Eigen::Dynamic> &cov_diag,
-                                      std::mt19937_64 &rng);
+Eigen::VectorXd multi_normal_diag_rng(
+    const Eigen::VectorXd &mean,
+    const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &cov_diag,
+    std::mt19937_64 &rng);
 
 /*
  * Returns a pseudorandom multivariate normal random variable parametrized
@@ -79,8 +80,8 @@ Eigen::VectorXd multi_normal_diag_rng(const Eigen::VectorXd &mean,
  * @return       multivariate normal r.v.
  */
 Eigen::VectorXd multi_normal_prec_chol_rng(const Eigen::VectorXd &mean,
-                                                     const Eigen::MatrixXd &prec_chol,
-                                                     std::mt19937_64 &rng);
+                                           const Eigen::MatrixXd &prec_chol,
+                                           std::mt19937_64 &rng);
 
 /*
  * Evaluates the log probability density function of a multivariate Student's t

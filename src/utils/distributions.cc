@@ -1,10 +1,11 @@
 #include "distributions.h"
 
 #include <Eigen/Dense>
-#include <random>
-#include <stan/math/prim.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <random>
+#include <stan/math/prim.hpp>
+
 #include "src/utils/proto_utils.h"
 
 int bayesmix::categorical_rng(const Eigen::VectorXd &probas,
@@ -35,38 +36,38 @@ Eigen::VectorXd bayesmix::multi_normal_prec_lpdf_grid(
   return (base - exp) * 0.5;
 }
 
-Eigen::VectorXd bayesmix::multi_normal_diag_rng(const Eigen::VectorXd &mean,
-                                      const Eigen::DiagonalMatrix<double,Eigen::Dynamic> &cov_diag,
-                                      std::mt19937_64 &rng){
-    size_t N = mean.size();                                    
-    Eigen::VectorXd output(N);
-    for (size_t i = 0; i < N; i++) {
-      output[i] = stan::math::normal_rng(0, 1, rng);
-    }
-    return output.cwiseProduct(cov_diag.diagonal().cwiseSqrt()) + mean;
+Eigen::VectorXd bayesmix::multi_normal_diag_rng(
+    const Eigen::VectorXd &mean,
+    const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &cov_diag,
+    std::mt19937_64 &rng) {
+  size_t N = mean.size();
+  Eigen::VectorXd output(N);
+  for (size_t i = 0; i < N; i++) {
+    output[i] = stan::math::normal_rng(0, 1, rng);
+  }
+  return output.cwiseProduct(cov_diag.diagonal().cwiseSqrt()) + mean;
 }
 
-Eigen::VectorXd bayesmix::multi_normal_prec_chol_rng(const Eigen::VectorXd &mean,
-                                                     const Eigen::MatrixXd &prec_chol,
-                                                     std::mt19937_64 &rng){
-    size_t N = mean.size();
-    Eigen::VectorXd output(N);
-    const auto& L_ref = stan::math::to_ref(prec_chol);
-    boost::variate_generator<std::mt19937_64 &, boost::normal_distribution<>> std_normal_rng(
-        rng, boost::normal_distribution<>(0, 1));
-  
-     for (size_t n = 0; n < N; ++n) {
-      Eigen::VectorXd z(prec_chol.cols());
-      for (int i = 0; i < prec_chol.cols(); i++) {
-        z(i) = std_normal_rng();
+Eigen::VectorXd bayesmix::multi_normal_prec_chol_rng(
+    const Eigen::VectorXd &mean, const Eigen::MatrixXd &prec_chol,
+    std::mt19937_64 &rng) {
+  size_t N = mean.size();
+  Eigen::VectorXd output(N);
+  const auto &L_ref = stan::math::to_ref(prec_chol);
+  boost::variate_generator<std::mt19937_64 &, boost::normal_distribution<>>
+      std_normal_rng(rng, boost::normal_distribution<>(0, 1));
+
+  for (size_t n = 0; n < N; ++n) {
+    Eigen::VectorXd z(prec_chol.cols());
+    for (int i = 0; i < prec_chol.cols(); i++) {
+      z(i) = std_normal_rng();
     }
-  
-      output[n]
-          = stan::math::as_column_vector_or_scalar(mean[n]) + stan::math::as_column_vector_or_scalar(L_ref.row(n)).dot(z);
-    }
-    
-    return output;
-      
+
+    output[n] = stan::math::as_column_vector_or_scalar(mean[n]) +
+                stan::math::as_column_vector_or_scalar(L_ref.row(n)).dot(z);
+  }
+
+  return output;
 }
 
 double bayesmix::multi_student_t_invscale_lpdf(

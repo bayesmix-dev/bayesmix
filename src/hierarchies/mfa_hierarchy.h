@@ -22,7 +22,7 @@ namespace MFA {
 struct State {
   Eigen::VectorXd mu, psi;
   Eigen::MatrixXd eta, lambda;
-  Eigen::DiagonalMatrix<double,Eigen::Dynamic> psi_inverse;
+  Eigen::DiagonalMatrix<double, Eigen::Dynamic> psi_inverse;
 };
 
 //! Custom container for Hyperparameters values

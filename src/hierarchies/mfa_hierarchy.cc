@@ -17,7 +17,7 @@
 double MFAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
   return stan::math::multi_normal_lpdf(
       datum, state.mu,
-      state.lambda * state.lambda.transpose() + 
+      state.lambda * state.lambda.transpose() +
           Eigen::MatrixXd(state.psi.asDiagonal()));
 }
 
@@ -144,7 +144,6 @@ MFAHierarchy::get_state_proto() const {
   bayesmix::to_proto(state.lambda, state_.mutable_lambda());
   bayesmix::to_proto(state.psi_inverse, state_.mutable_psi_inverse());
 
-
   auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
   out->mutable_mfa_state()->CopyFrom(state_);
   return out;
@@ -188,40 +187,41 @@ void MFAHierarchy::sample_full_cond(bool update_params) {
 
 void MFAHierarchy::sample_eta() {
   auto& rng = bayesmix::Rng::Instance().get();
-  auto sigma_eta_inv_llt = (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
-              state.lambda.transpose() * state.psi_inverse * state.lambda)
-                 .llt();
-  Eigen::MatrixXd sigma_eta(
-      sigma_eta_inv_llt.solve(Eigen::MatrixXd::Identity(hypers->q, hypers->q)));
+  auto sigma_eta_inv_llt =
+      (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
+       state.lambda.transpose() * state.psi_inverse * state.lambda)
+          .llt();
+  Eigen::MatrixXd sigma_eta(sigma_eta_inv_llt.solve(
+      Eigen::MatrixXd::Identity(hypers->q, hypers->q)));
 
   if (state.eta.rows() != card) {
     state.eta.resize(card, state.eta.cols());
     state.eta = Eigen::MatrixXd::Zero(card, state.eta.cols());
   }
-  Eigen::MatrixXd temp_product(sigma_eta * (state.lambda.transpose()) * state.psi_inverse);
+  Eigen::MatrixXd temp_product(sigma_eta * (state.lambda.transpose()) *
+                               state.psi_inverse);
   for (size_t i = 0; i < card; i++) {
     state.eta.row(i) = (bayesmix::multi_normal_prec_chol_rng(
-        temp_product * (data[i] - state.mu),
-        sigma_eta_inv_llt.matrixL(), rng));
+        temp_product * (data[i] - state.mu), sigma_eta_inv_llt.matrixL(),
+        rng));
   }
 }
 
 void MFAHierarchy::sample_mu() {
   auto& rng = bayesmix::Rng::Instance().get();
-  Eigen::DiagonalMatrix<double,Eigen::Dynamic> sigma_mu;
-  
-  sigma_mu.diagonal() = (card * state.psi_inverse.diagonal().array() + hypers->phi).cwiseInverse();
-  
+  Eigen::DiagonalMatrix<double, Eigen::Dynamic> sigma_mu;
+
+  sigma_mu.diagonal() =
+      (card * state.psi_inverse.diagonal().array() + hypers->phi)
+          .cwiseInverse();
 
   Eigen::VectorXd sum = Eigen::VectorXd::Zero(dim);
-
   for (size_t i = 0; i < card; i++) {
     Eigen::VectorXd row = state.eta.row(i);
     sum += state.lambda * row;
   }
   Eigen::VectorXd mumean = sigma_mu * (hypers->phi * hypers->mutilde +
                                        state.psi_inverse * (data_sum - sum));
-
   state.mu = bayesmix::multi_normal_diag_rng(mumean, sigma_mu, rng);
 }
 
@@ -232,17 +232,20 @@ void MFAHierarchy::sample_lambda() {
     data_matrix.col(i) = data[i];
   }
 
+  Eigen::MatrixXd temp_etateta(state.eta.transpose() * state.eta);
+
   for (size_t j = 0; j < dim; j++) {
-    auto sigma_lambda_inv_llt = (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
-                state.eta.transpose() / state.psi[j] * state.eta)
-                   .llt();
-    Eigen::MatrixXd sigma_lambda =
-        sigma_lambda_inv_llt.solve(Eigen::MatrixXd::Identity(hypers->q, hypers->q));
-    Eigen::VectorXd vectortemp(data_matrix.row(j));
+    auto sigma_lambda_inv_llt =
+        (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
+         temp_etateta / state.psi[j])
+            .llt();
+
+    Eigen::VectorXd temp_row(data_matrix.row(j));
     state.lambda.row(j) = bayesmix::multi_normal_prec_chol_rng(
-        sigma_lambda * state.eta.transpose() *
-            (vectortemp - Eigen::VectorXd::Constant(card, state.mu[j])) /
-            state.psi[j],
+        sigma_lambda_inv_llt.solve(
+            state.eta.transpose() *
+            (temp_row - Eigen::VectorXd::Constant(card, state.mu[j])) /
+            state.psi[j]),
         sigma_lambda_inv_llt.matrixL(), rng);
   }
 }
