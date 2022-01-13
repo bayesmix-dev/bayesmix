@@ -1,6 +1,8 @@
 import os
 import setuptools
-
+import site
+import sys
+site.ENABLE_USER_SITE = '--user' in sys.argv[1:]
 
 __version__ = "0.0.1"
 folder = os.path.dirname(__file__)
