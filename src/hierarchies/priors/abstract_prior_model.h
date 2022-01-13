@@ -14,23 +14,23 @@ class AbstractPriorModel {
  public:
   virtual ~AbstractPriorModel() = default;
 
+  // IMPLEMENTED in BasePriorModel
   virtual std::shared_ptr<AbstractPriorModel> clone() const = 0;
 
   virtual double lpdf() = 0;
 
-  // Da pensare, come restituisco lo stato? magari un pointer?
-  virtual void sample() = 0;
+  // Da pensare, come restituisco lo stato? magari un pointer? Oppure delego
+  // all'updater?? virtual void sample() = 0;
 
   virtual void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;
-
-  virtual void initialize_hypers() = 0;
 
   virtual google::protobuf::Message *get_mutable_prior() = 0;
 
   virtual void set_hypers_from_proto(
       const google::protobuf::Message &state_) = 0;
 
+  // IMPLEMENTED in BasePriorModel
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
 
  protected:
@@ -40,4 +40,4 @@ class AbstractPriorModel {
   virtual void initialize_hypers() = 0;
 };
 
-#endif
+#endif  // BAYESMIX_HIERARCHIES_ABSTRACT_PRIORMODEL_H_

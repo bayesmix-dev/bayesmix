@@ -14,7 +14,7 @@
 #include "hierarchy_id.pb.h"
 #include "src/utils/rng.h"
 
-template <class Derived, typename Hyperparams, typename Prior>
+template <class Derived, typename HyperParams, typename Prior>
 class BasePriorModel : public AbstractPriorModel {
  public:
   BasePriorModel() = default;
@@ -26,8 +26,6 @@ class BasePriorModel : public AbstractPriorModel {
     return out;
   }
 
-  // sample method, che posso fare??
-
   virtual google::protobuf::Message *get_mutable_prior() override {
     if (prior == nullptr) {
       create_empty_prior();
@@ -35,7 +33,7 @@ class BasePriorModel : public AbstractPriorModel {
     return prior.get();
   }
 
-  Hyperparams get_hypers() const { return *hypers; }
+  HyperParams get_hypers() const { return *hypers; }
 
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
@@ -60,12 +58,12 @@ class BasePriorModel : public AbstractPriorModel {
         const bayesmix::AlgorithmState::HierarchyHypers &>(state_);
   }
 
-  std::shared_ptr<Hyperparams> hypers;
+  HyperParams hypers;  // std::shared_ptr<HyperParams> hypers;
   std::shared_ptr<Prior> prior;
 };
 
-template <class Derived, typename Hyperparams, typename Prior>
-void BasePriorModel<Derived, Hyperparams, Prior>::write_hypers_to_proto(
+template <class Derived, typename HyperParams, typename Prior>
+void BasePriorModel<Derived, HyperParams, Prior>::write_hypers_to_proto(
     google::protobuf::Message *out) const {
   std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> hypers_ =
       get_hypers_proto();

@@ -27,4 +27,4 @@ struct MNIG {
 
 }  // namespace Hyperparams
 
-#endif
+#endif  // BAYESMIX_HIERARCHIES_PRIORMODEL_HYPERPARAMS_H_
