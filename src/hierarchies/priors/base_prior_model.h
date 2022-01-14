@@ -37,6 +37,11 @@ class BasePriorModel : public AbstractPriorModel {
 
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
+  void initialize() {
+    check_prior_is_set();
+    initialize_hypers();
+  }
+
  protected:
   void check_prior_is_set() const {
     if (prior == nullptr) {

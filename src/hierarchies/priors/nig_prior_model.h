@@ -20,8 +20,6 @@ class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
   NIGPriorModel() = default;
   ~NIGPriorModel() = default;
 
-  void initialize_hypers() override;
-
   double lpdf() override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
@@ -33,6 +31,8 @@ class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
  protected:
   std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
       const override;
+
+  void initialize_hypers() override;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_NIG_PRIOR_MODEL_H_
