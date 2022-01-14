@@ -21,33 +21,18 @@ class BasePriorModel : public AbstractPriorModel {
 
   ~BasePriorModel() = default;
 
-  virtual std::shared_ptr<AbstractPriorModel> clone() const override {
-    auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
-    return out;
-  }
+  virtual std::shared_ptr<AbstractPriorModel> clone() const override;
 
-  virtual google::protobuf::Message *get_mutable_prior() override {
-    if (prior == nullptr) {
-      create_empty_prior();
-    }
-    return prior.get();
-  }
+  virtual google::protobuf::Message *get_mutable_prior() override;
 
   HyperParams get_hypers() const { return *hypers; }
 
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
-  void initialize() {
-    check_prior_is_set();
-    initialize_hypers();
-  }
+  void initialize();
 
  protected:
-  void check_prior_is_set() const {
-    if (prior == nullptr) {
-      throw std::invalid_argument("Hierarchy prior was not provided");
-    }
-  }
+  void check_prior_is_set() const;
 
   void create_empty_prior() { prior.reset(new Prior); }
 
@@ -64,8 +49,26 @@ class BasePriorModel : public AbstractPriorModel {
   }
 
   std::shared_ptr<HyperParams> hypers = std::make_shared<HyperParams>();
-  std::shared_ptr<Prior> prior = std::make_shared<Prior>();
+  std::shared_ptr<Prior> prior;
 };
+
+// Methods Definitions
+
+template <class Derived, typename HyperParams, typename Prior>
+std::shared_ptr<AbstractPriorModel>
+BasePriorModel<Derived, HyperParams, Prior>::clone() const {
+  auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
+  return out;
+}
+
+template <class Derived, typename HyperParams, typename Prior>
+google::protobuf::Message *
+BasePriorModel<Derived, HyperParams, Prior>::get_mutable_prior() {
+  if (prior == nullptr) {
+    create_empty_prior();
+  }
+  return prior.get();
+}
 
 template <class Derived, typename HyperParams, typename Prior>
 void BasePriorModel<Derived, HyperParams, Prior>::write_hypers_to_proto(
@@ -74,6 +77,19 @@ void BasePriorModel<Derived, HyperParams, Prior>::write_hypers_to_proto(
       get_hypers_proto();
   auto *out_cast = downcast_hypers(out);
   out_cast->CopyFrom(*hypers_.get());
+}
+
+template <class Derived, typename HyperParams, typename Prior>
+void BasePriorModel<Derived, HyperParams, Prior>::initialize() {
+  check_prior_is_set();
+  initialize_hypers();
+}
+
+template <class Derived, typename HyperParams, typename Prior>
+void BasePriorModel<Derived, HyperParams, Prior>::check_prior_is_set() const {
+  if (prior == nullptr) {
+    throw std::invalid_argument("Hierarchy prior was not provided");
+  }
 }
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_PRIORMODEL_H_
