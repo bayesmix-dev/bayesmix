@@ -16,4 +16,6 @@ target_sources(bayesmix
     neal8_algorithm.cc
     semihdp_sampler.h
     semihdp_sampler.cc
+    split_and_merge_algorithm.cc
+    split_and_merge_algorithm.h
 )
