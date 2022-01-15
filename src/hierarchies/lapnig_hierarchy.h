@@ -87,13 +87,15 @@ class LapNIGHierarchy
   //! Samples from the proposal distribution
   Eigen::VectorXd propose_rwmh(const Eigen::VectorXd &curr_vals);
 
-  //! Evaluates the prior given the mean and log of the scale (beware of the
+  //! Evaluates the prior given the mean (unconstrained_parameters(0))
+  //! and log of the scale (unconstrained_parameters(1)) (beware of the
   //! change of variables!
   double eval_prior_lpdf_unconstrained(
       Eigen::VectorXd unconstrained_parameters);
 
   //! Evaluates the (sum of the) log likelihood for all the observations in the
-  //! cluster
+  //! cluster given the mean (unconstrained_parameters(0))
+  //! and log of the scale (unconstrained_parameters(1))
   double eval_like_lpdf_unconstrained(
       Eigen::VectorXd unconstrained_parameters);
 
