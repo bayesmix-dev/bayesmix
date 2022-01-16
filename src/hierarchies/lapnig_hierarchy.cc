@@ -182,23 +182,22 @@ Eigen::VectorXd LapNIGHierarchy::propose_rwmh(
 
 double LapNIGHierarchy::eval_prior_lpdf_unconstrained(
     Eigen::VectorXd unconstrained_parameters) {
-
   double mu = unconstrained_parameters(0);
   double log_scale = unconstrained_parameters(1);
   double scale = std::exp(log_scale);
-
-  return stan::math::normal_lpdf(mu, hypers->mean, 1./hypers->var) +
-               stan::math::inv_gamma_lpdf(scale, hypers->shape, hypers->scale) + (-log_scale);
+  return stan::math::normal_lpdf(mu, hypers->mean, 1. / hypers->var) +
+         stan::math::inv_gamma_lpdf(scale, hypers->shape, hypers->scale) +
+         (-log_scale);
 }
 
 double LapNIGHierarchy::eval_like_lpdf_unconstrained(
     Eigen::VectorXd unconstrained_parameters) {
   double mean = unconstrained_parameters(0);
   double log_scale = unconstrained_parameters(1);
+  double scale = std::exp(log_scale);
   double diff_sum = 0;  // Sum of absolute values of data - candidate_mean
   for (auto &elem : cluster_data_values) {
     diff_sum += std::abs(elem(0, 0) - mean);
   }
-  return std::log(0.5 / std::exp(log_scale)) +
-         (-0.5 / std::exp(log_scale) * diff_sum);
+  return std::log(0.5 / scale) + (-0.5 / scale * diff_sum);
 }
