@@ -185,9 +185,9 @@ double LapNIGHierarchy::eval_prior_lpdf_unconstrained(
   double mu = unconstrained_parameters(0);
   double log_scale = unconstrained_parameters(1);
   double scale = std::exp(log_scale);
-  return stan::math::normal_lpdf(mu, hypers->mean, 1. / hypers->var) +
+  return stan::math::normal_lpdf(mu, hypers->mean, std::sqrt(hypers->var)) +
          stan::math::inv_gamma_lpdf(scale, hypers->shape, hypers->scale) +
-         (-log_scale);
+         log_scale;
 }
 
 double LapNIGHierarchy::eval_like_lpdf_unconstrained(
