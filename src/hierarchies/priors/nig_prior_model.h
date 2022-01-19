@@ -20,7 +20,10 @@ class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
   NIGPriorModel() = default;
   ~NIGPriorModel() = default;
 
-  double lpdf() override;
+  double lpdf(const google::protobuf::Message &state_) override;
+
+  std::shared_ptr<google::protobuf::Message> sample(
+      bool use_post_hypers = false) override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;

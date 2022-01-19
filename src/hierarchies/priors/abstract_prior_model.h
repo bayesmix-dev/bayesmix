@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "algorithm_state.pb.h"
+#include "src/hierarchies/likelihoods/states.h"
 #include "src/utils/rng.h"
 
 class AbstractPriorModel {
@@ -17,10 +18,11 @@ class AbstractPriorModel {
   // IMPLEMENTED in BasePriorModel
   virtual std::shared_ptr<AbstractPriorModel> clone() const = 0;
 
-  virtual double lpdf() = 0;
+  virtual double lpdf(const google::protobuf::Message &state_) = 0;
 
   // Da pensare, come restituisco lo stato? magari un pointer? Oppure delego
-  // all'updater?? virtual void sample() = 0;
+  virtual std::shared_ptr<google::protobuf::Message> sample(
+      bool use_post_hypers = false) = 0;
 
   virtual void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;

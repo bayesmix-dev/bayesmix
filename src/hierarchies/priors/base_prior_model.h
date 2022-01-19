@@ -27,6 +27,10 @@ class BasePriorModel : public AbstractPriorModel {
 
   HyperParams get_hypers() const { return *hypers; }
 
+  void set_posterior_hypers(const HyperParams &_post_hypers) {
+    post_hypers = std::make_shared<HyperParams>(_post_hypers);
+  };
+
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
   void initialize();
@@ -48,7 +52,14 @@ class BasePriorModel : public AbstractPriorModel {
         const bayesmix::AlgorithmState::HierarchyHypers &>(state_);
   }
 
+  const bayesmix::AlgorithmState::ClusterState &downcast_state(
+      const google::protobuf::Message &state_) const {
+    return google::protobuf::internal::down_cast<
+        const bayesmix::AlgorithmState::ClusterState &>(state_);
+  }
+
   std::shared_ptr<HyperParams> hypers = std::make_shared<HyperParams>();
+  std::shared_ptr<HyperParams> post_hypers = std::make_shared<HyperParams>();
   std::shared_ptr<Prior> prior;
 };
 

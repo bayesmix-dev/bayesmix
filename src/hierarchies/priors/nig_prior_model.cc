@@ -75,38 +75,29 @@ void NIGPriorModel::initialize_hypers() {
   }
 }
 
-double NIGPriorModel::lpdf() {
-  if (prior->has_fixed_values()) {
-    return 0;
-  } else if (prior->has_normal_mean_prior()) {
-    double mu = prior->normal_mean_prior().mean_prior().mean();
-    double var = prior->normal_mean_prior().mean_prior().var();
-    return stan::math::normal_lpdf(hypers->mean, mu, sqrt(var));
-  } else if (prior->has_ngg_prior()) {
-    // Set variables
-    double mu, var, shape, rate;
-    double target = 0;
-
-    // Gaussian distribution on the mean
-    mu = prior->ngg_prior().mean_prior().mean();
-    var = prior->ngg_prior().mean_prior().var();
-    target += stan::math::normal_lpdf(hypers->mean, mu, sqrt(var));
-
-    // Gamma distribution on var_scaling
-    shape = prior->ngg_prior().var_scaling_prior().shape();
-    rate = prior->ngg_prior().var_scaling_prior().rate();
-    target += stan::math::gamma_lpdf(hypers->var_scaling, shape, rate);
-
-    // Gamma distribution on scale
-    shape = prior->ngg_prior().scale_prior().shape();
-    rate = prior->ngg_prior().scale_prior().rate();
-    target += stan::math::gamma_lpdf(hypers->var_scaling, shape, rate);
-
-    return target;
-  } else {
-    throw std::invalid_argument("Unrecognized hierarchy prior");
-  }
+double NIGPriorModel::lpdf(const google::protobuf::Message &state_) {
+  auto &state = downcast_state(state_).uni_ls_state();
+  double target =
+      stan::math::normal_lpdf(state.mean(), hypers->mean,
+                              sqrt(state.var() / hypers->var_scaling)) +
+      stan::math::inv_gamma_lpdf(state.var(), hypers->shape, hypers->scale);
+  return target;
 }
+
+std::shared_ptr<google::protobuf::Message> NIGPriorModel::sample(
+    bool use_post_hypers) {
+  auto &rng = bayesmix::Rng::Instance().get();
+  Hyperparams::NIG params = use_post_hypers ? *post_hypers : *hypers;
+
+  double var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+  double mean =
+      stan::math::normal_rng(params.mean, sqrt(var / params.var_scaling), rng);
+
+  bayesmix::AlgorithmState::ClusterState state;
+  state.mutable_uni_ls_state()->set_mean(mean);
+  state.mutable_uni_ls_state()->set_var(var);
+  return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
+};
 
 void NIGPriorModel::update_hypers(
     const std::vector<bayesmix::AlgorithmState::ClusterState> &states) {
