@@ -198,10 +198,10 @@ class AbstractHierarchy {
   virtual bool is_multivariate() const = 0;
 
   //! Returns whether the hierarchy depends on covariate values or not
-  virtual bool is_dependent() const { return false; }
+  virtual bool is_dependent() const = 0;
 
   //! Returns whether the hierarchy represents a conjugate model or not
-  virtual bool is_conjugate() const { return false; }
+  virtual bool is_conjugate() const = 0;
 
  protected:
   //! Evaluates the log-likelihood of data in a single point
