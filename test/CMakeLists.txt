@@ -18,7 +18,7 @@ FetchContent_MakeAvailable(googletest)
 add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   # write_proto.cc
   # proto_utils.cc
-  # hierarchies.cc
+  hierarchies.cc
   # lpdf.cc
   # priors.cc
   # eigen_utils.cc
