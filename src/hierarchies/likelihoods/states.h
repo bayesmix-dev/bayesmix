@@ -5,25 +5,17 @@
 
 namespace State {
 
-class Base {
- protected:
-  Base() = default;
-
- public:
-  virtual ~Base() = default;
-};
-
-struct UniLS : public Base {
+struct UniLS {
   double mean, var;
 };
 
-struct MultiLS : public Base {
+struct MultiLS {
   Eigen::VectorXd mean;
   Eigen::MatrixXd prec, prec_chol;
   double prec_logdet;
 };
 
-struct UniLinReg : public Base {
+struct UniLinReg {
   Eigen::VectorXd regression_coeffs;
   double var;
 };
