@@ -6,8 +6,6 @@
 //! This file implements basic input-output utilities for Eigen matrices from
 //! and to text files.
 
-#define MAXBUFSIZE ((int)1e6)
-
 namespace bayesmix {
 //! Checks whether the given file is available for writing
 bool check_file_is_writeable(const std::string &filename);
