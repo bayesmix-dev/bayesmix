@@ -39,6 +39,8 @@ class BaseLikelihood : public AbstractLikelihood {
 
   State get_state() const { return state; }
 
+  void set_state(const State &_state) { state = _state; };
+
   void add_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
@@ -47,15 +49,15 @@ class BaseLikelihood : public AbstractLikelihood {
       const int id, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
 
+  void clear_data() {
+    set_card(0);
+    cluster_data_idx = std::set<int>();
+  }
+
  protected:
   void set_card(const int card_) {
     card = card_;
     log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
-  }
-
-  void clear_data() {
-    set_card(0);
-    cluster_data_idx = std::set<int>();
   }
 
   bayesmix::AlgorithmState::ClusterState *downcast_state(

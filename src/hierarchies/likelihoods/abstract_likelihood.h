@@ -30,6 +30,9 @@ class AbstractLikelihood {
     }
   }
 
+  // AGGIUNGERE CLUST_LPDF (CHE VALUTA LA LIKELIHOOD CONGIUNTA SU TUTTO IL
+  // CLUSTER)
+
   virtual Eigen::VectorXd lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const = 0;
