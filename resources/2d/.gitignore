@@ -1,0 +1,8 @@
+# Several image formats
+*.png
+*.svg
+*.pdf
+*.jpg
+*.jpeg
+# Output files
+*.csv
