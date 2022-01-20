@@ -27,6 +27,8 @@ class BasePriorModel : public AbstractPriorModel {
 
   HyperParams get_hypers() const { return *hypers; }
 
+  HyperParams get_posterior_hypers() const { return *post_hypers; }
+
   void set_posterior_hypers(const HyperParams &_post_hypers) {
     post_hypers = std::make_shared<HyperParams>(_post_hypers);
   };
