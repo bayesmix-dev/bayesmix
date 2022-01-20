@@ -21,8 +21,9 @@ class AbstractLikelihood {
   // IMPLEMENTED in BaseLikelihood
   virtual std::shared_ptr<AbstractLikelihood> clone() const = 0;
 
-  double lpdf(const Eigen::RowVectorXd &datum,
-              const Eigen::RowVectorXd &covariate) const {
+  double lpdf(
+      const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     if (is_dependent()) {
       return compute_lpdf(datum, covariate);
     } else {
@@ -30,12 +31,12 @@ class AbstractLikelihood {
     }
   }
 
-  // AGGIUNGERE CLUST_LPDF (CHE VALUTA LA LIKELIHOOD CONGIUNTA SU TUTTO IL
-  // CLUSTER)
-
   virtual Eigen::VectorXd lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const = 0;
+
+  // AGGIUNGERE CLUST_LPDF (CHE VALUTA LA LIKELIHOOD CONGIUNTA SU TUTTO IL
+  // CLUSTER)
 
   virtual bool is_multivariate() const = 0;
 
