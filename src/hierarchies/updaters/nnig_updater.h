@@ -12,6 +12,7 @@ class NNIGUpdater {
   ~NNIGUpdater() = default;
 
   std::shared_ptr<NNIGUpdater> clone() const;
+  bool is_conjugate() const { return true; };
   void draw(UniNormLikelihood& like, NIGPriorModel& prior);
   void initialize(UniNormLikelihood& like, NIGPriorModel& prior);
   void compute_posterior_hypers(UniNormLikelihood& like, NIGPriorModel& prior);
