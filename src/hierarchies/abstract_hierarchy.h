@@ -72,8 +72,12 @@ class AbstractHierarchy {
   virtual double prior_pred_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error(
-        "Cannot call prior_pred_lpdf() from a non-conjugate hierarchy");
+    if (is_conjugate()) {
+      throw std::runtime_error("prior_pred_lpdf() not implemented yet");
+    } else {
+      throw std::runtime_error(
+          "Cannot call prior_pred_lpdf() from a non-conjugate hierarchy");
+    }
   }
 
   //! Evaluates the log-conditional predictive distr. of data in a single point
@@ -83,8 +87,13 @@ class AbstractHierarchy {
   virtual double conditional_pred_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error(
-        "Cannot call conditional_pred_lpdf() from a non-conjugate hierarchy");
+    if (is_conjugate()) {
+      throw std::runtime_error("conditional_pred_lpdf() not implemented yet");
+    } else {
+      throw std::runtime_error(
+          "Cannot call conditional_pred_lpdf() from a non-conjugate "
+          "hierarchy");
+    }
   }
 
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
@@ -103,8 +112,12 @@ class AbstractHierarchy {
   virtual Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
-    throw std::runtime_error(
-        "Cannot call prior_pred_lpdf_grid() from a non-conjugate hierarchy");
+    if (is_conjugate()) {
+      throw std::runtime_error("prior_pred_lpdf_grid() not yet implemented");
+    } else {
+      throw std::runtime_error(
+          "Cannot call prior_pred_lpdf_grid() from a non-conjugate hierarchy");
+    }
   }
 
   //! Evaluates the log-prior predictive distr. of data in a grid of points
@@ -114,9 +127,14 @@ class AbstractHierarchy {
   virtual Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
-    throw std::runtime_error(
-        "Cannot call conditional_pred_lpdf_grid() from a non-conjugate "
-        "hierarchy");
+    if (is_conjugate()) {
+      throw std::runtime_error(
+          "conditional_pred_lpdf_grid() not yet implemented");
+    } else {
+      throw std::runtime_error(
+          "Cannot call conditional_pred_lpdf_grid() from a non-conjugate "
+          "hierarchy");
+    }
   }
 
   // SAMPLING FUNCTIONS

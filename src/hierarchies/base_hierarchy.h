@@ -38,6 +38,7 @@ class BaseHierarchy : public AbstractHierarchy {
   std::shared_ptr<Updater> updater = std::make_shared<Updater>();
 
  public:
+  using HyperParams = decltype(prior->get_hypers());
   BaseHierarchy() = default;
   ~BaseHierarchy() = default;
 
@@ -55,11 +56,89 @@ class BaseHierarchy : public AbstractHierarchy {
     return out;
   };
 
+  double like_lpdf(const Eigen::RowVectorXd &datum) const override {
+    return like->lpdf(datum);
+  }
+
   Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data,
                                  const Eigen::MatrixXd &covariates =
                                      Eigen::MatrixXd(0, 0)) const override {
     return like->lpdf_grid(data, covariates);
   };
+
+  double get_marg_lpdf(
+      const HyperParams &params, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+    if (this->is_dependent()) {
+      return marg_lpdf(params, datum, covariate);
+    } else {
+      return marg_lpdf(params, datum);
+    }
+  }
+
+  double prior_pred_lpdf(const Eigen::RowVectorXd &datum,
+                         const Eigen::RowVectorXd &covariate =
+                             Eigen::RowVectorXd(0)) const override {
+    return get_marg_lpdf(prior->get_hypers(), datum, covariate);
+  }
+
+  Eigen::VectorXd prior_pred_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
+    Eigen::VectorXd lpdf(data.rows());
+    if (covariates.cols() == 0) {
+      // Pass null value as covariate
+      for (int i = 0; i < data.rows(); i++) {
+        lpdf(i) = static_cast<Derived const *>(this)->prior_pred_lpdf(
+            data.row(i), Eigen::RowVectorXd(0));
+      }
+    } else if (covariates.rows() == 1) {
+      // Use unique covariate
+      for (int i = 0; i < data.rows(); i++) {
+        lpdf(i) = static_cast<Derived const *>(this)->prior_pred_lpdf(
+            data.row(i), covariates.row(0));
+      }
+    } else {
+      // Use different covariates
+      for (int i = 0; i < data.rows(); i++) {
+        lpdf(i) = static_cast<Derived const *>(this)->prior_pred_lpdf(
+            data.row(i), covariates.row(i));
+      }
+    }
+    return lpdf;
+  }
+
+  double conditional_pred_lpdf(const Eigen::RowVectorXd &datum,
+                               const Eigen::RowVectorXd &covariate =
+                                   Eigen::RowVectorXd(0)) const override {
+    return get_marg_lpdf(prior->get_posterior_hypers(), datum, covariate);
+  }
+
+  Eigen::VectorXd conditional_pred_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
+    Eigen::VectorXd lpdf(data.rows());
+    if (covariates.cols() == 0) {
+      // Pass null value as covariate
+      for (int i = 0; i < data.rows(); i++) {
+        lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
+            data.row(i), Eigen::RowVectorXd(0));
+      }
+    } else if (covariates.rows() == 1) {
+      // Use unique covariate
+      for (int i = 0; i < data.rows(); i++) {
+        lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
+            data.row(i), covariates.row(0));
+      }
+    } else {
+      // Use different covariates
+      for (int i = 0; i < data.rows(); i++) {
+        lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
+            data.row(i), covariates.row(i));
+      }
+    }
+    return lpdf;
+  }
 
   void sample_prior() override {
     like->set_state_from_proto(*prior->sample(false));
@@ -69,16 +148,40 @@ class BaseHierarchy : public AbstractHierarchy {
     updater->draw(*like, *prior);
   };
 
-  // DA IMPLEMENTARE !!!
   void sample_full_cond(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override {
-    return;
+    like->clear_data();
+    like->clear_summary_statistics();
+    if (covariates.cols() == 0) {
+      // Pass null value as covariate
+      for (int i = 0; i < data.rows(); i++) {
+        static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
+                                                Eigen::RowVectorXd(0));
+      }
+    } else if (covariates.rows() == 1) {
+      // Use unique covariate
+      for (int i = 0; i < data.rows(); i++) {
+        static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
+                                                covariates.row(0));
+      }
+    } else {
+      // Use different covariates
+      for (int i = 0; i < data.rows(); i++) {
+        static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
+                                                covariates.row(i));
+      }
+    }
+    static_cast<Derived *>(this)->sample_full_cond(true);
   };
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override {
     prior->update_hypers(states);
+  };
+
+  auto get_state() const -> decltype(like->get_state()) {
+    return like->get_state();
   };
 
   int get_card() const override { return like->get_card(); };
@@ -108,22 +211,20 @@ class BaseHierarchy : public AbstractHierarchy {
     prior->set_hypers_from_proto(state_);
   };
 
-  // DA SISTEMARE
   void add_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
-    // gestire update_params !!
     like->add_datum(id, datum, covariate);
+    if (update_params) updater->compute_posterior_hypers(*like, *prior);
   };
 
-  // DA SISTEMARE
   void remove_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
-    // gestire update_params !!
     like->remove_datum(id, datum, covariate);
+    if (update_params) updater->compute_posterior_hypers(*like, *prior);
   };
 
   void initialize() override { updater->initialize(*like, *prior); };
@@ -131,6 +232,30 @@ class BaseHierarchy : public AbstractHierarchy {
   bool is_multivariate() const override { return like->is_multivariate(); };
 
   bool is_dependent() const override { return like->is_dependent(); };
+
+  bool is_conjugate() const override { return updater->is_conjugate(); };
+
+ protected:
+  virtual double marg_lpdf(const HyperParams &params,
+                           const Eigen::RowVectorXd &datum) const {
+    if (!is_conjugate()) {
+      throw std::runtime_error(
+          "Call marg_lpdf() for a non-conjugate hierarchy");
+    } else {
+      throw std::runtime_error("marg_lpdf() not yet implemented");
+    }
+  }
+
+  virtual double marg_lpdf(const HyperParams &params,
+                           const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate) const {
+    if (!is_conjugate()) {
+      throw std::runtime_error(
+          "Call marg_lpdf() for a non-conjugate hierarchy");
+    } else {
+      throw std::runtime_error("marg_lpdf() not yet implemented");
+    }
+  }
 };
 
 //   //! Returns an independent, data-less copy of this object
