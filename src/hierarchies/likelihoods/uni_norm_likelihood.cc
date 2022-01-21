@@ -25,11 +25,9 @@ void UniNormLikelihood::set_state_from_proto(
 
 std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
 UniNormLikelihood::get_state_proto() const {
-  bayesmix::UniLSState state_;
-  state_.set_mean(state.mean);
-  state_.set_var(state.var);
   auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
-  out->mutable_uni_ls_state()->CopyFrom(state_);
+  out->mutable_uni_ls_state()->set_mean(state.mean);
+  out->mutable_uni_ls_state()->set_var(state.var);
   return out;
 }
 
