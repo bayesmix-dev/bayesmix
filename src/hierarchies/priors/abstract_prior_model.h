@@ -22,7 +22,7 @@ class AbstractPriorModel {
 
   // Da pensare, come restituisco lo stato? magari un pointer? Oppure delego
   virtual std::shared_ptr<google::protobuf::Message> sample(
-      bool use_post_hypers = false) = 0;
+      bool use_post_hypers) = 0;
 
   virtual void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;
