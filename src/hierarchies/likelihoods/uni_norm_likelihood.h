@@ -19,7 +19,8 @@ class UniNormLikelihood
   ~UniNormLikelihood() = default;
   bool is_multivariate() const override { return false; };
   bool is_dependent() const override { return false; };
-  void set_state_from_proto(const google::protobuf::Message &state_) override;
+  void set_state_from_proto(const google::protobuf::Message &state_,
+                            bool update_card = true) override;
   void clear_summary_statistics() override;
   double get_data_sum() const { return data_sum; };
   double get_data_sum_squares() const { return data_sum_squares; };

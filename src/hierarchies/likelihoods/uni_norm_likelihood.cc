@@ -16,11 +16,11 @@ void UniNormLikelihood::update_sum_stats(const Eigen::RowVectorXd &datum,
 }
 
 void UniNormLikelihood::set_state_from_proto(
-    const google::protobuf::Message &state_) {
+    const google::protobuf::Message &state_, bool update_card) {
   auto &statecast = downcast_state(state_);
   state.mean = statecast.uni_ls_state().mean();
   state.var = statecast.uni_ls_state().var();
-  set_card(statecast.cardinality());
+  if (update_card) set_card(statecast.cardinality());
 }
 
 std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
