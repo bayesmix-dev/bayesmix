@@ -42,8 +42,8 @@ class AbstractLikelihood {
 
   virtual bool is_dependent() const = 0;
 
-  virtual void set_state_from_proto(
-      const google::protobuf::Message &state_) = 0;
+  virtual void set_state_from_proto(const google::protobuf::Message &state_,
+                                    bool update_card = true) = 0;
 
   // IMPLEMENTED in BaseLikelihood
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
