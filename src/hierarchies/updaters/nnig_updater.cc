@@ -59,11 +59,11 @@ void NNIGUpdater::compute_posterior_hypers(UniNormLikelihood &like,
 void NNIGUpdater::draw(UniNormLikelihood &like, NIGPriorModel &prior,
                        bool update_params) {
   if (like.get_card() == 0) {
-    like.set_state_from_proto(*prior.sample(false));
+    like.set_state_from_proto(*prior.sample(false), false);
   } else {
     if (update_params) {
       compute_posterior_hypers(like, prior);
     }
-    like.set_state_from_proto(*prior.sample(true));
+    like.set_state_from_proto(*prior.sample(true), false);
   }
 };
