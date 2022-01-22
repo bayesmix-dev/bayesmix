@@ -141,11 +141,15 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   void sample_prior() override {
+    int card = like->get_card();
     like->set_state_from_proto(*prior->sample(false));
+    like->set_card(card);
   };
 
   void sample_full_cond(bool update_params = false) override {
-    updater->draw(*like, *prior);
+    int card = like->get_card();
+    updater->draw(*like, *prior, update_params);
+    like->set_card(card);
   };
 
   void sample_full_cond(
