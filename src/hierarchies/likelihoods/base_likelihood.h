@@ -74,9 +74,9 @@ class BaseLikelihood : public AbstractLikelihood {
 
   State state;
 
-  int card;
+  int card = 0;
 
-  int log_card;
+  double log_card = stan::math::NEGATIVE_INFTY;
 
   std::set<int> cluster_data_idx;
 };
