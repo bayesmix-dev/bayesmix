@@ -31,6 +31,11 @@ class BaseLikelihood : public AbstractLikelihood {
 
   int get_card() const { return card; }
 
+  void set_card(const int card_) {
+    card = card_;
+    log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
+  }
+
   double get_log_card() const { return log_card; }
 
   std::set<int> get_data_idx() const { return cluster_data_idx; }
@@ -55,11 +60,6 @@ class BaseLikelihood : public AbstractLikelihood {
   }
 
  protected:
-  void set_card(const int card_) {
-    card = card_;
-    log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
-  }
-
   bayesmix::AlgorithmState::ClusterState *downcast_state(
       google::protobuf::Message *state_) const {
     return google::protobuf::internal::down_cast<
