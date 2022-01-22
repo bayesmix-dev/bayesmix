@@ -25,12 +25,12 @@ class BasePriorModel : public AbstractPriorModel {
 
   virtual google::protobuf::Message *get_mutable_prior() override;
 
-  HyperParams get_hypers() const { return *hypers; }
+  HyperParams get_hypers() const { return hypers; }
 
-  HyperParams get_posterior_hypers() const { return *post_hypers; }
+  HyperParams get_posterior_hypers() const { return post_hypers; }
 
   void set_posterior_hypers(const HyperParams &_post_hypers) {
-    post_hypers = std::make_shared<HyperParams>(_post_hypers);
+    post_hypers = _post_hypers;
   };
 
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
@@ -60,8 +60,8 @@ class BasePriorModel : public AbstractPriorModel {
         const bayesmix::AlgorithmState::ClusterState &>(state_);
   }
 
-  std::shared_ptr<HyperParams> hypers = std::make_shared<HyperParams>();
-  std::shared_ptr<HyperParams> post_hypers = std::make_shared<HyperParams>();
+  HyperParams hypers;
+  HyperParams post_hypers;
   std::shared_ptr<Prior> prior;
 };
 
