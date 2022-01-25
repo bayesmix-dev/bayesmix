@@ -16,9 +16,10 @@
 #include "likelihoods/uni_norm_likelihood.h"
 #include "priors/nig_prior_model.h"
 #include "updaters/nnig_updater.h"
+#include "updaters/random_walk_updater.h"
 
 class NNIGHierarchy : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
-                                           NIGPriorModel, NNIGUpdater> {
+                                           NIGPriorModel, RandomWalkUpdater> {
  public:
   NNIGHierarchy() = default;
   ~NNIGHierarchy() = default;
