@@ -44,7 +44,6 @@ class BaseHierarchy : public AbstractHierarchy {
 
   void set_likelihood(std::shared_ptr<Likelihood> like_) { like = like_; };
   void set_prior(std::shared_ptr<PriorModel> prior_) { prior = prior_; };
-  void set_updater(std::shared_ptr<Updater> updater_) { updater = updater_; };
 
   std::shared_ptr<AbstractHierarchy> clone() const override {
     // Create copy of the hierarchy
@@ -52,7 +51,6 @@ class BaseHierarchy : public AbstractHierarchy {
     // Cloning each component class
     out->set_likelihood(std::static_pointer_cast<Likelihood>(like->clone()));
     out->set_prior(std::static_pointer_cast<PriorModel>(prior->clone()));
-    out->set_updater(std::static_pointer_cast<Updater>(updater->clone()));
     return out;
   };
 
