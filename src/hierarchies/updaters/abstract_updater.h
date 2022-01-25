@@ -18,6 +18,10 @@ class AbstractUpdater {
                           AbstractPriorModel &prior) = 0;
   virtual void draw(AbstractLikelihood &like, AbstractPriorModel &prior,
                     bool update_params) = 0;
+  virtual void compute_posterior_hypers(UniNormLikelihood &like,
+                                NIGPriorModel &prior) {
+    throw std::runtime_error("compute_posterior_hypers not implemented");
+  }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_UPDATERS_ABSTRACT_UPDATER_H_
