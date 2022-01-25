@@ -17,7 +17,7 @@ if __name__ == '__main__':
          np.random.normal(loc=5, size=N_BY_CLUS)])
 
     fname = os.path.join(BASE_PATH, "univariate_gaussian.csv")
-    np.savetxt(fname, univ_y)
+    np.savetxt(fname, univ_y, delimiter=',')
 
     for d in multivariate_dims:
         multiv_y = np.vstack(
@@ -26,4 +26,4 @@ if __name__ == '__main__':
 
         fname = os.path.join(
             BASE_PATH, "multi_gaussian_dim_{0}.csv".format(d))
-        np.savetxt(fname, multiv_y)
+        np.savetxt(fname, multiv_y, delimiter=',')
