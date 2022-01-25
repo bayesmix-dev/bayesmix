@@ -148,7 +148,7 @@ TEST(nig_prior_model, unconstrained_lpdf) {
   Eigen::VectorXd unconstrained_params(2);
   unconstrained_params << mean, std::log(var);
 
-  ASSERT_DOUBLE_EQ(prior->lpdf(state) + std::log(std::exp(unconstrained_params(1))), 
-                   prior->lpdf_from_unconstrained(unconstrained_params));
+  ASSERT_DOUBLE_EQ(
+      prior->lpdf(state) + std::log(std::exp(unconstrained_params(1))),
+      prior->lpdf_from_unconstrained(unconstrained_params));
 }
-

@@ -100,11 +100,11 @@ TEST(uni_norm_likelihood, eval_lpdf_unconstrained) {
     lpdf += like->lpdf(data.row(i));
   }
 
-  double clus_lpdf = like->cluster_lpdf_from_unconstrained(unconstrained_params);
+  double clus_lpdf =
+      like->cluster_lpdf_from_unconstrained(unconstrained_params);
   ASSERT_DOUBLE_EQ(lpdf, clus_lpdf);
 
   unconstrained_params(0) = 4.0;
   clus_lpdf = like->cluster_lpdf_from_unconstrained(unconstrained_params);
   ASSERT_TRUE(std::abs(clus_lpdf - lpdf) > 1e-5);
 }
-
