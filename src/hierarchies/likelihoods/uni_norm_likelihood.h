@@ -25,6 +25,10 @@ class UniNormLikelihood
   double get_data_sum() const { return data_sum; };
   double get_data_sum_squares() const { return data_sum_squares; };
 
+  // The unconstrained parameters are mean and log(var)
+  double cluster_lpdf_from_unconstrained(
+      Eigen::VectorXd unconstrained_params) override;
+
  protected:
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override;

@@ -39,7 +39,16 @@ class BaseLikelihood : public AbstractLikelihood {
 
   State get_state() const { return state; }
 
+  Eigen::VectorXd get_unconstrained_state() override {
+    return state.get_unconstrained();
+  }
+
   void set_state(const State &_state) { state = _state; };
+
+  void set_state_from_unconstrained(
+      const Eigen::VectorXd &unconstrained_state) override {
+    state.set_from_unconstrained(unconstrained_state);
+  }
 
   void add_datum(
       const int id, const Eigen::RowVectorXd &datum,
