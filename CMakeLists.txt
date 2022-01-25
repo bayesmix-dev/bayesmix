@@ -11,7 +11,7 @@ project(bayesmix)
 
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize")
@@ -23,7 +23,7 @@ find_package(PkgConfig REQUIRED)
 # TBB CMake integration
 message(STATUS "Using math TBB")
 # Define TBB_ROOT Folder
-set(TBB_ROOT ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb) 
+set(TBB_ROOT ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb)
 file(COPY ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2019_U8/ DESTINATION ${TBB_ROOT})
 # Build TBB Library with CMake Integration
 include(${TBB_ROOT}/cmake/TBBBuild.cmake)
@@ -96,8 +96,8 @@ set(INCLUDE_PATHS
 )
 
 
-set(LINK_LIBRARIES 
-	pthread 
+set(LINK_LIBRARIES
+	pthread
 	protobuf::libprotobuf
 	TBB::tbb
 )
