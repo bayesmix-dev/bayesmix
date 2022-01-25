@@ -1,0 +1,13 @@
+fixed_values {
+  mutilde: {
+    size:0
+    data:[]
+    }
+  beta: {
+    size:0
+    data:[]
+    }
+  phi: 0.1
+  alpha0: 2.0
+  q: 5
+}

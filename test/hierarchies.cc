@@ -257,6 +257,43 @@ TEST(mfahierarchy, draw) {
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
 
+TEST(mfahierarchy, draw_auto) {
+  auto hier = std::make_shared<MFAHierarchy>();
+  bayesmix::MFAPrior prior;
+  Eigen::VectorXd mutilde(0);
+  bayesmix::Vector mutilde_proto;
+  bayesmix::to_proto(mutilde, &mutilde_proto);
+  int q = 2;
+  double phi = 1.0;
+  double alpha0 = 5.0;
+  Eigen::VectorXd beta(0);
+  bayesmix::Vector beta_proto;
+  bayesmix::to_proto(beta, &beta_proto);
+  Eigen::MatrixXd dataset(5, 5);
+  dataset << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+      20, 1, 5, 7, 8, 9;
+  hier->set_dataset(&dataset);
+  *prior.mutable_fixed_values()->mutable_mutilde() = mutilde_proto;
+  prior.mutable_fixed_values()->set_phi(phi);
+  prior.mutable_fixed_values()->set_alpha0(alpha0);
+  prior.mutable_fixed_values()->set_q(q);
+  *prior.mutable_fixed_values()->mutable_beta() = beta_proto;
+  hier->get_mutable_prior()->CopyFrom(prior);
+  hier->initialize();
+
+  auto hier2 = hier->clone();
+  hier2->sample_prior();
+
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
+  hier->write_state_to_proto(clusval);
+  hier2->write_state_to_proto(clusval2);
+
+  ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString())
+      << clusval->DebugString() << clusval2->DebugString();
+}
+
 TEST(mfahierarchy, sample_given_data) {
   auto hier = std::make_shared<MFAHierarchy>();
   bayesmix::MFAPrior prior;

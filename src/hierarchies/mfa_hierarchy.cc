@@ -69,6 +69,23 @@ void MFAHierarchy::initialize_hypers() {
     hypers->alpha0 = prior->fixed_values().alpha0();
     hypers->q = prior->fixed_values().q();
 
+    // Automatic initialization
+    if (dim == 0) {
+      hypers->mutilde = dataset_ptr->colwise().mean();
+      dim = hypers->mutilde.size();
+    }
+    if (hypers->beta.size() == 0) {
+      auto cov_llt = (dataset_ptr->transpose() * *dataset_ptr).llt();
+      Eigen::MatrixXd precision_matrix(
+          cov_llt.solve(Eigen::MatrixXd::Identity(dim, dim)));
+      hypers->beta =
+          (hypers->alpha0 - 1) * precision_matrix.diagonal().cwiseInverse();
+      if (hypers->alpha0 == 1) {
+        throw std::invalid_argument(
+            "Scale parameter must be different than 1 when automatic "
+            "initialization is used");
+      }
+    }
     // Check validity
     if (dim != hypers->beta.rows()) {
       throw std::invalid_argument(
