@@ -22,6 +22,9 @@ class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
 
   double lpdf(const google::protobuf::Message &state_) override;
 
+  double lpdf_from_unconstrained(
+      Eigen::VectorXd unconstrained_params) override;
+
   std::shared_ptr<google::protobuf::Message> sample(
       bool use_post_hypers) override;
 

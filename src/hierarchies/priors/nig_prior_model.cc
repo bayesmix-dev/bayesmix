@@ -84,6 +84,13 @@ double NIGPriorModel::lpdf(const google::protobuf::Message &state_) {
   return target;
 }
 
+double NIGPriorModel::lpdf_from_unconstrained(
+    Eigen::VectorXd unconstrained_params) {
+  State::UniLS state;
+  state.set_from_unconstrained(unconstrained_params);
+  return lpdf(state.get_as_proto()) + state.log_det_jac();
+}
+
 std::shared_ptr<google::protobuf::Message> NIGPriorModel::sample(
     bool use_post_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
