@@ -132,7 +132,7 @@ class MFAHierarchy
   //! Vector of data points currently belonging to the cluster
   std::vector<Eigen::VectorXd> data;
 
-  //! Pointer to the covariate matrix for the mixture model
+  //! Pointer to the dataset matrix for the mixture model
   const Eigen::MatrixXd* dataset_ptr;
 };
 

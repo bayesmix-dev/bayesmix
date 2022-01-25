@@ -52,6 +52,7 @@ MFA::State MFAHierarchy::draw(const MFA::Hyperparams& params) {
 }
 
 void MFAHierarchy::initialize_state() {
+  std::cout << "init state" << std::endl;
   state.mu = hypers->mutilde;
   state.psi = hypers->beta / (hypers->alpha0 + 1.);
   state.eta = Eigen::MatrixXd::Zero(card, hypers->q);
@@ -71,18 +72,15 @@ void MFAHierarchy::initialize_hypers() {
 
     // Automatic initialization
     if (dim == 0) {
-      std::cout << "init mu" << std::endl;
       hypers->mutilde = dataset_ptr->colwise().mean();
       dim = hypers->mutilde.size();
     }
     if (hypers->beta.size() == 0) {
-      std::cout << "init beta" << std::endl;
       auto cov_llt = (dataset_ptr->transpose() * *dataset_ptr).llt();
       Eigen::MatrixXd precision_matrix(
           cov_llt.solve(Eigen::MatrixXd::Identity(dim, dim)));
       hypers->beta =
           (hypers->alpha0 - 1) * precision_matrix.diagonal().cwiseInverse();
-      std::cout << " end init" << std::endl;
       if (hypers->alpha0 == 1) {
         throw std::invalid_argument(
             "Scale parameter must be different than 1 when automatic "

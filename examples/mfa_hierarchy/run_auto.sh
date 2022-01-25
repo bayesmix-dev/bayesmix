@@ -26,7 +26,7 @@
 #  examples/examples_mfa_hierarchy/out/numclust.csv \
 #  examples/examples_mfa_hierarchy/out/clustering.csv
 
-  build/run_mcmc \
+  build/run_mcmc_mfa \
   --algo-params-file examples/mfa_hierarchy/in/algo.asciipb \
   --hier-type MFA --hier-args examples/mfa_hierarchy/in/mfa_auto.asciipb \
   --mix-type DP --mix-args examples/mfa_hierarchy/in/dp_gamma.asciipb \
