@@ -76,7 +76,11 @@ void MFAHierarchy::initialize_hypers() {
       dim = hypers->mutilde.size();
     }
     if (hypers->beta.size() == 0) {
-      auto cov_llt = (dataset_ptr->transpose() * *dataset_ptr).llt();
+      Eigen::MatrixXd centered =
+          dataset_ptr->rowwise() - dataset_ptr->colwise().mean();
+      auto cov_llt = ((centered.transpose() * centered) /
+                      double(dataset_ptr->rows() - 1.))
+                         .llt();
       Eigen::MatrixXd precision_matrix(
           cov_llt.solve(Eigen::MatrixXd::Identity(dim, dim)));
       hypers->beta =
@@ -87,6 +91,7 @@ void MFAHierarchy::initialize_hypers() {
             "initialization is used");
       }
     }
+    std::cout << hypers->beta << std::endl;
     // Check validity
     if (dim != hypers->beta.rows()) {
       throw std::invalid_argument(
