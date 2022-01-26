@@ -4,4 +4,6 @@ target_sources(bayesmix
     conjugate_updater.h
     nnig_updater.h
     nnig_updater.cc
+    nnxig_updater.h
+    nnxig_updater.cc
 )
