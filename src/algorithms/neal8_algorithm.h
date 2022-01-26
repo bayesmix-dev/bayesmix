@@ -41,6 +41,8 @@ class Neal8Algorithm : public Neal2Algorithm {
   void read_params_from_proto(
       const bayesmix::AlgorithmParams &params) override;
 
+  bool requires_conjugate_hierarchy() const override { return false; }
+
  protected:
   void initialize() override;
 

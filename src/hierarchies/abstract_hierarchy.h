@@ -11,6 +11,9 @@
 
 #include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
+#include "src/hierarchies/likelihoods/abstract_likelihood.h"
+#include "src/hierarchies/priors/abstract_prior_model.h"
+#include "src/hierarchies/updaters/abstract_updater.h"
 #include "src/utils/rng.h"
 
 //! Abstract base class for a hierarchy object.
@@ -48,6 +51,10 @@
 
 class AbstractHierarchy {
  public:
+  virtual void set_likelihood(std::shared_ptr<AbstractLikelihood> like_) = 0;
+  virtual void set_prior(std::shared_ptr<AbstractPriorModel> prior_) = 0;
+  virtual void set_updater(std::shared_ptr<AbstractUpdater> updater_) = 0;
+
   virtual ~AbstractHierarchy() = default;
 
   //! Returns an independent, data-less copy of this object

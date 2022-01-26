@@ -39,12 +39,32 @@ class BaseHierarchy : public AbstractHierarchy {
 
  public:
   using HyperParams = decltype(prior->get_hypers());
-  BaseHierarchy() = default;
+
+  BaseHierarchy(std::shared_ptr<AbstractLikelihood> like_ = nullptr,
+                std::shared_ptr<AbstractPriorModel> prior_ = nullptr,
+                std::shared_ptr<AbstractUpdater> updater_ = nullptr) {
+    if (like_) {
+      set_likelihood(like_);
+    }
+    if (prior_) {
+      set_prior(prior_);
+    }
+    if (updater_) {
+      set_updater(updater_);
+    }
+  }
+
   ~BaseHierarchy() = default;
 
-  void set_likelihood(std::shared_ptr<Likelihood> like_) { like = like_; };
-  void set_prior(std::shared_ptr<PriorModel> prior_) { prior = prior_; };
-  void set_updater(std::shared_ptr<Updater> updater_) { updater = updater_; };
+  void set_likelihood(std::shared_ptr<AbstractLikelihood> like_) override {
+    like = std::static_pointer_cast<Likelihood>(like_);
+  }
+  void set_prior(std::shared_ptr<AbstractPriorModel> prior_) override {
+    prior = std::static_pointer_cast<PriorModel>(prior_);
+  }
+  void set_updater(std::shared_ptr<AbstractUpdater> updater_) override {
+    updater = std::static_pointer_cast<Updater>(updater_);
+  };
 
   std::shared_ptr<AbstractHierarchy> clone() const override {
     // Create copy of the hierarchy
@@ -397,7 +417,7 @@ class BaseHierarchy : public AbstractHierarchy {
 //   }
 
 //   //! Down-casts the given generic proto message to a ClusterState proto
-//   const bayesmix::AlgorithmState::ClusterState &downcast_state(
+//   const bayesmix::AlgorithmState::ClusterState &f(
 //       const google::protobuf::Message &state_) const {
 //     return google::protobuf::internal::down_cast<
 //         const bayesmix::AlgorithmState::ClusterState &>(state_);

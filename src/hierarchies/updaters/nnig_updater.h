@@ -15,7 +15,8 @@ class NNIGUpdater {
   bool is_conjugate() const { return true; };
   void draw(UniNormLikelihood& like, NIGPriorModel& prior, bool update_params);
   void initialize(UniNormLikelihood& like, NIGPriorModel& prior);
-  void compute_posterior_hypers(UniNormLikelihood& like, NIGPriorModel& prior);
+  void compute_posterior_hypers(UniNormLikelihood& like,
+                                NIGPriorModel& prior) override;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_NNIG_UPDATER_H_

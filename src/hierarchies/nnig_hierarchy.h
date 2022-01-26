@@ -15,14 +15,16 @@
 #include "base_hierarchy.h"
 #include "likelihoods/uni_norm_likelihood.h"
 #include "priors/nig_prior_model.h"
-#include "updaters/nnig_updater.h"
+// #include "updaters/nnig_updater.h"
 #include "updaters/random_walk_updater.h"
 
 class NNIGHierarchy : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
                                            NIGPriorModel, RandomWalkUpdater> {
  public:
-  NNIGHierarchy() = default;
   ~NNIGHierarchy() = default;
+
+  using BaseHierarchy<NNIGHierarchy, UniNormLikelihood, NIGPriorModel,
+                      RandomWalkUpdater>::BaseHierarchy;
 
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNIG;
