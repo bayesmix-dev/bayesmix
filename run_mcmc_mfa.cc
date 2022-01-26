@@ -194,8 +194,6 @@ int main(int argc, char *argv[]) {
   algo->set_data(data);
   algo->set_hierarchy(hier);
 
-  auto hier2 = std::static_pointer_cast<MFAHierarchy>(hier);
-  hier2->set_dataset(&data);
   // Read and set covariates
   if (hier->is_dependent()) {
     Eigen::MatrixXd hier_cov =

@@ -129,17 +129,13 @@ void MFAHierarchy::update_summary_statistics(const Eigen::RowVectorXd& datum,
                                              bool add) {
   if (add) {
     data_sum += datum;
-    data.push_back(datum);
   } else {
     data_sum -= datum;
-    auto pos = std::find(data.begin(), data.end(), datum.transpose());
-    data.erase(pos);
   }
 }
 
 void MFAHierarchy::clear_summary_statistics() {
   data_sum = Eigen::VectorXd::Zero(dim);
-  data.clear();
 }
 
 void MFAHierarchy::set_state_from_proto(
@@ -196,6 +192,8 @@ void MFAHierarchy::sample_full_cond(bool update_params) {
     // No posterior update possible
     sample_prior();
   } else {
+    cluster_data_idx_vector.resize(cluster_data_idx.size());
+    std::copy(cluster_data_idx.begin(),cluster_data_idx.end(),cluster_data_idx_vector.begin());
     sample_eta();
     sample_mu();
     sample_psi();
@@ -220,7 +218,7 @@ void MFAHierarchy::sample_eta() {
                                state.psi_inverse);
   for (size_t i = 0; i < card; i++) {
     state.eta.row(i) = (bayesmix::multi_normal_prec_chol_rng(
-        temp_product * (data[i] - state.mu), sigma_eta_inv_llt.matrixL(),
+        temp_product * ((*dataset_ptr).row(cluster_data_idx_vector[i]) - state.mu), sigma_eta_inv_llt.matrixL(),
         rng));
   }
 }
@@ -245,10 +243,10 @@ void MFAHierarchy::sample_mu() {
 
 void MFAHierarchy::sample_lambda() {
   auto& rng = bayesmix::Rng::Instance().get();
-  Eigen::MatrixXd data_matrix(dim, card);
+  /*Eigen::MatrixXd data_matrix(dim, card);
   for (size_t i = 0; i < card; i++) {
-    data_matrix.col(i) = data[i];
-  }
+    data_matrix.col(i) = data[cluster_data_idx_vector[i]];
+  }*/
 
   Eigen::MatrixXd temp_etateta(state.eta.transpose() * state.eta);
 
@@ -257,12 +255,10 @@ void MFAHierarchy::sample_lambda() {
         (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
          temp_etateta / state.psi[j])
             .llt();
-
-    Eigen::VectorXd temp_row(data_matrix.row(j));
     state.lambda.row(j) = bayesmix::multi_normal_prec_chol_rng(
         sigma_lambda_inv_llt.solve(
             state.eta.transpose() *
-            (temp_row - Eigen::VectorXd::Constant(card, state.mu[j])) /
+            (dataset_ptr->operator()(cluster_data_idx_vector,j) - Eigen::VectorXd::Constant(card, state.mu[j])) /
             state.psi[j]),
         sigma_lambda_inv_llt.matrixL(), rng);
   }
@@ -274,7 +270,7 @@ void MFAHierarchy::sample_psi() {
   for (size_t j = 0; j < dim; j++) {
     double sum = 0;
     for (size_t i = 0; i < card; i++) {
-      sum += std::pow((data[i][j] - state.mu[j] -
+      sum += std::pow(((*dataset_ptr)(cluster_data_idx_vector[i],j) - state.mu[j] -
                        state.lambda.row(j).dot(state.eta.row(i))),
                       2);
     }
