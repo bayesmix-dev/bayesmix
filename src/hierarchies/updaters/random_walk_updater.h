@@ -34,14 +34,6 @@ class RandomWalkUpdater : public MetropolisUpdater {
     return out;
   }
 
-  void initialize(AbstractLikelihood &like,
-                  AbstractPriorModel &prior) override {
-    // Weird to have it here!!
-    // prior.initialize();
-    Eigen::VectorXd curr_state = Eigen::VectorXd::Ones(2);
-    like.set_state_from_unconstrained(curr_state);
-  }
-
   std::shared_ptr<RandomWalkUpdater> clone() const {
     auto out = std::make_shared<RandomWalkUpdater>(
         static_cast<RandomWalkUpdater const &>(*this));

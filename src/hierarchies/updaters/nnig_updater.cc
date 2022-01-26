@@ -1,42 +1,23 @@
 #include "nnig_updater.h"
 
-std::shared_ptr<NNIGUpdater> NNIGUpdater::clone() const {
-  auto out =
-      std::make_shared<NNIGUpdater>(static_cast<NNIGUpdater const &>(*this));
-  return out;
-};
+#include "src/hierarchies/likelihoods/states.h"
+#include "src/hierarchies/priors/hyperparams.h"
 
-void NNIGUpdater::initialize(UniNormLikelihood &like, NIGPriorModel &prior) {
-  // PriorModel Initialization
-  prior.initialize();
-  Hyperparams::NIG hypers = prior.get_hypers();
-  prior.set_posterior_hypers(hypers);
+void NNIGUpdater::compute_posterior_hypers(AbstractLikelihood& like,
+                                           AbstractPriorModel& prior) {
+  // Likelihood and Prior downcast
+  auto& likecast = downcast_likelihood(like);
+  auto& priorcast = downcast_prior(prior);
 
-  // State initialization
-  State::UniLS state;
-  state.mean = hypers.mean;
-  state.var = hypers.scale / (hypers.shape + 1);
-
-  // Likelihood Initalization
-  like.set_state(state);
-  like.clear_data();
-  like.clear_summary_statistics();
-};
-
-void NNIGUpdater::compute_posterior_hypers(UniNormLikelihood &like,
-                                           NIGPriorModel &prior) {
-  // std::cout << "NNIGUpdater::compute_posterior_hypers()" << std::endl;
   // Getting required quantities from likelihood and prior
-  int card = like.get_card();
-  double data_sum = like.get_data_sum();
-  double data_sum_squares = like.get_data_sum_squares();
-  auto hypers = prior.get_hypers();
-
-  // std::cout << "current cardinality: " << card << std::endl;
+  int card = likecast.get_card();
+  double data_sum = likecast.get_data_sum();
+  double data_sum_squares = likecast.get_data_sum_squares();
+  auto hypers = priorcast.get_hypers();
 
   // No update possible
   if (card == 0) {
-    prior.set_posterior_hypers(hypers);
+    priorcast.set_posterior_hypers(hypers);
     return;
   }
 
@@ -52,18 +33,6 @@ void NNIGUpdater::compute_posterior_hypers(UniNormLikelihood &like,
                       0.5 * hypers.var_scaling * card * (y_bar - hypers.mean) *
                           (y_bar - hypers.mean) / (card + hypers.var_scaling);
 
-  prior.set_posterior_hypers(post_params);
+  priorcast.set_posterior_hypers(post_params);
   return;
-};
-
-void NNIGUpdater::draw(UniNormLikelihood &like, NIGPriorModel &prior,
-                       bool update_params) {
-  if (like.get_card() == 0) {
-    like.set_state_from_proto(*prior.sample(false), false);
-  } else {
-    if (update_params) {
-      compute_posterior_hypers(like, prior);
-    }
-    like.set_state_from_proto(*prior.sample(true), false);
-  }
 };
