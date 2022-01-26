@@ -91,7 +91,9 @@ class MFAHierarchy
   void sample_full_cond(bool update_params = false) override;
 
   //! Sets the (pointer to the) dataset matrix
-  void set_dataset(const Eigen::MatrixXd* dataset) override { dataset_ptr = dataset; }
+  void set_dataset(const Eigen::MatrixXd* dataset) override {
+    dataset_ptr = dataset;
+  }
 
  protected:
   //! Evaluates the log-likelihood of data in a single point
