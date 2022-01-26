@@ -129,9 +129,6 @@ class MFAHierarchy
   //! Number of variables for each datum
   size_t dim;
 
-  //! Vector of data points currently belonging to the cluster
-  std::vector<int> cluster_data_idx_vector;
-
   //! Pointer to the dataset matrix for the mixture model
   const Eigen::MatrixXd* dataset_ptr = nullptr;
 };
