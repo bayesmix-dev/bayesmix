@@ -5,4 +5,6 @@ target_sources(bayesmix
     hyperparams.h
     nig_prior_model.h
     nig_prior_model.cc
+    nxig_prior_model.h
+    nxig_prior_model.cc
 )
