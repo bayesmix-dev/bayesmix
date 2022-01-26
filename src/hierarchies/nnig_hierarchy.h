@@ -27,6 +27,16 @@ class NNIGHierarchy : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
     return bayesmix::HierarchyId::NNIG;
   }
 
+  void initialize_state() override {
+    // Get hypers
+    auto hypers = prior->get_hypers();
+    // Initialize likelihood state
+    State::UniLS state;
+    state.mean = hypers.mean;
+    state.var = hypers.scale / (hypers.shape + 1);
+    like->set_state(state);
+  };
+
   double marg_lpdf(const HyperParams &params,
                    const Eigen::RowVectorXd &datum) const override {
     double sig_n = sqrt(params.scale * (params.var_scaling + 1) /

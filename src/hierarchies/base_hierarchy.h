@@ -52,7 +52,6 @@ class BaseHierarchy : public AbstractHierarchy {
     // Cloning each component class
     out->set_likelihood(std::static_pointer_cast<Likelihood>(like->clone()));
     out->set_prior(std::static_pointer_cast<PriorModel>(prior->clone()));
-    out->set_updater(std::static_pointer_cast<Updater>(updater->clone()));
     return out;
   };
 
@@ -231,7 +230,14 @@ class BaseHierarchy : public AbstractHierarchy {
     if (update_params) updater->compute_posterior_hypers(*like, *prior);
   };
 
-  void initialize() override { updater->initialize(*like, *prior); };
+  void initialize() override {
+    prior->initialize();
+    if (is_conjugate())
+      prior->set_posterior_hypers(prior->get_hypers());
+    initialize_state();
+    like->clear_data();
+    like->clear_summary_statistics();
+  };
 
   bool is_multivariate() const override { return like->is_multivariate(); };
 
@@ -240,6 +246,9 @@ class BaseHierarchy : public AbstractHierarchy {
   bool is_conjugate() const override { return updater->is_conjugate(); };
 
  protected:
+
+  virtual void initialize_state() = 0;
+
   virtual double marg_lpdf(const HyperParams &params,
                            const Eigen::RowVectorXd &datum) const {
     if (!is_conjugate()) {
