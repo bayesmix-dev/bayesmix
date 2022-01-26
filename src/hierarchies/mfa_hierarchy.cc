@@ -91,7 +91,6 @@ void MFAHierarchy::initialize_hypers() {
             "initialization is used");
       }
     }
-    std::cout << hypers->beta << std::endl;
     // Check validity
     if (dim != hypers->beta.rows()) {
       throw std::invalid_argument(
