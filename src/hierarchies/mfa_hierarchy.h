@@ -91,12 +91,9 @@ class MFAHierarchy
   void sample_full_cond(bool update_params = false) override;
 
   //! Sets the (pointer to the) dataset matrix
-  void set_dataset(const MatrixPtr& dataset) { dataset_ptr = dataset; }
+  void set_dataset(const Eigen::MatrixXd* dataset) { dataset_ptr = dataset; }
 
  protected:
-  //! Define MatrixPtr as Eigen::MatrixXd* for convenience
-  using MatrixPtr = Eigen::MatrixXd*;
-
   //! Evaluates the log-likelihood of data in a single point
   //! @param datum      Point which is to be evaluated
   //! @return           The evaluation of the lpdf
@@ -136,7 +133,7 @@ class MFAHierarchy
   std::vector<Eigen::VectorXd> data;
 
   //! Pointer to the dataset matrix for the mixture model
-  const MatrixPtr dataset_ptr = nullptr;
+  const Eigen::MatrixXd* dataset_ptr = nullptr;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_MFA_HIERARCHY_H_
