@@ -56,6 +56,14 @@ class MultiLS {
     return out;
   }
 
+  void set_from_constrained(Eigen::VectorXd mean_, Eigen::MatrixXd prec_) {
+    mean = mean_;
+    prec = prec_;
+    prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec).matrixL();
+    Eigen::VectorXd diag = prec_chol.diagonal();
+    prec_logdet = 2 * log(diag.array()).sum();
+  }
+
   void set_from_unconstrained(Eigen::VectorXd in) {
     double dim_ = 0.5 * (std::sqrt(8 * in.size() + 9) - 3);
     double dim;
@@ -63,9 +71,7 @@ class MultiLS {
     mean = in.head(int(dim));
     prec =
         stan::math::cov_matrix_constrain(in.tail(int(in.size() - dim)), dim);
-    prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec).matrixL();
-    Eigen::VectorXd diag = prec_chol.diagonal();
-    prec_logdet = 2 * log(diag.array()).sum();
+    set_from_constrained(mean, prec);
   }
 
   void set_from_proto(const bayesmix::AlgorithmState::ClusterState &state_) {

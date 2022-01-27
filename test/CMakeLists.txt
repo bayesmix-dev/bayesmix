@@ -24,7 +24,7 @@ add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   # lpdf.cc
   # priors.cc // OLD, USEREI prior_models.cc
   # eigen_utils.cc
-  # distributions.cc
+  distributions.cc
   # semi_hdp.cc
   # collectors.cc
   # runtime.cc
