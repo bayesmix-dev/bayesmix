@@ -36,5 +36,4 @@ message MFAState {
   Vector psi = 2;
   Matrix eta = 3;
   Matrix lambda = 4;
-  Matrix psi_inverse = 5;
 }

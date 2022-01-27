@@ -160,7 +160,6 @@ MFAHierarchy::get_state_proto() const {
   bayesmix::to_proto(state.psi, state_.mutable_psi());
   bayesmix::to_proto(state.eta, state_.mutable_eta());
   bayesmix::to_proto(state.lambda, state_.mutable_lambda());
-  bayesmix::to_proto(state.psi_inverse, state_.mutable_psi_inverse());
 
   auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
   out->mutable_mfa_state()->CopyFrom(state_);
@@ -213,14 +212,14 @@ void MFAHierarchy::sample_eta() {
       Eigen::MatrixXd::Identity(hypers->q, hypers->q)));
 
   if (state.eta.rows() != card) {
-    state.eta.resize(card, state.eta.cols());
     state.eta = Eigen::MatrixXd::Zero(card, state.eta.cols());
   }
   Eigen::MatrixXd temp_product(sigma_eta * (state.lambda.transpose()) *
                                state.psi_inverse);
   auto iterator = cluster_data_idx.begin();
   for (size_t i = 0; i < card; i++, iterator++) {
-    Eigen::VectorXd tempvector((*dataset_ptr).row(*iterator));
+    Eigen::VectorXd tempvector(dataset_ptr->row(
+        *iterator));  // TODO use slicing when Eigen is updated to v3.4
     state.eta.row(i) = (bayesmix::multi_normal_prec_chol_rng(
         temp_product * (tempvector - state.mu), sigma_eta_inv_llt.matrixL(),
         rng));
@@ -256,12 +255,14 @@ void MFAHierarchy::sample_lambda() {
          temp_etateta / state.psi[j])
             .llt();
     Eigen::VectorXd tempsum(card);
+    const Eigen::VectorXd& data_col = dataset_ptr->col(j);
     auto iterator = cluster_data_idx.begin();
-    for (size_t i = 0; i < card; i++) {
-      tempsum[i] = (dataset_ptr->operator()(*iterator, j) - (state.mu[j])) /
-                   state.psi[j];
-      iterator++;
+    for (size_t i = 0; i < card; i++, iterator++) {
+      tempsum[i] = data_col(
+          *iterator);  // TODO use slicing when Eigen is updated to v3.4
     }
+    tempsum = tempsum.array() - state.mu[j];
+    tempsum = tempsum.array() / state.psi[j];
     state.lambda.row(j) = bayesmix::multi_normal_prec_chol_rng(
         sigma_lambda_inv_llt.solve(state.eta.transpose() * tempsum),
         sigma_lambda_inv_llt.matrixL(), rng);
@@ -275,9 +276,11 @@ void MFAHierarchy::sample_psi() {
     double sum = 0;
     auto iterator = cluster_data_idx.begin();
     for (size_t i = 0; i < card; i++, iterator++) {
-      sum += std::pow(((*dataset_ptr)(*iterator, j) - state.mu[j] -
-                       state.lambda.row(j).dot(state.eta.row(i))),
-                      2);
+      sum += std::pow(
+          ((*dataset_ptr)(*iterator, j) -
+           state.mu[j] -  // TODO use slicing when Eigen is updated to v3.4
+           state.lambda.row(j).dot(state.eta.row(i))),
+          2);
     }
     state.psi[j] = stan::math::inv_gamma_rng(hypers->alpha0 + card / 2,
                                              hypers->beta[j] + sum / 2, rng);

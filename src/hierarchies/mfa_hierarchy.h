@@ -90,11 +90,6 @@ class MFAHierarchy
   //! @param update_params  Save posterior hypers after the computation?
   void sample_full_cond(bool update_params = false) override;
 
-  //! Sets the (pointer to the) dataset matrix
-  void set_dataset(const Eigen::MatrixXd* dataset) override {
-    dataset_ptr = dataset;
-  }
-
  protected:
   //! Evaluates the log-likelihood of data in a single point
   //! @param datum      Point which is to be evaluated
@@ -130,9 +125,6 @@ class MFAHierarchy
 
   //! Number of variables for each datum
   size_t dim;
-
-  //! Pointer to the dataset matrix for the mixture model
-  const Eigen::MatrixXd* dataset_ptr = nullptr;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_MFA_HIERARCHY_H_
