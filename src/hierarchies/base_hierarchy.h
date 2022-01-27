@@ -49,7 +49,6 @@ class BaseHierarchy : public AbstractHierarchy {
 
   void set_likelihood(std::shared_ptr<Likelihood> like_) { like = like_; };
   void set_prior(std::shared_ptr<PriorModel> prior_) { prior = prior_; };
-  void set_updater(std::shared_ptr<Updater> updater_) { updater = updater_; };
 
   //! Returns an independent, data-less copy of this object
   std::shared_ptr<AbstractHierarchy> clone() const override {
