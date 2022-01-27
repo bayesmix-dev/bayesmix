@@ -36,13 +36,14 @@ void UniNormLikelihood::clear_summary_statistics() {
   data_sum_squares = 0;
 }
 
-double UniNormLikelihood::cluster_lpdf_from_unconstrained(
-    Eigen::VectorXd unconstrained_params) {
-  assert(unconstrained_params.size() == 2);
-  double mean = unconstrained_params(0);
-  double var = std::exp(unconstrained_params(1));
-  double out = -(data_sum_squares - 2 * mean * data_sum + card * mean * mean) /
-               (2 * var);
-  out -= card * 0.5 * std::log(stan::math::TWO_PI * var);
-  return out;
-}
+// double UniNormLikelihood::cluster_lpdf_from_unconstrained(
+//     Eigen::VectorXd unconstrained_params) {
+//   assert(unconstrained_params.size() == 2);
+//   double mean = unconstrained_params(0);
+//   double var = std::exp(unconstrained_params(1));
+//   double out = -(data_sum_squares - 2 * mean * data_sum + card * mean *
+//   mean) /
+//                (2 * var);
+//   out -= card * 0.5 * std::log(stan::math::TWO_PI * var);
+//   return out;
+// }

@@ -38,7 +38,7 @@ class AbstractLikelihood {
   //! Usually, some kind of transformation is required from the unconstrained
   //! parameterization to the actual parameterization.
   virtual double cluster_lpdf_from_unconstrained(
-      Eigen::VectorXd unconstrained_params) {
+      Eigen::VectorXd unconstrained_params) const {
     throw std::runtime_error(
         "cluster_lpdf_from_unconstrained() not yet implemented");
   }
