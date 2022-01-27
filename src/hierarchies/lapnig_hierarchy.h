@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_LAPNIG_HIERARCHY_H
-#define BAYESMIX_LAPNIG_HIERARCHY_H
+#ifndef BAYESMIX_HIERARCHIES_LAPNIG_HIERARCHY_H_
+#define BAYESMIX_HIERARCHIES_LAPNIG_HIERARCHY_H_
 
 #include <google/protobuf/stubs/casts.h>
 
@@ -84,20 +84,26 @@ class LapNIGHierarchy
   //! Set of values of data points belonging to this cluster
   std::list<Eigen::RowVectorXd> cluster_data_values;
 
-  //! Samples from the proposal distribution
+  //! Sum of absolute differences for current params
+  double sum_abs_diff_curr = 0;
+
+  //! Sum of absolute differences for proposal params
+  double sum_abs_diff_prop = 0;
+
+  //! Samples from the proposal distribution using Random Walk
+  //! Metropolis-Hastings
   Eigen::VectorXd propose_rwmh(const Eigen::VectorXd &curr_vals);
 
   //! Evaluates the prior given the mean (unconstrained_parameters(0))
-  //! and log of the scale (unconstrained_parameters(1)) (beware of the
-  //! change of variables!
+  //! and log of the scale (unconstrained_parameters(1))
   double eval_prior_lpdf_unconstrained(
       Eigen::VectorXd unconstrained_parameters);
 
   //! Evaluates the (sum of the) log likelihood for all the observations in the
   //! cluster given the mean (unconstrained_parameters(0))
   //! and log of the scale (unconstrained_parameters(1))
-  double eval_like_lpdf_unconstrained(
-      Eigen::VectorXd unconstrained_parameters);
+  double eval_like_lpdf_unconstrained(Eigen::VectorXd unconstrained_parameters,
+                                      bool is_current);
 
   //! Evaluates the log-likelihood of data in a single point
   //! @param datum      Point which is to be evaluated
@@ -116,4 +122,4 @@ class LapNIGHierarchy
   //! Initializes state parameters to appropriate values
   void initialize_state() override;
 };
-#endif  // BAYESMIX_LAPNIG_HIERARCHY_H
+#endif  // BAYESMIX_HIERARCHIES_LAPNIG_HIERARCHY_H_

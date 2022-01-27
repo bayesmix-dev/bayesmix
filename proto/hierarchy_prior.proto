@@ -49,13 +49,6 @@ message LapNIGPrior {
   }
 }
 
-message NNWState {
-  Vector mean = 1;
-  double var_scaling = 2;
-  double deg_free = 3;
-  Matrix scale = 4;
-}
-
 /*
  * Prior for the parameters of the base measure in a Normal-Normal Wishart hierarchy
  */

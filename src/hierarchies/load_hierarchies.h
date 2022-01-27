@@ -6,10 +6,10 @@
 
 #include "abstract_hierarchy.h"
 #include "hierarchy_id.pb.h"
+#include "lapnig_hierarchy.h"
 #include "lin_reg_uni_hierarchy.h"
 #include "nnig_hierarchy.h"
 #include "nnw_hierarchy.h"
-#include "lapnig_hierarchy.h"
 #include "src/runtime/factory.h"
 
 //! Loads all available `Hierarchy` objects into the appropriate factory, so
@@ -36,10 +36,10 @@ __attribute__((constructor)) static void load_hierarchies() {
     return std::make_shared<LapNIGHierarchy>();
   };
 
+  factory.add_builder(LapNIGHierarchy().get_id(), LapNIGbuilder);
+  factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
   factory.add_builder(NNIGHierarchy().get_id(), NNIGbuilder);
   factory.add_builder(NNWHierarchy().get_id(), NNWbuilder);
-  factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
-  factory.add_builder(LapNIGHierarchy().get_id(), LapNIGbuilder);
 }
 
 #endif  // BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_H_

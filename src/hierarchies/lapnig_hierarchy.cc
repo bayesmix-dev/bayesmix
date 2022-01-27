@@ -68,6 +68,8 @@ LapNIGHierarchy::get_hypers_proto() const {
 
 void LapNIGHierarchy::clear_summary_statistics() {
   cluster_data_values.clear();
+  sum_abs_diff_curr = 0;
+  sum_abs_diff_prop = 0;
 }
 
 void LapNIGHierarchy::initialize_hypers() {
@@ -102,7 +104,7 @@ void LapNIGHierarchy::initialize_hypers() {
 
 void LapNIGHierarchy::initialize_state() {
   state.mean = hypers->mean;
-  state.scale = 1. / hypers->scale / (hypers->shape + 1);
+  state.scale = hypers->scale / (hypers->shape + 1);
 }
 
 void LapNIGHierarchy::update_hypers(
@@ -126,8 +128,10 @@ LapNIG::State LapNIGHierarchy::draw(const LapNIG::Hyperparams &params) {
 void LapNIGHierarchy::update_summary_statistics(
     const Eigen::RowVectorXd &datum, bool add) {
   if (add) {
+    sum_abs_diff_curr += std::abs(state.mean - datum(0, 0));
     cluster_data_values.push_back(datum);
   } else {
+    sum_abs_diff_curr -= std::abs(state.mean - datum(0, 0));
     auto it = std::find(cluster_data_values.begin(), cluster_data_values.end(),
                         datum);
     cluster_data_values.erase(it);
@@ -152,10 +156,10 @@ void LapNIGHierarchy::sample_full_cond(bool update_params) {
     Eigen::VectorXd prop_unc_params = propose_rwmh(curr_unc_params);
 
     double log_target_prop = eval_prior_lpdf_unconstrained(prop_unc_params) +
-                             eval_like_lpdf_unconstrained(prop_unc_params);
+                             eval_like_lpdf_unconstrained(prop_unc_params, 0);
 
     double log_target_curr = eval_prior_lpdf_unconstrained(curr_unc_params) +
-                             eval_like_lpdf_unconstrained(curr_unc_params);
+                             eval_like_lpdf_unconstrained(curr_unc_params, 1);
 
     double log_a_rate = log_target_prop - log_target_curr;
 
@@ -163,6 +167,7 @@ void LapNIGHierarchy::sample_full_cond(bool update_params) {
       ++accepted_;
       state.mean = prop_unc_params(0);
       state.scale = std::exp(prop_unc_params(1));
+      sum_abs_diff_curr = sum_abs_diff_prop;
     }
   }
 }
@@ -191,13 +196,18 @@ double LapNIGHierarchy::eval_prior_lpdf_unconstrained(
 }
 
 double LapNIGHierarchy::eval_like_lpdf_unconstrained(
-    Eigen::VectorXd unconstrained_parameters) {
+    Eigen::VectorXd unconstrained_parameters, bool is_current) {
   double mean = unconstrained_parameters(0);
   double log_scale = unconstrained_parameters(1);
   double scale = std::exp(log_scale);
   double diff_sum = 0;  // Sum of absolute values of data - candidate_mean
-  for (auto &elem : cluster_data_values) {
-    diff_sum += std::abs(elem(0, 0) - mean);
+  if (is_current) {
+    diff_sum = sum_abs_diff_curr;
+  } else {
+    for (auto &elem : cluster_data_values) {
+      diff_sum += std::abs(elem(0, 0) - mean);
+    }
+    sum_abs_diff_prop = diff_sum;
   }
   return std::log(0.5 / scale) + (-0.5 / scale * diff_sum);
 }
