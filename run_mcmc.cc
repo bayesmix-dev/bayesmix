@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
   std::cout << "hier->prior: \n"
             << hier->get_mutable_prior()->DebugString() << std::endl;
 
-  auto updater = std::make_shared<RandomWalkUpdater>(0.25);
+  auto updater = std::make_shared<MalaUpdater>(0.25);
   hier->set_updater(updater);
   hier->initialize();
 

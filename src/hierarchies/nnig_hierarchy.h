@@ -3,7 +3,7 @@
 
 // #include <google/protobuf/stubs/casts.h>
 
-// #include <Eigen/Dense>
+// #include <stan/math/rev.hpp>
 // #include <memory>
 // #include <vector>
 
@@ -16,15 +16,16 @@
 #include "likelihoods/uni_norm_likelihood.h"
 #include "priors/nig_prior_model.h"
 // #include "updaters/nnig_updater.h"
+#include "updaters/mala_updater.h"
 #include "updaters/random_walk_updater.h"
 
 class NNIGHierarchy : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
-                                           NIGPriorModel, RandomWalkUpdater> {
+                                           NIGPriorModel, MalaUpdater> {
  public:
   ~NNIGHierarchy() = default;
 
   using BaseHierarchy<NNIGHierarchy, UniNormLikelihood, NIGPriorModel,
-                      RandomWalkUpdater>::BaseHierarchy;
+                      MalaUpdater>::BaseHierarchy;
 
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNIG;

@@ -1,9 +1,9 @@
 #ifndef BAYESMIX_HIERARCHIES_UPDATERS_MALA_UPDATER_H_
 #define BAYESMIX_HIERARCHIES_UPDATERS_MALA_UPDATER_H_
 
-#include "metropolis_updater.h"
-
 #include <stan/math/rev.hpp>
+
+#include "metropolis_updater.h"
 
 class MalaUpdater : public MetropolisUpdater<MalaUpdater> {
  protected:
@@ -14,13 +14,11 @@ class MalaUpdater : public MetropolisUpdater<MalaUpdater> {
   ~MalaUpdater() = default;
 
   MalaUpdater(double step_size) : step_size(step_size) {}
-  
+
   template <typename F>
   Eigen::VectorXd sample_proposal(Eigen::VectorXd curr_state,
                                   AbstractLikelihood &like,
-                                  AbstractPriorModel &prior, 
-                                  F& target_lpdf) {
-
+                                  AbstractPriorModel &prior, F &target_lpdf) {
     Eigen::VectorXd noise(curr_state.size());
     auto &rng = bayesmix::Rng::Instance().get();
     double noise_scale = std::sqrt(2 * step_size);
@@ -32,12 +30,11 @@ class MalaUpdater : public MetropolisUpdater<MalaUpdater> {
     stan::math::gradient(target_lpdf, curr_state, tmp, grad);
     return curr_state + step_size * grad + noise;
   }
-  
+
   template <typename F>
   double proposal_lpdf(Eigen::VectorXd prop_state, Eigen::VectorXd curr_state,
-                       AbstractLikelihood &like,
-                       AbstractPriorModel &prior,
-                       F& target_lpdf) {
+                       AbstractLikelihood &like, AbstractPriorModel &prior,
+                       F &target_lpdf) {
     double out;
     Eigen::VectorXd grad;
     double tmp;
@@ -53,11 +50,10 @@ class MalaUpdater : public MetropolisUpdater<MalaUpdater> {
   }
 
   std::shared_ptr<MalaUpdater> clone() const {
-    auto out = std::make_shared<MalaUpdater>(
-        static_cast<MalaUpdater const &>(*this));
+    auto out =
+        std::make_shared<MalaUpdater>(static_cast<MalaUpdater const &>(*this));
     return out;
   }
-
 };
 
 #endif

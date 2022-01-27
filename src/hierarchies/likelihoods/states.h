@@ -1,27 +1,51 @@
 #ifndef BAYESMIX_HIERARCHIES_LIKELIHOOD_STATES_H_
 #define BAYESMIX_HIERARCHIES_LIKELIHOOD_STATES_H_
 
-#include <Eigen/Dense>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "algorithm_state.pb.h"
 #include "src/utils/proto_utils.h"
 
 namespace State {
 
+template <typename T>
+Eigen::Matrix<T, Eigen::Dynamic, 1> uni_ls_to_constrained(
+    Eigen::Matrix<T, Eigen::Dynamic, 1> in) {
+  Eigen::Matrix<T, Eigen::Dynamic, 1> out(2);
+  out << in(0), stan::math::exp(in(1));
+  return out;
+}
+
+template <typename T>
+Eigen::Matrix<T, Eigen::Dynamic, 1> uni_ls_to_unconstrained(
+    Eigen::Matrix<T, Eigen::Dynamic, 1> in) {
+  Eigen::Matrix<T, Eigen::Dynamic, 1> out(2);
+  out << in(0), stan::math::log(in(1));
+  return out;
+}
+
+template <typename T>
+T uni_ls_log_det_jac(Eigen::Matrix<T, Eigen::Dynamic, 1> constrained) {
+  T out = 0;
+  stan::math::positive_constrain(stan::math::log(constrained(1)), out);
+  return out;
+}
+
 class UniLS {
  public:
   double mean, var;
 
   Eigen::VectorXd get_unconstrained() {
-    Eigen::VectorXd out(2);
-    out << mean, std::log(var);
-    return out;
+    Eigen::VectorXd temp(2);
+    temp << mean, var;
+    return uni_ls_to_unconstrained(temp);
   }
 
   void set_from_unconstrained(Eigen::VectorXd in) {
-    mean = in(0);
-    var = std::exp(in(1));
+    Eigen::VectorXd temp = uni_ls_to_constrained(in);
+    mean = temp(0);
+    var = temp(1);
   }
 
   void set_from_proto(const bayesmix::AlgorithmState::ClusterState &state_) {
@@ -37,9 +61,9 @@ class UniLS {
   }
 
   double log_det_jac() {
-    double out = 0;
-    stan::math::positive_constrain(std::log(var), out);
-    return out;
+    Eigen::VectorXd temp(2);
+    temp << mean, var;
+    return uni_ls_log_det_jac(temp);
   }
 };
 

@@ -35,7 +35,6 @@ class target_lpdf_unconstrained;
 
 template <class Derived, class Likelihood, class PriorModel, class Updater>
 class BaseHierarchy : public AbstractHierarchy {
-
   template <class DerivedHierarchy>
   friend class target_lpdf_unconstrained;
 
@@ -298,11 +297,11 @@ class target_lpdf_unconstrained {
   const DerivedHierarchy &parent;
 
  public:
- target_lpdf_unconstrained(const DerivedHierarchy &p): parent(p) {}
+  target_lpdf_unconstrained(const DerivedHierarchy &p) : parent(p) {}
 
-  template<typename T>
+  template <typename T>
   T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x) const {
-    return parent.like->clus_lpdf_from_unconstrained(x) +
+    return parent.like->cluster_lpdf_from_unconstrained(x) +
            parent.prior->lpdf_from_unconstrained(x);
   }
 };
@@ -310,7 +309,7 @@ class target_lpdf_unconstrained {
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
     bool update_params) {
-  target_lpdf_unconstrained<Derived> target(static_cast<Derived&>(*this));
+  target_lpdf_unconstrained<Derived> target(static_cast<Derived &>(*this));
   updater->draw(*like, *prior, update_params, target);
 };
 

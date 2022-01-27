@@ -32,7 +32,7 @@ class UniNormLikelihood
     T var = stan::math::positive_constrain(unconstrained_params(1));
     T out = -(data_sum_squares - 2 * mean * data_sum + card * mean * mean) /
             (2 * var);
-    out -= card * 0.5 * std::log(stan::math::TWO_PI * var);
+    out -= card * 0.5 * stan::math::log(stan::math::TWO_PI * var);
     return out;
   }
 

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <Eigen/Dense>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "algorithm_state.pb.h"
 #include "ls_state.pb.h"

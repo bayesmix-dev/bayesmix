@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <Eigen/Dense>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "src/hierarchies/likelihoods/states.h"

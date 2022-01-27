@@ -1,7 +1,7 @@
 #ifndef BAYESMIX_UTILS_PROTO_UTILS_H_
 #define BAYESMIX_UTILS_PROTO_UTILS_H_
 
-#include <Eigen/Dense>
+#include <stan/math/rev.hpp>
 
 #include "matrix.pb.h"
 

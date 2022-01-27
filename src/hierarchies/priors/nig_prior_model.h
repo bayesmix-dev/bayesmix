@@ -3,9 +3,9 @@
 
 // #include <google/protobuf/stubs/casts.h>
 
-#include <Eigen/Dense>
 #include <memory>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 // #include "algorithm_state.pb.h"
@@ -22,8 +22,25 @@ class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
 
   double lpdf(const google::protobuf::Message &state_) override;
 
+  template <typename T>
+  T lpdf_from_unconstrained(
+      const Eigen::Matrix<T, Eigen::Dynamic, 1> &unconstrained_params) const {
+    Eigen::Matrix<T, Eigen::Dynamic, 1> constrained_params =
+        State::uni_ls_to_constrained(unconstrained_params);
+    T log_det_jac = State::uni_ls_log_det_jac(constrained_params);
+    T mean = constrained_params(0);
+    T var = constrained_params(1);
+    T lpdf = stan::math::normal_lpdf(mean, hypers.mean,
+                                     sqrt(var / hypers.var_scaling)) +
+             stan::math::inv_gamma_lpdf(var, hypers.shape, hypers.scale);
+
+    return lpdf + log_det_jac;
+  }
+
   double lpdf_from_unconstrained(
-      Eigen::VectorXd unconstrained_params) override;
+      Eigen::VectorXd unconstrained_params) const override {
+    return this->lpdf_from_unconstrained<double>(unconstrained_params);
+  }
 
   std::shared_ptr<google::protobuf::Message> sample(
       bool use_post_hypers) override;

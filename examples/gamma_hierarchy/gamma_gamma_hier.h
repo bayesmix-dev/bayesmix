@@ -4,11 +4,12 @@
 #include <google/protobuf/stubs/casts.h>
 #include <src/hierarchies/base_hierarchy.h>
 #include <src/hierarchies/conjugate_hierarchy.h>
-#include "hierarchy_prior.pb.h"
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 #include <vector>
+
+#include "hierarchy_prior.pb.h"
 
 namespace GammaGamma {
 //! Custom container for State values
@@ -97,7 +98,7 @@ class GammaGammaHierarchy
     set_card(statecast.cardinality());
   }
 
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto() 
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override {
     bayesmix::Vector state_;
     state_.mutable_data()->Add(state.rate);

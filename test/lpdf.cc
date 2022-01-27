@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <Eigen/Dense>
 #include <stan/math/prim/fun.hpp>  // lgamma, lmgamma
 #include <stan/math/prim/prob.hpp>
+#include <stan/math/rev.hpp>
 
 #include "algorithm_state.pb.h"
 // #include "src/hierarchies/lin_reg_uni_hierarchy.h"

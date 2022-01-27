@@ -3,11 +3,11 @@
 
 #include <google/protobuf/message.h>
 
-#include <Eigen/Dense>
 #include <memory>
 #include <random>
 #include <set>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "abstract_prior_model.h"
 #include "algorithm_state.pb.h"

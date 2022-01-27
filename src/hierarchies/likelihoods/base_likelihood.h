@@ -3,8 +3,8 @@
 
 #include <google/protobuf/message.h>
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 // #include <random>
 #include <set>
 // #include <stan/math/prim.hpp>

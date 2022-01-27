@@ -1,7 +1,7 @@
 #include "cluster_utils.h"
 
-#include <Eigen/Dense>
 #include <Eigen/SparseCore>
+#include <stan/math/rev.hpp>
 
 #include "lib/progressbar/progressbar.h"
 #include "proto_utils.h"

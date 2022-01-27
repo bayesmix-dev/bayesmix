@@ -1,7 +1,7 @@
 #ifndef BAYESMIX_UTILS_CLUSTER_UTILS_H_
 #define BAYESMIX_UTILS_CLUSTER_UTILS_H_
 
-#include <Eigen/Dense>
+#include <stan/math/rev.hpp>
 
 //! This file includes some utilities for cluster estimation. These functions
 //! only use Eigen ojects.

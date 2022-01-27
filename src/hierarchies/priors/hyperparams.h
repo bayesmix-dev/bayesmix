@@ -1,7 +1,7 @@
 #ifndef BAYESMIX_HIERARCHIES_PRIORMODEL_HYPERPARAMS_H_
 #define BAYESMIX_HIERARCHIES_PRIORMODEL_HYPERPARAMS_H_
 
-#include <Eigen/Dense>
+#include <stan/math/rev.hpp>
 
 namespace Hyperparams {
 
