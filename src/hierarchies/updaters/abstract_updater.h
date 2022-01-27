@@ -8,8 +8,8 @@ class AbstractUpdater {
  public:
   virtual ~AbstractUpdater() = default;
   virtual bool is_conjugate() const { return false; };
-//   virtual void draw(AbstractLikelihood &like, AbstractPriorModel &prior,
-//                     bool update_params) = 0;
+  //   virtual void draw(AbstractLikelihood &like, AbstractPriorModel &prior,
+  //                     bool update_params) = 0;
   virtual void compute_posterior_hypers(AbstractLikelihood &like,
                                         AbstractPriorModel &prior) {
     throw std::runtime_error("compute_posterior_hypers not implemented");
