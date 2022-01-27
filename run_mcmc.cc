@@ -205,11 +205,6 @@ int main(int argc, char *argv[]) {
   // Run algorithm
   algo->run(coll);
 
-  if (args["--hier-type"] == std::string("LapNIG")){
-    std::cout << "Acceptance rate of the MH chain: "
-              << (double) LapNIGHierarchy::accepted_/LapNIGHierarchy::iter_ << std::endl;
-  }
-
   if (args["--grid-file"] != std::string("\"\"") &&
       args["--dens-file"] != std::string("\"\"")) {
     Eigen::MatrixXd grid =
