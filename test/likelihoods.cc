@@ -108,3 +108,20 @@ TEST(uni_norm_likelihood, eval_lpdf_unconstrained) {
   clus_lpdf = like->cluster_lpdf_from_unconstrained(unconstrained_params);
   ASSERT_TRUE(std::abs(clus_lpdf - lpdf) > 1e-5);
 }
+
+TEST(multi_ls_state, set_unconstrained) {
+  auto& rng = bayesmix::Rng::Instance().get();
+
+  State::MultiLS state;
+  auto mean = Eigen::VectorXd::Zero(5);
+  auto prec =
+      stan::math::wishart_rng(10, Eigen::MatrixXd::Identity(5, 5), rng);
+  state.mean = mean;
+  state.prec = prec;
+  Eigen::VectorXd unconstrained_state = state.get_unconstrained();
+
+  State::MultiLS state2;
+  state2.set_from_unconstrained(unconstrained_state);
+  ASSERT_TRUE((state.mean - state2.mean).squaredNorm() < 1e-5);
+  ASSERT_TRUE((state.prec - state2.prec).squaredNorm() < 1e-5);
+}

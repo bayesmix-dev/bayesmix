@@ -90,6 +90,7 @@ set(INCLUDE_PATHS
   ${CMAKE_CURRENT_LIST_DIR}/lib/math
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.72.0
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/sundials_5.5.0/include
   # TBB already included
   ${CMAKE_CURRENT_BINARY_DIR}
   ${protobuf_SOURCE_DIR}/src
@@ -156,6 +157,8 @@ if (BUILD_RUN)
   target_link_libraries(run_mcmc PUBLIC ${LINK_LIBRARIES})
   target_compile_options(run_mcmc PUBLIC ${COMPILE_OPTIONS})
 endif()
+
+add_subdirectory(test)
 
 if (NOT DISABLE_TESTS)
   add_subdirectory(test)
