@@ -13,7 +13,7 @@
 #include "hierarchies/load_hierarchies.h"
 #include "hierarchies/nnig_hierarchy.h"
 // #include "hierarchies/nnw_hierarchy.h"
-// #include "hierarchies/nnxig_hierarchy.h"
+#include "hierarchies/nnxig_hierarchy.h"
 #include "mixings/dirichlet_mixing.h"
 #include "mixings/load_mixings.h"
 #include "mixings/logit_sb_mixing.h"
