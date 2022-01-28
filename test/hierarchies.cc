@@ -365,7 +365,7 @@ TEST(mfahierarchy, sample_full_cond) {
 
   hier->get_mutable_prior()->CopyFrom(prior);
   hier->initialize();
-  int p = data.row(0);
+  int p = data.cols();
   for(unsigned int i = 0; i<data.rows(); i++){
 
     Eigen::RowVectorXd row = data.row(i);
@@ -382,9 +382,9 @@ TEST(mfahierarchy, sample_full_cond) {
     hier->sample_full_cond();
     MFA::State stato = hier->get_state();
     //Eigen::VectorXd riga=stato.lambda.col(0);
-    Lambdasamplato.row(i) = (stato.lambda*(stato.lambda.transpose())).row(19);
+    Lambdasamplato.row(i) = (stato.lambda*(stato.lambda.transpose())).row(0);
     //Lambdasamplato.row(i) = stato.lambda.col(3);
-    Etasamplato.row(i) = stato.eta.row(0);
+    Etasamplato.row(i) = stato.eta.row(1);
     psisamplato.row(i) = stato.psi;
     musamplato.row(i) = stato.mu;
   }
