@@ -30,6 +30,13 @@ class AbstractPriorModel {
     throw std::runtime_error("lpdf_from_unconstrained() not yet implemented");
   }
 
+  virtual stan::math::var lpdf_from_unconstrained(
+      Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> unconstrained_params)
+      const {
+    throw std::runtime_error(
+        "cluster_lpdf_from_unconstrained() not yet implemented");
+  }
+
   // Da pensare, come restituisco lo stato? magari un pointer? Oppure delego
   virtual std::shared_ptr<google::protobuf::Message> sample(
       bool use_post_hypers) = 0;

@@ -21,6 +21,20 @@ class BasePriorModel : public AbstractPriorModel {
 
   ~BasePriorModel() = default;
 
+  double lpdf_from_unconstrained(
+      Eigen::VectorXd unconstrained_params) const override {
+    return static_cast<const Derived &>(*this)
+        .template lpdf_from_unconstrained<double>(unconstrained_params);
+  }
+
+  stan::math::var lpdf_from_unconstrained(
+      Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> unconstrained_params)
+      const override {
+    return static_cast<const Derived &>(*this)
+        .template lpdf_from_unconstrained<stan::math::var>(
+            unconstrained_params);
+  }
+
   virtual std::shared_ptr<AbstractPriorModel> clone() const override;
 
   virtual google::protobuf::Message *get_mutable_prior() override;

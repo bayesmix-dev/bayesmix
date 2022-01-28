@@ -2,13 +2,14 @@
 #define BAYESMIX_HIERARCHIES_UPDATERS_METROPOLIS_UPDATER_H_
 
 #include "abstract_updater.h"
+#include "target_lpdf_unconstrained.h"
 
 template <class DerivedUpdater>
 class MetropolisUpdater : public AbstractUpdater {
  public:
-  template <typename F>
   void draw(AbstractLikelihood &like, AbstractPriorModel &prior,
-            bool update_params, F &target_lpdf) {
+            bool update_params,
+            target_lpdf_unconstrained &target_lpdf) override {
     Eigen::VectorXd curr_state = like.get_unconstrained_state();
     Eigen::VectorXd prop_state =
         static_cast<DerivedUpdater *>(this)->sample_proposal(
@@ -26,19 +27,6 @@ class MetropolisUpdater : public AbstractUpdater {
       like.set_state_from_unconstrained(prop_state);
     }
   }
-
-  //   template <typename F>
-  //   virtual Eigen::VectorXd sample_proposal(Eigen::VectorXd curr_state,
-  //                                           AbstractLikelihood &like,
-  //                                           AbstractPriorModel &prior,
-  //                                           F& target_lpdf) = 0;
-
-  //   template <typename F>
-  //   virtual double proposal_lpdf(Eigen::VectorXd prop_state,
-  //                                Eigen::VectorXd curr_state,
-  //                                AbstractLikelihood &like,
-  //                                AbstractPriorModel &prior,
-  //                                F& target_lpdf) = 0;
 };
 
 #endif

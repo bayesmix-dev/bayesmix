@@ -37,11 +37,6 @@ class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
     return lpdf + log_det_jac;
   }
 
-  double lpdf_from_unconstrained(
-      Eigen::VectorXd unconstrained_params) const override {
-    return this->lpdf_from_unconstrained<double>(unconstrained_params);
-  }
-
   std::shared_ptr<google::protobuf::Message> sample(
       bool use_post_hypers) override;
 

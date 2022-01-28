@@ -12,10 +12,8 @@
 #include "abstract_hierarchy.h"
 #include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
+#include "src/hierarchies/updaters/target_lpdf_unconstrained.h"
 #include "src/utils/rng.h"
-
-template <class DerivedHierarchy>
-class target_lpdf_unconstrained;
 
 //! Base template class for a hierarchy object.
 
@@ -35,9 +33,6 @@ class target_lpdf_unconstrained;
 
 template <class Derived, class Likelihood, class PriorModel, class Updater>
 class BaseHierarchy : public AbstractHierarchy {
-  template <class DerivedHierarchy>
-  friend class target_lpdf_unconstrained;
-
  protected:
   std::shared_ptr<Likelihood> like = std::make_shared<Likelihood>();
   std::shared_ptr<PriorModel> prior = std::make_shared<PriorModel>();
@@ -71,6 +66,11 @@ class BaseHierarchy : public AbstractHierarchy {
   void set_updater(std::shared_ptr<AbstractUpdater> updater_) override {
     updater = std::static_pointer_cast<Updater>(updater_);
   };
+
+  std::shared_ptr<AbstractLikelihood> get_likelihood() override {
+    return like;
+  }
+  std::shared_ptr<AbstractPriorModel> get_prior() override { return prior; }
 
   std::shared_ptr<AbstractHierarchy> clone() const override {
     // Create copy of the hierarchy
@@ -171,7 +171,10 @@ class BaseHierarchy : public AbstractHierarchy {
     // like->set_card(card);
   };
 
-  void sample_full_cond(bool update_params = false) override;
+  void sample_full_cond(bool update_params = false) override {
+    target_lpdf_unconstrained target(this);
+    updater->draw(*like, *prior, update_params, target);
+  };
 
   void sample_full_cond(
       const Eigen::MatrixXd &data,
@@ -290,105 +293,5 @@ class BaseHierarchy : public AbstractHierarchy {
     }
   }
 };
-
-template <class DerivedHierarchy>
-class target_lpdf_unconstrained {
- protected:
-  const DerivedHierarchy &parent;
-
- public:
-  target_lpdf_unconstrained(const DerivedHierarchy &p) : parent(p) {}
-
-  template <typename T>
-  T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x) const {
-    return parent.like->cluster_lpdf_from_unconstrained(x) +
-           parent.prior->lpdf_from_unconstrained(x);
-  }
-};
-
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
-    bool update_params) {
-  target_lpdf_unconstrained<Derived> target(static_cast<Derived &>(*this));
-  updater->draw(*like, *prior, update_params, target);
-};
-
-  // template <class Derived, typename State, typename Hyperparams, typename
-  // Prior> void BaseHierarchy<Derived, State, Hyperparams,
-  // Prior>::write_state_to_proto(
-  //     google::protobuf::Message *out) const {
-  //   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> state_ =
-  //       get_state_proto();
-  //   auto *out_cast = downcast_state(out);
-  //   out_cast->CopyFrom(*state_.get());
-  //   out_cast->set_cardinality(card);
-  // }
-
-  // template <class Derived, typename State, typename Hyperparams, typename
-  // Prior> void BaseHierarchy<Derived, State, Hyperparams,
-  // Prior>::write_hypers_to_proto(
-  //     google::protobuf::Message *out) const {
-  //   std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> hypers_ =
-  //       get_hypers_proto();
-  //   auto *out_cast = downcast_hypers(out);
-  //   out_cast->CopyFrom(*hypers_.get());
-  // }
-
-  // template <class Derived, typename State, typename Hyperparams, typename
-  // Prior> Eigen::VectorXd BaseHierarchy<Derived, State, Hyperparams,
-  // Prior>::like_lpdf_grid(
-  //     const Eigen::MatrixXd &data,
-  //     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
-  //   Eigen::VectorXd lpdf(data.rows());
-  //   if (covariates.cols() == 0) {
-  //     // Pass null value as covariate
-  //     for (int i = 0; i < data.rows(); i++) {
-  //       lpdf(i) = static_cast<Derived const *>(this)->get_like_lpdf(
-  //           data.row(i), Eigen::RowVectorXd(0));
-  //     }
-  //   } else if (covariates.rows() == 1) {
-  //     // Use unique covariate
-  //     for (int i = 0; i < data.rows(); i++) {
-  //       lpdf(i) = static_cast<Derived const *>(this)->get_like_lpdf(
-  //           data.row(i), covariates.row(0));
-  //     }
-  //   } else {
-  //     // Use different covariates
-  //     for (int i = 0; i < data.rows(); i++) {
-  //       lpdf(i) = static_cast<Derived const *>(this)->get_like_lpdf(
-  //           data.row(i), covariates.row(i));
-  //     }
-  //   }
-  //   return lpdf;
-  // }
-
-  // template <class Derived, typename State, typename Hyperparams, typename
-  // Prior> void BaseHierarchy<Derived, State, Hyperparams,
-  // Prior>::sample_full_cond(
-  //     const Eigen::MatrixXd &data,
-  //     const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
-  //   clear_data();
-  //   clear_summary_statistics();
-  //   if (covariates.cols() == 0) {
-  //     // Pass null value as covariate
-  //     for (int i = 0; i < data.rows(); i++) {
-  //       static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
-  //                                               Eigen::RowVectorXd(0));
-  //     }
-  //   } else if (covariates.rows() == 1) {
-  //     // Use unique covariate
-  //     for (int i = 0; i < data.rows(); i++) {
-  //       static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
-  //                                               covariates.row(0));
-  //     }
-  //   } else {
-  //     // Use different covariates
-  //     for (int i = 0; i < data.rows(); i++) {
-  //       static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
-  //                                               covariates.row(i));
-  //     }
-  //   }
-  //   static_cast<Derived *>(this)->sample_full_cond(true);
-  // }
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

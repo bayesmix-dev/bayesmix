@@ -43,6 +43,13 @@ class AbstractLikelihood {
         "cluster_lpdf_from_unconstrained() not yet implemented");
   }
 
+  virtual stan::math::var cluster_lpdf_from_unconstrained(
+      Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> unconstrained_params)
+      const {
+    throw std::runtime_error(
+        "cluster_lpdf_from_unconstrained() not yet implemented");
+  }
+
   virtual Eigen::VectorXd lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const = 0;

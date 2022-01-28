@@ -15,10 +15,10 @@ class MalaUpdater : public MetropolisUpdater<MalaUpdater> {
 
   MalaUpdater(double step_size) : step_size(step_size) {}
 
-  template <typename F>
   Eigen::VectorXd sample_proposal(Eigen::VectorXd curr_state,
                                   AbstractLikelihood &like,
-                                  AbstractPriorModel &prior, F &target_lpdf) {
+                                  AbstractPriorModel &prior,
+                                  target_lpdf_unconstrained &target_lpdf) {
     Eigen::VectorXd noise(curr_state.size());
     auto &rng = bayesmix::Rng::Instance().get();
     double noise_scale = std::sqrt(2 * step_size);
@@ -31,10 +31,9 @@ class MalaUpdater : public MetropolisUpdater<MalaUpdater> {
     return curr_state + step_size * grad + noise;
   }
 
-  template <typename F>
   double proposal_lpdf(Eigen::VectorXd prop_state, Eigen::VectorXd curr_state,
                        AbstractLikelihood &like, AbstractPriorModel &prior,
-                       F &target_lpdf) {
+                       target_lpdf_unconstrained &target_lpdf) {
     double out;
     Eigen::VectorXd grad;
     double tmp;

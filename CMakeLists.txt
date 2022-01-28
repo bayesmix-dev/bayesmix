@@ -158,8 +158,6 @@ if (BUILD_RUN)
   target_compile_options(run_mcmc PUBLIC ${COMPILE_OPTIONS})
 endif()
 
-add_subdirectory(test)
-
 if (NOT DISABLE_TESTS)
   add_subdirectory(test)
 endif()

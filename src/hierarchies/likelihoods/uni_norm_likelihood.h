@@ -36,12 +36,6 @@ class UniNormLikelihood
     return out;
   }
 
-  // The unconstrained parameters are mean and log(var)
-  double cluster_lpdf_from_unconstrained(
-      Eigen::VectorXd unconstrained_params) const override {
-    return this->cluster_lpdf_from_unconstrained<double>(unconstrained_params);
-  }
-
  protected:
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override;

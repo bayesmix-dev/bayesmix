@@ -49,11 +49,16 @@
 //! instance the proto/ls_state.proto and proto/hierarchy_prior.proto files)
 //! and their relative class methods.
 
+class target_lpdf_unconstrained;
+
 class AbstractHierarchy {
  public:
   virtual void set_likelihood(std::shared_ptr<AbstractLikelihood> like_) = 0;
   virtual void set_prior(std::shared_ptr<AbstractPriorModel> prior_) = 0;
   virtual void set_updater(std::shared_ptr<AbstractUpdater> updater_) = 0;
+
+  virtual std::shared_ptr<AbstractLikelihood> get_likelihood() = 0;
+  virtual std::shared_ptr<AbstractPriorModel> get_prior() = 0;
 
   virtual ~AbstractHierarchy() = default;
 
@@ -281,6 +286,20 @@ class AbstractHierarchy {
     } else {
       throw std::runtime_error("Not implemented");
     }
+  }
+};
+
+class target_lpdf_unconstrained {
+ protected:
+  AbstractHierarchy *parent;
+
+ public:
+  target_lpdf_unconstrained(AbstractHierarchy *p) : parent(p) {}
+
+  template <typename T>
+  T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x) const {
+    return parent->get_likelihood()->cluster_lpdf_from_unconstrained(x) +
+           parent->get_prior()->lpdf_from_unconstrained(x);
   }
 };
 

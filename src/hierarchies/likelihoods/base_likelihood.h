@@ -25,6 +25,22 @@ class BaseLikelihood : public AbstractLikelihood {
     return out;
   }
 
+  // The unconstrained parameters are mean and log(var)
+  double cluster_lpdf_from_unconstrained(
+      Eigen::VectorXd unconstrained_params) const override {
+    return static_cast<const Derived &>(*this)
+        .template cluster_lpdf_from_unconstrained<double>(
+            unconstrained_params);
+  }
+
+  stan::math::var cluster_lpdf_from_unconstrained(
+      Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> unconstrained_params)
+      const override {
+    return static_cast<const Derived &>(*this)
+        .template cluster_lpdf_from_unconstrained<stan::math::var>(
+            unconstrained_params);
+  }
+
   virtual Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data,
                                     const Eigen::MatrixXd &covariates =
                                         Eigen::MatrixXd(0, 0)) const override;
