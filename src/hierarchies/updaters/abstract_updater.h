@@ -4,8 +4,7 @@
 #include "src/hierarchies/abstract_hierarchy.h"
 #include "src/hierarchies/likelihoods/abstract_likelihood.h"
 #include "src/hierarchies/priors/abstract_prior_model.h"
-
-class target_lpdf_unconstrained;
+#include "src/hierarchies/updaters/target_lpdf_unconstrained.h"
 
 class AbstractUpdater {
  public:
@@ -14,8 +13,7 @@ class AbstractUpdater {
   virtual bool is_conjugate() const { return false; };
 
   virtual void draw(AbstractLikelihood &like, AbstractPriorModel &prior,
-                    bool update_params,
-                    target_lpdf_unconstrained &target_lpdf) = 0;
+                    bool update_params) = 0;
 
   virtual void compute_posterior_hypers(AbstractLikelihood &like,
                                         AbstractPriorModel &prior) {

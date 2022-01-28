@@ -8,8 +8,8 @@ template <class DerivedUpdater>
 class MetropolisUpdater : public AbstractUpdater {
  public:
   void draw(AbstractLikelihood &like, AbstractPriorModel &prior,
-            bool update_params,
-            target_lpdf_unconstrained &target_lpdf) override {
+            bool update_params) override {
+    target_lpdf_unconstrained target_lpdf(&like, &prior);
     Eigen::VectorXd curr_state = like.get_unconstrained_state();
     Eigen::VectorXd prop_state =
         static_cast<DerivedUpdater *>(this)->sample_proposal(

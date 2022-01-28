@@ -7,4 +7,5 @@ target_sources(bayesmix PUBLIC
     # nnig_updater.cc
     # random_walk_updater.h
     target_lpdf_unconstrained.h
+    target_lpdf_unconstrained.cc
 )

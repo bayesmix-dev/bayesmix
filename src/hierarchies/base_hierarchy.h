@@ -12,8 +12,8 @@
 #include "abstract_hierarchy.h"
 #include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
-#include "src/hierarchies/updaters/target_lpdf_unconstrained.h"
 #include "src/utils/rng.h"
+#include "updaters/target_lpdf_unconstrained.h"
 
 //! Base template class for a hierarchy object.
 
@@ -172,8 +172,7 @@ class BaseHierarchy : public AbstractHierarchy {
   };
 
   void sample_full_cond(bool update_params = false) override {
-    target_lpdf_unconstrained target(this);
-    updater->draw(*like, *prior, update_params, target);
+    updater->draw(*like, *prior, update_params);
   };
 
   void sample_full_cond(
