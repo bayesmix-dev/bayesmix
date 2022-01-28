@@ -33,9 +33,9 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
 
  protected:
  	std::vector<unsigned int> S;
- 	unsigned int T=5;
- 	unsigned int K=1;
- 	unsigned int M=1;
+  unsigned int T=5;
+  unsigned int K=1;
+  unsigned int M=1;
   unsigned int LabI;
 
   void print_startup_message() const override;
