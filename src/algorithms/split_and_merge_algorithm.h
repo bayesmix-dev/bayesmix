@@ -51,7 +51,7 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
   void compute_S(const unsigned int i, const unsigned int j);
 
   std::vector<unsigned int> compute_C_launch(const unsigned int i,
-  	const unsigned int j) const;
+  	const unsigned int j);
 
   // The function is void because we update the allocation labels directly 
   // inside the function.
