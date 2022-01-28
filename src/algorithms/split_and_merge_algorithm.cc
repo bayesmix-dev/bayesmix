@@ -41,7 +41,7 @@ std::vector<unsigned int> SplitAndMergeAlgorithm::compute_C_launch(const unsigne
         LabI=allocations[i];
     }
     std::vector<unsigned int>cl(S.size(),LabI);
-    std::default_random_engine generator(seed=seed);
+    std::default_random_engine generator;
     std::bernoulli_distribution bdistr(0.5);
     for (int k = 0; k < S.size(); ++k) {
         if (bdistr(generator))
