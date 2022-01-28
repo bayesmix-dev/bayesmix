@@ -208,14 +208,12 @@ void MFAHierarchy::sample_eta() {
       (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
        state.lambda.transpose() * state.psi_inverse * state.lambda)
           .llt();
-  Eigen::MatrixXd sigma_eta(sigma_eta_inv_llt.solve(
-      Eigen::MatrixXd::Identity(hypers->q, hypers->q)));
-
+  
   if (state.eta.rows() != card) {
     state.eta = Eigen::MatrixXd::Zero(card, state.eta.cols());
   }
-  Eigen::MatrixXd temp_product(sigma_eta * (state.lambda.transpose()) *
-                               state.psi_inverse);
+  Eigen::MatrixXd temp_product(sigma_eta_inv_llt.solve(state.lambda.transpose() *
+                               state.psi_inverse));
   auto iterator = cluster_data_idx.begin();
   for (size_t i = 0; i < card; i++, iterator++) {
     Eigen::VectorXd tempvector(dataset_ptr->row(
@@ -233,13 +231,12 @@ void MFAHierarchy::sample_mu() {
       (card * state.psi_inverse.diagonal().array() + hypers->phi)
           .cwiseInverse();
 
-  Eigen::VectorXd sum = Eigen::VectorXd::Zero(dim);
-  for (size_t i = 0; i < card; i++) {
-    Eigen::VectorXd row = state.eta.row(i);
-    sum += state.lambda * row;
-  }
-  Eigen::VectorXd mumean = sigma_mu * (hypers->phi * hypers->mutilde +
-                                       state.psi_inverse * (data_sum - sum));
+  Eigen::VectorXd sum = (state.eta.colwise().sum());
+  
+  Eigen::VectorXd mumean = sigma_mu * 
+  (hypers->phi * hypers->mutilde + state.psi_inverse * 
+                      (data_sum - state.lambda * sum));
+
   state.mu = bayesmix::multi_normal_diag_rng(mumean, sigma_mu, rng);
 }
 
@@ -262,6 +259,7 @@ void MFAHierarchy::sample_lambda() {
     }
     tempsum = tempsum.array() - state.mu[j];
     tempsum = tempsum.array() / state.psi[j];
+
     state.lambda.row(j) = bayesmix::multi_normal_prec_chol_rng(
         sigma_lambda_inv_llt.solve(state.eta.transpose() * tempsum),
         sigma_lambda_inv_llt, rng);
