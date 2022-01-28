@@ -8,6 +8,8 @@
 #include "marginal_algorithm.h"
 #include "src/hierarchies/base_hierarchy.h"
 
+
+
 //! Template class for Split and Merge for conjugate hierarchies
 
 //! This class implements Split and Merge algorithm from Jain and Neal (2004)
@@ -34,6 +36,7 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
  	unsigned int T=5;
  	unsigned int K=1;
  	unsigned int M=1;
+  unsigned int LabI;
 
   void print_startup_message() const override;
 
