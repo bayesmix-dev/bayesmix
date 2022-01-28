@@ -80,7 +80,7 @@ Eigen::VectorXd multi_normal_diag_rng(
  * @return       multivariate normal r.v.
  */
 Eigen::VectorXd multi_normal_prec_chol_rng(const Eigen::VectorXd &mean,
-                                           const Eigen::MatrixXd &prec_chol,
+                                           const Eigen::LLT<Eigen::MatrixXd> &prec_chol,
                                            std::mt19937_64 &rng);
 
 /*

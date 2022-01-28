@@ -17,7 +17,7 @@ burnin: 0
 #  by certain mixing objects, such as LogSBMixing. Please check a mixing's
 #  initialize() function to know for sure whether or not it will override this
 #  value.)
-init_num_clusters: 3
+init_num_clusters: 300
 
 
 ##### ALGORITHM-SPECIFIC SETTINGS #####

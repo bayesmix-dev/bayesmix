@@ -49,23 +49,20 @@ Eigen::VectorXd bayesmix::multi_normal_diag_rng(
 }
 
 Eigen::VectorXd bayesmix::multi_normal_prec_chol_rng(
-    const Eigen::VectorXd &mean, const Eigen::MatrixXd &prec_chol,
+    const Eigen::VectorXd &mean,  const Eigen::LLT<Eigen::MatrixXd>  &prec_chol,
     std::mt19937_64 &rng) {
   size_t N = mean.size();
   Eigen::VectorXd output(N);
-  const auto &L_ref = stan::math::to_ref(prec_chol);
   boost::variate_generator<std::mt19937_64 &, boost::normal_distribution<>>
       std_normal_rng(rng, boost::normal_distribution<>(0, 1));
 
-  for (size_t n = 0; n < N; ++n) {
-    Eigen::VectorXd z(prec_chol.cols());
-    for (int i = 0; i < prec_chol.cols(); i++) {
+    Eigen::VectorXd z(N);
+    for (int i = 0; i < N; i++) {
       z(i) = std_normal_rng();
     }
 
-    output[n] = stan::math::as_column_vector_or_scalar(mean[n]) +
-                stan::math::as_column_vector_or_scalar(L_ref.row(n)).dot(z);
-  }
+    output = mean + prec_chol.matrixU().solve(z);
+  
 
   return output;
 }
@@ -114,7 +111,7 @@ double bayesmix::gaussian_mixture_dist(
                                                vars1(i) + vars1(j)));
     }
   }
-
+ 
   double mix2 = 0.0;
 #pragma omp parallel for collapse(2) reduction(+ : mix2)
   for (int i = 0; i < means2.size(); i++) {

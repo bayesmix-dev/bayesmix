@@ -221,8 +221,7 @@ void MFAHierarchy::sample_eta() {
     Eigen::VectorXd tempvector(dataset_ptr->row(
         *iterator));  // TODO use slicing when Eigen is updated to v3.4
     state.eta.row(i) = (bayesmix::multi_normal_prec_chol_rng(
-        temp_product * (tempvector - state.mu), sigma_eta_inv_llt.matrixL(),
-        rng));
+        temp_product * (tempvector - state.mu), sigma_eta_inv_llt, rng));
   }
 }
 
@@ -265,7 +264,7 @@ void MFAHierarchy::sample_lambda() {
     tempsum = tempsum.array() / state.psi[j];
     state.lambda.row(j) = bayesmix::multi_normal_prec_chol_rng(
         sigma_lambda_inv_llt.solve(state.eta.transpose() * tempsum),
-        sigma_lambda_inv_llt.matrixL(), rng);
+        sigma_lambda_inv_llt, rng);
   }
 }
 
