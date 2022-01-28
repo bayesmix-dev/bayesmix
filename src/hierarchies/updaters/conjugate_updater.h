@@ -14,8 +14,6 @@ class ConjugateUpdater : public AbstractUpdater {
   bool is_conjugate() const override { return true; };
   void draw(AbstractLikelihood& like, AbstractPriorModel& prior,
             bool update_params) override;
-  virtual void compute_posterior_hypers(AbstractLikelihood& like,
-                                        AbstractPriorModel& prior) = 0;
 
  protected:
   Likelihood& downcast_likelihood(AbstractLikelihood& like_);

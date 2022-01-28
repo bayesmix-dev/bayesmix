@@ -31,12 +31,12 @@
 //! @tparam Hyperparams  Class name of the container for hyperprior parameters
 //! @tparam Prior        Class name of the container for prior parameters
 
-template <class Derived, class Likelihood, class PriorModel, class Updater>
+template <class Derived, class Likelihood, class PriorModel>
 class BaseHierarchy : public AbstractHierarchy {
  protected:
   std::shared_ptr<Likelihood> like = std::make_shared<Likelihood>();
   std::shared_ptr<PriorModel> prior = std::make_shared<PriorModel>();
-  std::shared_ptr<Updater> updater = std::make_shared<Updater>();
+  std::shared_ptr<AbstractUpdater> updater;
 
  public:
   using HyperParams = decltype(prior->get_hypers());
@@ -52,6 +52,8 @@ class BaseHierarchy : public AbstractHierarchy {
     }
     if (updater_) {
       set_updater(updater_);
+    } else {
+      static_cast<Derived *>(this)->set_default_updater();
     }
   }
 
@@ -64,8 +66,10 @@ class BaseHierarchy : public AbstractHierarchy {
     prior = std::static_pointer_cast<PriorModel>(prior_);
   }
   void set_updater(std::shared_ptr<AbstractUpdater> updater_) override {
-    updater = std::static_pointer_cast<Updater>(updater_);
+    updater = updater_;
   };
+
+  virtual void set_default_updater() = 0;
 
   std::shared_ptr<AbstractLikelihood> get_likelihood() override {
     return like;
@@ -109,7 +113,8 @@ class BaseHierarchy : public AbstractHierarchy {
 
   Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
+      const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/)
+      const override {
     Eigen::VectorXd lpdf(data.rows());
     if (covariates.cols() == 0) {
       // Pass null value as covariate
@@ -141,7 +146,8 @@ class BaseHierarchy : public AbstractHierarchy {
 
   Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
+      const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/)
+      const override {
     Eigen::VectorXd lpdf(data.rows());
     if (covariates.cols() == 0) {
       // Pass null value as covariate
@@ -217,7 +223,7 @@ class BaseHierarchy : public AbstractHierarchy {
 
   std::set<int> get_data_idx() const override { return like->get_data_idx(); };
 
-  google::protobuf::Message *get_mutable_prior() {
+  google::protobuf::Message *get_mutable_prior() override {
     return prior->get_mutable_prior();
   };
 

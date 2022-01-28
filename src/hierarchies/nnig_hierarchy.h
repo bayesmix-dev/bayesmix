@@ -15,20 +15,22 @@
 #include "base_hierarchy.h"
 #include "likelihoods/uni_norm_likelihood.h"
 #include "priors/nig_prior_model.h"
-// #include "updaters/nnig_updater.h"
-#include "updaters/mala_updater.h"
-#include "updaters/random_walk_updater.h"
+#include "updaters/nnig_updater.h"
 
-class NNIGHierarchy : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
-                                           NIGPriorModel, MalaUpdater> {
+class NNIGHierarchy
+    : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood, NIGPriorModel> {
  public:
   ~NNIGHierarchy() = default;
 
-  using BaseHierarchy<NNIGHierarchy, UniNormLikelihood, NIGPriorModel,
-                      MalaUpdater>::BaseHierarchy;
+  using BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
+                      NIGPriorModel>::BaseHierarchy;
 
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNIG;
+  }
+
+  void set_default_updater() override {
+    updater = std::make_shared<NNIGUpdater>();
   }
 
   void initialize_state() override {
