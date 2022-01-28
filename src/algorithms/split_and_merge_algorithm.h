@@ -32,7 +32,7 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
   }
 
  protected:
- 	std::vector<unsigned int> S;
+  std::vector<unsigned int> S;
   unsigned int T=5;
   unsigned int K=1;
   unsigned int M=1;
