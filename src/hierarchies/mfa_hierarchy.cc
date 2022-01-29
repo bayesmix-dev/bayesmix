@@ -72,10 +72,14 @@ void MFAHierarchy::initialize_hypers() {
 
     // Automatic initialization
     if (dim == 0) {
+      std::cout << "No mutilde found. Initializing with mean." << std::endl;
       hypers->mutilde = dataset_ptr->colwise().mean();
       dim = hypers->mutilde.size();
     }
     if (hypers->beta.size() == 0) {
+      std::cout << "No beta found. Initializing with scaled precision matrix "
+                   "diagonal."
+                << std::endl;
       Eigen::MatrixXd centered =
           dataset_ptr->rowwise() - dataset_ptr->colwise().mean();
       auto cov_llt = ((centered.transpose() * centered) /
@@ -208,7 +212,6 @@ void MFAHierarchy::sample_eta() {
       (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
        state.lambda.transpose() * state.psi_inverse * state.lambda)
           .llt();
-
   if (state.eta.rows() != card) {
     state.eta = Eigen::MatrixXd::Zero(card, state.eta.cols());
   }
@@ -281,14 +284,14 @@ void MFAHierarchy::sample_psi() {
 
   Eigen::VectorXd sum =
       (((tempdata - lambda_eta).rowwise() -
-  state.mu.transpose()).array().square()) .colwise() .sum(); std::cout <<
-  sum.cols() << std::endl;
+  state.mu.transpose()).array().square()) .colwise() .sum();
+  std::cout<<sum<<std::endl;
 
   for (size_t j = 0; j < dim; j++) {
     state.psi[j] = stan::math::inv_gamma_rng(
         hypers->alpha0 + card / 2, hypers->beta[j] + sum[j] / 2, rng);
-  }
-  */
+  }*/
+
   for (size_t j = 0; j < dim; j++) {
     double sum = 0;
     auto iterator = cluster_data_idx.begin();

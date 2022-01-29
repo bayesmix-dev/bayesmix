@@ -314,16 +314,15 @@ TEST(mfahierarchy, sample_given_data) {
   prior.mutable_fixed_values()->set_q(q);
   *prior.mutable_fixed_values()->mutable_beta() = beta_proto;
   hier->get_mutable_prior()->CopyFrom(prior);
+  Eigen::MatrixXd dataset(5, 4);
+  dataset << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+      20;
+  hier->set_dataset(&dataset);
   hier->initialize();
 
-  Eigen::RowVectorXd datum1(4);
-  Eigen::RowVectorXd datum2(4);
-  datum1 << 1.0, 2.0, 3.0, 4.0;
-  datum2 << 2.0, 4.0, 6.0, 8.0;
-
   auto hier2 = hier->clone();
-  hier2->add_datum(0, datum1, false);
-  hier2->add_datum(1, datum2, false);
+  hier2->add_datum(0, dataset.row(0), false);
+  hier2->add_datum(1, dataset.row(1), false);
   hier2->sample_full_cond();
   bayesmix::AlgorithmState out;
   bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
