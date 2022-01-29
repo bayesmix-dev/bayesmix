@@ -12,12 +12,8 @@ double MultiNormLikelihood::compute_lpdf(const Eigen::RowVectorXd &datum) const 
 void MultiNormLikelihood::update_sum_stats(const Eigen::RowVectorXd &datum, bool add) {
     
     // Prepare buffer in case dim is not defined yet
-    if (!dim) {
-        dim = datum.size();
-        data_sum = Eigen::VectorXd::Zero(dim);
-        data_sum_squares = Eigen::MatrixXd::Zero(dim,dim);
-    }
-
+    if (!dim)
+      set_dim(datum.size());
     // Updates
     if (add) {
         data_sum += datum.transpose();

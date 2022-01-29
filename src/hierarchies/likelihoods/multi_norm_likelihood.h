@@ -23,6 +23,11 @@ class MultiNormLikelihood
                             bool update_card = true) override;
   void clear_summary_statistics() override;
 
+  void set_dim(unsigned int dim_) {
+    dim = dim_;
+    data_sum = Eigen::VectorXd::Zero(dim);
+    data_sum_squares = Eigen::MatrixXd::Zero(dim,dim);
+  };
   unsigned int get_dim() const { return dim; };
   Eigen::VectorXd get_data_sum() const { return data_sum; };
   Eigen::MatrixXd get_data_sum_squares() const { return data_sum_squares; };
