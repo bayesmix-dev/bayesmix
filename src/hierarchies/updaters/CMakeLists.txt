@@ -6,4 +6,6 @@ target_sources(bayesmix
     nnig_updater.cc
     nnxig_updater.h
     nnxig_updater.cc
+    nnw_updater.h
+    nnw_updater.cc
 )

@@ -7,7 +7,7 @@
 #include "ls_state.pb.h"
 // #include "src/hierarchies/lin_reg_uni_hierarchy.h"
 #include "src/hierarchies/nnig_hierarchy.h"
-// #include "src/hierarchies/nnw_hierarchy.h"
+#include "src/hierarchies/nnw_hierarchy.h"
 #include "src/hierarchies/nnxig_hierarchy.h"
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
@@ -69,71 +69,71 @@ TEST(nnig_hierarchy, sample_given_data) {
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
 
-// TEST(nnwhierarchy, draw) {
-//   auto hier = std::make_shared<NNWHierarchy>();
-//   bayesmix::NNWPrior prior;
-//   Eigen::Vector2d mu0;
-//   mu0 << 5.5, 5.5;
-//   bayesmix::Vector mu0_proto;
-//   bayesmix::to_proto(mu0, &mu0_proto);
-//   double lambda0 = 0.2;
-//   double nu0 = 5.0;
-//   Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
-//   bayesmix::Matrix tau0_proto;
-//   bayesmix::to_proto(tau0, &tau0_proto);
-//   *prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
-//   prior.mutable_fixed_values()->set_var_scaling(lambda0);
-//   prior.mutable_fixed_values()->set_deg_free(nu0);
-//   *prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
-//   hier->get_mutable_prior()->CopyFrom(prior);
-//   hier->initialize();
+TEST(nnw_hierarchy, draw) {
+  auto hier = std::make_shared<NNWHierarchy>();
+  bayesmix::NNWPrior prior;
+  Eigen::Vector2d mu0;
+  mu0 << 5.5, 5.5;
+  bayesmix::Vector mu0_proto;
+  bayesmix::to_proto(mu0, &mu0_proto);
+  double lambda0 = 0.2;
+  double nu0 = 5.0;
+  Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
+  bayesmix::Matrix tau0_proto;
+  bayesmix::to_proto(tau0, &tau0_proto);
+  *prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
+  prior.mutable_fixed_values()->set_var_scaling(lambda0);
+  prior.mutable_fixed_values()->set_deg_free(nu0);
+  *prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
+  hier->get_mutable_prior()->CopyFrom(prior);
+  hier->initialize();
 
-//   auto hier2 = hier->clone();
-//   hier2->sample_prior();
+  auto hier2 = hier->clone();
+  hier2->sample_prior();
 
-//   bayesmix::AlgorithmState out;
-//   bayesmix::AlgorithmState::ClusterState* clusval =
-//   out.add_cluster_states(); bayesmix::AlgorithmState::ClusterState* clusval2
-//   = out.add_cluster_states(); hier->write_state_to_proto(clusval);
-//   hier2->write_state_to_proto(clusval2);
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval =
+  out.add_cluster_states(); bayesmix::AlgorithmState::ClusterState* clusval2
+  = out.add_cluster_states(); hier->write_state_to_proto(clusval);
+  hier2->write_state_to_proto(clusval2);
 
-//   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
-// }
+  ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+}
 
-// TEST(nnwhierarchy, sample_given_data) {
-//   auto hier = std::make_shared<NNWHierarchy>();
-//   bayesmix::NNWPrior prior;
-//   Eigen::Vector2d mu0;
-//   mu0 << 5.5, 5.5;
-//   bayesmix::Vector mu0_proto;
-//   bayesmix::to_proto(mu0, &mu0_proto);
-//   double lambda0 = 0.2;
-//   double nu0 = 5.0;
-//   Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
-//   bayesmix::Matrix tau0_proto;
-//   bayesmix::to_proto(tau0, &tau0_proto);
-//   *prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
-//   prior.mutable_fixed_values()->set_var_scaling(lambda0);
-//   prior.mutable_fixed_values()->set_deg_free(nu0);
-//   *prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
-//   hier->get_mutable_prior()->CopyFrom(prior);
-//   hier->initialize();
+TEST(nnw_hierarchy, sample_given_data) {
+  auto hier = std::make_shared<NNWHierarchy>();
+  bayesmix::NNWPrior prior;
+  Eigen::Vector2d mu0;
+  mu0 << 5.5, 5.5;
+  bayesmix::Vector mu0_proto;
+  bayesmix::to_proto(mu0, &mu0_proto);
+  double lambda0 = 0.2;
+  double nu0 = 5.0;
+  Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
+  bayesmix::Matrix tau0_proto;
+  bayesmix::to_proto(tau0, &tau0_proto);
+  *prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
+  prior.mutable_fixed_values()->set_var_scaling(lambda0);
+  prior.mutable_fixed_values()->set_deg_free(nu0);
+  *prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
+  hier->get_mutable_prior()->CopyFrom(prior);
+  hier->initialize();
 
-//   Eigen::RowVectorXd datum(2);
-//   datum << 4.5, 4.5;
+  Eigen::RowVectorXd datum(2);
+  datum << 4.5, 4.5;
 
-//   auto hier2 = hier->clone();
-//   hier2->add_datum(0, datum, false);
-//   hier2->sample_full_cond();
+  auto hier2 = hier->clone();
+  hier2->add_datum(0, datum, false);
+  hier2->sample_full_cond();
 
-//   bayesmix::AlgorithmState out;
-//   bayesmix::AlgorithmState::ClusterState* clusval =
-//   out.add_cluster_states(); bayesmix::AlgorithmState::ClusterState* clusval2
-//   = out.add_cluster_states(); hier->write_state_to_proto(clusval);
-//   hier2->write_state_to_proto(clusval2);
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval =
+  out.add_cluster_states(); bayesmix::AlgorithmState::ClusterState* clusval2
+  = out.add_cluster_states(); hier->write_state_to_proto(clusval);
+  hier2->write_state_to_proto(clusval2);
 
-//   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
-// }
+  ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+}
 
 // TEST(lin_reg_uni_hierarchy, state_read_write) {
 //   Eigen::Vector2d beta;
