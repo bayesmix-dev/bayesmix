@@ -6,6 +6,22 @@
 #include "lib/argparse/argparse.h"
 #include "src/includes.h"
 
+std::vector<std::string> read_arguments_from_txt(const std::string filename) {
+  std::vector<std::string> arguments;
+  std::ifstream infile(filename);
+  std::string line;
+  while (std::getline(infile, line)) {
+    std::istringstream iss(line);
+    std::string a, b;
+    if (!(iss >> a >> b)) {
+      break;
+    }  // error
+    arguments.push_back(a);
+    arguments.push_back(b);
+  }
+  return arguments;
+}
+
 bool check_file_is_writeable(std::string filename) {
   std::ofstream ofstr;
   ofstr.open(filename);
@@ -43,7 +59,10 @@ inline bool instanceof(const T *ptr) {
     return dynamic_cast<const Base*>(ptr) != nullptr;
 }*/
 
-int main(int argc, char *argv[]) {
+void run_serial_mcmc_mfa(const std::string &filename) {
+  std::vector<std::string> arguments = read_arguments_from_txt(filename);
+  arguments.insert(arguments.begin(), "build/run_mcmc_mfa");
+
   argparse::ArgumentParser args("bayesmix::run");
 
   args.add_argument("--algo-params-file")
@@ -143,7 +162,7 @@ int main(int argc, char *argv[]) {
           "on which to evaluate the (log) predictive density");
 
   try {
-    args.parse_args(argc, argv);
+    args.parse_args(arguments);
   } catch (const std::runtime_error &err) {
     std::cerr << err.what() << std::endl;
     std::cerr << args;
@@ -269,5 +288,9 @@ int main(int argc, char *argv[]) {
 
   std::cout << "End of run_mcmc.cc" << std::endl;
   delete coll;
+}
+
+int main(int argc, char *argv[]) {
+  run_serial_mcmc_mfa(argv[1]);
   return 0;
 }
