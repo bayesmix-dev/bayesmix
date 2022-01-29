@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <omp.h>
 
 #include "lib/argparse/argparse.h"
 #include "src/includes.h"
@@ -291,8 +292,21 @@ void run_serial_mcmc_mfa(const std::string &filename) {
 }
 
 int main(int argc, char *argv[]) {
-  std::cout << "Running " << argc-1 << " simulations" << std::endl;
-  for (size_t i = 1; i < argc; ++i)
+  std::cout << "Running " << argc-2 << " simulations" << std::endl;
+  int n_threads = std::stoi(argv[1]);
+  if (n_threads > 0) {
+    int max_threads = omp_get_max_threads();
+    int used_threads = std::min(max_threads, n_threads);
+    std::cout << "desired: " << n_threads << std::endl;
+    std::cout << "max: " << max_threads << std::endl;
+    std::cout << "used: " << used_threads << std::endl;
+    omp_set_num_threads(used_threads);
+  } else {
+    std::cout << "Using all available threads"<< std::endl;
+  }
+  #pragma omp parallel for
+  for (size_t i = 2; i < argc; ++i) {
     run_serial_mcmc_mfa(argv[i]);
+  }
   return 0;
 }

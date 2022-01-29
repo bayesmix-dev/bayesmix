@@ -20,6 +20,9 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 # Require PkgConfig
 find_package(PkgConfig REQUIRED)
 
+# Require OpenMP
+find_package(OpenMP REQUIRED)
+
 # TBB CMake integration
 message(STATUS "Using math TBB")
 # Define TBB_ROOT Folder
@@ -157,7 +160,7 @@ if (BUILD_RUN)
   target_compile_options(run_mcmc PUBLIC ${COMPILE_OPTIONS})
   add_executable(run_mcmc_mfa $<TARGET_OBJECTS:bayesmix> run_mcmc_mfa.cc)
   target_include_directories(run_mcmc_mfa PUBLIC ${INCLUDE_PATHS})
-  target_link_libraries(run_mcmc_mfa PUBLIC ${LINK_LIBRARIES})
+  target_link_libraries(run_mcmc_mfa PUBLIC ${LINK_LIBRARIES} OpenMP::OpenMP_CXX)
   target_compile_options(run_mcmc_mfa PUBLIC ${COMPILE_OPTIONS})
 endif()
 

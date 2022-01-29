@@ -12,4 +12,4 @@
 #  --clus-file examples/mfa_hierarchy/out/clustering_auto.csv \
 #  --best-clus-file resources/tutorial/out/best_clustering.csv
 
-./build/run_mcmc_mfa examples/mfa_hierarchy/config.txt
+./build/run_mcmc_mfa -1 examples/mfa_hierarchy/config.txt
