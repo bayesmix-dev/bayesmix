@@ -208,12 +208,12 @@ void MFAHierarchy::sample_eta() {
       (Eigen::MatrixXd::Identity(hypers->q, hypers->q) +
        state.lambda.transpose() * state.psi_inverse * state.lambda)
           .llt();
-  
+
   if (state.eta.rows() != card) {
     state.eta = Eigen::MatrixXd::Zero(card, state.eta.cols());
   }
-  Eigen::MatrixXd temp_product(sigma_eta_inv_llt.solve(state.lambda.transpose() *
-                               state.psi_inverse));
+  Eigen::MatrixXd temp_product(
+      sigma_eta_inv_llt.solve(state.lambda.transpose() * state.psi_inverse));
   auto iterator = cluster_data_idx.begin();
   for (size_t i = 0; i < card; i++, iterator++) {
     Eigen::VectorXd tempvector(dataset_ptr->row(
@@ -232,10 +232,10 @@ void MFAHierarchy::sample_mu() {
           .cwiseInverse();
 
   Eigen::VectorXd sum = (state.eta.colwise().sum());
-  
-  Eigen::VectorXd mumean = sigma_mu * 
-  (hypers->phi * hypers->mutilde + state.psi_inverse * 
-                      (data_sum - state.lambda * sum));
+
+  Eigen::VectorXd mumean =
+      sigma_mu * (hypers->phi * hypers->mutilde +
+                  state.psi_inverse * (data_sum - state.lambda * sum));
 
   state.mu = bayesmix::multi_normal_diag_rng(mumean, sigma_mu, rng);
 }
@@ -268,8 +268,27 @@ void MFAHierarchy::sample_lambda() {
 
 void MFAHierarchy::sample_psi() {
   auto& rng = bayesmix::Rng::Instance().get();
+  //(LAMBDA*ETA^T)^T = ETA*LAMBDA^T  dim*q q*card
+  //(data.colwise()-mu-LAMBDA*ETA^T).square().colwise().sum()
+  Eigen::MatrixXd lambda_eta(state.eta.dot(state.lambda.transpose()));
+  Eigen::MatrixXd tempdata(card, dim);
+  auto iterator = cluster_data_idx.begin();
+  for (size_t i = 0; i < card;
+       i++, iterator++) {  // TODO use slicing when Eigen is updated to v3.4
+    tempdata.row(i) = dataset_ptr->row(*iterator);
+  }
+
+  Eigen::VectorXd sum =
+      (((tempdata - lambda_eta).colwise() - state.mu).square())
+          .colwise()
+          .sum();
 
   for (size_t j = 0; j < dim; j++) {
+    state.psi[j] = stan::math::inv_gamma_rng(
+        hypers->alpha0 + card / 2, hypers->beta[j] + sum[j] / 2, rng);
+  }
+
+  /*for (size_t j = 0; j < dim; j++) {
     double sum = 0;
     auto iterator = cluster_data_idx.begin();
     for (size_t i = 0; i < card; i++, iterator++) {
@@ -281,6 +300,6 @@ void MFAHierarchy::sample_psi() {
     }
     state.psi[j] = stan::math::inv_gamma_rng(hypers->alpha0 + card / 2,
                                              hypers->beta[j] + sum / 2, rng);
-  }
+  }*/
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
 }
