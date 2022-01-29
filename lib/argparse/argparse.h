@@ -966,10 +966,6 @@ class ArgumentParser {
   void parse_args(int argc, const char *const argv[]) {
     std::vector<std::string> arguments;
     std::copy(argv, argv + argc, std::back_inserter(arguments));
-    std::cout << "-------------------------------------------------" << std::endl;
-    for (auto &e:arguments)
-      std::cout << e << std::endl;
-    std::cout << "-------------------------------------------------" << std::endl;
     parse_args(arguments);
   }
 
