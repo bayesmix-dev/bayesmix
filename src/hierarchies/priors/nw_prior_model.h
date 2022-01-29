@@ -31,14 +31,16 @@ class NWPriorModel : public BasePriorModel<NWPriorModel, Hyperparams::NW,
   void set_hypers_from_proto(
       const google::protobuf::Message &hypers_) override;
 
+  void write_prec_to_state(const Eigen::MatrixXd &prec_, State::MultiLS *out);
+
+  unsigned int get_dim() const { return dim; };
+
  protected:
 
   std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
       const override;
 
   void initialize_hypers() override;
-
-  void write_prec_to_state(const Eigen::MatrixXd &prec_, State::MultiLS *out);
 
   unsigned int dim;
 };
