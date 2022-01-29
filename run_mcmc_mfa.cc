@@ -291,6 +291,8 @@ void run_serial_mcmc_mfa(const std::string &filename) {
 }
 
 int main(int argc, char *argv[]) {
-  run_serial_mcmc_mfa(argv[1]);
+  std::cout << "Running " << argc-1 << " simulations" << std::endl;
+  for (size_t i = 1; i < argc; ++i)
+    run_serial_mcmc_mfa(argv[i]);
   return 0;
 }
