@@ -268,9 +268,9 @@ void MFAHierarchy::sample_lambda() {
 
 void MFAHierarchy::sample_psi() {
   auto& rng = bayesmix::Rng::Instance().get();
-  //(LAMBDA*ETA^T)^T = ETA*LAMBDA^T  dim*q q*card
-  //(data.colwise()-mu-LAMBDA*ETA^T).square().colwise().sum()
-  Eigen::MatrixXd lambda_eta(state.eta.dot(state.lambda.transpose()));
+  /*//(LAMBDA*ETA^T)^T = ETA*LAMBDA^T  (dim*q q*card)^T
+  //(data.rowwise()-mu-LAMBDA*ETA^T).square().colwise().sum()
+  Eigen::MatrixXd lambda_eta(state.eta * state.lambda.transpose());
   Eigen::MatrixXd tempdata(card, dim);
   auto iterator = cluster_data_idx.begin();
   for (size_t i = 0; i < card;
@@ -278,17 +278,18 @@ void MFAHierarchy::sample_psi() {
     tempdata.row(i) = dataset_ptr->row(*iterator);
   }
 
+
   Eigen::VectorXd sum =
-      (((tempdata - lambda_eta).colwise() - state.mu).square())
-          .colwise()
-          .sum();
+      (((tempdata - lambda_eta).rowwise() -
+  state.mu.transpose()).array().square()) .colwise() .sum(); std::cout <<
+  sum.cols() << std::endl;
 
   for (size_t j = 0; j < dim; j++) {
     state.psi[j] = stan::math::inv_gamma_rng(
         hypers->alpha0 + card / 2, hypers->beta[j] + sum[j] / 2, rng);
   }
-
-  /*for (size_t j = 0; j < dim; j++) {
+  */
+  for (size_t j = 0; j < dim; j++) {
     double sum = 0;
     auto iterator = cluster_data_idx.begin();
     for (size_t i = 0; i < card; i++, iterator++) {
@@ -300,6 +301,6 @@ void MFAHierarchy::sample_psi() {
     }
     state.psi[j] = stan::math::inv_gamma_rng(hypers->alpha0 + card / 2,
                                              hypers->beta[j] + sum / 2, rng);
-  }*/
+  }
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
 }
