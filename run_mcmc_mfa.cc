@@ -310,6 +310,12 @@ int main(int argc, char *argv[]) {
   size_t N = argc - 2;
   size_t n = N;
 
+  // get underlying buffer
+  std::streambuf* orig_buf = std::cout.rdbuf();
+
+  // set null
+  std::cout.rdbuf(NULL);
+
 // Run all the tests in parallel
 #pragma omp parallel for
   for (size_t i = 2; i < argc; ++i) {
@@ -319,6 +325,10 @@ int main(int argc, char *argv[]) {
       n--;
     }
   }
+
+  // restore buffer
+  std::cout.rdbuf(orig_buf);
+  
   std::cout << n << "/" << N << " simulations correctly performed"
             << std::endl;
   return 0;
