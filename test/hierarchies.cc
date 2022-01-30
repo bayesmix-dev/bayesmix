@@ -372,7 +372,7 @@ TEST(mfahierarchy, sample_full_cond) {
     Eigen::RowVectorXd row = data.row(i);
     hier->add_datum(i, row, false);
   }
-  int n_iter = 5000;
+  int n_iter = 500;
   Eigen::MatrixXd musamplato(n_iter, p);
   Eigen::MatrixXd psisamplato(n_iter, p);
   Eigen::MatrixXd Lambdasamplato(n_iter, p);

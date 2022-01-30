@@ -15,10 +15,12 @@
 #include "src/utils/rng.h"
 
 double MFAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
-  return stan::math::multi_normal_lpdf(
-      datum, state.mu,
-      state.lambda * state.lambda.transpose() +
-          Eigen::MatrixXd(state.psi.asDiagonal()));
+  using stan::math::NEG_LOG_SQRT_TWO_PI;
+  double base = 2*(Eigen::MatrixXd(state.prec_chol.matrixL())).diagonal().array().log().sum()
+   + NEG_LOG_SQRT_TWO_PI * dim;
+  double exp = ((datum.transpose()-state.mu).dot(state.prec_chol.solve((datum.transpose()-state.mu))));
+  return -0.5 * (base + exp);
+  
 }
 
 MFA::State MFAHierarchy::draw(const MFA::Hyperparams& params) {
@@ -47,6 +49,8 @@ MFA::State MFAHierarchy::draw(const MFA::Hyperparams& params) {
   }
 
   out.psi_inverse = out.psi.cwiseInverse().asDiagonal();
+  out.prec_chol = (out.lambda * out.lambda.transpose() +
+          Eigen::MatrixXd(out.psi.asDiagonal()) ).llt();
 
   return out;
 }
@@ -58,6 +62,8 @@ void MFAHierarchy::initialize_state() {
   state.eta = Eigen::MatrixXd::Zero(card, hypers->q);
   state.lambda = Eigen::MatrixXd::Zero(dim, hypers->q);
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
+  state.prec_chol = (state.lambda * state.lambda.transpose() +
+          Eigen::MatrixXd(state.psi.asDiagonal()) ).llt();
 }
 
 void MFAHierarchy::initialize_hypers() {
@@ -154,6 +160,8 @@ void MFAHierarchy::set_state_from_proto(
   state.eta = bayesmix::to_eigen(statecast.mfa_state().eta());
   state.lambda = bayesmix::to_eigen(statecast.mfa_state().lambda());
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
+  state.prec_chol = (state.lambda * state.lambda.transpose() +
+          Eigen::MatrixXd(state.psi.asDiagonal()) ).llt();
   set_card(statecast.cardinality());
 }
 
@@ -306,4 +314,6 @@ void MFAHierarchy::sample_psi() {
                                              hypers->beta[j] + sum / 2, rng);
   }
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
+  state.prec_chol = (state.lambda * state.lambda.transpose() +
+          Eigen::MatrixXd(state.psi.asDiagonal()) ).llt();
 }
