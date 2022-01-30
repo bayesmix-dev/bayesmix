@@ -20,7 +20,7 @@ double MFAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
                         .diagonal()
                         .array()
                         .log()
-                        .sum() +
+                        .sum() -
                 NEG_LOG_SQRT_TWO_PI * dim;
   double exp =
       ((datum.transpose() - state.mu)
