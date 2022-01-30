@@ -14,11 +14,10 @@ std::vector<std::string> read_arguments_from_txt(const std::string filename) {
   while (std::getline(infile, line)) {
     std::istringstream iss(line);
     std::string a, b;
-    if (!(iss >> a >> b)) {
-      break;
-    }  // error
-    arguments.push_back(a);
-    arguments.push_back(b);
+    if (iss >> a >> b) {
+      arguments.push_back(a);
+      arguments.push_back(b);
+    }
   }
   return arguments;
 }
@@ -61,6 +60,7 @@ inline bool instanceof(const T *ptr) {
 }*/
 
 void run_serial_mcmc_mfa(const std::string &filename) {
+  // Read arguments from filename
   std::vector<std::string> arguments = read_arguments_from_txt(filename);
   arguments.insert(arguments.begin(), "build/run_mcmc_mfa");
 
@@ -293,6 +293,8 @@ void run_serial_mcmc_mfa(const std::string &filename) {
 
 int main(int argc, char *argv[]) {
   std::cout << "Running " << argc-2 << " simulations" << std::endl;
+
+  // Set the number of threads
   int n_threads = std::stoi(argv[1]);
   if (n_threads > 0) {
     int max_threads = omp_get_max_threads();
@@ -304,6 +306,8 @@ int main(int argc, char *argv[]) {
   } else {
     std::cout << "Using all available threads"<< std::endl;
   }
+
+  // Run all the tests in parallel
   #pragma omp parallel for
   for (size_t i = 2; i < argc; ++i) {
     run_serial_mcmc_mfa(argv[i]);
