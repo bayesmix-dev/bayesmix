@@ -4,8 +4,8 @@
 --mix-type DP 
 --mix-args examples/mfa_hierarchy/in/dp_gamma.asciipb
 --coll-name examples/mfa_hierarchy/out/chains_auto.recordio
---data-file examples/mfa_hierarchy/in/data3.csv
---grid-file examples/mfa_hierarchy/in/data3.csv
+--data-file examples/mfa_hierarchy/in/olive.csv
+--grid-file examples/mfa_hierarchy/in/olive.csv
 --dens-file examples/mfa_hierarchy/out/density_file_auto.csv
 --n-cl-file examples/mfa_hierarchy/out/numclust_auto.csv
 --clus-file examples/mfa_hierarchy/out/clustering_auto.csv
