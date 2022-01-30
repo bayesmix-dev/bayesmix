@@ -1,4 +1,5 @@
 #include <math.h>
+#include <omp.h>
 
 #include <fstream>
 #include <iostream>
@@ -13,11 +14,10 @@ std::vector<std::string> read_arguments_from_txt(const std::string filename) {
   while (std::getline(infile, line)) {
     std::istringstream iss(line);
     std::string a, b;
-    if (!(iss >> a >> b)) {
-      break;
-    }  // error
-    arguments.push_back(a);
-    arguments.push_back(b);
+    if (iss >> a >> b) {
+      arguments.push_back(a);
+      arguments.push_back(b);
+    }
   }
   return arguments;
 }
@@ -60,6 +60,7 @@ inline bool instanceof(const T *ptr) {
 }*/
 
 void run_serial_mcmc_mfa(const std::string &filename) {
+  // Read arguments from filename
   std::vector<std::string> arguments = read_arguments_from_txt(filename);
   arguments.insert(arguments.begin(), "build/run_mcmc_mfa");
 
@@ -161,13 +162,7 @@ void run_serial_mcmc_mfa(const std::string &filename) {
           "Path to a csv file with the values covariates used in the mixing "
           "on which to evaluate the (log) predictive density");
 
-  try {
-    args.parse_args(arguments);
-  } catch (const std::runtime_error &err) {
-    std::cerr << err.what() << std::endl;
-    std::cerr << args;
-    std::exit(1);
-  }
+  args.parse_args(arguments);
 
   std::cout << "Running run_mcmc.cc" << std::endl;
   check_args(args);
@@ -291,6 +286,50 @@ void run_serial_mcmc_mfa(const std::string &filename) {
 }
 
 int main(int argc, char *argv[]) {
-  run_serial_mcmc_mfa(argv[1]);
+  std::cout << "Running " << argc - 2 << " simulations" << std::endl;
+
+  // Set the number of threads
+  int n_threads = -1;
+  try {
+    n_threads = std::stoi(argv[1]);
+  } catch (const std::exception &err) {
+    std::cerr << err.what() << std::endl;
+    std::exit(1);
+  }
+  if (n_threads > 0) {
+    int max_threads = omp_get_max_threads();
+    int used_threads = std::min(max_threads, n_threads);
+    std::cout << "desired: " << n_threads << std::endl;
+    std::cout << "max: " << max_threads << std::endl;
+    std::cout << "used: " << used_threads << std::endl;
+    omp_set_num_threads(used_threads);
+  } else {
+    std::cout << "Using all available threads" << std::endl;
+  }
+
+  size_t N = argc - 2;
+  size_t n = N;
+
+  // get underlying buffer
+  std::streambuf* orig_buf = std::cout.rdbuf();
+
+  // set null
+  std::cout.rdbuf(NULL);
+
+// Run all the tests in parallel
+#pragma omp parallel for
+  for (size_t i = 2; i < argc; ++i) {
+    try {
+      run_serial_mcmc_mfa(argv[i]);
+    } catch (const std::exception &err) {
+      n--;
+    }
+  }
+
+  // restore buffer
+  std::cout.rdbuf(orig_buf);
+  
+  std::cout << n << "/" << N << " simulations correctly performed"
+            << std::endl;
   return 0;
 }
