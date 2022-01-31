@@ -27,10 +27,10 @@ init_num_clusters: 3
 neal8_n_aux: 3
 
 # Split and Merge number of restricted GS scans for each MH step.
-splitmerge_n_restr_GS_updates: 5
+splitmerge_n_restr_gs_updates: 5
 
 # Split and Merge number of MH updates for each iteration
-splitmerge_n_MH_updates: 1
+splitmerge_n_mh_updates: 1
 
 # Split and Merge number of full GS scans for each iteration
-splitmerge_n_full_GS_updates: 1
+splitmerge_n_full_gs_updates: 1
