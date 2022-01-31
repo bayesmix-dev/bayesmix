@@ -108,6 +108,12 @@ int main(int argc, char const *argv[]) {
         std::vector<double> mean_dens_vec(mean_dens.data(),
                                           mean_dens.data() + n_points);
         matplot::scatter(X, Y, mean_dens_vec);  // TODO make surf() work
+        std::stringstream title;
+        title << "Density estimation on " << n_iters << " iterations";
+        matplot::title(title.str());
+        matplot::xlabel("X");
+        matplot::ylabel("Y");
+        matplot::zlabel("Density");
         matplot::save(dens_plot);
         std::cout << "Saved density plot to " << dens_plot << std::endl;
       }
