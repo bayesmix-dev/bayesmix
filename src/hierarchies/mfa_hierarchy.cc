@@ -16,16 +16,16 @@
 
 double MFAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
-  double base = 2 * (Eigen::MatrixXd(state.prec_chol.matrixL()))
+  double base =  (Eigen::MatrixXd(state.prec_chol.matrixL()))
                         .diagonal()
                         .array()
                         .log()
                         .sum() -
                 NEG_LOG_SQRT_TWO_PI * dim;
   double exp =
-      ((datum.transpose() - state.mu)
+      0.5 * ((datum.transpose() - state.mu)
            .dot(state.prec_chol.solve((datum.transpose() - state.mu))));
-  return -0.5 * (base + exp);
+  return - (base + exp);
 }
 
 MFA::State MFAHierarchy::draw(const MFA::Hyperparams& params) {
