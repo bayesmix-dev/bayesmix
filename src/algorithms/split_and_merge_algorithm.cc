@@ -6,9 +6,9 @@
 void SplitAndMergeAlgorithm::read_params_from_proto(
   const bayesmix::AlgorithmParams &params){
   BaseAlgorithm::read_params_from_proto(params);
-  T = params.splitmerge_n_restr_GS_updates();
-  K = params.splitmerge_n_MH_updates();
-  M = params.splitmerge_n_full_GS_updates();
+  T = params.splitmerge_n_restr_gs_updates();
+  K = params.splitmerge_n_mh_updates();
+  M = params.splitmerge_n_full_gs_updates();
 } 
 
 void SplitAndMergeAlgorithm::print_startup_message() const {
