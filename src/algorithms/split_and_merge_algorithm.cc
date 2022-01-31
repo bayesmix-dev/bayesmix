@@ -204,7 +204,7 @@ void SplitAndMergeAlgorithm::split_or_merge(std::vector<unsigned int>& cl, const
       const double p1=q;
       const double p2=factorial(CountLabI-1)*factorial(CountLabJ-1)/(S.size()+2-1)*hierarchy.alpha; //fissare alpha
       const double p3=std::exp(-p_i-p_j+p_J); 
-      const double AcRa=min(1,p1*p2*p3) #acceptance ratio 
+      const double AcRa=min(1,p1*p2*p3) //acceptance ratio 
       if(accepted_proposal(AcRa)) allocations=clMerge;
       }
     
@@ -212,7 +212,7 @@ void SplitAndMergeAlgorithm::split_or_merge(std::vector<unsigned int>& cl, const
 
 bool SplitAndMergeAlgorithm::accepted_proposal(const double acRa) const{
     std::default_random_engine generator;
-    std::uniform_real_distribution UnifDis(0.0, 1.0);
+    std::uniform_real_distribution<> UnifDis(0.0, 1.0);
     return (UnifDis(generator)<=acRa);
                                                                         }
 
