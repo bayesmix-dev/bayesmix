@@ -61,7 +61,6 @@ std::vector<unsigned int> SplitAndMergeAlgorithm::compute_C_launch(const unsigne
 
 void SplitAndMergeAlgorithm::split_or_merge(std::vector<unsigned int>& cl, const unsigned int i, const unsigned int j){
     if(allocations[i]==allocations[j]) { 
-      LabI=*(std::max_element(allocations.begin(), allocations.end()));
       std::vector<unsigned int> clSplit (allocations.size()); #we could initialize the vector to LAbI
       Eigen::MatrixXd data_i();  
       Eigen::MatrixXd data_j();  
@@ -220,7 +219,6 @@ bool SplitAndMergeAlgorithm::accepted_proposal(const double acRa) const{
 void SplitAndMergeAlgorithm::restricted_GS(std::vector<unsigned int>& cl, const unsigned int i, 
                    const unsigned int j) const{ 
   for(unsigned int i=0; i<S.size(); i++){
-    LabI=*(std::max_element(allocations.begin(), allocations.end())); #bisogna mettere LabI come _private
     p_i = ComputeRestrGSProbabilities(cl, i, j, z, 'i');
     p_j = ComputeRestrGSProbabilities(cl, i, j, z, 'j');
     p   = p_i/(p_i+p_j);  
@@ -232,7 +230,6 @@ void SplitAndMergeAlgorithm::restricted_GS(std::vector<unsigned int>& cl, const 
 void SplitAndMergeAlgorithm::restricted_GS(std::vector<unsigned int>& cl, const unsigned int i, 
                    const unsigned int j, double &res_prod)const{ 
   for(unsigned int i=0; i<S.size(); i++){
-    LabI=*(std::max_element(allocations.begin(), allocations.end())); #bisogna mettere LabI come _private
     p_i = ComputeRestrGSProbabilities(cl, i, j, z, 'i');
     p_j = ComputeRestrGSProbabilities(cl, i, j, z, 'j');
     p   = p_i/(p_i+p_j);  
