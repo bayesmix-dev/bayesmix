@@ -96,12 +96,20 @@ int main(int argc, char const *argv[]) {
         matplot::title(title.str());
         matplot::xlabel("Grid");
         matplot::ylabel("Density");
-        matplot::save(args.get<std::string>("--dens-plot"));
+        matplot::save(dens_plot);
         std::cout << "Saved density plot to " << dens_plot << std::endl;
       }
       // Plot 2D density
       else {
-        // TODO
+        std::vector<double> X(grid.col(0).data(),
+                              grid.col(0).data() + n_points);
+        std::vector<double> Y(grid.col(1).data(),
+                              grid.col(1).data() + n_points);
+        std::vector<double> mean_dens_vec(mean_dens.data(),
+                                          mean_dens.data() + n_points);
+        matplot::scatter(X, Y, mean_dens_vec);  // TODO make surf() work
+        matplot::save(dens_plot);
+        std::cout << "Saved density plot to " << dens_plot << std::endl;
       }
     }
   }
