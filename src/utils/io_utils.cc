@@ -2,46 +2,59 @@
 
 #include <Eigen/Dense>
 #include <fstream>
+#include <iostream>
+
+bool bayesmix::check_file_is_writeable(const std::string &filename) {
+  std::ofstream ofstr;
+  ofstr.open(filename);
+  if (ofstr.fail()) {
+    ofstr.close();
+    throw std::invalid_argument("Cannot write to " + filename);
+  }
+  ofstr.close();
+  return true;
+}
 
 Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename,
                                             const char delim /* = ','*/) {
   // Initialize objects
-  unsigned int cols = 0, rows = 0;
-  double buffer[MAXBUFSIZE];
+  int rows = 0, cols = 0;
   std::ifstream filestream(filename);
   if (!filestream.is_open()) {
     std::string err = "File " + filename + " does not exist";
     throw std::invalid_argument(err);
   }
 
-  // Loop over file lines
+  // Get number of rows and columns
   std::string line, entry;
   while (getline(filestream, line, '\n')) {
-    unsigned int temp = 0;
+    rows++;
+    if (rows == 1) {
+      std::stringstream linestream(line);
+      while (getline(linestream, entry, delim)) {
+        cols++;
+      }
+    }
+  }
+  // Reset file stream to the beginning of the file
+  filestream.clear();
+  filestream.seekg(0, std::ios::beg);
+
+  // Fill an Eigen Matrix with values from the matrix
+  Eigen::MatrixXd mat(rows, cols);
+  int i = 0;
+  while (getline(filestream, line, '\n')) {
+    int j = 0;
     std::stringstream linestream(line);
     while (getline(linestream, entry, delim)) {
-      // Place read values into the buffer array
       std::stringstream entrystream(entry);
-      entrystream >> buffer[cols * rows + temp++];
+      mat(i, j) = std::stof(entry);
+      j++;
     }
-    if (temp == 0) {
-      continue;
-    }
-    if (cols == 0) {
-      cols = temp;
-    }
-    rows++;
+    i++;
   }
 
   filestream.close();
-
-  // Fill an Eigen Matrix with values from the buffer array
-  Eigen::MatrixXd mat(rows, cols);
-  for (size_t i = 0; i < rows; i++) {
-    for (size_t j = 0; j < cols; j++) {
-      mat(i, j) = buffer[cols * i + j];
-    }
-  }
   return mat;
 };
 
