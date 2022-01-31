@@ -3,6 +3,14 @@
 #include <algorithm>
 #include <random>
 
+void SplitAndMergeAlgorithm::read_params_from_proto(
+  const bayesmix::AlgorithmParams &params){
+  BaseAlgorithm::read_params_from_proto(params);
+  T = params.splitmerge_n_restr_GS_updates();
+  K = params.splitmerge_n_MH_updates();
+  M = params.splitmerge_n_full_GS_updates();
+} 
+
 void SplitAndMergeAlgorithm::print_startup_message() const {
   std::string msg = "Running Split and Merge algorithm with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +

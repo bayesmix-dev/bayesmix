@@ -18,11 +18,8 @@
 //! This algorithm requires the use of a `ConjugateHierarchy` object.
 class SplitAndMergeAlgorithm : public MarginalAlgorithm {
  public:
+  // DESTRUCTOR AND CONSTRUCTORS
   SplitAndMergeAlgorithm() = default;
-
-  SplitAndMergeAlgorithm(unsigned int T_, unsigned int K_, unsigned int M_):
-  	T(T_), K(K_), M(M_) {}
-
   ~SplitAndMergeAlgorithm() = default;
 
   bool requires_conjugate_hierarchy() const override { return true; }
@@ -31,13 +28,10 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
     return bayesmix::AlgorithmId::SplitMerge;
   }
 
- protected:
-  std::vector<unsigned int> S;
-  unsigned int T=5;
-  unsigned int K=1;
-  unsigned int M=1;
-  unsigned int LabI;
+  void read_params_from_proto(
+    const bayesmix::AlgorithmParams &params) override;
 
+ protected:
   void print_startup_message() const override;
 
   void sample_allocations() override;
@@ -67,6 +61,19 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
   	const unsigned int j, double &res_prod) const;
 
   // TODO: Proposal swap
+
+  std::vector<unsigned int> S;
+  
+  // Number of restricted GS scans for each MH step.
+  unsigned int T=5;
+  
+  // Number of MH updates for each iteration of Split and Merge algorithm. 
+  unsigned int K=1;
+
+  // Number of full GS scans for each iteration of Split and Merge algorithm.
+  unsigned int M=1;
+
+  unsigned int LabI;
 };
 
 
