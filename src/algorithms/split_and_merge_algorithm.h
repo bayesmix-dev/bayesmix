@@ -56,11 +56,19 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
   bool accepted_proposal(const double acRa) const;
 
   void full_GS();
-
+  
+  // Standard Gibbs Sampling
   void restricted_GS(std::vector<unsigned int>& cl, const unsigned int i, 
-  	const unsigned int j, double &res_prod) const;
-
-  // TODO: Proposal swap
+  	const unsigned int j) const;
+ 
+ // Modified Gibbs Sampling Function (used in the Merge case)
+ void SplitAndMergeAlgorithm::restricted_GS(std::vector<unsigned int>& cl, const unsigned int i, 
+                   const unsigned int j, double &res_prod) const;
+ 
+ double ComputeRestrGSProbabilities(std::vector<unsigned int>& cl,
+               const unsigned int i, const unsigned int j, const unsigned int z,const char cluster) const;
+  
+ // TODO: Proposal swap
 
   std::vector<unsigned int> S;
   
