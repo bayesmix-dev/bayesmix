@@ -4,5 +4,6 @@
 *.pdf
 *.jpg
 *.jpeg
+*.eps
 # Output files
 *.csv
