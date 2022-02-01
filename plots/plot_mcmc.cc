@@ -101,19 +101,19 @@ int main(int argc, char const *argv[]) {
       }
       // Plot 2D density
       else {
+        mean_dens *= 10;  // for the purpose of better visualization
         std::vector<double> X(grid.col(0).data(),
                               grid.col(0).data() + n_points);
         std::vector<double> Y(grid.col(1).data(),
                               grid.col(1).data() + n_points);
-        std::vector<double> mean_dens_vec(mean_dens.data(),
-                                          mean_dens.data() + n_points);
-        matplot::scatter(X, Y, mean_dens_vec);  // TODO make surf() work
+        std::vector<double> Z(mean_dens.data(), mean_dens.data() + n_points);
+        matplot::scatter(X, Y, Z)->marker_style(
+            matplot::line_spec::marker_style::point);
         std::stringstream title;
         title << "Density estimation on " << n_iters << " iterations";
         matplot::title(title.str());
         matplot::xlabel("X");
         matplot::ylabel("Y");
-        matplot::zlabel("Density");
         matplot::save(dens_plot);
         std::cout << "Saved density plot to " << dens_plot << std::endl;
       }
