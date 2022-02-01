@@ -3,8 +3,8 @@
 
 #include <google/protobuf/message.h>
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 // #include <random>
 #include <set>
 // #include <stan/math/prim.hpp>
@@ -25,6 +25,22 @@ class BaseLikelihood : public AbstractLikelihood {
     return out;
   }
 
+  // The unconstrained parameters are mean and log(var)
+  double cluster_lpdf_from_unconstrained(
+      Eigen::VectorXd unconstrained_params) const override {
+    return static_cast<const Derived &>(*this)
+        .template cluster_lpdf_from_unconstrained<double>(
+            unconstrained_params);
+  }
+
+  stan::math::var cluster_lpdf_from_unconstrained(
+      Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> unconstrained_params)
+      const override {
+    return static_cast<const Derived &>(*this)
+        .template cluster_lpdf_from_unconstrained<stan::math::var>(
+            unconstrained_params);
+  }
+
   virtual Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data,
                                     const Eigen::MatrixXd &covariates =
                                         Eigen::MatrixXd(0, 0)) const override;
@@ -39,7 +55,16 @@ class BaseLikelihood : public AbstractLikelihood {
 
   State get_state() const { return state; }
 
+  Eigen::VectorXd get_unconstrained_state() override {
+    return state.get_unconstrained();
+  }
+
   void set_state(const State &_state) { state = _state; };
+
+  void set_state_from_unconstrained(
+      const Eigen::VectorXd &unconstrained_state) override {
+    state.set_from_unconstrained(unconstrained_state);
+  }
 
   void add_datum(
       const int id, const Eigen::RowVectorXd &datum,

@@ -2,9 +2,9 @@
 
 #include <google/protobuf/stubs/casts.h>
 
-#include <Eigen/Dense>
 #include <memory>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "mixing_prior.pb.h"

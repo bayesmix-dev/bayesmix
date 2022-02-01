@@ -1,5 +1,4 @@
-target_sources(bayesmix
-  PUBLIC
+target_sources(bayesmix PUBLIC
     abstract_likelihood.h
     base_likelihood.h
     states.h

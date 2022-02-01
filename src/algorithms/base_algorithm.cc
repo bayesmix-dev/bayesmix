@@ -1,7 +1,7 @@
 #include "base_algorithm.h"
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "algorithm_params.pb.h"

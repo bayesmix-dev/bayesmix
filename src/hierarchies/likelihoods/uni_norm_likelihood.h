@@ -3,9 +3,8 @@
 
 #include <google/protobuf/stubs/casts.h>
 
-#include <Eigen/Dense>
 #include <memory>
-#include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "algorithm_state.pb.h"
@@ -24,6 +23,18 @@ class UniNormLikelihood
   void clear_summary_statistics() override;
   double get_data_sum() const { return data_sum; };
   double get_data_sum_squares() const { return data_sum_squares; };
+
+  template <typename T>
+  T cluster_lpdf_from_unconstrained(
+      const Eigen::Matrix<T, Eigen::Dynamic, 1> &unconstrained_params) const {
+    assert(unconstrained_params.size() == 2);
+    T mean = unconstrained_params(0);
+    T var = stan::math::positive_constrain(unconstrained_params(1));
+    T out = -(data_sum_squares - 2 * mean * data_sum + card * mean * mean) /
+            (2 * var);
+    out -= card * 0.5 * stan::math::log(stan::math::TWO_PI * var);
+    return out;
+  }
 
  protected:
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()

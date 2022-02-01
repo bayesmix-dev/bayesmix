@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <Eigen/Dense>
 #include <memory>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "algorithm_state.pb.h"
 #include "hierarchy_prior.pb.h"
@@ -209,6 +209,33 @@ TEST(nxig_prior_model, sample) {
 
   // Check if they coincides
   ASSERT_TRUE(state1->DebugString() != state2->DebugString());
+}
+
+TEST(nig_prior_model, unconstrained_lpdf) {
+  // Instance
+  auto prior = std::make_shared<NIGPriorModel>();
+
+  // Define prior hypers
+  bayesmix::AlgorithmState::HierarchyHypers hypers_proto;
+  hypers_proto.mutable_nnig_state()->set_mean(5.0);
+  hypers_proto.mutable_nnig_state()->set_var_scaling(0.1);
+  hypers_proto.mutable_nnig_state()->set_shape(4.0);
+  hypers_proto.mutable_nnig_state()->set_scale(3.0);
+
+  // Set hypers and get sampled state as proto
+  prior->set_hypers_from_proto(hypers_proto);
+  double mean = 0.0;
+  double var = 5.0;
+
+  bayesmix::AlgorithmState::ClusterState state;
+  state.mutable_uni_ls_state()->set_mean(mean);
+  state.mutable_uni_ls_state()->set_var(var);
+  Eigen::VectorXd unconstrained_params(2);
+  unconstrained_params << mean, std::log(var);
+
+  ASSERT_DOUBLE_EQ(
+      prior->lpdf(state) + std::log(std::exp(unconstrained_params(1))),
+      prior->lpdf_from_unconstrained(unconstrained_params));
 }
 
 TEST(nw_prior_model, set_get_hypers) {

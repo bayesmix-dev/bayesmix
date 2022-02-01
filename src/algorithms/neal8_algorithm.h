@@ -1,8 +1,8 @@
 #ifndef BAYESMIX_ALGORITHMS_NEAL8_ALGORITHM_H_
 #define BAYESMIX_ALGORITHMS_NEAL8_ALGORITHM_H_
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "algorithm_id.pb.h"
@@ -42,6 +42,8 @@ class Neal8Algorithm : public Neal2Algorithm {
 
   void read_params_from_proto(
       const bayesmix::AlgorithmParams &params) override;
+
+  bool requires_conjugate_hierarchy() const override { return false; }
 
  protected:
   void initialize() override;
