@@ -2,7 +2,7 @@
 
 build/run_mcmc \
   --algo-params-file resources/tutorial/algo.asciipb \
-  --hier-type NNW --hier-args resources/asciipb/nnw_ngiw_prior.asciipb \
+  --hier-type NNW --hier-args resources/tutorial/nnw_ngiw.asciipb \
   --mix-type DP --mix-args resources/tutorial/dp_gamma.asciipb \
   --data-file resources/datasets/faithful.csv \
   --grid-file resources/datasets/faithful_grid.csv \
