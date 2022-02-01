@@ -20,6 +20,17 @@ message DPPrior {
   }
 }
 
+message MFMPrior {
+  message GammaPrior {
+    GammaDistribution totalmass_prior = 1;
+  }
+
+  oneof totalmass {
+    DPState fixed_value = 1; // No prior, just a fixed value
+    GammaPrior gamma_prior = 2; // Gamma prior on the total mass
+  }
+}
+
 /*
  * Prior for the strength and discount parameters of a Pitman-Yor process.
  * For the moment, we only support fixed values
@@ -54,6 +65,10 @@ message TruncSBPrior {
     // Truncated Dirichlet process
     double totalmass = 1;
   }
+  message MFMPrior {
+    // Truncated Dirichlet process
+    double totalmass = 1;
+  }
   message PYPrior {
     // Truncated Pitman-Yor process
     double strength = 1;
@@ -64,6 +79,7 @@ message TruncSBPrior {
     BetaPriors beta_priors = 1; // General stick-breaking distributions
     DPPrior dp_prior = 2; // Truncated Dirichlet process
     PYPrior py_prior = 3; // Truncated Pitman-Yor process
+    MFMPrior mfm_prior = 5;
   }
   uint32 num_components = 4; // Number of components in the process
 }

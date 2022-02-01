@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated />
+  </component>
+  <component name="CMakeSettings" AUTO_RELOAD="true">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a9d2a45c-ca0f-41e6-9cba-10d2b35b9cd3" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/mixings/mixture_finite_mixing.cc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/mixings/mixture_finite_mixing.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tutorial/run.sh" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tutorial/run.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/mixing_id.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/mixing_id.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/mixing_prior.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/mixing_prior.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/mixing_state.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/mixing_state.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/includes.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/includes.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mixings/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/mixings/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mixings/load_mixings.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/mixings/load_mixings.h" afterDir="false" />
+    </list>
+    <list id="f6c9c6b3-3d54-4b79-a2af-0c19172539ba" name="Changes by taguhi" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2021" />
+    <option name="minorVersion" value="3" />
+  </component>
+  <component name="ProjectId" id="2200U0ymyoNvaPCByvTh2NCAmVI" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.advertisement.text.has.clang-format" value="true" />
+    <property name="cf.advertisement.text.overridden" value="true" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="cidr.known.project.marker" value="true" />
+    <property name="cmake.loaded.for.project" value="true" />
+    <property name="codeWithMe.voiceChat.enabledByDefault" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/tutorial" />
+      <recent name="$PROJECT_DIR$/src/hierarchies" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a9d2a45c-ca0f-41e6-9cba-10d2b35b9cd3" name="Changes" comment="" />
+      <created>1638959209014</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1638959209014</updated>
+      <workItem from="1638959217306" duration="4841000" />
+      <workItem from="1638973372698" duration="14121000" />
+      <workItem from="1639151994709" duration="49000" />
+      <workItem from="1639558991207" duration="45973000" />
+      <workItem from="1640087138886" duration="10000" />
+      <workItem from="1640376582813" duration="9000" />
+      <workItem from="1640771558296" duration="9167000" />
+      <workItem from="1640957892199" duration="5209000" />
+      <workItem from="1641137934641" duration="424000" />
+      <workItem from="1641391729464" duration="1895000" />
+      <workItem from="1641499534958" duration="11265000" />
+      <workItem from="1641575859338" duration="599000" />
+      <workItem from="1641662422545" duration="16973000" />
+      <workItem from="1641711617074" duration="26229000" />
+      <workItem from="1641746571994" duration="3649000" />
+      <workItem from="1641847148082" duration="6275000" />
+      <workItem from="1641886239460" duration="17200000" />
+      <workItem from="1641976311828" duration="25995000" />
+      <workItem from="1642527019138" duration="3143000" />
+      <workItem from="1642581648228" duration="8025000" />
+      <workItem from="1642606253402" duration="7887000" />
+      <workItem from="1643300112737" duration="1143000" />
+      <workItem from="1643308150472" duration="1368000" />
+      <workItem from="1643711800987" duration="17259000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
