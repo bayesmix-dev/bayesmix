@@ -44,6 +44,24 @@ class BaseHierarchy : public AbstractHierarchy {
     return out;
   }
 
+  //! Returns an independent, data-less copy of this object
+  virtual std::shared_ptr<AbstractHierarchy> deep_clone() const override {
+    auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
+    out->clear_data();
+    out->clear_summary_statistics();
+    out->reset_hypers();
+    out->reset_prior();
+    std::shared_ptr<google::protobuf::Message> new_prior(prior->New());
+    new_prior->CopyFrom(*prior.get());
+    out->get_mutable_prior()->CopyFrom(*new_prior.get());
+    out->initialize();
+    return out;
+  }
+
+  void reset_hypers() { hypers = std::make_shared<Hyperparams>(); }
+
+  void reset_prior() { prior = nullptr; }
+
   //! Evaluates the log-likelihood of data in a grid of points
   //! @param data        Grid of points (by row) which are to be evaluated
   //! @param covariates  (Optional) covariate vectors associated to data
@@ -135,12 +153,6 @@ class BaseHierarchy : public AbstractHierarchy {
     card = card_;
     log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
   }
-
-  //! Writes current state to a Protobuf message and return a shared_ptr
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! AlgoritmState::ClusterState message by adding the appropriate type
-  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
-  get_state_proto() const = 0;
 
   //! Initializes state parameters to appropriate values
   virtual void initialize_state() = 0;
