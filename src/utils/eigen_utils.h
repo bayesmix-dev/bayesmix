@@ -1,4 +1,8 @@
+#ifndef BAYESMIX_SRC_UTILS_EIGEN_UTILS_H_
+#define BAYESMIX_SRC_UTILS_EIGEN_UTILS_H_
+
 #include <Eigen/Dense>
+#include <iostream>
 #include <vector>
 
 //! This file implements a few methods to manipulate groups of matrices, mainly
@@ -31,10 +35,8 @@ template <template <typename...> class Container>
 Eigen::MatrixXd stack_vectors(const Container<Eigen::VectorXd> &rows) {
   int nrows = rows.size();
   int ncols = rows[0].size();
-
   Eigen::MatrixXd out(nrows, ncols);
   for (int i = 0; i < nrows; i++) out.row(i) = rows[i].transpose();
-
   return out;
 }
 
@@ -48,3 +50,5 @@ void check_spd(const Eigen::MatrixXd &mat);
 Eigen::MatrixXd get_2d_grid(double x1, double x2, int nx, double y1, double y2,
                             int ny);
 }  // namespace bayesmix
+
+#endif

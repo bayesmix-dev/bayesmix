@@ -42,42 +42,54 @@ Eigen::MatrixXd get_grid(int dim) {
   return out;
 }
 
-static void BM_eval_lpdf_memory_read(benchmark::State& state) {
+static void BM_eval_lpdf_memory_read_seq(benchmark::State& state) {
   int dim = state.range(0);
   std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
   Eigen::MatrixXd grid = get_grid(dim);
   MemoryCollector collector;
   algo->set_data(get_data(dim));
   algo->run(&collector);
-  int i = 0;
   for (auto _ : state) {
-    i += 1;
     algo->eval_lpdf(&collector, grid);
   }
 }
 
-static void BM_eval_lpdf_memory_noread(benchmark::State& state) {
+static void BM_eval_lpdf_memory_read_par(benchmark::State& state) {
   int dim = state.range(0);
   std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
   Eigen::MatrixXd grid = get_grid(dim);
   MemoryCollector collector;
-  collector.read_from_file<bayesmix::AlgorithmState>(
-      get_chain_file("Neal2", dim));
+  algo->set_data(get_data(dim));
+  algo->run(&collector);
   for (auto _ : state) {
-    algo->eval_lpdf(&collector, grid);
+    bayesmix::eval_lpdf_parallel(algo, &collector, grid);
   }
 }
 
-static void BM_eval_lpdf_file(benchmark::State& state) {
-  int dim = state.range(0);
-  std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
-  Eigen::MatrixXd grid = get_grid(dim);
-  FileCollector collector(get_chain_file("Neal2", dim));
-  for (auto _ : state) {
-    algo->eval_lpdf(&collector, grid);
-  }
-}
+// static void BM_eval_lpdf_memory_noread(benchmark::State& state) {
+//   int dim = state.range(0);
+//   std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
+//   Eigen::MatrixXd grid = get_grid(dim);
+//   MemoryCollector collector;
+//   collector.read_from_file<bayesmix::AlgorithmState>(
+//       get_chain_file("Neal2", dim));
+//   for (auto _ : state) {
+//       bayesmix::eval_lpdf_parallel(algo, &collector, grid);
+//   }
+// }
 
-BENCHMARK(BM_eval_lpdf_memory_read)->Arg(1)->Arg(2);
+// static void BM_eval_lpdf_file(benchmark::State& state) {
+//   int dim = state.range(0);
+//   std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
+//   Eigen::MatrixXd grid = get_grid(dim);
+//   FileCollector collector(get_chain_file("Neal2", dim));
+//   for (auto _ : state) {
+//     bayesmix::eval_lpdf_parallel(algo, &collector, grid);
+//   }
+// }
+
+BENCHMARK(BM_eval_lpdf_memory_read_seq)->Arg(1)->Arg(2);
+BENCHMARK(BM_eval_lpdf_memory_read_par)->Arg(1)->Arg(2);
+
 // BENCHMARK(BM_eval_lpdf_memory_noread)->Arg(1)->Arg(2);
 // BENCHMARK(BM_eval_lpdf_file)->Arg(1)->Arg(2);

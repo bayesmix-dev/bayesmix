@@ -4,6 +4,8 @@ target_sources(bayesmix
     cluster_utils.cc
     eigen_utils.h
     eigen_utils.cc
+    eval_like.h
+    eval_like.cc
     distributions.h
     distributions.cc
     io_utils.h

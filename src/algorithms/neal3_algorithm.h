@@ -27,6 +27,13 @@ class Neal3Algorithm : public Neal2Algorithm {
     return bayesmix::AlgorithmId::Neal3;
   }
 
+  std::shared_ptr<BaseAlgorithm> clone() override {
+    auto out = std::make_shared<Neal3Algorithm>(*this);
+    out->set_mixing(mixing->clone());
+    out->set_hierarchy(unique_values[0]->clone());
+    return out;
+  }
+
  protected:
   void print_startup_message() const override;
 

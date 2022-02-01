@@ -41,6 +41,13 @@ class Neal8Algorithm : public Neal2Algorithm {
   void read_params_from_proto(
       const bayesmix::AlgorithmParams &params) override;
 
+  std::shared_ptr<BaseAlgorithm> clone() override {
+    auto out = std::make_shared<Neal8Algorithm>(*this);
+    out->set_mixing(mixing->clone());
+    out->set_hierarchy(unique_values[0]->clone());
+    return out;
+  }
+
  protected:
   void initialize() override;
 

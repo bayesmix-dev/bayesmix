@@ -21,6 +21,13 @@ class BlockedGibbsAlgorithm : public ConditionalAlgorithm {
     return bayesmix::AlgorithmId::BlockedGibbs;
   }
 
+  std::shared_ptr<BaseAlgorithm> clone() override {
+    auto out = std::make_shared<BlockedGibbsAlgorithm>(*this);
+    out->set_mixing(mixing->clone());
+    out->set_hierarchy(unique_values[0]->clone());
+    return out;
+  }
+
  protected:
   void print_startup_message() const override;
 

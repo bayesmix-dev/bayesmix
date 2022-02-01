@@ -141,6 +141,8 @@ class BaseAlgorithm {
       const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
       const Eigen::RowVectorXd &mix_covariate) = 0;
 
+  virtual std::shared_ptr<BaseAlgorithm> clone() = 0;
+
  protected:
   // ALGORITHM FUNCTIONS
   //! Initializes all members of the class before running the algorithm
