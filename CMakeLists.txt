@@ -11,7 +11,7 @@ project(bayesmix)
 
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize")
@@ -19,6 +19,7 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 # Require PkgConfig
 find_package(PkgConfig REQUIRED)
+find_package(OpenMP REQUIRED)
 
 # TBB CMake integration
 message(STATUS "Using math TBB")
@@ -100,6 +101,7 @@ set(LINK_LIBRARIES
 	pthread
 	protobuf::libprotobuf
 	TBB::tbb
+  OpenMP::OpenMP_CXX
 )
 
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)

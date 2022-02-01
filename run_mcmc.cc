@@ -194,29 +194,6 @@ int main(int argc, char *argv[]) {
   // Run algorithm
   algo->run(coll);
 
-  if (args["--grid-file"] != std::string("\"\"") &&
-      args["--dens-file"] != std::string("\"\"")) {
-    Eigen::MatrixXd grid =
-        bayesmix::read_eigen_matrix(args.get<std::string>("--grid-file"));
-    Eigen::MatrixXd hier_cov_grid = Eigen::RowVectorXd(0);
-    Eigen::MatrixXd mix_cov_grid = Eigen::RowVectorXd(0);
-    if (hier->is_dependent()) {
-      hier_cov_grid = bayesmix::read_eigen_matrix(
-          args.get<std::string>("--hier-grid-cov-file"));
-    }
-    if (mixing->is_dependent()) {
-      mix_cov_grid = bayesmix::read_eigen_matrix(
-          args.get<std::string>("--mix-grid-cov-file"));
-    }
-
-    std::cout << "Computing log-density..." << std::endl;
-    Eigen::MatrixXd dens =
-        algo->eval_lpdf(coll, grid, hier_cov_grid, mix_cov_grid);
-    bayesmix::write_matrix_to_file(dens, args.get<std::string>("--dens-file"));
-    std::cout << "Successfully wrote density to "
-              << args.get<std::string>("--dens-file") << std::endl;
-  }
-
   if ((args.get<std::string>("--n-cl-file") != std::string("\"\"")) ||
       (args.get<std::string>("--clus-file") != std::string("\"\"")) ||
       (args.get<std::string>("--best-clus-file") != std::string("\"\""))) {
@@ -230,6 +207,7 @@ int main(int argc, char *argv[]) {
       }
       num_clust(i) = state.cluster_states_size();
     }
+    coll->reset();
 
     if (args.get<std::string>("--n-cl-file") != std::string("\"\"")) {
       bayesmix::write_matrix_to_file(num_clust,
@@ -252,6 +230,30 @@ int main(int argc, char *argv[]) {
       std::cout << "Successfully wrote best cluster allocations to "
                 << args.get<std::string>("--best-clus-file") << std::endl;
     }
+  }
+
+  if (args["--grid-file"] != std::string("\"\"") &&
+      args["--dens-file"] != std::string("\"\"")) {
+    Eigen::MatrixXd grid =
+        bayesmix::read_eigen_matrix(args.get<std::string>("--grid-file"));
+    Eigen::MatrixXd hier_cov_grid = Eigen::RowVectorXd(0);
+    Eigen::MatrixXd mix_cov_grid = Eigen::RowVectorXd(0);
+    if (hier->is_dependent()) {
+      hier_cov_grid = bayesmix::read_eigen_matrix(
+          args.get<std::string>("--hier-grid-cov-file"));
+    }
+    if (mixing->is_dependent()) {
+      mix_cov_grid = bayesmix::read_eigen_matrix(
+          args.get<std::string>("--mix-grid-cov-file"));
+    }
+
+    std::cout << "Computing log-density..." << std::endl;
+    // Eigen::MatrixXd dens =
+    //     algo->eval_lpdf(coll, grid, hier_cov_grid, mix_cov_grid);
+    Eigen::MatrixXd dens = eval_lpdf(algo, coll, grid);
+    bayesmix::write_matrix_to_file(dens, args.get<std::string>("--dens-file"));
+    std::cout << "Successfully wrote density to "
+              << args.get<std::string>("--dens-file") << std::endl;
   }
 
   std::cout << "End of run_mcmc.cc" << std::endl;

@@ -28,7 +28,13 @@ Eigen::MatrixXd BaseAlgorithm::eval_lpdf(
     if (!keep) {
       break;
     }
-    lpdf.push_back(lpdf_from_state(grid, hier_covariate, mix_covariate));
+
+    try {
+      lpdf.push_back(lpdf_from_state(grid, hier_covariate, mix_covariate));
+    } catch (...) {
+      break;
+    }
+
     if (verbose) {
       ++(*bar);
       bar->display();

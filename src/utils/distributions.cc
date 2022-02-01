@@ -52,6 +52,10 @@ Eigen::VectorXd bayesmix::multi_student_t_invscale_lpdf_grid(
     const Eigen::MatrixXd &invscale_chol, double scale_logdet) {
   int dim = data.cols();
   int n = data.rows();
+  // std::cout << "dim: " << dim << ", n: " << n
+  //           << ", df: " << df << ", mean: " << mean.transpose()
+  //           << ", logdet: " << scale_logdet << std::endl;
+  // std::cout << "invscale_chol: \n" << invscale_chol << std::endl;
   double base_coeff = stan::math::lgamma((df + dim) * 0.5) -
                       stan::math::lgamma(df * 0.5) -
                       (0.5 * dim) * std::log(df) -

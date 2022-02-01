@@ -16,6 +16,21 @@ std::string get_chain_file(std::string algo_id, int dim) {
   return fname;
 }
 
+Eigen::MatrixXd get_data(int dim) {
+  const char delim = ' ';
+  Eigen::MatrixXd out;
+  if (dim == 1) {
+    out = bayesmix::read_eigen_matrix(
+        "../resources/benchmarks/datasets/univariate_gaussian.csv", delim);
+  } else {
+    out = bayesmix::read_eigen_matrix(
+        "../resources/benchmarks/datasets/multi_gaussian_dim_" +
+            std::to_string(dim) + ".csv",
+        delim);
+  }
+  return out;
+}
+
 Eigen::MatrixXd get_grid(int dim) {
   Eigen::MatrixXd out;
   if (dim == 1) {
@@ -32,9 +47,11 @@ static void BM_eval_lpdf_memory_read(benchmark::State& state) {
   std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
   Eigen::MatrixXd grid = get_grid(dim);
   MemoryCollector collector;
+  algo->set_data(get_data(dim));
+  algo->run(&collector);
+  int i = 0;
   for (auto _ : state) {
-    collector.read_from_file<bayesmix::AlgorithmState>(
-        get_chain_file("Neal2", dim));
+    i += 1;
     algo->eval_lpdf(&collector, grid);
   }
 }
@@ -62,5 +79,5 @@ static void BM_eval_lpdf_file(benchmark::State& state) {
 }
 
 BENCHMARK(BM_eval_lpdf_memory_read)->Arg(1)->Arg(2);
-BENCHMARK(BM_eval_lpdf_memory_noread)->Arg(1)->Arg(2);
-BENCHMARK(BM_eval_lpdf_file)->Arg(1)->Arg(2);
+// BENCHMARK(BM_eval_lpdf_memory_noread)->Arg(1)->Arg(2);
+// BENCHMARK(BM_eval_lpdf_file)->Arg(1)->Arg(2);
