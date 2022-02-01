@@ -2,7 +2,7 @@
 
 std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>,
            std::vector<std::vector<double>>>
-to_mesh(const Eigen::MatrixXd &grid, const Eigen::VectorXd vals) {
+to_mesh(const Eigen::MatrixXd &grid, const Eigen::VectorXd &vals) {
   // infer the number of points in the ygrid
   int ny = 0;
   double first_x = grid(0, 0);
@@ -38,9 +38,7 @@ void density_plot_1d(const Eigen::MatrixXd &grid, const Eigen::VectorXd &dens,
   std::vector<double> grid_vec(grid.data(), grid.data() + n_points);
   std::vector<double> mean_dens_vec(dens.data(), dens.data() + n_points);
   matplot::plot(grid_vec, mean_dens_vec);
-  std::stringstream title;
-  title << "Density Estimate";
-  matplot::title(title.str());
+  matplot::title("Density estimate");
   matplot::xlabel("Grid");
   matplot::ylabel("Density");
   matplot::save(outfile);
@@ -48,7 +46,7 @@ void density_plot_1d(const Eigen::MatrixXd &grid, const Eigen::VectorXd &dens,
 }
 
 void density_plot_2d(const Eigen::MatrixXd &grid, const Eigen::VectorXd &dens_,
-                     const std::string &outfile, bool log_scale) {
+                     const std::string &outfile, bool log_scale /*= true*/) {
   int n_points = grid.size();
 
   Eigen::VectorXd dens = dens_;
@@ -59,12 +57,10 @@ void density_plot_2d(const Eigen::MatrixXd &grid, const Eigen::VectorXd &dens_,
   }
   auto [X, Y, Z] = to_mesh(grid, dens);
 
-  matplot::contour(X, Y, Z);
+  matplot::contour(X, Y, Z)->line_width(2);
   matplot::hold(false);
 
-  std::stringstream title;
-  title << "Density Estimate";
-  matplot::title(title.str());
+  matplot::title("Density estimate");
   matplot::xlabel("X");
   matplot::ylabel("Y");
   matplot::save(outfile);
@@ -90,7 +86,8 @@ void num_clus_trace(const Eigen::MatrixXd &num_clus_chain,
   std::cout << "Saved traceplot to " << outfile << std::endl;
 }
 
-void num_clus_bar(Eigen::MatrixXd num_clus_chain_, std::string outfile) {
+void num_clus_bar(const Eigen::MatrixXd &num_clus_chain_,
+                  const std::string &outfile) {
   int n_iters = num_clus_chain_.size();
   const Eigen::VectorXi &num_clus_chain = num_clus_chain_.col(0).cast<int>();
   int xmin = num_clus_chain.minCoeff();

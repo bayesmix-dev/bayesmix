@@ -13,7 +13,7 @@
  */
 std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>,
            std::vector<std::vector<double>>>
-to_mesh(const Eigen::MatrixXd &grid, const Eigen::VectorXd vals);
+to_mesh(const Eigen::MatrixXd &grid, const Eigen::VectorXd &vals);
 
 void density_plot_1d(const Eigen::MatrixXd &grid, const Eigen::VectorXd &dens,
                      const std::string &outfile);
@@ -24,6 +24,7 @@ void density_plot_2d(const Eigen::MatrixXd &grid, const Eigen::VectorXd &dens_,
 void num_clus_trace(const Eigen::MatrixXd &num_clus_chain,
                     const std::string &outfile);
 
-void num_clus_bar(Eigen::MatrixXd num_clus_chain_, std::string outfile);
+void num_clus_bar(const Eigen::MatrixXd &num_clus_chain_,
+                  const std::string &outfile);
 
-#endif
+#endif  // BAYESMIX_PLOTS_PLOT_UTILS_H_
