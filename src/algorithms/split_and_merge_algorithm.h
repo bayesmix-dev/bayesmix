@@ -32,7 +32,14 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
     const bayesmix::AlgorithmParams &params) override;
 
  protected:
+  void initialize() override;
+  
   void print_startup_message() const override;
+
+  /* We need to update the parameters when we add or remove a datum from a 
+   * cluster to esure that conditional_pred_lpdf returns a correct value.
+   */ 
+  bool update_hierarchy_params() override { return true; }
 
   void sample_allocations() override;
 

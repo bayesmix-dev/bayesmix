@@ -12,6 +12,15 @@ void SplitAndMergeAlgorithm::read_params_from_proto(
   M = params.splitmerge_n_full_gs_updates();
 } 
 
+void SplitAndMergeAlgorithm::initialize(){
+  MarginalAlgorithm::initialize();
+
+  if(mixing->get_id()!=bayesmix::MixingId::DP){
+    throw std::invalid_argument(
+      "Invalid mixing supplied to Split and Merge, only DP mixing supported");
+  }
+}
+
 void SplitAndMergeAlgorithm::print_startup_message() const {
   std::string msg = "Running Split and Merge algorithm with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
@@ -225,6 +234,50 @@ void SplitAndMergeAlgorithm::restricted_GS(std::vector<unsigned int>& cl, const 
     cl[i]= (accepted_proposal(p)) ? LabI : cl[i];
                                          }                                                        
                                                            }
+
+void SplitAndMergeAlgorithm::full_GS(){
+  unsigned int n_data = data.rows();
+  auto &rng = bayesmix::Rng::Instance().get();
+  for(size_t i=0; i<n_data; ++i){
+    bool singleton = (unique_values[allocations[i]]->get_card()<=1);
+    unsigned int c_old = allocations[i];
+    if(singleton){
+      remove_singleton(c_old);
+    }else{
+      unique_values[c_old]->remove_datum(
+        i, data.row(i), update_hierarchy_params());
+    }
+    unsigned int n_clust = unique_values.size();
+
+    Eigen::VectorXd logprobas(unique_values.size()+1);
+    for(size_t j=0; j<n_clust; ++j){
+      logprobas(j) = mixing->get_mass_existing_cluster(
+        n_data-1, true, true, unique_values[j]);
+      logprobas(j) += unique_values[j]->conditional_pred_lpdf(
+        data.row(data_idx));
+    }
+    logprobas(n_clust) = mixing->get_mass_new_cluster(
+      n_data-1, true, true, n_clust);
+    logprobas(n_clust) += unique_values[j]->prior_pred_lpdf(
+      data.row(i));
+
+    unsigned int c_new = 
+      bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
+
+    if(c_new==n_clust){
+      std::shared_ptr<AbstractHierarchy> new_unique =
+        unique_values[0]->clone();
+      new_unique->add_datum(i, data.row(i), update_hierarchy_params());
+      new_unique->sample_full_cond(!update_hierarchy_params());
+      unique_values.push_back(new_unique);
+      allocations[i] = unique_values.size() - 1;
+    }else{
+      allocations[i] = c_new;
+      unique_values[c_new]->add_datum(
+        i, data.row(i), update_hierarchy_params());
+    }
+  }
+}
 
 // Modified Gibbs Sampling
 void SplitAndMergeAlgorithm::restricted_GS(std::vector<unsigned int>& cl, const unsigned int i, 
