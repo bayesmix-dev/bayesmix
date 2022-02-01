@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_HIERARCHIES_BASE_PRIORMODEL_H_
-#define BAYESMIX_HIERARCHIES_BASE_PRIORMODEL_H_
+#ifndef BAYESMIX_HIERARCHIES_PRIORS_BASE_PRIOR_MODEL_H_
+#define BAYESMIX_HIERARCHIES_PRIORS_BASE_PRIOR_MODEL_H_
 
 #include <google/protobuf/message.h>
 
@@ -119,4 +119,4 @@ void BasePriorModel<Derived, HyperParams, Prior>::check_prior_is_set() const {
   }
 }
 
-#endif  // BAYESMIX_HIERARCHIES_BASE_PRIORMODEL_H_
+#endif  // BAYESMIX_HIERARCHIES_PRIORS_BASE_PRIOR_MODEL_H_

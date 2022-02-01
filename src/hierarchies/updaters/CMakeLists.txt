@@ -8,4 +8,8 @@ target_sources(bayesmix PUBLIC
     random_walk_updater.h
     target_lpdf_unconstrained.h
     target_lpdf_unconstrained.cc
+    nnxig_updater.h
+    nnxig_updater.cc
+    nnw_updater.h
+    nnw_updater.cc
 )

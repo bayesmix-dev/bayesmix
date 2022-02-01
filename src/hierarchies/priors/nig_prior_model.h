@@ -1,5 +1,5 @@
-#ifndef BAYESMIX_HIERARCHIES_NIG_PRIOR_MODEL_H_
-#define BAYESMIX_HIERARCHIES_NIG_PRIOR_MODEL_H_
+#ifndef BAYESMIX_HIERARCHIES_PRIORS_NIG_PRIOR_MODEL_H_
+#define BAYESMIX_HIERARCHIES_PRIORS_NIG_PRIOR_MODEL_H_
 
 // #include <google/protobuf/stubs/casts.h>
 
@@ -53,4 +53,4 @@ class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
   void initialize_hypers() override;
 };
 
-#endif  // BAYESMIX_HIERARCHIES_NIG_PRIOR_MODEL_H_
+#endif  // BAYESMIX_HIERARCHIES_PRIORS_NIG_PRIOR_MODEL_H_
