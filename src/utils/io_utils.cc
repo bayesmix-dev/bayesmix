@@ -36,6 +36,7 @@ Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename,
       }
     }
   }
+
   // Reset file stream to the beginning of the file
   filestream.clear();
   filestream.seekg(0, std::ios::beg);
