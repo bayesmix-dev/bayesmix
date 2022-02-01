@@ -6,4 +6,4 @@ build/plots/plot_mcmc \
   --dens-plot resources/2d/density.png \
   --n-cl-file resources/2d/numclust_2d.csv \
   --n-cl-trace-plot resources/2d/traceplot.png \
-  --n-cl-hist-plot  resources/2d/histogram.png
+  --n-cl-bar-plot  resources/2d/nclus_barplot.png

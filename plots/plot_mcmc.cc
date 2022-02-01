@@ -1,7 +1,8 @@
 #include <matplot/matplot.h>
 
-#include "../lib/argparse/argparse.h"
-#include "../src/utils/io_utils.h"
+#include "lib/argparse/argparse.h"
+#include "plots/plot_utils.h"
+#include "src/utils/io_utils.h"
 
 #define EMPTYSTR std::string("\"\"")
 
@@ -35,11 +36,11 @@ int main(int argc, char const *argv[]) {
           "File to which to save the traceplot of the number of clusters "
           "in the MCMC chain");
 
-  args.add_argument("--n-cl-hist-plot")
+  args.add_argument("--n-cl-bar-plot")
       .default_value(EMPTYSTR)
       .help(
-          "File to which to save the histogram of the number of clusters "
-          "in the MCMC chain");
+          "File to which to save the barplot with the empirical distribution "
+          "of the number of clusters in the MCMC chain");
 
   std::cout << "Running plot_mcmc.cc" << std::endl;
 
@@ -51,10 +52,30 @@ int main(int argc, char const *argv[]) {
     std::exit(1);
   }
 
+  // Get other arguments
+  std::string ncl_file = args.get<std::string>("--n-cl-file");
+  std::string ncl_trace_plot = args.get<std::string>("--n-cl-trace-plot");
+  std::string ncl_bar_plot = args.get<std::string>("--n-cl-bar-plot");
+
+  // TRACEPLOT OF NUMBER OF CLUSTERS
+  if (ncl_file != EMPTYSTR and ncl_trace_plot != EMPTYSTR) {
+    bayesmix::check_file_is_writeable(ncl_trace_plot);
+    Eigen::MatrixXd num_clus = bayesmix::read_eigen_matrix(ncl_file);
+    num_clus_trace(num_clus, ncl_trace_plot);
+  }
+
+  // HISTOGRAM OF NUMBER OF CLUSTERS
+  if (ncl_file != EMPTYSTR and ncl_bar_plot != EMPTYSTR) {
+    bayesmix::check_file_is_writeable(ncl_bar_plot);
+    Eigen::MatrixXd num_clus = bayesmix::read_eigen_matrix(ncl_file);
+    num_clus_bar(num_clus, ncl_bar_plot);
+  }
+
   // DENSITY PLOT
   std::string grid_file = args.get<std::string>("--grid-file");
   std::string dens_file = args.get<std::string>("--dens-file");
   std::string dens_plot = args.get<std::string>("--dens-plot");
+
   if (grid_file != EMPTYSTR and dens_file != EMPTYSTR and
       dens_plot != EMPTYSTR) {
     bayesmix::check_file_is_writeable(dens_plot);
@@ -80,83 +101,18 @@ int main(int argc, char const *argv[]) {
                 << "be plotted" << std::endl;
     } else {
       // Go from log-densities to mean density
-      std::cout << "Computing mean density across " << n_iters << " rows..."
-                << std::endl;
       dens = dens.array().exp();
-      Eigen::MatrixXd mean_dens = dens.colwise().mean();
+      Eigen::VectorXd mean_dens = dens.colwise().mean();
 
       // Plot 1D density
       if (dim == 1) {
-        std::vector<double> grid_vec(grid.data(), grid.data() + n_points);
-        std::vector<double> mean_dens_vec(mean_dens.data(),
-                                          mean_dens.data() + n_points);
-        matplot::plot(grid_vec, mean_dens_vec);
-        std::stringstream title;
-        title << "Density estimation on " << n_iters << " iterations";
-        matplot::title(title.str());
-        matplot::xlabel("Grid");
-        matplot::ylabel("Density");
-        matplot::save(dens_plot);
-        std::cout << "Saved density plot to " << dens_plot << std::endl;
+        density_plot_1d(grid, mean_dens, dens_plot);
       }
       // Plot 2D density
       else {
-        mean_dens *= 10;  // for the purpose of better visualization
-        std::vector<double> X(grid.col(0).data(),
-                              grid.col(0).data() + n_points);
-        std::vector<double> Y(grid.col(1).data(),
-                              grid.col(1).data() + n_points);
-        std::vector<double> Z(mean_dens.data(), mean_dens.data() + n_points);
-        matplot::scatter(X, Y, Z)->marker_style(
-            matplot::line_spec::marker_style::point);
-        std::stringstream title;
-        title << "Density estimation on " << n_iters << " iterations";
-        matplot::title(title.str());
-        matplot::xlabel("X");
-        matplot::ylabel("Y");
-        matplot::save(dens_plot);
-        std::cout << "Saved density plot to " << dens_plot << std::endl;
+        density_plot_2d(grid, mean_dens, dens_plot, true);
       }
     }
-  }
-
-  // Get other arguments
-  std::string ncl_file = args.get<std::string>("--n-cl-file");
-  std::string ncl_trace_plot = args.get<std::string>("--n-cl-trace-plot");
-  std::string ncl_hist_plot = args.get<std::string>("--n-cl-hist-plot");
-
-  // TRACEPLOT OF NUMBER OF CLUSTERS
-  if (ncl_file != EMPTYSTR and ncl_trace_plot != EMPTYSTR) {
-    bayesmix::check_file_is_writeable(ncl_trace_plot);
-    Eigen::MatrixXd num_clus = bayesmix::read_eigen_matrix(ncl_file);
-    int n_iters = num_clus.rows();
-    std::vector<double> num_clus_vec(num_clus.data(),
-                                     num_clus.data() + n_iters);
-    std::vector<double> iters_vec(n_iters);
-    for (int i = 0; i < n_iters; i++) {
-      iters_vec[i] = i;
-    }
-    matplot::plot(iters_vec, num_clus_vec);
-    matplot::title("Traceplot of number of clusters from the MCMC");
-    matplot::xlabel("MCMC iterations");
-    matplot::ylabel("Number of clusters");
-    matplot::save(ncl_trace_plot);
-    std::cout << "Saved traceplot to " << ncl_trace_plot << std::endl;
-  }
-
-  // HISTOGRAM OF NUMBER OF CLUSTERS
-  if (ncl_file != EMPTYSTR and ncl_hist_plot != EMPTYSTR) {
-    bayesmix::check_file_is_writeable(ncl_hist_plot);
-    Eigen::MatrixXd num_clus = bayesmix::read_eigen_matrix(ncl_file);
-    int n_iters = num_clus.rows();
-    std::vector<double> num_clus_vec(num_clus.data(),
-                                     num_clus.data() + n_iters);
-    matplot::hist(num_clus_vec);
-    matplot::title("Distribution of number of clusters from the MCMC");
-    matplot::xlabel("Number of clusters");
-    matplot::ylabel("Absolute frequency in the MCMC");
-    matplot::save(ncl_hist_plot);
-    std::cout << "Saved histogram to " << ncl_hist_plot << std::endl;
   }
 
   std::cout << "End of plot_mcmc.cc" << std::endl;
