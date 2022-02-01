@@ -13,4 +13,6 @@ target_sources(bayesmix
     proto_utils.h
     proto_utils.cc
     rng.h
+    testing_utils.h
+    testing_utils.cc
 )
