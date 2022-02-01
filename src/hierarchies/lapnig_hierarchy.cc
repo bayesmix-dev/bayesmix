@@ -104,7 +104,7 @@ void LapNIGHierarchy::initialize_hypers() {
 
 void LapNIGHierarchy::initialize_state() {
   state.mean = hypers->mean;
-  state.scale = hypers->scale / (hypers->shape + 1);
+  state.scale = hypers->scale / (hypers->shape + 1);  // mode of Inv-Gamma
 }
 
 void LapNIGHierarchy::update_hypers(
@@ -155,11 +155,13 @@ void LapNIGHierarchy::sample_full_cond(bool update_params) {
 
     Eigen::VectorXd prop_unc_params = propose_rwmh(curr_unc_params);
 
-    double log_target_prop = eval_prior_lpdf_unconstrained(prop_unc_params) +
-                             eval_like_lpdf_unconstrained(prop_unc_params, 0);
+    double log_target_prop =
+        eval_prior_lpdf_unconstrained(prop_unc_params) +
+        eval_like_lpdf_unconstrained(prop_unc_params, false);
 
-    double log_target_curr = eval_prior_lpdf_unconstrained(curr_unc_params) +
-                             eval_like_lpdf_unconstrained(curr_unc_params, 1);
+    double log_target_curr =
+        eval_prior_lpdf_unconstrained(curr_unc_params) +
+        eval_like_lpdf_unconstrained(curr_unc_params, true);
 
     double log_a_rate = log_target_prop - log_target_curr;
 

@@ -13,6 +13,22 @@
 #include "hierarchy_id.pb.h"
 #include "hierarchy_prior.pb.h"
 
+//! Laplace Normal-InverseGamma hierarchy for univariate data.
+
+//! This class represents a hierarchical model where data are distributed
+//! according to a laplace likelihood, the parameters of which have a
+//! Normal-InverseGamma centering distribution. That is:
+//! f(x_i|mu,lambda) = Laplace(mu,lambda)
+//!    (mu,lambda) ~ N-IG(mu0, lambda0, alpha0, beta0)
+//! The state is composed of mean and scale. The state hyperparameters,
+//! contained in the Hypers object, are (mu_0, lambda0, alpha0, beta0,
+//! scale_var, mean_var), all scalar values. Note that this hierarchy is NOT
+//! conjugate, thus the marginal distribution is not available in closed form.
+//! The hyperprameters scale_var and mean_var are used to perform a step of
+//! Random Walk Metropolis Hastings to sample from the full conditionals. For
+//! more information, please refer to parent classes: `AbstractHierarchy` and
+//! `BaseHierarchy`.
+
 namespace LapNIG {
 //! Custom container for State values
 struct State {
@@ -101,7 +117,10 @@ class LapNIGHierarchy
 
   //! Evaluates the (sum of the) log likelihood for all the observations in the
   //! cluster given the mean (unconstrained_parameters(0))
-  //! and log of the scale (unconstrained_parameters(1))
+  //! and log of the scale (unconstrained_parameters(1)).
+  //! The parameter "is_current" is used to identify if the evaluation of the
+  //! likelihood is on the current or on the proposed parameters, in order to
+  //! avoid repeating calculations of the sum of the absolute differences
   double eval_like_lpdf_unconstrained(Eigen::VectorXd unconstrained_parameters,
                                       bool is_current);
 
