@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "src/includes.h"
+#include "src/utils/testing_utils.h"
 
 TEST(can_build, allmodels) {
   auto &factory_algo = AlgorithmFactory::Instance();
@@ -24,4 +25,15 @@ TEST(can_build, allmodels) {
       }
     }
   }
+}
+
+TEST(clone, algorithm) {
+  std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal3", 2);
+  std::shared_ptr<BaseAlgorithm> algo_clone = algo->clone();
+
+  algo->get_unique_values()[0]->sample_prior();
+
+  ASSERT_FALSE(
+      algo->get_unique_values()[0]->get_state_proto()->DebugString() ==
+      algo_clone->get_unique_values()[0]->get_state_proto()->DebugString());
 }
