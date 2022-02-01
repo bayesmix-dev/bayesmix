@@ -143,6 +143,10 @@ class BaseAlgorithm {
 
   virtual std::shared_ptr<BaseAlgorithm> clone() = 0;
 
+  std::vector<std::shared_ptr<AbstractHierarchy>> get_unique_values() {
+    return unique_values;
+  }
+
  protected:
   // ALGORITHM FUNCTIONS
   //! Initializes all members of the class before running the algorithm
