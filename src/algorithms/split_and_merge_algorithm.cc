@@ -52,20 +52,33 @@ void SplitAndMergeAlgorithm::compute_S(const unsigned int i, const unsigned int 
     }
 }
 
-std::vector<unsigned int> SplitAndMergeAlgorithm::compute_C_launch(const unsigned int i, const unsigned int j){
-    if (allocations[i]==allocations[j]) {
-        LabI = *max_element(allocations.begin(), allocations.end()) + 1;
+void SplitAndMergeAlgorithm::compute_C_launch(const unsigned int i,
+  const unsigned int j){
+  allocations_cl.clear();
+  allocations_cl.resize(S.size());
+
+  cl.clear();
+  cl.push_back(unique_values[0]->clone());
+  cl.push_back(unique_values[0]->clone());
+  
+  auto &rng = bayesmix::Rng::Instance().get(); 
+  Eigen::VectorXd probas(2);
+  probas(0)=0.5;
+  probas(1)=0.5;
+  for (size_t k = 0; k < S.size(); ++k) {
+    if (bayesmix::categorical_rng(probas, rng, 0)){
+      allocations_cl[k]=1;
+      cl[1]->add_datum(S[k], data.row(S[k]), false);
     }else{
-        LabI=allocations[i];
+      allocations_cl[k]=0;
+      cl[0]->add_datum(S[k], data.row(S[k]), false);
     }
-    std::vector<unsigned int>cl(S.size(),LabI);
-    std::default_random_engine generator;
-    std::bernoulli_distribution bdistr(0.5);
-    for (int k = 0; k < S.size(); ++k) {
-        if (bdistr(generator))
-            cl[k]=allocations[j];
-    }
-    return cl;
+  }
+  /* We update the posterior parameters only at the last insertion to ease
+   * computations.
+   */
+  cl[0]->add_datum(i, data.row[i], true);
+  cl[1]->add_datum(j, data.row[j], true);
 }
 
 void SplitAndMergeAlgorithm::split_or_merge(std::vector<std::shared_ptr<AbstractHierarchy>>& cl, const unsigned int i, const unsigned int j){
@@ -226,15 +239,40 @@ bool SplitAndMergeAlgorithm::accepted_proposal(const double acRa) const{
                                                                         }
 
 // standard Gibbs Sampling
-void SplitAndMergeAlgorithm::restricted_GS(std::vector<unsigned int>& cl, const unsigned int i, 
-                   const unsigned int j) const{ 
+void SplitAndMergeAlgorithm::restricted_GS(const unsigned int i, 
+  const unsigned int j){
+  auto &rng = bayesmix::Rng::Instance().get();
+
+  for(size_t k=0; k<S.size(); ++k){
+    cl[allocations_cl[k]].remove_datum(S[k], data.row(S[k]), 
+      update_hierarchy_params());
+
+    Eigen::VectorXd logprobas(2);
+    logprobas(0) = mixing->get_mass_existing_cluster(S.size()+2-1, true, true,
+      cl[0]);
+    logprobas(0) += cl[0]->conditional_pred_lpdf(data.row(S[k]));
+    logprobas(1) = mixing->get_mass_existing_cluster(S.size()+2-1, true, true,
+      cl[1]);
+    logprobas(1) += cl[1]->conditional_pred_lpdf(data.row(S[k]));
+
+    unsigned int c_new = 
+      bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
+
+    allocations_cl[k]=c_new;
+    cl[allocations_cl[k]].add_datum(S[k], data.row(S[k]), 
+      update_hierarchy_params());
+  }
+
+
+
+
   for(unsigned int i=0; i<S.size(); i++){
     p_i = ComputeRestrGSProbabilities(cl, i, j, z, 'i');
     p_j = ComputeRestrGSProbabilities(cl, i, j, z, 'j');
     p   = p_i/(p_i+p_j);  
     cl[i]= (accepted_proposal(p)) ? LabI : cl[i];
-                                         }                                                        
-                                                           }
+  }                                                        
+}
 
 void SplitAndMergeAlgorithm::full_GS(){
   unsigned int n_data = data.rows();
@@ -250,12 +288,12 @@ void SplitAndMergeAlgorithm::full_GS(){
     }
     unsigned int n_clust = unique_values.size();
 
-    Eigen::VectorXd logprobas(unique_values.size()+1);
+    Eigen::VectorXd logprobas(n_clust+1);
     for(size_t j=0; j<n_clust; ++j){
       logprobas(j) = mixing->get_mass_existing_cluster(
         n_data-1, true, true, unique_values[j]);
       logprobas(j) += unique_values[j]->conditional_pred_lpdf(
-        data.row(data_idx));
+        data.row(i));
     }
     logprobas(n_clust) = mixing->get_mass_new_cluster(
       n_data-1, true, true, n_clust);

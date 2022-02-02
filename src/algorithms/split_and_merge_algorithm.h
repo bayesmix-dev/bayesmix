@@ -51,8 +51,7 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
 
   void compute_S(const unsigned int i, const unsigned int j);
 
-  std::vector<unsigned int> compute_C_launch(const unsigned int i,
-  	const unsigned int j);
+  void compute_C_launch(const unsigned int i, const unsigned int j);
 
   // The function is void because we update the allocation labels directly 
   // inside the function.
@@ -65,8 +64,7 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
   void full_GS();
   
   // Standard Gibbs Sampling
-  void restricted_GS(std::vector<unsigned int>& cl, const unsigned int i, 
-  	const unsigned int j) const;
+  void restricted_GS(const unsigned int i, const unsigned int j);
  
  // Modified Gibbs Sampling Function (used in the Merge case)
  void SplitAndMergeAlgorithm::restricted_GS(std::vector<unsigned int>& cl, const unsigned int i, 
@@ -78,6 +76,8 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
  // TODO: Proposal swap
 
   std::vector<unsigned int> S;
+  std::vector<std::shared_ptr<AbstractHierarchy>> cl;
+  std::vector<bool> allocations_cl;
   
   // Number of restricted GS scans for each MH step.
   unsigned int T=5;
@@ -87,8 +87,6 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
 
   // Number of full GS scans for each iteration of Split and Merge algorithm.
   unsigned int M=1;
-
-  unsigned int LabI;
 };
 
 
