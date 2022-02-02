@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <random>
 #include <cmath>
+#include "src/utils/distributions.h"
 
 void SplitAndMergeAlgorithm::read_params_from_proto(
   const bayesmix::AlgorithmParams &params){
@@ -39,13 +40,13 @@ void SplitAndMergeAlgorithm::compute_S(const unsigned int i, const unsigned int 
     }
     lengthS=lengthS-2;
     S={}; //Necessary, since it needs to be zero at each iter, not only at the beginning
-    S=S.resize(lengthS,0);
+    S.resize(lengthS,0);
     unsigned int index=0;
     for (int k = 0; k < allocations.size(); ++k) {
         if ((allocations[k]==allocations[i]||allocations[k]==allocations[j])&& (k!=i) && (k!=j)) {
             if (index>=lengthS)
                 std::cerr<< "Index out of bounds. index="<<index
-                    <<",lengthS="<<lengthS<< " allocations="<<allocations<<", i="<<i<<", j="<<j<<std::endl;
+                    <<",lengthS="<<lengthS<< ", i="<<i<<", j="<<j<<std::endl;
             S[index]=k;
             index++;
         }
@@ -77,8 +78,8 @@ void SplitAndMergeAlgorithm::compute_C_launch(const unsigned int i,
   /* We update the posterior parameters only at the last insertion to ease
    * computations.
    */
-  cl[0]->add_datum(i, data.row[i], true);
-  cl[1]->add_datum(j, data.row[j], true);
+  cl[0]->add_datum(i, data.row(i), true);
+  cl[1]->add_datum(j, data.row(j), true);
 }
 
 void SplitAndMergeAlgorithm::split_or_merge(std::vector<std::shared_ptr<AbstractHierarchy>>& cl, const unsigned int i, const unsigned int j){
@@ -237,15 +238,15 @@ bool SplitAndMergeAlgorithm::accepted_proposal(const double acRa) const{
     std::uniform_real_distribution<> UnifDis(0.0, 1.0);
     return (UnifDis(generator)<=acRa);
                                                                         }
-                                                                        
+
 double SplitAndMergeAlgorithm::restricted_GS(const unsigned int i, 
-  const unsigned int j, bool return_log_res_prod=false){
+  const unsigned int j, bool return_log_res_prod/*=false*/){
   auto &rng = bayesmix::Rng::Instance().get();
 
   double log_res_prod = 0;
 
   for(size_t k=0; k<S.size(); ++k){
-    cl[allocations_cl[k]].remove_datum(S[k], data.row(S[k]), 
+    cl[allocations_cl[k]]->remove_datum(S[k], data.row(S[k]), 
       update_hierarchy_params());
 
     Eigen::VectorXd logprobas(2);
@@ -264,7 +265,7 @@ double SplitAndMergeAlgorithm::restricted_GS(const unsigned int i,
     }
 
     allocations_cl[k]=c_new;
-    cl[allocations_cl[k]].add_datum(S[k], data.row(S[k]), 
+    cl[allocations_cl[k]]->add_datum(S[k], data.row(S[k]), 
       update_hierarchy_params());
   }
 
@@ -294,7 +295,7 @@ void SplitAndMergeAlgorithm::full_GS(){
     }
     logprobas(n_clust) = mixing->get_mass_new_cluster(
       n_data-1, true, true, n_clust);
-    logprobas(n_clust) += unique_values[j]->prior_pred_lpdf(
+    logprobas(n_clust) += unique_values[0]->prior_pred_lpdf(
       data.row(i));
 
     unsigned int c_new = 
