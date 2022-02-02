@@ -63,17 +63,26 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
 
   void full_GS();
   
-  // Standard Gibbs Sampling
+  /* If return_log_res_prod is true, the function returns the log of the 
+   * probability of the transition that cl has done in the function.
+   * If return_log_res_prod is false, ignore the return value.
+   */
   double restricted_GS(const unsigned int i, const unsigned int j, 
     bool return_log_res_prod=false);
- 
- double ComputeRestrGSProbabilities(std::vector<unsigned int>& cl,
-               const unsigned int i, const unsigned int j, const unsigned int z,const char cluster) const;
   
- // TODO: Proposal swap
-
+  /* Vector that contains the indexes of the data points that are considered
+   * in the MH step.
+   */
   std::vector<unsigned int> S;
+
+  /* Vector of two elements that represent the two temporary clusters used
+   * in the MH step.
+   */
   std::vector<std::shared_ptr<AbstractHierarchy>> cl;
+  
+  /* Vector that associates each element of S to one of the two temporary 
+   * clusters. 
+   */
   std::vector<bool> allocations_cl;
   
   // Number of restricted GS scans for each MH step.

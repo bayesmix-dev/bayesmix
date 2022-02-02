@@ -30,7 +30,44 @@ void SplitAndMergeAlgorithm::print_startup_message() const {
   std::cout << msg << std::endl;
 }
 
+void SplitAndMergeAlgorithm::sample_allocations(){
+  auto &rng = bayesmix::Rng::Instance().get();
 
+  // MH updates
+  for(unsigned int k=0; k<K; ++k){
+    unsigned int n_data = data.rows();
+
+    // Sample i and j from the datapoints
+    Eigen::VectorXd probas = Eigen::VectorXd::Constant(n_data, 1/n_data);
+    unsigned int i = bayesmix::categorical_rng(probas, rng, 0);
+    probas = Eigen::VectorXd::Constant(n_data-1, 1/(n_data-1));
+    unsigned int j = bayesmix::categorical_rng(probas, rng, 0);
+    if(j>=i){
+      j++;
+    }
+
+    compute_S(i,j);
+    compute_C_launch(i,j);
+
+    // Restricted GS steps
+    for(unsigned int t=0; t<T; ++t){
+      restricted_GS(i,j);
+    }
+    
+    split_or_merge(i,j);
+  }
+
+  // Full GS updates
+  for(unsigned int k=0; k<M; ++k){
+    full_GS();
+  }
+}
+
+void SplitAndMergeAlgorithm::sample_unique_values(){
+  for (auto &un : unique_values) {
+    un->sample_full_cond(!update_hierarchy_params());
+  }
+}
 
 void SplitAndMergeAlgorithm::compute_S(const unsigned int i, const unsigned int j) {
     unsigned int lengthS;
