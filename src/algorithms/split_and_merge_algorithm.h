@@ -56,7 +56,7 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
 
   // The function is void because we update the allocation labels directly 
   // inside the function.
-  void split_or_merge(std::vector<unsigned int>& cl, const unsigned int i,
+  void split_or_merge(std::vector<std::shared_ptr<AbstractHierarchy>>& cl, const unsigned int i,
   	const unsigned int j);
 
   // This function was __MH in Python
