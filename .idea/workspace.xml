@@ -10,15 +10,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a9d2a45c-ca0f-41e6-9cba-10d2b35b9cd3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/mixings/mixture_finite_mixing.cc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/mixings/mixture_finite_mixing.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/tutorial/run.sh" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tutorial/run.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/mixing_id.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/mixing_id.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/mixing_prior.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/mixing_prior.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proto/mixing_state.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/mixing_state.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/includes.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/includes.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mixings/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/mixings/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mixings/load_mixings.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/mixings/load_mixings.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/algorithms/marginal_algorithm.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithms/marginal_algorithm.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/algorithms/neal2_algorithm.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithms/neal2_algorithm.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/algorithms/neal8_algorithm.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithms/neal8_algorithm.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mixings/abstract_mixing.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/mixings/abstract_mixing.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mixings/dirichlet_mixing.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/mixings/dirichlet_mixing.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mixings/dirichlet_mixing.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/mixings/dirichlet_mixing.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mixings/mixture_finite_mixing.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/mixings/mixture_finite_mixing.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mixings/mixture_finite_mixing.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/mixings/mixture_finite_mixing.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mixings/pityor_mixing.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/mixings/pityor_mixing.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mixings/pityor_mixing.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/mixings/pityor_mixing.h" afterDir="false" />
     </list>
     <list id="f6c9c6b3-3d54-4b79-a2af-0c19172539ba" name="Changes by taguhi" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -106,6 +108,8 @@
       <workItem from="1643300112737" duration="1143000" />
       <workItem from="1643308150472" duration="1368000" />
       <workItem from="1643711800987" duration="17259000" />
+      <workItem from="1643745871149" duration="445000" />
+      <workItem from="1643786007602" duration="2582000" />
     </task>
     <servers />
   </component>

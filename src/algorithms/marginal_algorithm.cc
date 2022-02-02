@@ -36,7 +36,7 @@ Eigen::VectorXd MarginalAlgorithm::lpdf_from_state(
     // Get hierarchy and mass values
     temp_hier->set_state_from_proto(curr_state.cluster_states(j));
     double mass_ex = mixing->get_mass_existing_cluster(
-        n_data, true, false, temp_hier, mix_covariate);
+        n_data, true, false, temp_hier, n_clust, mix_covariate);
     // Get local, single-point estimate
     lpdf_local.col(j) =
         temp_hier->like_lpdf_grid(grid, hier_covariate).array() + mass_ex;

@@ -47,7 +47,8 @@ void DirichletMixing::update_state(
 
 double DirichletMixing::mass_existing_cluster(
     const unsigned int n, const bool log, const bool propto,
-    std::shared_ptr<AbstractHierarchy> hier) const {
+    std::shared_ptr<AbstractHierarchy> hier,
+    const unsigned int n_clust) const {
   double out;
   if (log) {
     out = hier->get_log_card();

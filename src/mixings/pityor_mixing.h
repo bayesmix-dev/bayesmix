@@ -66,9 +66,10 @@ class PitYorMixing
   //! @param propto     Whether to include normalizing constants or not
   //! @param hier       `Hierarchy` object representing the cluster
   //! @return           Probability value
-  double mass_existing_cluster(
-      const unsigned int n, const bool log, const bool propto,
-      std::shared_ptr<AbstractHierarchy> hier) const override;
+  double mass_existing_cluster(const unsigned int n, const bool log,
+                               const bool propto,
+                               std::shared_ptr<AbstractHierarchy> hier,
+                               const unsigned int n_clust) const override;
 
   //! Returns probability mass for a new cluster (for marginal mixings only)
   //! @param n          Total dataset size

@@ -56,13 +56,45 @@ void MixtureFiniteMixing::update_state(
 
 double MixtureFiniteMixing::mass_existing_cluster(
     const unsigned int n, const bool log, const bool propto,
-    std::shared_ptr<AbstractHierarchy> hier) const {
+    std::shared_ptr<AbstractHierarchy> hier,
+    const unsigned int n_clust) const {
+  double gamma = 1;    //! Has to be a parameter
+  double lambda = 20;  //! Has to be a parameter
+
+  if (!check) {
+    for (unsigned int t = 0; t < n + 1; ++t) {
+      double v = 0;
+      for (unsigned int k = 1; k < 10000; ++k) {
+        double log_num = std::log(k);
+        double log_den = std::log(gamma * k);
+        for (unsigned int jj = 1; jj < t; ++jj) {
+          log_num += std::log(k - jj);
+        }
+        for (unsigned int jjj = 1; jjj < n; ++jjj) {
+          log_den += std::log(gamma * k + jjj);
+        }
+        v += std::exp(log_num - log_den + stan::math::poisson_lpmf(k, lambda) +
+                      1000);
+      }
+      std::cout << v << std::endl;
+      V.push_back(v);
+    }
+    check = true;
+  }
+
   double out;
-  double gamma = 1;  //! Has to be a parameter
   if (log) {
     out = std::log(hier->get_card() + gamma);
+    if (!propto) {
+      out -= std::log(n - 1 + n_clust * gamma +
+                      (V[n_clust + 1] / V[n_clust] * gamma));
+    }
   } else {
     out = hier->get_card() + gamma;
+    if (!propto) {
+      out = out /
+            (n - 1 + n_clust * gamma + (V[n_clust + 1] / V[n_clust] * gamma));
+    }
   }
   return out;
 }
@@ -71,12 +103,12 @@ double MixtureFiniteMixing::mass_new_cluster(
     const unsigned int n, const bool log, const bool propto,
     const unsigned int n_clust) const {
   double gamma = 1;   //! Has to be a parameter
-  double lambda = 5;  //! Has to be a parameter
+  double lambda = 2;  //! Has to be a parameter
 
   if (!check) {
     for (unsigned int t = 0; t < n + 1; ++t) {
       double v = 0;
-      for (unsigned int k = 1; k < 1000; ++k) {
+      for (unsigned int k = 1; k < 10000; ++k) {
         double log_num = std::log(k);
         double log_den = std::log(gamma * k);
         for (unsigned int jj = 1; jj < t; ++jj) {
@@ -96,8 +128,16 @@ double MixtureFiniteMixing::mass_new_cluster(
   double out;
   if (log) {
     out = std::log(V[n_clust + 1] / V[n_clust] * gamma);
+    if (!propto) {
+      out -= std::log(n - 1 + n_clust * gamma +
+                      V[n_clust + 1] / V[n_clust] * gamma);
+    }
   } else {
     out = V[n_clust + 1] / V[n_clust] * gamma;
+    if (!propto) {
+      out = out /
+            (n - 1 + n_clust * gamma + V[n_clust + 1] / V[n_clust] * gamma);
+    }
   }
   return out;
 }
@@ -140,6 +180,6 @@ void MixtureFiniteMixing::initialize_state() {
   }
 
   else {
-    throw std::invalid_argument("Uunrecognized mixing prior");
+    throw std::invalid_argument("Unrecognized mixing prior");
   }
 }

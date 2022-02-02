@@ -71,12 +71,12 @@ class AbstractMixing {
   //! Public wrapper for `mass_existing_cluster()` methods
   double get_mass_existing_cluster(
       const unsigned int n, const bool log, const bool propto,
-      std::shared_ptr<AbstractHierarchy> hier,
+      std::shared_ptr<AbstractHierarchy> hier, const unsigned int n_clust,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     if (is_dependent()) {
-      return mass_existing_cluster(n, log, propto, hier, covariate);
+      return mass_existing_cluster(n, log, propto, hier, n_clust, covariate);
     } else {
-      return mass_existing_cluster(n, log, propto, hier);
+      return mass_existing_cluster(n, log, propto, hier, n_clust);
     }
   }
 
@@ -163,7 +163,7 @@ class AbstractMixing {
   //! @return           Probability value
   virtual double mass_existing_cluster(
       const unsigned int n, const bool log, const bool propto,
-      std::shared_ptr<AbstractHierarchy> hier,
+      std::shared_ptr<AbstractHierarchy> hier, const unsigned int n_clust,
       const Eigen::RowVectorXd &covariate) const {
     if (!is_dependent()) {
       throw std::runtime_error(
@@ -178,10 +178,12 @@ class AbstractMixing {
   //! @param log        Whether to return logarithm-scale values or not
   //! @param propto     Whether to include normalizing constants or not
   //! @param hier       `Hierarchy` object representing the cluster
+  //! @param n_clust    Current number of clusters
   //! @return           Probability value
-  virtual double mass_existing_cluster(
-      const unsigned int n, const bool log, const bool propto,
-      std::shared_ptr<AbstractHierarchy> hier) const {
+  virtual double mass_existing_cluster(const unsigned int n, const bool log,
+                                       const bool propto,
+                                       std::shared_ptr<AbstractHierarchy> hier,
+                                       const unsigned int n_clust) const {
     if (is_dependent()) {
       throw std::runtime_error(
           "Cannot call this function from dependent mixing");

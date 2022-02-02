@@ -16,3 +16,5 @@ sftp-config.json
 *.local.*
 # MacOS storage files
 .DS_Store
+# .idea folder
+.idea/
