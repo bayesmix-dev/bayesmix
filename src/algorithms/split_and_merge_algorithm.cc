@@ -237,11 +237,12 @@ bool SplitAndMergeAlgorithm::accepted_proposal(const double acRa) const{
     std::uniform_real_distribution<> UnifDis(0.0, 1.0);
     return (UnifDis(generator)<=acRa);
                                                                         }
-
-// standard Gibbs Sampling
-void SplitAndMergeAlgorithm::restricted_GS(const unsigned int i, 
-  const unsigned int j){
+                                                                        
+double SplitAndMergeAlgorithm::restricted_GS(const unsigned int i, 
+  const unsigned int j, bool return_log_res_prod=false){
   auto &rng = bayesmix::Rng::Instance().get();
+
+  double log_res_prod = 0;
 
   for(size_t k=0; k<S.size(); ++k){
     cl[allocations_cl[k]].remove_datum(S[k], data.row(S[k]), 
@@ -255,23 +256,19 @@ void SplitAndMergeAlgorithm::restricted_GS(const unsigned int i,
       cl[1]);
     logprobas(1) += cl[1]->conditional_pred_lpdf(data.row(S[k]));
 
-    unsigned int c_new = 
-      bayesmix::categorical_rng(stan::math::softmax(logprobas), rng, 0);
+    Eigen::VectorXd probas = stan::math::softmax(logprobas);
+    unsigned int c_new = bayesmix::categorical_rng(probas, rng, 0);
+
+    if(return_log_res_prod){
+      log_res_prod+=log(probas(c_new));
+    }
 
     allocations_cl[k]=c_new;
     cl[allocations_cl[k]].add_datum(S[k], data.row(S[k]), 
       update_hierarchy_params());
   }
 
-
-
-
-  for(unsigned int i=0; i<S.size(); i++){
-    p_i = ComputeRestrGSProbabilities(cl, i, j, z, 'i');
-    p_j = ComputeRestrGSProbabilities(cl, i, j, z, 'j');
-    p   = p_i/(p_i+p_j);  
-    cl[i]= (accepted_proposal(p)) ? LabI : cl[i];
-  }                                                        
+  return log_res_prod;                                                       
 }
 
 void SplitAndMergeAlgorithm::full_GS(){
@@ -317,48 +314,3 @@ void SplitAndMergeAlgorithm::full_GS(){
     }
   }
 }
-
-// Modified Gibbs Sampling
-void SplitAndMergeAlgorithm::restricted_GS(std::vector<unsigned int>& cl, const unsigned int i, 
-                   const unsigned int j, double &res_prod)const{ 
-  for(unsigned int i=0; i<S.size(); i++){
-    p_i = ComputeRestrGSProbabilities(cl, i, j, z, 'i');
-    p_j = ComputeRestrGSProbabilities(cl, i, j, z, 'j');
-    p   = p_i/(p_i+p_j);  
-    cl[i]= (accepted_proposal(p)) ? LabI : allocations[j];
-    if(cl[i]==LabI) res_prod=res_prod*p;
-    else res_prod=res_prod*(1-p);
-                                         }                                                        
-                                                           }
-
-double SplitAndMergeAlgorithm::ComputeRestrGSProbabilities(std::vector<unsigned int>& cl,
-                    const unsigned int i, const unsigned int j, const unsigned int z,const char cluster='i') const{
-    if(cluster!='i' and cluster!='j'){
-      std::cerr<<"Unexpected value for the parameter cluster ";
-      return 0.0;
-                                      }
-    else{
-      unsigned int label=0;
-      if(cluster=='i')label=LabI;
-      else label=allocations[j];
-      std::vector<unsigned int> v;
-      v.reserve(cl.size());
-      for(unsigned int k=0; k<cl.size(); k++){
-        if(cl[k]==label && S[k]!=S[z]){
-          v.push_back(S[k]);
-                                      }
-                                              }
-      if(cluster=='i') v.push_back(i);
-      else v.push_back(j);
-      Eigen::MatrixXd ExtractedData;
-      ExtractedData=data(v,Eigen::all);
-      if(ExtractedData.rows()==0){
-        std::cerr<<"No data points in one of the two clusters considered for restricted Gibbs sampling."+
-                    "This is impossible, indeed there should always be at "+"least i or j in the datapoints.+
-                    "least i or j in the datapoints."<<std::endl;
-        return 0.0;
-                                    }
-      else return v.size()*std::exp(conditional_pred_lpdf(data(S[z],Eigen::all),ExtractedData));
-         }
-   
- }
