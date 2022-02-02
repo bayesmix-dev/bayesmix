@@ -68,141 +68,140 @@ std::vector<unsigned int> SplitAndMergeAlgorithm::compute_C_launch(const unsigne
     return cl;
 }
 
-void SplitAndMergeAlgorithm::split_or_merge(std::vector<unsigned int>& cl, const unsigned int i, const unsigned int j){
+void SplitAndMergeAlgorithm::split_or_merge(std::vector<std::shared_ptr<AbstractHierarchy>>& cl, const unsigned int i, const unsigned int j){
     if(allocations[i]==allocations[j]) { 
-      std::vector<unsigned int> clSplit (allocations.size()); #we could initialize the vector to LAbI
-      Eigen::MatrixXd data_i();  
-      Eigen::MatrixXd data_j();  
-      Eigen::MatrixXd data_J();
+      std::vector<unsigned int> clSplit (allocations.size()); 
+      std::shared_ptr<AbstractHierarchy> data_i()= unique_values[0]->clone();
+      std::shared_ptr<AbstractHierarchy> data_j()= unique_values[0]->clone();  
+      std::shared_ptr<AbstractHierarchy> data_J()= unique_values[0]->clone();
       double p_i=0; 
       double p_j=0;
       double p_J=0;
       
       clSplit[i]=LabI;
       clSplit[j]=allocations[j];
-      unsigned int CountLabI=0;
-      unsigned int CountLabJ=0;
       double q=1.0;
       restricted_GS(cl,i,j,q);
       unsigned int z=0;
-      unsigned int I=i;
-      for(unsigned int i=0; i < clSplit.size(); i++){
-          if((z<S.size())and(i==S[z])){
-            if(cl[z]==LabI){
-              CountLabI++;
-              if (!data_i.rows()){ #first iteration
-                p_i+=prior_pred_lpdf(data.row(S[z])) 
-                                 }
-              else{
-                p_i+=conditional_pred_lpdf(data.row(S[z]), data_i) 
-                  }
-              data_i.conservativeResize(data_i.rows()+1,NoChange);
-              data_i.row(data_i.rows()-1)=data.row(i);              
-                          }
-            else{
-              CountLabJ++;
-              if (!data_j.rows()){ #first iteration
-                p_j+=prior_pred_lpdf(data.row(S[z])) 
-                                 }
-              else{
-                p_j+=conditional_pred_lpdf(data.row(S[z]), data_j)
-                  }
-              data_j.conservativeResize(data_j.rows()+1,NoChange);
-              data_j.row(data_j.rows()-1)=data.row(i)
-                 }
-            
-            clSplit[i]=cl[z];
-            z++;
+      std::set<int> set_i=cl[0]->get_data_idx();
+      std::set<int> set_j=cl[1]->get_data_idx();
+      std::set<int>::const_iterator iter_i=set_i.cbegin();
+      std::set<int>::const_iterator iter_j=set_j.cbegin();
+      for(unsigned int k=0; k < clSplit.size(); k++){
+          if(((z<S.size())and(k==S[z]))or((k==i)or(k==j)){ //since S doesn't contain i and j but we put them in data_i or data_j
+            if(*iter_i==k){
+              if (!data_i->get_card()){ //first iteration
+                p_i+=data_i->prior_pred_lpdf(data.row(k));
                                       }
-          else{
-            if(i!=I and i!=j){
-            clSPlit[i]=allocations[i];
-                             }
-              }
-          if(allocations[i]==clSplit[j]){
-            if(!data_J.rows()){
-              p_J+=prior_pred_lpdf(data.row(i))
+              else{
+                p_i+=data_i->conditional_pred_lpdf(data.row(k));
+                  }
+              data_i->add_datum(k, data.row(k), update_hierarchy_params());    
+              iter_i++;
+              clSplit[k]=LabI;
                               }
             else{
-              p_J+=conditional_pred_lpdf(data.row(i), data_J)
+              if (!data_j->get_card()){ //first iteration
+                p_j+=data_j->prior_pred_lpdf(data.row(k));
+                                      }
+              else{
+                p_j+=data_j->conditional_pred_lpdf(data.row(k));
+                  }
+              data_j->add_datum(k, data.row(k), update_hierarchy_params());
+              iter_j++;
+              clSplit[k]=allocations[j];
+                 }
+            
+            if((k!=i)and(k!=j)) z++;
+                                                           }
+          else{
+            
+            clSPlit[k]=allocations[k];
+                             
+              }
+          if(allocations[k]==allocations[j]){
+            if(!data_J->get_card()){
+              p_J+=data_J->prior_pred_lpdf(data.row(k));
+                              }
+            else{
+              p_J+=data_J->conditional_pred_lpdf(data.row(k));
                 }
-            data_J.conservativeResize(data_J.rows()+1,NoChange);
-            data_J.row(data_J.rows()-1)=data.row(i)
-                                        }
+            data_J->add_datum(k, data.row(k), update_hierarchy_params());
+                                            }
                                             
                                               }
       const double p1=1/q;
-      const double p2=factorial(CountLabI-1)*factorial(CountLabJ-1)/(S.size()+2-1)*hierarchy.alpha; //alpha da fissare
+       // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j
+      const double p2=factorial(data_j->get_card()-1-1)*factorial(data_i->get_card()-1-1)/(S.size()+2-1)*hierarchy.alpha; //alpha da fissare
       const double p3=std::exp(p_i+p_j-p_J); 
       const double AcRa=min(1,p1*p2*p3) //acceptance ratio 
       if(accepted_proposal(AcRa)) allocations=clSplit;
       }
   else{
     std::vector<unsigned int> clMerge (allocations.size()); 
-    Eigen::MatrixXd data_i();  
-    Eigen::MatrixXd data_j(); 
-    Eigen::MatrixXd data_J();
+    std::shared_ptr<AbstractHierarchy> data_i()= unique_values[0]->clone();
+    std::shared_ptr<AbstractHierarchy> data_j()= unique_values[0]->clone();  
+    std::shared_ptr<AbstractHierarchy> data_J()= unique_values[0]->clone();
     double p_i=0; 
     double p_j=0;
     double p_J=0;
      
     clMerge[i]=allocations[j];
     clMerge[j]=allocations[j];
-    unsigned int CountLabI=0;
-    unsigned int CountLabJ=0;
+    std::set<int> set_i=cl[0]->get_data_idx();
+    std::set<int> set_j=cl[1]->get_data_idx();
+    std::set<int>::const_iterator iter_i=set_i.cbegin();
+    std::set<int>::const_iterator iter_j=set_j.cbegin();
     unsigned int z=0;
-    unsigned int I=i;
-     for(unsigned int i=0; i < clMerge.size(); i++){
-          if((z<S.size())and(i==S[z])){
-            if(cl[z]==allocations[I]){
-              CountLabI++;
-              if (!data_i.rows()){ #first iteration
-                p_i+=prior_pred_lpdf(data.row(S[z])) 
+     for(unsigned int k=0; k < clMerge.size(); k++){
+          if(((z<S.size())and(k==S[z]))or((k==i)or(k==j)){
+            if(*iter_i==k){
+              if (!data_i->get_card()){ //first iteration
+                p_i+=data_i->prior_pred_lpdf(data.row(k));
                                  }
               else{
-                p_i+=conditional_pred_lpdf(data.row(S[z]), data_i) 
+                p_i+=data_i->conditional_pred_lpdf(data.row(k));
                   }
-              data_i.conservativeResize(data_i.rows()+1,NoChange);
-              data_i.row(data_i.rows()-1)=data.row(i);              
+              data_i->add_datum(k, data.row(k), update_hierarchy_params());
+              iter_i++;
                           }
             else{
-              CountLabJ++;
-              if (!data_j.rows()){ #first iteration
-                p_j+=prior_pred_lpdf(data.row(S[z])) 
+              if (!data_j->get_card()){ //first iteration
+                p_j+=data_j->prior_pred_lpdf(data.row(k)); 
                                  }
               else{
-                p_j+=conditional_pred_lpdf(data.row(S[z]), data_j) 
+                p_j+=data_j->conditional_pred_lpdf(data.row(k));
                   }
-              data_j.conservativeResize(data_j.rows()+1,NoChange);
-              data_j.row(data_j.rows()-1)=data.row(i)
+              data_j->add_datum(k, data.row(k), update_hierarchy_params());
+              iter_j++;
                  }
             
-            clMerge[i]=allocations[j];
-            z++;
+            clMerge[k]=allocations[j];
+            if((k!=i)and(k!=j))z++;
+            
                                       }      
           else{
-            if(i!=I and i!=j){
-            clMerge[i]=allocations[i];
-                             }
+          
+            clMerge[k]=allocations[k];
+                             
               }
-          if(allocations[i]==clMerge[j]){
-            if(!data_J.rows()){
-              p_J+=prior_pred_lpdf(data.row(i))
+          if(allocations[k]==allocations[j]){
+            if(!data_J->get_card()){
+              p_J+=data_J->prior_pred_lpdf(data.row(k));
                               }
             else{
-              p_J+=conditional_pred_lpdf(data.row(i), data_J)
+              p_J+=data_J->conditional_pred_lpdf(data.row(k));
                 }
-            data_J.conservativeResize(data_J.rows()+1,NoChange);
-            data_J.row(data_J.rows()-1)=data.row(i)
+              data_J->add_datum(k, data.row(k), update_hierarchy_params());
+              iter_J++;
                                         }
                                             
                                               }
       double q=1; 
       //Fake Gibbs Sampling in order to compute the probability q
-      std::vector<unsigned int> cl_copy(cl);
       for(unsigned int k=0; k<S.size(); k++){
-        double p_i=ComputeRestrGSProbabilities(cl_copy, i, j, k, cluster='i');
-        double p_j=ComputeRestrGSProbabilities(cl_copy, i, j, k, cluster='j');
+        double p_i=cl[0]->conditional_pred_lpdf(data.row(k));
+        double p_j=
         double p=(p_i)/(p_i + p_j);
         cl_copy[k]=allocations[S[k]];
         if(cl_copy[k]==allocations[i]) q=q*p;
@@ -210,13 +209,15 @@ void SplitAndMergeAlgorithm::split_or_merge(std::vector<unsigned int>& cl, const
                                              }
         
       const double p1=q;
-      const double p2=factorial(CountLabI-1)*factorial(CountLabJ-1)/(S.size()+2-1)*hierarchy.alpha; //fissare alpha
+       // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j
+      const double p2=factorial(data_i->get_card()-1-1)*factorial(data_j->get_card()-1-1)/(S.size()+2-1)*hierarchy.alpha; //fissare alpha
       const double p3=std::exp(-p_i-p_j+p_J); 
       const double AcRa=min(1,p1*p2*p3) //acceptance ratio 
       if(accepted_proposal(AcRa)) allocations=clMerge;
       }
     
 }
+
 
 bool SplitAndMergeAlgorithm::accepted_proposal(const double acRa) const{
     std::default_random_engine generator;
