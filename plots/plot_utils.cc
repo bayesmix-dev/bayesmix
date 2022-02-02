@@ -6,7 +6,7 @@ to_mesh(const Eigen::MatrixXd &grid, const Eigen::VectorXd &vals) {
   // infer the number of points in the ygrid
   int ny = 0;
   double first_x = grid(0, 0);
-  while (grid(ny + 1, 0) == first_x) {
+  while (ny < grid.rows() && grid(ny + 1, 0) == first_x) {
     ny += 1;
   }
   ny += 1;
