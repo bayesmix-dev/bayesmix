@@ -1,0 +1,8 @@
+fixed_values {
+  mean: 0
+  var: 10
+  shape: 2
+  scale: 1
+  mh_mean_var: 10;
+  mh_log_scale_var: 1;
+}
