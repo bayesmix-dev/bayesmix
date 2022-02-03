@@ -53,7 +53,7 @@ void SplitAndMergeAlgorithm::sample_allocations(){
     for(unsigned int t=0; t<T; ++t){
       restricted_GS(i,j);
     }
-    
+
     split_or_merge(i,j);
   }
 
@@ -67,6 +67,12 @@ void SplitAndMergeAlgorithm::sample_unique_values(){
   for (auto &un : unique_values) {
     un->sample_full_cond(!update_hierarchy_params());
   }
+}
+
+Eigen::VectorXd SplitAndMergeAlgorithm::lpdf_marginal_component(
+    std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+    const Eigen::RowVectorXd &covariate) const {
+  return hier->prior_pred_lpdf_grid(grid, covariate);
 }
 
 void SplitAndMergeAlgorithm::compute_S(const unsigned int i, const unsigned int j) {

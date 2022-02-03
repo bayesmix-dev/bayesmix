@@ -77,6 +77,9 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
 
   /* Vector of two elements that represent the two temporary clusters used
    * in the MH step.
+   * Attention! Each cluster contains also the point that is drawn at the 
+   * beginning of the MH iteration and assigned to that cluster, i.e. point i
+   * for the first cluster and point j for the second cluster.
    */
   std::vector<std::shared_ptr<AbstractHierarchy>> cl;
   
