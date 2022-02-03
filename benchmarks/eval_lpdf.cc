@@ -62,7 +62,20 @@ static void BM_eval_lpdf_memory_read_par(benchmark::State& state) {
   algo->set_data(get_data(dim));
   algo->run(&collector);
   for (auto _ : state) {
-    bayesmix::eval_lpdf_parallel(algo, &collector, grid);
+    bayesmix::internal::eval_lpdf_parallel_lowmemory(algo, &collector, grid);
+  }
+}
+
+static void BM_eval_lpdf_memory_read_par2(benchmark::State& state) {
+  int dim = state.range(0);
+  Eigen::MatrixXd grid = get_grid(dim);
+  std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
+  MemoryCollector collector;
+  algo->set_data(get_data(dim));
+  algo->run(&collector);
+  for (auto _ : state) {
+    bayesmix::internal::eval_lpdf_parallel_fullmemory(algo, &collector, grid,
+                                                      8);
   }
 }
 
@@ -90,6 +103,7 @@ static void BM_eval_lpdf_memory_read_par(benchmark::State& state) {
 
 BENCHMARK(BM_eval_lpdf_memory_read_seq)->Arg(1)->Arg(2);
 BENCHMARK(BM_eval_lpdf_memory_read_par)->Arg(1)->Arg(2);
+BENCHMARK(BM_eval_lpdf_memory_read_par2)->Arg(1)->Arg(2);
 
 // BENCHMARK(BM_eval_lpdf_memory_noread)->Arg(1)->Arg(2);
 // BENCHMARK(BM_eval_lpdf_file)->Arg(1)->Arg(2);
