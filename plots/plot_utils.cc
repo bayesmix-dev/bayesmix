@@ -6,7 +6,7 @@ to_mesh(const Eigen::MatrixXd &grid, const Eigen::VectorXd &vals) {
   // infer the number of points in the ygrid
   int ny = 0;
   double first_x = grid(0, 0);
-  while (grid(ny + 1, 0) == first_x) {
+  while (ny < grid.rows() && grid(ny + 1, 0) == first_x) {
     ny += 1;
   }
   ny += 1;
@@ -104,9 +104,6 @@ void num_clus_bar(const Eigen::MatrixXd &num_clus_chain_,
   std::vector<double> bar_heights(bar_heights_.data(),
                                   bar_heights_.data() + bar_heights_.size());
 
-  for (int i = 0; i < xticks.size(); i++) {
-    std::cout << xticks[i] << ", " << bar_heights[i] << std::endl;
-  }
   matplot::bar(xticks, bar_heights);
   matplot::title("Posterior number of clusters");
   matplot::xlabel("Number of clusters");
