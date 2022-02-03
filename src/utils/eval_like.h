@@ -11,12 +11,10 @@ namespace bayesmix {
 //! @param algo a shared_ptr to the algorithm used for MCMC sampling
 //! @param collector a pointer to the collector containing the chain
 //! @param low_memory if false, the whole chain will be loaded into the memory.
-//!        When a `MemoryCollector` is being used, this leads to a speedup
-//!        which ranges between 20-50% but increases significantly the memory
-//!        required. If true, we load the chain by deserializing chunks of size
+//!        This leads to a speedup which ranges between 20-50% but increases
+//!        significantly the memory required.
+//!        If true, we load the chain by deserializing chunks of size
 //!        `chunk_size`, and process the states within each chunk in parallel.
-//!        If a `FileCollector` is being used, setting low_memory to true
-//!        yields to faster runtimes.
 //! @param njobs used only if low_memory=false, the number of parallel jobs
 //! @param chunk_size see `low_memory`.
 Eigen::MatrixXd eval_lpdf_parallel(std::shared_ptr<BaseAlgorithm> algo,

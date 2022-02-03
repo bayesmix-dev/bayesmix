@@ -1,8 +1,8 @@
 rng_seed: 20210329
 
-iterations: 11
+iterations: 11000
 
-burnin: 1
+burnin: 100
 
 init_num_clusters: 5
 
