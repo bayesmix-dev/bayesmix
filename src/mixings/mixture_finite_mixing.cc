@@ -29,9 +29,7 @@ void MixtureFiniteMixing::update_state(
 
   if (priorcast->has_fixed_value()) {
     return;
-  }
-
-  else if (priorcast->has_gamma_prior()) {
+  } else if (priorcast->has_gamma_prior()) {
     // Recover parameters
     unsigned int k = unique_values.size();
     double alpha = priorcast->gamma_prior().totalmass_prior().shape();
@@ -47,9 +45,7 @@ void MixtureFiniteMixing::update_state(
       state.totalmass =
           stan::math::gamma_rng(alpha + k - 1, beta - log(phi), rng);
     }
-  }
-
-  else {
+  } else {
     throw std::invalid_argument("Unrecognized mixing prior");
   }
 }
@@ -62,24 +58,7 @@ double MixtureFiniteMixing::mass_existing_cluster(
   double lambda = 20;  //! Has to be a parameter
 
   if (!check) {
-    for (unsigned int t = 0; t < n + 1; ++t) {
-      double v = 0;
-      for (unsigned int k = 1; k < 10000; ++k) {
-        double log_num = std::log(k);
-        double log_den = std::log(gamma * k);
-        for (unsigned int jj = 1; jj < t; ++jj) {
-          log_num += std::log(k - jj);
-        }
-        for (unsigned int jjj = 1; jjj < n; ++jjj) {
-          log_den += std::log(gamma * k + jjj);
-        }
-        v += std::exp(log_num - log_den + stan::math::poisson_lpmf(k, lambda) +
-                      1000);
-      }
-      std::cout << v << std::endl;
-      V.push_back(v);
-    }
-    check = true;
+    init_V(n, gamma, lambda);
   }
 
   double out;
@@ -102,28 +81,11 @@ double MixtureFiniteMixing::mass_existing_cluster(
 double MixtureFiniteMixing::mass_new_cluster(
     const unsigned int n, const bool log, const bool propto,
     const unsigned int n_clust) const {
-  double gamma = 1;   //! Has to be a parameter
-  double lambda = 2;  //! Has to be a parameter
+  double gamma = 1;    //! Has to be a parameter
+  double lambda = 20;  //! Has to be a parameter
 
   if (!check) {
-    for (unsigned int t = 0; t < n + 1; ++t) {
-      double v = 0;
-      for (unsigned int k = 1; k < 10000; ++k) {
-        double log_num = std::log(k);
-        double log_den = std::log(gamma * k);
-        for (unsigned int jj = 1; jj < t; ++jj) {
-          log_num += std::log(k - jj);
-        }
-        for (unsigned int jjj = 1; jjj < n; ++jjj) {
-          log_den += std::log(gamma * k + jjj);
-        }
-        v += std::exp(log_num - log_den + stan::math::poisson_lpmf(k, lambda) +
-                      1000);
-      }
-      std::cout << v << std::endl;
-      V.push_back(v);
-    }
-    check = true;
+    init_V(n, gamma, lambda);
   }
   double out;
   if (log) {
@@ -165,9 +127,7 @@ void MixtureFiniteMixing::initialize_state() {
     if (state.totalmass <= 0) {
       throw std::invalid_argument("Total mass parameter must be > 0");
     }
-  }
-
-  else if (priorcast->has_gamma_prior()) {
+  } else if (priorcast->has_gamma_prior()) {
     double alpha = priorcast->gamma_prior().totalmass_prior().shape();
     double beta = priorcast->gamma_prior().totalmass_prior().rate();
     if (alpha <= 0) {
@@ -177,9 +137,29 @@ void MixtureFiniteMixing::initialize_state() {
       throw std::invalid_argument("Rate parameter must be > 0");
     }
     state.totalmass = alpha / beta;
-  }
-
-  else {
+  } else {
     throw std::invalid_argument("Unrecognized mixing prior");
   }
+}
+
+void MixtureFiniteMixing::init_V(unsigned int n, double gamma,
+                                 double lambda) const {
+  for (unsigned int t = 0; t < n + 1; ++t) {
+    double v = 0;
+    for (unsigned int k = 1; k < 10000; ++k) {
+      double log_num = std::log(k);
+      double log_den = std::log(gamma * k);
+      for (unsigned int jj = 1; jj < t; ++jj) {
+        log_num += std::log(k - jj);
+      }
+      for (unsigned int jjj = 1; jjj < n; ++jjj) {
+        log_den += std::log(gamma * k + jjj);
+      }
+      v += std::exp(log_num - log_den + stan::math::poisson_lpmf(k, lambda) +
+                    1000);
+    }
+    std::cout << v << std::endl;
+    V.push_back(v);
+  }
+  check = true;
 }

@@ -73,6 +73,9 @@ class MixtureFiniteMixing
   //! Initializes state parameters to appropriate values
   void initialize_state() override;
 
+ protected:
+  void init_V(unsigned int n, double gamma, double lambda) const;
+
   mutable std::vector<double> V{};
 
   mutable bool check = false;
