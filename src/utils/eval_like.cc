@@ -32,7 +32,7 @@ Eigen::MatrixXd internal::eval_lpdf_parallel_fullmemory(
   bayesmix::AlgorithmState base_state;
   std::vector<std::shared_ptr<google::protobuf::Message>> chain =
       collector->get_whole_chain(&base_state);
-  auto chain_shards = bayesmix::gen_even_slices(chain, njobs);
+  auto chain_shards = bayesmix::internal::gen_even_slices(chain, njobs);
   std::vector<Eigen::MatrixXd> lpdfs(njobs);
 
 #pragma omp parallel for

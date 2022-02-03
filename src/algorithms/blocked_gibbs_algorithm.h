@@ -24,7 +24,6 @@ class BlockedGibbsAlgorithm : public ConditionalAlgorithm {
   std::shared_ptr<BaseAlgorithm> clone() override {
     auto out = std::make_shared<BlockedGibbsAlgorithm>(*this);
     out->set_mixing(mixing->clone());
-    out->set_mixing(mixing->clone());
     out->set_hierarchy(unique_values[0]->deep_clone());
     return out;
   }
