@@ -2,10 +2,9 @@
 
 namespace bayesmix {
 
-Eigen::MatrixXd eval_lpdf_parallel(std::shared_ptr<BaseAlgorithm> algo,
-                                   BaseCollector *const collector,
-                                   const Eigen::MatrixXd &grid,
-                                   int chunk_size) {
+Eigen::MatrixXd internal::eval_lpdf_parallel_lowmemory(
+    std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
+    const Eigen::MatrixXd &grid, int chunk_size) {
   std::vector<Eigen::VectorXd> lpdfs;
   bool keep = true;
   do {
@@ -27,9 +26,9 @@ Eigen::MatrixXd eval_lpdf_parallel(std::shared_ptr<BaseAlgorithm> algo,
   return out;
 }
 
-Eigen::MatrixXd eval_lpdf_parallel2(std::shared_ptr<BaseAlgorithm> algo,
-                                    BaseCollector *const collector,
-                                    const Eigen::MatrixXd &grid, int njobs) {
+Eigen::MatrixXd internal::eval_lpdf_parallel_fullmemory(
+    std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
+    const Eigen::MatrixXd &grid, int njobs) {
   bayesmix::AlgorithmState base_state;
   std::vector<std::shared_ptr<google::protobuf::Message>> chain =
       collector->get_whole_chain(&base_state);
