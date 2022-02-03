@@ -6,10 +6,10 @@ algo_id: "Neal3"
 rng_seed: 20201124
 
 # Number of iterations of the algorithm
-iterations: 1100
+iterations: 11
 
 # Number of initial iterations discarded by the algorithm
-burnin: 100
+burnin: 1
 
 # Number of clusters in which data will be first initialized
 # (NOTE: If you wish to initialize one datum per cluster, please write 0.)
