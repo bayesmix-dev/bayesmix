@@ -23,7 +23,7 @@ struct State {
   Eigen::VectorXd mu, psi;
   Eigen::MatrixXd eta, lambda;
   Eigen::DiagonalMatrix<double, Eigen::Dynamic> psi_inverse;
-  Eigen::LLT<Eigen::MatrixXd> prec_chol;
+  Eigen::LLT<Eigen::MatrixXd> cov_chol;
   double prec_logdet;
 };
 

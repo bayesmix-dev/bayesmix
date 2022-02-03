@@ -16,7 +16,7 @@
 
 double MFAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
-  double base =  (Eigen::MatrixXd(state.prec_chol.matrixL()))
+  double base =  (Eigen::MatrixXd(state.cov_chol.matrixL()))
                         .diagonal()
                         .array()
                         .log()
@@ -24,7 +24,7 @@ double MFAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
                 NEG_LOG_SQRT_TWO_PI * dim;
   double exp =
       0.5 * ((datum.transpose() - state.mu)
-           .dot(state.prec_chol.solve((datum.transpose() - state.mu))));
+           .dot(state.cov_chol.solve((datum.transpose() - state.mu))));
   return - (base + exp);
 }
 
@@ -54,7 +54,7 @@ MFA::State MFAHierarchy::draw(const MFA::Hyperparams& params) {
   }
 
   out.psi_inverse = out.psi.cwiseInverse().asDiagonal();
-  out.prec_chol = (out.lambda * out.lambda.transpose() +
+  out.cov_chol = (out.lambda * out.lambda.transpose() +
                    Eigen::MatrixXd(out.psi.asDiagonal()))
                       .llt();
 
@@ -68,7 +68,7 @@ void MFAHierarchy::initialize_state() {
   state.eta = Eigen::MatrixXd::Zero(card, hypers->q);
   state.lambda = Eigen::MatrixXd::Zero(dim, hypers->q);
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
-  state.prec_chol = (state.lambda * state.lambda.transpose() +
+  state.cov_chol = (state.lambda * state.lambda.transpose() +
                      Eigen::MatrixXd(state.psi.asDiagonal()))
                         .llt();
 }
@@ -167,7 +167,7 @@ void MFAHierarchy::set_state_from_proto(
   state.eta = bayesmix::to_eigen(statecast.mfa_state().eta());
   state.lambda = bayesmix::to_eigen(statecast.mfa_state().lambda());
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
-  state.prec_chol = (state.lambda * state.lambda.transpose() +
+  state.cov_chol = (state.lambda * state.lambda.transpose() +
                      Eigen::MatrixXd(state.psi.asDiagonal()))
                         .llt();
   set_card(statecast.cardinality());
@@ -322,7 +322,7 @@ void MFAHierarchy::sample_psi() {
                                              hypers->beta[j] + sum / 2, rng);
   }
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
-  state.prec_chol = (state.lambda * state.lambda.transpose() +
+  state.cov_chol = (state.lambda * state.lambda.transpose() +
                      Eigen::MatrixXd(state.psi.asDiagonal()))
                         .llt();
 }
