@@ -2,6 +2,20 @@
 
 namespace bayesmix {
 
+Eigen::MatrixXd eval_lpdf_parallel(std::shared_ptr<BaseAlgorithm> algo,
+                                   BaseCollector *const collector,
+                                   const Eigen::MatrixXd &grid,
+                                   bool low_memory, int njobs,
+                                   int chunk_size) {
+  if (low_memory) {
+    return bayesmix::internal::eval_lpdf_parallel_lowmemory(algo, collector,
+                                                            grid, chunk_size);
+  } else {
+    return bayesmix::internal::eval_lpdf_parallel_fullmemory(algo, collector,
+                                                             grid, njobs);
+  }
+}
+
 Eigen::MatrixXd internal::eval_lpdf_parallel_lowmemory(
     std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
     const Eigen::MatrixXd &grid, int chunk_size) {

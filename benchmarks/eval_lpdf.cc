@@ -42,7 +42,7 @@ Eigen::MatrixXd get_grid(int dim) {
   return out;
 }
 
-static void BM_eval_lpdf_memory_read_seq(benchmark::State& state) {
+static void BM_eval_lpdf_memory_seq(benchmark::State& state) {
   int dim = state.range(0);
   Eigen::MatrixXd grid = get_grid(dim);
   std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
@@ -54,7 +54,7 @@ static void BM_eval_lpdf_memory_read_seq(benchmark::State& state) {
   }
 }
 
-static void BM_eval_lpdf_memory_read_par(benchmark::State& state) {
+static void BM_eval_lpdf_memory_par_lowmem(benchmark::State& state) {
   int dim = state.range(0);
   Eigen::MatrixXd grid = get_grid(dim);
   std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
@@ -62,11 +62,12 @@ static void BM_eval_lpdf_memory_read_par(benchmark::State& state) {
   algo->set_data(get_data(dim));
   algo->run(&collector);
   for (auto _ : state) {
-    bayesmix::internal::eval_lpdf_parallel_lowmemory(algo, &collector, grid);
+    bayesmix::internal::eval_lpdf_parallel_lowmemory(algo, &collector, grid,
+                                                     100);
   }
 }
 
-static void BM_eval_lpdf_memory_read_par2(benchmark::State& state) {
+static void BM_eval_lpdf_memory_par_fullmem(benchmark::State& state) {
   int dim = state.range(0);
   Eigen::MatrixXd grid = get_grid(dim);
   std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
@@ -79,31 +80,49 @@ static void BM_eval_lpdf_memory_read_par2(benchmark::State& state) {
   }
 }
 
-// static void BM_eval_lpdf_memory_noread(benchmark::State& state) {
-//   int dim = state.range(0);
-//   std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
-//   Eigen::MatrixXd grid = get_grid(dim);
-//   MemoryCollector collector;
-//   collector.read_from_file<bayesmix::AlgorithmState>(
-//       get_chain_file("Neal2", dim));
-//   for (auto _ : state) {
-//       bayesmix::eval_lpdf_parallel(algo, &collector, grid);
-//   }
-// }
+static void BM_eval_lpdf_file_seq(benchmark::State& state) {
+  int dim = state.range(0);
+  Eigen::MatrixXd grid = get_grid(dim);
+  std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
+  FileCollector collector(get_chain_file("Neal2", dim));
+  algo->set_data(get_data(dim));
+  algo->run(&collector);
+  for (auto _ : state) {
+    std::cout << "one" << std::endl;
+    algo->eval_lpdf(&collector, grid);
+  }
+}
 
-// static void BM_eval_lpdf_file(benchmark::State& state) {
-//   int dim = state.range(0);
-//   std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
-//   Eigen::MatrixXd grid = get_grid(dim);
-//   FileCollector collector(get_chain_file("Neal2", dim));
-//   for (auto _ : state) {
-//     bayesmix::eval_lpdf_parallel(algo, &collector, grid);
-//   }
-// }
+static void BM_eval_lpdf_file_par_lowmem(benchmark::State& state) {
+  int dim = state.range(0);
+  Eigen::MatrixXd grid = get_grid(dim);
+  std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
+  FileCollector collector(get_chain_file("Neal2", dim));
+  algo->set_data(get_data(dim));
+  algo->run(&collector);
+  for (auto _ : state) {
+    bayesmix::internal::eval_lpdf_parallel_lowmemory(algo, &collector, grid,
+                                                     100);
+  }
+}
 
-BENCHMARK(BM_eval_lpdf_memory_read_seq)->Arg(1)->Arg(2);
-BENCHMARK(BM_eval_lpdf_memory_read_par)->Arg(1)->Arg(2);
-BENCHMARK(BM_eval_lpdf_memory_read_par2)->Arg(1)->Arg(2);
+static void BM_eval_lpdf_file_par_fullmem(benchmark::State& state) {
+  int dim = state.range(0);
+  Eigen::MatrixXd grid = get_grid(dim);
+  std::shared_ptr<BaseAlgorithm> algo = get_algorithm("Neal2", dim);
+  FileCollector collector(get_chain_file("Neal2", dim));
+  algo->set_data(get_data(dim));
+  algo->run(&collector);
+  for (auto _ : state) {
+    bayesmix::internal::eval_lpdf_parallel_fullmemory(algo, &collector, grid,
+                                                      8);
+  }
+}
 
-// BENCHMARK(BM_eval_lpdf_memory_noread)->Arg(1)->Arg(2);
-// BENCHMARK(BM_eval_lpdf_file)->Arg(1)->Arg(2);
+BENCHMARK(BM_eval_lpdf_memory_seq)->Arg(1)->Arg(2);
+BENCHMARK(BM_eval_lpdf_memory_par_lowmem)->Arg(1)->Arg(2);
+BENCHMARK(BM_eval_lpdf_memory_par_fullmem)->Arg(1)->Arg(2);
+
+BENCHMARK(BM_eval_lpdf_file_seq)->Arg(1)->Arg(2);
+BENCHMARK(BM_eval_lpdf_file_par_lowmem)->Arg(1)->Arg(2);
+BENCHMARK(BM_eval_lpdf_file_par_fullmem)->Arg(1)->Arg(2);
