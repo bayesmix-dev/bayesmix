@@ -17,7 +17,7 @@ The aforementioned script executes the following command:
     --coll-name resources/tutorial/out/chains.recordio \
     --data-file resources/tutorial/data.csv \
     --grid-file resources/tutorial/grid.csv \
-    --dens-file resources/tutorial/out/density_file.csv \
+    --dens-file resources/tutorial/out/density.csv \
     --n-cl-file resources/tutorial/out/numclust.csv \
     --clus-file resources/tutorial/out/clustering.csv
 
@@ -81,7 +81,7 @@ The output of the program should look something like this:
   Computing log-density...
   [============================================================] 100% 1.164s
   Done
-  Successfully wrote density to resources/tutorial/out/density_file.csv
+  Successfully wrote density to resources/tutorial/out/density.csv
   Successfully wrote number of clusters to resources/tutorial/out/numclust.csv
   Successfully wrote cluster allocations to resources/tutorial/out/clustering.csv
   End of run_mcmc.cc
