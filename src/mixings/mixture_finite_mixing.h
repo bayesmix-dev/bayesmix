@@ -14,7 +14,7 @@
 
 namespace Mixture_Finite {
 struct State {
-  double totalmass, logtotmass;
+  double lambda, gamma;
 };
 };  // namespace Mixture_Finite
 
@@ -86,10 +86,10 @@ class MixtureFiniteMixing
   mutable bool V_is_initialized = false;
 
   //! Initializes V to a vector of -1 of length n+1 and C
-  void init_V_C(unsigned int n, double gamma, double lambda) const;
+  void init_V_C(unsigned int n) const;
 
   //! Computes V_n[t] and stores it in V
-  void compute_V_t(double t, unsigned int n, double gamma, double lambda) const;
+  void compute_V_t(double t, unsigned int n) const;
 
 };
 

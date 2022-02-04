@@ -2,22 +2,13 @@
 
 #include <google/protobuf/stubs/casts.h>
 
-#include <Eigen/Dense>
 #include <memory>
-#include <stan/math/prim.hpp>
 #include <stan/math/prim/prob.hpp>
 #include <vector>
 
-#include "algorithm_state.pb.h"
-#include "hierarchy_prior.pb.h"
-#include "ls_state.pb.h"
-#include "matrix.pb.h"
 #include "mixing_prior.pb.h"
 #include "mixing_state.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
-#include "src/utils/distributions.h"
-#include "src/utils/eigen_utils.h"
-#include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
 void MixtureFiniteMixing::update_state(
@@ -29,22 +20,6 @@ void MixtureFiniteMixing::update_state(
 
   if (priorcast->has_fixed_value()) {
     return;
-  } else if (priorcast->has_gamma_prior()) {
-    // Recover parameters
-    unsigned int k = unique_values.size();
-    double alpha = priorcast->gamma_prior().totalmass_prior().shape();
-    double beta = priorcast->gamma_prior().totalmass_prior().rate();
-    // Update state (see Neal (2000) for details)
-    double phi = stan::math::gamma_rng(state.totalmass + 1, n, rng);
-    double odds = (alpha + k - 1) / (n * (beta - log(phi)));
-    double prob = odds / (1 + odds);
-    double p = stan::math::uniform_rng(0.0, 1.0, rng);
-    if (p <= prob) {
-      state.totalmass = stan::math::gamma_rng(alpha + k, beta - log(phi), rng);
-    } else {
-      state.totalmass =
-          stan::math::gamma_rng(alpha + k - 1, beta - log(phi), rng);
-    }
   } else {
     throw std::invalid_argument("Unrecognized mixing prior");
   }
@@ -54,37 +29,35 @@ double MixtureFiniteMixing::mass_existing_cluster(
     const unsigned int n, const bool log, const bool propto,
     std::shared_ptr<AbstractHierarchy> hier,
     const unsigned int n_clust) const {
-  double gamma = 1;    //! Has to be a parameter
-  double lambda = 20;  //! Has to be a parameter
 
   if (!V_is_initialized) {
-    init_V_C(n+1,gamma,lambda);
+    init_V_C(n + 1);
   }
 
   double out;
   if (log) {
-    out = std::log(hier->get_card() + gamma);
+    out = std::log(hier->get_card() + state.gamma);
     if (!propto) {
-      if(V[n_clust + 1] < 0){
-        compute_V_t(n_clust + 1,n,gamma,lambda);
+      if (V[n_clust + 1] < 0) {
+        compute_V_t(n_clust + 1, n);
       }
-      if(V[n_clust] < 0){
-        compute_V_t(n_clust,n,gamma,lambda);
+      if (V[n_clust] < 0) {
+        compute_V_t(n_clust, n);
       }
-      out -= std::log(n - 1 + n_clust * gamma +
-                      (V[n_clust + 1] / V[n_clust] * gamma));
+      out -= std::log(n - 1 + n_clust * state.gamma +
+                      (V[n_clust + 1] / V[n_clust] * state.gamma));
     }
   } else {
-    out = hier->get_card() + gamma;
+    out = hier->get_card() + state.gamma;
     if (!propto) {
-      if(V[n_clust + 1] < 0){
-        compute_V_t(n_clust + 1,n,gamma,lambda);
+      if (V[n_clust + 1] < 0) {
+        compute_V_t(n_clust + 1, n);
       }
-      if(V[n_clust] < 0){
-        compute_V_t(n_clust,n,gamma,lambda);
+      if (V[n_clust] < 0) {
+        compute_V_t(n_clust, n);
       }
       out = out /
-            (n - 1 + n_clust * gamma + (V[n_clust + 1] / V[n_clust] * gamma));
+            (n - 1 + n_clust * state.gamma + (V[n_clust + 1] / V[n_clust] * state.gamma));
     }
   }
   return out;
@@ -93,32 +66,30 @@ double MixtureFiniteMixing::mass_existing_cluster(
 double MixtureFiniteMixing::mass_new_cluster(
     const unsigned int n, const bool log, const bool propto,
     const unsigned int n_clust) const {
-  double gamma = 1;    //! Has to be a parameter
-  double lambda = 20;  //! Has to be a parameter
 
   if (!V_is_initialized) {
-    init_V_C(n+1,gamma,lambda);
+    init_V_C(n + 1);
   }
 
   double out;
-  if(V[n_clust + 1] < 0){
-    compute_V_t(n_clust + 1,n,gamma,lambda);
+  if (V[n_clust + 1] < 0) {
+    compute_V_t(n_clust + 1, n);
   }
-  if(V[n_clust] < 0){
-    compute_V_t(n_clust,n,gamma,lambda);
+  if (V[n_clust] < 0) {
+    compute_V_t(n_clust, n);
   }
 
   if (log) {
-    out = std::log(V[n_clust + 1] / V[n_clust] * gamma);
+    out = std::log(V[n_clust + 1] / V[n_clust] * state.gamma);
     if (!propto) {
-      out -= std::log(n - 1 + n_clust * gamma +
-                      V[n_clust + 1] / V[n_clust] * gamma);
+      out -= std::log(n - 1 + n_clust * state.gamma +
+                      V[n_clust + 1] / V[n_clust] * state.gamma);
     }
   } else {
-    out = V[n_clust + 1] / V[n_clust] * gamma;
+    out = V[n_clust + 1] / V[n_clust] * state.gamma;
     if (!propto) {
       out = out /
-            (n - 1 + n_clust * gamma + V[n_clust + 1] / V[n_clust] * gamma);
+            (n - 1 + n_clust * state.gamma + V[n_clust + 1] / V[n_clust] * state.gamma);
     }
   }
   return out;
@@ -162,45 +133,42 @@ void MixtureFiniteMixing::initialize_state() {
   }
 }
 
-void MixtureFiniteMixing::init_V_C(unsigned int n, double gamma, double lambda) const {
-
-  V = std::vector<double>(n,-1);
+void MixtureFiniteMixing::init_V_C(unsigned int n) const {
+  V = std::vector<double>(n, -1);
   V_is_initialized = true;
 
   // Compute C = first term of the sum of V_n(0)
   double log_num = 0;
-  double log_den = std::log(gamma);
+  double log_den = std::log(state.gamma);
   for (unsigned int i = 1; i < n; ++i) {
-    log_den += std::log(gamma * 1 + i);
+    log_den += std::log(state.gamma * 1 + i);
   }
-  C = log_num - log_den + stan::math::poisson_lpmf(1, lambda);
+  C = log_num - log_den + stan::math::poisson_lpmf(1, state.lambda);
 }
 
-void MixtureFiniteMixing::compute_V_t(double t, unsigned int n, double gamma, double lambda) const{
-
+void MixtureFiniteMixing::compute_V_t(double t, unsigned int n) const {
   double v = 0;
   unsigned int k = 1;
   double last_term_sum_rate = 1;
-  while (last_term_sum_rate > 1e-4){
+  while (last_term_sum_rate > 1e-4) {
     double log_num = std::log(k);
-    double log_den = std::log(gamma * k);
+    double log_den = std::log(state.gamma * k);
 
     for (unsigned int i = 1; i < t; ++i) {
       log_num += std::log(k - i);
     }
     for (unsigned int i = 1; i < n; ++i) {
-      log_den += std::log(gamma * k + i);
+      log_den += std::log(state.gamma * k + i);
     }
 
-    if(v == 0){
+    if (v == 0) {
       last_term_sum_rate = 1;
     } else {
       last_term_sum_rate = std::exp(log_num - log_den +
-                                    stan::math::poisson_lpmf(k, lambda) - C) /
+                                    stan::math::poisson_lpmf(k, state.lambda) - C) /
                            v;
     }
-    v += std::exp(log_num - log_den + stan::math::poisson_lpmf(k, lambda) -
-                  C);
+    v += std::exp(log_num - log_den + stan::math::poisson_lpmf(k, state.lambda) - C);
     ++k;
   }
   V[t] = v;

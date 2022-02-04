@@ -21,13 +21,8 @@ message DPPrior {
 }
 
 message MFMPrior {
-  message GammaPrior {
-    GammaDistribution totalmass_prior = 1;
-  }
-
   oneof totalmass {
-    DPState fixed_value = 1; // No prior, just a fixed value
-    GammaPrior gamma_prior = 2; // Gamma prior on the total mass
+    MFMState fixed_value = 1; // No prior, just a fixed value
   }
 }
 
