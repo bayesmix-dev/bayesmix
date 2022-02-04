@@ -42,7 +42,8 @@ message AlgorithmState {
       NIGDistribution nnig_state = 2;
       NWDistribution nnw_state = 3;
       MultiNormalIGDistribution lin_reg_uni_state = 4;
-      MFAPriorDistribution mfa_state = 7; //TODO change name
+      LapNIGState lapnig_state = 6;
+      MFAPriorDistribution mfa_state = 7;
     }
   }
   HierarchyHypers hierarchy_hypers = 5; // The current values of the hyperparameters of the hierarchy

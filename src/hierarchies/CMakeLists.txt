@@ -11,4 +11,6 @@ target_sources(bayesmix
     nnw_hierarchy.cc
     mfa_hierarchy.h
     mfa_hierarchy.cc
+    lapnig_hierarchy.h
+    lapnig_hierarchy.cc
 )

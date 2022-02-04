@@ -1,5 +1,5 @@
 #include "io_utils.h"
-#include <iostream>
+
 #include <Eigen/Dense>
 #include <fstream>
 #include <iostream>
@@ -36,6 +36,7 @@ Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename,
       }
     }
   }
+
   // Reset file stream to the beginning of the file
   filestream.clear();
   filestream.seekg(0, std::ios::beg);
