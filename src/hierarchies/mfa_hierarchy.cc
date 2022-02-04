@@ -16,16 +16,16 @@
 
 double MFAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
-  double base =  (Eigen::MatrixXd(state.cov_chol.matrixL()))
-                        .diagonal()
-                        .array()
-                        .log()
-                        .sum() -
+  double base = (Eigen::MatrixXd(state.cov_chol.matrixL()))
+                    .diagonal()
+                    .array()
+                    .log()
+                    .sum() -
                 NEG_LOG_SQRT_TWO_PI * dim;
   double exp =
       0.5 * ((datum.transpose() - state.mu)
-           .dot(state.cov_chol.solve((datum.transpose() - state.mu))));
-  return - (base + exp);
+                 .dot(state.cov_chol.solve((datum.transpose() - state.mu))));
+  return -(base + exp);
 }
 
 MFA::State MFAHierarchy::draw(const MFA::Hyperparams& params) {
@@ -55,8 +55,8 @@ MFA::State MFAHierarchy::draw(const MFA::Hyperparams& params) {
 
   out.psi_inverse = out.psi.cwiseInverse().asDiagonal();
   out.cov_chol = (out.lambda * out.lambda.transpose() +
-                   Eigen::MatrixXd(out.psi.asDiagonal()))
-                      .llt();
+                  Eigen::MatrixXd(out.psi.asDiagonal()))
+                     .llt();
 
   return out;
 }
@@ -69,8 +69,8 @@ void MFAHierarchy::initialize_state() {
   state.lambda = Eigen::MatrixXd::Zero(dim, hypers->q);
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
   state.cov_chol = (state.lambda * state.lambda.transpose() +
-                     Eigen::MatrixXd(state.psi.asDiagonal()))
-                        .llt();
+                    Eigen::MatrixXd(state.psi.asDiagonal()))
+                       .llt();
 }
 
 void MFAHierarchy::initialize_hypers() {
@@ -121,7 +121,7 @@ void MFAHierarchy::initialize_hypers() {
     if (hypers->alpha0 <= 0) {
       throw std::invalid_argument("Scale parameter must be > 0");
     }
-    if (hypers->phi <= 0) {  // TODO check
+    if (hypers->phi <= 0) {
       throw std::invalid_argument("Diffusion parameter must be > 0");
     }
     if (hypers->q <= 0) {
@@ -168,8 +168,8 @@ void MFAHierarchy::set_state_from_proto(
   state.lambda = bayesmix::to_eigen(statecast.mfa_state().lambda());
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
   state.cov_chol = (state.lambda * state.lambda.transpose() +
-                     Eigen::MatrixXd(state.psi.asDiagonal()))
-                        .llt();
+                    Eigen::MatrixXd(state.psi.asDiagonal()))
+                       .llt();
   set_card(statecast.cardinality());
 }
 
@@ -287,26 +287,6 @@ void MFAHierarchy::sample_lambda() {
 
 void MFAHierarchy::sample_psi() {
   auto& rng = bayesmix::Rng::Instance().get();
-  /*//(LAMBDA*ETA^T)^T = ETA*LAMBDA^T  (dim*q q*card)^T
-  //(data.rowwise()-mu-LAMBDA*ETA^T).square().colwise().sum()
-  Eigen::MatrixXd lambda_eta(state.eta * state.lambda.transpose());
-  Eigen::MatrixXd tempdata(card, dim);
-  auto iterator = cluster_data_idx.begin();
-  for (size_t i = 0; i < card;
-       i++, iterator++) {  // TODO use slicing when Eigen is updated to v3.4
-    tempdata.row(i) = dataset_ptr->row(*iterator);
-  }
-
-
-  Eigen::VectorXd sum =
-      (((tempdata - lambda_eta).rowwise() -
-  state.mu.transpose()).array().square()) .colwise() .sum();
-  std::cout<<sum<<std::endl;
-
-  for (size_t j = 0; j < dim; j++) {
-    state.psi[j] = stan::math::inv_gamma_rng(
-        hypers->alpha0 + card / 2, hypers->beta[j] + sum[j] / 2, rng);
-  }*/
 
   for (size_t j = 0; j < dim; j++) {
     double sum = 0;
@@ -323,6 +303,6 @@ void MFAHierarchy::sample_psi() {
   }
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
   state.cov_chol = (state.lambda * state.lambda.transpose() +
-                     Eigen::MatrixXd(state.psi.asDiagonal()))
-                        .llt();
+                    Eigen::MatrixXd(state.psi.asDiagonal()))
+                       .llt();
 }
