@@ -112,6 +112,6 @@ void DirichletMixing::initialize_state() {
   }
 
   else {
-    throw std::invalid_argument("Uunrecognized mixing prior");
+    throw std::invalid_argument("Unrecognized mixing prior");
   }
 }

@@ -98,14 +98,15 @@ double MixtureFiniteMixing::mass_new_cluster(
 void MixtureFiniteMixing::set_state_from_proto(
     const google::protobuf::Message &state_) {
   auto &statecast = downcast_state(state_);
-  state.totalmass = statecast.mfm_state().totalmass();
-  state.logtotmass = std::log(state.totalmass);
+  state.lambda = statecast.mfm_state().lambda();
+  state.gamma = statecast.mfm_state().gamma();
 }
 
 std::shared_ptr<bayesmix::MixingState> MixtureFiniteMixing::get_state_proto()
     const {
   bayesmix::MFMState state_;
-  state_.set_totalmass(state.totalmass);
+  state_.set_lambda(state.lambda);
+  state_.set_gamma(state.gamma);
   auto out = std::make_shared<bayesmix::MixingState>();
   out->mutable_mfm_state()->CopyFrom(state_);
   return out;
@@ -114,20 +115,14 @@ std::shared_ptr<bayesmix::MixingState> MixtureFiniteMixing::get_state_proto()
 void MixtureFiniteMixing::initialize_state() {
   auto priorcast = cast_prior();
   if (priorcast->has_fixed_value()) {
-    state.totalmass = priorcast->fixed_value().totalmass();
-    if (state.totalmass <= 0) {
-      throw std::invalid_argument("Total mass parameter must be > 0");
+    state.lambda = priorcast->fixed_value().lambda();
+    state.gamma = priorcast->fixed_value().gamma();
+    if (state.lambda <= 0) {
+      throw std::invalid_argument("Poisson rate lambda must be > 0");
     }
-  } else if (priorcast->has_gamma_prior()) {
-    double alpha = priorcast->gamma_prior().totalmass_prior().shape();
-    double beta = priorcast->gamma_prior().totalmass_prior().rate();
-    if (alpha <= 0) {
-      throw std::invalid_argument("Shape parameter must be > 0");
+    if (state.gamma <= 0) {
+      throw std::invalid_argument("Dirichlet parameter gamma must be > 0");
     }
-    if (beta <= 0) {
-      throw std::invalid_argument("Rate parameter must be > 0");
-    }
-    state.totalmass = alpha / beta;
   } else {
     throw std::invalid_argument("Unrecognized mixing prior");
   }
