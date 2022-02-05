@@ -125,6 +125,7 @@ void SplitAndMergeAlgorithm::compute_C_launch(const unsigned int i,
   cl[1]->add_datum(j, data.row(j), true);
 }
 
+// in cl (vettore di due celle) ci saranno anche i a j
 void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned int j){
     if(allocations[i]==allocations[j]) { 
       std::vector<unsigned int> clSplit (allocations.size()); 
@@ -187,12 +188,32 @@ void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned
                                             
                                               }
       const double p1=1/q;
-       // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j
-      const double p2=factorial(data_j->get_card()-1-1)*factorial(data_i->get_card()-1-1)/(S.size()+2-1)*hierarchy.alpha; //alpha da fissare
+       // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j (+1 finale perchè usiamo la funzione gamma)
+      const double p2=tgamma(data_j->get_card()-1-1+1)*tgamma(data_i->get_card()-1-1+1)/(S.size()+2-1)*hierarchy.alpha; //alpha da fissare
       const double p3=std::exp(p_i+p_j-p_J); 
       const double AcRa=std::min(1,p1*p2*p3) //acceptance ratio 
-      if(accepted_proposal(AcRa)) allocations=clSplit;
+      if(accepted_proposal(AcRa)){
+        unique_values.push_back(unique_values[0]->clone());
+        for(unsigned int k=0; k<clSplit.size(); k++){
+          
+          if(allocations[k]!=clSplit[k]){ //it should happen only when we pass data from labj to labi
+            if(unique_values[allocations[k]]->get_card()<=1){ //just to be sure, if all data end up in labi
+              remove_singleton(allocations[k]);
+              unique_values[clSplit[k]-1]->add_datum(k, data.row(k), update_hierarchy_params()); //new label is always shifted back since it's the new one
+              allocations[k]=clSplit[k]-1;
+              break;  //no more data cluster to update
+            }
+            
+            else{
+              unique_values[allocations[k]]->remove_datum(k, data.row(k), update_hierarchy_params());
+              unique_values[clSplit[k]]->add_datum(k, data.row(k), update_hierarchy_params());
+              allocations[k]=clSplit[k];
+            }
+            
+          }
+        }
       }
+    }
   else{
     std::vector<unsigned int> clMerge (allocations.size()); 
     std::shared_ptr<AbstractHierarchy> data_i()= unique_values[0]->clone();
@@ -292,20 +313,35 @@ void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned
         
       const double p1=q;
        // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j
-      const double p2=factorial(data_i->get_card()-1-1)*factorial(data_j->get_card()-1-1)/(S.size()+2-1)*hierarchy.alpha; //fissare alpha
+      const double p2=tgamma(data_i->get_card()-1-1+1)*tgamma(data_j->get_card()-1-1+1)/(S.size()+2-1)*hierarchy.alpha; //fissare alpha
       const double p3=std::exp(-p_i-p_j+p_J); 
       const double AcRa=std::min(1,p1*p2*p3) //acceptance ratio 
-      if(accepted_proposal(AcRa)) allocations=clMerge;
+      if(accepted_proposal(AcRa)){
+        for(unsigned int k=0; k<allocations.size(),k++){
+          if(allocations[k]==LabI){
+            
+            if(unique_values[LabI]->get_card()<=1){
+              remove_singleton(LabI);
+              unique_values[allocations[j]]->add_datum(k,data.row(k),update_hierarchy_params()); // allocations is already updated, also for j
+              allocations[k]=allocations[j];
+              break;
+            }
+            else unique_values[LAbI]->remove_datum(k,data.row(k),update_hierarchy_params());  //REVIEW: we don't have to update params since we are only interested
+                                                                                                       //in deleting cluster LabI right?
+            unique_values[allocations[j]]->add_datum(k,data.row(k),update_hierarchy_params()); // here we can update only at the last iteration maybe?
+            allocations[k]=allocations[j];
+          }
+        }
       }
+    } //close for
     
 }
 
-
-
 bool SplitAndMergeAlgorithm::accepted_proposal(const double acRa) const{
-    std::default_random_engine generator;
+    // std::default_random_engine generator; //old generator
+    
     std::uniform_real_distribution<> UnifDis(0.0, 1.0);
-    return (UnifDis(generator)<=acRa);
+    return (UnifDis(bayesmix::Rng::Instance().get())<=acRa);
                                                                         }
 
 double SplitAndMergeAlgorithm::restricted_GS(const unsigned int i, 
