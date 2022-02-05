@@ -74,12 +74,11 @@ class MixtureFiniteMixing
   void initialize_state() override;
 
  protected:
-
   //! Vector V needed to cumpute the probabilities of a new or existing cluster
   mutable std::vector<double> V{};
 
-  //! Constant that is multipied by each value of V for numerical reasons, it is
-  //! computed as the first term of the series of V_n[0].
+  //! Constant that is multipied by each value of V for numerical reasons, it
+  //! is computed as the first term of the series of V_n[0].
   mutable double C;
 
   //! Checks if V has been initialized by init_V_C
@@ -90,7 +89,6 @@ class MixtureFiniteMixing
 
   //! Computes V_n[t] and stores it in V
   void compute_V_t(double t, unsigned int n) const;
-
 };
 
 #endif  // BAYESMIX_MIXINGS_MIXTURE_FINITE_MIXTURES_H_
