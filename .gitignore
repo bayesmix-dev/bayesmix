@@ -16,7 +16,7 @@ sftp-config.json
 *.local.*
 # MacOS storage files
 .DS_Store
-# .idea folder
+#CLion cash
 .idea/
 # Build debug folder
 cmake-build-debug/
