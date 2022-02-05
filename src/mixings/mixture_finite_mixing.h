@@ -82,10 +82,10 @@ class MixtureFiniteMixing
   //! computed as the first term of the series of V_n[0].
   mutable double C;
 
-  //! Checks if V has been initialized by init_V
-  mutable bool V_is_initialized = false;
+  //! Checks if V has been initialized by init_V_C
+  mutable bool V_C_are_initialized = false;
 
-  //! Initializes V to a vector of -1 of length n+1 and C
+  //! Initializes V to a vector of -1 of length n+1 and computes and assigns C
   void init_V_C(unsigned int n) const;
 
   //! Computes V_n[t] and stores it in V
