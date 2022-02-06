@@ -190,7 +190,7 @@ void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned
       const double p1=1/q;
       const double alpha=DirichletMixing::mass_new_cluster(n=allocations.size(), log=false,
                                          propto=true,
-                                         n_clust=LabI+1) //LabI should be number of clusters - 1
+                                         n_clust=LabI+1) //LabI should be number of clusters - 1, alternatively unique_values.size()
        // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j (+1 finale perchè usiamo la funzione gamma)
       const double p2=tgamma(data_j->get_card()-1-1+1)*tgamma(data_i->get_card()-1-1+1)/(S.size()+2-1)*alpha;
       const double p3=std::exp(p_i+p_j-p_J); 
