@@ -127,104 +127,95 @@ void SplitAndMergeAlgorithm::compute_C_launch(const unsigned int i,
 
 // in cl (vettore di due celle) ci saranno anche i a j
 void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned int j){
-    if(allocations[i]==allocations[j]) { 
-      std::vector<unsigned int> clSplit (allocations.size()); 
-      std::shared_ptr<AbstractHierarchy> data_i()= unique_values[0]->clone();
-      std::shared_ptr<AbstractHierarchy> data_j()= unique_values[0]->clone();  
-      std::shared_ptr<AbstractHierarchy> data_J()= unique_values[0]->clone();
-      double p_i=0; 
-      double p_j=0;
-      double p_J=0;
-      
-      clSplit[i]=LabI;
-      clSplit[j]=allocations[j];
-      double q=std::exp(restricted_GS(i,j,true));
-      unsigned int z=0;
-      std::set<int> set_i=cl[0]->get_data_idx();
-      std::set<int> set_j=cl[1]->get_data_idx();
-      std::set<int>::const_iterator iter_i=set_i.cbegin();
-      std::set<int>::const_iterator iter_j=set_j.cbegin();
-      for(unsigned int k=0; k < clSplit.size(); k++){
-          if(((z<S.size())and(k==S[z]))or((k==i)or(k==j)){ //since S doesn't contain i and j but we put them in data_i or data_j
-            if(*iter_i==k){
-              if (!data_i->get_card()){ //first iteration
-                p_i+=data_i->prior_pred_lpdf(data.row(k));
-                                      }
-              else{
-                p_i+=data_i->conditional_pred_lpdf(data.row(k));
-                  }
-              data_i->add_datum(k, data.row(k), update_hierarchy_params());    
-              iter_i++;
-              clSplit[k]=LabI;
-                              }
-            else{
-              if (!data_j->get_card()){ //first iteration
-                p_j+=data_j->prior_pred_lpdf(data.row(k));
-                                      }
-              else{
-                p_j+=data_j->conditional_pred_lpdf(data.row(k));
-                  }
-              data_j->add_datum(k, data.row(k), update_hierarchy_params());
-              iter_j++;
-              clSplit[k]=allocations[j];
-                 }
-            
-            if((k!=i)and(k!=j)) z++;
-                                                           }
-          else{
-            
-            clSPlit[k]=allocations[k];
-                             
-              }
-          if(allocations[k]==allocations[j]){
-            if(!data_J->get_card()){
-              p_J+=data_J->prior_pred_lpdf(data.row(k));
-                              }
-            else{
-              p_J+=data_J->conditional_pred_lpdf(data.row(k));
-                }
-            data_J->add_datum(k, data.row(k), update_hierarchy_params());
-                                            }
-                                            
-                                              }
-      const double p1=1/q;
-      const double alpha=DirichletMixing::mass_new_cluster(n=allocations.size(), log=false,
-                                         propto=true,
-                                         n_clust=LabI+1) //LabI should be number of clusters - 1, alternatively unique_values.size()
-       // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j (+1 finale perchè usiamo la funzione gamma)
-      const double p2=tgamma(data_j->get_card()-1-1+1)*tgamma(data_i->get_card()-1-1+1)/(S.size()+2-1)*alpha;
-      const double p3=std::exp(p_i+p_j-p_J); 
-      const double AcRa=std::min(1,p1*p2*p3) //acceptance ratio 
-      if(accepted_proposal(AcRa)){
-        unique_values.push_back(unique_values[0]->clone());
-        for(unsigned int k=0; k<clSplit.size(); k++){
-          
-          if(allocations[k]!=clSplit[k]){ //it should happen only when we pass data from labj to labi
-            if(unique_values[allocations[k]]->get_card()<=1){ //just to be sure, if all data end up in labi
-              remove_singleton(allocations[k]);
-              unique_values[clSplit[k]-1]->add_datum(k, data.row(k), update_hierarchy_params()); //new label is always shifted back since it's the new one
-              allocations[k]=clSplit[k]-1;
-              break;  //no more data cluster to update
-            }
-            
-            else{
-              unique_values[allocations[k]]->remove_datum(k, data.row(k), update_hierarchy_params());
-              unique_values[clSplit[k]]->add_datum(k, data.row(k), update_hierarchy_params());
-              allocations[k]=clSplit[k];
-            }
-            
-          }
-        }
-      }
-    }
-  else{
-    std::vector<unsigned int> clMerge (allocations.size()); 
-    std::shared_ptr<AbstractHierarchy> data_i()= unique_values[0]->clone();
-    std::shared_ptr<AbstractHierarchy> data_j()= unique_values[0]->clone();  
-    std::shared_ptr<AbstractHierarchy> data_J()= unique_values[0]->clone();
+  if(allocations[i]==allocations[j]){ 
+    std::vector<unsigned int> clSplit (allocations.size()); 
+    std::shared_ptr<AbstractHierarchy> data_i(unique_values[0]->clone());
+    std::shared_ptr<AbstractHierarchy> data_j(unique_values[0]->clone());  
+    std::shared_ptr<AbstractHierarchy> data_J(unique_values[0]->clone());
     double p_i=0; 
     double p_j=0;
     double p_J=0;
+    unsigned int LabI = allocations[i];
+    
+    clSplit[i]=LabI;
+    clSplit[j]=allocations[j];
+    double q=std::exp(restricted_GS(i,j,true));
+    unsigned int z=0;
+    std::set<int> set_i=cl[0]->get_data_idx();
+    std::set<int> set_j=cl[1]->get_data_idx();
+    std::set<int>::const_iterator iter_i=set_i.cbegin();
+    std::set<int>::const_iterator iter_j=set_j.cbegin();
+    for(unsigned int k=0; k < clSplit.size(); k++){
+      if(((z<S.size())and(k==S[z]))or((k==i)or(k==j))){ //since S doesn't contain i and j but we put them in data_i or data_j
+        if(*iter_i==k){
+          if (!data_i->get_card()){ //first iteration
+            p_i+=data_i->prior_pred_lpdf(data.row(k));
+          }else{
+            p_i+=data_i->conditional_pred_lpdf(data.row(k));
+          }
+          data_i->add_datum(k, data.row(k), update_hierarchy_params());    
+          iter_i++;
+          clSplit[k]=LabI;
+        }else{
+          if (!data_j->get_card()){ //first iteration
+            p_j+=data_j->prior_pred_lpdf(data.row(k));
+          }else{
+            p_j+=data_j->conditional_pred_lpdf(data.row(k));
+          }
+          data_j->add_datum(k, data.row(k), update_hierarchy_params());
+          iter_j++;
+          clSplit[k]=allocations[j];
+        }
+        if((k!=i)and(k!=j)) z++;
+      }else{
+        clSplit[k]=allocations[k];                   
+      }
+      if(allocations[k]==allocations[j]){
+        if(!data_J->get_card()){
+          p_J+=data_J->prior_pred_lpdf(data.row(k));
+        }else{
+          p_J+=data_J->conditional_pred_lpdf(data.row(k));
+        }
+        data_J->add_datum(k, data.row(k), update_hierarchy_params());
+      }                             
+    }
+    const double p1=1/q;
+    const double alpha=mixing->get_mass_new_cluster(allocations.size(), false,
+                                       true, LabI+1); //LabI should be number of clusters - 1, alternatively unique_values.size()
+     // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j (+1 finale perchè usiamo la funzione gamma)
+    const double p2=tgamma(data_j->get_card()-1-1+1)*tgamma(data_i->get_card()-1-1+1)/(S.size()+2-1)*alpha;
+    const double p3=std::exp(p_i+p_j-p_J); 
+    const double AcRa=std::min(1.0,p1*p2*p3); //acceptance ratio 
+    if(accepted_proposal(AcRa)){
+      unique_values.push_back(unique_values[0]->clone());
+      for(unsigned int k=0; k<clSplit.size(); k++){
+        
+        if(allocations[k]!=clSplit[k]){ //it should happen only when we pass data from labj to labi
+          if(unique_values[allocations[k]]->get_card()<=1){ //just to be sure, if all data end up in labi
+            remove_singleton(allocations[k]);
+            unique_values[clSplit[k]-1]->add_datum(k, data.row(k), update_hierarchy_params()); //new label is always shifted back since it's the new one
+            allocations[k]=clSplit[k]-1;
+            break;  //no more data cluster to update
+          }
+          
+          else{
+            unique_values[allocations[k]]->remove_datum(k, data.row(k), update_hierarchy_params());
+            unique_values[clSplit[k]]->add_datum(k, data.row(k), update_hierarchy_params());
+            allocations[k]=clSplit[k];
+          }
+          
+        }
+      }
+    }
+  }else{
+    std::vector<unsigned int> clMerge (allocations.size()); 
+    std::shared_ptr<AbstractHierarchy> data_i(unique_values[0]->clone());
+    std::shared_ptr<AbstractHierarchy> data_j(unique_values[0]->clone());  
+    std::shared_ptr<AbstractHierarchy> data_J(unique_values[0]->clone());
+    double p_i=0; 
+    double p_j=0;
+    double p_J=0;
+    unsigned int LabI = allocations[i];
      
     clMerge[i]=allocations[j];
     clMerge[j]=allocations[j];
@@ -233,122 +224,106 @@ void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned
     std::set<int>::const_iterator iter_i=set_i.cbegin();
     std::set<int>::const_iterator iter_j=set_j.cbegin();
     unsigned int z=0;
-     for(unsigned int k=0; k < clMerge.size(); k++){
-          if(((z<S.size())and(k==S[z]))or((k==i)or(k==j)){
-            if(*iter_i==k){
-              if (!data_i->get_card()){ //first iteration
-                p_i+=data_i->prior_pred_lpdf(data.row(k));
-                                 }
-              else{
-                p_i+=data_i->conditional_pred_lpdf(data.row(k));
-                  }
-              data_i->add_datum(k, data.row(k), update_hierarchy_params());
-              iter_i++;
-                          }
-            else{
-              if (!data_j->get_card()){ //first iteration
-                p_j+=data_j->prior_pred_lpdf(data.row(k)); 
-                                 }
-              else{
-                p_j+=data_j->conditional_pred_lpdf(data.row(k));
-                  }
-              data_j->add_datum(k, data.row(k), update_hierarchy_params());
-              iter_j++;
-                 }
-            
-            clMerge[k]=allocations[j];
-            if((k!=i)and(k!=j))z++;
-            
-                                      }      
-          else{
-          
-            clMerge[k]=allocations[k];
-                             
-              }
-          if(allocations[k]==allocations[j]){
-            if(!data_J->get_card()){
-              p_J+=data_J->prior_pred_lpdf(data.row(k));
-                              }
-            else{
-              p_J+=data_J->conditional_pred_lpdf(data.row(k));
-                }
-              data_J->add_datum(k, data.row(k), update_hierarchy_params());
-              iter_J++;
-                                        }
-                                            
-                                              }
-      double q=1; 
-      //Fake Gibbs Sampling in order to compute the probability q
-      for(unsigned int k=0; k<S.size(); k++){
-        if(allocations_cl[k]){ //cluster j
-          cl[1]->remove_datum(S[k], data.row(S[k]), update_hierarchy_params());
-                             }
-        else{
-          cl[0]->remove_datum(S[k], data.row(S[k]), update_hierarchy_params());
-             }
-        if(cl[0]->get_card()>=1 and cl[1]->get_card()>=1){
-          double p_i=cl[0]->conditional_pred_lpdf(data.row(S[k]));
-          double p_j=cl[1]->conditional_pred_lpdf(data.row(S[k]));
-                                }
-        else{
-          if(cl[1]->get_card()==0){
-            double p_j=cl[1]->prior_pred_lpdf(data.row(S[k]));
-            double p_i=cl[0]->conditional_pred_lpdf(data.row(S[k]));
-                                   }
-          else{
-             double p_i=cl[0]->prior_pred_lpdf(data.row(S[k]));
-             double p_j=cl[1]->conditional_pred_lpdf(data.row(S[k]));
-               }  
-            }
-     
-        double p=(p_i)/(p_i + p_j);
-        if(allocations[S[k]]==allocations[i]){
-          allocations_cl[k]=0;
-          cl[0]->add_datum(S[k], data.row(S[k]), update_hierarchy_params());
-          q=q*p;
-                                             }
-        else{
-          allocations_cl[k]=1;
-          cl[1]->add_datum(S[k], data.row(S[k]), update_hierarchy_params());
-          q=q*(1-p);
-            }
-                                             }
-        
-      const double p1=q;
-      const double alpha=DirichletMixing::mass_new_cluster(n=allocations.size(), log=false,
-                                         propto=true,
-                                         n_clust=unique_values.size())
-       // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j
-      const double p2=tgamma(data_i->get_card()-1-1+1)*tgamma(data_j->get_card()-1-1+1)/(S.size()+2-1)*alpha;
-      const double p3=std::exp(-p_i-p_j+p_J); 
-      const double AcRa=std::min(1,p1*p2*p3) //acceptance ratio 
-      if(accepted_proposal(AcRa)){
-        for(unsigned int k=0; k<allocations.size(),k++){
-          if(allocations[k]==LabI){
-            
-            if(unique_values[LabI]->get_card()<=1){
-              remove_singleton(LabI);
-              unique_values[allocations[j]]->add_datum(k,data.row(k),update_hierarchy_params()); // allocations is already updated, also for j
-              allocations[k]=allocations[j];
-              break;
-            }
-            else unique_values[LAbI]->remove_datum(k,data.row(k),update_hierarchy_params());  //REVIEW: we don't have to update params since we are only interested
-                                                                                                       //in deleting cluster LabI right?
-            unique_values[allocations[j]]->add_datum(k,data.row(k),update_hierarchy_params()); // here we can update only at the last iteration maybe?
-            allocations[k]=allocations[j];
+    for(unsigned int k=0; k < clMerge.size(); k++){
+      if(((z<S.size())and(k==S[z]))or((k==i)or(k==j))){
+        if(*iter_i==k){
+          if (!data_i->get_card()){ //first iteration
+            p_i+=data_i->prior_pred_lpdf(data.row(k));
+          }else{
+            p_i+=data_i->conditional_pred_lpdf(data.row(k));
           }
+          data_i->add_datum(k, data.row(k), update_hierarchy_params());
+          iter_i++;
+        }else{
+          if (!data_j->get_card()){ //first iteration
+            p_j+=data_j->prior_pred_lpdf(data.row(k)); 
+          }
+          else{
+            p_j+=data_j->conditional_pred_lpdf(data.row(k));
+          }
+          data_j->add_datum(k, data.row(k), update_hierarchy_params());
+          iter_j++;
+        }
+        clMerge[k]=allocations[j];
+        if((k!=i)and(k!=j))z++;                                 
+      }else{
+        clMerge[k]=allocations[k];              
+      }
+      if(allocations[k]==allocations[j]){
+        if(!data_J->get_card()){
+          p_J+=data_J->prior_pred_lpdf(data.row(k));
+        }else{
+          p_J+=data_J->conditional_pred_lpdf(data.row(k));
+        }
+        data_J->add_datum(k, data.row(k), update_hierarchy_params());
+      }                                    
+    }
+    double q=1; 
+    //Fake Gibbs Sampling in order to compute the probability q
+    for(unsigned int k=0; k<S.size(); k++){
+      if(allocations_cl[k]){ //cluster j
+        cl[1]->remove_datum(S[k], data.row(S[k]), update_hierarchy_params());
+      }else{
+        cl[0]->remove_datum(S[k], data.row(S[k]), update_hierarchy_params());
+      }
+      if(cl[0]->get_card()>=1 and cl[1]->get_card()>=1){
+        double p_i=cl[0]->conditional_pred_lpdf(data.row(S[k]));
+        double p_j=cl[1]->conditional_pred_lpdf(data.row(S[k]));
+      }else{
+        if(cl[1]->get_card()==0){
+          double p_j=cl[1]->prior_pred_lpdf(data.row(S[k]));
+          double p_i=cl[0]->conditional_pred_lpdf(data.row(S[k]));
+        }else{
+           double p_i=cl[0]->prior_pred_lpdf(data.row(S[k]));
+           double p_j=cl[1]->conditional_pred_lpdf(data.row(S[k]));
+        }  
+      }
+   
+      double p=(p_i)/(p_i + p_j);
+      if(allocations[S[k]]==allocations[i]){
+        allocations_cl[k]=0;
+        cl[0]->add_datum(S[k], data.row(S[k]), update_hierarchy_params());
+        q=q*p;
+      }else{
+        allocations_cl[k]=1;
+        cl[1]->add_datum(S[k], data.row(S[k]), update_hierarchy_params());
+        q=q*(1-p);
+      }
+    }
+        
+    const double p1=q;
+    const double alpha=mixing->get_mass_new_cluster(allocations.size(), false,
+                                       true,unique_values.size());
+     // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j
+    const double p2=tgamma(data_i->get_card()-1-1+1)*tgamma(data_j->get_card()-1-1+1)/(S.size()+2-1)*alpha;
+    const double p3=std::exp(-p_i-p_j+p_J); 
+    const double AcRa=std::min(1.0,p1*p2*p3); //acceptance ratio 
+    if(accepted_proposal(AcRa)){
+      for(unsigned int k=0; k<allocations.size();k++){
+        if(allocations[k]==LabI){
+          
+          if(unique_values[LabI]->get_card()<=1){
+            remove_singleton(LabI);
+            unique_values[allocations[j]]->add_datum(k,data.row(k),update_hierarchy_params()); // allocations is already updated, also for j
+            allocations[k]=allocations[j];
+            break;
+          }
+          else unique_values[LabI]->remove_datum(k,data.row(k),update_hierarchy_params());  //REVIEW: we don't have to update params since we are only interested
+                                                                                                     //in deleting cluster LabI right?
+          unique_values[allocations[j]]->add_datum(k,data.row(k),update_hierarchy_params()); // here we can update only at the last iteration maybe?
+          allocations[k]=allocations[j];
         }
       }
-    } //close for
-    
+    }
+  } //close for  
 }
 
 bool SplitAndMergeAlgorithm::accepted_proposal(const double acRa) const{
-    // std::default_random_engine generator; //old generator
-    
-    std::uniform_real_distribution<> UnifDis(0.0, 1.0);
-    return (UnifDis(bayesmix::Rng::Instance().get())<=acRa);
-                                                                        }
+  // std::default_random_engine generator; //old generator
+  
+  std::uniform_real_distribution<> UnifDis(0.0, 1.0);
+  return (UnifDis(bayesmix::Rng::Instance().get())<=acRa);
+}
 
 double SplitAndMergeAlgorithm::restricted_GS(const unsigned int i, 
   const unsigned int j, bool return_log_res_prod/*=false*/){
