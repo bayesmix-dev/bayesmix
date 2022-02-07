@@ -88,9 +88,6 @@ void SplitAndMergeAlgorithm::compute_S(const unsigned int i, const unsigned int 
     unsigned int index=0;
     for (int k = 0; k < allocations.size(); ++k) {
         if ((allocations[k]==allocations[i]||allocations[k]==allocations[j])&& (k!=i) && (k!=j)) {
-            if (index>=lengthS)
-                std::cerr<< "Index out of bounds. index="<<index
-                    <<",lengthS="<<lengthS<< ", i="<<i<<", j="<<j<<std::endl;
             S[index]=k;
             index++;
         }
@@ -126,7 +123,6 @@ void SplitAndMergeAlgorithm::compute_C_launch(const unsigned int i,
   cl[1]->add_datum(j, data.row(j), true);
 }
 
-// in cl (vettore di due celle) ci saranno anche i a j
 void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned int j){
   if(allocations[i]==allocations[j]){  
     std::vector<unsigned int> clSplit (allocations.size()); 
@@ -183,28 +179,34 @@ void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned
     const double p1=1/q;
     const double alpha=mixing->get_mass_new_cluster(allocations.size(), false,
                                        true, LabI+1); //LabI should be number of clusters - 1, alternatively unique_values.size()
-     // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j (+1 finale perchè usiamo la funzione gamma)
+    // data_i->get_card()-1 = n. of data with LabelI different from i, data_j->get_card()-1= n. of data with LabelJ different from j (+1 because we are using gamma function)
     const double p2=tgamma(data_j->get_card()-1-1+1)*tgamma(data_i->get_card()-1-1+1)/(S.size()+2-1)*alpha;
     const double p3=std::exp(p_i+p_j-p_J); 
     const double AcRa=std::min(1.0,p1*p2*p3); //acceptance ratio 
     if(accepted_proposal(AcRa)){
       unique_values.push_back(unique_values[0]->clone());
-      for(unsigned int k=0; k<clSplit.size(); k++){
-        
+      unsigned int n_movements = data_i->get_card();
+      bool update = false;
+      for(unsigned int k=0; n_movements>0 && k<clSplit.size(); k++){
         if(allocations[k]!=clSplit[k]){ //it should happen only when we pass data from labj to labi
           if(unique_values[allocations[k]]->get_card()<=1){ //just to be sure, if all data end up in labi
             remove_singleton(allocations[k]);
-            unique_values[clSplit[k]-1]->add_datum(k, data.row(k), update_hierarchy_params()); //new label is always shifted back since it's the new one
+            unique_values[clSplit[k]-1]->add_datum(k, data.row(k), update_hierarchy_params()); //new label is always shifted back since it's the greatest
             allocations[k]=clSplit[k]-1;
             break;  //no more data cluster to update
           }
           
-          else{
-            unique_values[allocations[k]]->remove_datum(k, data.row(k), update_hierarchy_params());
-            unique_values[clSplit[k]]->add_datum(k, data.row(k), update_hierarchy_params());
-            allocations[k]=clSplit[k];
+          /* We update the posterior parameters only at the last insertion to 
+           * ease computations.
+           */
+          if(n_movements==1){
+            update=update_hierarchy_params();
           }
-          
+          unique_values[allocations[k]]->remove_datum(k, data.row(k), update);
+          unique_values[clSplit[k]]->add_datum(k, data.row(k), update);
+          allocations[k]=clSplit[k];
+
+          n_movements--;
         }
       }
     }
@@ -295,7 +297,7 @@ void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned
     const double p1=q;
     const double alpha=mixing->get_mass_new_cluster(allocations.size(), false,
                                        true,unique_values.size());
-     // data_i->get_card()-1 = n. di dati con LabelI senza i, data_j->get_card()-1= n. di dati con label j senza j
+    // data_i->get_card()-1 = n. of data with LabelI different from i, data_j->get_card()-1= n. of data with LabelJ different from j (+1 because we are using gamma function)
     const double p2=tgamma(data_i->get_card()-1-1+1)*tgamma(data_j->get_card()-1-1+1)/(S.size()+2-1)*alpha;
     const double p3=std::exp(-p_i-p_j+p_J); 
     const double AcRa=std::min(1.0,p1*p2*p3); //acceptance ratio 
@@ -304,14 +306,18 @@ void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned
         if(allocations[k]==LabI){
           
           if(unique_values[LabI]->get_card()<=1){
+            // Last datum to be moved from i's cluster to j's cluster.
             remove_singleton(LabI);
             unique_values[allocations[j]]->add_datum(k,data.row(k),update_hierarchy_params()); // allocations is already updated, also for j
             allocations[k]=allocations[j];
             break;
           }
-          else unique_values[LabI]->remove_datum(k,data.row(k),update_hierarchy_params());  //REVIEW: we don't have to update params since we are only interested
-                                                                                                     //in deleting cluster LabI right?
-          unique_values[allocations[j]]->add_datum(k,data.row(k),update_hierarchy_params()); // here we can update only at the last iteration maybe?
+        
+          /* We update the posterior parameters only at the last insertion to 
+           * ease computations.
+           */ 
+          unique_values[LabI]->remove_datum(k,data.row(k),false);                                                                                                     
+          unique_values[allocations[j]]->add_datum(k,data.row(k),false);
           allocations[k]=allocations[j];
         }
       }
@@ -320,8 +326,6 @@ void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned
 }
 
 bool SplitAndMergeAlgorithm::accepted_proposal(const double acRa) const{
-  // std::default_random_engine generator; //old generator
-  
   std::uniform_real_distribution<> UnifDis(0.0, 1.0);
   return (UnifDis(bayesmix::Rng::Instance().get())<=acRa);
 }

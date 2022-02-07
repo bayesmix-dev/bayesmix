@@ -53,11 +53,8 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
 
   void compute_C_launch(const unsigned int i, const unsigned int j);
 
-  // The function is void because we update the allocation labels directly 
-  // inside the function.
   void split_or_merge(const unsigned int i, const unsigned int j);
 
-  // This function was __MH in Python
   bool accepted_proposal(const double acRa) const;
 
   void full_GS();
