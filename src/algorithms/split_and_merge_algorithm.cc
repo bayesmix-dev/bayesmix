@@ -38,9 +38,9 @@ void SplitAndMergeAlgorithm::sample_allocations(){
     unsigned int n_data = data.rows();
 
     // Sample i and j from the datapoints
-    Eigen::VectorXd probas = Eigen::VectorXd::Constant(n_data, 1/n_data);
+    Eigen::VectorXd probas = Eigen::VectorXd::Constant(n_data, 1.0/n_data);
     unsigned int i = bayesmix::categorical_rng(probas, rng, 0);
-    probas = Eigen::VectorXd::Constant(n_data-1, 1/(n_data-1));
+    probas = Eigen::VectorXd::Constant(n_data-1, 1.0/(n_data-1));
     unsigned int j = bayesmix::categorical_rng(probas, rng, 0);
     if(j>=i){
       j++;
@@ -61,6 +61,7 @@ void SplitAndMergeAlgorithm::sample_allocations(){
   for(unsigned int k=0; k<M; ++k){
     full_GS();
   }
+  
 }
 
 void SplitAndMergeAlgorithm::sample_unique_values(){
@@ -76,8 +77,8 @@ Eigen::VectorXd SplitAndMergeAlgorithm::lpdf_marginal_component(
 }
 
 void SplitAndMergeAlgorithm::compute_S(const unsigned int i, const unsigned int j) {
-    unsigned int lengthS;
-    for(int k; k<allocations.size(); k++){
+    unsigned int lengthS=0;
+    for(int k=0; k<allocations.size(); k++){
         if(allocations[k]==allocations[i]||allocations[k]==allocations[j])
             lengthS++;
     }
@@ -127,7 +128,7 @@ void SplitAndMergeAlgorithm::compute_C_launch(const unsigned int i,
 
 // in cl (vettore di due celle) ci saranno anche i a j
 void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned int j){
-  if(allocations[i]==allocations[j]){ 
+  if(allocations[i]==allocations[j]){  
     std::vector<unsigned int> clSplit (allocations.size()); 
     std::shared_ptr<AbstractHierarchy> data_i(unique_values[0]->clone());
     std::shared_ptr<AbstractHierarchy> data_j(unique_values[0]->clone());  
@@ -135,7 +136,7 @@ void SplitAndMergeAlgorithm::split_or_merge(const unsigned int i, const unsigned
     double p_i=0; 
     double p_j=0;
     double p_J=0;
-    unsigned int LabI = allocations[i];
+    unsigned int LabI = unique_values.size();
     
     clSplit[i]=LabI;
     clSplit[j]=allocations[j];
