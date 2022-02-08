@@ -85,7 +85,7 @@ class MixtureFiniteMixing
   mutable bool V_C_are_initialized = false;
 
   //! Initializes V to a vector of -1 of length n+1 and computes and assigns C
-  void init_V_C(unsigned int n) const;
+  void init_V_and_C(unsigned int n) const;
 
   //! Computes V_n[t] and stores it in V
   void compute_V_t(double t, unsigned int n) const;

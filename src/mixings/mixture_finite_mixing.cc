@@ -30,7 +30,7 @@ double MixtureFiniteMixing::mass_existing_cluster(
     std::shared_ptr<AbstractHierarchy> hier,
     const unsigned int n_clust) const {
   if (!V_C_are_initialized) {
-    init_V_C(n + 2);
+    init_V_and_C(n + 2);
   }
 
   // If prop to is false we will need V[n_clust] and V[n_clust+1] to compute
@@ -65,7 +65,7 @@ double MixtureFiniteMixing::mass_new_cluster(
     const unsigned int n, const bool log, const bool propto,
     const unsigned int n_clust) const {
   if (!V_C_are_initialized) {
-    init_V_C(n + 2);
+    init_V_and_C(n + 2);
   }
 
   double out;
@@ -125,19 +125,20 @@ void MixtureFiniteMixing::initialize_state() {
   }
 }
 
-void MixtureFiniteMixing::init_V_C(unsigned int n) const {
-  // Initialized V
+void MixtureFiniteMixing::init_V_and_C(unsigned int n) const {
+  // Initialize V
   V = std::vector<double>(n, -1);
 
-  // Compute C = log(first term of the series of V_n(0)), all the values of V
-  // that are computed are multiplied by exp(-C) to avoid ending up  with
-  // values bigger than the largest number that can be contained in a double
+  // The values of V grow fast enough to become bigger than the largest
+  // number that can be contained in double, in order to avoid that introduce
+  // C as the first term (the largest) of the series and multiply all the
+  // elements of the series with exp(-C)
 
   double log_den = std::log(state.gamma);
   for (unsigned int i = 1; i < n; ++i) {
     log_den += std::log(state.gamma * 1 + i);
   }
-  C = -log_den + stan::math::poisson_lpmf(1, state.lambda);
+  C = -log_den + stan::math::poisson_lpmf(0, state.lambda);
 
   V_C_are_initialized = true;
 }
@@ -168,12 +169,12 @@ void MixtureFiniteMixing::compute_V_t(double t, unsigned int n) const {
     } else {
       last_term_sum_rate =
           std::exp(log_num - log_den +
-                   stan::math::poisson_lpmf(k, state.lambda) - C) /
+                   stan::math::poisson_lpmf(k - 1, state.lambda) - C) /
           sum;
     }
 
     sum += std::exp(log_num - log_den +
-                    stan::math::poisson_lpmf(k, state.lambda) - C);
+                    stan::math::poisson_lpmf(k - 1, state.lambda) - C);
     ++k;
   }
   V[t] = sum;
