@@ -12,6 +12,25 @@
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
+//! Class that represents the Mixture of Finite Mixtures (MFM) introduced in
+//! "Mixture Models with a Prior on the Number of Components" by by J.W.Miller
+//! and M.T.Harrison.
+//! Basic idea is to take usual finite mixture model with Dirichlet weights and
+//! put a prior (Poisson) on the number of components.
+//! The EPPF induced by MFM depends on a Dirichlet parameter 'gamma' and number
+//! V_n(t), where V_n(t) depends on the Poisson rate parameter 'lambda'.
+//!      V_n(t) = sum_{k=1}^{inf} ( k_(t)*p_K(k) / (gamma*k)^(n) )
+//! Given a clustering of n elements into k clusters, each with cardinality
+//! n_j, j=1, ..., k, the EPPF of the DP gives the following probabilities for
+//! the cluster membership of the (n+1)-th observation:
+//! denominator = n_j + gamma / (n + gamma*(n_clust + V[n_clust+1]/V[n_clust]))
+//!      p(j-th cluster | ...) = n_j + gamma / denominator
+//!      p(k+1-th cluster | ...) = V[n_clust+1]/V[n_clust] / denominator
+//! Since the V_n(t) numbers grow large enough to exceed the capacity of double
+//! we scale them with the exponent of -V_n(0), called C.
+//! For more information about the class, please refer instead to base
+//! classes, `AbstractMixing` and `BaseMixing`.
+
 namespace Mixture_Finite {
 struct State {
   double lambda, gamma;

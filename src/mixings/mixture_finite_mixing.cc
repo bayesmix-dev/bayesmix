@@ -131,7 +131,7 @@ void MixtureFiniteMixing::init_V_and_C(unsigned int n) const {
 
   // The values of V grow fast enough to become bigger than the largest
   // number that can be contained in double, in order to avoid that introduce
-  // C as the first term (the largest) of the series and multiply all the
+  // C as the first term of the series and multiply all the
   // elements of the series with exp(-C)
 
   double log_den = std::log(state.gamma);
@@ -148,10 +148,8 @@ void MixtureFiniteMixing::compute_V_t(double t, unsigned int n) const {
   unsigned int k = 1;
   double last_term_sum_rate =
       1;  // Rate between the last computed term of the series
-          // and the sum computed up to that point, this value
-          // is used to decide when to stop computing additional
-          // terms of the series
-
+          // and the sum computed up to that point. This value
+          // is used as a stopping criterion
   while (last_term_sum_rate > 1e-8) {
     double log_num = std::log(k);
     double log_den = std::log(state.gamma * k);
