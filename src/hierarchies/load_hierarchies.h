@@ -35,16 +35,17 @@ __attribute__((constructor)) static void load_hierarchies() {
   };
   Builder<AbstractHierarchy> MFAbuilder = []() {
     return std::make_shared<MFAHierarchy>();
-    Builder<AbstractHierarchy> LapNIGbuilder = []() {
-      return std::make_shared<LapNIGHierarchy>();
-    };
+  };
+  Builder<AbstractHierarchy> LapNIGbuilder = []() {
+    return std::make_shared<LapNIGHierarchy>();
+  };
 
-    factory.add_builder(LapNIGHierarchy().get_id(), LapNIGbuilder);
-    factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
-    factory.add_builder(NNIGHierarchy().get_id(), NNIGbuilder);
-    factory.add_builder(NNWHierarchy().get_id(), NNWbuilder);
-    factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
-    factory.add_builder(MFAHierarchy().get_id(), MFAbuilder);
-  }
+  factory.add_builder(LapNIGHierarchy().get_id(), LapNIGbuilder);
+  factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
+  factory.add_builder(NNIGHierarchy().get_id(), NNIGbuilder);
+  factory.add_builder(NNWHierarchy().get_id(), NNWbuilder);
+  factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
+  factory.add_builder(MFAHierarchy().get_id(), MFAbuilder);
+}
 
 #endif  // BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_H_
