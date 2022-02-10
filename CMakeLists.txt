@@ -20,7 +20,6 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 # Require PkgConfig
 find_package(PkgConfig REQUIRED)
 
-
 # TBB CMake integration
 message(STATUS "Using math TBB")
 # Define TBB_ROOT Folder
