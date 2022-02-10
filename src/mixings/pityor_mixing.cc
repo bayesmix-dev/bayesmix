@@ -23,9 +23,8 @@ void PitYorMixing::update_state(
 }
 
 double PitYorMixing::mass_existing_cluster(
-    const unsigned int n, const bool log, const bool propto,
-    std::shared_ptr<AbstractHierarchy> hier,
-    const unsigned int n_clust) const {
+    const unsigned int n, const unsigned int n_clust, const bool log,
+    const bool propto, std::shared_ptr<AbstractHierarchy> hier) const {
   double out;
   if (hier->get_card() == 0) {
     return log ? stan::math::NEGATIVE_INFTY : 0;
@@ -40,9 +39,10 @@ double PitYorMixing::mass_existing_cluster(
   return out;
 }
 
-double PitYorMixing::mass_new_cluster(const unsigned int n, const bool log,
-                                      const bool propto,
-                                      const unsigned int n_clust) const {
+double PitYorMixing::mass_new_cluster(const unsigned int n,
+                                      const unsigned int n_clust,
+                                      const bool log,
+                                      const bool propto) const {
   double out;
   if (log) {
     out = std::log(state.strength + state.discount * n_clust);

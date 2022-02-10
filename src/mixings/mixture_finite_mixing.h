@@ -30,6 +30,8 @@
 //! we scale them with the first term of V_n(0).
 //! For more information about the class, please refer instead to base
 //! classes, `AbstractMixing` and `BaseMixing`.
+//! [1] "Mixture Models with a Prior on the Number of Components", J.W.Miller
+//! and M.T.Harrison, 2015, arXiv:1502.06241v1.
 
 namespace Mixture_Finite {
 struct State {
@@ -74,10 +76,10 @@ class MixtureFiniteMixing
   //! @param propto     Whether to include normalizing constants or not
   //! @param hier       `Hierarchy` object representing the cluster
   //! @return           Probability value
-  double mass_existing_cluster(const unsigned int n, const bool log,
-                               const bool propto,
-                               std::shared_ptr<AbstractHierarchy> hier,
-                               const unsigned int n_clust) const override;
+  double mass_existing_cluster(
+      const unsigned int n, const unsigned int n_clust, const bool log,
+      const bool propto,
+      std::shared_ptr<AbstractHierarchy> hier) const override;
 
   //! Returns probability mass for a new cluster (for marginal mixings only)
   //! @param n          Total dataset size
@@ -85,9 +87,8 @@ class MixtureFiniteMixing
   //! @param propto     Whether to include normalizing constants or not
   //! @param n_clust    Current number of clusters
   //! @return           Probability value
-  double mass_new_cluster(const unsigned int n, const bool log,
-                          const bool propto,
-                          const unsigned int n_clust) const override;
+  double mass_new_cluster(const unsigned int n, const unsigned int n_clust,
+                          const bool log, const bool propto) const override;
 
   //! Initializes state parameters to appropriate values
   void initialize_state() override;

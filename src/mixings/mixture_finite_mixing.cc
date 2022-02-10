@@ -26,9 +26,8 @@ void MixtureFiniteMixing::update_state(
 }
 
 double MixtureFiniteMixing::mass_existing_cluster(
-    const unsigned int n, const bool log, const bool propto,
-    std::shared_ptr<AbstractHierarchy> hier,
-    const unsigned int n_clust) const {
+    const unsigned int n, const unsigned int n_clust, const bool log,
+    const bool propto, std::shared_ptr<AbstractHierarchy> hier) const {
   double out;
   double V1 = get_V_t(n_clust, n);
   double V2 = get_V_t(n_clust + 1, n);
@@ -47,9 +46,10 @@ double MixtureFiniteMixing::mass_existing_cluster(
   return out;
 }
 
-double MixtureFiniteMixing::mass_new_cluster(
-    const unsigned int n, const bool log, const bool propto,
-    const unsigned int n_clust) const {
+double MixtureFiniteMixing::mass_new_cluster(const unsigned int n,
+                                             const unsigned int n_clust,
+                                             const bool log,
+                                             const bool propto) const {
   double out;
   double V1 = get_V_t(n_clust, n);
   double V2 = get_V_t(n_clust + 1, n);
