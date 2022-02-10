@@ -82,9 +82,7 @@ class FAHierarchy : public BaseHierarchy<FAHierarchy, FA::State,
 
   //! Saves posterior hyperparameters to the corresponding class member
   void save_posterior_hypers() {
-    // TODO
-    /* posterior_hypers =
-        static_cast<Derived *>(this)->compute_posterior_hypers();*/
+    // No Hyperprior present in the hierarchy
   }
 
   //! Generates new state values from the centering posterior distribution

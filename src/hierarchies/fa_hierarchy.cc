@@ -62,7 +62,6 @@ FA::State FAHierarchy::draw(const FA::Hyperparams& params) {
 }
 
 void FAHierarchy::initialize_state() {
-  std::cout << "init state" << std::endl;
   state.mu = hypers->mutilde;
   state.psi = hypers->beta / (hypers->alpha0 + 1.);
   state.eta = Eigen::MatrixXd::Zero(card, hypers->q);
@@ -85,14 +84,10 @@ void FAHierarchy::initialize_hypers() {
 
     // Automatic initialization
     if (dim == 0) {
-      std::cout << "No mutilde found. Initializing with mean." << std::endl;
       hypers->mutilde = dataset_ptr->colwise().mean();
       dim = hypers->mutilde.size();
     }
     if (hypers->beta.size() == 0) {
-      std::cout << "No beta found. Initializing with scaled precision matrix "
-                   "diagonal."
-                << std::endl;
       Eigen::MatrixXd centered =
           dataset_ptr->rowwise() - dataset_ptr->colwise().mean();
       auto cov_llt = ((centered.transpose() * centered) /
