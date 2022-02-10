@@ -108,6 +108,9 @@ class MixtureFiniteMixing
 
   //! Computes V_n[t] and stores it in V
   void compute_V_t(double t, unsigned int n) const;
+
+  //! Gets V_n[t] or computes and stores it if it has not been computed before
+  double get_V_t(double t, unsigned int n) const;
 };
 
 #endif  // BAYESMIX_MIXINGS_MIXTURE_FINITE_MIXTURES_H_

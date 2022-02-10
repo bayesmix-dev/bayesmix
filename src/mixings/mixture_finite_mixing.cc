@@ -29,33 +29,19 @@ double MixtureFiniteMixing::mass_existing_cluster(
     const unsigned int n, const bool log, const bool propto,
     std::shared_ptr<AbstractHierarchy> hier,
     const unsigned int n_clust) const {
-  if (!V_C_are_initialized) {
-    init_V_and_C(n + 2);
-  }
-
-  // If prop to is false we will need V[n_clust] and V[n_clust+1] to compute
-  // the normalizing constant
-  if (!propto) {
-    if (V[n_clust + 1] < 0) {
-      compute_V_t(n_clust + 1, n + 1);
-    }
-    if (V[n_clust] < 0) {
-      compute_V_t(n_clust, n + 1);
-    }
-  }
-
   double out;
+  double V1 = get_V_t(n_clust, n);
+  double V2 = get_V_t(n_clust + 1, n);
+
   if (log) {
     out = std::log(hier->get_card() + state.gamma);
     if (!propto) {
-      out -= std::log(n + n_clust * state.gamma +
-                      (V[n_clust + 1] / V[n_clust] * state.gamma));
+      out -= std::log(n + n_clust * state.gamma + (V2 / V1 * state.gamma));
     }
   } else {
     out = hier->get_card() + state.gamma;
     if (!propto) {
-      out = out / (n + n_clust * state.gamma +
-                   (V[n_clust + 1] / V[n_clust] * state.gamma));
+      out = out / (n + n_clust * state.gamma + (V2 / V1 * state.gamma));
     }
   }
   return out;
@@ -64,29 +50,19 @@ double MixtureFiniteMixing::mass_existing_cluster(
 double MixtureFiniteMixing::mass_new_cluster(
     const unsigned int n, const bool log, const bool propto,
     const unsigned int n_clust) const {
-  if (!V_C_are_initialized) {
-    init_V_and_C(n + 2);
-  }
-
   double out;
-  if (V[n_clust + 1] < 0) {
-    compute_V_t(n_clust + 1, n + 1);
-  }
-  if (V[n_clust] < 0) {
-    compute_V_t(n_clust, n + 1);
-  }
+  double V1 = get_V_t(n_clust, n);
+  double V2 = get_V_t(n_clust + 1, n);
 
   if (log) {
-    out = std::log(V[n_clust + 1] / V[n_clust] * state.gamma);
+    out = std::log(V2 / V1 * state.gamma);
     if (!propto) {
-      out -= std::log(n + n_clust * state.gamma +
-                      V[n_clust + 1] / V[n_clust] * state.gamma);
+      out -= std::log(n + n_clust * state.gamma + V2 / V1 * state.gamma);
     }
   } else {
-    out = V[n_clust + 1] / V[n_clust] * state.gamma;
+    out = V2 / V1 * state.gamma;
     if (!propto) {
-      out = out / (n + n_clust * state.gamma +
-                   V[n_clust + 1] / V[n_clust] * state.gamma);
+      out = out / (n + n_clust * state.gamma + V2 / V1 * state.gamma);
     }
   }
   return out;
@@ -176,4 +152,14 @@ void MixtureFiniteMixing::compute_V_t(double t, unsigned int n) const {
     ++k;
   }
   V[t] = sum;
+}
+
+double MixtureFiniteMixing::get_V_t(double t, unsigned int n) const {
+  if (!V_C_are_initialized) {
+    init_V_and_C(n + 1);
+  }
+  if (V[t] < 0) {
+    compute_V_t(t, n + 1);
+  }
+  return V[t];
 }
