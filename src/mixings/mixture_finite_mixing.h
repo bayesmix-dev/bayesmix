@@ -12,9 +12,7 @@
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-//! Class that represents the Mixture of Finite Mixtures (MFM) introduced in
-//! "Mixture Models with a Prior on the Number of Components" by J.W.Miller
-//! and M.T.Harrison.
+//! Class that represents the Mixture of Finite Mixtures (MFM) [1]
 //! The basic idea is to take usual finite mixture model with Dirichlet weights
 //! and put a prior (Poisson) on the number of components. The EPPF induced by
 //! MFM depends on a Dirichlet parameter 'gamma' and number V_n(t), where
