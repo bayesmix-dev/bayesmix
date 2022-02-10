@@ -25,7 +25,7 @@ message AlgorithmState {
       MultiLSState multi_ls_state = 2; // State of a multivariate location-scale family
       LinRegUniLSState lin_reg_uni_ls_state = 4; // State of a linear regression univariate location-scale family
       Vector general_state = 5; // Just a vector of doubles
-      MFAState mfa_state = 6; // State of a Mixture of Factor Analysers
+      FAState fa_state = 6; // State of a Mixture of Factor Analysers
     }
     int32 cardinality = 3; // How many observations are in this cluster
   }
@@ -43,7 +43,7 @@ message AlgorithmState {
       NWDistribution nnw_state = 3;
       MultiNormalIGDistribution lin_reg_uni_state = 4;
       LapNIGState lapnig_state = 6;
-      MFAPriorDistribution mfa_state = 7;
+      FAPriorDistribution fa_state = 7;
     }
   }
   HierarchyHypers hierarchy_hypers = 5; // The current values of the hyperparameters of the hierarchy

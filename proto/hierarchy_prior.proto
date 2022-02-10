@@ -87,7 +87,7 @@ message LinRegUniPrior {
 }
 
 
- message MFAPriorDistribution {
+ message FAPriorDistribution {
   Vector mutilde = 1;
   Vector beta = 2;
   double phi = 3;
@@ -96,9 +96,9 @@ message LinRegUniPrior {
  }
 
 
-message MFAPrior {
+message FAPrior {
   oneof prior {
-    MFAPriorDistribution fixed_values = 1;
+    FAPriorDistribution fixed_values = 1;
   }
 }
 

@@ -11,5 +11,5 @@ enum HierarchyId {
     NNW = 2; // Normal - Normal Wishart
     LinRegUni = 3; // Linear Regression (univariate response)
     LapNIG = 4; // Laplace - Normal Inverse Gamma
-    MFA = 5; // Mixture of Factor Analysers
+    FA = 5; // Factor Analysers
 }

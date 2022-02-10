@@ -6,7 +6,7 @@
 #include "algorithm_state.pb.h"
 #include "ls_state.pb.h"
 #include "src/hierarchies/lin_reg_uni_hierarchy.h"
-#include "src/hierarchies/mfa_hierarchy.h"
+#include "src/hierarchies/fa_hierarchy.h"
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/hierarchies/nnw_hierarchy.h"
 #include "src/includes.h"
@@ -222,9 +222,9 @@ TEST(lin_reg_uni_hierarchy, misc) {
   }
 }
 
-TEST(mfahierarchy, draw) {
-  auto hier = std::make_shared<MFAHierarchy>();
-  bayesmix::MFAPrior prior;
+TEST(fahierarchy, draw) {
+  auto hier = std::make_shared<FAHierarchy>();
+  bayesmix::FAPrior prior;
   Eigen::VectorXd mutilde(4);
   mutilde << 3.0, 3.0, 4.0, 1.0;
   bayesmix::Vector mutilde_proto;
@@ -256,9 +256,9 @@ TEST(mfahierarchy, draw) {
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
 
-TEST(mfahierarchy, draw_auto) {
-  auto hier = std::make_shared<MFAHierarchy>();
-  bayesmix::MFAPrior prior;
+TEST(fahierarchy, draw_auto) {
+  auto hier = std::make_shared<FAHierarchy>();
+  bayesmix::FAPrior prior;
   Eigen::VectorXd mutilde(0);
   bayesmix::Vector mutilde_proto;
   bayesmix::to_proto(mutilde, &mutilde_proto);
@@ -293,9 +293,9 @@ TEST(mfahierarchy, draw_auto) {
       << clusval->DebugString() << clusval2->DebugString();
 }
 
-TEST(mfahierarchy, sample_given_data) {
-  auto hier = std::make_shared<MFAHierarchy>();
-  bayesmix::MFAPrior prior;
+TEST(fahierarchy, sample_given_data) {
+  auto hier = std::make_shared<FAHierarchy>();
+  bayesmix::FAPrior prior;
   Eigen::VectorXd mutilde(4);
   mutilde << 3.0, 3.0, 4.0, 1.0;
   bayesmix::Vector mutilde_proto;

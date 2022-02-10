@@ -8,7 +8,7 @@
 #include "hierarchy_id.pb.h"
 #include "lapnig_hierarchy.h"
 #include "lin_reg_uni_hierarchy.h"
-#include "mfa_hierarchy.h"
+#include "fa_hierarchy.h"
 #include "nnig_hierarchy.h"
 #include "nnw_hierarchy.h"
 #include "src/runtime/factory.h"
@@ -33,8 +33,8 @@ __attribute__((constructor)) static void load_hierarchies() {
   Builder<AbstractHierarchy> LinRegUnibuilder = []() {
     return std::make_shared<LinRegUniHierarchy>();
   };
-  Builder<AbstractHierarchy> MFAbuilder = []() {
-    return std::make_shared<MFAHierarchy>();
+  Builder<AbstractHierarchy> FAbuilder = []() {
+    return std::make_shared<FAHierarchy>();
   };
   Builder<AbstractHierarchy> LapNIGbuilder = []() {
     return std::make_shared<LapNIGHierarchy>();
@@ -44,8 +44,7 @@ __attribute__((constructor)) static void load_hierarchies() {
   factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
   factory.add_builder(NNIGHierarchy().get_id(), NNIGbuilder);
   factory.add_builder(NNWHierarchy().get_id(), NNWbuilder);
-  factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
-  factory.add_builder(MFAHierarchy().get_id(), MFAbuilder);
+  factory.add_builder(FAHierarchy().get_id(), FAbuilder);
 }
 
 #endif  // BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_H_
