@@ -24,12 +24,12 @@
 //! denominator = n_j + gamma / (n + gamma*(n_clust + V[n_clust+1]/V[n_clust]))
 //!      p(j-th cluster | ...) = (n_j + gamma) / denominator
 //!      p(k+1-th cluster | ...) = V[n_clust+1]/V[n_clust]*gamma / denominator
-//! Since the V_n(t) numbers grow large enough to exceed the capacity of double
-//! we scale them with the first term of V_n(0).
+//! For numerical reasons each value of V is multiplied with a constant  C
+//! computed as the first term of the series of V_n[0].
 //! For more information about the class, please refer instead to base
 //! classes, `AbstractMixing` and `BaseMixing`.
 //! [1] "Mixture Models with a Prior on the Number of Components", J.W.Miller
-//! and M.T.Harrison, 2015, arXiv:1502.06241v1.
+//! and M.T.Harrison, 2015, arXiv:1502.06241v1
 
 namespace Mixture_Finite {
 struct State {
