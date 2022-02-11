@@ -105,7 +105,7 @@ void MixtureFiniteMixing::init_V_and_C(unsigned int n) const {
   // Initialize V
   V = std::vector<double>(n, -1);
 
-  // The values of V grow fast enough to become bigger than the largest
+  // The values of V decrease fast enough to become smaller than the smallest
   // number that can be contained in double, in order to avoid that introduce
   // C as the first term of the series and multiply all the
   // elements of the series with exp(-C)
