@@ -19,7 +19,10 @@ message DPPrior {
     GammaPrior gamma_prior = 2; // Gamma prior on the total mass
   }
 }
-
+/*
+ * Prior for the Poisson rate and Dirichlet parameters of a MFM (Finite Dirichlet) process.
+ * For the moment, we only support fixed values
+ */
 message MFMPrior {
   oneof totalmass {
     MFMState fixed_value = 1; // No prior, just a fixed value

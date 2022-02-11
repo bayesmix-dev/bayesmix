@@ -34,6 +34,9 @@ message TruncSBState {
   Vector logweights = 2;
 }
 
+/*
+ * State of a MFM (Finite Dirichlet) process
+ */
 message MFMState {
   double lambda = 1; // rate parameter of Poisson prior on number of compunents of the MFM
   double gamma = 2; // parameter of the dirichlet distribution for the mixing weights
