@@ -1,5 +1,5 @@
 fixed_values {
-	    #Automatic initialization if size is 0. Use the syntax below to set hyperparameters manually.
+	    #Automatic initialization if size of parameters is 0. Use the syntax below to set hyperparameters manually.
   mutilde: {
     size:0
     data:[]
