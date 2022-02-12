@@ -11,4 +11,5 @@ enum MixingId {
     PY = 2; // Pitman-Yor Process
     LogSB = 3; // Logit Stick-Breaking Process
     TruncSB = 4; // Truncated Stick-Breaking Process
+    MFM = 5; // Mixture of finite mixtures
 }

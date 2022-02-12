@@ -1,0 +1,4 @@
+fixed_value {
+    lambda: 10
+    gamma: 1
+}

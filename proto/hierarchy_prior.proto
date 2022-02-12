@@ -32,6 +32,24 @@ message NNIGPrior {
 }
 
 /*
+ * Prior for the parameters of the base measure in a Laplace - Normal Inverse Gamma hierarchy
+ */
+message LapNIGState {
+    double mean = 1;
+    double var = 2;
+    double shape = 3;
+    double scale = 4;
+    double mh_mean_var = 5;
+    double mh_log_scale_var = 6;
+}
+
+message LapNIGPrior {
+  oneof prior {
+    LapNIGState fixed_values = 1;
+  }
+}
+
+/*
  * Prior for the parameters of the base measure in a Normal-Normal Wishart hierarchy
  */
 message NNWPrior {
@@ -65,6 +83,22 @@ message NNWPrior {
 message LinRegUniPrior {
   oneof prior {
     MultiNormalIGDistribution fixed_values = 1;
+  }
+}
+
+
+ message FAPriorDistribution {
+  Vector mutilde = 1;
+  Vector beta = 2;
+  double phi = 3;
+  double alpha0 = 4;
+  uint32 q = 5;
+ }
+
+
+message FAPrior {
+  oneof prior {
+    FAPriorDistribution fixed_values = 1;
   }
 }
 
