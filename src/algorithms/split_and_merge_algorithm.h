@@ -67,12 +67,6 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
   void split_or_merge(const unsigned int first_random_idx,
                       const unsigned int second_random_idx);
 
-  void split(const unsigned int first_random_idx,
-             const unsigned int second_random_idx);
-
-  void merge(const unsigned int first_random_idx,
-             const unsigned int second_random_idx);
-
   /* Updates unique_values and allocations when a split or a merge proposal
    * is accepted.
    */

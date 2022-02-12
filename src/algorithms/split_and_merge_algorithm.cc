@@ -225,40 +225,21 @@ void SplitAndMergeAlgorithm::compute_log_ratio_like_and_prior(
 void SplitAndMergeAlgorithm::split_or_merge(
     const unsigned int first_random_idx,
     const unsigned int second_random_idx) {
+  bool split = false;
   if (allocations[first_random_idx] == allocations[second_random_idx]) {
-    split(first_random_idx, second_random_idx);
-  } else {
-    merge(first_random_idx, second_random_idx);
+    split = true;
   }
-}
 
-void SplitAndMergeAlgorithm::split(const unsigned int first_random_idx,
-                                   const unsigned int second_random_idx) {
   double log_ratio_transition_prob =
-      -restricted_gibbs_sampling(first_random_idx, true);
+      restricted_gibbs_sampling(first_random_idx, true, !split);
 
-  double log_ratio_likelihoods = 0;
-  double log_ratio_prior_prob = 0;
-  compute_log_ratio_like_and_prior(first_random_idx, second_random_idx, true,
-                                   log_ratio_prior_prob,
-                                   log_ratio_likelihoods);
-
-  auto &rng = bayesmix::Rng::Instance().get();
-  const double log_arate =
-      log_ratio_transition_prob + log_ratio_prior_prob + log_ratio_likelihoods;
-  if (std::log(stan::math::uniform_rng(0, 1, rng)) < log_arate) {
-    proposal_update_allocations(first_random_idx, second_random_idx, true);
+  if (split) {
+    log_ratio_transition_prob *= -1;
   }
-}
-
-void SplitAndMergeAlgorithm::merge(const unsigned int first_random_idx,
-                                   const unsigned int second_random_idx) {
-  const double log_ratio_transition_prob =
-      restricted_gibbs_sampling(first_random_idx, true, true);
 
   double log_ratio_likelihoods = 0;
   double log_ratio_prior_prob = 0;
-  compute_log_ratio_like_and_prior(first_random_idx, second_random_idx, false,
+  compute_log_ratio_like_and_prior(first_random_idx, second_random_idx, split,
                                    log_ratio_prior_prob,
                                    log_ratio_likelihoods);
 
@@ -266,7 +247,7 @@ void SplitAndMergeAlgorithm::merge(const unsigned int first_random_idx,
   const double log_arate =
       log_ratio_transition_prob + log_ratio_prior_prob + log_ratio_likelihoods;
   if (std::log(stan::math::uniform_rng(0, 1, rng)) < log_arate) {
-    proposal_update_allocations(first_random_idx, second_random_idx, false);
+    proposal_update_allocations(first_random_idx, second_random_idx, split);
   }
 }
 
