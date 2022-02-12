@@ -30,8 +30,6 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
       const bayesmix::AlgorithmParams &params) override;
 
  protected:
-  void initialize() override;
-
   void print_startup_message() const override;
 
   /* We need to update the parameters when we add or remove a datum from a
@@ -75,8 +73,6 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
   void merge(const unsigned int first_random_idx,
              const unsigned int second_random_idx);
 
-  bool accepted_proposal(const double acRa) const;
-
   /* Updates unique_values and allocations when a split or a merge proposal
    * is accepted.
    */
@@ -103,8 +99,16 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
    * probability of the transition that restricted_gs_unique_values has done
    * in the function.
    * If return_log_res_prod is false, ignore the return value.
+   *
+   * If step_to_original_clust is true, the function moves all the points
+   * in restricted_gs_data_idx to their original clustering configuration.
+   * This step is used in the merge case to compute the transition probability
+   * from the restricted gibbs sampling state to the original split
+   * configuration.
    */
-  double restricted_gibbs_sampling(bool return_log_res_prod = false);
+  double restricted_gibbs_sampling(const double first_random_idx,
+                                   bool return_log_res_prod = false,
+                                   bool step_to_original_clust = false);
 
   /* Vector that contains the indexes of the data points that are considered
    * in the restricted Gibbs sampling.
