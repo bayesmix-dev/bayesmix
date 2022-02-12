@@ -15,16 +15,6 @@ void SplitAndMergeAlgorithm::read_params_from_proto(
   n_full_gs_updates = params.splitmerge_n_full_gs_updates();
 }
 
-void SplitAndMergeAlgorithm::initialize() {
-  MarginalAlgorithm::initialize();
-
-  if (mixing->get_id() != bayesmix::MixingId::DP) {
-    throw std::invalid_argument(
-        "Invalid mixing supplied to Split and Merge, only DP mixing "
-        "supported");
-  }
-}
-
 void SplitAndMergeAlgorithm::print_startup_message() const {
   std::string msg = "Running Split and Merge algorithm with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
@@ -54,7 +44,7 @@ void SplitAndMergeAlgorithm::sample_allocations() {
 
     // Restricted GS steps
     for (unsigned int t = 0; t < n_restr_gs_updates; ++t) {
-      restricted_gibbs_sampling();
+      restricted_gibbs_sampling(first_random_idx);
     }
 
     split_or_merge(first_random_idx, second_random_idx);
@@ -174,6 +164,9 @@ void SplitAndMergeAlgorithm::compute_log_ratio_like_and_prior(
         random_idxs[clust_idx], data.row(random_idxs[clust_idx]),
         update_hierarchy_params());
 
+    /* FIXME@Mario: conditional_pred_lpdf should execute prior_pred_lpdf when
+     * card == 0
+     */
     if (united_clust_unique_values->get_card() == 0) {
       pred_lpdf_united_clust += united_clust_unique_values->prior_pred_lpdf(
           data.row(random_idxs[clust_idx]));
@@ -189,20 +182,16 @@ void SplitAndMergeAlgorithm::compute_log_ratio_like_and_prior(
                                           update_hierarchy_params());
 
     std::set<int> set_to_cycle;
-    std::set<int>::const_iterator it;
-    std::set<int>::const_iterator end;
     if (split) {
       set_to_cycle = restricted_gs_unique_values[clust_idx]->get_data_idx();
       set_to_cycle.erase(random_idxs[clust_idx]);
-      it = set_to_cycle.cbegin();
-      end = set_to_cycle.cend();
     } else {
       set_to_cycle =
           unique_values[allocations[random_idxs[clust_idx]]]->get_data_idx();
-      set_to_cycle.erase(random_idxs[clust_idx]);
-      it = set_to_cycle.cbegin();
-      end = set_to_cycle.cend();
     }
+    set_to_cycle.erase(random_idxs[clust_idx]);
+    auto it = set_to_cycle.cbegin();
+    const auto end = set_to_cycle.cend();
 
     for (; it != end; ++it) {
       unsigned int curr_idx = (*it);
@@ -225,13 +214,10 @@ void SplitAndMergeAlgorithm::compute_log_ratio_like_and_prior(
     }
   }
 
-  if (!split) {
-    log_ratio_prior_prob = -log_ratio_prior_prob;
-  }
-
   log_ratio_likelihoods =
       pred_lpdf_divided_clust.sum() - pred_lpdf_united_clust;
   if (!split) {
+    log_ratio_prior_prob = -log_ratio_prior_prob;
     log_ratio_likelihoods = -log_ratio_likelihoods;
   }
 }
@@ -248,7 +234,8 @@ void SplitAndMergeAlgorithm::split_or_merge(
 
 void SplitAndMergeAlgorithm::split(const unsigned int first_random_idx,
                                    const unsigned int second_random_idx) {
-  double log_ratio_transition_prob = -restricted_gibbs_sampling(true);
+  double log_ratio_transition_prob =
+      -restricted_gibbs_sampling(first_random_idx, true);
 
   double log_ratio_likelihoods = 0;
   double log_ratio_prior_prob = 0;
@@ -256,59 +243,18 @@ void SplitAndMergeAlgorithm::split(const unsigned int first_random_idx,
                                    log_ratio_prior_prob,
                                    log_ratio_likelihoods);
 
-  const double AcRa =
-      std::min(1.0, std::exp(log_ratio_transition_prob + log_ratio_prior_prob +
-                             log_ratio_likelihoods));
-  if (accepted_proposal(AcRa)) {
+  auto &rng = bayesmix::Rng::Instance().get();
+  const double log_arate =
+      log_ratio_transition_prob + log_ratio_prior_prob + log_ratio_likelihoods;
+  if (std::log(stan::math::uniform_rng(0, 1, rng)) < log_arate) {
     proposal_update_allocations(first_random_idx, second_random_idx, true);
   }
 }
 
 void SplitAndMergeAlgorithm::merge(const unsigned int first_random_idx,
                                    const unsigned int second_random_idx) {
-  double log_ratio_transition_prob = 0;
-  // Fake Gibbs Sampling in order to compute the transition probability
-  for (unsigned int k = 0; k < restricted_gs_data_idx.size(); k++) {
-    restricted_gs_unique_values[allocations_restricted_gs[k]]->remove_datum(
-        restricted_gs_data_idx[k], data.row(restricted_gs_data_idx[k]),
-        update_hierarchy_params());
-
-    Eigen::VectorXd logprobas(2);
-
-    if (restricted_gs_unique_values[0]->get_card() >= 1 and
-        restricted_gs_unique_values[1]->get_card() >= 1) {
-      logprobas(0) = restricted_gs_unique_values[0]->conditional_pred_lpdf(
-          data.row(restricted_gs_data_idx[k]));
-      logprobas(1) = restricted_gs_unique_values[1]->conditional_pred_lpdf(
-          data.row(restricted_gs_data_idx[k]));
-    } else {
-      if (restricted_gs_unique_values[1]->get_card() == 0) {
-        logprobas(1) = restricted_gs_unique_values[1]->prior_pred_lpdf(
-            data.row(restricted_gs_data_idx[k]));
-        logprobas(0) = restricted_gs_unique_values[0]->conditional_pred_lpdf(
-            data.row(restricted_gs_data_idx[k]));
-      } else {
-        logprobas(0) = restricted_gs_unique_values[0]->prior_pred_lpdf(
-            data.row(restricted_gs_data_idx[k]));
-        logprobas(1) = restricted_gs_unique_values[1]->conditional_pred_lpdf(
-            data.row(restricted_gs_data_idx[k]));
-      }
-    }
-    if (allocations[restricted_gs_data_idx[k]] ==
-        allocations[first_random_idx]) {
-      allocations_restricted_gs[k] = 0;
-      restricted_gs_unique_values[0]->add_datum(
-          restricted_gs_data_idx[k], data.row(restricted_gs_data_idx[k]),
-          update_hierarchy_params());
-      log_ratio_transition_prob += log(stan::math::softmax(logprobas)(0));
-    } else {
-      allocations_restricted_gs[k] = 1;
-      restricted_gs_unique_values[1]->add_datum(
-          restricted_gs_data_idx[k], data.row(restricted_gs_data_idx[k]),
-          update_hierarchy_params());
-      log_ratio_transition_prob += log(stan::math::softmax(logprobas)(1));
-    }
-  }
+  const double log_ratio_transition_prob =
+      restricted_gibbs_sampling(first_random_idx, true, true);
 
   double log_ratio_likelihoods = 0;
   double log_ratio_prior_prob = 0;
@@ -316,17 +262,12 @@ void SplitAndMergeAlgorithm::merge(const unsigned int first_random_idx,
                                    log_ratio_prior_prob,
                                    log_ratio_likelihoods);
 
-  const double AcRa =
-      std::min(1.0, std::exp(log_ratio_transition_prob + log_ratio_prior_prob +
-                             log_ratio_likelihoods));
-  if (accepted_proposal(AcRa)) {
+  auto &rng = bayesmix::Rng::Instance().get();
+  const double log_arate =
+      log_ratio_transition_prob + log_ratio_prior_prob + log_ratio_likelihoods;
+  if (std::log(stan::math::uniform_rng(0, 1, rng)) < log_arate) {
     proposal_update_allocations(first_random_idx, second_random_idx, false);
   }
-}
-
-bool SplitAndMergeAlgorithm::accepted_proposal(const double acRa) const {
-  std::uniform_real_distribution<> UnifDis(0.0, 1.0);
-  return (UnifDis(bayesmix::Rng::Instance().get()) <= acRa);
 }
 
 void SplitAndMergeAlgorithm::proposal_update_allocations(
@@ -381,7 +322,8 @@ void SplitAndMergeAlgorithm::proposal_update_allocations(
 }
 
 double SplitAndMergeAlgorithm::restricted_gibbs_sampling(
-    bool return_log_res_prod /*=false*/) {
+    const double first_random_idx, bool return_log_res_prod /*=false*/,
+    bool step_to_original_clust /*=false*/) {
   auto &rng = bayesmix::Rng::Instance().get();
 
   double log_res_prod = 0;
@@ -404,7 +346,15 @@ double SplitAndMergeAlgorithm::restricted_gibbs_sampling(
         data.row(restricted_gs_data_idx[k]));
 
     Eigen::VectorXd probas = stan::math::softmax(logprobas);
-    unsigned int c_new = bayesmix::categorical_rng(probas, rng, 0);
+    unsigned int c_new;
+    if (step_to_original_clust) {
+      c_new = (allocations[restricted_gs_data_idx[k]] ==
+               allocations[first_random_idx])
+                  ? 0
+                  : 1;
+    } else {
+      c_new = bayesmix::categorical_rng(probas, rng, 0);
+    }
 
     if (return_log_res_prod) {
       log_res_prod += log(probas(c_new));
