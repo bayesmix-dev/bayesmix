@@ -119,6 +119,7 @@ void BaseAlgorithm::initialize() {
     mixing->set_num_components(data.rows());
   }
   // Initialize hierarchies
+  unique_values[0]->set_dataset(&data);
   unique_values[0]->initialize();
   unsigned int num_components = mixing->get_num_components();
   for (size_t i = 0; i < num_components - 1; i++) {

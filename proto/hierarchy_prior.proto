@@ -86,6 +86,22 @@ message LinRegUniPrior {
   }
 }
 
+
+ message FAPriorDistribution {
+  Vector mutilde = 1;
+  Vector beta = 2;
+  double phi = 3;
+  double alpha0 = 4;
+  uint32 q = 5;
+ }
+
+
+message FAPrior {
+  oneof prior {
+    FAPriorDistribution fixed_values = 1;
+  }
+}
+
 message EmptyPrior {
   double fake_field = 1;
 }
