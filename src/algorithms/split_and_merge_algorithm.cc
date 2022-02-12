@@ -149,8 +149,8 @@ std::pair<double, double> SplitAndMergeAlgorithm::compute_log_ratios(
   /* We treat log_prior_ratio as in the split case, then we change its
    * sign at the end if we are in the merge case.
    */
-  double log_prior_ratio = mixing->get_mass_new_cluster(
-      allocations.size(), true, true, unique_values.size());
+  double log_prior_ratio =
+      mixing->get_mass_new_cluster(allocations.size(), 2, true, true);
   double log_lik_ratio = 0;
 
   std::vector<unsigned int> random_idxs = {first_random_idx,
@@ -175,7 +175,7 @@ std::pair<double, double> SplitAndMergeAlgorithm::compute_log_ratios(
           united_clust_unique_values->conditional_pred_lpdf(
               data.row(random_idxs[clust_idx]));
       log_prior_ratio -= mixing->get_mass_existing_cluster(
-          allocations.size(), true, true, united_clust_unique_values);
+          allocations.size(), 2, true, true, united_clust_unique_values);
     }
     united_clust_unique_values->add_datum(random_idxs[clust_idx],
                                           data.row(random_idxs[clust_idx]),
@@ -198,7 +198,7 @@ std::pair<double, double> SplitAndMergeAlgorithm::compute_log_ratios(
           divided_clust_unique_values[clust_idx]->conditional_pred_lpdf(
               data.row(curr_idx));
       log_prior_ratio += mixing->get_mass_existing_cluster(
-          allocations.size(), true, true,
+          allocations.size(), 2, true, true,
           divided_clust_unique_values[clust_idx]);
       divided_clust_unique_values[clust_idx]->add_datum(
           curr_idx, data.row(curr_idx), update_hierarchy_params());
@@ -207,7 +207,7 @@ std::pair<double, double> SplitAndMergeAlgorithm::compute_log_ratios(
           united_clust_unique_values->conditional_pred_lpdf(
               data.row(curr_idx));
       log_prior_ratio -= mixing->get_mass_existing_cluster(
-          allocations.size(), true, true, united_clust_unique_values);
+          allocations.size(), 2, true, true, united_clust_unique_values);
       united_clust_unique_values->add_datum(curr_idx, data.row(curr_idx),
                                             update_hierarchy_params());
     }
@@ -312,12 +312,12 @@ double SplitAndMergeAlgorithm::restricted_gs(
 
     Eigen::VectorXd logprobas(2);
     logprobas(0) = mixing->get_mass_existing_cluster(
-        restricted_gs_data_idx.size() + 2 - 1, true, true,
+        restricted_gs_data_idx.size() + 2 - 1, 2, true, true,
         restricted_gs_unique_values[0]);
     logprobas(0) += restricted_gs_unique_values[0]->conditional_pred_lpdf(
         data.row(restricted_gs_data_idx[k]));
     logprobas(1) = mixing->get_mass_existing_cluster(
-        restricted_gs_data_idx.size() + 2 - 1, true, true,
+        restricted_gs_data_idx.size() + 2 - 1, 2, true, true,
         restricted_gs_unique_values[1]);
     logprobas(1) += restricted_gs_unique_values[1]->conditional_pred_lpdf(
         data.row(restricted_gs_data_idx[k]));
@@ -363,12 +363,12 @@ void SplitAndMergeAlgorithm::full_gs() {
 
     Eigen::VectorXd logprobas(n_clust + 1);
     for (size_t j = 0; j < n_clust; ++j) {
-      logprobas(j) = mixing->get_mass_existing_cluster(n_data - 1, true, true,
-                                                       unique_values[j]);
+      logprobas(j) = mixing->get_mass_existing_cluster(
+          n_data - 1, n_clust, true, true, unique_values[j]);
       logprobas(j) += unique_values[j]->conditional_pred_lpdf(data.row(i));
     }
     logprobas(n_clust) =
-        mixing->get_mass_new_cluster(n_data - 1, true, true, n_clust);
+        mixing->get_mass_new_cluster(n_data - 1, n_clust, true, true);
     logprobas(n_clust) += unique_values[0]->prior_pred_lpdf(data.row(i));
 
     unsigned int c_new =
