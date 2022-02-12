@@ -44,7 +44,7 @@ void SplitAndMergeAlgorithm::sample_allocations() {
 
     // Restricted GS steps
     for (unsigned int t = 0; t < n_restr_gs_updates; ++t) {
-      restricted_gibbs_sampling(first_random_idx);
+      restricted_gs(first_random_idx);
     }
 
     split_or_merge(first_random_idx, second_random_idx);
@@ -52,7 +52,7 @@ void SplitAndMergeAlgorithm::sample_allocations() {
 
   // Full GS updates
   for (unsigned int k = 0; k < n_full_gs_updates; ++k) {
-    full_gibbs_sampling();
+    full_gs();
   }
 }
 
@@ -129,9 +129,9 @@ void SplitAndMergeAlgorithm::compute_restricted_gs_unique_values(
                                             data.row(second_random_idx), true);
 }
 
-void SplitAndMergeAlgorithm::compute_log_ratio_like_and_prior(
+std::pair<double, double> SplitAndMergeAlgorithm::compute_log_ratios(
     const unsigned int first_random_idx, const unsigned int second_random_idx,
-    bool split, double &log_ratio_prior_prob, double &log_ratio_likelihoods) {
+    bool split) {
   /* In the function, we treat the two clusterings as the "divided" one, where
    * first_random_idx and second_random_idx are in different clusters, and as
    * the "united" one, where the two datapoints are in the same cluster.
@@ -146,12 +146,12 @@ void SplitAndMergeAlgorithm::compute_log_ratio_like_and_prior(
   Eigen::VectorXd pred_lpdf_divided_clust = Eigen::VectorXd::Zero(2);
   double pred_lpdf_united_clust = 0;
 
-  /* We treat log_ratio_prior_prob as in the split case, then we change its
+  /* We treat log_prior_ratio as in the split case, then we change its
    * sign at the end if we are in the merge case.
    */
-  log_ratio_prior_prob = mixing->get_mass_new_cluster(
+  double log_prior_ratio = mixing->get_mass_new_cluster(
       allocations.size(), true, true, unique_values.size());
-  log_ratio_likelihoods = 0;
+  double log_lik_ratio = 0;
 
   std::vector<unsigned int> random_idxs = {first_random_idx,
                                            second_random_idx};
@@ -174,7 +174,7 @@ void SplitAndMergeAlgorithm::compute_log_ratio_like_and_prior(
       pred_lpdf_united_clust +=
           united_clust_unique_values->conditional_pred_lpdf(
               data.row(random_idxs[clust_idx]));
-      log_ratio_prior_prob -= mixing->get_mass_existing_cluster(
+      log_prior_ratio -= mixing->get_mass_existing_cluster(
           allocations.size(), true, true, united_clust_unique_values);
     }
     united_clust_unique_values->add_datum(random_idxs[clust_idx],
@@ -190,15 +190,14 @@ void SplitAndMergeAlgorithm::compute_log_ratio_like_and_prior(
           unique_values[allocations[random_idxs[clust_idx]]]->get_data_idx();
     }
     set_to_cycle.erase(random_idxs[clust_idx]);
-    auto it = set_to_cycle.cbegin();
-    const auto end = set_to_cycle.cend();
 
-    for (; it != end; ++it) {
+    for (auto it = set_to_cycle.cbegin(), end = set_to_cycle.cend(); it != end;
+         ++it) {
       unsigned int curr_idx = (*it);
       pred_lpdf_divided_clust(clust_idx) +=
           divided_clust_unique_values[clust_idx]->conditional_pred_lpdf(
               data.row(curr_idx));
-      log_ratio_prior_prob += mixing->get_mass_existing_cluster(
+      log_prior_ratio += mixing->get_mass_existing_cluster(
           allocations.size(), true, true,
           divided_clust_unique_values[clust_idx]);
       divided_clust_unique_values[clust_idx]->add_datum(
@@ -207,19 +206,20 @@ void SplitAndMergeAlgorithm::compute_log_ratio_like_and_prior(
       pred_lpdf_united_clust +=
           united_clust_unique_values->conditional_pred_lpdf(
               data.row(curr_idx));
-      log_ratio_prior_prob -= mixing->get_mass_existing_cluster(
+      log_prior_ratio -= mixing->get_mass_existing_cluster(
           allocations.size(), true, true, united_clust_unique_values);
       united_clust_unique_values->add_datum(curr_idx, data.row(curr_idx),
                                             update_hierarchy_params());
     }
   }
 
-  log_ratio_likelihoods =
-      pred_lpdf_divided_clust.sum() - pred_lpdf_united_clust;
+  log_lik_ratio = pred_lpdf_divided_clust.sum() - pred_lpdf_united_clust;
   if (!split) {
-    log_ratio_prior_prob = -log_ratio_prior_prob;
-    log_ratio_likelihoods = -log_ratio_likelihoods;
+    log_prior_ratio = -log_prior_ratio;
+    log_lik_ratio = -log_lik_ratio;
   }
+
+  return std::make_pair(log_lik_ratio, log_prior_ratio);
 }
 
 void SplitAndMergeAlgorithm::split_or_merge(
@@ -230,22 +230,18 @@ void SplitAndMergeAlgorithm::split_or_merge(
     split = true;
   }
 
-  double log_ratio_transition_prob =
-      restricted_gibbs_sampling(first_random_idx, true, !split);
+  double log_trans_prob_ratio = restricted_gs(first_random_idx, true, !split);
 
   if (split) {
-    log_ratio_transition_prob *= -1;
+    log_trans_prob_ratio *= -1;
   }
 
-  double log_ratio_likelihoods = 0;
-  double log_ratio_prior_prob = 0;
-  compute_log_ratio_like_and_prior(first_random_idx, second_random_idx, split,
-                                   log_ratio_prior_prob,
-                                   log_ratio_likelihoods);
+  auto [log_lik_ratio, log_prior_ratio] =
+      compute_log_ratios(first_random_idx, second_random_idx, split);
 
   auto &rng = bayesmix::Rng::Instance().get();
   const double log_arate =
-      log_ratio_transition_prob + log_ratio_prior_prob + log_ratio_likelihoods;
+      log_trans_prob_ratio + log_prior_ratio + log_lik_ratio;
   if (std::log(stan::math::uniform_rng(0, 1, rng)) < log_arate) {
     proposal_update_allocations(first_random_idx, second_random_idx, split);
   }
@@ -302,7 +298,7 @@ void SplitAndMergeAlgorithm::proposal_update_allocations(
   }
 }
 
-double SplitAndMergeAlgorithm::restricted_gibbs_sampling(
+double SplitAndMergeAlgorithm::restricted_gs(
     const double first_random_idx, bool return_log_res_prod /*=false*/,
     bool step_to_original_clust /*=false*/) {
   auto &rng = bayesmix::Rng::Instance().get();
@@ -350,7 +346,8 @@ double SplitAndMergeAlgorithm::restricted_gibbs_sampling(
   return log_res_prod;
 }
 
-void SplitAndMergeAlgorithm::full_gibbs_sampling() {
+// TODO: identical to Neal3
+void SplitAndMergeAlgorithm::full_gs() {
   unsigned int n_data = data.rows();
   auto &rng = bayesmix::Rng::Instance().get();
   for (size_t i = 0; i < n_data; ++i) {
