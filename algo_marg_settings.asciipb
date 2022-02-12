@@ -26,6 +26,7 @@ init_num_clusters: 3
 #  know what you're doing.)
 neal8_n_aux: 3
 
+##### SPLIT AND MERGE SETTING #####
 # Split and Merge number of restricted GS scans for each MH step.
 splitmerge_n_restr_gs_updates: 5
 
