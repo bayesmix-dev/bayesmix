@@ -14,6 +14,17 @@
 //! that generates a Markov chain on the clustering of the provided data.
 //!
 //! This algorithm requires the use of a `ConjugateHierarchy` object.
+
+//! After picking at random two points, the Split and Merge algorithm
+//! takes all the points that are in the same clusters as the first two and
+//! assigns to each of them, at random, one of two temporary clusters. Then,
+//! it updates these assignments by doing a restricted Gibbs sampling (GS),
+//! restricted in the sense that it considers only the points cited above
+//! and only the two temporary clusters.
+//! The result of this operation is used to compute the acceptance
+//! probability for the split or merge proposal.
+//! These Metropolis-Hastings (MH) steps are alternated with full Gibbs
+//! sampling steps, similar to the ones that are computed in Neal3 algorithm.
 class SplitAndMergeAlgorithm : public MarginalAlgorithm {
  public:
   // DESTRUCTOR AND CONSTRUCTORS
@@ -32,9 +43,6 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
  protected:
   void print_startup_message() const override;
 
-  /* We need to update the parameters when we add or remove a datum from a
-   * cluster to esure that conditional_pred_lpdf returns a correct value.
-   */
   bool update_hierarchy_params() override { return true; }
 
   void sample_allocations() override;
@@ -58,11 +66,9 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
    * The parameter "split" represents if the function is called in the "split"
    * case or in the "merge" case.
    */
-  void compute_log_ratio_like_and_prior(const unsigned int first_random_idx,
-                                        const unsigned int second_random_idx,
-                                        bool split,
-                                        double &log_ratio_prior_prob,
-                                        double &log_ratio_likelihoods);
+  std::pair<double, double> compute_log_ratios(
+      const unsigned int first_random_idx,
+      const unsigned int second_random_idx, bool split);
 
   void split_or_merge(const unsigned int first_random_idx,
                       const unsigned int second_random_idx);
@@ -74,41 +80,22 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
                                    const unsigned int second_random_idx,
                                    const bool split);
 
-  void full_gibbs_sampling();
+  void full_gs();
 
-  /* After picking at random two points, the Split and Merge algorithm
-   * takes all the points that are in the same clusters as the first two and
-   * assigns to each of them, at random, one of two temporary clusters. Then,
-   * it updates these assignments by doing a restricted Gibbs sampling,
-   * restricted in the sense that it considers only the points cited above
-   * and only the two temporary clusters.
-   * The result of this operation is used to compute the acceptance
-   * probability for the split or merge proposal.
-   * For more information, check the article on Split and Merge by
-   * Jain and Neal (2004).
-   *
-   * This function computes one iteration of the restricted Gibbs sampling.
-   *
-   * If return_log_res_prod is true, the function returns the log of the
+  /* If return_log_res_prod is true, the function returns the log of the
    * probability of the transition that restricted_gs_unique_values has done
    * in the function.
    * If return_log_res_prod is false, ignore the return value.
    *
    * If step_to_original_clust is true, the function moves all the points
    * in restricted_gs_data_idx to their original clustering configuration.
-   * This step is used in the merge case to compute the transition probability
-   * from the restricted gibbs sampling state to the original split
-   * configuration.
    */
-  double restricted_gibbs_sampling(const double first_random_idx,
-                                   bool return_log_res_prod = false,
-                                   bool step_to_original_clust = false);
+  double restricted_gs(const double first_random_idx,
+                       bool return_log_res_prod = false,
+                       bool step_to_original_clust = false);
 
   /* Vector that contains the indexes of the data points that are considered
    * in the restricted Gibbs sampling.
-   *
-   * For more information about restricted Gibbs Sampling, check out the
-   * comment on function restricted_gibbs_sampling().
    */
   std::vector<unsigned int> restricted_gs_data_idx;
 
@@ -118,25 +105,15 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
    * beginning of the MH iteration and assigned to that cluster, i.e. point
    * first_random_idx for the first cluster and point second_random_idx for
    * the second cluster.
-   *
-   * For more information about restricted Gibbs Sampling, check out the
-   * comment on function restricted_gibbs_sampling().
    */
   std::vector<std::shared_ptr<AbstractHierarchy>> restricted_gs_unique_values;
 
   /* Vector that associates each element of restricted_GS_data_idx to one of
    * the two temporary clusters.
-   *
-   * For more information about restricted Gibbs Sampling, check out the
-   * comment on function restricted_gibbs_sampling().
    */
   std::vector<bool> allocations_restricted_gs;
 
-  /* Number of restricted GS scans for each MH step.
-   *
-   * For more information about restricted Gibbs Sampling, check out the
-   * comment on function restricted_gibbs_sampling().
-   */
+  // Number of restricted GS scans for each MH step.
   unsigned int n_restr_gs_updates = 5;
 
   // Number of MH updates for each iteration of Split and Merge algorithm.
