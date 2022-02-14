@@ -211,6 +211,9 @@ class AbstractHierarchy {
   //! Returns whether the hierarchy represents a conjugate model or not
   virtual bool is_conjugate() const { return false; }
 
+  //! Main function that initializes members to appropriate values
+  virtual void set_dataset(const Eigen::MatrixXd *dataset) = 0;
+
  protected:
   //! Evaluates the log-likelihood of data in a single point
   //! @param datum      Point which is to be evaluated

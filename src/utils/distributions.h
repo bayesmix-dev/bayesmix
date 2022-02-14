@@ -57,6 +57,33 @@ Eigen::VectorXd multi_normal_prec_lpdf_grid(const Eigen::MatrixXd &data,
                                             double prec_logdet);
 
 /*
+ * Returns a pseudorandom multivariate normal random variable with diagonal
+ * covariance matrix
+ *
+ * @param mean   The mean of the Gaussian r.v.
+ * @param cov_diag   The diagonal covariance matrix
+ * @rng          Random number generator
+ * @return       multivariate normal r.v.
+ */
+Eigen::VectorXd multi_normal_diag_rng(
+    const Eigen::VectorXd &mean,
+    const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &cov_diag,
+    std::mt19937_64 &rng);
+
+/*
+ * Returns a pseudorandom multivariate normal random variable parametrized
+ * through mean and Cholesky decomposition of precision matrix
+ *
+ * @param mean   The mean of the Gaussian r.v.
+ * @prec_chol    The (lower) Cholesky factor of the precision matrix
+ * @param rng    Random number generator
+ * @return       multivariate normal r.v.
+ */
+Eigen::VectorXd multi_normal_prec_chol_rng(
+    const Eigen::VectorXd &mean, const Eigen::LLT<Eigen::MatrixXd> &prec_chol,
+    std::mt19937_64 &rng);
+
+/*
  * Evaluates the log probability density function of a multivariate Student's t
  * distribution on a single point
  *

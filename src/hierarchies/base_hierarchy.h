@@ -138,6 +138,11 @@ class BaseHierarchy : public AbstractHierarchy {
     clear_summary_statistics();
   }
 
+  //! Sets the (pointer to the) dataset matrix
+  void set_dataset(const Eigen::MatrixXd *dataset) override {
+    dataset_ptr = dataset;
+  }
+
  protected:
   //! Raises an error if the prior pointer is not initialized
   void check_prior_is_set() const {
@@ -227,6 +232,9 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Logarithm of current cardinality of this cluster
   double log_card = stan::math::NEGATIVE_INFTY;
+
+  //! Pointer to the dataset matrix for the mixture model
+  const Eigen::MatrixXd *dataset_ptr = nullptr;
 };
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>

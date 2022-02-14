@@ -1,6 +1,6 @@
 ##### GENERIC SETTINGS FOR ALL ALGORITHMS #####
 # Algorithm ID string, e.g. "Neal2"
-algo_id: "Neal3"
+algo_id: "Neal8"
 
 # RNG initial seed: any nonnegative integer
 rng_seed: 20201124
@@ -25,13 +25,3 @@ init_num_clusters: 3
 # (NOTE: 3 is the recommended value in most cases, please change it only if you
 #  know what you're doing.)
 neal8_n_aux: 3
-
-##### SPLIT AND MERGE SETTING #####
-# Split and Merge number of restricted GS scans for each MH step.
-splitmerge_n_restr_gs_updates: 5
-
-# Split and Merge number of MH updates for each iteration
-splitmerge_n_mh_updates: 1
-
-# Split and Merge number of full GS scans for each iteration
-splitmerge_n_full_gs_updates: 1
