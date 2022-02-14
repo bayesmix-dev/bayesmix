@@ -4,11 +4,12 @@
 #include <google/protobuf/stubs/casts.h>
 #include <src/hierarchies/base_hierarchy.h>
 #include <src/hierarchies/conjugate_hierarchy.h>
-#include "hierarchy_prior.pb.h"
 
 #include <Eigen/Dense>
 #include <memory>
 #include <vector>
+
+#include "hierarchy_prior.pb.h"
 
 namespace GammaGamma {
 //! Custom container for State values
@@ -33,16 +34,14 @@ class GammaGammaHierarchy
   }
   ~GammaGammaHierarchy() = default;
 
-  double like_lpdf(const Eigen::RowVectorXd &datum,
-                   const Eigen::RowVectorXd &covariate =
-                       Eigen::RowVectorXd(0)) const override {
+  double like_lpdf(const Eigen::RowVectorXd &datum) const override {
     return stan::math::gamma_lpdf(datum(0), hypers->shape, state.rate);
   }
 
   double marg_lpdf(
       const GammaGamma::Hyperparams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error("Not implemented");
+    throw std::runtime_error("marg_lpdf() not implemented");
     return 0;
   }
 
@@ -51,9 +50,7 @@ class GammaGammaHierarchy
         params.rate_alpha, params.rate_beta, bayesmix::Rng::Instance().get())};
   }
 
-  void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                 const Eigen::RowVectorXd &covariate,
-                                 bool add) {
+  void update_summary_statistics(const Eigen::RowVectorXd &datum, bool add) {
     if (add) {
       data_sum += datum(0);
       ndata += 1;
@@ -97,7 +94,7 @@ class GammaGammaHierarchy
     set_card(statecast.cardinality());
   }
 
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto() 
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override {
     bayesmix::Vector state_;
     state_.mutable_data()->Add(state.rate);
@@ -114,6 +111,16 @@ class GammaGammaHierarchy
 
   void write_hypers_to_proto(google::protobuf::Message *out) const override {
     return;
+  }
+
+  void set_hypers_from_proto(
+      const google::protobuf::Message &state_) override {
+    return;
+  }
+
+  std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
+      const override {
+    return nullptr;
   }
 
   bayesmix::HierarchyId get_id() const override {
