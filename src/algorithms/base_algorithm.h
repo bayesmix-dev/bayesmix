@@ -126,7 +126,8 @@ class BaseAlgorithm {
   //! Reads and sets algorithm parameters from an appropriate Protobuf message
   virtual void read_params_from_proto(const bayesmix::AlgorithmParams &params);
 
-  void set_state_proto(std::shared_ptr<google::protobuf::Message> state) {
+  void set_state_proto(
+      const std::shared_ptr<google::protobuf::Message> state) {
     curr_state.CopyFrom(
         google::protobuf::internal::down_cast<bayesmix::AlgorithmState &>(
             *state.get()));

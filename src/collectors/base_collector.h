@@ -71,7 +71,7 @@ class BaseCollector {
   std::vector<std::shared_ptr<google::protobuf::Message>> get_whole_chain(
       google::protobuf::Message *base_msg) {
     std::vector<std::shared_ptr<google::protobuf::Message>> out;
-    bool keep;
+    bool keep = true;
     while (keep) {
       std::shared_ptr<google::protobuf::Message> msg(base_msg->New());
       keep = get_next_state(msg.get());

@@ -5,20 +5,23 @@ namespace bayesmix {
 Eigen::MatrixXd eval_lpdf_parallel(std::shared_ptr<BaseAlgorithm> algo,
                                    BaseCollector *const collector,
                                    const Eigen::MatrixXd &grid,
+                                   const Eigen::RowVectorXd &hier_covariate,
+                                   const Eigen::RowVectorXd &mix_covariate,
                                    bool low_memory, int njobs,
                                    int chunk_size) {
   if (low_memory) {
-    return bayesmix::internal::eval_lpdf_parallel_lowmemory(algo, collector,
-                                                            grid, chunk_size);
+    return bayesmix::internal::eval_lpdf_parallel_lowmemory(
+        algo, collector, grid, hier_covariate, mix_covariate, chunk_size);
   } else {
-    return bayesmix::internal::eval_lpdf_parallel_fullmemory(algo, collector,
-                                                             grid, njobs);
+    return bayesmix::internal::eval_lpdf_parallel_fullmemory(
+        algo, collector, grid, hier_covariate, mix_covariate, njobs);
   }
 }
 
 Eigen::MatrixXd internal::eval_lpdf_parallel_lowmemory(
     std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
-    const Eigen::MatrixXd &grid, int chunk_size) {
+    const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
+    const Eigen::RowVectorXd &mix_covariate, int chunk_size) {
   std::vector<Eigen::VectorXd> lpdfs;
   bool keep = true;
   do {
@@ -30,8 +33,8 @@ Eigen::MatrixXd internal::eval_lpdf_parallel_lowmemory(
     for (int i = 0; i < states.size(); i++) {
       std::shared_ptr<BaseAlgorithm> curr_algo = algo->clone();
       curr_algo->set_state_proto(states[i]);
-      curr_lpdfs[i] = curr_algo->lpdf_from_state(grid, Eigen::RowVectorXd(0),
-                                                 Eigen::RowVectorXd(0));
+      curr_lpdfs[i] =
+          curr_algo->lpdf_from_state(grid, hier_covariate, mix_covariate);
     }
     lpdfs.insert(lpdfs.end(), curr_lpdfs.begin(), curr_lpdfs.end());
   } while (keep);
@@ -42,7 +45,8 @@ Eigen::MatrixXd internal::eval_lpdf_parallel_lowmemory(
 
 Eigen::MatrixXd internal::eval_lpdf_parallel_fullmemory(
     std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
-    const Eigen::MatrixXd &grid, int njobs) {
+    const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
+    const Eigen::RowVectorXd &mix_covariate, int njobs) {
   bayesmix::AlgorithmState base_state;
   std::vector<std::shared_ptr<google::protobuf::Message>> chain =
       collector->get_whole_chain(&base_state);
@@ -55,8 +59,8 @@ Eigen::MatrixXd internal::eval_lpdf_parallel_fullmemory(
     Eigen::MatrixXd curr_lpdfs(chain_shards[i].size(), grid.rows());
     for (int j = 0; j < chain_shards[i].size(); j++) {
       curr_algo->set_state_proto(chain_shards[i][j]);
-      curr_lpdfs.row(j) = curr_algo->lpdf_from_state(
-          grid, Eigen::RowVectorXd(0), Eigen::RowVectorXd(0));
+      curr_lpdfs.row(j) =
+          curr_algo->lpdf_from_state(grid, hier_covariate, mix_covariate);
     }
     lpdfs[i] = curr_lpdfs;
   }

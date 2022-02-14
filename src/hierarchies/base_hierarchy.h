@@ -47,20 +47,21 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractHierarchy> deep_clone() const override {
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
+
     out->clear_data();
     out->clear_summary_statistics();
-    out->reset_hypers();
-    out->reset_prior();
+
+    out->create_empty_prior();
     std::shared_ptr<google::protobuf::Message> new_prior(prior->New());
     new_prior->CopyFrom(*prior.get());
     out->get_mutable_prior()->CopyFrom(*new_prior.get());
+
+    out->create_empty_hypers();
+    auto curr_hypers_proto = get_hypers_proto();
+    out->set_hypers_from_proto(*curr_hypers_proto.get());
     out->initialize();
     return out;
   }
-
-  void reset_hypers() { hypers = std::make_shared<Hyperparams>(); }
-
-  void reset_prior() { prior = nullptr; }
 
   //! Evaluates the log-likelihood of data in a grid of points
   //! @param data        Grid of points (by row) which are to be evaluated
@@ -147,6 +148,9 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Re-initializes the prior of the hierarchy to a newly created object
   void create_empty_prior() { prior.reset(new Prior); }
+
+  //! Re-initializes the hypers of the hierarchy to a newly created object
+  void create_empty_hypers() { hypers.reset(new Hyperparams); }
 
   //! Sets the cardinality of the cluster
   void set_card(const int card_) {

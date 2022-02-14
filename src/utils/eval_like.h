@@ -17,13 +17,15 @@ namespace bayesmix {
 //!        `chunk_size`, and process the states within each chunk in parallel.
 //! @param njobs used only if low_memory=false, the number of parallel jobs
 //! @param chunk_size see `low_memory`.
-Eigen::MatrixXd eval_lpdf_parallel(std::shared_ptr<BaseAlgorithm> algo,
-                                   BaseCollector *const collector,
-                                   const Eigen::MatrixXd &grid,
-                                   bool low_memory = false, int njobs = 4,
-                                   int chunk_size = 100);
+Eigen::MatrixXd eval_lpdf_parallel(
+    std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
+    const Eigen::MatrixXd &grid,
+    const Eigen::RowVectorXd &hier_covariate = Eigen::RowVectorXd(0),
+    const Eigen::RowVectorXd &mix_covariate = Eigen::RowVectorXd(0),
+    bool low_memory = false, int njobs = 4, int chunk_size = 100);
 
 namespace internal {
+
 template <typename T>
 std::vector<std::vector<T>> gen_even_slices(std::vector<T> x, int num_slices) {
   std::vector<std::vector<T>> out(num_slices);
@@ -35,11 +37,17 @@ std::vector<std::vector<T>> gen_even_slices(std::vector<T> x, int num_slices) {
 
 Eigen::MatrixXd eval_lpdf_parallel_lowmemory(
     std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
-    const Eigen::MatrixXd &grid, int chunk_size = 100);
+    const Eigen::MatrixXd &grid,
+    const Eigen::RowVectorXd &hier_covariate = Eigen::RowVectorXd(0),
+    const Eigen::RowVectorXd &mix_covariate = Eigen::RowVectorXd(0),
+    int chunk_size = 100);
 
 Eigen::MatrixXd eval_lpdf_parallel_fullmemory(
     std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
-    const Eigen::MatrixXd &grid, int njobs);
+    const Eigen::MatrixXd &grid,
+    const Eigen::RowVectorXd &hier_covariate = Eigen::RowVectorXd(0),
+    const Eigen::RowVectorXd &mix_covariate = Eigen::RowVectorXd(0),
+    int njobs = 4);
 }  // namespace internal
 
 }  // namespace bayesmix
