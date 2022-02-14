@@ -203,4 +203,4 @@ Eigen::VectorXd ConjugateHierarchy<Derived, State, Hyperparams, Prior>::
   return lpdf;
 }
 
-#endif
+#endif  // BAYESMIX_HIERARCHIES_CONJUGATE_HIERARCHY_H_
