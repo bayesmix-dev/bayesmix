@@ -58,7 +58,7 @@ class AbstractMixing {
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     if (!is_conditional()) {
       throw std::runtime_error(
-          "Cannot call this function from non-conditional mixing");
+          "Cannot call get_mixing_weights() from non-conditional mixing");
     } else {
       if (is_dependent()) {
         return mixing_weights(log, propto, covariate);
@@ -134,9 +134,9 @@ class AbstractMixing {
       const Eigen::RowVectorXd &covariate) const {
     if (!is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from non-dependent mixing");
+          "Cannot call mixing_weights() from non-dependent mixing");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("mixing_weights() not implemented");
     }
   }
 
@@ -148,9 +148,9 @@ class AbstractMixing {
                                          const bool propto) const {
     if (is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from dependent mixing");
+          "Cannot call mixing_weights() from dependent mixing");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("mixing_weights() not implemented");
     }
   }
 
@@ -168,9 +168,9 @@ class AbstractMixing {
       const Eigen::RowVectorXd &covariate) const {
     if (!is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from non-dependent mixing");
+          "Cannot call mass_existing_cluster() from non-dependent mixing");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("mass_existing_cluster() not implemented");
     }
   }
 
@@ -186,9 +186,9 @@ class AbstractMixing {
       const bool propto, std::shared_ptr<AbstractHierarchy> hier) const {
     if (is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from dependent mixing");
+          "Cannot call mass_existing_cluster() from dependent mixing");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("mass_existing_cluster() not implemented");
     }
   }
 
@@ -205,9 +205,9 @@ class AbstractMixing {
                                   const Eigen::RowVectorXd &covariate) const {
     if (!is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from non-dependent mixing");
+          "Cannot call mass_new_cluster() from non-dependent mixing");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("mass_new_cluster() not implemented");
     }
   }
 
@@ -222,9 +222,9 @@ class AbstractMixing {
                                   const bool propto) const {
     if (is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from dependent mixing");
+          "Cannot call mass_new_cluster() from dependent mixing");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("mass_new_cluster() not implemented");
     }
   }
 };

@@ -64,7 +64,9 @@ class LapNIGHierarchy
   void set_hypers_from_proto(
       const google::protobuf::Message &hypers_) override;
 
-  void save_posterior_hypers() { throw std::runtime_error("Not implemented"); }
+  void save_posterior_hypers() {
+    throw std::runtime_error("save_posterior_hypers() not implemented");
+  }
 
   //! Returns whether the hierarchy models multivariate data or not
   bool is_multivariate() const override { return false; }

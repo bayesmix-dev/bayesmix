@@ -215,9 +215,9 @@ class AbstractHierarchy {
                            const Eigen::RowVectorXd &covariate) const {
     if (!is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a non-dependent hierarchy");
+          "Cannot call like_lpdf() from a non-dependent hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("like_lpdf() not implemented");
     }
   }
 
@@ -227,9 +227,9 @@ class AbstractHierarchy {
   virtual double like_lpdf(const Eigen::RowVectorXd &datum) const {
     if (is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a dependent hierarchy");
+          "Cannot call like_lpdf() from a dependent hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("like_lpdf() not implemented");
     }
   }
 
@@ -242,9 +242,10 @@ class AbstractHierarchy {
                                          bool add) {
     if (!is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a non-dependent hierarchy");
+          "Cannot call update_summary_statistics() from a non-dependent "
+          "hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("update_summary_statistics() not implemented");
     }
   }
 
@@ -255,9 +256,10 @@ class AbstractHierarchy {
                                          bool add) {
     if (is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a dependent hierarchy");
+          "Cannot call update_summary_statistics() from a dependent "
+          "hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("update_summary_statistics() not implemented");
     }
   }
 };

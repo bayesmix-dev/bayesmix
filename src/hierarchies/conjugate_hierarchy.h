@@ -115,9 +115,9 @@ class ConjugateHierarchy
                            const Eigen::RowVectorXd &covariate) const {
     if (!this->is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a non-dependent hierarchy");
+          "Cannot call marg_lpdf() from a non-dependent hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("marg_lpdf() not implemented");
     }
   }
 
@@ -129,9 +129,9 @@ class ConjugateHierarchy
                            const Eigen::RowVectorXd &datum) const {
     if (this->is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a dependent hierarchy");
+          "Cannot call marg_lpdf() from a dependent hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("marg_lpdf() not implemented");
     }
   }
 };
