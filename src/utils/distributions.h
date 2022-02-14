@@ -122,9 +122,12 @@ Eigen::VectorXd multi_student_t_invscale_lpdf_grid(
  * The L^2 distance amounts to
  * d(p, q) = (\int (p(x) - q(x)^2 dx))^{1/2}
  */
-double gaussian_mixture_dist(Eigen::VectorXd means1, Eigen::VectorXd vars1,
-                             Eigen::VectorXd weights1, Eigen::VectorXd means2,
-                             Eigen::VectorXd vars2, Eigen::VectorXd weights2);
+double gaussian_mixture_dist(const Eigen::VectorXd &means1,
+                             const Eigen::VectorXd &vars1,
+                             const Eigen::VectorXd &weights1,
+                             const Eigen::VectorXd &means2,
+                             const Eigen::VectorXd &vars2,
+                             const Eigen::VectorXd &weights2);
 
 /*
  * Computes the L^2 distance between the multivariate mixture of Gaussian
@@ -134,12 +137,12 @@ double gaussian_mixture_dist(Eigen::VectorXd means1, Eigen::VectorXd vars1,
  * The L^2 distance amounts to
  * d(p, q) = (\int (p(x) - q(x)^2 dx))^{1/2}
  */
-double gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
-                             std::vector<Eigen::MatrixXd> precs1,
-                             Eigen::VectorXd weights1,
-                             std::vector<Eigen::VectorXd> means2,
-                             std::vector<Eigen::MatrixXd> precs2,
-                             Eigen::VectorXd weights2);
+double gaussian_mixture_dist(const std::vector<Eigen::VectorXd> &means1,
+                             const std::vector<Eigen::MatrixXd> &precs1,
+                             const Eigen::VectorXd &weights1,
+                             const std::vector<Eigen::VectorXd> &means2,
+                             const std::vector<Eigen::MatrixXd> &precs2,
+                             const Eigen::VectorXd &weights2);
 
 /*
  * Computes the L^2 distance between the mixture of Gaussian
@@ -152,10 +155,10 @@ double gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
  * @return                    The L^2 distance between p and q
  */
 double gaussian_mixture_dist(
-    std::vector<bayesmix::AlgorithmState::ClusterState> clus1,
-    Eigen::VectorXd weights1,
-    std::vector<bayesmix::AlgorithmState::ClusterState> clus2,
-    Eigen::VectorXd weights2);
+    const std::vector<bayesmix::AlgorithmState::ClusterState> &clus1,
+    const Eigen::VectorXd &weights1,
+    const std::vector<bayesmix::AlgorithmState::ClusterState> &clus2,
+    const Eigen::VectorXd &weights2);
 
 }  // namespace bayesmix
 
