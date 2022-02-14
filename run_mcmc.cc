@@ -211,6 +211,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::cout << "Computing log-density..." << std::endl;
+    // Eigen::MatrixXd dens =
+    //     algo->eval_lpdf(coll, grid, hier_cov_grid, mix_cov_grid);
     Eigen::MatrixXd dens =
         bayesmix::eval_lpdf_parallel(algo, coll, grid, false);
     bayesmix::write_matrix_to_file(dens, args.get<std::string>("--dens-file"));
