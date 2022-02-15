@@ -28,7 +28,7 @@ Eigen::MatrixXd eval_lpdf_parallel(
 namespace internal {
 
 template <typename T>
-std::vector<std::vector<T>> gen_even_slices(const std::vector<T> x,
+std::vector<std::vector<T>> gen_even_slices(const std::vector<T> &x,
                                             const int num_slices) {
   std::vector<std::vector<T>> out(num_slices);
   for (int i = 0; i < x.size(); i++) {
