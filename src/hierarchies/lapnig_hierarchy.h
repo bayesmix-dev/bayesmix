@@ -115,7 +115,7 @@ class LapNIGHierarchy
   //! Evaluates the prior given the mean (unconstrained_parameters(0))
   //! and log of the scale (unconstrained_parameters(1))
   double eval_prior_lpdf_unconstrained(
-      Eigen::VectorXd unconstrained_parameters);
+      const Eigen::VectorXd &unconstrained_parameters);
 
   //! Evaluates the (sum of the) log likelihood for all the observations in the
   //! cluster given the mean (unconstrained_parameters(0))
@@ -123,8 +123,8 @@ class LapNIGHierarchy
   //! The parameter "is_current" is used to identify if the evaluation of the
   //! likelihood is on the current or on the proposed parameters, in order to
   //! avoid repeating calculations of the sum of the absolute differences
-  double eval_like_lpdf_unconstrained(Eigen::VectorXd unconstrained_parameters,
-                                      bool is_current);
+  double eval_like_lpdf_unconstrained(
+      const Eigen::VectorXd &unconstrained_parameters, const bool is_current);
 
   //! Evaluates the log-likelihood of data in a single point
   //! @param datum      Point which is to be evaluated

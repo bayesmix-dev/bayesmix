@@ -188,7 +188,7 @@ Eigen::VectorXd LapNIGHierarchy::propose_rwmh(
 }
 
 double LapNIGHierarchy::eval_prior_lpdf_unconstrained(
-    Eigen::VectorXd unconstrained_parameters) {
+    const Eigen::VectorXd &unconstrained_parameters) {
   double mu = unconstrained_parameters(0);
   double log_scale = unconstrained_parameters(1);
   double scale = std::exp(log_scale);
@@ -198,7 +198,7 @@ double LapNIGHierarchy::eval_prior_lpdf_unconstrained(
 }
 
 double LapNIGHierarchy::eval_like_lpdf_unconstrained(
-    Eigen::VectorXd unconstrained_parameters, bool is_current) {
+    const Eigen::VectorXd &unconstrained_parameters, const bool is_current) {
   double mean = unconstrained_parameters(0);
   double log_scale = unconstrained_parameters(1);
   double scale = std::exp(log_scale);
