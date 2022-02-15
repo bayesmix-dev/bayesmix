@@ -9,14 +9,14 @@
 #include "src/utils/proto_utils.h"
 
 int bayesmix::categorical_rng(const Eigen::VectorXd &probas,
-                              std::mt19937_64 &rng, int start /*= 0*/) {
+                              std::mt19937_64 &rng, const int start /*= 0*/) {
   return stan::math::categorical_rng(probas, rng) + (start - 1);
 }
 
 double bayesmix::multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
                                         const Eigen::VectorXd &mean,
                                         const Eigen::MatrixXd &prec_chol,
-                                        double prec_logdet) {
+                                        const double prec_logdet) {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
   double base = prec_logdet + NEG_LOG_SQRT_TWO_PI * datum.size();
   double exp = (prec_chol * (datum - mean)).squaredNorm();
@@ -25,7 +25,7 @@ double bayesmix::multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
 
 Eigen::VectorXd bayesmix::multi_normal_prec_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::VectorXd &mean,
-    const Eigen::MatrixXd &prec_chol, double prec_logdet) {
+    const Eigen::MatrixXd &prec_chol, const double prec_logdet) {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
   Eigen::VectorXd exp =
       ((data.rowwise() - mean.transpose()) * prec_chol.transpose())
@@ -67,8 +67,8 @@ Eigen::VectorXd bayesmix::multi_normal_prec_chol_rng(
 }
 
 double bayesmix::multi_student_t_invscale_lpdf(
-    const Eigen::VectorXd &datum, double df, const Eigen::VectorXd &mean,
-    const Eigen::MatrixXd &invscale_chol, double scale_logdet) {
+    const Eigen::VectorXd &datum, const double df, const Eigen::VectorXd &mean,
+    const Eigen::MatrixXd &invscale_chol, const double scale_logdet) {
   int dim = datum.size();
   double exp =
       0.5 * (df + dim) *
@@ -80,8 +80,8 @@ double bayesmix::multi_student_t_invscale_lpdf(
 }
 
 Eigen::VectorXd bayesmix::multi_student_t_invscale_lpdf_grid(
-    const Eigen::MatrixXd &data, double df, const Eigen::VectorXd &mean,
-    const Eigen::MatrixXd &invscale_chol, double scale_logdet) {
+    const Eigen::MatrixXd &data, const double df, const Eigen::VectorXd &mean,
+    const Eigen::MatrixXd &invscale_chol, const double scale_logdet) {
   int dim = data.cols();
   int n = data.rows();
   double base_coeff = stan::math::lgamma((df + dim) * 0.5) -

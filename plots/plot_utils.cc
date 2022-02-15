@@ -46,7 +46,8 @@ void density_plot_1d(const Eigen::MatrixXd &grid, const Eigen::VectorXd &dens,
 }
 
 void density_plot_2d(const Eigen::MatrixXd &grid, const Eigen::VectorXd &dens_,
-                     const std::string &outfile, bool log_scale /*= true*/) {
+                     const std::string &outfile,
+                     const bool log_scale /*= true*/) {
   int n_points = grid.size();
 
   Eigen::VectorXd dens = dens_;

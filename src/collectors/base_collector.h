@@ -50,7 +50,7 @@ class BaseCollector {
   virtual void finish_collecting() = 0;
 
   //! Reads the next state and deserializes it into the pointer `out`.
-  bool get_next_state(google::protobuf::Message *out) {
+  bool get_next_state(google::protobuf::Message *const out) {
     return next_state(out);
   }
 

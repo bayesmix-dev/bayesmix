@@ -14,7 +14,7 @@ Eigen::MatrixXd vstack(const std::vector<Eigen::MatrixXd> &mats);
 
 //! Concatenates two matrices by row, modifying the first matrix in-place
 //! @throw std::invalid_argument if sizes mismatch
-void append_by_row(Eigen::MatrixXd *a, const Eigen::MatrixXd &b);
+void append_by_row(Eigen::MatrixXd *const a, const Eigen::MatrixXd &b);
 
 //! Concatenates two matrices by row
 //! @param a,b The matrices to be concatenated
@@ -45,6 +45,6 @@ void check_spd(const Eigen::MatrixXd &mat);
 //! @param x1, x2, y1, y2  Bounds for the rectangle
 //! @param nx, ny          Number of points created along the x, y directions
 //! @return                The resulting grid
-Eigen::MatrixXd get_2d_grid(double x1, double x2, int nx, double y1, double y2,
-                            int ny);
+Eigen::MatrixXd get_2d_grid(const double x1, const double x2, const int nx,
+                            const double y1, const double y2, const int ny);
 }  // namespace bayesmix

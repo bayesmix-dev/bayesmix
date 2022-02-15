@@ -14,10 +14,10 @@
 namespace bayesmix {
 
 //! Writes an Eigen vector to a bayesmix::Vector Protobuf object by pointer
-void to_proto(const Eigen::VectorXd &vec, bayesmix::Vector *out);
+void to_proto(const Eigen::VectorXd &vec, bayesmix::Vector *const out);
 
 //! Writes an Eigen matrix to a bayesmix::Matrix Protobuf object by pointer
-void to_proto(const Eigen::MatrixXd &mat, bayesmix::Matrix *out);
+void to_proto(const Eigen::MatrixXd &mat, bayesmix::Matrix *const out);
 
 //! Converts a bayesmix::Vector Protobuf object into an Eigen vector
 Eigen::VectorXd to_eigen(const bayesmix::Vector &vec);
@@ -27,7 +27,7 @@ Eigen::MatrixXd to_eigen(const bayesmix::Matrix &mat);
 
 //! Writes from a given file to a Protobuf object via pointer
 void read_proto_from_file(const std::string &filename,
-                          google::protobuf::Message *out);
+                          google::protobuf::Message *const out);
 
 }  // namespace bayesmix
 
