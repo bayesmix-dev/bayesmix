@@ -50,4 +50,4 @@ Eigen::MatrixXd get_2d_grid(const double x1, const double x2, const int nx,
                             const double y1, const double y2, const int ny);
 }  // namespace bayesmix
 
-#endif
+#endif  // BAYESMIX_SRC_UTILS_EIGEN_UTILS_H_

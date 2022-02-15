@@ -45,7 +45,7 @@ class FileCollector : public BaseCollector {
 
   void reset() override;
 
-  google::protobuf::Message *get_base_msg() { return base_msg; }
+  google::protobuf::Message *get_base_msg() const { return base_msg; }
 
  protected:
   google::protobuf::Message *base_msg = nullptr;
@@ -71,7 +71,7 @@ class FileCollector : public BaseCollector {
 
   int curr_buffer_pos;
 
-  void set_base_msg(google::protobuf::Message *example_msg) {
+  void set_base_msg(google::protobuf::Message *const example_msg) {
     base_msg = example_msg->New();
   }
 

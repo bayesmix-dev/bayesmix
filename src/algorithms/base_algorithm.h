@@ -142,9 +142,9 @@ class BaseAlgorithm {
       const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
       const Eigen::RowVectorXd &mix_covariate) = 0;
 
-  virtual std::shared_ptr<BaseAlgorithm> clone() = 0;
+  virtual std::shared_ptr<BaseAlgorithm> clone() const = 0;
 
-  std::vector<std::shared_ptr<AbstractHierarchy>> get_unique_values() {
+  std::vector<std::shared_ptr<AbstractHierarchy>> get_unique_values() const {
     return unique_values;
   }
 

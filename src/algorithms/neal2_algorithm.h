@@ -26,7 +26,7 @@ class Neal2Algorithm : public MarginalAlgorithm {
     return bayesmix::AlgorithmId::Neal2;
   }
 
-  std::shared_ptr<BaseAlgorithm> clone() override {
+  std::shared_ptr<BaseAlgorithm> clone() const override {
     auto out = std::make_shared<Neal2Algorithm>(*this);
     out->set_mixing(mixing->clone());
     out->set_hierarchy(unique_values[0]->deep_clone());

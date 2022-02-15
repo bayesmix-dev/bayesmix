@@ -18,16 +18,18 @@ namespace bayesmix {
 //! @param njobs used only if low_memory=false, the number of parallel jobs
 //! @param chunk_size see `low_memory`.
 Eigen::MatrixXd eval_lpdf_parallel(
-    std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
+    const std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
     const Eigen::MatrixXd &grid,
     const Eigen::RowVectorXd &hier_covariate = Eigen::RowVectorXd(0),
     const Eigen::RowVectorXd &mix_covariate = Eigen::RowVectorXd(0),
-    bool low_memory = false, int njobs = 4, int chunk_size = 100);
+    const bool low_memory = false, const int njobs = 4,
+    const int chunk_size = 100);
 
 namespace internal {
 
 template <typename T>
-std::vector<std::vector<T>> gen_even_slices(std::vector<T> x, int num_slices) {
+std::vector<std::vector<T>> gen_even_slices(const std::vector<T> x,
+                                            const int num_slices) {
   std::vector<std::vector<T>> out(num_slices);
   for (int i = 0; i < x.size(); i++) {
     out[i % num_slices].push_back(x[i]);
@@ -36,18 +38,18 @@ std::vector<std::vector<T>> gen_even_slices(std::vector<T> x, int num_slices) {
 }
 
 Eigen::MatrixXd eval_lpdf_parallel_lowmemory(
-    std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
+    const std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
     const Eigen::MatrixXd &grid,
     const Eigen::RowVectorXd &hier_covariate = Eigen::RowVectorXd(0),
     const Eigen::RowVectorXd &mix_covariate = Eigen::RowVectorXd(0),
-    int chunk_size = 100);
+    const int chunk_size = 100);
 
 Eigen::MatrixXd eval_lpdf_parallel_fullmemory(
-    std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
+    const std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
     const Eigen::MatrixXd &grid,
     const Eigen::RowVectorXd &hier_covariate = Eigen::RowVectorXd(0),
     const Eigen::RowVectorXd &mix_covariate = Eigen::RowVectorXd(0),
-    int njobs = 4);
+    const int njobs = 4);
 }  // namespace internal
 
 }  // namespace bayesmix

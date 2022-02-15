@@ -55,7 +55,7 @@ class BaseCollector {
   }
 
   std::vector<std::shared_ptr<google::protobuf::Message>> get_chunk(
-      int size, bool &keep, google::protobuf::Message *base_msg) {
+      const int size, bool &keep, google::protobuf::Message *const base_msg) {
     std::vector<std::shared_ptr<google::protobuf::Message>> out;
     for (int i = 0; i < size; i++) {
       std::shared_ptr<google::protobuf::Message> msg(base_msg->New());
@@ -69,7 +69,7 @@ class BaseCollector {
   }
 
   std::vector<std::shared_ptr<google::protobuf::Message>> get_whole_chain(
-      google::protobuf::Message *base_msg) {
+      google::protobuf::Message *const base_msg) {
     std::vector<std::shared_ptr<google::protobuf::Message>> out;
     bool keep = true;
     while (keep) {

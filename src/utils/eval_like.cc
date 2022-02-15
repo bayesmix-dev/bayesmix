@@ -2,13 +2,11 @@
 
 namespace bayesmix {
 
-Eigen::MatrixXd eval_lpdf_parallel(std::shared_ptr<BaseAlgorithm> algo,
-                                   BaseCollector *const collector,
-                                   const Eigen::MatrixXd &grid,
-                                   const Eigen::RowVectorXd &hier_covariate,
-                                   const Eigen::RowVectorXd &mix_covariate,
-                                   bool low_memory, int njobs,
-                                   int chunk_size) {
+Eigen::MatrixXd eval_lpdf_parallel(
+    const std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
+    const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
+    const Eigen::RowVectorXd &mix_covariate, const bool low_memory /*= false*/,
+    const int njobs /*= 4*/, const int chunk_size /*= 100*/) {
   if (low_memory) {
     return bayesmix::internal::eval_lpdf_parallel_lowmemory(
         algo, collector, grid, hier_covariate, mix_covariate, chunk_size);
@@ -19,9 +17,9 @@ Eigen::MatrixXd eval_lpdf_parallel(std::shared_ptr<BaseAlgorithm> algo,
 }
 
 Eigen::MatrixXd internal::eval_lpdf_parallel_lowmemory(
-    std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
+    const std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
     const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
-    const Eigen::RowVectorXd &mix_covariate, int chunk_size) {
+    const Eigen::RowVectorXd &mix_covariate, const int chunk_size /*= 100*/) {
   std::vector<Eigen::VectorXd> lpdfs;
   bool keep = true;
   do {
@@ -44,9 +42,9 @@ Eigen::MatrixXd internal::eval_lpdf_parallel_lowmemory(
 }
 
 Eigen::MatrixXd internal::eval_lpdf_parallel_fullmemory(
-    std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
+    const std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
     const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
-    const Eigen::RowVectorXd &mix_covariate, int njobs) {
+    const Eigen::RowVectorXd &mix_covariate, const int njobs /*= 4*/) {
   bayesmix::AlgorithmState base_state;
   std::vector<std::shared_ptr<google::protobuf::Message>> chain =
       collector->get_whole_chain(&base_state);
