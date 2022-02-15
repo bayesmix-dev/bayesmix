@@ -96,4 +96,4 @@ Documentation is available at https://bayesmix.readthedocs.io.
 
 # Contributions are welcome!
 
-Please check out [CONTRIBUTORS.md](CONTRIBUTORS.md) for details on how to collaborate with us.
+Please check out [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to collaborate with us.
