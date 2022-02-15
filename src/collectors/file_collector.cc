@@ -50,7 +50,7 @@ void FileCollector::close_reading() {
   }
 }
 
-bool FileCollector::next_state(google::protobuf::Message *out) {
+bool FileCollector::next_state(google::protobuf::Message *const out) {
   if (!is_open_read) {
     set_base_msg(out);
     open_for_reading();

@@ -63,7 +63,7 @@ void SplitAndMergeAlgorithm::sample_unique_values() {
 }
 
 Eigen::VectorXd SplitAndMergeAlgorithm::lpdf_marginal_component(
-    std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+    const std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
     const Eigen::RowVectorXd &covariate) const {
   return hier->prior_pred_lpdf_grid(grid, covariate);
 }
@@ -131,7 +131,7 @@ void SplitAndMergeAlgorithm::compute_restricted_gs_unique_values(
 
 std::pair<double, double> SplitAndMergeAlgorithm::compute_log_ratios(
     const unsigned int first_random_idx, const unsigned int second_random_idx,
-    bool split) {
+    const bool split) {
   /* In the function, we treat the two clusterings as the "divided" one, where
    * first_random_idx and second_random_idx are in different clusters, and as
    * the "united" one, where the two datapoints are in the same cluster.
@@ -299,8 +299,8 @@ void SplitAndMergeAlgorithm::proposal_update_allocations(
 }
 
 double SplitAndMergeAlgorithm::restricted_gs(
-    const double first_random_idx, bool return_log_res_prod /*=false*/,
-    bool step_to_original_clust /*=false*/) {
+    const double first_random_idx, const bool return_log_res_prod /*=false*/,
+    const bool step_to_original_clust /*=false*/) {
   auto &rng = bayesmix::Rng::Instance().get();
 
   double log_res_prod = 0;

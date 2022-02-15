@@ -82,7 +82,7 @@ class ConjugateHierarchy
 
   //! Generates new state values from the centering posterior distribution
   //! @param update_params  Save posterior hypers after the computation?
-  void sample_full_cond(bool update_params = true) override {
+  void sample_full_cond(const bool update_params = true) override {
     if (this->card == 0) {
       // No posterior update possible
       static_cast<Derived *>(this)->sample_prior();
@@ -115,9 +115,9 @@ class ConjugateHierarchy
                            const Eigen::RowVectorXd &covariate) const {
     if (!this->is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a non-dependent hierarchy");
+          "Cannot call marg_lpdf() from a non-dependent hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("marg_lpdf() not implemented");
     }
   }
 
@@ -129,9 +129,9 @@ class ConjugateHierarchy
                            const Eigen::RowVectorXd &datum) const {
     if (this->is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a dependent hierarchy");
+          "Cannot call marg_lpdf() from a dependent hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("marg_lpdf() not implemented");
     }
   }
 };
@@ -203,4 +203,4 @@ Eigen::VectorXd ConjugateHierarchy<Derived, State, Hyperparams, Prior>::
   return lpdf;
 }
 
-#endif
+#endif  // BAYESMIX_HIERARCHIES_CONJUGATE_HIERARCHY_H_

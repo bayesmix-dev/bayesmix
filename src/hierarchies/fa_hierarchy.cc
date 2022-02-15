@@ -142,7 +142,7 @@ void FAHierarchy::update_hypers(
 }
 
 void FAHierarchy::update_summary_statistics(const Eigen::RowVectorXd& datum,
-                                            bool add) {
+                                            const bool add) {
   if (add) {
     data_sum += datum;
   } else {
@@ -205,7 +205,7 @@ FAHierarchy::get_hypers_proto() const {
   return out;
 }
 
-void FAHierarchy::sample_full_cond(bool update_params) {
+void FAHierarchy::sample_full_cond(const bool update_params /*= false*/) {
   if (this->card == 0) {
     // No posterior update possible
     sample_prior();

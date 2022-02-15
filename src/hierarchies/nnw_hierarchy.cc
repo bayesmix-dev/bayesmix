@@ -266,7 +266,7 @@ NNW::State NNWHierarchy::draw(const NNW::Hyperparams &params) {
 }
 
 void NNWHierarchy::update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                             bool add) {
+                                             const bool add) {
   if (add) {
     data_sum += datum.transpose();
     data_sum_squares += datum.transpose() * datum;

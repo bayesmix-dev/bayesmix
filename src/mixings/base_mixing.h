@@ -44,12 +44,13 @@ class BaseMixing : public AbstractMixing {
   }
 
   //! Sets the (pointer to the) covariate matrix for the mixture model
-  void set_covariates(Eigen::MatrixXd *covar) override {
+  void set_covariates(Eigen::MatrixXd *const covar) override {
     covariates_ptr = covar;
   }
 
   //! Writes current state to a Protobuf message by pointer
-  void write_state_to_proto(google::protobuf::Message *out) const override;
+  void write_state_to_proto(
+      google::protobuf::Message *const out) const override;
 
   //! Writes current state to a Protobuf message and return a shared_ptr
   //! New hierarchies have to first modify the field 'oneof val' in the
@@ -72,7 +73,8 @@ class BaseMixing : public AbstractMixing {
   virtual void initialize_state() = 0;
 
   //! Down-casts the given generic proto message to a MixingState proto
-  bayesmix::MixingState *downcast_state(google::protobuf::Message *out) const {
+  bayesmix::MixingState *downcast_state(
+      google::protobuf::Message *const out) const {
     return google::protobuf::internal::down_cast<bayesmix::MixingState *>(out);
   }
 
@@ -112,7 +114,7 @@ BaseMixing<Derived, State, Prior>::get_mutable_prior() {
 
 template <class Derived, typename State, typename Prior>
 void BaseMixing<Derived, State, Prior>::write_state_to_proto(
-    google::protobuf::Message *out) const {
+    google::protobuf::Message *const out) const {
   auto outcast = downcast_state(out);
   outcast->CopyFrom(*get_state_proto().get());
 }

@@ -41,7 +41,8 @@ class Neal2Algorithm : public MarginalAlgorithm {
   void sample_unique_values() override;
 
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+      const std::shared_ptr<AbstractHierarchy> hier,
+      const Eigen::MatrixXd &grid,
       const Eigen::RowVectorXd &covariate) const override;
 
   //! Computes prior component of allocation sampling masses for given datum

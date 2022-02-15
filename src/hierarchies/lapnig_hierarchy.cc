@@ -126,7 +126,7 @@ LapNIG::State LapNIGHierarchy::draw(const LapNIG::Hyperparams &params) {
 }
 
 void LapNIGHierarchy::update_summary_statistics(
-    const Eigen::RowVectorXd &datum, bool add) {
+    const Eigen::RowVectorXd &datum, const bool add) {
   if (add) {
     sum_abs_diff_curr += std::abs(state.mean - datum(0, 0));
     cluster_data_values.push_back(datum);
@@ -138,7 +138,7 @@ void LapNIGHierarchy::update_summary_statistics(
   }
 }
 
-void LapNIGHierarchy::sample_full_cond(bool update_params) {
+void LapNIGHierarchy::sample_full_cond(const bool update_params /*= false*/) {
   if (this->card == 0) {
     // No posterior update possible
     this->sample_prior();
@@ -188,7 +188,7 @@ Eigen::VectorXd LapNIGHierarchy::propose_rwmh(
 }
 
 double LapNIGHierarchy::eval_prior_lpdf_unconstrained(
-    Eigen::VectorXd unconstrained_parameters) {
+    const Eigen::VectorXd &unconstrained_parameters) {
   double mu = unconstrained_parameters(0);
   double log_scale = unconstrained_parameters(1);
   double scale = std::exp(log_scale);
@@ -198,7 +198,7 @@ double LapNIGHierarchy::eval_prior_lpdf_unconstrained(
 }
 
 double LapNIGHierarchy::eval_like_lpdf_unconstrained(
-    Eigen::VectorXd unconstrained_parameters, bool is_current) {
+    const Eigen::VectorXd &unconstrained_parameters, const bool is_current) {
   double mean = unconstrained_parameters(0);
   double log_scale = unconstrained_parameters(1);
   double scale = std::exp(log_scale);

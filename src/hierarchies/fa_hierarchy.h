@@ -87,7 +87,7 @@ class FAHierarchy : public BaseHierarchy<FAHierarchy, FA::State,
 
   //! Generates new state values from the centering posterior distribution
   //! @param update_params  Save posterior hypers after the computation?
-  void sample_full_cond(bool update_params = false) override;
+  void sample_full_cond(const bool update_params = false) override;
 
  protected:
   //! Evaluates the log-likelihood of data in a single point
@@ -99,7 +99,7 @@ class FAHierarchy : public BaseHierarchy<FAHierarchy, FA::State,
   //! @param datum      Data point which is being added or removed
   //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd& datum,
-                                 bool add) override;
+                                 const bool add) override;
 
   //! Initializes state parameters to appropriate values
   void initialize_state() override;

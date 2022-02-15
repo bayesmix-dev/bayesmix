@@ -77,7 +77,7 @@ class MixtureFiniteMixing
   double mass_existing_cluster(
       const unsigned int n, const unsigned int n_clust, const bool log,
       const bool propto,
-      std::shared_ptr<AbstractHierarchy> hier) const override;
+      const std::shared_ptr<AbstractHierarchy> hier) const override;
 
   //! Returns probability mass for a new cluster (for marginal mixings only)
   //! @param n          Total dataset size
@@ -103,13 +103,13 @@ class MixtureFiniteMixing
   mutable bool V_C_are_initialized = false;
 
   //! Initializes V to a vector of -1 of length n+1 and computes and assigns C
-  void init_V_and_C(unsigned int n) const;
+  void init_V_and_C(const unsigned int n) const;
 
   //! Computes V_n[t] and stores it in V
-  void compute_V_t(double t, unsigned int n) const;
+  void compute_V_t(const double t, const unsigned int n) const;
 
   //! Gets V_n[t] or computes and stores it if it has not been computed before
-  double get_V_t(double t, unsigned int n) const;
+  double get_V_t(const double t, const unsigned int n) const;
 };
 
 #endif  // BAYESMIX_MIXINGS_MIXTURE_FINITE_MIXTURES_H_

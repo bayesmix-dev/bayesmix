@@ -58,7 +58,8 @@ class Neal8Algorithm : public Neal2Algorithm {
   void sample_allocations() override;
 
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+      const std::shared_ptr<AbstractHierarchy> hier,
+      const Eigen::MatrixXd &grid,
       const Eigen::RowVectorXd &covariate) const override;
 
   Eigen::VectorXd get_cluster_prior_mass(

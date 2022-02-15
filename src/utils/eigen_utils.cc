@@ -35,7 +35,8 @@ Eigen::MatrixXd bayesmix::vstack(const std::vector<Eigen::MatrixXd> &mats) {
   return out;
 }
 
-void bayesmix::append_by_row(Eigen::MatrixXd *a, const Eigen::MatrixXd &b) {
+void bayesmix::append_by_row(Eigen::MatrixXd *const a,
+                             const Eigen::MatrixXd &b) {
   if (a->rows() == 0) {
     *a = b;
   } else if (b.rows() == 0) {
@@ -86,8 +87,9 @@ void bayesmix::check_spd(const Eigen::MatrixXd &mat) {
   stan::math::check_pos_definite("", "Matrix", mat);
 }
 
-Eigen::MatrixXd bayesmix::get_2d_grid(double x1, double x2, int nx, double y1,
-                                      double y2, int ny) {
+Eigen::MatrixXd bayesmix::get_2d_grid(const double x1, const double x2,
+                                      const int nx, const double y1,
+                                      const double y2, const int ny) {
   Eigen::VectorXd xgrid = Eigen::ArrayXd::LinSpaced(nx, x1, x2);
   Eigen::VectorXd ygrid = Eigen::ArrayXd::LinSpaced(ny, y1, y2);
   Eigen::MatrixXd out(nx * ny, 2);

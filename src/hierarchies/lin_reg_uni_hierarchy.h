@@ -63,7 +63,7 @@ class LinRegUniHierarchy
   //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  const Eigen::RowVectorXd &covariate,
-                                 bool add) override;
+                                 const bool add) override;
 
   //! Resets summary statistics for this cluster
   void clear_summary_statistics() override;
