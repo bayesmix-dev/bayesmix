@@ -135,7 +135,7 @@ class LapNIGHierarchy
   //! @param datum      Data point which is being added or removed
   //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                 bool add) override;
+                                 const bool add) override;
 
   //! Initializes hierarchy hyperparameters to appropriate values
   void initialize_hypers() override;

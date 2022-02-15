@@ -142,7 +142,7 @@ void FAHierarchy::update_hypers(
 }
 
 void FAHierarchy::update_summary_statistics(const Eigen::RowVectorXd& datum,
-                                            bool add) {
+                                            const bool add) {
   if (add) {
     data_sum += datum;
   } else {

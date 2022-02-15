@@ -126,7 +126,7 @@ LapNIG::State LapNIGHierarchy::draw(const LapNIG::Hyperparams &params) {
 }
 
 void LapNIGHierarchy::update_summary_statistics(
-    const Eigen::RowVectorXd &datum, bool add) {
+    const Eigen::RowVectorXd &datum, const bool add) {
   if (add) {
     sum_abs_diff_curr += std::abs(state.mean - datum(0, 0));
     cluster_data_values.push_back(datum);

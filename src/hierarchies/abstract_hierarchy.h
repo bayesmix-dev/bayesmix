@@ -181,7 +181,7 @@ class AbstractHierarchy {
 
   //! Public wrapper for `update_summary_statistics()` methods
   void update_ss(const Eigen::RowVectorXd &datum,
-                 const Eigen::RowVectorXd &covariate, bool add) {
+                 const Eigen::RowVectorXd &covariate, const bool add) {
     if (is_dependent()) {
       return update_summary_statistics(datum, covariate, add);
     } else {
@@ -239,7 +239,7 @@ class AbstractHierarchy {
   //! @param add        Whether the datum is being added or removed
   virtual void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                          const Eigen::RowVectorXd &covariate,
-                                         bool add) {
+                                         const bool add) {
     if (!is_dependent()) {
       throw std::runtime_error(
           "Cannot call update_summary_statistics() from a non-dependent "
@@ -253,7 +253,7 @@ class AbstractHierarchy {
   //! @param datum      Data point which is being added or removed
   //! @param add        Whether the datum is being added or removed
   virtual void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                         bool add) {
+                                         const bool add) {
     if (is_dependent()) {
       throw std::runtime_error(
           "Cannot call update_summary_statistics() from a dependent "
