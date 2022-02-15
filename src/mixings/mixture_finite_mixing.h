@@ -77,7 +77,7 @@ class MixtureFiniteMixing
   double mass_existing_cluster(
       const unsigned int n, const unsigned int n_clust, const bool log,
       const bool propto,
-      std::shared_ptr<AbstractHierarchy> hier) const override;
+      const std::shared_ptr<AbstractHierarchy> hier) const override;
 
   //! Returns probability mass for a new cluster (for marginal mixings only)
   //! @param n          Total dataset size

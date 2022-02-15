@@ -50,7 +50,8 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
   void sample_unique_values() override;
 
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+      const std::shared_ptr<AbstractHierarchy> hier,
+      const Eigen::MatrixXd &grid,
       const Eigen::RowVectorXd &covariate) const override;
 
   void compute_restricted_gs_data_idx(const unsigned int first_random_idx,

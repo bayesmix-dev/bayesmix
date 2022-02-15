@@ -24,7 +24,7 @@ void PitYorMixing::update_state(
 
 double PitYorMixing::mass_existing_cluster(
     const unsigned int n, const unsigned int n_clust, const bool log,
-    const bool propto, std::shared_ptr<AbstractHierarchy> hier) const {
+    const bool propto, const std::shared_ptr<AbstractHierarchy> hier) const {
   double out;
   if (hier->get_card() == 0) {
     return log ? stan::math::NEGATIVE_INFTY : 0;

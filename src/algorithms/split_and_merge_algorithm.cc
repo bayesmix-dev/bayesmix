@@ -63,7 +63,7 @@ void SplitAndMergeAlgorithm::sample_unique_values() {
 }
 
 Eigen::VectorXd SplitAndMergeAlgorithm::lpdf_marginal_component(
-    std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+    const std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
     const Eigen::RowVectorXd &covariate) const {
   return hier->prior_pred_lpdf_grid(grid, covariate);
 }

@@ -71,7 +71,7 @@ class AbstractMixing {
   //! Public wrapper for `mass_existing_cluster()` methods
   double get_mass_existing_cluster(
       const unsigned int n, const unsigned int n_clust, const bool log,
-      const bool propto, std::shared_ptr<AbstractHierarchy> hier,
+      const bool propto, const std::shared_ptr<AbstractHierarchy> hier,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     if (is_dependent()) {
       return mass_existing_cluster(n, n_clust, log, propto, hier, covariate);
@@ -165,7 +165,7 @@ class AbstractMixing {
   //! @return           Probability value
   virtual double mass_existing_cluster(
       const unsigned int n, const unsigned int n_clust, const bool log,
-      const bool propto, std::shared_ptr<AbstractHierarchy> hier,
+      const bool propto, const std::shared_ptr<AbstractHierarchy> hier,
       const Eigen::RowVectorXd &covariate) const {
     if (!is_dependent()) {
       throw std::runtime_error(
@@ -184,7 +184,7 @@ class AbstractMixing {
   //! @return           Probability value
   virtual double mass_existing_cluster(
       const unsigned int n, const unsigned int n_clust, const bool log,
-      const bool propto, std::shared_ptr<AbstractHierarchy> hier) const {
+      const bool propto, const std::shared_ptr<AbstractHierarchy> hier) const {
     if (is_dependent()) {
       throw std::runtime_error(
           "Cannot call mass_existing_cluster() from dependent mixing");

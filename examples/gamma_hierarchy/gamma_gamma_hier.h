@@ -111,7 +111,8 @@ class GammaGammaHierarchy
     return;
   }
 
-  void write_hypers_to_proto(google::protobuf::Message *out) const override {
+  void write_hypers_to_proto(
+      google::protobuf::Message *const out) const override {
     return;
   }
 
