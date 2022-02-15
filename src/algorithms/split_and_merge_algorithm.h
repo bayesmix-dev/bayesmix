@@ -40,6 +40,13 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
   void read_params_from_proto(
       const bayesmix::AlgorithmParams &params) override;
 
+  std::shared_ptr<BaseAlgorithm> clone() override {
+    auto out = std::make_shared<SplitAndMergeAlgorithm>(*this);
+    out->set_mixing(mixing->clone());
+    out->set_hierarchy(unique_values[0]->deep_clone());
+    return out;
+  }
+
  protected:
   void print_startup_message() const override;
 

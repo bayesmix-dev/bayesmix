@@ -31,7 +31,10 @@ class FileCollector : public BaseCollector {
       fin->Close();
       close(infd);
     }
-    delete base_msg;
+
+    if (base_msg != nullptr) {
+      delete base_msg;
+    }
   }
 
   void start_collecting() override;
@@ -45,7 +48,7 @@ class FileCollector : public BaseCollector {
   google::protobuf::Message *get_base_msg() { return base_msg; }
 
  protected:
-  google::protobuf::Message *base_msg;
+  google::protobuf::Message *base_msg = nullptr;
 
   //! Opens collector in reading mode
   void open_for_reading();
