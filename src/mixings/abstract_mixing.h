@@ -102,14 +102,15 @@ class AbstractMixing {
   virtual void set_num_components(const unsigned int num_) = 0;
 
   //! Sets pointer to the covariate matrix for the mixture model
-  virtual void set_covariates(Eigen::MatrixXd *covar) = 0;
+  virtual void set_covariates(Eigen::MatrixXd *const covar) = 0;
 
   //! Read and set state values from a given Protobuf message
   virtual void set_state_from_proto(
       const google::protobuf::Message &state_) = 0;
 
   //! Writes current state to a Protobuf message by pointer
-  virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
+  virtual void write_state_to_proto(
+      google::protobuf::Message *const out) const = 0;
 
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::MixingId get_id() const = 0;

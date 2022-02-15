@@ -138,7 +138,7 @@ void LapNIGHierarchy::update_summary_statistics(
   }
 }
 
-void LapNIGHierarchy::sample_full_cond(bool update_params) {
+void LapNIGHierarchy::sample_full_cond(const bool update_params /*= false*/) {
   if (this->card == 0) {
     // No posterior update possible
     this->sample_prior();

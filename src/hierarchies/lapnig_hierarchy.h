@@ -96,7 +96,7 @@ class LapNIGHierarchy
 
   //! Generates new state values from the centering posterior distribution
   //! @param update_params  Save posterior hypers after the computation?
-  void sample_full_cond(bool update_params = false) override;
+  void sample_full_cond(const bool update_params = false) override;
 
  protected:
   //! Set of values of data points belonging to this cluster

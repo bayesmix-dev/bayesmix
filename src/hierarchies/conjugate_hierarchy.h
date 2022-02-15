@@ -82,7 +82,7 @@ class ConjugateHierarchy
 
   //! Generates new state values from the centering posterior distribution
   //! @param update_params  Save posterior hypers after the computation?
-  void sample_full_cond(bool update_params = true) override {
+  void sample_full_cond(const bool update_params = true) override {
     if (this->card == 0) {
       // No posterior update possible
       static_cast<Derived *>(this)->sample_prior();
