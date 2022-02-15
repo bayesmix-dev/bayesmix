@@ -153,10 +153,12 @@ class AbstractHierarchy {
   virtual google::protobuf::Message *get_mutable_prior() = 0;
 
   //! Writes current state to a Protobuf message by pointer
-  virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
+  virtual void write_state_to_proto(
+      google::protobuf::Message *const out) const = 0;
 
   //! Writes current hyperparameters to a Protobuf message by pointer
-  virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
+  virtual void write_hypers_to_proto(
+      google::protobuf::Message *const out) const = 0;
 
   //! Read and set state values from a given Protobuf message
   virtual void set_state_from_proto(

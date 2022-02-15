@@ -172,7 +172,7 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Down-casts the given generic proto message to a ClusterState proto
   bayesmix::AlgorithmState::ClusterState *downcast_state(
-      google::protobuf::Message *state_) const {
+      google::protobuf::Message *const state_) const {
     return google::protobuf::internal::down_cast<
         bayesmix::AlgorithmState::ClusterState *>(state_);
   }
@@ -186,7 +186,7 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Down-casts the given generic proto message to a HierarchyHypers proto
   bayesmix::AlgorithmState::HierarchyHypers *downcast_hypers(
-      google::protobuf::Message *state_) const {
+      google::protobuf::Message *const state_) const {
     return google::protobuf::internal::down_cast<
         bayesmix::AlgorithmState::HierarchyHypers *>(state_);
   }
