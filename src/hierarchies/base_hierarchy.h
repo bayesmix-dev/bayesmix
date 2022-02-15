@@ -37,7 +37,7 @@ class BaseHierarchy : public AbstractHierarchy {
   ~BaseHierarchy() = default;
 
   //! Returns an independent, data-less copy of this object
-  virtual std::shared_ptr<AbstractHierarchy> clone() const override {
+  std::shared_ptr<AbstractHierarchy> clone() const override {
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
     out->clear_data();
     out->clear_summary_statistics();
@@ -45,7 +45,7 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   //! Returns an independent, data-less copy of this object
-  virtual std::shared_ptr<AbstractHierarchy> deep_clone() const override {
+  std::shared_ptr<AbstractHierarchy> deep_clone() const override {
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
 
     out->clear_data();
@@ -92,7 +92,7 @@ class BaseHierarchy : public AbstractHierarchy {
   std::set<int> get_data_idx() const override { return cluster_data_idx; }
 
   //! Returns a pointer to the Protobuf message of the prior of this cluster
-  virtual google::protobuf::Message *get_mutable_prior() override {
+  google::protobuf::Message *get_mutable_prior() override {
     if (prior == nullptr) {
       create_empty_prior();
     }
