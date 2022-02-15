@@ -26,7 +26,7 @@ class MemoryCollector : public BaseCollector {
   void reset() override;
 
   //! Writes the i-th state in the collector to the given message pointer
-  void get_state(unsigned int i, google::protobuf::Message* out);
+  void get_state(const unsigned int i, google::protobuf::Message* out);
 
   //! Templatized utility for writing states directly to file
   template <typename MsgType>
@@ -77,7 +77,7 @@ class MemoryCollector : public BaseCollector {
 
  protected:
   //! Reads the next state, based on the curr_iter curson
-  bool next_state(google::protobuf::Message* out) override;
+  bool next_state(google::protobuf::Message* const out) override;
 
   //! Deque that contains all states in Protobuf-object form
   std::deque<std::string> chain;

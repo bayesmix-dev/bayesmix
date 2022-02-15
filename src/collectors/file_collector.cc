@@ -50,7 +50,7 @@ void FileCollector::close_reading() {
   }
 }
 
-bool FileCollector::next_state(google::protobuf::Message *out) {
+bool FileCollector::next_state(google::protobuf::Message *const out) {
   if (!is_open_read) {
     open_for_reading();
     populate_buffer(out);
@@ -78,7 +78,8 @@ bool FileCollector::next_state(google::protobuf::Message *out) {
   return keep;
 }
 
-void FileCollector::populate_buffer(google::protobuf::Message *base_msg) {
+void FileCollector::populate_buffer(
+    google::protobuf::Message *const base_msg) {
   msg_buffer = std::vector<std::future<
       std::tuple<std::shared_ptr<google::protobuf::Message>, bool>>>();
 
@@ -93,7 +94,7 @@ void FileCollector::populate_buffer(google::protobuf::Message *base_msg) {
 }
 
 std::tuple<std::shared_ptr<google::protobuf::Message>, bool>
-FileCollector::read_one(google::protobuf::Message *base_msg) {
+FileCollector::read_one(google::protobuf::Message *const base_msg) {
   std::shared_ptr<google::protobuf::Message> msg(base_msg->New());
   bool keep = google::protobuf::util::ParseDelimitedFromZeroCopyStream(
       msg.get(), fin, nullptr);

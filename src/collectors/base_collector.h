@@ -65,7 +65,7 @@ class BaseCollector {
 
  protected:
   //! Reads the state, based on the curr_iter cursor, and returns exit code
-  virtual bool next_state(google::protobuf::Message *out) = 0;
+  virtual bool next_state(google::protobuf::Message *const out) = 0;
 
   //! Current size of the chain
   unsigned int size = 0;
