@@ -211,8 +211,8 @@ int main(int argc, char *argv[]) {
     }
 
     std::cout << "Computing log-density..." << std::endl;
-    Eigen::MatrixXd dens =
-        algo->eval_lpdf(coll, grid, hier_cov_grid, mix_cov_grid);
+    Eigen::MatrixXd dens = bayesmix::eval_lpdf_parallel(
+        algo, coll, grid, hier_cov_grid, mix_cov_grid, false);
     bayesmix::write_matrix_to_file(dens, args.get<std::string>("--dens-file"));
     std::cout << "Successfully wrote density to "
               << args.get<std::string>("--dens-file") << std::endl;
@@ -230,6 +230,7 @@ int main(int argc, char *argv[]) {
       }
       num_clust(i) = state.cluster_states_size();
     }
+    coll->reset();
 
     if (args["--n-cl-file"] != EMPTYSTR) {
       bayesmix::write_matrix_to_file(num_clust,

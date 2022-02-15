@@ -23,6 +23,7 @@
 #include "mixings/truncated_sb_mixing.h"
 #include "runtime/factory.h"
 #include "utils/cluster_utils.h"
+#include "utils/eval_like.h"
 #include "utils/io_utils.h"
 #include "utils/proto_utils.h"
 

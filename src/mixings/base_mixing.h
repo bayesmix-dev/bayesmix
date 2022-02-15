@@ -60,6 +60,11 @@ class BaseMixing : public AbstractMixing {
   //! Main function that initializes members to appropriate values
   void initialize() override;
 
+  std::shared_ptr<AbstractMixing> clone() const override {
+    auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
+    return out;
+  }
+
  protected:
   //! Re-initializes the prior of the mixing to a newly created object
   void create_empty_prior() { prior.reset(new Prior); }

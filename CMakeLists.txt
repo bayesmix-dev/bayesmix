@@ -19,6 +19,7 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 # Require PkgConfig
 find_package(PkgConfig REQUIRED)
+find_package(OpenMP REQUIRED)
 
 # TBB CMake integration
 message(STATUS "Using math TBB")
@@ -100,6 +101,7 @@ set(LINK_LIBRARIES
 	pthread
 	protobuf::libprotobuf
 	TBB::tbb
+  OpenMP::OpenMP_CXX
 )
 
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)

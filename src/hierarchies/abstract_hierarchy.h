@@ -53,6 +53,8 @@ class AbstractHierarchy {
   //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractHierarchy> clone() const = 0;
 
+  virtual std::shared_ptr<AbstractHierarchy> deep_clone() const = 0;
+
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
   //! Public wrapper for `like_lpdf()` methods
   double get_like_lpdf(
@@ -151,6 +153,12 @@ class AbstractHierarchy {
 
   //! Returns a pointer to the Protobuf message of the prior of this cluster
   virtual google::protobuf::Message *get_mutable_prior() = 0;
+
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::ClusterState message by adding the appropriate type
+  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
+  get_state_proto() const = 0;
 
   //! Writes current state to a Protobuf message by pointer
   virtual void write_state_to_proto(

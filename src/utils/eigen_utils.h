@@ -1,3 +1,6 @@
+#ifndef BAYESMIX_SRC_UTILS_EIGEN_UTILS_H_
+#define BAYESMIX_SRC_UTILS_EIGEN_UTILS_H_
+
 #include <Eigen/Dense>
 #include <vector>
 
@@ -31,10 +34,8 @@ template <template <typename...> class Container>
 Eigen::MatrixXd stack_vectors(const Container<Eigen::VectorXd> &rows) {
   int nrows = rows.size();
   int ncols = rows[0].size();
-
   Eigen::MatrixXd out(nrows, ncols);
   for (int i = 0; i < nrows; i++) out.row(i) = rows[i].transpose();
-
   return out;
 }
 
@@ -48,3 +49,5 @@ void check_spd(const Eigen::MatrixXd &mat);
 Eigen::MatrixXd get_2d_grid(const double x1, const double x2, const int nx,
                             const double y1, const double y2, const int ny);
 }  // namespace bayesmix
+
+#endif  // BAYESMIX_SRC_UTILS_EIGEN_UTILS_H_

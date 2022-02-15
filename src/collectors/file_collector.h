@@ -31,6 +31,10 @@ class FileCollector : public BaseCollector {
       fin->Close();
       close(infd);
     }
+
+    if (base_msg != nullptr) {
+      delete base_msg;
+    }
   }
 
   void start_collecting() override;
@@ -41,7 +45,11 @@ class FileCollector : public BaseCollector {
 
   void reset() override;
 
+  google::protobuf::Message *get_base_msg() const { return base_msg; }
+
  protected:
+  google::protobuf::Message *base_msg = nullptr;
+
   //! Opens collector in reading mode
   void open_for_reading();
 
@@ -51,7 +59,7 @@ class FileCollector : public BaseCollector {
   bool next_state(google::protobuf::Message *const out) override;
 
   //! Populates the buffer with the next chunk of objects.
-  void populate_buffer(google::protobuf::Message *const base_msg);
+  void populate_buffer();
 
   //! Unix file descriptor for reading mode
   int infd;
@@ -63,6 +71,10 @@ class FileCollector : public BaseCollector {
 
   int curr_buffer_pos;
 
+  void set_base_msg(google::protobuf::Message *const example_msg) {
+    base_msg = example_msg->New();
+  }
+
   //! Buffer of std::future objects, one per message. std::future is needed
   //! to perform the reading asynchronously.
   std::vector<std::future<
@@ -72,8 +84,7 @@ class FileCollector : public BaseCollector {
   //! Reads one message from the file and returns a tuple containing (a shared
   //! ptr to) the message and a bool indicating whether the message was
   //! successfully read.
-  std::tuple<std::shared_ptr<google::protobuf::Message>, bool> read_one(
-      google::protobuf::Message *const base_msg);
+  std::tuple<std::shared_ptr<google::protobuf::Message>, bool> read_one();
 
   //! Pointer to a reading file stream
   google::protobuf::io::FileInputStream *fin;

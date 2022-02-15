@@ -1,7 +1,7 @@
 #include <benchmark/benchmark.h>
 
+#include "benchmarks/utils.h"
 #include "src/includes.h"
-#include "utils.h"
 
 void run(std::shared_ptr<BaseAlgorithm>& algorithm,
          const Eigen::MatrixXd& data, MemoryCollector* collector) {
@@ -10,14 +10,16 @@ void run(std::shared_ptr<BaseAlgorithm>& algorithm,
 }
 
 Eigen::MatrixXd get_data(int dim) {
+  const char delim = ' ';
   Eigen::MatrixXd out;
   if (dim == 1) {
     out = bayesmix::read_eigen_matrix(
-        "../resources/benchmarks/datasets/univariate_gaussian.csv");
+        "../resources/benchmarks/datasets/univariate_gaussian.csv", delim);
   } else {
     out = bayesmix::read_eigen_matrix(
         "../resources/benchmarks/datasets/multi_gaussian_dim_" +
-        std::to_string(dim) + ".csv");
+            std::to_string(dim) + ".csv",
+        delim);
   }
   return out;
 }

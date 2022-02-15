@@ -124,6 +124,8 @@ class AbstractMixing {
   //! Returns whether the mixing depends on covariate values or not
   virtual bool is_dependent() const { return false; }
 
+  virtual std::shared_ptr<AbstractMixing> clone() const = 0;
+
  protected:
   //! Returns mixing weights (for conditional mixings only)
   //! @param log        Return logarithm-scale values?

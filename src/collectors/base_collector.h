@@ -54,6 +54,35 @@ class BaseCollector {
     return next_state(out);
   }
 
+  std::vector<std::shared_ptr<google::protobuf::Message>> get_chunk(
+      const int size, bool &keep, google::protobuf::Message *const base_msg) {
+    std::vector<std::shared_ptr<google::protobuf::Message>> out;
+    for (int i = 0; i < size; i++) {
+      std::shared_ptr<google::protobuf::Message> msg(base_msg->New());
+      keep = get_next_state(msg.get());
+      if (!keep) {
+        break;
+      }
+      out.push_back(msg);
+    }
+    return out;
+  }
+
+  std::vector<std::shared_ptr<google::protobuf::Message>> get_whole_chain(
+      google::protobuf::Message *const base_msg) {
+    std::vector<std::shared_ptr<google::protobuf::Message>> out;
+    bool keep = true;
+    while (keep) {
+      std::shared_ptr<google::protobuf::Message> msg(base_msg->New());
+      keep = get_next_state(msg.get());
+      if (!keep) {
+        break;
+      }
+      out.push_back(msg);
+    }
+    return out;
+  }
+
   //! Writes the given state to the collector
   virtual void collect(const google::protobuf::Message &state) = 0;
 

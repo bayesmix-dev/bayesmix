@@ -37,11 +37,11 @@ class ConditionalAlgorithm : public BaseAlgorithm {
 
   bool is_conditional() const override { return true; }
 
- protected:
   Eigen::VectorXd lpdf_from_state(
       const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
       const Eigen::RowVectorXd &mix_covariate) override;
 
+ protected:
   //! Performs Gibbs sampling sub-step for all component weights
   virtual void sample_weights() = 0;
 

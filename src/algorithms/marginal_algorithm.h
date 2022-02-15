@@ -39,11 +39,11 @@ class MarginalAlgorithm : public BaseAlgorithm {
 
   bool is_conditional() const override { return false; }
 
- protected:
   Eigen::VectorXd lpdf_from_state(
       const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
       const Eigen::RowVectorXd &mix_covariate) override;
 
+ protected:
   //! Computes marginal contribution of the given cluster to the lpdf estimate
   //! @param hier   Pointer to the `Hierarchy` object representing the cluster
   //! @param grid   Grid of row points on which the density is to be evaluated

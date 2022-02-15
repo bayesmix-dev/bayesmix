@@ -25,7 +25,7 @@ def build_bayesmix(nproc=1, build_dirname="build"):
     build_dir = os.path.join(BAYESMIX_HOME, build_dirname)
     os.makedirs(build_dir, exist_ok=True)
     cmake_cmd = "cmake .. -DDISABLE_DOCS=TRUE -DDISABLE_BENCHMARKS=TRUE " + \
-        "-DDISABLE_TESTS=TRUE -DCMAKE_BUILD_TYPE=Release"
+        "-DDISABLE_TESTS=TRUE -DDISABLE_PLOTS=TRUE -DCMAKE_BUILD_TYPE=Release"
     try:
         run_shell(cmake_cmd, cwd=build_dir)
     except subprocess.CalledProcessError as e:

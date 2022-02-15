@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "testing_utils.h"
 
 std::shared_ptr<AbstractHierarchy> get_multivariate_nnw_hierarchy(int dim) {
   Eigen::MatrixXd scale = get_spd_matrix(dim);
@@ -59,6 +59,7 @@ std::shared_ptr<BaseAlgorithm> get_algorithm(const std::string& id, int dim) {
   } else {
     hier = get_multivariate_nnw_hierarchy(dim);
   }
+  hier->initialize();
   algo->set_mixing(mixing);
   algo->set_hierarchy(hier);
   return algo;

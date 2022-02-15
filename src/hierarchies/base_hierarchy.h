@@ -37,10 +37,29 @@ class BaseHierarchy : public AbstractHierarchy {
   ~BaseHierarchy() = default;
 
   //! Returns an independent, data-less copy of this object
-  virtual std::shared_ptr<AbstractHierarchy> clone() const override {
+  std::shared_ptr<AbstractHierarchy> clone() const override {
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
     out->clear_data();
     out->clear_summary_statistics();
+    return out;
+  }
+
+  //! Returns an independent, data-less copy of this object
+  std::shared_ptr<AbstractHierarchy> deep_clone() const override {
+    auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
+
+    out->clear_data();
+    out->clear_summary_statistics();
+
+    out->create_empty_prior();
+    std::shared_ptr<google::protobuf::Message> new_prior(prior->New());
+    new_prior->CopyFrom(*prior.get());
+    out->get_mutable_prior()->CopyFrom(*new_prior.get());
+
+    out->create_empty_hypers();
+    auto curr_hypers_proto = get_hypers_proto();
+    out->set_hypers_from_proto(*curr_hypers_proto.get());
+    out->initialize();
     return out;
   }
 
@@ -73,7 +92,7 @@ class BaseHierarchy : public AbstractHierarchy {
   std::set<int> get_data_idx() const override { return cluster_data_idx; }
 
   //! Returns a pointer to the Protobuf message of the prior of this cluster
-  virtual google::protobuf::Message *get_mutable_prior() override {
+  google::protobuf::Message *get_mutable_prior() override {
     if (prior == nullptr) {
       create_empty_prior();
     }
@@ -137,17 +156,14 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Re-initializes the prior of the hierarchy to a newly created object
   void create_empty_prior() { prior.reset(new Prior); }
 
+  //! Re-initializes the hypers of the hierarchy to a newly created object
+  void create_empty_hypers() { hypers.reset(new Hyperparams); }
+
   //! Sets the cardinality of the cluster
   void set_card(const int card_) {
     card = card_;
     log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
   }
-
-  //! Writes current state to a Protobuf message and return a shared_ptr
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! AlgoritmState::ClusterState message by adding the appropriate type
-  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
-  get_state_proto() const = 0;
 
   //! Initializes state parameters to appropriate values
   virtual void initialize_state() = 0;
