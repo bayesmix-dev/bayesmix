@@ -19,7 +19,7 @@ void density_plot_1d(const Eigen::MatrixXd &grid, const Eigen::VectorXd &dens,
                      const std::string &outfile);
 
 void density_plot_2d(const Eigen::MatrixXd &grid, const Eigen::VectorXd &dens_,
-                     const std::string &outfile, bool log_scale = true);
+                     const std::string &outfile, const bool log_scale = true);
 
 void num_clus_trace(const Eigen::MatrixXd &num_clus_chain,
                     const std::string &outfile);

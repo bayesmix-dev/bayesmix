@@ -81,11 +81,13 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   //! Writes current state to a Protobuf message by pointer
-  void write_state_to_proto(google::protobuf::Message *out) const override;
+  void write_state_to_proto(
+      google::protobuf::Message *const out) const override;
 
   //! Writes current values of the hyperparameters to a Protobuf message by
   //! pointer
-  void write_hypers_to_proto(google::protobuf::Message *out) const override;
+  void write_hypers_to_proto(
+      google::protobuf::Message *const out) const override;
 
   //! Returns the struct of the current state
   State get_state() const { return state; }
@@ -120,7 +122,7 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   //! Sets the (pointer to the) dataset matrix
-  void set_dataset(const Eigen::MatrixXd *dataset) override {
+  void set_dataset(const Eigen::MatrixXd *const dataset) override {
     dataset_ptr = dataset;
   }
 
@@ -170,7 +172,7 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Down-casts the given generic proto message to a ClusterState proto
   bayesmix::AlgorithmState::ClusterState *downcast_state(
-      google::protobuf::Message *state_) const {
+      google::protobuf::Message *const state_) const {
     return google::protobuf::internal::down_cast<
         bayesmix::AlgorithmState::ClusterState *>(state_);
   }
@@ -184,7 +186,7 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Down-casts the given generic proto message to a HierarchyHypers proto
   bayesmix::AlgorithmState::HierarchyHypers *downcast_hypers(
-      google::protobuf::Message *state_) const {
+      google::protobuf::Message *const state_) const {
     return google::protobuf::internal::down_cast<
         bayesmix::AlgorithmState::HierarchyHypers *>(state_);
   }
@@ -253,7 +255,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
-    google::protobuf::Message *out) const {
+    google::protobuf::Message *const out) const {
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> state_ =
       get_state_proto();
   auto *out_cast = downcast_state(out);
@@ -263,7 +265,7 @@ void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
 
 template <class Derived, typename State, typename Hyperparams, typename Prior>
 void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_hypers_to_proto(
-    google::protobuf::Message *out) const {
+    google::protobuf::Message *const out) const {
   std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> hypers_ =
       get_hypers_proto();
   auto *out_cast = downcast_hypers(out);

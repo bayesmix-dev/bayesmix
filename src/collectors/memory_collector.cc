@@ -7,14 +7,14 @@ void MemoryCollector::collect(const google::protobuf::Message& state) {
   size++;
 }
 
-void MemoryCollector::get_state(unsigned int i,
+void MemoryCollector::get_state(const unsigned int i,
                                 google::protobuf::Message* out) {
   out->ParseFromString(chain[i]);
 }
 
 void MemoryCollector::reset() { curr_iter = 0; }
 
-bool MemoryCollector::next_state(google::protobuf::Message* out) {
+bool MemoryCollector::next_state(google::protobuf::Message* const out) {
   if (curr_iter == size) {
     return false;
   }

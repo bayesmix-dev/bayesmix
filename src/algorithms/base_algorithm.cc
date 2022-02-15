@@ -161,7 +161,8 @@ void BaseAlgorithm::update_hierarchy_hypers() {
   unique_values[0]->update_hypers(states);
 }
 
-bayesmix::AlgorithmState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
+bayesmix::AlgorithmState BaseAlgorithm::get_state_as_proto(
+    const unsigned int iter) {
   bayesmix::AlgorithmState iter_out;
   // Transcribe iteration number, allocations, and cardinalities
   iter_out.set_iteration_num(iter);
@@ -187,7 +188,7 @@ bayesmix::AlgorithmState BaseAlgorithm::get_state_as_proto(unsigned int iter) {
   return iter_out;
 }
 
-bool BaseAlgorithm::update_state_from_collector(BaseCollector *coll) {
+bool BaseAlgorithm::update_state_from_collector(BaseCollector *const coll) {
   bool success = coll->get_next_state(&curr_state);
   return success;
 }

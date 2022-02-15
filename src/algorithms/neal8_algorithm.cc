@@ -90,7 +90,7 @@ void Neal8Algorithm::sample_allocations() {
 }
 
 Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
-    std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+    const std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
     const Eigen::RowVectorXd &covariate) const {
   unsigned int n_grid = grid.rows();
   Eigen::VectorXd lpdf_(n_grid);

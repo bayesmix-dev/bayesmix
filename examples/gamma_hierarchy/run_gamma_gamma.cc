@@ -3,7 +3,7 @@
 #include "gamma_gamma_hier.h"
 #include "src/includes.h"
 
-Eigen::MatrixXd simulate_data(int ndata) {
+Eigen::MatrixXd simulate_data(const unsigned int ndata) {
   Eigen::MatrixXd data(ndata, 1);
   auto& rng = bayesmix::Rng::Instance().get();
   for (int i = 0; i < ndata; i++) {

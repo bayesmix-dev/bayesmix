@@ -64,7 +64,9 @@ class LapNIGHierarchy
   void set_hypers_from_proto(
       const google::protobuf::Message &hypers_) override;
 
-  void save_posterior_hypers() { throw std::runtime_error("Not implemented"); }
+  void save_posterior_hypers() {
+    throw std::runtime_error("save_posterior_hypers() not implemented");
+  }
 
   //! Returns whether the hierarchy models multivariate data or not
   bool is_multivariate() const override { return false; }
@@ -94,7 +96,7 @@ class LapNIGHierarchy
 
   //! Generates new state values from the centering posterior distribution
   //! @param update_params  Save posterior hypers after the computation?
-  void sample_full_cond(bool update_params = false) override;
+  void sample_full_cond(const bool update_params = false) override;
 
  protected:
   //! Set of values of data points belonging to this cluster
@@ -113,7 +115,7 @@ class LapNIGHierarchy
   //! Evaluates the prior given the mean (unconstrained_parameters(0))
   //! and log of the scale (unconstrained_parameters(1))
   double eval_prior_lpdf_unconstrained(
-      Eigen::VectorXd unconstrained_parameters);
+      const Eigen::VectorXd &unconstrained_parameters);
 
   //! Evaluates the (sum of the) log likelihood for all the observations in the
   //! cluster given the mean (unconstrained_parameters(0))
@@ -121,8 +123,8 @@ class LapNIGHierarchy
   //! The parameter "is_current" is used to identify if the evaluation of the
   //! likelihood is on the current or on the proposed parameters, in order to
   //! avoid repeating calculations of the sum of the absolute differences
-  double eval_like_lpdf_unconstrained(Eigen::VectorXd unconstrained_parameters,
-                                      bool is_current);
+  double eval_like_lpdf_unconstrained(
+      const Eigen::VectorXd &unconstrained_parameters, const bool is_current);
 
   //! Evaluates the log-likelihood of data in a single point
   //! @param datum      Point which is to be evaluated
@@ -133,7 +135,7 @@ class LapNIGHierarchy
   //! @param datum      Data point which is being added or removed
   //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                 bool add) override;
+                                 const bool add) override;
 
   //! Initializes hierarchy hyperparameters to appropriate values
   void initialize_hypers() override;

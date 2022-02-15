@@ -140,7 +140,7 @@ class NNWHierarchy
   //! @param datum      Data point which is being added or removed
   //! @param add        Whether the datum is being added or removed
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                 bool add) override;
+                                 const bool add) override;
 
   //! Writes prec and its utilities to the given state object by pointer
   void write_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);

@@ -19,7 +19,7 @@
 
 class FileCollector : public BaseCollector {
  public:
-  FileCollector(const std::string &filename_, int chunk_size = 100)
+  FileCollector(const std::string &filename_, const int chunk_size = 100)
       : filename(filename_), chunk_size(chunk_size) {}
 
   ~FileCollector() {
@@ -48,10 +48,10 @@ class FileCollector : public BaseCollector {
   //! Terminates reading mode for the collector
   void close_reading();
 
-  bool next_state(google::protobuf::Message *out) override;
+  bool next_state(google::protobuf::Message *const out) override;
 
   //! Populates the buffer with the next chunk of objects.
-  void populate_buffer(google::protobuf::Message *base_msg);
+  void populate_buffer(google::protobuf::Message *const base_msg);
 
   //! Unix file descriptor for reading mode
   int infd;
@@ -73,7 +73,7 @@ class FileCollector : public BaseCollector {
   //! ptr to) the message and a bool indicating whether the message was
   //! successfully read.
   std::tuple<std::shared_ptr<google::protobuf::Message>, bool> read_one(
-      google::protobuf::Message *base_msg);
+      google::protobuf::Message *const base_msg);
 
   //! Pointer to a reading file stream
   google::protobuf::io::FileInputStream *fin;

@@ -163,10 +163,10 @@ class BaseAlgorithm {
 
   // AUXILIARY TOOLS
   //! Returns Protobuf object containing current state values and iter number
-  bayesmix::AlgorithmState get_state_as_proto(unsigned int iter);
+  bayesmix::AlgorithmState get_state_as_proto(const unsigned int iter);
 
   //! Advances `Collector` reading pointer by one, and returns 1 if successful
-  bool update_state_from_collector(BaseCollector *coll);
+  bool update_state_from_collector(BaseCollector *const coll);
 
   //! Evaluates the estimated log-lpdf on the state contained in `curr_state`
   //! @param grid   Grid of row points on which the density is to be evaluated

@@ -49,7 +49,8 @@ class MarginalAlgorithm : public BaseAlgorithm {
   //! @param grid   Grid of row points on which the density is to be evaluated
   //! @return       The marginal component of the estimate
   virtual Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+      const std::shared_ptr<AbstractHierarchy> hier,
+      const Eigen::MatrixXd &grid,
       const Eigen::RowVectorXd &covariate) const = 0;
 
   //! Deletes cluster from the algorithm state given its label

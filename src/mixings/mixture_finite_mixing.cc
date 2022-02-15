@@ -27,7 +27,7 @@ void MixtureFiniteMixing::update_state(
 
 double MixtureFiniteMixing::mass_existing_cluster(
     const unsigned int n, const unsigned int n_clust, const bool log,
-    const bool propto, std::shared_ptr<AbstractHierarchy> hier) const {
+    const bool propto, const std::shared_ptr<AbstractHierarchy> hier) const {
   double out;
   double V1 = get_V_t(n_clust, n);
   double V2 = get_V_t(n_clust + 1, n);
@@ -101,7 +101,7 @@ void MixtureFiniteMixing::initialize_state() {
   }
 }
 
-void MixtureFiniteMixing::init_V_and_C(unsigned int n) const {
+void MixtureFiniteMixing::init_V_and_C(const unsigned int n) const {
   // Initialize V
   V = std::vector<double>(n, -1);
 
@@ -119,7 +119,8 @@ void MixtureFiniteMixing::init_V_and_C(unsigned int n) const {
   V_C_are_initialized = true;
 }
 
-void MixtureFiniteMixing::compute_V_t(double t, unsigned int n) const {
+void MixtureFiniteMixing::compute_V_t(const double t,
+                                      const unsigned int n) const {
   double sum = 0;
   unsigned int k = 1;
   double last_term_sum_rate =
@@ -154,7 +155,8 @@ void MixtureFiniteMixing::compute_V_t(double t, unsigned int n) const {
   V[t] = sum;
 }
 
-double MixtureFiniteMixing::get_V_t(double t, unsigned int n) const {
+double MixtureFiniteMixing::get_V_t(const double t,
+                                    const unsigned int n) const {
   if (!V_C_are_initialized) {
     init_V_and_C(n + 1);
   }

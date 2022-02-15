@@ -50,7 +50,8 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
   void sample_unique_values() override;
 
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+      const std::shared_ptr<AbstractHierarchy> hier,
+      const Eigen::MatrixXd &grid,
       const Eigen::RowVectorXd &covariate) const override;
 
   void compute_restricted_gs_data_idx(const unsigned int first_random_idx,
@@ -68,7 +69,7 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
    */
   std::pair<double, double> compute_log_ratios(
       const unsigned int first_random_idx,
-      const unsigned int second_random_idx, bool split);
+      const unsigned int second_random_idx, const bool split);
 
   void split_or_merge(const unsigned int first_random_idx,
                       const unsigned int second_random_idx);
@@ -91,8 +92,8 @@ class SplitAndMergeAlgorithm : public MarginalAlgorithm {
    * in restricted_gs_data_idx to their original clustering configuration.
    */
   double restricted_gs(const double first_random_idx,
-                       bool return_log_res_prod = false,
-                       bool step_to_original_clust = false);
+                       const bool return_log_res_prod = false,
+                       const bool step_to_original_clust = false);
 
   /* Vector that contains the indexes of the data points that are considered
    * in the restricted Gibbs sampling.
