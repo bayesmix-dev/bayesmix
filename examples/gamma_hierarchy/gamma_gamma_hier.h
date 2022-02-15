@@ -28,7 +28,8 @@ class GammaGammaHierarchy
                                 GammaGamma::Hyperparams,
                                 bayesmix::EmptyPrior> {
  public:
-  GammaGammaHierarchy(double shape, double rate_alpha, double rate_beta)
+  GammaGammaHierarchy(const double shape, const double rate_alpha,
+                      const double rate_beta)
       : shape(shape), rate_alpha(rate_alpha), rate_beta(rate_beta) {
     create_empty_prior();
   }
@@ -50,7 +51,8 @@ class GammaGammaHierarchy
         params.rate_alpha, params.rate_beta, bayesmix::Rng::Instance().get())};
   }
 
-  void update_summary_statistics(const Eigen::RowVectorXd &datum, bool add) {
+  void update_summary_statistics(const Eigen::RowVectorXd &datum,
+                                 const bool add) {
     if (add) {
       data_sum += datum(0);
       ndata += 1;
