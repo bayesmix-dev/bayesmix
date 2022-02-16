@@ -16,3 +16,8 @@ sftp-config.json
 *.local.*
 # MacOS storage files
 .DS_Store
+.dockerignore
+.ipynb_checkpoints/
+docs/_build/
+resources/benchmarks/datasets
+resources/2d
