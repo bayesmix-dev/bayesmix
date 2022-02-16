@@ -23,19 +23,24 @@
 //! class for further information). It includes class members and some more
 //! functions which could not be implemented in the non-templatized abstract
 //! class.
-//! See, for instance, `ConjugateHierarchy` and `NNIGHierarchy` to better
-//! understand the CRTP patterns.
+//! See, for instance, `NNIGHierarchy` to better understand the CRTP patterns.
 
 //! @tparam Derived      Name of the implemented derived class
-//! @tparam State        Class name of the container for state values
-//! @tparam Hyperparams  Class name of the container for hyperprior parameters
-//! @tparam Prior        Class name of the container for prior parameters
+//! @tparam Likelihood   Class name of the likelihood model for the hierarchy
+//! @tparam PriorModel   Class name of the prior model for the hierarchy
+//! @tparam Updater      Class name for the update algorithm used for posterior sampling
 
 template <class Derived, class Likelihood, class PriorModel>
 class BaseHierarchy : public AbstractHierarchy {
  protected:
+  
+  //! Container for the likelihood of the hierarchy
   std::shared_ptr<Likelihood> like = std::make_shared<Likelihood>();
+
+  //! Container for the prior model of the hierarchy
   std::shared_ptr<PriorModel> prior = std::make_shared<PriorModel>();
+  
+  //! Container for the update algorithm adopted
   std::shared_ptr<AbstractUpdater> updater;
 
  public:
@@ -75,7 +80,8 @@ class BaseHierarchy : public AbstractHierarchy {
     return like;
   }
   std::shared_ptr<AbstractPriorModel> get_prior() override { return prior; }
-
+  
+  //! Returns an independent, data-less copy of this object
   std::shared_ptr<AbstractHierarchy> clone() const override {
     // Create copy of the hierarchy
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
@@ -85,16 +91,22 @@ class BaseHierarchy : public AbstractHierarchy {
     return out;
   };
 
+  // NOT SURE THIS IS CORRECT, MAYBE OVERRIDE GET_LIKE_LPDF? OR THIS IS EVEN UNNECESSARY
   double like_lpdf(const Eigen::RowVectorXd &datum) const override {
     return like->lpdf(datum);
   }
 
+  //! Evaluates the log-likelihood of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
   Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data,
                                  const Eigen::MatrixXd &covariates =
                                      Eigen::MatrixXd(0, 0)) const override {
     return like->lpdf_grid(data, covariates);
   };
 
+  // ADD EXCEPTION HANDLING
   double get_marg_lpdf(
       const HyperParams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
@@ -105,12 +117,14 @@ class BaseHierarchy : public AbstractHierarchy {
     }
   }
 
+  // ADD EXCEPTION HANDLING
   double prior_pred_lpdf(const Eigen::RowVectorXd &datum,
                          const Eigen::RowVectorXd &covariate =
                              Eigen::RowVectorXd(0)) const override {
     return get_marg_lpdf(prior->get_hypers(), datum, covariate);
   }
 
+  // ADD EXCEPTION HANDLING
   Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/)
@@ -138,12 +152,14 @@ class BaseHierarchy : public AbstractHierarchy {
     return lpdf;
   }
 
+  // ADD EXCEPTION HANDLING
   double conditional_pred_lpdf(const Eigen::RowVectorXd &datum,
                                const Eigen::RowVectorXd &covariate =
                                    Eigen::RowVectorXd(0)) const override {
     return get_marg_lpdf(prior->get_posterior_hypers(), datum, covariate);
   }
 
+  // ADD EXCEPTION HANDLING
   Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/)
@@ -171,16 +187,18 @@ class BaseHierarchy : public AbstractHierarchy {
     return lpdf;
   }
 
+  //! Generates new state values from the centering prior distribution
   void sample_prior() override {
-    // int card = like->get_card();
     like->set_state_from_proto(*prior->sample(false), false);
-    // like->set_card(card);
   };
 
+  //! Generates new state values from the centering posterior distribution
+  //! @param update_params  Save posterior hypers after the computation?
   void sample_full_cond(bool update_params = false) override {
     updater->draw(*like, *prior, update_params);
   };
 
+  //! Overloaded version of sample_full_cond(bool), mainly used for debugging
   void sample_full_cond(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override {
@@ -213,24 +231,31 @@ class BaseHierarchy : public AbstractHierarchy {
     prior->update_hypers(states);
   };
 
+  //! Returns the class of the current state
   auto get_state() const -> decltype(like->get_state()) {
     return like->get_state();
   };
 
+  //! Returns the current cardinality of the cluster
   int get_card() const override { return like->get_card(); };
 
+  //! Returns the logarithm of the current cardinality of the cluster
   double get_log_card() const override { return like->get_log_card(); };
 
+  //! Returns the indexes of data points belonging to this cluster
   std::set<int> get_data_idx() const override { return like->get_data_idx(); };
 
+  //! Returns a pointer to the Protobuf message of the prior of this cluster
   google::protobuf::Message *get_mutable_prior() override {
     return prior->get_mutable_prior();
   };
 
+  //! Writes current state to a Protobuf message by pointer
   void write_state_to_proto(google::protobuf::Message *out) const override {
     like->write_state_to_proto(out);
   };
 
+  //! Writes current values of the hyperparameters to a Protobuf message by pointer
   void write_hypers_to_proto(google::protobuf::Message *out) const override {
     prior->write_hypers_to_proto(out);
   };
@@ -244,6 +269,7 @@ class BaseHierarchy : public AbstractHierarchy {
     prior->set_hypers_from_proto(state_);
   };
 
+  //! Adds a datum and its index to the hierarchy
   void add_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
@@ -252,6 +278,7 @@ class BaseHierarchy : public AbstractHierarchy {
     if (update_params) updater->compute_posterior_hypers(*like, *prior);
   };
 
+  //! Removes a datum and its index from the hierarchy
   void remove_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
@@ -260,6 +287,7 @@ class BaseHierarchy : public AbstractHierarchy {
     if (update_params) updater->compute_posterior_hypers(*like, *prior);
   };
 
+  //! Main function that initializes members to appropriate values
   void initialize() override {
     prior->initialize();
     if (is_conjugate()) prior->set_posterior_hypers(prior->get_hypers());
@@ -275,8 +303,10 @@ class BaseHierarchy : public AbstractHierarchy {
   bool is_conjugate() const override { return updater->is_conjugate(); };
 
  protected:
+  //! Initializes state parameters to appropriate values
   virtual void initialize_state() = 0;
 
+  // ADD EXEPTION HANDLING
   virtual double marg_lpdf(const HyperParams &params,
                            const Eigen::RowVectorXd &datum) const {
     if (!is_conjugate()) {
@@ -287,6 +317,7 @@ class BaseHierarchy : public AbstractHierarchy {
     }
   }
 
+  // ADD EXEPTION HANDLING
   virtual double marg_lpdf(const HyperParams &params,
                            const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const {
@@ -298,5 +329,102 @@ class BaseHierarchy : public AbstractHierarchy {
     }
   }
 };
+
+// TODO: Move definitions outside the class to improve code cleaness
+// TODO: Move this docs in the right place
+
+//! Returns the struct of the current prior hyperparameters
+//   Hyperparams get_hypers() const { return *hypers; }
+
+//! Returns the struct of the current posterior hyperparameters
+//   Hyperparams get_posterior_hypers() const { return posterior_hypers; }
+
+
+//! Raises an error if the prior pointer is not initialized
+//   void check_prior_is_set() const {
+//     if (prior == nullptr) {
+//       throw std::invalid_argument("Hierarchy prior was not provided");
+//     }
+//   }
+
+//! Re-initializes the prior of the hierarchy to a newly created object
+//   void create_empty_prior() { prior.reset(new Prior); }
+
+//! Sets the cardinality of the cluster
+//   void set_card(const int card_) {
+//     card = card_;
+//     log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
+//   }
+
+//! Writes current state to a Protobuf message and return a shared_ptr
+//! New hierarchies have to first modify the field 'oneof val' in the
+//! AlgoritmState::ClusterState message by adding the appropriate type
+//   virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
+//   get_state_proto() const = 0;
+
+
+//! Writes current value of hyperparameters to a Protobuf message and
+//! return a shared_ptr.
+//! New hierarchies have to first modify the field 'oneof val' in the
+//! AlgoritmState::HierarchyHypers message by adding the appropriate type
+//   virtual std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
+//   get_hypers_proto() const = 0;
+
+//! Initializes hierarchy hyperparameters to appropriate values
+//   virtual void initialize_hypers() = 0;
+
+//! Resets cardinality and indexes of data in this cluster
+//   void clear_data() {
+//     set_card(0);
+//     cluster_data_idx = std::set<int>();
+//   }
+
+//! Down-casts the given generic proto message to a ClusterState proto
+//   bayesmix::AlgorithmState::ClusterState *downcast_state(
+//       google::protobuf::Message *state_) const {
+//     return google::protobuf::internal::down_cast<
+//         bayesmix::AlgorithmState::ClusterState *>(state_);
+//   }
+
+//! Down-casts the given generic proto message to a ClusterState proto
+//   const bayesmix::AlgorithmState::ClusterState &downcast_state(
+//       const google::protobuf::Message &state_) const {
+//     return google::protobuf::internal::down_cast<
+//         const bayesmix::AlgorithmState::ClusterState &>(state_);
+//   }
+
+//! Down-casts the given generic proto message to a HierarchyHypers proto
+//   bayesmix::AlgorithmState::HierarchyHypers *downcast_hypers(
+//       google::protobuf::Message *state_) const {
+//     return google::protobuf::internal::down_cast<
+//         bayesmix::AlgorithmState::HierarchyHypers *>(state_);
+//   }
+
+//! Down-casts the given generic proto message to a HierarchyHypers proto
+//   const bayesmix::AlgorithmState::HierarchyHypers &downcast_hypers(
+//       const google::protobuf::Message &state_) const {
+//     return google::protobuf::internal::down_cast<
+//         const bayesmix::AlgorithmState::HierarchyHypers &>(state_);
+//   }
+
+
+//   //! Container for prior hyperparameters values
+//   std::shared_ptr<Hyperparams> hypers;
+
+//   //! Container for posterior hyperparameters values
+//   Hyperparams posterior_hypers;
+
+//   //! Pointer to a Protobuf prior object for this class
+//   std::shared_ptr<Prior> prior;
+
+//   //! Set of indexes of data points belonging to this cluster
+//   std::set<int> cluster_data_idx;
+
+//   //! Current cardinality of this cluster
+//   int card = 0;
+
+//   //! Logarithm of current cardinality of this cluster
+//   double log_card = stan::math::NEGATIVE_INFTY;
+// };
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

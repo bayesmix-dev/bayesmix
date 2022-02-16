@@ -4,4 +4,6 @@ target_sources(bayesmix PUBLIC
     states.h
     uni_norm_likelihood.h
     uni_norm_likelihood.cc
+    multi_norm_likelihood.h
+    multi_norm_likelihood.cc
 )
