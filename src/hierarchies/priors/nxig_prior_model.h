@@ -3,9 +3,10 @@
 
 // #include <google/protobuf/stubs/casts.h>
 
-#include <Eigen/Dense>
+// #include <Eigen/Dense>
 #include <memory>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 // #include "algorithm_state.pb.h"
@@ -15,7 +16,7 @@
 #include "src/utils/rng.h"
 
 class NxIGPriorModel : public BasePriorModel<NxIGPriorModel, Hyperparams::NxIG,
-                                            bayesmix::NNxIGPrior> {
+                                             bayesmix::NNxIGPrior> {
  public:
   NxIGPriorModel() = default;
   ~NxIGPriorModel() = default;

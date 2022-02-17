@@ -3,9 +3,10 @@
 
 // #include <google/protobuf/stubs/casts.h>
 
-#include <Eigen/Dense>
+// #include <Eigen/Dense>
 #include <memory>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 // #include "algorithm_state.pb.h"
@@ -15,7 +16,7 @@
 #include "src/utils/rng.h"
 
 class NWPriorModel : public BasePriorModel<NWPriorModel, Hyperparams::NW,
-                                            bayesmix::NNWPrior> {
+                                           bayesmix::NNWPrior> {
  public:
   NWPriorModel() = default;
   ~NWPriorModel() = default;
@@ -36,7 +37,6 @@ class NWPriorModel : public BasePriorModel<NWPriorModel, Hyperparams::NW,
   unsigned int get_dim() const { return dim; };
 
  protected:
-
   std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
       const override;
 

@@ -1,6 +1,6 @@
 #include "nnig_updater.h"
 
-#include "src/hierarchies/likelihoods/states.h"
+#include "src/hierarchies/likelihoods/states/includes.h"
 #include "src/hierarchies/priors/hyperparams.h"
 
 void NNIGUpdater::compute_posterior_hypers(AbstractLikelihood& like,
@@ -8,7 +8,7 @@ void NNIGUpdater::compute_posterior_hypers(AbstractLikelihood& like,
   // Likelihood and Prior downcast
   auto& likecast = downcast_likelihood(like);
   auto& priorcast = downcast_prior(prior);
-  
+
   // Getting required quantities from likelihood and prior
   int card = likecast.get_card();
   double data_sum = likecast.get_data_sum();

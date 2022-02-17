@@ -1,6 +1,6 @@
 #include "nnw_updater.h"
 
-#include "src/hierarchies/likelihoods/states.h"
+#include "src/hierarchies/likelihoods/states/includes.h"
 #include "src/hierarchies/priors/hyperparams.h"
 
 void NNWUpdater::compute_posterior_hypers(AbstractLikelihood& like,
@@ -8,7 +8,7 @@ void NNWUpdater::compute_posterior_hypers(AbstractLikelihood& like,
   // Likelihood and Prior downcast
   auto& likecast = downcast_likelihood(like);
   auto& priorcast = downcast_prior(prior);
-  
+
   // Getting required quantities from likelihood and prior
   int card = likecast.get_card();
   Eigen::VectorXd data_sum = likecast.get_data_sum();
@@ -35,7 +35,8 @@ void NNWUpdater::compute_posterior_hypers(AbstractLikelihood& like,
               (mubar - hypers.mean) * (mubar - hypers.mean).transpose();
   post_params.scale_inv = tau_temp + hypers.scale_inv;
   post_params.scale = stan::math::inverse_spd(post_params.scale_inv);
-  post_params.scale_chol = Eigen::LLT<Eigen::MatrixXd>(post_params.scale).matrixU();
+  post_params.scale_chol =
+      Eigen::LLT<Eigen::MatrixXd>(post_params.scale).matrixU();
   priorcast.set_posterior_hypers(post_params);
   return;
 };
