@@ -4,7 +4,7 @@ FROM ubuntu:latest
 RUN apt-get -y update && apt-get install -y
 
 
-RUN apt-get -y install g++ autoconf automake libtool curl make unzip 
+RUN apt-get -y install g++ autoconf automake libtool curl make unzip
 RUN apt-get -y install ccache
 RUN apt-get -y install python3-pip
 RUN python3 -m pip install cmake
