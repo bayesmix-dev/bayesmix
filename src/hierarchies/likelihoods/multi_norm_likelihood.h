@@ -3,14 +3,14 @@
 
 #include <google/protobuf/stubs/casts.h>
 
-#include <Eigen/Dense>
 #include <memory>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "algorithm_state.pb.h"
 #include "base_likelihood.h"
-#include "states.h"
+#include "states/includes.h"
 
 class MultiNormLikelihood
     : public BaseLikelihood<MultiNormLikelihood, State::MultiLS> {
@@ -26,7 +26,7 @@ class MultiNormLikelihood
   void set_dim(unsigned int dim_) {
     dim = dim_;
     data_sum = Eigen::VectorXd::Zero(dim);
-    data_sum_squares = Eigen::MatrixXd::Zero(dim,dim);
+    data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
   };
   unsigned int get_dim() const { return dim; };
   Eigen::VectorXd get_data_sum() const { return data_sum; };
