@@ -7,7 +7,7 @@ COPY test /usr/bayesmix/test
 COPY python /usr/bayesmix/python
 COPY CMakeLists.txt /usr/bayesmix/CMakeLists.txt
 COPY lib/argparse /usr/bayesmix/lib/argparse
-COPY *.cc /usr/bayesmix/
+COPY executables/ /usr/bayesmix/executables
 
 WORKDIR /usr/bayesmix
 
