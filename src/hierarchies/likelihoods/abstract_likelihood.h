@@ -4,15 +4,10 @@
 #include <google/protobuf/message.h>
 
 #include <memory>
+#include <stan/math/prim.hpp>
 #include <stan/math/rev.hpp>
 
-// #include <random>
-// #include <set>
-// #include <stan/math/prim.hpp>
-
 #include "algorithm_state.pb.h"
-// #include "hierarchy_id.pb.h"
-// #include "src/utils/rng.h"
 
 class AbstractLikelihood {
  public:
