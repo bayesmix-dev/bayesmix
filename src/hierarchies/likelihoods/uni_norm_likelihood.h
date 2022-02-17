@@ -9,7 +9,7 @@
 
 #include "algorithm_state.pb.h"
 #include "base_likelihood.h"
-#include "states.h"
+#include "states/includes.h"
 
 class UniNormLikelihood
     : public BaseLikelihood<UniNormLikelihood, State::UniLS> {
