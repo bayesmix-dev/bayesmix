@@ -6,7 +6,7 @@
 #include <stan/math/rev.hpp>
 #include <vector>
 
-#include "src/hierarchies/likelihoods/states.h"
+#include "src/hierarchies/likelihoods/states/includes.h"
 #include "src/utils/rng.h"
 
 TEST(mix_dist, 1) {
