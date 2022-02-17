@@ -87,7 +87,6 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
 set(INCLUDE_PATHS
   ${BASEPATH}
-  ${BASEPATH}/proto
   ${CMAKE_CURRENT_LIST_DIR}/lib/math
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.72.0
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
@@ -106,7 +105,7 @@ set(LINK_LIBRARIES
 
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
-file(GLOB ProtoFiles "${BASEPATH}/proto/*.proto")
+file(GLOB ProtoFiles "${BASEPATH}/src/proto/*.proto")
 set(PROTO_DIR proto)
 
 foreach(PROTO_FILE IN LISTS ProtoFiles)
@@ -119,7 +118,7 @@ foreach(PROTO_FILE IN LISTS ProtoFiles)
   message(STATUS "protoc src: ${PROTO_SRC}")
   add_custom_command(
     OUTPUT ${PROTO_SRC} ${PROTO_HDR}
-    COMMAND protobuf::protoc "--proto_path=${BASEPATH}/proto"
+    COMMAND protobuf::protoc "--proto_path=${BASEPATH}/src/proto"
     ${PROTO_DIRS} "--cpp_out=${PROJECT_BINARY_DIR}" ${PROTO_FILE}
     DEPENDS ${PROTO_FILE} protobuf::protoc
     COMMENT "Generate C++ protocol buffer for ${PROTO_FILE}"
@@ -143,7 +142,7 @@ endif()
 # Build library object
 add_library(bayesmix OBJECT)
 target_sources(bayesmix PUBLIC ${PROTO_SRCS} ${PROTO_HDRS})
-add_subdirectory(src)    # source files
+add_subdirectory(src)
 target_include_directories(bayesmix PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(bayesmix PUBLIC ${LINK_LIBRARIES})
 target_compile_options(bayesmix PUBLIC ${COMPILE_OPTIONS})
@@ -153,7 +152,7 @@ add_library(bayesmixlib $<TARGET_OBJECTS:bayesmix>)
 
 if (BUILD_RUN)
   # Build run executable
-  add_executable(run_mcmc $<TARGET_OBJECTS:bayesmix> run_mcmc.cc)
+  add_executable(run_mcmc $<TARGET_OBJECTS:bayesmix> executables/run_mcmc.cc)
   target_include_directories(run_mcmc PUBLIC ${INCLUDE_PATHS})
   target_link_libraries(run_mcmc PUBLIC ${LINK_LIBRARIES})
   target_compile_options(run_mcmc PUBLIC ${COMPILE_OPTIONS})
@@ -172,7 +171,38 @@ if (NOT DISABLE_DOCS)
 endif()
 
 if (NOT DISABLE_PLOTS)
-  add_subdirectory(plots)
+  include(FetchContent)
+
+  set(FETCHCONTENT_QUIET OFF)
+  set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+  set(BUILD_SHARED_LIBS OFF)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  set(BUILD_TESTING OFF)
+
+  message(CHECK_START "Fetching Matplotplusplus")
+  list(APPEND CMAKE_MESSAGE_INDENT "  ")
+
+  FetchContent_Declare(matplotplusplus
+    GIT_REPOSITORY https://github.com/alandefreitas/matplotplusplus
+    GIT_TAG origin/master # or whatever tag you want
+  )
+
+  FetchContent_GetProperties(matplotplusplus)
+  if(NOT matplotplusplus_POPULATED)
+    FetchContent_Populate(matplotplusplus)
+    add_subdirectory(${matplotplusplus_SOURCE_DIR} ${matplotplusplus_BINARY_DIR}
+                     EXCLUDE_FROM_ALL)
+  endif()
+  # find_package(Matplot++ REQUIRED)
+  message("matplot " ${matplotplusplus_SOURCE_DIR})
+
+  add_executable(plot_mcmc $<TARGET_OBJECTS:bayesmix> executables/plot_mcmc.cc
+    src/plots/plot_utils.h
+    src/plots/plot_utils.cc)
+    target_include_directories(plot_mcmc PUBLIC
+      ${INCLUDE_PATHS} ${matplotplusplus_SOURCE_DIR}/source)
+  target_link_libraries(plot_mcmc PUBLIC ${LINK_LIBRARIES} matplot)
+  target_compile_options(plot_mcmc PUBLIC ${COMPILE_OPTIONS})
 endif()
 
 if (NOT DISABLE_EXAMPLES)
