@@ -29,9 +29,7 @@ class NNIGHierarchy
     return bayesmix::HierarchyId::NNIG;
   }
 
-  void set_default_updater() override {
-    updater = std::make_shared<NNIGUpdater>();
-  }
+  void set_default_updater() { updater = std::make_shared<NNIGUpdater>(); }
 
   void initialize_state() override {
     // Get hypers
