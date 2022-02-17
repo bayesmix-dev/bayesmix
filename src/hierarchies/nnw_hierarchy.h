@@ -18,8 +18,8 @@
 #include "priors/nw_prior_model.h"
 #include "updaters/nnw_updater.h"
 
-class NNWHierarchy : public BaseHierarchy<NNWHierarchy, MultiNormLikelihood,
-                                          NWPriorModel, NNWUpdater> {
+class NNWHierarchy
+    : public BaseHierarchy<NNWHierarchy, MultiNormLikelihood, NWPriorModel> {
  public:
   NNWHierarchy() = default;
   ~NNWHierarchy() = default;
@@ -27,6 +27,8 @@ class NNWHierarchy : public BaseHierarchy<NNWHierarchy, MultiNormLikelihood,
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNW;
   }
+
+  void set_default_updater() { updater = std::make_shared<NNWUpdater>(); }
 
   void initialize_state() override {
     // Initialize likelihood dimension to prior one
@@ -37,7 +39,8 @@ class NNWHierarchy : public BaseHierarchy<NNWHierarchy, MultiNormLikelihood,
     // Initialize likelihood state
     State::MultiLS state;
     state.mean = hypers.mean;
-    prior->write_prec_to_state(hypers.var_scaling * Eigen::MatrixXd::Identity(dim, dim), &state);
+    prior->write_prec_to_state(
+        hypers.var_scaling * Eigen::MatrixXd::Identity(dim, dim), &state);
     like->set_state(state);
   };
 
@@ -66,4 +69,4 @@ class NNWHierarchy : public BaseHierarchy<NNWHierarchy, MultiNormLikelihood,
   }
 };
 
-#endif // BAYESMIX_HIERARCHIES_NNW_HIERARCHY_H_
+#endif  // BAYESMIX_HIERARCHIES_NNW_HIERARCHY_H_
