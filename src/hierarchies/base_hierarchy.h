@@ -28,18 +28,16 @@
 //! @tparam Derived      Name of the implemented derived class
 //! @tparam Likelihood   Class name of the likelihood model for the hierarchy
 //! @tparam PriorModel   Class name of the prior model for the hierarchy
-//! @tparam Updater      Class name for the update algorithm used for posterior sampling
 
 template <class Derived, class Likelihood, class PriorModel>
 class BaseHierarchy : public AbstractHierarchy {
  protected:
-  
   //! Container for the likelihood of the hierarchy
   std::shared_ptr<Likelihood> like = std::make_shared<Likelihood>();
 
   //! Container for the prior model of the hierarchy
   std::shared_ptr<PriorModel> prior = std::make_shared<PriorModel>();
-  
+
   //! Container for the update algorithm adopted
   std::shared_ptr<AbstractUpdater> updater;
 
@@ -74,13 +72,11 @@ class BaseHierarchy : public AbstractHierarchy {
     updater = updater_;
   };
 
-  virtual void set_default_updater() = 0;
-
   std::shared_ptr<AbstractLikelihood> get_likelihood() override {
     return like;
   }
   std::shared_ptr<AbstractPriorModel> get_prior() override { return prior; }
-  
+
   //! Returns an independent, data-less copy of this object
   std::shared_ptr<AbstractHierarchy> clone() const override {
     // Create copy of the hierarchy
@@ -91,7 +87,8 @@ class BaseHierarchy : public AbstractHierarchy {
     return out;
   };
 
-  // NOT SURE THIS IS CORRECT, MAYBE OVERRIDE GET_LIKE_LPDF? OR THIS IS EVEN UNNECESSARY
+  // NOT SURE THIS IS CORRECT, MAYBE OVERRIDE GET_LIKE_LPDF? OR THIS IS EVEN
+  // UNNECESSARY
   double like_lpdf(const Eigen::RowVectorXd &datum) const override {
     return like->lpdf(datum);
   }
@@ -255,7 +252,8 @@ class BaseHierarchy : public AbstractHierarchy {
     like->write_state_to_proto(out);
   };
 
-  //! Writes current values of the hyperparameters to a Protobuf message by pointer
+  //! Writes current values of the hyperparameters to a Protobuf message by
+  //! pointer
   void write_hypers_to_proto(google::protobuf::Message *out) const override {
     prior->write_hypers_to_proto(out);
   };
@@ -339,7 +337,6 @@ class BaseHierarchy : public AbstractHierarchy {
 //! Returns the struct of the current posterior hyperparameters
 //   Hyperparams get_posterior_hypers() const { return posterior_hypers; }
 
-
 //! Raises an error if the prior pointer is not initialized
 //   void check_prior_is_set() const {
 //     if (prior == nullptr) {
@@ -361,7 +358,6 @@ class BaseHierarchy : public AbstractHierarchy {
 //! AlgoritmState::ClusterState message by adding the appropriate type
 //   virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
 //   get_state_proto() const = 0;
-
 
 //! Writes current value of hyperparameters to a Protobuf message and
 //! return a shared_ptr.
@@ -406,7 +402,6 @@ class BaseHierarchy : public AbstractHierarchy {
 //     return google::protobuf::internal::down_cast<
 //         const bayesmix::AlgorithmState::HierarchyHypers &>(state_);
 //   }
-
 
 //   //! Container for prior hyperparameters values
 //   std::shared_ptr<Hyperparams> hypers;
