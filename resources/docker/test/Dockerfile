@@ -1,7 +1,6 @@
 FROM mberaha/bayesmix-base
 
 COPY cmake /usr/bayesmix/cmake
-COPY proto /usr/bayesmix/proto
 COPY resources /usr/bayesmix/resources
 COPY src /usr/bayesmix/src
 COPY test /usr/bayesmix/test
