@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "algorithm_state.pb.h"
-#include "src/hierarchies/likelihoods/states.h"
+#include "src/hierarchies/likelihoods/states/includes.h"
 #include "src/utils/rng.h"
 
 class AbstractPriorModel {
