@@ -1,7 +1,7 @@
 #include <matplot/matplot.h>
 
 #include "lib/argparse/argparse.h"
-#include "plots/plot_utils.h"
+#include "src/plots/plot_utils.h"
 #include "src/utils/io_utils.h"
 
 #define EMPTYSTR std::string("\"\"")

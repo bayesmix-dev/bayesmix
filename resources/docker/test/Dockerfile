@@ -1,14 +1,13 @@
 FROM mberaha/bayesmix-base
 
 COPY cmake /usr/bayesmix/cmake
-COPY proto /usr/bayesmix/proto
 COPY resources /usr/bayesmix/resources
 COPY src /usr/bayesmix/src
 COPY test /usr/bayesmix/test
 COPY python /usr/bayesmix/python
 COPY CMakeLists.txt /usr/bayesmix/CMakeLists.txt
 COPY lib/argparse /usr/bayesmix/lib/argparse
-COPY *.cc /usr/bayesmix/
+COPY executables/ /usr/bayesmix/executables
 
 WORKDIR /usr/bayesmix
 

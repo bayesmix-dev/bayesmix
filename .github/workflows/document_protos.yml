@@ -19,7 +19,7 @@ jobs:
         run: echo $(pwd)
 
       - name: build_html
-        run: docker run --rm --platform linux/amd64  -v $(pwd)/docs:/out -v $(pwd)/proto:/protos pseudomuto/protoc-gen-doc --doc_opt=html,protos.html
+        run: docker run --rm --platform linux/amd64  -v $(pwd)/docs:/out -v $(pwd)/src/proto:/protos pseudomuto/protoc-gen-doc --doc_opt=html,protos.html
 
       - name: Commit changes
         uses: EndBug/add-and-commit@v7

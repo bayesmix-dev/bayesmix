@@ -40,4 +40,3 @@ if (Protobuf_FOUND OR PROTOBUF_FOUND)
   )
 
 endif()
-
