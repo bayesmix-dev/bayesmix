@@ -46,8 +46,8 @@ void DirichletMixing::update_state(
 }
 
 double DirichletMixing::mass_existing_cluster(
-    const unsigned int n, const bool log, const bool propto,
-    std::shared_ptr<AbstractHierarchy> hier) const {
+    const unsigned int n, const unsigned int n_clust, const bool log,
+    const bool propto, const std::shared_ptr<AbstractHierarchy> hier) const {
   double out;
   if (log) {
     out = hier->get_log_card();
@@ -59,9 +59,10 @@ double DirichletMixing::mass_existing_cluster(
   return out;
 }
 
-double DirichletMixing::mass_new_cluster(const unsigned int n, const bool log,
-                                         const bool propto,
-                                         const unsigned int n_clust) const {
+double DirichletMixing::mass_new_cluster(const unsigned int n,
+                                         const unsigned int n_clust,
+                                         const bool log,
+                                         const bool propto) const {
   double out;
   if (log) {
     out = state.logtotmass;
@@ -111,6 +112,6 @@ void DirichletMixing::initialize_state() {
   }
 
   else {
-    throw std::invalid_argument("Uunrecognized mixing prior");
+    throw std::invalid_argument("Unrecognized mixing prior");
   }
 }

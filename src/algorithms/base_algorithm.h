@@ -126,6 +126,28 @@ class BaseAlgorithm {
   //! Reads and sets algorithm parameters from an appropriate Protobuf message
   virtual void read_params_from_proto(const bayesmix::AlgorithmParams &params);
 
+  void set_state_proto(
+      const std::shared_ptr<google::protobuf::Message> state) {
+    curr_state.CopyFrom(
+        google::protobuf::internal::down_cast<bayesmix::AlgorithmState &>(
+            *state.get()));
+  }
+
+  //! Evaluates the estimated log-lpdf on the state contained in `curr_state`
+  //! @param grid   Grid of row points on which the density is to be evaluated
+  //! @param hier_covariate   Optional covariates related to the `Hierarchy`
+  //! @param mix_covariate   Optional covariates related to the `Mixing`
+  //! @return   The estimation on the iteration of `curr_state` over all points
+  virtual Eigen::VectorXd lpdf_from_state(
+      const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
+      const Eigen::RowVectorXd &mix_covariate) = 0;
+
+  virtual std::shared_ptr<BaseAlgorithm> clone() const = 0;
+
+  std::vector<std::shared_ptr<AbstractHierarchy>> get_unique_values() const {
+    return unique_values;
+  }
+
  protected:
   // ALGORITHM FUNCTIONS
   //! Initializes all members of the class before running the algorithm
@@ -163,19 +185,10 @@ class BaseAlgorithm {
 
   // AUXILIARY TOOLS
   //! Returns Protobuf object containing current state values and iter number
-  bayesmix::AlgorithmState get_state_as_proto(unsigned int iter);
+  bayesmix::AlgorithmState get_state_as_proto(const unsigned int iter);
 
   //! Advances `Collector` reading pointer by one, and returns 1 if successful
-  bool update_state_from_collector(BaseCollector *coll);
-
-  //! Evaluates the estimated log-lpdf on the state contained in `curr_state`
-  //! @param grid   Grid of row points on which the density is to be evaluated
-  //! @param hier_covariate   Optional covariates related to the `Hierarchy`
-  //! @param mix_covariate   Optional covariates related to the `Mixing`
-  //! @return   The estimation on the iteration of `curr_state` over all points
-  virtual Eigen::VectorXd lpdf_from_state(
-      const Eigen::MatrixXd &grid, const Eigen::RowVectorXd &hier_covariate,
-      const Eigen::RowVectorXd &mix_covariate) = 0;
+  bool update_state_from_collector(BaseCollector *const coll);
 
   /*
     Returns whether the posterior parameters for the hierarchies should be

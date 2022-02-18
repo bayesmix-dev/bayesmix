@@ -1,5 +1,8 @@
 #include "distributions.h"
 
+// #include <Eigen/Dense>
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
 #include <random>
 #include <stan/math/prim.hpp>
 #include <stan/math/rev.hpp>
@@ -7,14 +10,14 @@
 #include "src/utils/proto_utils.h"
 
 int bayesmix::categorical_rng(const Eigen::VectorXd &probas,
-                              std::mt19937_64 &rng, int start /*= 0*/) {
+                              std::mt19937_64 &rng, const int start /*= 0*/) {
   return stan::math::categorical_rng(probas, rng) + (start - 1);
 }
 
 double bayesmix::multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
                                         const Eigen::VectorXd &mean,
                                         const Eigen::MatrixXd &prec_chol,
-                                        double prec_logdet) {
+                                        const double prec_logdet) {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
   double base = 0.5 * prec_logdet + NEG_LOG_SQRT_TWO_PI * datum.size();
   double exp = 0.5 * (prec_chol.transpose() * (datum - mean)).squaredNorm();
@@ -23,7 +26,7 @@ double bayesmix::multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
 
 Eigen::VectorXd bayesmix::multi_normal_prec_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::VectorXd &mean,
-    const Eigen::MatrixXd &prec_chol, double prec_logdet) {
+    const Eigen::MatrixXd &prec_chol, const double prec_logdet) {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
 
   Eigen::VectorXd exp = ((data.rowwise() - mean.transpose()) * prec_chol)
@@ -36,9 +39,39 @@ Eigen::VectorXd bayesmix::multi_normal_prec_lpdf_grid(
   return base - exp;
 }
 
+Eigen::VectorXd bayesmix::multi_normal_diag_rng(
+    const Eigen::VectorXd &mean,
+    const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &cov_diag,
+    std::mt19937_64 &rng) {
+  size_t N = mean.size();
+  Eigen::VectorXd output(N);
+  for (size_t i = 0; i < N; i++) {
+    output[i] = stan::math::normal_rng(0, 1, rng);
+  }
+  return output.cwiseProduct(cov_diag.diagonal().cwiseSqrt()) + mean;
+}
+
+Eigen::VectorXd bayesmix::multi_normal_prec_chol_rng(
+    const Eigen::VectorXd &mean, const Eigen::LLT<Eigen::MatrixXd> &prec_chol,
+    std::mt19937_64 &rng) {
+  size_t N = mean.size();
+  Eigen::VectorXd output(N);
+  boost::variate_generator<std::mt19937_64 &, boost::normal_distribution<>>
+      std_normal_rng(rng, boost::normal_distribution<>(0, 1));
+
+  Eigen::VectorXd z(N);
+  for (int i = 0; i < N; i++) {
+    z(i) = std_normal_rng();
+  }
+
+  output = mean + prec_chol.matrixU().solve(z);
+
+  return output;
+}
+
 double bayesmix::multi_student_t_invscale_lpdf(
-    const Eigen::VectorXd &datum, double df, const Eigen::VectorXd &mean,
-    const Eigen::MatrixXd &invscale_chol, double scale_logdet) {
+    const Eigen::VectorXd &datum, const double df, const Eigen::VectorXd &mean,
+    const Eigen::MatrixXd &invscale_chol, const double scale_logdet) {
   int dim = datum.size();
   double exp =
       0.5 * (df + dim) *
@@ -50,8 +83,8 @@ double bayesmix::multi_student_t_invscale_lpdf(
 }
 
 Eigen::VectorXd bayesmix::multi_student_t_invscale_lpdf_grid(
-    const Eigen::MatrixXd &data, double df, const Eigen::VectorXd &mean,
-    const Eigen::MatrixXd &invscale_chol, double scale_logdet) {
+    const Eigen::MatrixXd &data, const double df, const Eigen::VectorXd &mean,
+    const Eigen::MatrixXd &invscale_chol, const double scale_logdet) {
   int dim = data.cols();
   int n = data.rows();
   double base_coeff = stan::math::lgamma((df + dim) * 0.5) -
@@ -68,9 +101,12 @@ Eigen::VectorXd bayesmix::multi_student_t_invscale_lpdf_grid(
   return base - exp;
 }
 
-double bayesmix::gaussian_mixture_dist(
-    Eigen::VectorXd means1, Eigen::VectorXd vars1, Eigen::VectorXd weights1,
-    Eigen::VectorXd means2, Eigen::VectorXd vars2, Eigen::VectorXd weights2) {
+double bayesmix::gaussian_mixture_dist(const Eigen::VectorXd &means1,
+                                       const Eigen::VectorXd &vars1,
+                                       const Eigen::VectorXd &weights1,
+                                       const Eigen::VectorXd &means2,
+                                       const Eigen::VectorXd &vars2,
+                                       const Eigen::VectorXd &weights2) {
   double mix1 = 0.0;
 #pragma omp parallel for collapse(2) reduction(+ : mix1)
   for (int i = 0; i < means1.size(); i++) {
@@ -80,7 +116,6 @@ double bayesmix::gaussian_mixture_dist(
                                                vars1(i) + vars1(j)));
     }
   }
-
   double mix2 = 0.0;
 #pragma omp parallel for collapse(2) reduction(+ : mix2)
   for (int i = 0; i < means2.size(); i++) {
@@ -104,12 +139,13 @@ double bayesmix::gaussian_mixture_dist(
   return mix1 + mix2 - 2 * inter;
 }
 
-double bayesmix::gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
-                                       std::vector<Eigen::MatrixXd> precs1,
-                                       Eigen::VectorXd weights1,
-                                       std::vector<Eigen::VectorXd> means2,
-                                       std::vector<Eigen::MatrixXd> precs2,
-                                       Eigen::VectorXd weights2) {
+double bayesmix::gaussian_mixture_dist(
+    const std::vector<Eigen::VectorXd> &means1,
+    const std::vector<Eigen::MatrixXd> &precs1,
+    const Eigen::VectorXd &weights1,
+    const std::vector<Eigen::VectorXd> &means2,
+    const std::vector<Eigen::MatrixXd> &precs2,
+    const Eigen::VectorXd &weights2) {
   std::vector<Eigen::MatrixXd> vars1;
   std::vector<Eigen::MatrixXd> vars2;
 
@@ -150,10 +186,10 @@ double bayesmix::gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
 }
 
 double bayesmix::gaussian_mixture_dist(
-    std::vector<bayesmix::AlgorithmState::ClusterState> clus1,
-    Eigen::VectorXd weights1,
-    std::vector<bayesmix::AlgorithmState::ClusterState> clus2,
-    Eigen::VectorXd weights2) {
+    const std::vector<bayesmix::AlgorithmState::ClusterState> &clus1,
+    const Eigen::VectorXd &weights1,
+    const std::vector<bayesmix::AlgorithmState::ClusterState> &clus2,
+    const Eigen::VectorXd &weights2) {
   double out;
 
   if (clus1[0].has_uni_ls_state()) {

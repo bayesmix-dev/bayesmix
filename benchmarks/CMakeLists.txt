@@ -9,8 +9,6 @@ add_executable(benchmark_bayesmix $<TARGET_OBJECTS:bayesmix>
   mcmc_runs.cc
   eval_lpdf.cc
   lpd_grid.cc
-  utils.h
-  utils.cc
   main.cpp
 )
 

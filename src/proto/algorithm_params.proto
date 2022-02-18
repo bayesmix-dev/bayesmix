@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package bayesmix;
+
+/*
+ * Parameters used in the BaseAlgorithm class and childs.
+ */
+message AlgorithmParams {
+  string algo_id = 1; // Id of the Algorithm. Must match the ones in the AlgorithmId enum
+  uint32 rng_seed = 2; // Seed for the random number generator
+  uint32 iterations = 3; // Total number of iterations of the MCMC chain
+  uint32 burnin = 4; // Number of iterations to discard as burn-in
+  uint32 init_num_clusters = 5; // Number of clusters to initialize the algorithm. It may be overridden by conditional mixings for which the number of components is fixed (e.g. TruncatedSBMixing). In this case, this value is ignored.
+  uint32 neal8_n_aux = 6; // Number of auxiliary unique values for the Neal8 algorithm
+  uint32 splitmerge_n_restr_gs_updates = 7; // Number of restricted GS scans for each MH step.
+  uint32 splitmerge_n_mh_updates = 8; // Number of MH updates for each iteration of Split and Merge algorithm.
+  uint32 splitmerge_n_full_gs_updates = 9; // Number of full GS scans for each iteration of Split and Merge algorithm.
+}

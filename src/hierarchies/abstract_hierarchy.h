@@ -63,6 +63,8 @@ class AbstractHierarchy {
   //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractHierarchy> clone() const = 0;
 
+  virtual std::shared_ptr<AbstractHierarchy> deep_clone() const = 0;
+
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
   //! Public wrapper for `like_lpdf()` methods
   double get_like_lpdf(
@@ -153,7 +155,7 @@ class AbstractHierarchy {
 
   //! Generates new state values from the centering posterior distribution
   //! @param update_params  Save posterior hypers after the computation?
-  virtual void sample_full_cond(bool update_params = false) = 0;
+  virtual void sample_full_cond(const bool update_params = false) = 0;
 
   //! Overloaded version of sample_full_cond(bool), mainly used for debugging
   virtual void sample_full_cond(
@@ -180,11 +182,19 @@ class AbstractHierarchy {
   //! Returns a pointer to the Protobuf message of the prior of this cluster
   virtual google::protobuf::Message *get_mutable_prior() = 0;
 
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::ClusterState message by adding the appropriate type
+  virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
+  get_state_proto() const = 0;
+
   //! Writes current state to a Protobuf message by pointer
-  virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
+  virtual void write_state_to_proto(
+      google::protobuf::Message *const out) const = 0;
 
   //! Writes current hyperparameters to a Protobuf message by pointer
-  virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
+  virtual void write_hypers_to_proto(
+      google::protobuf::Message *const out) const = 0;
 
   //! Read and set state values from a given Protobuf message
   virtual void set_state_from_proto(
@@ -209,7 +219,7 @@ class AbstractHierarchy {
 
   //! Public wrapper for `update_summary_statistics()` methods
   void update_ss(const Eigen::RowVectorXd &datum,
-                 const Eigen::RowVectorXd &covariate, bool add) {
+                 const Eigen::RowVectorXd &covariate, const bool add) {
     if (is_dependent()) {
       return update_summary_statistics(datum, covariate, add);
     } else {
@@ -231,6 +241,9 @@ class AbstractHierarchy {
   //! Returns whether the hierarchy represents a conjugate model or not
   virtual bool is_conjugate() const = 0;
 
+  //! Main function that initializes members to appropriate values
+  virtual void set_dataset(const Eigen::MatrixXd *const dataset) = 0;
+
  protected:
   //! Evaluates the log-likelihood of data in a single point
   //! @param datum      Point which is to be evaluated
@@ -240,9 +253,9 @@ class AbstractHierarchy {
                            const Eigen::RowVectorXd &covariate) const {
     if (!is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a non-dependent hierarchy");
+          "Cannot call like_lpdf() from a non-dependent hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("like_lpdf() not implemented");
     }
   }
 
@@ -252,9 +265,9 @@ class AbstractHierarchy {
   virtual double like_lpdf(const Eigen::RowVectorXd &datum) const {
     if (is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a dependent hierarchy");
+          "Cannot call like_lpdf() from a dependent hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("like_lpdf() not implemented");
     }
   }
 
@@ -264,12 +277,13 @@ class AbstractHierarchy {
   //! @param add        Whether the datum is being added or removed
   virtual void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                          const Eigen::RowVectorXd &covariate,
-                                         bool add) {
+                                         const bool add) {
     if (!is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a non-dependent hierarchy");
+          "Cannot call update_summary_statistics() from a non-dependent "
+          "hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("update_summary_statistics() not implemented");
     }
   }
 
@@ -277,12 +291,13 @@ class AbstractHierarchy {
   //! @param datum      Data point which is being added or removed
   //! @param add        Whether the datum is being added or removed
   virtual void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                         bool add) {
+                                         const bool add) {
     if (is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a dependent hierarchy");
+          "Cannot call update_summary_statistics() from a dependent "
+          "hierarchy");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("update_summary_statistics() not implemented");
     }
   }
 };

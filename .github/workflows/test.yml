@@ -22,7 +22,7 @@ jobs:
         run: docker
 
       - name: create build
-        run: docker build -f docker/test/Dockerfile -t test .
+        run: docker build -f resources/docker/test/Dockerfile -t test .
 
       - name: run C++ tests
         run: docker run -w /usr/bayesmix test ./build_/test/test_bayesmix

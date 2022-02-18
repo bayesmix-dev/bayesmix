@@ -90,7 +90,7 @@ void Neal8Algorithm::sample_allocations() {
 }
 
 Eigen::VectorXd Neal8Algorithm::lpdf_marginal_component(
-    std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+    const std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
     const Eigen::RowVectorXd &covariate) const {
   unsigned int n_grid = grid.rows();
   Eigen::VectorXd lpdf_(n_grid);
@@ -113,13 +113,13 @@ Eigen::VectorXd Neal8Algorithm::get_cluster_prior_mass(
   for (size_t j = 0; j < n_clust; j++) {
     // Probability of being assigned to an already existing cluster
     logprior(j) = mixing->get_mass_existing_cluster(
-        n_data - 1, true, true, unique_values[j],
+        n_data - 1, n_clust, true, true, unique_values[j],
         mix_covariates.row(data_idx));
   }
   // Further update with marginal components
   for (size_t j = 0; j < n_aux; j++) {
     logprior(n_clust + j) = mixing->get_mass_new_cluster(
-        n_data - 1, true, true, n_clust, mix_covariates.row(data_idx));
+        n_data - 1, n_clust, true, true, mix_covariates.row(data_idx));
   }
   return logprior;
 }

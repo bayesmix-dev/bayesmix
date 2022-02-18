@@ -1,0 +1,10 @@
+# Several image formats
+*.png
+*.svg
+*.pdf
+*.jpg
+*.jpeg
+*.eps
+# Output files
+*.csv
+*.recordio

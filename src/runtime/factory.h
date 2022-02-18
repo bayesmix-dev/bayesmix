@@ -79,11 +79,7 @@ class Factory {
   //! @param id      Identifier to associate the builder with
   //! @param bulider Builder function for a specific object type
   void add_builder(const Identifier &id, const Builder &builder) {
-    auto f = storage.insert(std::make_pair(id, builder));
-    if (f.second == false) {
-      std::cout << "Warning: new duplicate builder \"" << id
-                << "\" was not added to factory" << std::endl;
-    }
+    storage.insert(std::make_pair(id, builder));
   }
 
   //! Returns a list of identifiers of all builders in the storage
