@@ -30,9 +30,9 @@ class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
     T log_det_jac = State::uni_ls_log_det_jac(constrained_params);
     T mean = constrained_params(0);
     T var = constrained_params(1);
-    T lpdf = stan::math::normal_lpdf(mean, hypers.mean,
-                                     sqrt(var / hypers.var_scaling)) +
-             stan::math::inv_gamma_lpdf(var, hypers.shape, hypers.scale);
+    T lpdf = stan::math::normal_lpdf(mean, hypers->mean,
+                                     sqrt(var / hypers->var_scaling)) +
+             stan::math::inv_gamma_lpdf(var, hypers->shape, hypers->scale);
 
     return lpdf + log_det_jac;
   }
