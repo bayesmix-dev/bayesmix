@@ -36,9 +36,10 @@ class UniNormLikelihood
     return out;
   }
 
- protected:
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override;
+
+ protected:
   double compute_lpdf(const Eigen::RowVectorXd &datum) const override;
   void update_sum_stats(const Eigen::RowVectorXd &datum, bool add) override;
 

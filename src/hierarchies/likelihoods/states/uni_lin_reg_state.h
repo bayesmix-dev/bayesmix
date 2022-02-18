@@ -55,10 +55,11 @@ class UniLinReg {
     var = temp(dim);
   }
 
-  void set_from_proto(const bayesmix::AlgorithmState::ClusterState &state_) {
-    mean = state_.uni_ls_state().mean();
-    var = state_.uni_ls_state().var();
-  }
+  // void set_from_proto(const bayesmix::AlgorithmState::ClusterState &state_)
+  // {
+  //   mean = state_.uni_ls_state().mean();
+  //   var = state_.uni_ls_state().var();
+  // }
 
   // bayesmix::AlgorithmState::ClusterState get_as_proto() {
   //   bayesmix::AlgorithmState::ClusterState state;
