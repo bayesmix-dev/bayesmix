@@ -28,10 +28,10 @@ class Rng {
   std::mt19937_64 &get() { return mt; }
 
   //! Sets the RNG seed
-  void seed(int seed_val) { mt.seed(seed_val); }
+  void seed(const int seed_val) { mt.seed(seed_val); }
 
  private:
-  Rng(int seed_val = 20201103) { mt.seed(seed_val); }
+  Rng(const int seed_val = 20201103) { mt.seed(seed_val); }
   ~Rng() {}
   Rng(Rng const &) = delete;
   Rng &operator=(Rng const &) = delete;

@@ -21,3 +21,7 @@ sftp-config.json
 docs/_build/
 resources/benchmarks/datasets
 resources/2d
+#CLion cash
+.idea/
+# Build debug folder
+cmake-build-debug/

@@ -294,6 +294,22 @@
                 </li>
               
                 <li>
+                  <a href="#bayesmix.FAPrior"><span class="badge">M</span>FAPrior</a>
+                </li>
+              
+                <li>
+                  <a href="#bayesmix.FAPriorDistribution"><span class="badge">M</span>FAPriorDistribution</a>
+                </li>
+              
+                <li>
+                  <a href="#bayesmix.LapNIGPrior"><span class="badge">M</span>LapNIGPrior</a>
+                </li>
+              
+                <li>
+                  <a href="#bayesmix.LapNIGState"><span class="badge">M</span>LapNIGState</a>
+                </li>
+              
+                <li>
                   <a href="#bayesmix.LinRegUniPrior"><span class="badge">M</span>LinRegUniPrior</a>
                 </li>
               
@@ -331,6 +347,10 @@
           <li>
             <a href="#ls_state.proto">ls_state.proto</a>
             <ul>
+              
+                <li>
+                  <a href="#bayesmix.FAState"><span class="badge">M</span>FAState</a>
+                </li>
               
                 <li>
                   <a href="#bayesmix.LinRegUniLSState"><span class="badge">M</span>LinRegUniLSState</a>
@@ -402,6 +422,10 @@
                 </li>
               
                 <li>
+                  <a href="#bayesmix.MFMPrior"><span class="badge">M</span>MFMPrior</a>
+                </li>
+              
+                <li>
                   <a href="#bayesmix.PYPrior"><span class="badge">M</span>PYPrior</a>
                 </li>
               
@@ -415,6 +439,10 @@
               
                 <li>
                   <a href="#bayesmix.TruncSBPrior.DPPrior"><span class="badge">M</span>TruncSBPrior.DPPrior</a>
+                </li>
+              
+                <li>
+                  <a href="#bayesmix.TruncSBPrior.MFMPrior"><span class="badge">M</span>TruncSBPrior.MFMPrior</a>
                 </li>
               
                 <li>
@@ -438,6 +466,10 @@
               
                 <li>
                   <a href="#bayesmix.LogSBState"><span class="badge">M</span>LogSBState</a>
+                </li>
+              
+                <li>
+                  <a href="#bayesmix.MFMState"><span class="badge">M</span>MFMState</a>
                 </li>
               
                 <li>
@@ -628,6 +660,27 @@
                   <td><p>Number of auxiliary unique values for the Neal8 algorithm </p></td>
                 </tr>
               
+                <tr>
+                  <td>splitmerge_n_restr_gs_updates</td>
+                  <td><a href="#uint32">uint32</a></td>
+                  <td></td>
+                  <td><p>Number of restricted GS scans for each MH step. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>splitmerge_n_mh_updates</td>
+                  <td><a href="#uint32">uint32</a></td>
+                  <td></td>
+                  <td><p>Number of MH updates for each iteration of Split and Merge algorithm. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>splitmerge_n_full_gs_updates</td>
+                  <td><a href="#uint32">uint32</a></td>
+                  <td></td>
+                  <td><p>Number of full GS scans for each iteration of Split and Merge algorithm. </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -740,6 +793,13 @@
                 </tr>
               
                 <tr>
+                  <td>fa_state</td>
+                  <td><a href="#bayesmix.FAState">FAState</a></td>
+                  <td></td>
+                  <td><p>State of a Mixture of Factor Analysers </p></td>
+                </tr>
+              
+                <tr>
                   <td>cardinality</td>
                   <td><a href="#int32">int32</a></td>
                   <td></td>
@@ -787,6 +847,20 @@
                 <tr>
                   <td>lin_reg_uni_state</td>
                   <td><a href="#bayesmix.MultiNormalIGDistribution">MultiNormalIGDistribution</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>lapnig_state</td>
+                  <td><a href="#bayesmix.LapNIGState">LapNIGState</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>fa_state</td>
+                  <td><a href="#bayesmix.FAPriorDistribution">FAPriorDistribution</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -1150,6 +1224,18 @@
                 <td><p>Linear Regression (univariate response)</p></td>
               </tr>
             
+              <tr>
+                <td>LapNIG</td>
+                <td>4</td>
+                <td><p>Laplace - Normal Inverse Gamma</p></td>
+              </tr>
+            
+              <tr>
+                <td>FA</td>
+                <td>5</td>
+                <td><p>Factor Analysers</p></td>
+              </tr>
+            
           </tbody>
         </table>
       
@@ -1177,6 +1263,165 @@
               
                 <tr>
                   <td>fake_field</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="bayesmix.FAPrior">FAPrior</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>fixed_values</td>
+                  <td><a href="#bayesmix.FAPriorDistribution">FAPriorDistribution</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="bayesmix.FAPriorDistribution">FAPriorDistribution</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>mutilde</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>beta</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>phi</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>alpha0</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>q</td>
+                  <td><a href="#uint32">uint32</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="bayesmix.LapNIGPrior">LapNIGPrior</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>fixed_values</td>
+                  <td><a href="#bayesmix.LapNIGState">LapNIGState</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="bayesmix.LapNIGState">LapNIGState</h3>
+        <p>Prior for the parameters of the base measure in a Laplace - Normal Inverse Gamma hierarchy</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>mean</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>var</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>shape</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>scale</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>mh_mean_var</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>mh_log_scale_var</td>
                   <td><a href="#double">double</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -1483,6 +1728,51 @@
       <p></p>
 
       
+        <h3 id="bayesmix.FAState">FAState</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>mu</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>psi</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>eta</td>
+                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>lambda</td>
+                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="bayesmix.LinRegUniLSState">LinRegUniLSState</h3>
         <p>Parameters of a univariate linear regression</p>
 
@@ -1727,6 +2017,12 @@
                 <td><p>Truncated Stick-Breaking Process</p></td>
               </tr>
             
+              <tr>
+                <td>MFM</td>
+                <td>5</td>
+                <td><p>Mixture of finite mixtures</p></td>
+              </tr>
+            
           </tbody>
         </table>
       
@@ -1835,6 +2131,30 @@
 
         
       
+        <h3 id="bayesmix.MFMPrior">MFMPrior</h3>
+        <p>Prior for the Poisson rate and Dirichlet parameters of a MFM (Finite Dirichlet) process.</p><p>For the moment, we only support fixed values</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>fixed_value</td>
+                  <td><a href="#bayesmix.MFMState">MFMState</a></td>
+                  <td></td>
+                  <td><p>No prior, just a fixed value </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="bayesmix.PYPrior">PYPrior</h3>
         <p>Prior for the strength and discount parameters of a Pitman-Yor process.</p><p>For the moment, we only support fixed values</p>
 
@@ -1891,6 +2211,13 @@
                 </tr>
               
                 <tr>
+                  <td>mfm_prior</td>
+                  <td><a href="#bayesmix.TruncSBPrior.MFMPrior">TruncSBPrior.MFMPrior</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
                   <td>num_components</td>
                   <td><a href="#uint32">uint32</a></td>
                   <td></td>
@@ -1929,6 +2256,30 @@
         
       
         <h3 id="bayesmix.TruncSBPrior.DPPrior">TruncSBPrior.DPPrior</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>totalmass</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p>Truncated Dirichlet process </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="bayesmix.TruncSBPrior.MFMPrior">TruncSBPrior.MFMPrior</h3>
         <p></p>
 
         
@@ -2045,6 +2396,37 @@
 
         
       
+        <h3 id="bayesmix.MFMState">MFMState</h3>
+        <p>State of a MFM (Finite Dirichlet) process</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>lambda</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p>rate parameter of Poisson prior on number of compunents of the MFM </p></td>
+                </tr>
+              
+                <tr>
+                  <td>gamma</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p>parameter of the dirichlet distribution for the mixing weights </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="bayesmix.MixingState">MixingState</h3>
         <p>Wrapper of all possible mixing states into a single oneof</p>
 
@@ -2079,6 +2461,13 @@
                 <tr>
                   <td>trunc_sb_state</td>
                   <td><a href="#bayesmix.TruncSBState">TruncSBState</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>mfm_state</td>
+                  <td><a href="#bayesmix.MFMState">MFMState</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>

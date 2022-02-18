@@ -43,6 +43,13 @@ class Neal8Algorithm : public Neal2Algorithm {
   void read_params_from_proto(
       const bayesmix::AlgorithmParams &params) override;
 
+  std::shared_ptr<BaseAlgorithm> clone() const override {
+    auto out = std::make_shared<Neal8Algorithm>(*this);
+    out->set_mixing(mixing->clone());
+    out->set_hierarchy(unique_values[0]->deep_clone());
+    return out;
+  }
+
  protected:
   void initialize() override;
 
@@ -51,7 +58,8 @@ class Neal8Algorithm : public Neal2Algorithm {
   void sample_allocations() override;
 
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+      const std::shared_ptr<AbstractHierarchy> hier,
+      const Eigen::MatrixXd &grid,
       const Eigen::RowVectorXd &covariate) const override;
 
   Eigen::VectorXd get_cluster_prior_mass(

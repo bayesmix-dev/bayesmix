@@ -24,7 +24,7 @@ namespace bayesmix {
  * @return       categorical r.v. with values on {start, ..., start + k}
  */
 int categorical_rng(const Eigen::VectorXd &probas, std::mt19937_64 &rng,
-                    int start = 0);
+                    const int start = 0);
 
 /*
  * Evaluates the log probability density function of a multivariate Gaussian
@@ -39,7 +39,7 @@ int categorical_rng(const Eigen::VectorXd &probas, std::mt19937_64 &rng,
 double multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
                               const Eigen::VectorXd &mean,
                               const Eigen::MatrixXd &prec_chol,
-                              double prec_logdet);
+                              const double prec_logdet);
 
 /*
  * Evaluates the log probability density function of a multivariate Gaussian
@@ -54,7 +54,34 @@ double multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
 Eigen::VectorXd multi_normal_prec_lpdf_grid(const Eigen::MatrixXd &data,
                                             const Eigen::VectorXd &mean,
                                             const Eigen::MatrixXd &prec_chol,
-                                            double prec_logdet);
+                                            const double prec_logdet);
+
+/*
+ * Returns a pseudorandom multivariate normal random variable with diagonal
+ * covariance matrix
+ *
+ * @param mean   The mean of the Gaussian r.v.
+ * @param cov_diag   The diagonal covariance matrix
+ * @rng          Random number generator
+ * @return       multivariate normal r.v.
+ */
+Eigen::VectorXd multi_normal_diag_rng(
+    const Eigen::VectorXd &mean,
+    const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &cov_diag,
+    std::mt19937_64 &rng);
+
+/*
+ * Returns a pseudorandom multivariate normal random variable parametrized
+ * through mean and Cholesky decomposition of precision matrix
+ *
+ * @param mean   The mean of the Gaussian r.v.
+ * @prec_chol    The (lower) Cholesky factor of the precision matrix
+ * @param rng    Random number generator
+ * @return       multivariate normal r.v.
+ */
+Eigen::VectorXd multi_normal_prec_chol_rng(
+    const Eigen::VectorXd &mean, const Eigen::LLT<Eigen::MatrixXd> &prec_chol,
+    std::mt19937_64 &rng);
 
 /*
  * Evaluates the log probability density function of a multivariate Student's t
@@ -67,10 +94,11 @@ Eigen::VectorXd multi_normal_prec_lpdf_grid(const Eigen::MatrixXd &data,
  * @prec_logdet    The logarithm of the determinant of the inverse scale matrix
  * @return         The evaluation of the lpdf
  */
-double multi_student_t_invscale_lpdf(const Eigen::VectorXd &datum, double df,
+double multi_student_t_invscale_lpdf(const Eigen::VectorXd &datum,
+                                     const double df,
                                      const Eigen::VectorXd &mean,
                                      const Eigen::MatrixXd &invscale_chol,
-                                     double scale_logdet);
+                                     const double scale_logdet);
 
 /*
  * Evaluates the log probability density function of a multivariate Student's t
@@ -84,8 +112,8 @@ double multi_student_t_invscale_lpdf(const Eigen::VectorXd &datum, double df,
  * @return         The evaluation of the lpdf
  */
 Eigen::VectorXd multi_student_t_invscale_lpdf_grid(
-    const Eigen::MatrixXd &data, double df, const Eigen::VectorXd &mean,
-    const Eigen::MatrixXd &invscale_chol, double scale_logdet);
+    const Eigen::MatrixXd &data, const double df, const Eigen::VectorXd &mean,
+    const Eigen::MatrixXd &invscale_chol, const double scale_logdet);
 
 /*
  * Computes the L^2 distance between the univariate mixture of Gaussian
@@ -95,9 +123,12 @@ Eigen::VectorXd multi_student_t_invscale_lpdf_grid(
  * The L^2 distance amounts to
  * d(p, q) = (\int (p(x) - q(x)^2 dx))^{1/2}
  */
-double gaussian_mixture_dist(Eigen::VectorXd means1, Eigen::VectorXd vars1,
-                             Eigen::VectorXd weights1, Eigen::VectorXd means2,
-                             Eigen::VectorXd vars2, Eigen::VectorXd weights2);
+double gaussian_mixture_dist(const Eigen::VectorXd &means1,
+                             const Eigen::VectorXd &vars1,
+                             const Eigen::VectorXd &weights1,
+                             const Eigen::VectorXd &means2,
+                             const Eigen::VectorXd &vars2,
+                             const Eigen::VectorXd &weights2);
 
 /*
  * Computes the L^2 distance between the multivariate mixture of Gaussian
@@ -107,12 +138,12 @@ double gaussian_mixture_dist(Eigen::VectorXd means1, Eigen::VectorXd vars1,
  * The L^2 distance amounts to
  * d(p, q) = (\int (p(x) - q(x)^2 dx))^{1/2}
  */
-double gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
-                             std::vector<Eigen::MatrixXd> precs1,
-                             Eigen::VectorXd weights1,
-                             std::vector<Eigen::VectorXd> means2,
-                             std::vector<Eigen::MatrixXd> precs2,
-                             Eigen::VectorXd weights2);
+double gaussian_mixture_dist(const std::vector<Eigen::VectorXd> &means1,
+                             const std::vector<Eigen::MatrixXd> &precs1,
+                             const Eigen::VectorXd &weights1,
+                             const std::vector<Eigen::VectorXd> &means2,
+                             const std::vector<Eigen::MatrixXd> &precs2,
+                             const Eigen::VectorXd &weights2);
 
 /*
  * Computes the L^2 distance between the mixture of Gaussian
@@ -125,10 +156,10 @@ double gaussian_mixture_dist(std::vector<Eigen::VectorXd> means1,
  * @return                    The L^2 distance between p and q
  */
 double gaussian_mixture_dist(
-    std::vector<bayesmix::AlgorithmState::ClusterState> clus1,
-    Eigen::VectorXd weights1,
-    std::vector<bayesmix::AlgorithmState::ClusterState> clus2,
-    Eigen::VectorXd weights2);
+    const std::vector<bayesmix::AlgorithmState::ClusterState> &clus1,
+    const Eigen::VectorXd &weights1,
+    const std::vector<bayesmix::AlgorithmState::ClusterState> &clus2,
+    const Eigen::VectorXd &weights2);
 
 }  // namespace bayesmix
 

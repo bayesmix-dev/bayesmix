@@ -8,12 +8,14 @@
 
 #include "matrix.pb.h"
 
-void bayesmix::to_proto(const Eigen::VectorXd &vec, bayesmix::Vector *out) {
+void bayesmix::to_proto(const Eigen::VectorXd &vec,
+                        bayesmix::Vector *const out) {
   out->set_size(vec.size());
   *out->mutable_data() = {vec.data(), vec.data() + vec.size()};
 }
 
-void bayesmix::to_proto(const Eigen::MatrixXd &mat, bayesmix::Matrix *out) {
+void bayesmix::to_proto(const Eigen::MatrixXd &mat,
+                        bayesmix::Matrix *const out) {
   out->set_rows(mat.rows());
   out->set_cols(mat.cols());
   out->set_rowmajor(false);
@@ -48,7 +50,7 @@ Eigen::MatrixXd bayesmix::to_eigen(const bayesmix::Matrix &mat) {
 }
 
 void bayesmix::read_proto_from_file(const std::string &filename,
-                                    google::protobuf::Message *out) {
+                                    google::protobuf::Message *const out) {
   std::ifstream ifs(filename);
   google::protobuf::io::IstreamInputStream iis(&ifs);
   auto success = google::protobuf::TextFormat::Parse(&iis, out);

@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+import "matrix.proto";
+
+package bayesmix;
+
+/*
+ * Parameters of a univariate location-scale family of distributions.
+ */
+message UniLSState {
+  double mean = 1;
+  double var = 2;
+}
+
+/*
+ * Parameters of a multivariate location-scale family of distributions,
+ * parameterized by mean and precision (inverse of variance). For
+ * convenience, we also store the Cholesky factor of the precision matrix.
+ */
+message MultiLSState {
+  Vector mean = 1;
+  Matrix prec = 2;
+  Matrix prec_chol = 3;
+}
+
+/*
+ * Parameters of a univariate linear regression
+ */
+message LinRegUniLSState {
+  Vector regression_coeffs = 1; // regression coefficients
+  double var = 2; // variance of the noise
+}
+
+message FAState {
+  Vector mu = 1;
+  Vector psi = 2;
+  Matrix eta = 3;
+  Matrix lambda = 4;
+}

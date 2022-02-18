@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package bayesmix;
+
+import "matrix.proto";
+
+/*
+ * State of a Dirichlet process
+ */
+message DPState {
+  double totalmass = 1; // the total mass of the DP
+}
+
+/*
+ * State of a Pitman-Yor process
+ */
+message PYState {
+  double strength = 1;
+  double discount = 2;
+}
+
+/*
+ * State of a Logit-Stick Breaking process
+ */
+message LogSBState {
+  Matrix regression_coeffs = 1; // Num_Components x Num_Features matrix. Each row is the regression coefficients for a component.
+}
+
+/*
+ * State of a truncated sitck breaking process. For convenice we store also the logarithm of the weights
+ */
+message TruncSBState {
+  Vector sticks = 1;
+  Vector logweights = 2;
+}
+
+/*
+ * State of a MFM (Finite Dirichlet) process
+ */
+message MFMState {
+  double lambda = 1; // rate parameter of Poisson prior on number of compunents of the MFM
+  double gamma = 2; // parameter of the dirichlet distribution for the mixing weights
+}
+
+/*
+ * Wrapper of all possible mixing states into a single oneof
+ */
+message MixingState {
+  oneof state {
+    DPState dp_state = 1;
+    PYState py_state = 2;
+    LogSBState log_sb_state = 3;
+    TruncSBState trunc_sb_state = 4;
+    MFMState mfm_state = 5;
+  }
+}

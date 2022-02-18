@@ -7,6 +7,7 @@
 #include "abstract_mixing.h"
 #include "dirichlet_mixing.h"
 #include "logit_sb_mixing.h"
+#include "mixture_finite_mixing.h"
 #include "pityor_mixing.h"
 #include "src/runtime/factory.h"
 #include "truncated_sb_mixing.h"
@@ -28,6 +29,9 @@ __attribute__((constructor)) static void load_mixings() {
   Builder<AbstractMixing> LogSBbuilder = []() {
     return std::make_shared<LogitSBMixing>();
   };
+  Builder<AbstractMixing> MFMbuilder = []() {
+    return std::make_shared<MixtureFiniteMixing>();
+  };
   Builder<AbstractMixing> PYbuilder = []() {
     return std::make_shared<PitYorMixing>();
   };
@@ -37,6 +41,7 @@ __attribute__((constructor)) static void load_mixings() {
 
   factory.add_builder(DirichletMixing().get_id(), DPbuilder);
   factory.add_builder(LogitSBMixing().get_id(), LogSBbuilder);
+  factory.add_builder(MixtureFiniteMixing().get_id(), MFMbuilder);
   factory.add_builder(PitYorMixing().get_id(), PYbuilder);
   factory.add_builder(TruncatedSBMixing().get_id(), TruncSBbuilder);
 }

@@ -26,6 +26,13 @@ class Neal2Algorithm : public MarginalAlgorithm {
     return bayesmix::AlgorithmId::Neal2;
   }
 
+  std::shared_ptr<BaseAlgorithm> clone() const override {
+    auto out = std::make_shared<Neal2Algorithm>(*this);
+    out->set_mixing(mixing->clone());
+    out->set_hierarchy(unique_values[0]->deep_clone());
+    return out;
+  }
+
  protected:
   void print_startup_message() const override;
 
@@ -34,7 +41,8 @@ class Neal2Algorithm : public MarginalAlgorithm {
   void sample_unique_values() override;
 
   Eigen::VectorXd lpdf_marginal_component(
-      std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+      const std::shared_ptr<AbstractHierarchy> hier,
+      const Eigen::MatrixXd &grid,
       const Eigen::RowVectorXd &covariate) const override;
 
   //! Computes prior component of allocation sampling masses for given datum
