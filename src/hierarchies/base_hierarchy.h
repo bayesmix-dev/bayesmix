@@ -87,6 +87,16 @@ class BaseHierarchy : public AbstractHierarchy {
     return out;
   };
 
+  std::shared_ptr<AbstractHierarchy> deep_clone() const override {
+    // Create copy of the hierarchy
+    auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
+    // Simple Clone is enough for Likelihood
+    out->set_likelihood(std::static_pointer_cast<Likelihood>(like->clone()));
+    // Deep-Clone required for PriorModel
+    out->set_prior(std::static_pointer_cast<PriorModel>(prior->deep_clone()));
+    return out;
+  }
+
   // NOT SURE THIS IS CORRECT, MAYBE OVERRIDE GET_LIKE_LPDF? OR THIS IS EVEN
   // UNNECESSARY
   double like_lpdf(const Eigen::RowVectorXd &datum) const override {
@@ -94,23 +104,24 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   //! Returns an independent, data-less copy of this object
-  std::shared_ptr<AbstractHierarchy> deep_clone() const override {
-    auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
+  // std::shared_ptr<AbstractHierarchy> deep_clone() const override {
+  //   auto out = std::make_shared<Derived>(static_cast<Derived const
+  //   &>(*this));
 
-    out->clear_data();
-    out->clear_summary_statistics();
+  //   out->clear_data();
+  //   out->clear_summary_statistics();
 
-    out->create_empty_prior();
-    std::shared_ptr<google::protobuf::Message> new_prior(prior->New());
-    new_prior->CopyFrom(*prior.get());
-    out->get_mutable_prior()->CopyFrom(*new_prior.get());
+  //   out->create_empty_prior();
+  //   std::shared_ptr<google::protobuf::Message> new_prior(prior->New());
+  //   new_prior->CopyFrom(*prior.get());
+  //   out->get_mutable_prior()->CopyFrom(*new_prior.get());
 
-    out->create_empty_hypers();
-    auto curr_hypers_proto = get_hypers_proto();
-    out->set_hypers_from_proto(*curr_hypers_proto.get());
-    out->initialize();
-    return out;
-  }
+  //   out->create_empty_hypers();
+  //   auto curr_hypers_proto = get_hypers_proto();
+  //   out->set_hypers_from_proto(*curr_hypers_proto.get());
+  //   out->initialize();
+  //   return out;
+  // }
 
   //! Evaluates the log-likelihood of data in a grid of points
   //! @param data        Grid of points (by row) which are to be evaluated
@@ -261,6 +272,14 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Returns the indexes of data points belonging to this cluster
   std::set<int> get_data_idx() const override { return like->get_data_idx(); };
 
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::ClusterState message by adding the appropriate type
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
+      const override {
+    return like->get_state_proto();
+  }
+
   //! Returns a pointer to the Protobuf message of the prior of this cluster
   google::protobuf::Message *get_mutable_prior() override {
     return prior->get_mutable_prior();
@@ -350,6 +369,9 @@ class BaseHierarchy : public AbstractHierarchy {
       throw std::runtime_error("marg_lpdf() not yet implemented");
     }
   }
+
+  // TEMPORANEO!
+  const Eigen::MatrixXd *dataset_ptr;
 };
 
 // TODO: Move definitions outside the class to improve code cleaness
