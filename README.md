@@ -39,7 +39,6 @@ To build the executable for the main file `run_mcmc.cc`, please use the followin
 ```shell
 mkdir build
 cd build
-
 cmake .. -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON -DDISABLE_TESTS=ON
 make run_mcmc
 cd ..
