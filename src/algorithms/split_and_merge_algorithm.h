@@ -3,6 +3,7 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 
 #include "algorithm_id.pb.h"
 #include "marginal_algorithm.h"

@@ -5,6 +5,7 @@
 
 #include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "base_mixing.h"
