@@ -63,6 +63,7 @@ class AbstractHierarchy {
   //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractHierarchy> clone() const = 0;
 
+  //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractHierarchy> deep_clone() const = 0;
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
