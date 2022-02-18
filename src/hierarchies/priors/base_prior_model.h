@@ -74,7 +74,7 @@ class BasePriorModel : public AbstractPriorModel {
 
   virtual google::protobuf::Message *get_mutable_prior() override;
 
-  HyperParams get_hypers() const { return hypers; }
+  HyperParams get_hypers() const { return *hypers; }
 
   HyperParams get_posterior_hypers() const { return post_hypers; }
 
@@ -90,6 +90,8 @@ class BasePriorModel : public AbstractPriorModel {
   void check_prior_is_set() const;
 
   void create_empty_prior() { prior.reset(new Prior); }
+
+  void create_empty_hypers() { hypers.reset(new HyperParams); }
 
   bayesmix::AlgorithmState::HierarchyHypers *downcast_hypers(
       google::protobuf::Message *state_) const {
@@ -109,7 +111,7 @@ class BasePriorModel : public AbstractPriorModel {
         const bayesmix::AlgorithmState::ClusterState &>(state_);
   }
 
-  HyperParams hypers;
+  std::shared_ptr<HyperParams> hypers;
   HyperParams post_hypers;
   std::shared_ptr<Prior> prior;
 };
@@ -134,7 +136,13 @@ BasePriorModel<Derived, HyperParams, Prior>::deep_clone() const {
   new_prior->CopyFrom(*prior.get());
   out->get_mutable_prior()->CopyFrom(*new_prior.get());
 
-  // C'è da farlo anche su Hypers, ma va cambiata della roba!
+  // HyperParams Deep-clone
+  out->create_empty_hypers();
+  auto curr_hypers_proto = get_hypers_proto();
+  out->set_hypers_from_proto(*curr_hypers_proto.get());
+
+  // Initialization of Deep-cloned object
+  out->initialize();
 
   return out;
 }
