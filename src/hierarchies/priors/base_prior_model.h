@@ -168,6 +168,7 @@ void BasePriorModel<Derived, HyperParams, Prior>::write_hypers_to_proto(
 template <class Derived, typename HyperParams, typename Prior>
 void BasePriorModel<Derived, HyperParams, Prior>::initialize() {
   check_prior_is_set();
+  create_empty_hypers();
   initialize_hypers();
 }
 
