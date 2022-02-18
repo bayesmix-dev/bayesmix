@@ -18,6 +18,9 @@ class AbstractPriorModel {
   // IMPLEMENTED in BasePriorModel
   virtual std::shared_ptr<AbstractPriorModel> clone() const = 0;
 
+  // IMPLEMENTED in BasePriorModel
+  virtual std::shared_ptr<AbstractPriorModel> deep_clone() const = 0;
+
   virtual double lpdf(const google::protobuf::Message &state_) = 0;
 
   //! Evaluates the log likelihood for unconstrained parameter values.

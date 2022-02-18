@@ -70,6 +70,8 @@ class BasePriorModel : public AbstractPriorModel {
 
   virtual std::shared_ptr<AbstractPriorModel> clone() const override;
 
+  virtual std::shared_ptr<AbstractPriorModel> deep_clone() const override;
+
   virtual google::protobuf::Message *get_mutable_prior() override;
 
   HyperParams get_hypers() const { return hypers; }
@@ -118,6 +120,22 @@ template <class Derived, typename HyperParams, typename Prior>
 std::shared_ptr<AbstractPriorModel>
 BasePriorModel<Derived, HyperParams, Prior>::clone() const {
   auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
+  return out;
+}
+
+template <class Derived, typename HyperParams, typename Prior>
+std::shared_ptr<AbstractPriorModel>
+BasePriorModel<Derived, HyperParams, Prior>::deep_clone() const {
+  auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
+
+  // Prior Deep-clone
+  out->create_empty_prior();
+  std::shared_ptr<google::protobuf::Message> new_prior(prior->New());
+  new_prior->CopyFrom(*prior.get());
+  out->get_mutable_prior()->CopyFrom(*new_prior.get());
+
+  // C'è da farlo anche su Hypers, ma va cambiata della roba!
+
   return out;
 }
 
