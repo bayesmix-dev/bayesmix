@@ -30,6 +30,7 @@ add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   runtime.cc
   rng.cc
   logit_sb.cc
+  gradient.cc
 )
 
 target_include_directories(test_bayesmix PUBLIC ${INCLUDE_PATHS})

@@ -3,16 +3,36 @@
 
 #include <google/protobuf/message.h>
 
-#include <Eigen/Dense>
 #include <memory>
 #include <random>
 #include <set>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "abstract_prior_model.h"
 #include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
 #include "src/utils/rng.h"
+
+namespace internal {
+
+template <class Prior, typename T>
+auto lpdf_from_unconstrained(
+    const Prior &prior,
+    Eigen::Matrix<T, Eigen::Dynamic, 1> unconstrained_params, int)
+    -> decltype(prior.template lpdf_from_unconstrained<T>(
+        unconstrained_params)) {
+  return prior.template lpdf_from_unconstrained<T>(unconstrained_params);
+}
+
+template <class Prior, typename T>
+auto lpdf_from_unconstrained(
+    const Prior &prior,
+    Eigen::Matrix<T, Eigen::Dynamic, 1> unconstrained_params, double) -> T {
+  throw(std::runtime_error("lpdf_from_unconstrained() not yet implemented"));
+}
+
+}  // namespace internal
 
 template <class Derived, typename HyperParams, typename Prior>
 class BasePriorModel : public AbstractPriorModel {
@@ -20,6 +40,33 @@ class BasePriorModel : public AbstractPriorModel {
   BasePriorModel() = default;
 
   ~BasePriorModel() = default;
+
+  double lpdf_from_unconstrained(
+      Eigen::VectorXd unconstrained_params) const override {
+    return internal::lpdf_from_unconstrained(
+        static_cast<const Derived &>(*this), unconstrained_params, 0);
+  }
+
+  stan::math::var lpdf_from_unconstrained(
+      Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> unconstrained_params)
+      const override {
+    return internal::lpdf_from_unconstrained(
+        static_cast<const Derived &>(*this), unconstrained_params, 0);
+  }
+
+  // double lpdf_from_unconstrained(
+  //     Eigen::VectorXd unconstrained_params) const override {
+  //   return static_cast<const Derived &>(*this)
+  //       .template lpdf_from_unconstrained<double>(unconstrained_params);
+  // }
+
+  // stan::math::var lpdf_from_unconstrained(
+  //     Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>
+  //     unconstrained_params) const override {
+  //   return static_cast<const Derived &>(*this)
+  //       .template lpdf_from_unconstrained<stan::math::var>(
+  //           unconstrained_params);
+  // }
 
   virtual std::shared_ptr<AbstractPriorModel> clone() const override;
 

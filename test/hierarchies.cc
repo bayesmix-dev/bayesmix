@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <Eigen/Dense>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "algorithm_state.pb.h"
 #include "ls_state.pb.h"
@@ -92,9 +92,9 @@ TEST(nnw_hierarchy, draw) {
   hier2->sample_prior();
 
   bayesmix::AlgorithmState out;
-  bayesmix::AlgorithmState::ClusterState* clusval =
-  out.add_cluster_states(); bayesmix::AlgorithmState::ClusterState* clusval2
-  = out.add_cluster_states(); hier->write_state_to_proto(clusval);
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
+  hier->write_state_to_proto(clusval);
   hier2->write_state_to_proto(clusval2);
 
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
@@ -127,12 +127,39 @@ TEST(nnw_hierarchy, sample_given_data) {
   hier2->sample_full_cond();
 
   bayesmix::AlgorithmState out;
-  bayesmix::AlgorithmState::ClusterState* clusval =
-  out.add_cluster_states(); bayesmix::AlgorithmState::ClusterState* clusval2
-  = out.add_cluster_states(); hier->write_state_to_proto(clusval);
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
+  hier->write_state_to_proto(clusval);
   hier2->write_state_to_proto(clusval2);
 
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+}
+
+TEST(nnw_hierarchy, no_unconstrained_lpdf) {
+  // Initialize hierarchy
+  auto hier = std::make_shared<NNWHierarchy>();
+  bayesmix::NNWPrior prior;
+  Eigen::Vector2d mu0;
+  mu0 << 5.5, 5.5;
+  bayesmix::Vector mu0_proto;
+  bayesmix::to_proto(mu0, &mu0_proto);
+  double lambda0 = 0.2;
+  double nu0 = 5.0;
+  Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
+  bayesmix::Matrix tau0_proto;
+  bayesmix::to_proto(tau0, &tau0_proto);
+  *prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
+  prior.mutable_fixed_values()->set_var_scaling(lambda0);
+  prior.mutable_fixed_values()->set_deg_free(nu0);
+  *prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
+  hier->get_mutable_prior()->CopyFrom(prior);
+  hier->initialize();
+
+  // Check exeption handling in case unconstrained lpdfs are not implemented
+  auto state_uc = hier->get_state().get_unconstrained();
+  EXPECT_ANY_THROW(
+      hier->get_likelihood()->cluster_lpdf_from_unconstrained(state_uc));
+  EXPECT_ANY_THROW(hier->get_prior()->lpdf_from_unconstrained(state_uc));
 }
 
 // TEST(lin_reg_uni_hierarchy, state_read_write) {
@@ -237,9 +264,9 @@ TEST(nnxig_hierarchy, draw) {
   hier2->sample_prior();
 
   bayesmix::AlgorithmState out;
-  bayesmix::AlgorithmState::ClusterState* clusval =
-  out.add_cluster_states(); bayesmix::AlgorithmState::ClusterState* clusval2
-  = out.add_cluster_states(); hier->write_state_to_proto(clusval);
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
+  hier->write_state_to_proto(clusval);
   hier2->write_state_to_proto(clusval2);
 
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());

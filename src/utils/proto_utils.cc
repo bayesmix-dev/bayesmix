@@ -3,8 +3,8 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
 
-#include <Eigen/Dense>
 #include <fstream>
+#include <stan/math/rev.hpp>
 
 #include "matrix.pb.h"
 

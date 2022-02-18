@@ -88,7 +88,6 @@ std::shared_ptr<google::protobuf::Message> NIGPriorModel::sample(
     bool use_post_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
   Hyperparams::NIG params = use_post_hypers ? post_hypers : hypers;
-
   double var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
   double mean =
       stan::math::normal_rng(params.mean, sqrt(var / params.var_scaling), rng);

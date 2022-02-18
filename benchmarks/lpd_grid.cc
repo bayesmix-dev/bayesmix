@@ -1,7 +1,7 @@
 #include <benchmark/benchmark.h>
 
-#include <Eigen/Dense>
 #include <iostream>
+#include <stan/math/rev.hpp>
 
 #include "src/utils/distributions.h"
 #include "utils.h"
@@ -36,7 +36,6 @@ Eigen::VectorXd lpdf_naive(const Eigen::MatrixXd &x,
   }
   return out;
 }
-
 
 Eigen::VectorXd lpdf_fully_optimized(const Eigen::MatrixXd &x,
                                      const Eigen::VectorXd &mean,
@@ -84,7 +83,6 @@ static void BM_gauss_lpdf_naive(benchmark::State &state) {
   }
 }
 
-
 static void BM_gauss_lpdf_fully_optimized(benchmark::State &state) {
   int dim = state.range(0);
   Eigen::VectorXd mean = Eigen::VectorXd::Zero(dim);
@@ -98,7 +96,6 @@ static void BM_gauss_lpdf_fully_optimized(benchmark::State &state) {
     lpdf_fully_optimized(x, mean, prec_chol, prec_logdet);
   }
 }
-
 
 BENCHMARK(BM_gauss_lpdf_cov)->RangeMultiplier(2)->Range(2, 2 << 4);
 BENCHMARK(BM_gauss_lpdf_cov)->RangeMultiplier(2)->Range(2, 2 << 4);

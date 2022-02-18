@@ -3,14 +3,35 @@
 
 #include <google/protobuf/message.h>
 
-#include <Eigen/Dense>
 #include <memory>
-// #include <random>
 #include <set>
-// #include <stan/math/prim.hpp>
+#include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "abstract_likelihood.h"
 #include "algorithm_state.pb.h"
+
+namespace internal {
+
+template <class Like, typename T>
+auto cluster_lpdf_from_unconstrained(
+    const Like &like, Eigen::Matrix<T, Eigen::Dynamic, 1> unconstrained_params,
+    int)
+    -> decltype(like.template cluster_lpdf_from_unconstrained<T>(
+        unconstrained_params)) {
+  return like.template cluster_lpdf_from_unconstrained<T>(
+      unconstrained_params);
+}
+
+template <class Like, typename T>
+auto cluster_lpdf_from_unconstrained(
+    const Like &like, Eigen::Matrix<T, Eigen::Dynamic, 1> unconstrained_params,
+    double) -> T {
+  throw(std::runtime_error(
+      "cluster_lpdf_from_unconstrained() not yet implemented"));
+}
+
+}  // namespace internal
 
 template <class Derived, typename State>
 class BaseLikelihood : public AbstractLikelihood {
@@ -23,6 +44,36 @@ class BaseLikelihood : public AbstractLikelihood {
     out->clear_data();
     out->clear_summary_statistics();
     return out;
+  }
+
+  // The unconstrained parameters are mean and log(var)
+
+  // double cluster_lpdf_from_unconstrained(
+  //     Eigen::VectorXd unconstrained_params) const override {
+  //   return static_cast<const Derived &>(*this)
+  //       .template cluster_lpdf_from_unconstrained<double>(
+  //           unconstrained_params);
+  // }
+
+  // stan::math::var cluster_lpdf_from_unconstrained(
+  //     Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>
+  //     unconstrained_params) const override {
+  //   return static_cast<const Derived &>(*this)
+  //       .template cluster_lpdf_from_unconstrained<stan::math::var>(
+  //           unconstrained_params);
+  // }
+
+  double cluster_lpdf_from_unconstrained(
+      Eigen::VectorXd unconstrained_params) const override {
+    return internal::cluster_lpdf_from_unconstrained(
+        static_cast<const Derived &>(*this), unconstrained_params, 0);
+  }
+
+  stan::math::var cluster_lpdf_from_unconstrained(
+      Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> unconstrained_params)
+      const override {
+    return internal::cluster_lpdf_from_unconstrained(
+        static_cast<const Derived &>(*this), unconstrained_params, 0);
   }
 
   virtual Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data,
@@ -39,7 +90,16 @@ class BaseLikelihood : public AbstractLikelihood {
 
   State get_state() const { return state; }
 
+  Eigen::VectorXd get_unconstrained_state() override {
+    return state.get_unconstrained();
+  }
+
   void set_state(const State &_state) { state = _state; };
+
+  void set_state_from_unconstrained(
+      const Eigen::VectorXd &unconstrained_state) override {
+    state.set_from_unconstrained(unconstrained_state);
+  }
 
   void add_datum(
       const int id, const Eigen::RowVectorXd &datum,

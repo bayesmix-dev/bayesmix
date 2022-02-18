@@ -17,8 +17,8 @@
 #include "priors/nxig_prior_model.h"
 #include "updaters/nnxig_updater.h"
 
-class NNxIGHierarchy : public BaseHierarchy<NNxIGHierarchy, UniNormLikelihood,
-                                           NxIGPriorModel, NNxIGUpdater> {
+class NNxIGHierarchy
+    : public BaseHierarchy<NNxIGHierarchy, UniNormLikelihood, NxIGPriorModel> {
  public:
   NNxIGHierarchy() = default;
   ~NNxIGHierarchy() = default;
@@ -26,6 +26,8 @@ class NNxIGHierarchy : public BaseHierarchy<NNxIGHierarchy, UniNormLikelihood,
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNxIG;
   }
+
+  void set_default_updater() { updater = std::make_shared<NNxIGUpdater>(); }
 
   void initialize_state() override {
     // Get hypers
@@ -36,7 +38,6 @@ class NNxIGHierarchy : public BaseHierarchy<NNxIGHierarchy, UniNormLikelihood,
     state.var = hypers.scale / (hypers.shape + 1);
     like->set_state(state);
   };
-
 };
 
-#endif // BAYESMIX_HIERARCHIES_NNXIG_HIERARCHY_H_
+#endif  // BAYESMIX_HIERARCHIES_NNXIG_HIERARCHY_H_

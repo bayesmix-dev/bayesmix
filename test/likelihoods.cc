@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <Eigen/Dense>
 #include <memory>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "algorithm_state.pb.h"
 #include "ls_state.pb.h"
@@ -76,6 +76,57 @@ TEST(uni_norm_likelihood, eval_lpdf) {
 
   // Check if they coincides
   ASSERT_EQ(evals, evals_copy);
+}
+
+TEST(uni_norm_likelihood, eval_lpdf_unconstrained) {
+  // Instance
+  auto like = std::make_shared<UniNormLikelihood>();
+
+  // Set state from proto
+  bayesmix::UniLSState state_;
+  bayesmix::AlgorithmState::ClusterState clust_state_;
+  double mean = 5;
+  double var = 1;
+  state_.set_mean(mean);
+  state_.set_var(var);
+  Eigen::VectorXd unconstrained_params(2);
+  unconstrained_params << mean, std::log(var);
+  clust_state_.mutable_uni_ls_state()->CopyFrom(state_);
+  like->set_state_from_proto(clust_state_);
+
+  // Add new datum to likelihood
+  Eigen::VectorXd data(3);
+  data << 4.5, 5.1, 2.5;
+  double lpdf = 0.0;
+  for (int i = 0; i < data.size(); ++i) {
+    like->add_datum(i, data.row(i));
+    lpdf += like->lpdf(data.row(i));
+  }
+
+  double clus_lpdf =
+      like->cluster_lpdf_from_unconstrained(unconstrained_params);
+  ASSERT_DOUBLE_EQ(lpdf, clus_lpdf);
+
+  unconstrained_params(0) = 4.0;
+  clus_lpdf = like->cluster_lpdf_from_unconstrained(unconstrained_params);
+  ASSERT_TRUE(std::abs(clus_lpdf - lpdf) > 1e-5);
+}
+
+TEST(multi_ls_state, set_unconstrained) {
+  auto& rng = bayesmix::Rng::Instance().get();
+
+  State::MultiLS state;
+  auto mean = Eigen::VectorXd::Zero(5);
+  auto prec =
+      stan::math::wishart_rng(10, Eigen::MatrixXd::Identity(5, 5), rng);
+  state.mean = mean;
+  state.prec = prec;
+  Eigen::VectorXd unconstrained_state = state.get_unconstrained();
+
+  State::MultiLS state2;
+  state2.set_from_unconstrained(unconstrained_state);
+  ASSERT_TRUE((state.mean - state2.mean).squaredNorm() < 1e-5);
+  ASSERT_TRUE((state.prec - state2.prec).squaredNorm() < 1e-5);
 }
 
 TEST(multi_norm_likelihood, set_get_state) {

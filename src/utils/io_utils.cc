@@ -1,7 +1,7 @@
 #include "io_utils.h"
 
-#include <Eigen/Dense>
 #include <fstream>
+#include <stan/math/rev.hpp>
 
 Eigen::MatrixXd bayesmix::read_eigen_matrix(const std::string &filename,
                                             const char delim /* = ','*/) {

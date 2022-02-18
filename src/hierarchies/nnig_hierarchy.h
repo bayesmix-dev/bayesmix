@@ -3,7 +3,7 @@
 
 // #include <google/protobuf/stubs/casts.h>
 
-// #include <Eigen/Dense>
+// #include <stan/math/rev.hpp>
 // #include <memory>
 // #include <vector>
 
@@ -17,15 +17,19 @@
 #include "priors/nig_prior_model.h"
 #include "updaters/nnig_updater.h"
 
-class NNIGHierarchy : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
-                                           NIGPriorModel, NNIGUpdater> {
+class NNIGHierarchy
+    : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood, NIGPriorModel> {
  public:
-  NNIGHierarchy() = default;
   ~NNIGHierarchy() = default;
+
+  using BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
+                      NIGPriorModel>::BaseHierarchy;
 
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNIG;
   }
+
+  void set_default_updater() { updater = std::make_shared<NNIGUpdater>(); }
 
   void initialize_state() override {
     // Get hypers

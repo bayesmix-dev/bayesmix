@@ -1,8 +1,8 @@
 #ifndef BAYESMIX_UTILS_DISTRIBUTIONS_H_
 #define BAYESMIX_UTILS_DISTRIBUTIONS_H_
 
-#include <Eigen/Dense>
 #include <random>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "algorithm_state.pb.h"
