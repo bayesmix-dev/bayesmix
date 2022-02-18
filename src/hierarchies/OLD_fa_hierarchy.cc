@@ -1,5 +1,3 @@
-#include "fa_hierarchy.h"
-
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
@@ -9,6 +7,7 @@
 #include <vector>
 
 #include "algorithm_state.pb.h"
+#include "fa_hierarchy.h"
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"
 #include "src/utils/proto_utils.h"
