@@ -17,22 +17,35 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
+set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
+
 # Require PkgConfig
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
 
-# TBB CMake integration
-message(STATUS "Using math TBB")
-# Define TBB_ROOT Folder
-set(TBB_ROOT ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb)
-file(COPY ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2019_U8/ DESTINATION ${TBB_ROOT})
-# Build TBB Library with CMake Integration
-include(${TBB_ROOT}/cmake/TBBBuild.cmake)
-list(APPEND MAKE_ARGS "tbb_build_dir=${TBB_ROOT}")
-list(APPEND MAKE_ARGS "tbb_build_prefix=tbb")
-tbb_build(TBB_ROOT ${TBB_ROOT} CONFIG_DIR TBB_DIR MAKE_ARGS ${MAKE_ARGS})
-# Require TBB library (for compile / link options)
 find_package(TBB)
+
+if (TBB_FOUND)
+  message("FOUND TBB, VERSION: " ${TBB_VERSION})
+  if (${TBB_VERSION} GREATER_EQUAL 2021)
+    message("RIGHT VERSION")
+    set(COMPILE_OPTIONS ${COMPILE_OPTIONS} -DTBB_INTERFACE_NEW)
+  endif()
+else()
+  # TBB CMake integration
+  message(STATUS "Using math TBB")
+  # Define TBB_ROOT Folder
+  set(TBB_ROOT ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb)
+  file(COPY ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2019_U8/ DESTINATION ${TBB_ROOT})
+  # Build TBB Library with CMake Integration
+  include(${TBB_ROOT}/cmake/TBBBuild.cmake)
+  list(APPEND MAKE_ARGS "tbb_build_dir=${TBB_ROOT}")
+  list(APPEND MAKE_ARGS "tbb_build_prefix=tbb")
+  tbb_build(TBB_ROOT ${TBB_ROOT} CONFIG_DIR TBB_DIR MAKE_ARGS ${MAKE_ARGS})
+  # Require TBB library (for compile / link options)
+  find_package(TBB)
+endif()
+
 
 # Check if Protobuf is present in system
 find_package(Protobuf)
@@ -102,8 +115,6 @@ set(LINK_LIBRARIES
 	TBB::tbb
   OpenMP::OpenMP_CXX
 )
-
-set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
 file(GLOB ProtoFiles "${BASEPATH}/src/proto/*.proto")
 set(PROTO_DIR proto)
