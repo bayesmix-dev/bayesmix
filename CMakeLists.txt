@@ -25,12 +25,8 @@ find_package(OpenMP REQUIRED)
 
 find_package(TBB)
 
-if (TBB_FOUND)
-  message("FOUND TBB, VERSION: " ${TBB_VERSION})
-  if (${TBB_VERSION} GREATER_EQUAL 2021)
-    message("RIGHT VERSION")
-    set(COMPILE_OPTIONS ${COMPILE_OPTIONS} -DTBB_INTERFACE_NEW)
-  endif()
+if (TBB_FOUND AND ${TBB_VERSION} GREATER_EQUAL 2021)
+  set(COMPILE_OPTIONS ${COMPILE_OPTIONS} -DTBB_INTERFACE_NEW)
 else()
   # TBB CMake integration
   message(STATUS "Using math TBB")
