@@ -23,17 +23,11 @@ set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
 
-set (LOOK_FOR_TBB TRUE)
-find_package(TBB)
-
+find_package(TBB 2021)
 if (TBB_FOUND)
-  if (${TBB_VERSION} GREATER_EQUAL 2021)
-    set(COMPILE_OPTIONS ${COMPILE_OPTIONS} -DTBB_INTERFACE_NEW)
-    set(LOOK_FOR_TBB FALSE)
-  endif()
-endif()
-
-if (${LOOK_FOR_TBB})
+  message (STATUS "Using system TBB")
+  set(COMPILE_OPTIONS ${COMPILE_OPTIONS} -DTBB_INTERFACE_NEW)
+else()
   # TBB CMake integration
   message(STATUS "Using math TBB")
   # Define TBB_ROOT Folder
