@@ -1,8 +1,8 @@
 #include "laplace_likelihood.h"
 
 double LaplaceLikelihood::compute_lpdf(const Eigen::RowVectorXd &datum) const {
-  return stan::math::double_exponential_lpdf(datum(0), state.mean,
-                                             stan::math::sqrt(state.var / 2));
+  return stan::math::double_exponential_lpdf(
+      datum(0), state.mean, stan::math::sqrt(state.var / 2.0));
 }
 
 void LaplaceLikelihood::update_sum_stats(const Eigen::RowVectorXd &datum,
@@ -36,8 +36,8 @@ LaplaceLikelihood::get_state_proto() const {
 
 void LaplaceLikelihood::clear_summary_statistics() {
   cluster_data_values.clear();
-  sum_abs_diff_curr = 0;
-  sum_abs_diff_prop = 0;
+  // sum_abs_diff_curr = 0;
+  // sum_abs_diff_prop = 0;
 }
 
 // double UniNormLikelihood::cluster_lpdf_from_unconstrained(

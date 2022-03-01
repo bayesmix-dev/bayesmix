@@ -32,7 +32,7 @@ class LaplaceLikelihood
     for (auto it = cluster_data_values.begin();
          it != cluster_data_values.end(); ++it) {
       out += stan::math::double_exponential_lpdf(*it, mean,
-                                                 stan::math::sqrt(var / 2));
+                                                 stan::math::sqrt(var / 2.0));
     }
     return out;
   }
