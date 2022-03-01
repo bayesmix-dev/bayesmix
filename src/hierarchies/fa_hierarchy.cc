@@ -16,16 +16,14 @@
 
 double FAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
-  double base = (Eigen::MatrixXd(state.cov_chol.matrixL()))
-                    .diagonal()
-                    .array()
-                    .log()
-                    .sum() -
-                NEG_LOG_SQRT_TWO_PI * dim;
   double exp =
-      0.5 * ((datum.transpose() - state.mu)
-                 .dot(state.cov_chol.solve((datum.transpose() - state.mu))));
-  return -(base + exp);
+      -0.5 * ((datum.transpose() - state.mu)
+                  .dot(state.psi_inverse * (datum.transpose() - state.mu)) -
+              (state.cov_wood * (datum.transpose() - state.mu)).squaredNorm());
+
+  double base = -0.5 * state.cov_logdet + NEG_LOG_SQRT_TWO_PI * dim;
+
+  return base + exp;
 }
 
 FA::State FAHierarchy::draw(const FA::Hyperparams& params) {
@@ -54,9 +52,19 @@ FA::State FAHierarchy::draw(const FA::Hyperparams& params) {
   }
 
   out.psi_inverse = out.psi.cwiseInverse().asDiagonal();
-  out.cov_chol = (out.lambda * out.lambda.transpose() +
-                  Eigen::MatrixXd(out.psi.asDiagonal()))
-                     .llt();
+
+  Eigen::MatrixXd temp_chol =
+      (out.lambda.transpose() * out.psi_inverse * out.lambda +
+       Eigen::MatrixXd::Identity(hypers->q, hypers->q))
+          .llt()
+          .matrixL()
+          .solve(Eigen::MatrixXd::Identity(hypers->q, hypers->q));
+
+  out.cov_logdet =
+      -2 * Eigen::MatrixXd(temp_chol).diagonal().array().log().sum() +
+      out.psi.array().log().sum();
+
+  out.cov_wood = temp_chol * out.lambda.transpose() * out.psi_inverse;
 
   return out;
 }
@@ -67,9 +75,16 @@ void FAHierarchy::initialize_state() {
   state.eta = Eigen::MatrixXd::Zero(card, hypers->q);
   state.lambda = Eigen::MatrixXd::Zero(dim, hypers->q);
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
-  state.cov_chol = (state.lambda * state.lambda.transpose() +
-                    Eigen::MatrixXd(state.psi.asDiagonal()))
-                       .llt();
+  Eigen::MatrixXd temp_chol =
+      (state.lambda.transpose() * state.psi_inverse * state.lambda +
+       Eigen::MatrixXd::Identity(hypers->q, hypers->q))
+          .llt()
+          .matrixL()
+          .solve(Eigen::MatrixXd::Identity(hypers->q, hypers->q));
+  state.cov_logdet =
+      -2 * Eigen::MatrixXd(temp_chol).diagonal().array().log().sum() +
+      state.psi.array().log().sum();
+  state.cov_wood = temp_chol * state.lambda.transpose() * state.psi_inverse;
 }
 
 void FAHierarchy::initialize_hypers() {
@@ -162,9 +177,17 @@ void FAHierarchy::set_state_from_proto(
   state.eta = bayesmix::to_eigen(statecast.fa_state().eta());
   state.lambda = bayesmix::to_eigen(statecast.fa_state().lambda());
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
-  state.cov_chol = (state.lambda * state.lambda.transpose() +
-                    Eigen::MatrixXd(state.psi.asDiagonal()))
-                       .llt();
+  Eigen::MatrixXd temp_chol =
+      (state.lambda.transpose() * state.psi_inverse * state.lambda +
+       Eigen::MatrixXd::Identity(hypers->q, hypers->q))
+          .llt()
+          .matrixL()
+          .solve(Eigen::MatrixXd::Identity(hypers->q, hypers->q));
+  state.cov_logdet =
+      -2 * Eigen::MatrixXd(temp_chol).diagonal().array().log().sum() +
+      state.psi.array().log().sum();
+  state.cov_wood = temp_chol * state.lambda.transpose() * state.psi_inverse;
+
   set_card(statecast.cardinality());
 }
 
@@ -297,7 +320,14 @@ void FAHierarchy::sample_psi() {
                                              hypers->beta[j] + sum / 2, rng);
   }
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
-  state.cov_chol = (state.lambda * state.lambda.transpose() +
-                    Eigen::MatrixXd(state.psi.asDiagonal()))
-                       .llt();
+  Eigen::MatrixXd temp_chol =
+      (state.lambda.transpose() * state.psi_inverse * state.lambda +
+       Eigen::MatrixXd::Identity(hypers->q, hypers->q))
+          .llt()
+          .matrixL()
+          .solve(Eigen::MatrixXd::Identity(hypers->q, hypers->q));
+  state.cov_logdet =
+      -2 * Eigen::MatrixXd(temp_chol).diagonal().array().log().sum() +
+      state.psi.array().log().sum();
+  state.cov_wood = temp_chol * state.lambda.transpose() * state.psi_inverse;
 }
