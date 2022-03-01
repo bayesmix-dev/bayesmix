@@ -21,10 +21,9 @@ namespace FA {
 //! Custom container for State values
 struct State {
   Eigen::VectorXd mu, psi;
-  Eigen::MatrixXd eta, lambda;
+  Eigen::MatrixXd eta, lambda, cov_wood;
   Eigen::DiagonalMatrix<double, Eigen::Dynamic> psi_inverse;
-  Eigen::LLT<Eigen::MatrixXd> cov_chol;
-  double prec_logdet;
+  double cov_logdet;
 };
 
 //! Custom container for Hyperparameters values
