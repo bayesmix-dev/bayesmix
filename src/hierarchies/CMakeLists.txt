@@ -11,7 +11,7 @@ target_sources(bayesmix
     # lin_reg_uni_hierarchy.cc
     # fa_hierarchy.h
     # fa_hierarchy.cc
-    # lapnig_hierarchy.h
+    lapnig_hierarchy.h
     # lapnig_hierarchy.cc
 )
 
