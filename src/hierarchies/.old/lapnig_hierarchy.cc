@@ -1,3 +1,5 @@
+#include "lapnig_hierarchy.h"
+
 #include <google/protobuf/stubs/casts.h>
 
 #include <Eigen/Dense>
@@ -8,7 +10,6 @@
 
 #include "algorithm_state.pb.h"
 #include "hierarchy_prior.pb.h"
-#include "lapnig_hierarchy.h"
 #include "ls_state.pb.h"
 #include "src/utils/rng.h"
 
