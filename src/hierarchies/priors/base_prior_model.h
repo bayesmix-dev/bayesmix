@@ -111,7 +111,7 @@ class BasePriorModel : public AbstractPriorModel {
         const bayesmix::AlgorithmState::ClusterState &>(state_);
   }
 
-  std::shared_ptr<HyperParams> hypers;
+  std::shared_ptr<HyperParams> hypers = std::make_shared<HyperParams>();
   HyperParams post_hypers;
   std::shared_ptr<Prior> prior;
 };
