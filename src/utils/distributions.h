@@ -84,6 +84,39 @@ Eigen::VectorXd multi_normal_prec_chol_rng(
     std::mt19937_64 &rng);
 
 /*
+ * Evaluates the log probability density function of a multivariate Gaussian
+ * distribution parametrized by mean and precision matrix on multiple points
+ *
+ * @param datum           Point on which to evaluate the lpdf
+ * @param mean            The mean of the Gaussian distribution
+ * @sigma_diag_inverse    The inverse of the diagonal of Sigma matrix
+ * @wood_factor           Computed as L^{-1} * Lambda^T * Sigma^{-1}, where L
+ * is the (lower) Cholesky factor of I + Lambda^T * Sigma^{-1} * Lambda
+ * @cov_logdet            The logarithm of the determinant of the covariance
+ * matrix
+ * @return                The evaluation of the lpdf
+ */
+double multi_normal_lpdf_woodbury_chol(
+    const Eigen::RowVectorXd &datum, const Eigen::VectorXd &mean,
+    const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &sigma_diag_inverse,
+    const Eigen::MatrixXd &wood_factor, const double &cov_logdet);
+
+/*
+ * Evaluates the log probability density function of a multivariate Gaussian
+ * distribution parametrized with respect to the Woodbury matrix Identity
+ *
+ * @param datum  Point on which to evaluate the lpdf
+ * @param mean   The mean of the Gaussian distribution
+ * @sigma diag   The diagonal of Sigma matrix
+ * @lambda       Rectangular matrix in Woodbury Identity
+ * @return       The evaluation of the lpdf
+ */
+double multi_normal_lpdf_woodbury(const Eigen::VectorXd &datum,
+                                  const Eigen::VectorXd &mean,
+                                  const Eigen::VectorXd &sigma_diag,
+                                  const Eigen::MatrixXd &lambda);
+
+/*
  * Evaluates the log probability density function of a multivariate Student's t
  * distribution on a single point
  *

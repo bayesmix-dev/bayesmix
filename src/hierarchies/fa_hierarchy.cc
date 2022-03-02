@@ -15,15 +15,8 @@
 #include "src/utils/rng.h"
 
 double FAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
-  using stan::math::NEG_LOG_SQRT_TWO_PI;
-  double exp =
-      -0.5 * ((datum.transpose() - state.mu)
-                  .dot(state.psi_inverse * (datum.transpose() - state.mu)) -
-              (state.cov_wood * (datum.transpose() - state.mu)).squaredNorm());
-
-  double base = -0.5 * state.cov_logdet + NEG_LOG_SQRT_TWO_PI * dim;
-
-  return base + exp;
+  return bayesmix::multi_normal_lpdf_woodbury_chol(
+      datum, state.mu, state.psi_inverse, state.cov_wood, state.cov_logdet);
 }
 
 FA::State FAHierarchy::draw(const FA::Hyperparams& params) {
