@@ -8,6 +8,7 @@
 #include "ls_state.pb.h"
 #include "src/hierarchies/likelihoods/laplace_likelihood.h"
 #include "src/hierarchies/likelihoods/multi_norm_likelihood.h"
+#include "src/hierarchies/likelihoods/uni_lin_reg_likelihood.h"
 #include "src/hierarchies/likelihoods/uni_norm_likelihood.h"
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
@@ -205,6 +206,84 @@ TEST(multi_norm_likelihood, eval_lpdf) {
   auto evals = like->lpdf_grid(data);
   auto like_copy = like->clone();
   auto evals_copy = like_copy->lpdf_grid(data);
+
+  // Check if they coincides
+  ASSERT_EQ(evals, evals_copy);
+}
+
+TEST(uni_lin_reg_likelihood, set_get_state) {
+  // Instance
+  auto like = std::make_shared<UniLinRegLikelihood>();
+
+  // Prepare buffers
+  bayesmix::LinRegUniLSState state_;
+  bayesmix::AlgorithmState::ClusterState set_state_;
+  bayesmix::AlgorithmState::ClusterState got_state_;
+
+  // Prepare state
+  Eigen::Vector3d reg_coeffs;
+  reg_coeffs << 2.25, 0.22, -7.1;
+  bayesmix::Vector reg_coeffs_proto;
+  bayesmix::to_proto(reg_coeffs, &reg_coeffs_proto);
+  state_.mutable_regression_coeffs()->CopyFrom(reg_coeffs_proto);
+  state_.set_var(1.02);
+  set_state_.mutable_lin_reg_uni_ls_state()->CopyFrom(state_);
+
+  // Set and get the state
+  like->set_state_from_proto(set_state_);
+  like->write_state_to_proto(&got_state_);
+
+  // Check if they coincides
+  ASSERT_EQ(got_state_.DebugString(), set_state_.DebugString());
+}
+
+TEST(uni_lin_reg_likelihood, add_remove_data) {
+  // Instance
+  auto like = std::make_shared<UniLinRegLikelihood>();
+
+  // Add new datum to likelihood
+  Eigen::VectorXd datum(1);
+  datum << 5.0;
+  like->add_datum(0, datum);
+
+  // Check if cardinality is augmented
+  ASSERT_EQ(like->get_card(), 1);
+
+  // Remove datum from likelihood
+  like->remove_datum(0, datum);
+
+  // Check if cardinality is reduced
+  ASSERT_EQ(like->get_card(), 0);
+}
+
+TEST(uni_lin_reg_likelihood, eval_lpdf) {
+  // Instance
+  auto like = std::make_shared<UniLinRegLikelihood>();
+
+  // Set state from proto
+  bayesmix::LinRegUniLSState state_;
+  bayesmix::AlgorithmState::ClusterState clust_state_;
+  Eigen::Vector3d reg_coeffs;
+  reg_coeffs << 2.25, 0.22, -7.1;
+  bayesmix::Vector reg_coeffs_proto;
+  bayesmix::to_proto(reg_coeffs, &reg_coeffs_proto);
+  state_.mutable_regression_coeffs()->CopyFrom(reg_coeffs_proto);
+  state_.set_var(1.02);
+  clust_state_.mutable_lin_reg_uni_ls_state()->CopyFrom(state_);
+  like->set_state_from_proto(clust_state_);
+
+  // Generate data
+  Eigen::Vector3d data;
+  data << 4.5, 5.1, 2.5;
+
+  // Generate random covariate matrix
+  Eigen::MatrixXd cov =
+      Eigen::MatrixXd::Random(data.size(), reg_coeffs.size());
+
+  // Compute lpdf on this grid of points
+  auto evals = like->lpdf_grid(data, cov);
+  auto like_copy = like->clone();
+  auto evals_copy = like_copy->lpdf_grid(data, cov);
 
   // Check if they coincides
   ASSERT_EQ(evals, evals_copy);
