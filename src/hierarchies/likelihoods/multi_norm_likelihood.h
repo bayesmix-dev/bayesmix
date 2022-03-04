@@ -25,8 +25,7 @@ class MultiNormLikelihood
 
   void set_dim(unsigned int dim_) {
     dim = dim_;
-    data_sum = Eigen::VectorXd::Zero(dim);
-    data_sum_squares = Eigen::MatrixXd::Zero(dim, dim);
+    clear_summary_statistics();
   };
   unsigned int get_dim() const { return dim; };
   Eigen::VectorXd get_data_sum() const { return data_sum; };
