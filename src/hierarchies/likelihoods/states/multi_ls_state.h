@@ -1,7 +1,6 @@
 #ifndef BAYESMIX_HIERARCHIES_LIKELIHOODS_STATES_MULTI_LS_STATE_H_
 #define BAYESMIX_HIERARCHIES_LIKELIHOODS_STATES_MULTI_LS_STATE_H_
 
-// #include <stan/math/prim.hpp>
 #include <stan/math/rev.hpp>
 #include <tuple>
 
