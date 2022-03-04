@@ -7,7 +7,7 @@ target_sources(bayesmix
     nnw_hierarchy.h
     # nnw_hierarchy.cc
     # conjugate_hierarchy.h
-    # lin_reg_uni_hierarchy.h
+    lin_reg_uni_hierarchy.h
     # lin_reg_uni_hierarchy.cc
     # fa_hierarchy.h
     # fa_hierarchy.cc
