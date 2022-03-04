@@ -12,4 +12,6 @@ target_sources(bayesmix PUBLIC
     nnxig_updater.cc
     nnw_updater.h
     nnw_updater.cc
+    mnig_updater.h
+    mnig_updater.cc
 )
