@@ -1,14 +1,13 @@
-#ifndef BAYESMIX_HIERARCHIES_LIKELIHOODS_STATES_UNI_LIN_REG_STATE_H_
-#define BAYESMIX_HIERARCHIES_LIKELIHOODS_STATES_UNI_LIN_REG_STATE_H_
+#ifndef BAYESMIX_HIERARCHIES_LIKELIHOODS_STATES_UNI_LIN_REG_LS_STATE_H_
+#define BAYESMIX_HIERARCHIES_LIKELIHOODS_STATES_UNI_LIN_REG_LS_STATE_H_
 
-#include <stan/math/prim.hpp>
 #include <stan/math/rev.hpp>
 #include <tuple>
 
 #include "algorithm_state.pb.h"
+#include "src/utils/eigen_utils.h"
 #include "src/utils/proto_utils.h"
 
-// TODO: CHECK VECTOR ASSIGNMENTS AND POSITIONING!
 namespace State {
 
 template <typename T>
@@ -37,7 +36,7 @@ T uni_lin_reg_log_det_jac(Eigen::Matrix<T, Eigen::Dynamic, 1> constrained) {
   return out;
 }
 
-class UniLinReg {
+class UniLinRegLS {
  public:
   Eigen::VectorXd regression_coeffs;
   double var;
@@ -55,18 +54,20 @@ class UniLinReg {
     var = temp(dim);
   }
 
-  // void set_from_proto(const bayesmix::AlgorithmState::ClusterState &state_)
-  // {
-  //   mean = state_.uni_ls_state().mean();
-  //   var = state_.uni_ls_state().var();
-  // }
+  void set_from_proto(const bayesmix::AlgorithmState::ClusterState &state_) {
+    regression_coeffs =
+        bayesmix::to_eigen(state_.lin_reg_uni_ls_state().regression_coeffs());
+    var = state_.lin_reg_uni_ls_state().var();
+  }
 
-  // bayesmix::AlgorithmState::ClusterState get_as_proto() {
-  //   bayesmix::AlgorithmState::ClusterState state;
-  //   state.mutable_uni_ls_state()->set_mean(mean);
-  //   state.mutable_uni_ls_state()->set_var(var);
-  //   return state;
-  // }
+  bayesmix::AlgorithmState::ClusterState get_as_proto() {
+    bayesmix::LinRegUniLSState out;
+    bayesmix::to_proto(regression_coeffs, out.mutable_regression_coeffs());
+    out.set_var(var);
+    bayesmix::AlgorithmState::ClusterState state;
+    state.mutable_lin_reg_uni_ls_state()->CopyFrom(out);
+    return state;
+  }
 
   double log_det_jac() {
     Eigen::VectorXd temp(regression_coeffs.size() + 1);
@@ -77,4 +78,4 @@ class UniLinReg {
 
 }  // namespace State
 
-#endif  // BAYESMIX_HIERARCHIES_LIKELIHOODS_STATES_UNI_LIN_REG_STATE_H_
+#endif  // BAYESMIX_HIERARCHIES_LIKELIHOODS_STATES_UNI_LIN_REG_LS_STATE_H_
