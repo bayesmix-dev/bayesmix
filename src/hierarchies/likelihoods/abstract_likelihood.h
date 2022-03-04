@@ -19,7 +19,7 @@ class AbstractLikelihood {
   double lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    if (is_dependent()) {
+    if (is_dependent() and covariate.size() != 0) {
       return compute_lpdf(datum, covariate);
     } else {
       return compute_lpdf(datum);
@@ -96,9 +96,10 @@ class AbstractLikelihood {
   virtual double compute_lpdf(const Eigen::RowVectorXd &datum) const {
     if (is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a dependent likelihood");
+          "Cannot call compute_lpdf() from a dependent likelihood");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error(
+          "compute_lpdf() not implemented for this likelihood");
     }
   }
 
@@ -106,9 +107,10 @@ class AbstractLikelihood {
                               const Eigen::RowVectorXd &covariate) const {
     if (!is_dependent()) {
       throw std::runtime_error(
-          "Cannot call this function from a non-dependent likelihood");
+          "Cannot call compute_lpdf() from a non-dependent likelihood");
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error(
+          "compute_lpdf() not implemented for this likelihood");
     }
   }
 
