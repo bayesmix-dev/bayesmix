@@ -8,7 +8,7 @@
 // #include "fa_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "lapnig_hierarchy.h"
-// #include "lin_reg_uni_hierarchy.h"
+#include "lin_reg_uni_hierarchy.h"
 #include "nnig_hierarchy.h"
 #include "nnw_hierarchy.h"
 #include "nnxig_hierarchy.h"
@@ -34,9 +34,9 @@ __attribute__((constructor)) static void load_hierarchies() {
   Builder<AbstractHierarchy> NNWbuilder = []() {
     return std::make_shared<NNWHierarchy>();
   };
-  // Builder<AbstractHierarchy> LinRegUnibuilder = []() {
-  //   return std::make_shared<LinRegUniHierarchy>();
-  // };
+  Builder<AbstractHierarchy> LinRegUnibuilder = []() {
+    return std::make_shared<LinRegUniHierarchy>();
+  };
   // Builder<AbstractHierarchy> FAbuilder = []() {
   //   return std::make_shared<FAHierarchy>();
   // };
@@ -47,7 +47,7 @@ __attribute__((constructor)) static void load_hierarchies() {
   factory.add_builder(NNIGHierarchy().get_id(), NNIGbuilder);
   factory.add_builder(NNxIGHierarchy().get_id(), NNxIGbuilder);
   factory.add_builder(NNWHierarchy().get_id(), NNWbuilder);
-  // factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
+  factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
   // factory.add_builder(FAHierarchy().get_id(), FAbuilder);
   factory.add_builder(LapNIGHierarchy().get_id(), LapNIGbuilder);
 }
