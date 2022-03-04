@@ -97,12 +97,6 @@ class BaseHierarchy : public AbstractHierarchy {
     return out;
   }
 
-  // NOT SURE THIS IS CORRECT, MAYBE OVERRIDE GET_LIKE_LPDF? OR THIS IS EVEN
-  // UNNECESSARY
-  double like_lpdf(const Eigen::RowVectorXd &datum) const override {
-    return like->lpdf(datum);
-  }
-
   //! Returns an independent, data-less copy of this object
   // std::shared_ptr<AbstractHierarchy> deep_clone() const override {
   //   auto out = std::make_shared<Derived>(static_cast<Derived const
@@ -122,6 +116,12 @@ class BaseHierarchy : public AbstractHierarchy {
   //   out->initialize();
   //   return out;
   // }
+
+  double get_like_lpdf(const Eigen::RowVectorXd &datum,
+                       const Eigen::RowVectorXd &covariate =
+                           Eigen::RowVectorXd(0)) const override {
+    return like->lpdf(datum, covariate);
+  }
 
   //! Evaluates the log-likelihood of data in a grid of points
   //! @param data        Grid of points (by row) which are to be evaluated

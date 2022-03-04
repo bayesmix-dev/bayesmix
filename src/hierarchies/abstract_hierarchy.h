@@ -68,7 +68,7 @@ class AbstractHierarchy {
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
   //! Public wrapper for `like_lpdf()` methods
-  double get_like_lpdf(
+  virtual double get_like_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     if (is_dependent()) {
