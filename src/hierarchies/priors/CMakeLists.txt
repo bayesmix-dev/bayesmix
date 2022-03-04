@@ -8,4 +8,6 @@ target_sources(bayesmix PUBLIC
     nxig_prior_model.cc
     nw_prior_model.h
     nw_prior_model.cc
+    mnig_prior_model.h
+    mnig_prior_model.cc
 )
