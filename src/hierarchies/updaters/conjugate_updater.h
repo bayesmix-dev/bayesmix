@@ -42,14 +42,15 @@ void ConjugateUpdater<Likelihood, PriorModel>::draw(AbstractLikelihood& like,
   auto& priorcast = downcast_prior(prior);
 
   // Sample from the full conditional of a conjugate hierarchy
-  bool set_card = true;
+  bool set_card = true, use_post_hypers=true;
   if (likecast.get_card() == 0) {
-    likecast.set_state_from_proto(*priorcast.sample(false), !set_card);
+    likecast.set_state_from_proto(*priorcast.sample(!use_post_hypers), !set_card);
   } else {
-    if (update_params) {
-      compute_posterior_hypers(likecast, priorcast);
-    }
-    likecast.set_state_from_proto(*prior.sample(true), !set_card);
+    auto prev_hypers = priorcast.get_posterior_hypers();
+    compute_posterior_hypers(likecast, priorcast);
+    likecast.set_state_from_proto(*priorcast.sample(use_post_hypers), !set_card);
+    if (!update_params)
+      priorcast.set_posterior_hypers(prev_hypers);
   }
 }
 
