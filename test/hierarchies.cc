@@ -58,7 +58,7 @@ TEST(nnig_hierarchy, sample_given_data) {
   datum << 4.5;
 
   auto hier2 = hier->clone();
-  hier2->add_datum(0, datum, true);
+  hier2->add_datum(0, datum, false);
   hier2->sample_full_cond();
 
   bayesmix::AlgorithmState out;
@@ -190,11 +190,10 @@ TEST(lin_reg_uni_hierarchy, state_read_write) {
 }
 
 TEST(lin_reg_uni_hierarchy, misc) {
+  
   // Build data
-  int n = 5;
-  int dim = 2;
-  Eigen::Vector2d beta_true;
-  beta_true << 10.0, 10.0;
+  int n = 5, dim = 2;
+  Eigen::Vector2d beta_true({10.0, 10.0});
   Eigen::MatrixXd cov = Eigen::MatrixXd::Random(n, dim);  // each in U[-1,1]
   double sigma2 = 1.0;
   Eigen::VectorXd data(n);
@@ -202,25 +201,25 @@ TEST(lin_reg_uni_hierarchy, misc) {
   for (int i = 0; i < n; i++) {
     data(i) = stan::math::normal_rng(cov.row(i).dot(beta_true), sigma2, rng);
   }
+  
   // Initialize objects
   LinRegUniHierarchy hier;
   bayesmix::LinRegUniPrior prior;
+  
   // Create prior parameters
   Eigen::Vector2d beta0 = 0 * beta_true;
-  bayesmix::Vector beta0_proto;
-  bayesmix::to_proto(beta0, &beta0_proto);
   auto Lambda0 = Eigen::Matrix2d::Identity();
-  bayesmix::Matrix Lambda0_proto;
-  bayesmix::to_proto(Lambda0, &Lambda0_proto);
   double a0 = 2.0;
   double b0 = 1.0;
+
   // Initialize hierarchy
-  *prior.mutable_fixed_values()->mutable_mean() = beta0_proto;
-  *prior.mutable_fixed_values()->mutable_var_scaling() = Lambda0_proto;
+  bayesmix::to_proto(beta0, prior.mutable_fixed_values()->mutable_mean());
+  bayesmix::to_proto(Lambda0, prior.mutable_fixed_values()->mutable_var_scaling());
   prior.mutable_fixed_values()->set_shape(a0);
   prior.mutable_fixed_values()->set_scale(b0);
   hier.get_mutable_prior()->CopyFrom(prior);
   hier.initialize();
+
   // Extract hypers for reading test
   bayesmix::AlgorithmState::HierarchyHypers out;
   hier.write_hypers_to_proto(&out);
@@ -229,9 +228,10 @@ TEST(lin_reg_uni_hierarchy, misc) {
             bayesmix::to_eigen(out.lin_reg_uni_state().var_scaling()));
   ASSERT_EQ(a0, out.lin_reg_uni_state().shape());
   ASSERT_EQ(b0, out.lin_reg_uni_state().scale());
+  
   // Add data
   for (int i = 0; i < n; i++) {
-    hier.add_datum(i, data.row(i), true, cov.row(i));
+    hier.add_datum(i, data.row(i), false, cov.row(i));
   }
 
   // Check summary statistics
@@ -288,7 +288,7 @@ TEST(nnxig_hierarchy, sample_given_data) {
   datum << 4.5;
 
   auto hier2 = hier->clone();
-  hier2->add_datum(0, datum, true);
+  hier2->add_datum(0, datum, false);
   hier2->sample_full_cond();
 
   bayesmix::AlgorithmState out;
