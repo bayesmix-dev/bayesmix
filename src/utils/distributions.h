@@ -85,7 +85,12 @@ Eigen::VectorXd multi_normal_prec_chol_rng(
 
 /*
  * Evaluates the log probability density function of a multivariate Gaussian
- * distribution parametrized by mean and precision matrix on multiple points
+ * distribution with the following covariance structure:
+ * Sigma + Lambda * Lambda^T
+ * where Sigma is a diagonal matrix and Lambda a (p x d) one. Usually, p >> d.
+ * y^T*(Sigma + Lambda * Lambda^T)^{-1}*y = y^T*Sigma^{-1}*y -
+ * ||wood_factor*y||^2
+ *
  *
  * @param datum           Point on which to evaluate the lpdf
  * @param mean            The mean of the Gaussian distribution
@@ -103,7 +108,9 @@ double multi_normal_lpdf_woodbury_chol(
 
 /*
  * Evaluates the log probability density function of a multivariate Gaussian
- * distribution parametrized with respect to the Woodbury matrix Identity
+ * distribution with the following covariance structure:
+ * Sigma + Lambda * Lambda^T
+ * where Sigma is a diagonal matrix and Lambda a (p x d) one. Usually, p >> d.
  *
  * @param datum  Point on which to evaluate the lpdf
  * @param mean   The mean of the Gaussian distribution

@@ -5,8 +5,8 @@
 
 #include "algorithm_state.pb.h"
 #include "ls_state.pb.h"
-#include "src/hierarchies/lin_reg_uni_hierarchy.h"
 #include "src/hierarchies/fa_hierarchy.h"
+#include "src/hierarchies/lin_reg_uni_hierarchy.h"
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/hierarchies/nnw_hierarchy.h"
 #include "src/includes.h"
