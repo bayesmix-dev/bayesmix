@@ -111,6 +111,10 @@ double multi_normal_lpdf_woodbury_chol(
  * distribution with the following covariance structure:
  * Sigma + Lambda * Lambda^T
  * where Sigma is a diagonal matrix and Lambda a (p x d) one. Usually, p >> d.
+ * The Woodbury matrix identity
+ * (https://en.wikipedia.org/wiki/Woodbury_matrix_identity) is used to turn
+ * computation from being O(p^3) to being O(d^3 p) which gives a substantial
+ * speedup when p >> d
  *
  * @param datum  Point on which to evaluate the lpdf
  * @param mean   The mean of the Gaussian distribution
