@@ -74,8 +74,10 @@ class BasePriorModel : public AbstractPriorModel {
 
   virtual google::protobuf::Message *get_mutable_prior() override;
 
+  //! Returns the struct of the current prior hyperparameters
   HyperParams get_hypers() const { return *hypers; }
 
+  //! Returns the struct of the current posterior hyperparameters
   HyperParams get_posterior_hypers() const { return post_hypers; }
 
   void set_posterior_hypers(const HyperParams &_post_hypers) {
@@ -87,18 +89,24 @@ class BasePriorModel : public AbstractPriorModel {
   void initialize();
 
  protected:
+  //! Raises an error if the prior pointer is not initialized
   void check_prior_is_set() const;
 
+  //! Re-initializes the prior of the hierarchy to a newly created object
   void create_empty_prior() { prior.reset(new Prior); }
 
+  //! Re-initializes the hyperparameters of the hierarchy to a newly created
+  //! object
   void create_empty_hypers() { hypers.reset(new HyperParams); }
 
+  //! Down-casts the given generic proto message to a HierarchyHypers proto
   bayesmix::AlgorithmState::HierarchyHypers *downcast_hypers(
       google::protobuf::Message *state_) const {
     return google::protobuf::internal::down_cast<
         bayesmix::AlgorithmState::HierarchyHypers *>(state_);
   }
 
+  //! Down-casts the given generic proto message to a HierarchyHypers proto
   const bayesmix::AlgorithmState::HierarchyHypers &downcast_hypers(
       const google::protobuf::Message &state_) const {
     return google::protobuf::internal::down_cast<
@@ -111,8 +119,13 @@ class BasePriorModel : public AbstractPriorModel {
         const bayesmix::AlgorithmState::ClusterState &>(state_);
   }
 
+  //! Container for prior hyperparameters values
   std::shared_ptr<HyperParams> hypers = std::make_shared<HyperParams>();
+
+  //! Container for posterior hyperparameters values
   HyperParams post_hypers;
+
+  //! Pointer to a Protobuf prior object for this class
   std::shared_ptr<Prior> prior;
 };
 

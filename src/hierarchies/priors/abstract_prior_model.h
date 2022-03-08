@@ -56,9 +56,14 @@ class AbstractPriorModel {
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
 
  protected:
+  //! Writes current value of hyperparameters to a Protobuf message and
+  //! return a shared_ptr.
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::HierarchyHypers message by adding the appropriate type
   virtual std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
   get_hypers_proto() const = 0;
 
+  //! Initializes hierarchy hyperparameters to appropriate values
   virtual void initialize_hypers() = 0;
 };
 

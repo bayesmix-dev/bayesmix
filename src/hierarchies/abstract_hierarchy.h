@@ -51,13 +51,27 @@
 
 class AbstractHierarchy {
  public:
+  //! Set the likelihood for the current hierarchy. Implemented in the
+  //! BaseHierarchy class
   virtual void set_likelihood(std::shared_ptr<AbstractLikelihood> like_) = 0;
+
+  //! Set the prior model for the current hierarchy. Implemented in the
+  //! BaseHierarchy class
   virtual void set_prior(std::shared_ptr<AbstractPriorModel> prior_) = 0;
+
+  //! Set the update algorithm for the current hierarchy. Implemented in the
+  //! BaseHierarchy class
   virtual void set_updater(std::shared_ptr<AbstractUpdater> updater_) = 0;
 
+  //! Returns (a pointer to) the likelihood for the current hierarchy.
+  //! Implemented in the BaseHierarchy class
   virtual std::shared_ptr<AbstractLikelihood> get_likelihood() = 0;
+
+  //! Returns (a pointer to) the prior model for the current hierarchy.
+  //! Implemented in the BaseHierarchy class
   virtual std::shared_ptr<AbstractPriorModel> get_prior() = 0;
 
+  //! Default destructor
   virtual ~AbstractHierarchy() = default;
 
   //! Returns an independent, data-less copy of this object
@@ -86,7 +100,8 @@ class AbstractHierarchy {
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     if (is_conjugate()) {
-      throw std::runtime_error("prior_pred_lpdf() not implemented yet");
+      throw std::runtime_error(
+          "prior_pred_lpdf() not implemented for this hierarchy");
     } else {
       throw std::runtime_error(
           "Cannot call prior_pred_lpdf() from a non-conjugate hierarchy");
@@ -101,7 +116,8 @@ class AbstractHierarchy {
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
     if (is_conjugate()) {
-      throw std::runtime_error("conditional_pred_lpdf() not implemented yet");
+      throw std::runtime_error(
+          "conditional_pred_lpdf() not implemented for this hierarchy");
     } else {
       throw std::runtime_error(
           "Cannot call conditional_pred_lpdf() from a non-conjugate "
@@ -126,7 +142,8 @@ class AbstractHierarchy {
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     if (is_conjugate()) {
-      throw std::runtime_error("prior_pred_lpdf_grid() not yet implemented");
+      throw std::runtime_error(
+          "prior_pred_lpdf_grid() not implemented for this hierarchy");
     } else {
       throw std::runtime_error(
           "Cannot call prior_pred_lpdf_grid() from a non-conjugate hierarchy");
@@ -142,7 +159,7 @@ class AbstractHierarchy {
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
     if (is_conjugate()) {
       throw std::runtime_error(
-          "conditional_pred_lpdf_grid() not yet implemented");
+          "conditional_pred_lpdf_grid() not implemented for this hierarchy");
     } else {
       throw std::runtime_error(
           "Cannot call conditional_pred_lpdf_grid() from a non-conjugate "
@@ -256,7 +273,8 @@ class AbstractHierarchy {
       throw std::runtime_error(
           "Cannot call like_lpdf() from a non-dependent hierarchy");
     } else {
-      throw std::runtime_error("like_lpdf() not implemented");
+      throw std::runtime_error(
+          "like_lpdf() not implemented for this hierarchy");
     }
   }
 
@@ -268,7 +286,8 @@ class AbstractHierarchy {
       throw std::runtime_error(
           "Cannot call like_lpdf() from a dependent hierarchy");
     } else {
-      throw std::runtime_error("like_lpdf() not implemented");
+      throw std::runtime_error(
+          "like_lpdf() not implemented for this hierarchy");
     }
   }
 
@@ -284,7 +303,8 @@ class AbstractHierarchy {
           "Cannot call update_summary_statistics() from a non-dependent "
           "hierarchy");
     } else {
-      throw std::runtime_error("update_summary_statistics() not implemented");
+      throw std::runtime_error(
+          "update_summary_statistics() not implemented for this hierarchy");
     }
   }
 
@@ -298,7 +318,8 @@ class AbstractHierarchy {
           "Cannot call update_summary_statistics() from a dependent "
           "hierarchy");
     } else {
-      throw std::runtime_error("update_summary_statistics() not implemented");
+      throw std::runtime_error(
+          "update_summary_statistics() not implemented for this hierarchy");
     }
   }
 };

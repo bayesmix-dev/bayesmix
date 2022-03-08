@@ -38,7 +38,7 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Container for the prior model of the hierarchy
   std::shared_ptr<PriorModel> prior = std::make_shared<PriorModel>();
 
-  //! Container for the update algorithm adopted
+  //! Container for the update algorithm
   std::shared_ptr<AbstractUpdater> updater;
 
  public:
@@ -87,12 +87,13 @@ class BaseHierarchy : public AbstractHierarchy {
     return out;
   };
 
+  //! Returns an independent, data-less deep copy of this object
   std::shared_ptr<AbstractHierarchy> deep_clone() const override {
     // Create copy of the hierarchy
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
-    // Simple Clone is enough for Likelihood
+    // Simple clone for Likelihood is enough
     out->set_likelihood(std::static_pointer_cast<Likelihood>(like->clone()));
-    // Deep-Clone required for PriorModel
+    // Deep clone required for PriorModel
     out->set_prior(std::static_pointer_cast<PriorModel>(prior->deep_clone()));
     return out;
   }
@@ -332,10 +333,13 @@ class BaseHierarchy : public AbstractHierarchy {
     like->clear_summary_statistics();
   };
 
+  //! Returns whether the hierarchy models multivariate data or not
   bool is_multivariate() const override { return like->is_multivariate(); };
 
+  //! Returns whether the hierarchy depends on covariate values or not
   bool is_dependent() const override { return like->is_dependent(); };
 
+  //! Returns whether the hierarchy represents a conjugate model or not
   bool is_conjugate() const override { return updater->is_conjugate(); };
 
   //! Sets the (pointer to the) dataset matrix
@@ -347,18 +351,19 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Initializes state parameters to appropriate values
   virtual void initialize_state() = 0;
 
-  // ADD EXEPTION HANDLING
+  // ADD EXEPTION HANDLING FOR is_dependent()?
   virtual double marg_lpdf(const HyperParams &params,
                            const Eigen::RowVectorXd &datum) const {
     if (!is_conjugate()) {
       throw std::runtime_error(
           "Call marg_lpdf() for a non-conjugate hierarchy");
     } else {
-      throw std::runtime_error("marg_lpdf() not yet implemented");
+      throw std::runtime_error(
+          "marg_lpdf() not implemented for this hierarchy");
     }
   }
 
-  // ADD EXEPTION HANDLING
+  // ADD EXEPTION HANDLING FOR is_dependent()?
   virtual double marg_lpdf(const HyperParams &params,
                            const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const {
@@ -366,7 +371,8 @@ class BaseHierarchy : public AbstractHierarchy {
       throw std::runtime_error(
           "Call marg_lpdf() for a non-conjugate hierarchy");
     } else {
-      throw std::runtime_error("marg_lpdf() not yet implemented");
+      throw std::runtime_error(
+          "marg_lpdf() not implemented for this hierarchy");
     }
   }
 
@@ -375,97 +381,5 @@ class BaseHierarchy : public AbstractHierarchy {
 };
 
 // TODO: Move definitions outside the class to improve code cleaness
-// TODO: Move this docs in the right place
-
-//! Returns the struct of the current prior hyperparameters
-//   Hyperparams get_hypers() const { return *hypers; }
-
-//! Returns the struct of the current posterior hyperparameters
-//   Hyperparams get_posterior_hypers() const { return posterior_hypers; }
-
-//! Raises an error if the prior pointer is not initialized
-//   void check_prior_is_set() const {
-//     if (prior == nullptr) {
-//       throw std::invalid_argument("Hierarchy prior was not provided");
-//     }
-//   }
-
-//! Re-initializes the prior of the hierarchy to a newly created object
-//   void create_empty_prior() { prior.reset(new Prior); }
-
-//! Sets the cardinality of the cluster
-//   void set_card(const int card_) {
-//     card = card_;
-//     log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
-//   }
-
-//! Writes current state to a Protobuf message and return a shared_ptr
-//! New hierarchies have to first modify the field 'oneof val' in the
-//! AlgoritmState::ClusterState message by adding the appropriate type
-//   virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
-//   get_state_proto() const = 0;
-
-//! Writes current value of hyperparameters to a Protobuf message and
-//! return a shared_ptr.
-//! New hierarchies have to first modify the field 'oneof val' in the
-//! AlgoritmState::HierarchyHypers message by adding the appropriate type
-//   virtual std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
-//   get_hypers_proto() const = 0;
-
-//! Initializes hierarchy hyperparameters to appropriate values
-//   virtual void initialize_hypers() = 0;
-
-//! Resets cardinality and indexes of data in this cluster
-//   void clear_data() {
-//     set_card(0);
-//     cluster_data_idx = std::set<int>();
-//   }
-
-//! Down-casts the given generic proto message to a ClusterState proto
-//   bayesmix::AlgorithmState::ClusterState *downcast_state(
-//       google::protobuf::Message *state_) const {
-//     return google::protobuf::internal::down_cast<
-//         bayesmix::AlgorithmState::ClusterState *>(state_);
-//   }
-
-//! Down-casts the given generic proto message to a ClusterState proto
-//   const bayesmix::AlgorithmState::ClusterState &downcast_state(
-//       const google::protobuf::Message &state_) const {
-//     return google::protobuf::internal::down_cast<
-//         const bayesmix::AlgorithmState::ClusterState &>(state_);
-//   }
-
-//! Down-casts the given generic proto message to a HierarchyHypers proto
-//   bayesmix::AlgorithmState::HierarchyHypers *downcast_hypers(
-//       google::protobuf::Message *state_) const {
-//     return google::protobuf::internal::down_cast<
-//         bayesmix::AlgorithmState::HierarchyHypers *>(state_);
-//   }
-
-//! Down-casts the given generic proto message to a HierarchyHypers proto
-//   const bayesmix::AlgorithmState::HierarchyHypers &downcast_hypers(
-//       const google::protobuf::Message &state_) const {
-//     return google::protobuf::internal::down_cast<
-//         const bayesmix::AlgorithmState::HierarchyHypers &>(state_);
-//   }
-
-//   //! Container for prior hyperparameters values
-//   std::shared_ptr<Hyperparams> hypers;
-
-//   //! Container for posterior hyperparameters values
-//   Hyperparams posterior_hypers;
-
-//   //! Pointer to a Protobuf prior object for this class
-//   std::shared_ptr<Prior> prior;
-
-//   //! Set of indexes of data points belonging to this cluster
-//   std::set<int> cluster_data_idx;
-
-//   //! Current cardinality of this cluster
-//   int card = 0;
-
-//   //! Logarithm of current cardinality of this cluster
-//   double log_card = stan::math::NEGATIVE_INFTY;
-// };
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

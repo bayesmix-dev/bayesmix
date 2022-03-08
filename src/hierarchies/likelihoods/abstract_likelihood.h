@@ -90,6 +90,9 @@ class AbstractLikelihood {
   virtual Eigen::VectorXd get_unconstrained_state() = 0;
 
  protected:
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::ClusterState message by adding the appropriate type
   virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
   get_state_proto() const = 0;
 

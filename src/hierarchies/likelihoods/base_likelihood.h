@@ -109,23 +109,27 @@ class BaseLikelihood : public AbstractLikelihood {
       const int id, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
 
+  //! Resets cardinality and indexes of data in this cluster
   void clear_data() {
     set_card(0);
     cluster_data_idx = std::set<int>();
   }
 
  protected:
+  //! Sets the cardinality of the cluster
   void set_card(const int card_) {
     card = card_;
     log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
   }
 
+  //! Down-casts the given generic proto message to a ClusterState proto
   bayesmix::AlgorithmState::ClusterState *downcast_state(
       google::protobuf::Message *state_) const {
     return google::protobuf::internal::down_cast<
         bayesmix::AlgorithmState::ClusterState *>(state_);
   }
 
+  //! Down-casts the given generic proto message to a ClusterState proto
   const bayesmix::AlgorithmState::ClusterState &downcast_state(
       const google::protobuf::Message &state_) const {
     return google::protobuf::internal::down_cast<
@@ -134,10 +138,13 @@ class BaseLikelihood : public AbstractLikelihood {
 
   State state;
 
+  //! Current cardinality of this cluster
   int card = 0;
 
+  //! Logarithm of current cardinality of this cluster
   double log_card = stan::math::NEGATIVE_INFTY;
 
+  //! Set of indexes of data points belonging to this cluster
   std::set<int> cluster_data_idx;
 };
 
