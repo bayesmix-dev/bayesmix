@@ -11,11 +11,14 @@
 
 class AbstractLikelihood {
  public:
+  //! Default destructor
   virtual ~AbstractLikelihood() = default;
 
-  // IMPLEMENTED in BaseLikelihood
+  //! Returns an independent, data-less copy of this object. Implemented in
+  //! BaseLikelihood
   virtual std::shared_ptr<AbstractLikelihood> clone() const = 0;
 
+  //! Public wrapper for `compute_lpdf()` methods
   double lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
@@ -45,36 +48,45 @@ class AbstractLikelihood {
         "cluster_lpdf_from_unconstrained() not yet implemented");
   }
 
+  //! Evaluates the log-likelihood of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
   virtual Eigen::VectorXd lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const = 0;
 
-  // AGGIUNGERE CLUST_LPDF (CHE VALUTA LA LIKELIHOOD CONGIUNTA SU TUTTO IL
-  // CLUSTER)
-
+  //! Returns whether the likelihood models multivariate data or not
   virtual bool is_multivariate() const = 0;
 
+  //! Returns whether the likelihood depends on covariate values or not
   virtual bool is_dependent() const = 0;
 
+  //! Read and set state values from a given Protobuf message
   virtual void set_state_from_proto(const google::protobuf::Message &state_,
                                     bool update_card = true) = 0;
 
+  //! Read and set state values from the vector of unconstrained parameters
   virtual void set_state_from_unconstrained(
       const Eigen::VectorXd &unconstrained_state) = 0;
 
-  // IMPLEMENTED in BaseLikelihood
+  //! Writes current state to a Protobuf message by pointer. Implemented in
+  //! BaseLikelihood
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
-  // IMPLEMENTED in BaseLikelihood
+  //! Adds a datum and its index to the likelihood. Implemented in
+  //! BaseLikelihood
   virtual void add_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
 
-  // IMPLEMENTED in BaseLikelihood
+  //! Removes a datum and its index from the likelihood. Implemented in
+  //! BaseLikelihood
   virtual void remove_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
 
+  //! Public wrapper for `update_sum_stats()` methods
   void update_summary_statistics(const Eigen::RowVectorXd &datum,
                                  const Eigen::RowVectorXd &covariate,
                                  bool add) {
@@ -85,8 +97,10 @@ class AbstractLikelihood {
     }
   }
 
+  //! Resets the values of the summary statistics in the likelihood
   virtual void clear_summary_statistics() = 0;
 
+  //! Returns the vector of the unconstrained parameters for this likelihood
   virtual Eigen::VectorXd get_unconstrained_state() = 0;
 
  protected:
@@ -96,6 +110,9 @@ class AbstractLikelihood {
   virtual std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
   get_state_proto() const = 0;
 
+  //! Evaluates the log-likelihood of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
   virtual double compute_lpdf(const Eigen::RowVectorXd &datum) const {
     if (is_dependent()) {
       throw std::runtime_error(
@@ -106,6 +123,10 @@ class AbstractLikelihood {
     }
   }
 
+  //! Evaluates the log-likelihood of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  Covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   virtual double compute_lpdf(const Eigen::RowVectorXd &datum,
                               const Eigen::RowVectorXd &covariate) const {
     if (!is_dependent()) {
@@ -117,6 +138,9 @@ class AbstractLikelihood {
     }
   }
 
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param add        Whether the datum is being added or removed
   virtual void update_sum_stats(const Eigen::RowVectorXd &datum, bool add) {
     if (is_dependent()) {
       throw std::runtime_error(
@@ -126,6 +150,10 @@ class AbstractLikelihood {
     }
   }
 
+  //! Updates cluster statistics when a datum is added or removed from it
+  //! @param datum      Data point which is being added or removed
+  //! @param covariate  Covariate vector associated to datum
+  //! @param add        Whether the datum is being added or removed
   virtual void update_sum_stats(const Eigen::RowVectorXd &datum,
                                 const Eigen::RowVectorXd &covariate,
                                 bool add) {

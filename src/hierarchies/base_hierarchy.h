@@ -6,7 +6,7 @@
 #include <memory>
 #include <random>
 #include <set>
-#include <stan/math/prim.hpp>
+// #include <stan/math/prim.hpp>
 #include <stan/math/rev.hpp>
 
 #include "abstract_hierarchy.h"
@@ -44,6 +44,8 @@ class BaseHierarchy : public AbstractHierarchy {
  public:
   using HyperParams = decltype(prior->get_hypers());
 
+  //! Constructor that allows the specification of Likelihood, PriorModel and
+  //! Updater for a given Hierarchy
   BaseHierarchy(std::shared_ptr<AbstractLikelihood> like_ = nullptr,
                 std::shared_ptr<AbstractPriorModel> prior_ = nullptr,
                 std::shared_ptr<AbstractUpdater> updater_ = nullptr) {
@@ -60,21 +62,30 @@ class BaseHierarchy : public AbstractHierarchy {
     }
   }
 
+  //! Default destructor
   ~BaseHierarchy() = default;
 
+  //! Set the likelihood for the current hierarchy
   void set_likelihood(std::shared_ptr<AbstractLikelihood> like_) override {
     like = std::static_pointer_cast<Likelihood>(like_);
   }
+
+  //! Set the prior model for the current hierarchy
   void set_prior(std::shared_ptr<AbstractPriorModel> prior_) override {
     prior = std::static_pointer_cast<PriorModel>(prior_);
   }
+
+  //! Set the update algorithm for the current hierarchy
   void set_updater(std::shared_ptr<AbstractUpdater> updater_) override {
     updater = updater_;
   };
 
+  //! Returns (a pointer to) the likelihood for the current hierarchy
   std::shared_ptr<AbstractLikelihood> get_likelihood() override {
     return like;
   }
+
+  //! Returns (a pointer to) the prior model for the current hierarchy.
   std::shared_ptr<AbstractPriorModel> get_prior() override { return prior; }
 
   //! Returns an independent, data-less copy of this object
@@ -118,6 +129,7 @@ class BaseHierarchy : public AbstractHierarchy {
   //   return out;
   // }
 
+  //! Public wrapper for `like_lpdf()` methods
   double get_like_lpdf(const Eigen::RowVectorXd &datum,
                        const Eigen::RowVectorXd &covariate =
                            Eigen::RowVectorXd(0)) const override {
@@ -135,6 +147,7 @@ class BaseHierarchy : public AbstractHierarchy {
   };
 
   // ADD EXCEPTION HANDLING
+  //! Public wrapper for `marg_lpdf()` methods
   double get_marg_lpdf(
       const HyperParams &params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
@@ -146,6 +159,10 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   // ADD EXCEPTION HANDLING
+  //! Evaluates the log-prior predictive distribution of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   double prior_pred_lpdf(const Eigen::RowVectorXd &datum,
                          const Eigen::RowVectorXd &covariate =
                              Eigen::RowVectorXd(0)) const override {
@@ -153,6 +170,10 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   // ADD EXCEPTION HANDLING
+  //! Evaluates the log-prior predictive distr. of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
   Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/)
@@ -181,6 +202,10 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   // ADD EXCEPTION HANDLING
+  //! Evaluates the log-conditional predictive distr. of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   double conditional_pred_lpdf(const Eigen::RowVectorXd &datum,
                                const Eigen::RowVectorXd &covariate =
                                    Eigen::RowVectorXd(0)) const override {
@@ -188,6 +213,10 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   // ADD EXCEPTION HANDLING
+  //! Evaluates the log-prior predictive distr. of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
   Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/)
@@ -254,6 +283,7 @@ class BaseHierarchy : public AbstractHierarchy {
     static_cast<Derived *>(this)->sample_full_cond(true);
   };
 
+  //! Updates hyperparameter values given a vector of cluster states
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override {
     prior->update_hypers(states);
@@ -297,10 +327,12 @@ class BaseHierarchy : public AbstractHierarchy {
     prior->write_hypers_to_proto(out);
   };
 
+  //! Read and set state values from a given Protobuf message
   void set_state_from_proto(const google::protobuf::Message &state_) override {
     like->set_state_from_proto(state_);
   };
 
+  //! Read and set hyperparameter values from a given Protobuf message
   void set_hypers_from_proto(
       const google::protobuf::Message &state_) override {
     prior->set_hypers_from_proto(state_);
@@ -352,6 +384,10 @@ class BaseHierarchy : public AbstractHierarchy {
   virtual void initialize_state() = 0;
 
   // ADD EXEPTION HANDLING FOR is_dependent()?
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
   virtual double marg_lpdf(const HyperParams &params,
                            const Eigen::RowVectorXd &datum) const {
     if (!is_conjugate()) {
@@ -364,6 +400,11 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   // ADD EXEPTION HANDLING FOR is_dependent()?
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  Covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
   virtual double marg_lpdf(const HyperParams &params,
                            const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const {
