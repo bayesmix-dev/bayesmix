@@ -118,6 +118,12 @@ class FAHierarchy : public BaseHierarchy<FAHierarchy, FA::State,
   //! Gibbs sampling step for state variable lambda
   void sample_lambda();
 
+  //! Helper function to compute factors needed for likelihood evaluation
+  void compute_wood_factors(
+      Eigen::MatrixXd& cov_wood, double& cov_logdet,
+      const Eigen::MatrixXd& lambda,
+      const Eigen::DiagonalMatrix<double, Eigen::Dynamic>& psi_inverse);
+
   //! Sum of data points currently belonging to the cluster
   Eigen::VectorXd data_sum;
 

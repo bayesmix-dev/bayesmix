@@ -92,14 +92,14 @@ Eigen::VectorXd multi_normal_prec_chol_rng(
  * ||wood_factor*y||^2
  *
  *
- * @param datum           Point on which to evaluate the lpdf
- * @param mean            The mean of the Gaussian distribution
- * @sigma_diag_inverse    The inverse of the diagonal of Sigma matrix
- * @wood_factor           Computed as L^{-1} * Lambda^T * Sigma^{-1}, where L
- * is the (lower) Cholesky factor of I + Lambda^T * Sigma^{-1} * Lambda
- * @cov_logdet            The logarithm of the determinant of the covariance
- * matrix
- * @return                The evaluation of the lpdf
+ * @param datum                 Point on which to evaluate the lpdf
+ * @param mean                  The mean of the Gaussian distribution
+ * @param sigma_diag_inverse    The inverse of the diagonal of Sigma matrix
+ * @param wood_factor           Computed as L^{-1} * Lambda^T * Sigma^{-1},
+ * where L is the (lower) Cholesky factor of I + Lambda^T * Sigma^{-1} * Lambda
+ * @param cov_logdet            The logarithm of the determinant of the
+ * covariance matrix
+ * @return                      The evaluation of the lpdf
  */
 double multi_normal_lpdf_woodbury_chol(
     const Eigen::RowVectorXd &datum, const Eigen::VectorXd &mean,
@@ -118,8 +118,8 @@ double multi_normal_lpdf_woodbury_chol(
  *
  * @param datum  Point on which to evaluate the lpdf
  * @param mean   The mean of the Gaussian distribution
- * @sigma diag   The diagonal of Sigma matrix
- * @lambda       Rectangular matrix in Woodbury Identity
+ * @param sigma_diag   The diagonal of Sigma matrix
+ * @param lambda       Rectangular matrix in Woodbury Identity
  * @return       The evaluation of the lpdf
  */
 double multi_normal_lpdf_woodbury(const Eigen::VectorXd &datum,
