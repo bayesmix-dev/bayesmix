@@ -36,9 +36,13 @@ auto cluster_lpdf_from_unconstrained(
 template <class Derived, typename State>
 class BaseLikelihood : public AbstractLikelihood {
  public:
+  //! Default constructor
   BaseLikelihood() = default;
+
+  //! Default destructor
   ~BaseLikelihood() = default;
 
+  //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractLikelihood> clone() const override {
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
     out->clear_data();
@@ -46,29 +50,31 @@ class BaseLikelihood : public AbstractLikelihood {
     return out;
   }
 
-  // The unconstrained parameters are mean and log(var)
-
-  // double cluster_lpdf_from_unconstrained(
-  //     Eigen::VectorXd unconstrained_params) const override {
-  //   return static_cast<const Derived &>(*this)
-  //       .template cluster_lpdf_from_unconstrained<double>(
-  //           unconstrained_params);
-  // }
-
-  // stan::math::var cluster_lpdf_from_unconstrained(
-  //     Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>
-  //     unconstrained_params) const override {
-  //   return static_cast<const Derived &>(*this)
-  //       .template cluster_lpdf_from_unconstrained<stan::math::var>(
-  //           unconstrained_params);
-  // }
-
+  //! Evaluates the log likelihood over all the data in the cluster
+  //! given unconstrained parameter values.
+  //! By unconstrained parameters we mean that each entry of
+  //! the parameter vector can range over (-inf, inf).
+  //! Usually, some kind of transformation is required from the unconstrained
+  //! parameterization to the actual parameterization.
+  //! @param unconstrained_params vector collecting the unconstrained
+  //! parameters
+  //! @return The evaluation of the log likelihood over all data in the cluster
   double cluster_lpdf_from_unconstrained(
       Eigen::VectorXd unconstrained_params) const override {
     return internal::cluster_lpdf_from_unconstrained(
         static_cast<const Derived &>(*this), unconstrained_params, 0);
   }
 
+  //! Evaluates the log likelihood over all the data in the cluster
+  //! given unconstrained parameter values.
+  //! By unconstrained parameters we mean that each entry of
+  //! the parameter vector can range over (-inf, inf).
+  //! Usually, some kind of transformation is required from the unconstrained
+  //! parameterization to the actual parameterization. This version using
+  //! `stan::math::var` type is required for Stan automatic aifferentiation.
+  //! @param unconstrained_params vector collecting the unconstrained
+  //! parameters
+  //! @return The evaluation of the log likelihood over all data in the cluster
   stan::math::var cluster_lpdf_from_unconstrained(
       Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> unconstrained_params)
       const override {
@@ -76,35 +82,49 @@ class BaseLikelihood : public AbstractLikelihood {
         static_cast<const Derived &>(*this), unconstrained_params, 0);
   }
 
+  //! Evaluates the log-likelihood of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
   virtual Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data,
                                     const Eigen::MatrixXd &covariates =
                                         Eigen::MatrixXd(0, 0)) const override;
 
+  //! Returns the current cardinality of the cluster
   int get_card() const { return card; }
 
+  //! Returns the logarithm of the current cardinality of the cluster
   double get_log_card() const { return log_card; }
 
+  //! Returns the indexes of data points belonging to this cluster
   std::set<int> get_data_idx() const { return cluster_data_idx; }
 
+  //! Writes current state to a Protobuf message by pointer
   void write_state_to_proto(google::protobuf::Message *out) const override;
 
+  //! Returns the class of the current state for the likelihood
   State get_state() const { return state; }
 
+  //! Returns a vector storing the state in its unconstrained form
   Eigen::VectorXd get_unconstrained_state() override {
     return state.get_unconstrained();
   }
 
+  //! Updates the state of the likelihood with the object given as input
   void set_state(const State &_state) { state = _state; };
 
+  //! Updates the state of the likelihood starting from its unconstrained form
   void set_state_from_unconstrained(
       const Eigen::VectorXd &unconstrained_state) override {
     state.set_from_unconstrained(unconstrained_state);
   }
 
+  //! Adds a datum and its index to the likelihood
   void add_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
 
+  //! Removes a datum and its index from the likelihood
   void remove_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
@@ -136,6 +156,7 @@ class BaseLikelihood : public AbstractLikelihood {
         const bayesmix::AlgorithmState::ClusterState &>(state_);
   }
 
+  //! Current state of this cluster
   State state;
 
   //! Current cardinality of this cluster
@@ -207,5 +228,23 @@ Eigen::VectorXd BaseLikelihood<Derived, State>::lpdf_grid(
   }
   return lpdf;
 }
+
+// OLD STUFF
+// The unconstrained parameters are mean and log(var)
+
+// double cluster_lpdf_from_unconstrained(
+//     Eigen::VectorXd unconstrained_params) const override {
+//   return static_cast<const Derived &>(*this)
+//       .template cluster_lpdf_from_unconstrained<double>(
+//           unconstrained_params);
+// }
+
+// stan::math::var cluster_lpdf_from_unconstrained(
+//     Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>
+//     unconstrained_params) const override {
+//   return static_cast<const Derived &>(*this)
+//       .template cluster_lpdf_from_unconstrained<stan::math::var>(
+//           unconstrained_params);
+// }
 
 #endif  // BAYESMIX_HIERARCHIES_LIKELIHOODS_BASE_LIKELIHOOD_H_

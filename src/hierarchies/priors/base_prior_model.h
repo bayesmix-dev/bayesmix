@@ -37,16 +37,35 @@ auto lpdf_from_unconstrained(
 template <class Derived, typename HyperParams, typename Prior>
 class BasePriorModel : public AbstractPriorModel {
  public:
+  //! Default constructor
   BasePriorModel() = default;
 
+  //! Default destructor
   ~BasePriorModel() = default;
 
+  //! Evaluates the log likelihood for unconstrained parameter values.
+  //! By unconstrained parameters we mean that each entry of
+  //! the parameter vector can range over (-inf, inf).
+  //! Usually, some kind of transformation is required from the unconstrained
+  //! parameterization to the actual parameterization.
+  //! @param unconstrained_params vector collecting the unconstrained
+  //! parameters
+  //! @return The evaluation of the log likelihood of the prior model
   double lpdf_from_unconstrained(
       Eigen::VectorXd unconstrained_params) const override {
     return internal::lpdf_from_unconstrained(
         static_cast<const Derived &>(*this), unconstrained_params, 0);
   }
 
+  //! Evaluates the log likelihood for unconstrained parameter values.
+  //! By unconstrained parameters we mean that each entry of
+  //! the parameter vector can range over (-inf, inf).
+  //! Usually, some kind of transformation is required from the unconstrained
+  //! parameterization to the actual parameterization. This version using
+  //! `stan::math::var` type is required for Stan automatic aifferentiation.
+  //! @param unconstrained_params vector collecting the unconstrained
+  //! parameters
+  //! @return The evaluation of the log likelihood of the prior model
   stan::math::var lpdf_from_unconstrained(
       Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> unconstrained_params)
       const override {
@@ -54,24 +73,13 @@ class BasePriorModel : public AbstractPriorModel {
         static_cast<const Derived &>(*this), unconstrained_params, 0);
   }
 
-  // double lpdf_from_unconstrained(
-  //     Eigen::VectorXd unconstrained_params) const override {
-  //   return static_cast<const Derived &>(*this)
-  //       .template lpdf_from_unconstrained<double>(unconstrained_params);
-  // }
-
-  // stan::math::var lpdf_from_unconstrained(
-  //     Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>
-  //     unconstrained_params) const override {
-  //   return static_cast<const Derived &>(*this)
-  //       .template lpdf_from_unconstrained<stan::math::var>(
-  //           unconstrained_params);
-  // }
-
+  //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractPriorModel> clone() const override;
 
+  //! Returns an independent, data-less deep copy of this object
   virtual std::shared_ptr<AbstractPriorModel> deep_clone() const override;
 
+  //! Returns a pointer to the Protobuf message of the prior of this cluster
   virtual google::protobuf::Message *get_mutable_prior() override;
 
   //! Returns the struct of the current prior hyperparameters
@@ -80,12 +88,16 @@ class BasePriorModel : public AbstractPriorModel {
   //! Returns the struct of the current posterior hyperparameters
   HyperParams get_posterior_hypers() const { return post_hypers; }
 
+  //! Updates the current value of the posterior hyperparameters
   void set_posterior_hypers(const HyperParams &_post_hypers) {
     post_hypers = _post_hypers;
   };
 
+  //! Writes current values of the hyperparameters to a Protobuf message by
+  //! pointer
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
 
+  //! Initializes the prior model (both prior and hyperparameters)
   void initialize();
 
  protected:
@@ -113,6 +125,7 @@ class BasePriorModel : public AbstractPriorModel {
         const bayesmix::AlgorithmState::HierarchyHypers &>(state_);
   }
 
+  //! Down-casts the given generic proto message to a ClusterState proto
   const bayesmix::AlgorithmState::ClusterState &downcast_state(
       const google::protobuf::Message &state_) const {
     return google::protobuf::internal::down_cast<
@@ -129,8 +142,7 @@ class BasePriorModel : public AbstractPriorModel {
   std::shared_ptr<Prior> prior;
 };
 
-// Methods Definitions
-
+/* *** Methods Definitions *** */
 template <class Derived, typename HyperParams, typename Prior>
 std::shared_ptr<AbstractPriorModel>
 BasePriorModel<Derived, HyperParams, Prior>::clone() const {
@@ -191,5 +203,20 @@ void BasePriorModel<Derived, HyperParams, Prior>::check_prior_is_set() const {
     throw std::invalid_argument("Hierarchy prior was not provided");
   }
 }
+
+// OLD STUFF
+// double lpdf_from_unconstrained(
+//     Eigen::VectorXd unconstrained_params) const override {
+//   return static_cast<const Derived &>(*this)
+//       .template lpdf_from_unconstrained<double>(unconstrained_params);
+// }
+
+// stan::math::var lpdf_from_unconstrained(
+//     Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>
+//     unconstrained_params) const override {
+//   return static_cast<const Derived &>(*this)
+//       .template lpdf_from_unconstrained<stan::math::var>(
+//           unconstrained_params);
+// }
 
 #endif  // BAYESMIX_HIERARCHIES_PRIORS_BASE_PRIOR_MODEL_H_

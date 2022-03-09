@@ -35,17 +35,32 @@ class AbstractLikelihood {
   //! the parameter vector can range over (-inf, inf).
   //! Usually, some kind of transformation is required from the unconstrained
   //! parameterization to the actual parameterization.
+  //! @param unconstrained_params vector collecting the unconstrained
+  //! parameters
+  //! @return The evaluation of the log likelihood over all data in the cluster
   virtual double cluster_lpdf_from_unconstrained(
       Eigen::VectorXd unconstrained_params) const {
     throw std::runtime_error(
-        "cluster_lpdf_from_unconstrained() not yet implemented");
+        "cluster_lpdf_from_unconstrained() not implemented for this "
+        "likelihood");
   }
 
+  //! Evaluates the log likelihood over all the data in the cluster
+  //! given unconstrained parameter values.
+  //! By unconstrained parameters we mean that each entry of
+  //! the parameter vector can range over (-inf, inf).
+  //! Usually, some kind of transformation is required from the unconstrained
+  //! parameterization to the actual parameterization. This version using
+  //! `stan::math::var` type is required for Stan automatic aifferentiation.
+  //! @param unconstrained_params vector collecting the unconstrained
+  //! parameters
+  //! @return The evaluation of the log likelihood over all data in the cluster
   virtual stan::math::var cluster_lpdf_from_unconstrained(
       Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> unconstrained_params)
       const {
     throw std::runtime_error(
-        "cluster_lpdf_from_unconstrained() not yet implemented");
+        "cluster_lpdf_from_unconstrained() not implemented for this "
+        "likelihood");
   }
 
   //! Evaluates the log-likelihood of data in a grid of points
