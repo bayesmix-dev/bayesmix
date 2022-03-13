@@ -293,13 +293,8 @@ void FAHierarchy::compute_wood_factors(
     Eigen::MatrixXd& cov_wood, double& cov_logdet,
     const Eigen::MatrixXd& lambda,
     const Eigen::DiagonalMatrix<double, Eigen::Dynamic>& psi_inverse) {
-  Eigen::MatrixXd temp_chol =
-      (lambda.transpose() * psi_inverse * lambda +
-       Eigen::MatrixXd::Identity(hypers->q, hypers->q))
-          .llt()
-          .matrixL()
-          .solve(Eigen::MatrixXd::Identity(hypers->q, hypers->q));
-  cov_logdet = -2 * Eigen::MatrixXd(temp_chol).diagonal().array().log().sum() -
-               psi_inverse.diagonal().array().log().sum();
-  cov_wood = temp_chol * lambda.transpose() * psi_inverse;
+  auto [cov_wood_, cov_logdet_] =
+      bayesmix::compute_wood_chol_and_logdet(psi_inverse, lambda);
+  cov_logdet = cov_logdet_;
+  cov_wood = cov_wood_;
 }
