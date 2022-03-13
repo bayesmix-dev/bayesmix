@@ -128,6 +128,20 @@ double multi_normal_lpdf_woodbury(const Eigen::VectorXd &datum,
                                   const Eigen::MatrixXd &lambda);
 
 /*
+ * Returns the log-determinant of the matrix Lambda Lambda^T + Sigma
+ * and the 'wood_factor', i.e.
+ *           L^{-1} * Lambda^T * Sigma^{-1},
+ * where L is the (lower) Cholesky factor of
+ *          I + Lambda^T * Sigma^{-1} * Lambda
+ *
+ * @param sigma_dag_inverse The inverse of the diagonal matrix Sigma
+ * @param lambda            The matrix Lambda
+ */
+std::pair<Eigen::MatrixXd, double> compute_wood_chol_and_logdet(
+    const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &sigma_diag_inverse,
+    const Eigen::MatrixXd &lambda);
+
+/*
  * Evaluates the log probability density function of a multivariate Student's t
  * distribution on a single point
  *
