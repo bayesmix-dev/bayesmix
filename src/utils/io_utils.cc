@@ -1,8 +1,8 @@
 #include "io_utils.h"
 
-#include <Eigen/Dense>
 #include <fstream>
 #include <iostream>
+#include <stan/math/rev.hpp>
 
 bool bayesmix::check_file_is_writeable(const std::string &filename) {
   std::ofstream ofstr;

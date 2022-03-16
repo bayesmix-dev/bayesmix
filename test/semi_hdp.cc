@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "semihdp.pb.h"
@@ -302,6 +302,7 @@ TEST(semihdp, sample_unique_values2) {
 }
 
 TEST(semihdp, sample_allocations1) {
+  bayesmix::Rng::Instance().seed(220122);
   std::vector<Eigen::MatrixXd> data(2);
 
   data[0] = bayesmix::vstack({Eigen::MatrixXd::Zero(50, 1).array() + 5,

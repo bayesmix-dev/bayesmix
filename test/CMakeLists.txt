@@ -18,9 +18,11 @@ FetchContent_MakeAvailable(googletest)
 add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   write_proto.cc
   proto_utils.cc
+  likelihoods.cc
+  prior_models.cc
   hierarchies.cc
   lpdf.cc
-  priors.cc
+  # priors.cc // OLD, USEREI prior_models.cc
   eigen_utils.cc
   distributions.cc
   semi_hdp.cc
@@ -28,6 +30,7 @@ add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   runtime.cc
   rng.cc
   logit_sb.cc
+  gradient.cc
 )
 
 target_include_directories(test_bayesmix PUBLIC ${INCLUDE_PATHS})

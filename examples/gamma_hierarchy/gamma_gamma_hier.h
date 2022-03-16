@@ -5,8 +5,8 @@
 #include <src/hierarchies/base_hierarchy.h>
 #include <src/hierarchies/conjugate_hierarchy.h>
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "hierarchy_prior.pb.h"

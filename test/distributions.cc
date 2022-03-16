@@ -2,10 +2,11 @@
 
 #include <gtest/gtest.h>
 
-#include <Eigen/Dense>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <vector>
 
+#include "src/hierarchies/likelihoods/states/includes.h"
 #include "src/utils/rng.h"
 
 TEST(mix_dist, 1) {
@@ -152,17 +153,19 @@ TEST(mult_normal, lpdf_grid) {
   Eigen::MatrixXd tmp = Eigen::MatrixXd::Random(dim + 1, dim);
   Eigen::MatrixXd prec =
       tmp.transpose() * tmp + Eigen::MatrixXd::Identity(dim, dim);
-  Eigen::MatrixXd prec_chol = Eigen::LLT<Eigen::MatrixXd>(prec).matrixU();
-  Eigen::VectorXd diag = prec_chol.diagonal();
-  double prec_logdet = 2 * log(diag.array()).sum();
 
+  State::MultiLS state;
+  state.set_from_constrained(mean, prec);
   Eigen::VectorXd lpdfs = bayesmix::multi_normal_prec_lpdf_grid(
-      data, mean, prec_chol, prec_logdet);
+      data, state.mean, state.prec_chol, state.prec_logdet);
 
   for (int i = 0; i < 20; i++) {
-    double curr = bayesmix::multi_normal_prec_lpdf(data.row(i), mean,
-                                                   prec_chol, prec_logdet);
+    double curr = bayesmix::multi_normal_prec_lpdf(
+        data.row(i), state.mean, state.prec_chol, state.prec_logdet);
+    double curr2 = stan::math::multi_normal_prec_lpdf(data.row(i), state.mean,
+                                                      state.prec);
     ASSERT_DOUBLE_EQ(curr, lpdfs(i));
+    ASSERT_DOUBLE_EQ(curr, curr2);
   }
 }
 

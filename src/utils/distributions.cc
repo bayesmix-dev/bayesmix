@@ -1,10 +1,11 @@
 #include "distributions.h"
 
-#include <Eigen/Dense>
+// #include <Eigen/Dense>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <random>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "src/utils/proto_utils.h"
 
@@ -18,22 +19,24 @@ double bayesmix::multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
                                         const Eigen::MatrixXd &prec_chol,
                                         const double prec_logdet) {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
-  double base = prec_logdet + NEG_LOG_SQRT_TWO_PI * datum.size();
-  double exp = (prec_chol * (datum - mean)).squaredNorm();
-  return 0.5 * (base - exp);
+  double base = 0.5 * prec_logdet + NEG_LOG_SQRT_TWO_PI * datum.size();
+  double exp = 0.5 * (prec_chol.transpose() * (datum - mean)).squaredNorm();
+  return base - exp;
 }
 
 Eigen::VectorXd bayesmix::multi_normal_prec_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::VectorXd &mean,
     const Eigen::MatrixXd &prec_chol, const double prec_logdet) {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
-  Eigen::VectorXd exp =
-      ((data.rowwise() - mean.transpose()) * prec_chol.transpose())
-          .rowwise()
-          .squaredNorm();
-  Eigen::VectorXd base = Eigen::ArrayXd::Ones(data.rows()) * prec_logdet +
-                         NEG_LOG_SQRT_TWO_PI * data.cols();
-  return (base - exp) * 0.5;
+
+  Eigen::VectorXd exp = ((data.rowwise() - mean.transpose()) * prec_chol)
+                            .rowwise()
+                            .squaredNorm() *
+                        0.5;
+  Eigen::VectorXd base =
+      Eigen::ArrayXd::Ones(data.rows()) * prec_logdet * 0.5 +
+      NEG_LOG_SQRT_TWO_PI * data.cols();
+  return base - exp;
 }
 
 Eigen::VectorXd bayesmix::multi_normal_diag_rng(
