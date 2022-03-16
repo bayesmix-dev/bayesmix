@@ -192,3 +192,34 @@ TEST(mult_t, lpdf_grid) {
     ASSERT_DOUBLE_EQ(curr, lpdfs(i));
   }
 }
+
+TEST(lpdf_woodbury, 1) {
+  int dim = 1000;
+  int q = 10;
+  auto& rng = bayesmix::Rng::Instance().get();
+  Eigen::VectorXd mean(dim);
+  Eigen::VectorXd datum(dim);
+  Eigen::VectorXd sigma_diag(dim);
+  Eigen::MatrixXd lambda(dim, q);
+
+  for (size_t j = 0; j < dim; j++) {
+    mean[j] = stan::math::normal_rng(0, 1, rng);
+
+    sigma_diag[j] = stan::math::inv_gamma_rng(2.5, 1, rng);
+
+    for (size_t i = 0; i < q; i++) {
+      lambda(j, i) = stan::math::normal_rng(0, 1, rng);
+    }
+  }
+
+  Eigen::MatrixXd cov =
+      lambda * lambda.transpose() + Eigen::MatrixXd(sigma_diag.asDiagonal());
+
+  datum = stan::math::multi_normal_rng(mean, cov, rng);
+
+  double stan_lpdf = stan::math::multi_normal_lpdf(datum, mean, cov);
+  double our_lpdf =
+      bayesmix::multi_normal_lpdf_woodbury(datum, mean, sigma_diag, lambda);
+
+  ASSERT_LE(std::abs(stan_lpdf - our_lpdf), 1e-10);
+}

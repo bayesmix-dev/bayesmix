@@ -190,7 +190,6 @@ TEST(lin_reg_uni_hierarchy, state_read_write) {
 }
 
 TEST(lin_reg_uni_hierarchy, misc) {
-  
   // Build data
   int n = 5, dim = 2;
   Eigen::Vector2d beta_true({10.0, 10.0});
@@ -201,11 +200,11 @@ TEST(lin_reg_uni_hierarchy, misc) {
   for (int i = 0; i < n; i++) {
     data(i) = stan::math::normal_rng(cov.row(i).dot(beta_true), sigma2, rng);
   }
-  
+
   // Initialize objects
   LinRegUniHierarchy hier;
   bayesmix::LinRegUniPrior prior;
-  
+
   // Create prior parameters
   Eigen::Vector2d beta0 = 0 * beta_true;
   auto Lambda0 = Eigen::Matrix2d::Identity();
@@ -214,7 +213,8 @@ TEST(lin_reg_uni_hierarchy, misc) {
 
   // Initialize hierarchy
   bayesmix::to_proto(beta0, prior.mutable_fixed_values()->mutable_mean());
-  bayesmix::to_proto(Lambda0, prior.mutable_fixed_values()->mutable_var_scaling());
+  bayesmix::to_proto(Lambda0,
+                     prior.mutable_fixed_values()->mutable_var_scaling());
   prior.mutable_fixed_values()->set_shape(a0);
   prior.mutable_fixed_values()->set_scale(b0);
   hier.get_mutable_prior()->CopyFrom(prior);
@@ -228,7 +228,7 @@ TEST(lin_reg_uni_hierarchy, misc) {
             bayesmix::to_eigen(out.lin_reg_uni_state().var_scaling()));
   ASSERT_EQ(a0, out.lin_reg_uni_state().shape());
   ASSERT_EQ(b0, out.lin_reg_uni_state().scale());
-  
+
   // Add data
   for (int i = 0; i < n; i++) {
     hier.add_datum(i, data.row(i), false, cov.row(i));

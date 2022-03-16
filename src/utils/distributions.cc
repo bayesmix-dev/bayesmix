@@ -69,6 +69,54 @@ Eigen::VectorXd bayesmix::multi_normal_prec_chol_rng(
   return output;
 }
 
+double bayesmix::multi_normal_lpdf_woodbury_chol(
+    const Eigen::RowVectorXd &datum, const Eigen::VectorXd &mean,
+    const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &sigma_diag_inverse,
+    const Eigen::MatrixXd &wood_factor, const double &cov_logdet) {
+  using stan::math::NEG_LOG_SQRT_TWO_PI;
+  double exp =
+      -0.5 * ((datum.transpose() - mean)
+                  .dot(sigma_diag_inverse * (datum.transpose() - mean)) -
+              (wood_factor * (datum.transpose() - mean)).squaredNorm());
+
+  double base = -0.5 * cov_logdet + NEG_LOG_SQRT_TWO_PI * mean.size();
+  return base + exp;
+}
+
+double bayesmix::multi_normal_lpdf_woodbury(const Eigen::VectorXd &datum,
+                                            const Eigen::VectorXd &mean,
+                                            const Eigen::VectorXd &sigma_diag,
+                                            const Eigen::MatrixXd &lambda) {
+  Eigen::DiagonalMatrix<double, Eigen::Dynamic> sigma_diag_inverse =
+      sigma_diag.cwiseInverse().asDiagonal();
+  auto [wood_chol, cov_logdet] =
+      compute_wood_chol_and_logdet(sigma_diag_inverse, lambda);
+
+  return multi_normal_lpdf_woodbury_chol(datum, mean, sigma_diag_inverse,
+                                         wood_chol, cov_logdet);
+}
+
+std::pair<Eigen::MatrixXd, double> bayesmix::compute_wood_chol_and_logdet(
+    const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &sigma_diag_inverse,
+    const Eigen::MatrixXd &lambda) {
+  int q = lambda.cols();
+  Eigen::MatrixXd temp_chol =
+      (lambda.transpose() * sigma_diag_inverse * lambda +
+       Eigen::MatrixXd::Identity(q, q))
+          .llt()
+          .matrixL()
+          .solve(Eigen::MatrixXd::Identity(q, q));
+
+  double cov_logdet =
+      -2 * Eigen::MatrixXd(temp_chol).diagonal().array().log().sum() -
+      sigma_diag_inverse.diagonal().array().log().sum();
+
+  Eigen::MatrixXd wood_chol =
+      temp_chol * lambda.transpose() * sigma_diag_inverse;
+
+  return std::make_pair(wood_chol, cov_logdet);
+}
+
 double bayesmix::multi_student_t_invscale_lpdf(
     const Eigen::VectorXd &datum, const double df, const Eigen::VectorXd &mean,
     const Eigen::MatrixXd &invscale_chol, const double scale_logdet) {

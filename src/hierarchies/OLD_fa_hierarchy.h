@@ -21,10 +21,9 @@ namespace FA {
 //! Custom container for State values
 struct State {
   Eigen::VectorXd mu, psi;
-  Eigen::MatrixXd eta, lambda;
+  Eigen::MatrixXd eta, lambda, cov_wood;
   Eigen::DiagonalMatrix<double, Eigen::Dynamic> psi_inverse;
-  Eigen::LLT<Eigen::MatrixXd> cov_chol;
-  double prec_logdet;
+  double cov_logdet;
 };
 
 //! Custom container for Hyperparameters values
@@ -118,6 +117,12 @@ class FAHierarchy : public BaseHierarchy<FAHierarchy, FA::State,
 
   //! Gibbs sampling step for state variable lambda
   void sample_lambda();
+
+  //! Helper function to compute factors needed for likelihood evaluation
+  void compute_wood_factors(
+      Eigen::MatrixXd& cov_wood, double& cov_logdet,
+      const Eigen::MatrixXd& lambda,
+      const Eigen::DiagonalMatrix<double, Eigen::Dynamic>& psi_inverse);
 
   //! Sum of data points currently belonging to the cluster
   Eigen::VectorXd data_sum;

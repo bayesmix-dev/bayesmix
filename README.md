@@ -8,9 +8,13 @@ Current state of the software:
 
 - `bayesmix` performs inference for mixture models of the kind
 
+<img src="https://latex.codecogs.com/svg.image?\begin{align*}y_1,\dots,y_n&space;&\sim&space;\int&space;k(\cdot&space;\mid&space;\theta)P(\mathrm{d}\theta)\\P&space;&\sim&space;\Pi\end{align*}&space;" title="\begin{align*}y_1,\dots,y_n &\sim \int k(\cdot \mid \theta)P(\mathrm{d}\theta)\\P &\sim \Pi\end{align*} " />
+
+<!---
 <a href="https://www.codecogs.com/eqnedit.php?latex=y_1,&space;\ldots,&space;y_n&space;\sim&space;\int&space;k(\cdot&space;\mid&space;\theta)&space;P(d\theta)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?y_1,&space;\ldots,&space;y_n&space;\sim&space;\int&space;k(\cdot&space;\mid&space;\theta)&space;P(d\theta)" title="y_1, \ldots, y_n \sim \int k(\cdot \mid \theta) \Pi(d\theta)" /></a>
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=P&space;\sim&space;\Pi" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P&space;\sim&space;\Pi" title="\Pi \sim P" /></a>
+-->
 
 where P is either the Dirichlet process or the Pitman--Yor process
 

@@ -14,17 +14,8 @@
 #include "src/utils/rng.h"
 
 double FAHierarchy::like_lpdf(const Eigen::RowVectorXd& datum) const {
-  using stan::math::NEG_LOG_SQRT_TWO_PI;
-  double base = (Eigen::MatrixXd(state.cov_chol.matrixL()))
-                    .diagonal()
-                    .array()
-                    .log()
-                    .sum() -
-                NEG_LOG_SQRT_TWO_PI * dim;
-  double exp =
-      0.5 * ((datum.transpose() - state.mu)
-                 .dot(state.cov_chol.solve((datum.transpose() - state.mu))));
-  return -(base + exp);
+  return bayesmix::multi_normal_lpdf_woodbury_chol(
+      datum, state.mu, state.psi_inverse, state.cov_wood, state.cov_logdet);
 }
 
 FA::State FAHierarchy::draw(const FA::Hyperparams& params) {
@@ -53,9 +44,8 @@ FA::State FAHierarchy::draw(const FA::Hyperparams& params) {
   }
 
   out.psi_inverse = out.psi.cwiseInverse().asDiagonal();
-  out.cov_chol = (out.lambda * out.lambda.transpose() +
-                  Eigen::MatrixXd(out.psi.asDiagonal()))
-                     .llt();
+  compute_wood_factors(out.cov_wood, out.cov_logdet, out.lambda,
+                       out.psi_inverse);
 
   return out;
 }
@@ -66,9 +56,8 @@ void FAHierarchy::initialize_state() {
   state.eta = Eigen::MatrixXd::Zero(card, hypers->q);
   state.lambda = Eigen::MatrixXd::Zero(dim, hypers->q);
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
-  state.cov_chol = (state.lambda * state.lambda.transpose() +
-                    Eigen::MatrixXd(state.psi.asDiagonal()))
-                       .llt();
+  compute_wood_factors(state.cov_wood, state.cov_logdet, state.lambda,
+                       state.psi_inverse);
 }
 
 void FAHierarchy::initialize_hypers() {
@@ -161,9 +150,8 @@ void FAHierarchy::set_state_from_proto(
   state.eta = bayesmix::to_eigen(statecast.fa_state().eta());
   state.lambda = bayesmix::to_eigen(statecast.fa_state().lambda());
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
-  state.cov_chol = (state.lambda * state.lambda.transpose() +
-                    Eigen::MatrixXd(state.psi.asDiagonal()))
-                       .llt();
+  compute_wood_factors(state.cov_wood, state.cov_logdet, state.lambda,
+                       state.psi_inverse);
   set_card(statecast.cardinality());
 }
 
@@ -296,7 +284,16 @@ void FAHierarchy::sample_psi() {
                                              hypers->beta[j] + sum / 2, rng);
   }
   state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
-  state.cov_chol = (state.lambda * state.lambda.transpose() +
-                    Eigen::MatrixXd(state.psi.asDiagonal()))
-                       .llt();
+  compute_wood_factors(state.cov_wood, state.cov_logdet, state.lambda,
+                       state.psi_inverse);
+}
+
+void FAHierarchy::compute_wood_factors(
+    Eigen::MatrixXd& cov_wood, double& cov_logdet,
+    const Eigen::MatrixXd& lambda,
+    const Eigen::DiagonalMatrix<double, Eigen::Dynamic>& psi_inverse) {
+  auto [cov_wood_, cov_logdet_] =
+      bayesmix::compute_wood_chol_and_logdet(psi_inverse, lambda);
+  cov_logdet = cov_logdet_;
+  cov_wood = cov_wood_;
 }
