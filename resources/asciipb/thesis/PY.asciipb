@@ -1,0 +1,4 @@
+fixed_values {
+  strength: 1.0
+  discount: 0.1
+}

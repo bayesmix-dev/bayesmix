@@ -1,8 +1,11 @@
 # Build folder
 build/
 # Resources folder
-resources/csv
-resources/asciipb
+resources/csv/in/*
+!resources/csv/in/thesis/
+resources/csv/out/
+resources/asciipb/*
+!resources/asciipb/thesis/
 # Visual Studio Code folder
 .vscode
 # SFTP configuration file

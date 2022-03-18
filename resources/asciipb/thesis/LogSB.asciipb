@@ -1,0 +1,13 @@
+normal_prior {
+  mean {
+    size: 1
+    data: 0.0
+  }
+  var {
+    rows: 1
+    cols: 1
+    data: 5.0
+  }
+}
+step_size: 0.025
+num_components: 4

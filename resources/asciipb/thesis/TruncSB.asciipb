@@ -1,0 +1,4 @@
+dp_prior {
+  totalmass: 0.5
+}
+num_components: 4
