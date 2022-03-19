@@ -44,6 +44,7 @@ class LaplaceLikelihood
   double compute_lpdf(const Eigen::RowVectorXd &datum) const override;
   void update_sum_stats(const Eigen::RowVectorXd &datum, bool add) override;
 
+  // TODO: ORA CHE HO IL DATASET QUESTO NON SERVE!
   //! Set of values of data points belonging to this cluster
   std::list<Eigen::RowVectorXd> cluster_data_values;
   //! Sum of absolute differences for current params
