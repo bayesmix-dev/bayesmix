@@ -259,7 +259,8 @@ class AbstractHierarchy {
   //! Returns whether the hierarchy represents a conjugate model or not
   virtual bool is_conjugate() const = 0;
 
-  //! Main function that initializes members to appropriate values
+  //! Sets the (pointer to) the dataset in the cluster. Implemented in
+  //! BaseHierarchy
   virtual void set_dataset(const Eigen::MatrixXd *const dataset) = 0;
 
  protected:

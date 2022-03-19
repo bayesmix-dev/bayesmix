@@ -148,6 +148,11 @@ class BaseLikelihood : public AbstractLikelihood {
     // state.set_from_unconstrained(unconstrained_state);
   }
 
+  //! Sets the (pointer to) the dataset in the cluster
+  void set_dataset(const Eigen::MatrixXd *const dataset) {
+    dataset_ptr = dataset;
+  }
+
   //! Adds a datum and its index to the likelihood
   void add_datum(
       const int id, const Eigen::RowVectorXd &datum,
@@ -196,6 +201,9 @@ class BaseLikelihood : public AbstractLikelihood {
 
   //! Set of indexes of data points belonging to this cluster
   std::set<int> cluster_data_idx;
+
+  //! Pointer to the cluster dataset
+  const Eigen::MatrixXd *dataset_ptr;
 };
 
 template <class Derived, typename State>

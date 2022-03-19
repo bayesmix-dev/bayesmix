@@ -376,7 +376,7 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Sets the (pointer to the) dataset matrix
   void set_dataset(const Eigen::MatrixXd *const dataset) override {
-    dataset_ptr = dataset;
+    like->set_dataset(dataset);
   }
 
  protected:
@@ -418,7 +418,7 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   // TEMPORANEO!
-  const Eigen::MatrixXd *dataset_ptr;
+  // const Eigen::MatrixXd *dataset_ptr;
 };
 
 // TODO: Move definitions outside the class to improve code cleaness

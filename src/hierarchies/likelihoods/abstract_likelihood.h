@@ -89,6 +89,9 @@ class AbstractLikelihood {
   //! BaseLikelihood
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
+  //! Sets the (pointer to) the dataset in the cluster
+  virtual void set_dataset(const Eigen::MatrixXd *const dataset) = 0;
+
   //! Adds a datum and its index to the likelihood. Implemented in
   //! BaseLikelihood
   virtual void add_datum(
