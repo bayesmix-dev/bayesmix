@@ -25,6 +25,12 @@ struct MNIG {
   double shape, scale;
 };
 
+struct FA {
+  Eigen::VectorXd mutilde, beta;
+  double phi, alpha0;
+  unsigned int card, q;
+};
+
 }  // namespace Hyperparams
 
 #endif  // BAYESMIX_HIERARCHIES_PRIORS_HYPERPARAMS_H_

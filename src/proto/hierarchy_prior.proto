@@ -102,6 +102,7 @@ message LinRegUniPrior {
   double phi = 3;
   double alpha0 = 4;
   uint32 q = 5;
+  uint32 card = 6;
  }
 
 
