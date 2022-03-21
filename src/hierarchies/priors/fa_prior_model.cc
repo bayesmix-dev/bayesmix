@@ -3,10 +3,10 @@
 double FAPriorModel::lpdf(const google::protobuf::Message &state_) {
   // Downcast state
   auto &state = downcast_state(state_).fa_state();
-  // Proto to Eigen conversion
+  // Proto2Eigen conversion
   Eigen::VectorXd mu = bayesmix::to_eigen(state.mu());
   Eigen::VectorXd psi = bayesmix::to_eigen(state.psi());
-  Eigen::MatrixXd eta = bayesmix::to_eigen(state.eta());
+  // Eigen::MatrixXd eta = bayesmix::to_eigen(state.eta());
   Eigen::MatrixXd lambda = bayesmix::to_eigen(state.lambda());
   // Initialize lpdf value
   double target = 0.;
@@ -20,11 +20,11 @@ double FAPriorModel::lpdf(const google::protobuf::Message &state_) {
       target += stan::math::normal_lpdf(lambda(j, i), 0, 1);
     }
   }
-  for (size_t i = 0; i < eta.rows(); i++) {
-    for (size_t j = 0; j < hypers->q; j++) {
-      target += stan::math::normal_lpdf(eta(i, j), 0, 1);
-    }
-  }
+  // for (size_t i = 0; i < eta.rows(); i++) {
+  //   for (size_t j = 0; j < hypers->q; j++) {
+  //     target += stan::math::normal_lpdf(eta(i, j), 0, 1);
+  //   }
+  // }
   // Return lpdf contribution
   return target;
 }
@@ -42,7 +42,7 @@ std::shared_ptr<google::protobuf::Message> FAPriorModel::sample(
   State::FA out;
   out.mu = params.mutilde;
   out.psi = params.beta / (params.alpha0 + 1.);
-  out.eta = Eigen::MatrixXd::Zero(params.card, params.q);
+  // out.eta = Eigen::MatrixXd::Zero(params.card, params.q);
   out.lambda = Eigen::MatrixXd::Zero(dim, params.q);
   for (size_t j = 0; j < dim; j++) {
     out.mu[j] =
@@ -54,22 +54,22 @@ std::shared_ptr<google::protobuf::Message> FAPriorModel::sample(
       out.lambda(j, i) = stan::math::normal_rng(0, 1, rng);
     }
   }
-  for (size_t i = 0; i < params.card; i++) {
-    for (size_t j = 0; j < params.q; j++) {
-      out.eta(i, j) = stan::math::normal_rng(0, 1, rng);
-    }
-  }
+  // for (size_t i = 0; i < params.card; i++) {
+  //   for (size_t j = 0; j < params.q; j++) {
+  //     out.eta(i, j) = stan::math::normal_rng(0, 1, rng);
+  //   }
+  // }
 
   // Questi conti non li passo al proto, attenzione !!!
   // out.psi_inverse = out.psi.cwiseInverse().asDiagonal();
   // compute_wood_factors(out.cov_wood, out.cov_logdet, out.lambda,
   //                      out.psi_inverse);
 
-  // Convert to proto
+  // Eigen2Proto conversion
   bayesmix::AlgorithmState::ClusterState state;
   bayesmix::to_proto(out.mu, state.mutable_fa_state()->mutable_mu());
   bayesmix::to_proto(out.psi, state.mutable_fa_state()->mutable_psi());
-  bayesmix::to_proto(out.eta, state.mutable_fa_state()->mutable_eta());
+  // bayesmix::to_proto(out.eta, state.mutable_fa_state()->mutable_eta());
   bayesmix::to_proto(out.lambda, state.mutable_fa_state()->mutable_lambda());
   return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
 
@@ -95,7 +95,7 @@ void FAPriorModel::set_hypers_from_proto(
   hypers->beta = bayesmix::to_eigen(hyperscast.beta());
   hypers->phi = hyperscast.phi();
   hypers->q = hyperscast.q();
-  hypers->card = hyperscast.card();
+  // hypers->card = hyperscast.card();
 }
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
@@ -106,7 +106,7 @@ FAPriorModel::get_hypers_proto() const {
   hypers_.set_alpha0(hypers->alpha0);
   hypers_.set_phi(hypers->phi);
   hypers_.set_q(hypers->q);
-  hypers_.set_card(hypers->card);
+  // hypers_.set_card(hypers->card);
 
   auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
   out->mutable_fa_state()->CopyFrom(hypers_);
@@ -122,7 +122,7 @@ void FAPriorModel::initialize_hypers() {
     hypers->phi = prior->fixed_values().phi();
     hypers->alpha0 = prior->fixed_values().alpha0();
     hypers->q = prior->fixed_values().q();
-    hypers->card = prior->fixed_values().card();
+    // hypers->card = prior->fixed_values().card();
 
     // Check validity
     if (dim != hypers->beta.rows()) {
@@ -143,9 +143,9 @@ void FAPriorModel::initialize_hypers() {
     if (hypers->q <= 0) {
       throw std::invalid_argument("Number of factors must be > 0");
     }
-    if (hypers->card <= 0) {
-      throw std::invalid_argument("Number of data must be > 0");
-    }
+    // if (hypers->card < 0) {
+    //   throw std::invalid_argument("Number of data must be >= 0");
+    // }
   }
 
   else {
