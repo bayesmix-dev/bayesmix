@@ -5,8 +5,8 @@
 
 #include "algorithm_state.pb.h"
 #include "ls_state.pb.h"
+#include "src/hierarchies/fa_hierarchy.h"
 #include "src/hierarchies/lin_reg_uni_hierarchy.h"
-// #include "src/hierarchies/fa_hierarchy.h"
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/hierarchies/nnw_hierarchy.h"
 #include "src/includes.h"
@@ -300,39 +300,39 @@ TEST(nnxig_hierarchy, sample_given_data) {
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
 
-// TEST(fahierarchy, draw) {
-//   auto hier = std::make_shared<FAHierarchy>();
-//   bayesmix::FAPrior prior;
-//   Eigen::VectorXd mutilde(4);
-//   mutilde << 3.0, 3.0, 4.0, 1.0;
-//   bayesmix::Vector mutilde_proto;
-//   bayesmix::to_proto(mutilde, &mutilde_proto);
-//   int q = 2;
-//   double phi = 1.0;
-//   double alpha0 = 5.0;
-//   Eigen::VectorXd beta(4);
-//   beta << 3.0, 3.0, 2.0, 2.1;
-//   bayesmix::Vector beta_proto;
-//   bayesmix::to_proto(beta, &beta_proto);
-//   *prior.mutable_fixed_values()->mutable_mutilde() = mutilde_proto;
-//   prior.mutable_fixed_values()->set_phi(phi);
-//   prior.mutable_fixed_values()->set_alpha0(alpha0);
-//   prior.mutable_fixed_values()->set_q(q);
-//   *prior.mutable_fixed_values()->mutable_beta() = beta_proto;
-//   hier->get_mutable_prior()->CopyFrom(prior);
-//   hier->initialize();
+TEST(fa_hierarchy, draw) {
+  auto hier = std::make_shared<FAHierarchy>();
+  bayesmix::FAPrior prior;
+  Eigen::VectorXd mutilde(4);
+  mutilde << 3.0, 3.0, 4.0, 1.0;
+  bayesmix::Vector mutilde_proto;
+  bayesmix::to_proto(mutilde, &mutilde_proto);
+  int q = 2;
+  double phi = 1.0;
+  double alpha0 = 5.0;
+  Eigen::VectorXd beta(4);
+  beta << 3.0, 3.0, 2.0, 2.1;
+  bayesmix::Vector beta_proto;
+  bayesmix::to_proto(beta, &beta_proto);
+  *prior.mutable_fixed_values()->mutable_mutilde() = mutilde_proto;
+  prior.mutable_fixed_values()->set_phi(phi);
+  prior.mutable_fixed_values()->set_alpha0(alpha0);
+  prior.mutable_fixed_values()->set_q(q);
+  *prior.mutable_fixed_values()->mutable_beta() = beta_proto;
+  hier->get_mutable_prior()->CopyFrom(prior);
+  hier->initialize();
 
-//   auto hier2 = hier->clone();
-//   hier2->sample_prior();
+  auto hier2 = hier->clone();
+  hier2->sample_prior();
 
-//   bayesmix::AlgorithmState out;
-//   bayesmix::AlgorithmState::ClusterState* clusval =
-//   out.add_cluster_states(); bayesmix::AlgorithmState::ClusterState* clusval2
-//   = out.add_cluster_states(); hier->write_state_to_proto(clusval);
-//   hier2->write_state_to_proto(clusval2);
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
+  hier->write_state_to_proto(clusval);
+  hier2->write_state_to_proto(clusval2);
 
-//   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
-// }
+  ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+}
 
 // TEST(fahierarchy, draw_auto) {
 //   auto hier = std::make_shared<FAHierarchy>();
@@ -372,42 +372,41 @@ TEST(nnxig_hierarchy, sample_given_data) {
 //       << clusval->DebugString() << clusval2->DebugString();
 // }
 
-// TEST(fahierarchy, sample_given_data) {
-//   auto hier = std::make_shared<FAHierarchy>();
-//   bayesmix::FAPrior prior;
-//   Eigen::VectorXd mutilde(4);
-//   mutilde << 3.0, 3.0, 4.0, 1.0;
-//   bayesmix::Vector mutilde_proto;
-//   bayesmix::to_proto(mutilde, &mutilde_proto);
-//   int q = 2;
-//   double phi = 1.0;
-//   double alpha0 = 5.0;
-//   Eigen::VectorXd beta(4);
-//   beta << 3.0, 3.0, 2.0, 2.1;
-//   bayesmix::Vector beta_proto;
-//   bayesmix::to_proto(beta, &beta_proto);
-//   *prior.mutable_fixed_values()->mutable_mutilde() = mutilde_proto;
-//   prior.mutable_fixed_values()->set_phi(phi);
-//   prior.mutable_fixed_values()->set_alpha0(alpha0);
-//   prior.mutable_fixed_values()->set_q(q);
-//   *prior.mutable_fixed_values()->mutable_beta() = beta_proto;
-//   hier->get_mutable_prior()->CopyFrom(prior);
-//   Eigen::MatrixXd dataset(5, 4);
-//   dataset << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-//   19,
-//       20;
-//   hier->set_dataset(&dataset);
-//   hier->initialize();
+TEST(fa_hierarchy, sample_given_data) {
+  auto hier = std::make_shared<FAHierarchy>();
+  bayesmix::FAPrior prior;
+  Eigen::VectorXd mutilde(4);
+  mutilde << 3.0, 3.0, 4.0, 1.0;
+  bayesmix::Vector mutilde_proto;
+  bayesmix::to_proto(mutilde, &mutilde_proto);
+  int q = 2;
+  double phi = 1.0;
+  double alpha0 = 5.0;
+  Eigen::VectorXd beta(4);
+  beta << 3.0, 3.0, 2.0, 2.1;
+  bayesmix::Vector beta_proto;
+  bayesmix::to_proto(beta, &beta_proto);
+  *prior.mutable_fixed_values()->mutable_mutilde() = mutilde_proto;
+  prior.mutable_fixed_values()->set_phi(phi);
+  prior.mutable_fixed_values()->set_alpha0(alpha0);
+  prior.mutable_fixed_values()->set_q(q);
+  *prior.mutable_fixed_values()->mutable_beta() = beta_proto;
+  hier->get_mutable_prior()->CopyFrom(prior);
+  Eigen::MatrixXd dataset(5, 4);
+  dataset << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+      20;
+  hier->set_dataset(&dataset);
+  hier->initialize();
 
-//   auto hier2 = hier->clone();
-//   hier2->add_datum(0, dataset.row(0), false);
-//   hier2->add_datum(1, dataset.row(1), false);
-//   hier2->sample_full_cond();
-//   bayesmix::AlgorithmState out;
-//   bayesmix::AlgorithmState::ClusterState* clusval =
-//   out.add_cluster_states(); bayesmix::AlgorithmState::ClusterState* clusval2
-//   = out.add_cluster_states(); hier->write_state_to_proto(clusval);
-//   hier2->write_state_to_proto(clusval2);
+  auto hier2 = hier->clone();
+  hier2->add_datum(0, dataset.row(0), false);
+  hier2->add_datum(1, dataset.row(1), false);
+  hier2->sample_full_cond();
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
+  hier->write_state_to_proto(clusval);
+  hier2->write_state_to_proto(clusval2);
 
-//   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
-// }
+  ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+}
