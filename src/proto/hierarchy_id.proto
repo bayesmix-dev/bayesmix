@@ -12,5 +12,5 @@ enum HierarchyId {
     LinRegUni = 3; // Linear Regression (univariate response)
     NNxIG = 4; // Normal - Normal x Inverse Gamma
     LapNIG = 5; // Laplace - Normal Inverse Gamma
-    // FA = 6; // Factor Analysers
+    FA = 6; // Factor Analysers
 }
