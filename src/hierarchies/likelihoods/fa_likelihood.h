@@ -31,13 +31,14 @@ class FALikelihood : public BaseLikelihood<FALikelihood, State::FA> {
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override;
 
- protected:
-  double compute_lpdf(const Eigen::RowVectorXd& datum) const override;
-  void update_sum_stats(const Eigen::RowVectorXd& datum, bool add) override;
   void compute_wood_factors(
       Eigen::MatrixXd& cov_wood, double& cov_logdet,
       const Eigen::MatrixXd& lambda,
       const Eigen::DiagonalMatrix<double, Eigen::Dynamic>& psi_inverse);
+
+ protected:
+  double compute_lpdf(const Eigen::RowVectorXd& datum) const override;
+  void update_sum_stats(const Eigen::RowVectorXd& datum, bool add) override;
 
   unsigned int dim;
   Eigen::VectorXd data_sum;
