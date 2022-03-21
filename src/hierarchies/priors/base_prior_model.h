@@ -74,13 +74,13 @@ class BasePriorModel : public AbstractPriorModel {
   }
 
   //! Returns an independent, data-less copy of this object
-  virtual std::shared_ptr<AbstractPriorModel> clone() const override;
+  std::shared_ptr<AbstractPriorModel> clone() const override;
 
   //! Returns an independent, data-less deep copy of this object
-  virtual std::shared_ptr<AbstractPriorModel> deep_clone() const override;
+  std::shared_ptr<AbstractPriorModel> deep_clone() const override;
 
   //! Returns a pointer to the Protobuf message of the prior of this cluster
-  virtual google::protobuf::Message *get_mutable_prior() override;
+  google::protobuf::Message *get_mutable_prior() override;
 
   //! Returns the struct of the current prior hyperparameters
   HyperParams get_hypers() const { return *hypers; }
