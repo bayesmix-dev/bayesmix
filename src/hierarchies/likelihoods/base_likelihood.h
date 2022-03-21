@@ -70,7 +70,7 @@ class BaseLikelihood : public AbstractLikelihood {
   ~BaseLikelihood() = default;
 
   //! Returns an independent, data-less copy of this object
-  virtual std::shared_ptr<AbstractLikelihood> clone() const override {
+  std::shared_ptr<AbstractLikelihood> clone() const override {
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
     out->clear_data();
     out->clear_summary_statistics();
@@ -113,9 +113,9 @@ class BaseLikelihood : public AbstractLikelihood {
   //! @param data        Grid of points (by row) which are to be evaluated
   //! @param covariates  (Optional) covariate vectors associated to data
   //! @return            The evaluation of the lpdf
-  virtual Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data,
-                                    const Eigen::MatrixXd &covariates =
-                                        Eigen::MatrixXd(0, 0)) const override;
+  Eigen::VectorXd lpdf_grid(const Eigen::MatrixXd &data,
+                            const Eigen::MatrixXd &covariates =
+                                Eigen::MatrixXd(0, 0)) const override;
 
   //! Returns the current cardinality of the cluster
   int get_card() const { return card; }
@@ -149,9 +149,12 @@ class BaseLikelihood : public AbstractLikelihood {
   }
 
   //! Sets the (pointer to) the dataset in the cluster
-  void set_dataset(const Eigen::MatrixXd *const dataset) {
+  void set_dataset(const Eigen::MatrixXd *const dataset) override {
     dataset_ptr = dataset;
   }
+
+  //! Returns the (pointer to) the dataset in the cluster
+  const Eigen::MatrixXd *get_dataset() const { return dataset_ptr; }
 
   //! Adds a datum and its index to the likelihood
   void add_datum(
