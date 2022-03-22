@@ -51,13 +51,14 @@
 
 class AbstractHierarchy {
  public:
-  //! Set the likelihood for the current hierarchy. Implemented in the
-  //! BaseHierarchy class
-  virtual void set_likelihood(std::shared_ptr<AbstractLikelihood> like_) = 0;
+  // Set the likelihood for the current hierarchy. Implemented in the
+  // BaseHierarchy class
+  // virtual void set_likelihood(std::shared_ptr<AbstractLikelihood> like_) =
+  // 0;
 
-  //! Set the prior model for the current hierarchy. Implemented in the
-  //! BaseHierarchy class
-  virtual void set_prior(std::shared_ptr<AbstractPriorModel> prior_) = 0;
+  // Set the prior model for the current hierarchy. Implemented in the
+  // BaseHierarchy class
+  // virtual void set_prior(std::shared_ptr<AbstractPriorModel> prior_) = 0;
 
   //! Set the update algorithm for the current hierarchy. Implemented in the
   //! BaseHierarchy class

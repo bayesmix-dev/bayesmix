@@ -65,17 +65,17 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Default destructor
   ~BaseHierarchy() = default;
 
-  //! Set the likelihood for the current hierarchy
-  void set_likelihood(std::shared_ptr<AbstractLikelihood> like_) override {
+  //! Sets the likelihood for the current hierarchy
+  void set_likelihood(std::shared_ptr<AbstractLikelihood> like_) /*override*/ {
     like = std::static_pointer_cast<Likelihood>(like_);
   }
 
-  //! Set the prior model for the current hierarchy
-  void set_prior(std::shared_ptr<AbstractPriorModel> prior_) override {
+  //! Sets the prior model for the current hierarchy
+  void set_prior(std::shared_ptr<AbstractPriorModel> prior_) /*override*/ {
     prior = std::static_pointer_cast<PriorModel>(prior_);
   }
 
-  //! Set the update algorithm for the current hierarchy
+  //! Sets the update algorithm for the current hierarchy
   void set_updater(std::shared_ptr<AbstractUpdater> updater_) override {
     updater = updater_;
   };
