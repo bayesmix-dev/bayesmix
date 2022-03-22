@@ -35,12 +35,13 @@ multi_ls_to_constrained(Eigen::Matrix<T, Eigen::Dynamic, 1> in) {
   return std::make_tuple(mean, prec);
 }
 
+// SEE GitHub for tests
 template <typename T>
 T multi_ls_log_det_jac(
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> prec_constrained) {
   T out = 0;
-  stan::math::positive_constrain(stan::math::cov_matrix_free(prec_constrained),
-                                 out);
+  stan::math::cov_matrix_constrain(
+      stan::math::cov_matrix_free(prec_constrained), out);
   return out;
 }
 
