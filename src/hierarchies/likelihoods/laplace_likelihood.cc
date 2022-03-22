@@ -5,18 +5,19 @@ double LaplaceLikelihood::compute_lpdf(const Eigen::RowVectorXd &datum) const {
       datum(0), state.mean, stan::math::sqrt(state.var / 2.0));
 }
 
-void LaplaceLikelihood::update_sum_stats(const Eigen::RowVectorXd &datum,
-                                         bool add) {
-  if (add) {
-    // sum_abs_diff_curr += std::abs(state.mean - datum(0, 0));
-    cluster_data_values.push_back(datum);
-  } else {
-    // sum_abs_diff_curr -= std::abs(state.mean - datum(0, 0));
-    auto it = std::find(cluster_data_values.begin(), cluster_data_values.end(),
-                        datum);
-    cluster_data_values.erase(it);
-  }
-}
+// void LaplaceLikelihood::update_sum_stats(const Eigen::RowVectorXd &datum,
+//                                          bool add) {
+//   if (add) {
+//     sum_abs_diff_curr += std::abs(state.mean - datum(0, 0));
+//     cluster_data_values.push_back(datum);
+//   } else {
+//     sum_abs_diff_curr -= std::abs(state.mean - datum(0, 0));
+//     auto it = std::find(cluster_data_values.begin(),
+//     cluster_data_values.end(),
+//                         datum);
+//     cluster_data_values.erase(it);
+//   }
+// }
 
 void LaplaceLikelihood::set_state_from_proto(
     const google::protobuf::Message &state_, bool update_card) {
@@ -34,11 +35,11 @@ LaplaceLikelihood::get_state_proto() const {
   return out;
 }
 
-void LaplaceLikelihood::clear_summary_statistics() {
-  cluster_data_values.clear();
-  // sum_abs_diff_curr = 0;
-  // sum_abs_diff_prop = 0;
-}
+// void LaplaceLikelihood::clear_summary_statistics() {
+//   cluster_data_values.clear();
+//   sum_abs_diff_curr = 0;
+//   sum_abs_diff_prop = 0;
+// }
 
 // double UniNormLikelihood::cluster_lpdf_from_unconstrained(
 //     Eigen::VectorXd unconstrained_params) {

@@ -20,18 +20,20 @@ class LaplaceLikelihood
   bool is_dependent() const override { return false; };
   void set_state_from_proto(const google::protobuf::Message &state_,
                             bool update_card = true) override;
-  void clear_summary_statistics() override;
+  void clear_summary_statistics() override { return; };
 
   template <typename T>
   T cluster_lpdf_from_unconstrained(
       const Eigen::Matrix<T, Eigen::Dynamic, 1> &unconstrained_params) const {
     assert(unconstrained_params.size() == 2);
+
     T mean = unconstrained_params(0);
     T var = stan::math::positive_constrain(unconstrained_params(1));
+
     T out = 0.;
-    for (auto it = cluster_data_values.begin();
-         it != cluster_data_values.end(); ++it) {
-      out += stan::math::double_exponential_lpdf(*it, mean,
+    for (auto it = cluster_data_idx.begin(); it != cluster_data_idx.end();
+         ++it) {
+      out += stan::math::double_exponential_lpdf(dataset_ptr->row(*it), mean,
                                                  stan::math::sqrt(var / 2.0));
     }
     return out;
@@ -42,11 +44,12 @@ class LaplaceLikelihood
 
  protected:
   double compute_lpdf(const Eigen::RowVectorXd &datum) const override;
-  void update_sum_stats(const Eigen::RowVectorXd &datum, bool add) override;
+  void update_sum_stats(const Eigen::RowVectorXd &datum, bool add) override {
+    return;
+  };
 
-  // TODO: ORA CHE HO IL DATASET QUESTO NON SERVE!
   //! Set of values of data points belonging to this cluster
-  std::list<Eigen::RowVectorXd> cluster_data_values;
+  // std::list<Eigen::RowVectorXd> cluster_data_values;
   //! Sum of absolute differences for current params
   // double sum_abs_diff_curr = 0;
   //! Sum of absolute differences for proposal params
