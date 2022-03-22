@@ -28,7 +28,7 @@ struct MNIG {
 struct FA {
   Eigen::VectorXd mutilde, beta;
   double phi, alpha0;
-  unsigned int card, q;
+  unsigned int /*card,*/ q;
 };
 
 }  // namespace Hyperparams

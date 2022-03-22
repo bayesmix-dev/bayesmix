@@ -40,7 +40,7 @@ class FAHierarchy
     State::FA state;
     state.mu = hypers.mutilde;
     state.psi = hypers.beta / (hypers.alpha0 + 1.);
-    state.eta = Eigen::MatrixXd::Zero(hypers.card, hypers.q);
+    // state.eta = Eigen::MatrixXd::Zero(hypers.card, hypers.q);
     state.lambda = Eigen::MatrixXd::Zero(dim, hypers.q);
     state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
     like->set_state(state);
