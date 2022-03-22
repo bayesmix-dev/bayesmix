@@ -92,13 +92,12 @@ class BaseLikelihood : public AbstractLikelihood {
         static_cast<const Derived &>(*this), unconstrained_params, 0);
   }
 
-  //! Evaluates the log likelihood over all the data in the cluster
-  //! given unconstrained parameter values.
-  //! By unconstrained parameters we mean that each entry of
-  //! the parameter vector can range over (-inf, inf).
-  //! Usually, some kind of transformation is required from the unconstrained
-  //! parameterization to the actual parameterization. This version using
-  //! `stan::math::var` type is required for Stan automatic aifferentiation.
+  //! This version using `stan::math::var` type is required for Stan automatic
+  //! differentiation. Evaluates the log likelihood over all the data in the
+  //! cluster given unconstrained parameter values. By unconstrained parameters
+  //! we mean that each entry of the parameter vector can range over (-inf,
+  //! inf). Usually, some kind of transformation is required from the
+  //! unconstrained parameterization to the actual parameterization.
   //! @param unconstrained_params vector collecting the unconstrained
   //! parameters
   //! @return The evaluation of the log likelihood over all data in the cluster
@@ -214,8 +213,9 @@ void BaseLikelihood<Derived, State>::add_datum(
     const int id, const Eigen::RowVectorXd &datum,
     const Eigen::RowVectorXd &covariate) {
   assert(cluster_data_idx.find(id) == cluster_data_idx.end());
-  card += 1;
-  log_card = std::log(card);
+  set_card(++card);
+  // card += 1;
+  // log_card = std::log(card);
   static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
                                                           true);
   cluster_data_idx.insert(id);
@@ -227,7 +227,7 @@ void BaseLikelihood<Derived, State>::remove_datum(
     const Eigen::RowVectorXd &covariate) {
   static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
                                                           false);
-  set_card(card - 1);
+  set_card(--card);
   auto it = cluster_data_idx.find(id);
   assert(it != cluster_data_idx.end());
   cluster_data_idx.erase(it);
