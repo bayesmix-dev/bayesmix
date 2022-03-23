@@ -57,12 +57,12 @@ class BasePriorModel : public AbstractPriorModel {
         static_cast<const Derived &>(*this), unconstrained_params, 0);
   }
 
-  //! Evaluates the log likelihood for unconstrained parameter values.
-  //! By unconstrained parameters we mean that each entry of
-  //! the parameter vector can range over (-inf, inf).
-  //! Usually, some kind of transformation is required from the unconstrained
-  //! parameterization to the actual parameterization. This version using
-  //! `stan::math::var` type is required for Stan automatic aifferentiation.
+  //! This version using `stan::math::var` type is required for Stan automatic
+  //! aifferentiation. Evaluates the log likelihood for unconstrained parameter
+  //! values. By unconstrained parameters we mean that each entry of the
+  //! parameter vector can range over (-inf, inf). Usually, some kind of
+  //! transformation is required from the unconstrained parameterization to the
+  //! actual parameterization.
   //! @param unconstrained_params vector collecting the unconstrained
   //! parameters
   //! @return The evaluation of the log likelihood of the prior model
@@ -86,12 +86,12 @@ class BasePriorModel : public AbstractPriorModel {
   HyperParams get_hypers() const { return *hypers; }
 
   //! Returns the struct of the current posterior hyperparameters
-  HyperParams get_posterior_hypers() const { return post_hypers; }
+  // HyperParams get_posterior_hypers() const { return post_hypers; }
 
   //! Updates the current value of the posterior hyperparameters
-  void set_posterior_hypers(const HyperParams &_post_hypers) {
-    post_hypers = _post_hypers;
-  };
+  // void set_posterior_hypers(const HyperParams &_post_hypers) {
+  //   post_hypers = _post_hypers;
+  // };
 
   //! Writes current values of the hyperparameters to a Protobuf message by
   //! pointer
@@ -136,7 +136,7 @@ class BasePriorModel : public AbstractPriorModel {
   std::shared_ptr<HyperParams> hypers = std::make_shared<HyperParams>();
 
   //! Container for posterior hyperparameters values
-  HyperParams post_hypers;
+  // HyperParams post_hypers;
 
   //! Pointer to a Protobuf prior object for this class
   std::shared_ptr<Prior> prior;

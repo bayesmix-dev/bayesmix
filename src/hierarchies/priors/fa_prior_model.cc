@@ -30,52 +30,86 @@ double FAPriorModel::lpdf(const google::protobuf::Message &state_) {
 }
 
 std::shared_ptr<google::protobuf::Message> FAPriorModel::sample(
-    bool use_post_hypers) {
+    bayesmix::AlgorithmState::HierarchyHypers hier_hypers) {
   // Random seed
   auto &rng = bayesmix::Rng::Instance().get();
 
-  // Select params to use
-  Hyperparams::FA params = use_post_hypers ? post_hypers : *hypers;
+  // Get params to use
+  auto params = hier_hypers.fa_state();
+  Eigen::VectorXd mutilde = bayesmix::to_eigen(params.mutilde());
+  Eigen::VectorXd beta = bayesmix::to_eigen(params.beta());
 
-  // HO AGGIUNTO PARAMS.CARD MA NON SO SE SIA LA SCELTA MIGLIORE!!!
   // Compute output state
   State::FA out;
-  out.mu = params.mutilde;
-  out.psi = params.beta / (params.alpha0 + 1.);
-  // out.eta = Eigen::MatrixXd::Zero(params.card, params.q);
-  out.lambda = Eigen::MatrixXd::Zero(dim, params.q);
+  out.mu = mutilde;
+  out.psi = beta / (params.alpha0() + 1.);
+  out.lambda = Eigen::MatrixXd::Zero(dim, params.q());
   for (size_t j = 0; j < dim; j++) {
-    out.mu[j] =
-        stan::math::normal_rng(params.mutilde[j], sqrt(params.phi), rng);
+    out.mu[j] = stan::math::normal_rng(mutilde[j], sqrt(params.phi()), rng);
 
-    out.psi[j] = stan::math::inv_gamma_rng(params.alpha0, params.beta[j], rng);
+    out.psi[j] = stan::math::inv_gamma_rng(params.alpha0(), beta[j], rng);
 
-    for (size_t i = 0; i < params.q; i++) {
+    for (size_t i = 0; i < params.q(); i++) {
       out.lambda(j, i) = stan::math::normal_rng(0, 1, rng);
     }
   }
-  // for (size_t i = 0; i < params.card; i++) {
-  //   for (size_t j = 0; j < params.q; j++) {
-  //     out.eta(i, j) = stan::math::normal_rng(0, 1, rng);
-  //   }
-  // }
-
-  // Questi conti non li passo al proto, attenzione !!!
-  // out.psi_inverse = out.psi.cwiseInverse().asDiagonal();
-  // compute_wood_factors(out.cov_wood, out.cov_logdet, out.lambda,
-  //                      out.psi_inverse);
 
   // Eigen2Proto conversion
   bayesmix::AlgorithmState::ClusterState state;
   bayesmix::to_proto(out.mu, state.mutable_fa_state()->mutable_mu());
   bayesmix::to_proto(out.psi, state.mutable_fa_state()->mutable_psi());
-  // bayesmix::to_proto(out.eta, state.mutable_fa_state()->mutable_eta());
   bayesmix::to_proto(out.lambda, state.mutable_fa_state()->mutable_lambda());
   return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
-
-  // MANCA PSI_INVERSE E GLI OUTPUT DA COMPUTE_WOOD_FACTORS !!! BISOGNA
-  // CAMBIARE IL PROTO
 }
+
+// std::shared_ptr<google::protobuf::Message> FAPriorModel::sample(
+//     bool use_post_hypers) {
+//   // Random seed
+//   auto &rng = bayesmix::Rng::Instance().get();
+
+//   // Select params to use
+//   Hyperparams::FA params = use_post_hypers ? post_hypers : *hypers;
+
+//   // Compute output state
+//   State::FA out;
+//   out.mu = params.mutilde;
+//   out.psi = params.beta / (params.alpha0 + 1.);
+//   // out.eta = Eigen::MatrixXd::Zero(params.card, params.q);
+//   out.lambda = Eigen::MatrixXd::Zero(dim, params.q);
+//   for (size_t j = 0; j < dim; j++) {
+//     out.mu[j] =
+//         stan::math::normal_rng(params.mutilde[j], sqrt(params.phi), rng);
+
+//     out.psi[j] = stan::math::inv_gamma_rng(params.alpha0, params.beta[j],
+//     rng);
+
+//     for (size_t i = 0; i < params.q; i++) {
+//       out.lambda(j, i) = stan::math::normal_rng(0, 1, rng);
+//     }
+//   }
+//   // for (size_t i = 0; i < params.card; i++) {
+//   //   for (size_t j = 0; j < params.q; j++) {
+//   //     out.eta(i, j) = stan::math::normal_rng(0, 1, rng);
+//   //   }
+//   // }
+
+//   // Questi conti non li passo al proto, attenzione !!!
+//   // out.psi_inverse = out.psi.cwiseInverse().asDiagonal();
+//   // compute_wood_factors(out.cov_wood, out.cov_logdet, out.lambda,
+//   //                      out.psi_inverse);
+
+//   // Eigen2Proto conversion
+//   bayesmix::AlgorithmState::ClusterState state;
+//   bayesmix::to_proto(out.mu, state.mutable_fa_state()->mutable_mu());
+//   bayesmix::to_proto(out.psi, state.mutable_fa_state()->mutable_psi());
+//   // bayesmix::to_proto(out.eta, state.mutable_fa_state()->mutable_eta());
+//   bayesmix::to_proto(out.lambda,
+//   state.mutable_fa_state()->mutable_lambda()); return
+//   std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
+
+//   // MANCA PSI_INVERSE E GLI OUTPUT DA COMPUTE_WOOD_FACTORS !!! BISOGNA
+//   // CAMBIARE IL PROTO
+// }
 
 void FAPriorModel::update_hypers(
     const std::vector<bayesmix::AlgorithmState::ClusterState> &states) {

@@ -12,24 +12,46 @@ double MNIGPriorModel::lpdf(const google::protobuf::Message &state_) {
 }
 
 std::shared_ptr<google::protobuf::Message> MNIGPriorModel::sample(
-    bool use_post_hypers) {
+    bayesmix::AlgorithmState::HierarchyHypers hier_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
-  Hyperparams::MNIG params = use_post_hypers ? post_hypers : *hypers;
 
-  double var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
-  Eigen::VectorXd regression_coeffs = stan::math::multi_normal_prec_rng(
-      params.mean, params.var_scaling / var, rng);
+  auto params = hier_hypers.lin_reg_uni_state();
+  Eigen::VectorXd mean = bayesmix::to_eigen(params.mean());
+  Eigen::MatrixXd var_scaling = bayesmix::to_eigen(params.var_scaling());
+
+  double var = stan::math::inv_gamma_rng(params.shape(), params.scale(), rng);
+  Eigen::VectorXd regression_coeffs =
+      stan::math::multi_normal_prec_rng(mean, var_scaling / var, rng);
 
   bayesmix::AlgorithmState::ClusterState state;
-  // bayesmix::Vector regression_coeffs_proto;
   bayesmix::to_proto(
       regression_coeffs,
       state.mutable_lin_reg_uni_ls_state()->mutable_regression_coeffs());
-  // state.mutable_lin_reg_uni_ls_state()->mutable_regression_coeffs()->CopyFrom(regression_coeffs_proto);
   state.mutable_lin_reg_uni_ls_state()->set_var(var);
 
   return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
 }
+
+// std::shared_ptr<google::protobuf::Message> MNIGPriorModel::sample(
+//     bool use_post_hypers) {
+//   auto &rng = bayesmix::Rng::Instance().get();
+//   Hyperparams::MNIG params = use_post_hypers ? post_hypers : *hypers;
+
+//   double var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
+//   Eigen::VectorXd regression_coeffs = stan::math::multi_normal_prec_rng(
+//       params.mean, params.var_scaling / var, rng);
+
+//   bayesmix::AlgorithmState::ClusterState state;
+//   // bayesmix::Vector regression_coeffs_proto;
+//   bayesmix::to_proto(
+//       regression_coeffs,
+//       state.mutable_lin_reg_uni_ls_state()->mutable_regression_coeffs());
+//   //
+//   state.mutable_lin_reg_uni_ls_state()->mutable_regression_coeffs()->CopyFrom(regression_coeffs_proto);
+//   state.mutable_lin_reg_uni_ls_state()->set_var(var);
+
+//   return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
+// }
 
 void MNIGPriorModel::update_hypers(
     const std::vector<bayesmix::AlgorithmState::ClusterState> &states) {

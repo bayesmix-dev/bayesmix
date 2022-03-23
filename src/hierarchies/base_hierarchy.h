@@ -43,6 +43,7 @@ class BaseHierarchy : public AbstractHierarchy {
 
  public:
   using HyperParams = decltype(prior->get_hypers());
+  using ProtoHypers = AbstractUpdater::ProtoHypers;
 
   //! Constructor that allows the specification of Likelihood, PriorModel and
   //! Updater for a given Hierarchy
@@ -149,12 +150,12 @@ class BaseHierarchy : public AbstractHierarchy {
   // ADD EXCEPTION HANDLING
   //! Public wrapper for `marg_lpdf()` methods
   double get_marg_lpdf(
-      const HyperParams &params, const Eigen::RowVectorXd &datum,
+      const ProtoHypers &hier_params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
     if (this->is_dependent()) {
-      return marg_lpdf(params, datum, covariate);
+      return marg_lpdf(hier_params, datum, covariate);
     } else {
-      return marg_lpdf(params, datum);
+      return marg_lpdf(hier_params, datum);
     }
   }
 
@@ -166,7 +167,7 @@ class BaseHierarchy : public AbstractHierarchy {
   double prior_pred_lpdf(const Eigen::RowVectorXd &datum,
                          const Eigen::RowVectorXd &covariate =
                              Eigen::RowVectorXd(0)) const override {
-    return get_marg_lpdf(prior->get_hypers(), datum, covariate);
+    return get_marg_lpdf(*(prior->get_hypers_proto()), datum, covariate);
   }
 
   // ADD EXCEPTION HANDLING
@@ -209,7 +210,8 @@ class BaseHierarchy : public AbstractHierarchy {
   double conditional_pred_lpdf(const Eigen::RowVectorXd &datum,
                                const Eigen::RowVectorXd &covariate =
                                    Eigen::RowVectorXd(0)) const override {
-    return get_marg_lpdf(prior->get_posterior_hypers(), datum, covariate);
+    return get_marg_lpdf(updater->compute_posterior_hypers(*like, *prior),
+                         datum, covariate);
   }
 
   // ADD EXCEPTION HANDLING
@@ -246,7 +248,8 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Generates new state values from the centering prior distribution
   void sample_prior() override {
-    like->set_state_from_proto(*prior->sample(false), false);
+    auto hypers = prior->get_hypers_proto();
+    like->set_state_from_proto(*prior->sample(*hypers), false);
   };
 
   //! Generates new state values from the centering posterior distribution
@@ -344,7 +347,10 @@ class BaseHierarchy : public AbstractHierarchy {
       const bool update_params = false,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
     like->add_datum(id, datum, covariate);
-    if (update_params) updater->compute_posterior_hypers(*like, *prior);
+    if (update_params) {
+      updater->save_posterior_hypers(
+          updater->compute_posterior_hypers(*like, *prior));
+    }
   };
 
   //! Removes a datum and its index from the hierarchy
@@ -353,13 +359,18 @@ class BaseHierarchy : public AbstractHierarchy {
       const bool update_params = false,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
     like->remove_datum(id, datum, covariate);
-    if (update_params) updater->compute_posterior_hypers(*like, *prior);
+    if (update_params) {
+      updater->save_posterior_hypers(
+          updater->compute_posterior_hypers(*like, *prior));
+    }
   };
 
   //! Main function that initializes members to appropriate values
   void initialize() override {
     prior->initialize();
-    if (is_conjugate()) prior->set_posterior_hypers(prior->get_hypers());
+    if (is_conjugate()) {
+      updater->save_posterior_hypers(*prior->get_hypers_proto());
+    }
     initialize_state();
     like->clear_data();
     like->clear_summary_statistics();
@@ -388,7 +399,7 @@ class BaseHierarchy : public AbstractHierarchy {
   //! @param params     Container of (prior or posterior) hyperparameter values
   //! @param datum      Point which is to be evaluated
   //! @return           The evaluation of the lpdf
-  virtual double marg_lpdf(const HyperParams &params,
+  virtual double marg_lpdf(const ProtoHypers &hier_params,
                            const Eigen::RowVectorXd &datum) const {
     if (!is_conjugate()) {
       throw std::runtime_error(
@@ -405,7 +416,7 @@ class BaseHierarchy : public AbstractHierarchy {
   //! @param datum      Point which is to be evaluated
   //! @param covariate  Covariate vector associated to datum
   //! @return           The evaluation of the lpdf
-  virtual double marg_lpdf(const HyperParams &params,
+  virtual double marg_lpdf(const ProtoHypers &hier_params,
                            const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const {
     if (!is_conjugate()) {

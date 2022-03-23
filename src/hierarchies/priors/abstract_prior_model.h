@@ -63,8 +63,11 @@ class AbstractPriorModel {
   //! @param use_post_hypers It is a `bool` which decides whether to use prior
   //! or posterior parameters
   //! @return A Protobuf message storing the state sampled from the prior model
+  // virtual std::shared_ptr<google::protobuf::Message> sample(
+  //   bool use_post_hypers) = 0;
+
   virtual std::shared_ptr<google::protobuf::Message> sample(
-      bool use_post_hypers) = 0;
+      bayesmix::AlgorithmState::HierarchyHypers hier_hypers) = 0;
 
   //! Updates hyperparameter values given a vector of cluster states
   virtual void update_hypers(
@@ -81,7 +84,6 @@ class AbstractPriorModel {
   //! pointer. Implemented in BasePriorModel
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
 
- protected:
   //! Writes current value of hyperparameters to a Protobuf message and
   //! return a shared_ptr.
   //! New hierarchies have to first modify the field 'oneof val' in the
@@ -89,6 +91,7 @@ class AbstractPriorModel {
   virtual std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
   get_hypers_proto() const = 0;
 
+ protected:
   //! Initializes hierarchy hyperparameters to appropriate values
   virtual void initialize_hypers() = 0;
 };

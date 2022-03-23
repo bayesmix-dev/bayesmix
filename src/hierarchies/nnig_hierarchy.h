@@ -41,12 +41,13 @@ class NNIGHierarchy
     like->set_state(state);
   };
 
-  double marg_lpdf(const HyperParams &params,
+  double marg_lpdf(const ProtoHypers &hier_params,
                    const Eigen::RowVectorXd &datum) const override {
-    double sig_n = sqrt(params.scale * (params.var_scaling + 1) /
-                        (params.shape * params.var_scaling));
-    return stan::math::student_t_lpdf(datum(0), 2 * params.shape, params.mean,
-                                      sig_n);
+    auto params = hier_params.nnig_state();
+    double sig_n = sqrt(params.scale() * (params.var_scaling() + 1) /
+                        (params.shape() * params.var_scaling()));
+    return stan::math::student_t_lpdf(datum(0), 2 * params.shape(),
+                                      params.mean(), sig_n);
   }
 };
 

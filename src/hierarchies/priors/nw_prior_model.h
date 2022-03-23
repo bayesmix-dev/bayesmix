@@ -24,7 +24,10 @@ class NWPriorModel : public BasePriorModel<NWPriorModel, Hyperparams::NW,
   double lpdf(const google::protobuf::Message &state_) override;
 
   std::shared_ptr<google::protobuf::Message> sample(
-      bool use_post_hypers) override;
+      bayesmix::AlgorithmState::HierarchyHypers hier_hypers) override;
+
+  // std::shared_ptr<google::protobuf::Message> sample(
+  //     bool use_post_hypers) override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;
@@ -36,10 +39,10 @@ class NWPriorModel : public BasePriorModel<NWPriorModel, Hyperparams::NW,
 
   unsigned int get_dim() const { return dim; };
 
- protected:
   std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
       const override;
 
+ protected:
   void initialize_hypers() override;
 
   unsigned int dim;

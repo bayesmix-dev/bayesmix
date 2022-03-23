@@ -7,6 +7,9 @@
 
 class AbstractUpdater {
  public:
+  // Type alias
+  using ProtoHypers = bayesmix::AlgorithmState::HierarchyHypers;
+
   //! Default destructor
   virtual ~AbstractUpdater() = default;
 
@@ -23,10 +26,16 @@ class AbstractUpdater {
 
   //! Computes the posterior hyperparameters required for the sampling in case
   //! of conjugate hierarchies
-  virtual void compute_posterior_hypers(AbstractLikelihood &like,
-                                        AbstractPriorModel &prior) {
-    throw std::runtime_error(
-        "compute_posterior_hypers() not implemented for this updater");
+  virtual ProtoHypers compute_posterior_hypers(AbstractLikelihood &like,
+                                               AbstractPriorModel &prior) {
+    throw(std::runtime_error(
+        "compute_posterior_hypers() not implemented for this updater"));
+  }
+
+  //! Stores the posterior hyperparameters in an appropriate container
+  virtual void save_posterior_hypers(const ProtoHypers &post_hypers_) {
+    throw(std::runtime_error(
+        "save_posterior_hypers() not implemented for this updater"));
   }
 };
 

@@ -44,14 +44,22 @@ class LinRegUniHierarchy
     like->set_state(state);
   };
 
-  double marg_lpdf(const HyperParams &params, const Eigen::RowVectorXd &datum,
+  double marg_lpdf(const ProtoHypers &hier_params,
+                   const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override {
-    double sig_n = sqrt(
-        (1 + (covariate * params.var_scaling_inv * covariate.transpose())(0)) *
-        params.scale / params.shape);
-    return stan::math::student_t_lpdf(datum(0), 2 * params.shape,
-                                      covariate.dot(params.mean), sig_n);
-  }
+    auto params = hier_params.lin_reg_uni_state();
+    Eigen::VectorXd mean = bayesmix::to_eigen(params.mean());
+    Eigen::MatrixXd var_scaling = bayesmix::to_eigen(params.var_scaling());
+
+    auto I = Eigen::MatrixXd::Identity(prior->get_dim(), prior->get_dim());
+    Eigen::MatrixXd var_scaling_inv = var_scaling.llt().solve(I);
+
+    double sig_n =
+        sqrt((1 + (covariate * var_scaling_inv * covariate.transpose())(0)) *
+             params.scale() / params.shape());
+    return stan::math::student_t_lpdf(datum(0), 2 * params.shape(),
+                                      covariate.dot(mean), sig_n);
+  };
 };
 
 #endif  // BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_H_

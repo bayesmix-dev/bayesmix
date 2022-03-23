@@ -23,8 +23,11 @@ class NxIGPriorModel : public BasePriorModel<NxIGPriorModel, Hyperparams::NxIG,
 
   double lpdf(const google::protobuf::Message &state_) override;
 
+  // std::shared_ptr<google::protobuf::Message> sample(
+  //     bool use_post_hypers) override;
+
   std::shared_ptr<google::protobuf::Message> sample(
-      bool use_post_hypers) override;
+      bayesmix::AlgorithmState::HierarchyHypers hier_hypers) override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;
@@ -32,10 +35,10 @@ class NxIGPriorModel : public BasePriorModel<NxIGPriorModel, Hyperparams::NxIG,
   void set_hypers_from_proto(
       const google::protobuf::Message &hypers_) override;
 
- protected:
   std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
       const override;
 
+ protected:
   void initialize_hypers() override;
 };
 

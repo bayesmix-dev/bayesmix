@@ -44,9 +44,9 @@ class NNWHierarchy
     like->set_state(state);
   };
 
-  double marg_lpdf(const HyperParams &params,
+  double marg_lpdf(const ProtoHypers &hier_params,
                    const Eigen::RowVectorXd &datum) const override {
-    HyperParams pred_params = get_predictive_t_parameters(params);
+    HyperParams pred_params = get_predictive_t_parameters(hier_params);
     Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
     double logdet = 2 * log(diag.array()).sum();
     return bayesmix::multi_student_t_invscale_lpdf(
@@ -54,15 +54,21 @@ class NNWHierarchy
         logdet);
   }
 
-  HyperParams get_predictive_t_parameters(const HyperParams &params) const {
+  HyperParams get_predictive_t_parameters(
+      const ProtoHypers &hier_params) const {
+    auto params = hier_params.nnw_state();
     // Compute dof and scale of marginal distribution
     unsigned int dim = like->get_dim();
-    double nu_n = params.deg_free - dim + 1;
-    double coeff = (params.var_scaling + 1) / (params.var_scaling * nu_n);
-    Eigen::MatrixXd scale_chol_n = params.scale_chol / std::sqrt(coeff);
+    double nu_n = params.deg_free() - dim + 1;
+    double coeff = (params.var_scaling() + 1) / (params.var_scaling() * nu_n);
+    // Eigen::MatrixXd scale = bayesmix::to_eigen(params.scale());
+    Eigen::MatrixXd scale_chol =
+        Eigen::LLT<Eigen::MatrixXd>(bayesmix::to_eigen(params.scale()))
+            .matrixU();
+    Eigen::MatrixXd scale_chol_n = scale_chol / std::sqrt(coeff);
     // Return predictive t parameters
     HyperParams out;
-    out.mean = params.mean;
+    out.mean = bayesmix::to_eigen(params.mean());
     out.deg_free = nu_n;
     out.scale_chol = scale_chol_n;
     return out;

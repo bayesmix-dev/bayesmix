@@ -111,7 +111,6 @@ TEST(nig_prior_model, normal_mean_prior) {
 TEST(nig_prior_model, sample) {
   // Instance
   auto prior = std::make_shared<NIGPriorModel>();
-  bool use_post_hypers = true;
 
   // Define prior hypers
   bayesmix::AlgorithmState::HierarchyHypers hypers_proto;
@@ -122,8 +121,8 @@ TEST(nig_prior_model, sample) {
 
   // Set hypers and get sampled state as proto
   prior->set_hypers_from_proto(hypers_proto);
-  auto state1 = prior->sample(!use_post_hypers);
-  auto state2 = prior->sample(!use_post_hypers);
+  auto state1 = prior->sample(*prior->get_hypers_proto());
+  auto state2 = prior->sample(*prior->get_hypers_proto());
 
   // Check if they coincides
   ASSERT_TRUE(state1->DebugString() != state2->DebugString());
@@ -193,7 +192,7 @@ TEST(nxig_prior_model, fixed_values_prior) {
 TEST(nxig_prior_model, sample) {
   // Instance
   auto prior = std::make_shared<NxIGPriorModel>();
-  bool use_post_hypers = true;
+  // bool use_post_hypers = true;
 
   // Define prior hypers
   bayesmix::AlgorithmState::HierarchyHypers hypers_proto;
@@ -204,8 +203,8 @@ TEST(nxig_prior_model, sample) {
 
   // Set hypers and get sampled state as proto
   prior->set_hypers_from_proto(hypers_proto);
-  auto state1 = prior->sample(!use_post_hypers);
-  auto state2 = prior->sample(!use_post_hypers);
+  auto state1 = prior->sample(*prior->get_hypers_proto());
+  auto state2 = prior->sample(*prior->get_hypers_proto());
 
   // Check if they coincides
   ASSERT_TRUE(state1->DebugString() != state2->DebugString());
@@ -364,7 +363,7 @@ TEST(nw_prior_model, normal_mean_prior) {
 TEST(nw_prior_model, sample) {
   // Instance
   auto prior = std::make_shared<NWPriorModel>();
-  bool use_post_hypers = true;
+  // bool use_post_hypers = true;
 
   // Define prior hypers
   bayesmix::AlgorithmState::HierarchyHypers hypers_proto;
@@ -379,8 +378,8 @@ TEST(nw_prior_model, sample) {
 
   // Set hypers and get sampled state as proto
   prior->set_hypers_from_proto(hypers_proto);
-  auto state1 = prior->sample(!use_post_hypers);
-  auto state2 = prior->sample(!use_post_hypers);
+  auto state1 = prior->sample(*prior->get_hypers_proto());
+  auto state2 = prior->sample(*prior->get_hypers_proto());
 
   // Check if they coincides
   ASSERT_TRUE(state1->DebugString() != state2->DebugString());
@@ -455,7 +454,7 @@ TEST(mnig_prior_model, fixed_values_prior) {
 TEST(mnig_prior_model, sample) {
   // Instance
   auto prior = std::make_shared<MNIGPriorModel>();
-  bool use_post_hypers = true;
+  // bool use_post_hypers = true;
 
   // Define prior hypers
   bayesmix::AlgorithmState::HierarchyHypers hypers_proto;
@@ -471,8 +470,8 @@ TEST(mnig_prior_model, sample) {
 
   // Set hypers and get sampled state as proto
   prior->set_hypers_from_proto(hypers_proto);
-  auto state1 = prior->sample(!use_post_hypers);
-  auto state2 = prior->sample(!use_post_hypers);
+  auto state1 = prior->sample(*prior->get_hypers_proto());
+  auto state2 = prior->sample(*prior->get_hypers_proto());
 
   // Check if they coincides
   ASSERT_TRUE(state1->DebugString() != state2->DebugString());

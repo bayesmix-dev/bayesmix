@@ -10,8 +10,8 @@ void FAUpdater::draw(AbstractLikelihood& like, AbstractPriorModel& prior,
   // Sample from the full conditional of the fa hierarchy
   bool set_card = true, use_post_hypers = true;
   if (likecast.get_card() == 0) {
-    likecast.set_state_from_proto(*priorcast.sample(!use_post_hypers),
-                                  !set_card);
+    auto prior_params = *(priorcast.get_hypers_proto());
+    likecast.set_state_from_proto(*priorcast.sample(prior_params), !set_card);
   } else {
     // Get state and hypers
     State::FA new_state = likecast.get_state();
@@ -19,10 +19,9 @@ void FAUpdater::draw(AbstractLikelihood& like, AbstractPriorModel& prior,
     // Gibbs update
     sample_eta(new_state, hypers, likecast);
     sample_mu(new_state, hypers, likecast);
-    // sample_psi(new_state, hypers, likecast.get_dataset(),
-    // likecast.get_data_idx(), priorcast.get_dim()); sample_lambda(new_state,
-    // hypers, likecast.get_dataset(), likecast.get_data_idx(),
-    // priorcast.get_dim()); Eigen2Proto conversion
+    sample_psi(new_state, hypers, likecast);
+    sample_lambda(new_state, hypers, likecast);
+    // Eigen2Proto conversion
     bayesmix::AlgorithmState::ClusterState new_state_proto;
     bayesmix::to_proto(new_state.eta,
                        new_state_proto.mutable_fa_state()->mutable_eta());
@@ -45,13 +44,11 @@ void FAUpdater::sample_eta(State::FA& state, const Hyperparams::FA& hypers,
   auto cluster_data_idx = like.get_data_idx();
   unsigned int card = like.get_card();
   // eta update
+  state.eta = Eigen::MatrixXd::Zero(card, hypers.q);
   auto sigma_eta_inv_llt =
       (Eigen::MatrixXd::Identity(hypers.q, hypers.q) +
        state.lambda.transpose() * state.psi_inverse * state.lambda)
           .llt();
-  if (state.eta.rows() != card) {
-    state.eta = Eigen::MatrixXd::Zero(card, state.eta.cols());
-  }
   Eigen::MatrixXd temp_product(
       sigma_eta_inv_llt.solve(state.lambda.transpose() * state.psi_inverse));
   auto iterator = cluster_data_idx.begin();

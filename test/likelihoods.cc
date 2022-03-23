@@ -371,8 +371,8 @@ TEST(laplace_likelihood, eval_lpdf_unconstrained) {
   clust_state_.mutable_uni_ls_state()->CopyFrom(state_);
   like->set_state_from_proto(clust_state_);
 
-  // Add new datum to likelihood
-  Eigen::VectorXd data(3);
+  // Add new data to likelihood
+  Eigen::MatrixXd data(3, 1);
   data << 4.5, 5.1, 2.5;
   double lpdf = 0.0;
   for (int i = 0; i < data.size(); ++i) {
@@ -380,6 +380,7 @@ TEST(laplace_likelihood, eval_lpdf_unconstrained) {
     lpdf += like->lpdf(data.row(i));
   }
 
+  like->set_dataset(&data);  // Questa cosa è sempre garantita??
   double clus_lpdf =
       like->cluster_lpdf_from_unconstrained(unconstrained_params);
   ASSERT_DOUBLE_EQ(lpdf, clus_lpdf);
