@@ -81,7 +81,7 @@ class AbstractHierarchy {
   virtual double get_like_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    if (is_dependent()) {
+    if (is_dependent() and covariate.size() != 0) {
       return like_lpdf(datum, covariate);
     } else {
       return like_lpdf(datum);
