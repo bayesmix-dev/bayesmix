@@ -21,12 +21,10 @@ class AbstractPriorModel {
   //! Default destructor
   virtual ~AbstractPriorModel() = default;
 
-  //! Returns an independent, data-less copy of this object. Implemented in
-  //! BasePriorModel
+  //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractPriorModel> clone() const = 0;
 
-  //! Returns an independent, data-less deep copy of this object. Implemented
-  //! in BasePriorModel
+  //! Returns an independent, data-less deep copy of this object
   virtual std::shared_ptr<AbstractPriorModel> deep_clone() const = 0;
 
   //! Evaluates the log likelihood for the prior model, given the state of the
@@ -65,8 +63,10 @@ class AbstractPriorModel {
   }
 
   //! Sampling from the prior model
-  //! @param use_post_hypers It is a `bool` which decides whether to use prior
-  //! or posterior parameters
+  //! @param hier_hypers A pointer to a
+  //! `bayesmix::AlgorithmState::hierarchyHypers` object, which defines the
+  //! parameters to use for the sampling. The default behaviour (i.e.
+  //! `hier_hypers = nullptr`) uses prior hyperparameters
   //! @return A Protobuf message storing the state sampled from the prior model
   // virtual std::shared_ptr<google::protobuf::Message> sample(
   //   bool use_post_hypers) = 0;
@@ -86,7 +86,7 @@ class AbstractPriorModel {
       const google::protobuf::Message &state_) = 0;
 
   //! Writes current values of the hyperparameters to a Protobuf message by
-  //! pointer. Implemented in BasePriorModel
+  //! pointer
   virtual void write_hypers_to_proto(google::protobuf::Message *out) const = 0;
 
   //! Writes current value of hyperparameters to a Protobuf message and

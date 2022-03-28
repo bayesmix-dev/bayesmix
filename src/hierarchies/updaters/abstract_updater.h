@@ -3,7 +3,6 @@
 
 #include "src/hierarchies/likelihoods/abstract_likelihood.h"
 #include "src/hierarchies/priors/abstract_prior_model.h"
-// #include "src/hierarchies/updaters/target_lpdf_unconstrained.h"
 
 class AbstractUpdater {
  public:

@@ -14,8 +14,7 @@ class AbstractLikelihood {
   //! Default destructor
   virtual ~AbstractLikelihood() = default;
 
-  //! Returns an independent, data-less copy of this object. Implemented in
-  //! BaseLikelihood
+  //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractLikelihood> clone() const = 0;
 
   //! Public wrapper for `compute_lpdf()` methods
@@ -45,13 +44,12 @@ class AbstractLikelihood {
         "likelihood");
   }
 
-  //! Evaluates the log likelihood over all the data in the cluster
-  //! given unconstrained parameter values.
-  //! By unconstrained parameters we mean that each entry of
-  //! the parameter vector can range over (-inf, inf).
-  //! Usually, some kind of transformation is required from the unconstrained
-  //! parameterization to the actual parameterization. This version using
-  //! `stan::math::var` type is required for Stan automatic aifferentiation.
+  //! This version using `stan::math::var` type is required for Stan automatic
+  //! differentiation. Evaluates the log likelihood over all the data in the
+  //! cluster given unconstrained parameter values. By unconstrained parameters
+  //! we mean that each entry of the parameter vector can range over (-inf,
+  //! inf). Usually, some kind of transformation is required from the
+  //! unconstrained parameterization to the actual parameterization.
   //! @param unconstrained_params vector collecting the unconstrained
   //! parameters
   //! @return The evaluation of the log likelihood over all data in the cluster
@@ -85,21 +83,18 @@ class AbstractLikelihood {
   virtual void set_state_from_unconstrained(
       const Eigen::VectorXd &unconstrained_state) = 0;
 
-  //! Writes current state to a Protobuf message by pointer. Implemented in
-  //! BaseLikelihood
+  //! Writes current state to a Protobuf message by pointer
   virtual void write_state_to_proto(google::protobuf::Message *out) const = 0;
 
   //! Sets the (pointer to) the dataset in the cluster
   virtual void set_dataset(const Eigen::MatrixXd *const dataset) = 0;
 
-  //! Adds a datum and its index to the likelihood. Implemented in
-  //! BaseLikelihood
+  //! Adds a datum and its index to the likelihood
   virtual void add_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;
 
-  //! Removes a datum and its index from the likelihood. Implemented in
-  //! BaseLikelihood
+  //! Removes a datum and its index from the likelihood
   virtual void remove_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) = 0;

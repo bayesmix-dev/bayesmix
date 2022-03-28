@@ -15,9 +15,6 @@ class NNIGUpdater
 
   ProtoHypersPtr compute_posterior_hypers(AbstractLikelihood &like,
                                           AbstractPriorModel &prior) override;
-
-  // void compute_posterior_hypers(AbstractLikelihood& like,
-  //                               AbstractPriorModel& prior) override;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_UPDATERS_NNIG_UPDATER_H_

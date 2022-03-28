@@ -47,13 +47,6 @@ class LaplaceLikelihood
   void update_sum_stats(const Eigen::RowVectorXd &datum, bool add) override {
     return;
   };
-
-  //! Set of values of data points belonging to this cluster
-  // std::list<Eigen::RowVectorXd> cluster_data_values;
-  //! Sum of absolute differences for current params
-  // double sum_abs_diff_curr = 0;
-  //! Sum of absolute differences for proposal params
-  // double sum_abs_diff_prop = 0;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_LIKELIHOODS_LAPLACE_LIKELIHOOD_H_

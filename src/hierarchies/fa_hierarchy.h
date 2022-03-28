@@ -1,21 +1,11 @@
 #ifndef BAYESMIX_HIERARCHIES_FA_HIERARCHY_H_
 #define BAYESMIX_HIERARCHIES_FA_HIERARCHY_H_
 
-// #include <google/protobuf/stubs/casts.h>
-
-// #include <Eigen/Dense>
-// #include <memory>
-// #include <vector>
-
-// #include "algorithm_state.pb.h"
-// #include "conjugate_hierarchy.h"
-#include "hierarchy_id.pb.h"
-#include "src/utils/distributions.h"
-// #include "hierarchy_prior.pb.h"
-
 #include "base_hierarchy.h"
+#include "hierarchy_id.pb.h"
 #include "likelihoods/fa_likelihood.h"
 #include "priors/fa_prior_model.h"
+#include "src/utils/distributions.h"
 #include "updaters/fa_updater.h"
 
 class FAHierarchy
@@ -40,7 +30,6 @@ class FAHierarchy
     State::FA state;
     state.mu = hypers.mutilde;
     state.psi = hypers.beta / (hypers.alpha0 + 1.);
-    // state.eta = Eigen::MatrixXd::Zero(hypers.card, hypers.q);
     state.lambda = Eigen::MatrixXd::Zero(dim, hypers.q);
     state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
     like->set_state(state);

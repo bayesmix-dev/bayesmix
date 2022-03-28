@@ -1,13 +1,10 @@
 #ifndef BAYESMIX_HIERARCHIES_PRIORS_FA_PRIOR_MODEL_H_
 #define BAYESMIX_HIERARCHIES_PRIORS_FA_PRIOR_MODEL_H_
 
-// #include <google/protobuf/stubs/casts.h>
-
 #include <memory>
 #include <stan/math/rev.hpp>
 #include <vector>
 
-// #include "algorithm_state.pb.h"
 #include "base_prior_model.h"
 #include "hierarchy_prior.pb.h"
 #include "hyperparams.h"
@@ -26,9 +23,6 @@ class FAPriorModel
 
   std::shared_ptr<google::protobuf::Message> sample(
       ProtoHypersPtr hier_hypers = nullptr) override;
-
-  // std::shared_ptr<google::protobuf::Message> sample(
-  //     bool use_post_hypers) override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;

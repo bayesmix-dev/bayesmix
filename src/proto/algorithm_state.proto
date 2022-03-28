@@ -43,7 +43,6 @@ message AlgorithmState {
       NWDistribution nnw_state = 3;
       MultiNormalIGDistribution lin_reg_uni_state = 4;
       NxIGDistribution nnxig_state = 5;
-      // LapNIGState lapnig_state = 6;
       FAPriorDistribution fa_state = 7;
     }
   }

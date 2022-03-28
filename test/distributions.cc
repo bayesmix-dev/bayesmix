@@ -89,7 +89,6 @@ TEST(student_t, optimized) {
   Eigen::VectorXd x = Eigen::VectorXd::Ones(5);
 
   double lpdf_stan = stan::math::multi_student_t_lpdf(x, df, mean, sigma);
-  // std::cout << "lpdf_stan: " << lpdf_stan << std::endl;
 
   Eigen::MatrixXd sigma_inv = stan::math::inverse_spd(sigma);
   Eigen::MatrixXd sigma_inv_chol =
@@ -99,8 +98,6 @@ TEST(student_t, optimized) {
 
   double our_lpdf = bayesmix::multi_student_t_invscale_lpdf(
       x, df, mean, sigma_inv_chol, logdet);
-
-  // std::cout << "our_lpdf: " << our_lpdf << std::endl;
 
   ASSERT_LE(std::abs(our_lpdf - lpdf_stan), 0.001);
 }

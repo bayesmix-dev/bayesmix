@@ -1,18 +1,8 @@
 #ifndef BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_H_
 #define BAYESMIX_HIERARCHIES_LIN_REG_UNI_HIERARCHY_H_
 
-// #include <google/protobuf/stubs/casts.h>
-
-// #include <stan/math/rev.hpp>
-// #include <memory>
-// #include <vector>
-
-// #include "algorithm_state.pb.h"
-// #include "conjugate_hierarchy.h"
-#include "hierarchy_id.pb.h"
-// #include "hierarchy_prior.pb.h"
-
 #include "base_hierarchy.h"
+#include "hierarchy_id.pb.h"
 #include "likelihoods/uni_lin_reg_likelihood.h"
 #include "priors/mnig_prior_model.h"
 #include "updaters/mnig_updater.h"

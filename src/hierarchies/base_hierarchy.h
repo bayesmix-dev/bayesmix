@@ -6,7 +6,6 @@
 #include <memory>
 #include <random>
 #include <set>
-// #include <stan/math/prim.hpp>
 #include <stan/math/rev.hpp>
 
 #include "abstract_hierarchy.h"
@@ -225,8 +224,7 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Generates new state values from the centering prior distribution
   void sample_prior() override {
-    // auto hypers = prior->get_hypers_proto();
-    like->set_state_from_proto(*prior->sample(/*hypers*/), false);
+    like->set_state_from_proto(*prior->sample(), false);
   };
 
   //! Generates new state values from the centering posterior distribution
@@ -403,28 +401,5 @@ class BaseHierarchy : public AbstractHierarchy {
     }
   }
 };
-
-// OLD STUFF
-//! Returns an independent, data-less copy of this object
-// std::shared_ptr<AbstractHierarchy> deep_clone() const override {
-//   auto out = std::make_shared<Derived>(static_cast<Derived const
-//   &>(*this));
-
-//   out->clear_data();
-//   out->clear_summary_statistics();
-
-//   out->create_empty_prior();
-//   std::shared_ptr<google::protobuf::Message> new_prior(prior->New());
-//   new_prior->CopyFrom(*prior.get());
-//   out->get_mutable_prior()->CopyFrom(*new_prior.get());
-
-//   out->create_empty_hypers();
-//   auto curr_hypers_proto = get_hypers_proto();
-//   out->set_hypers_from_proto(*curr_hypers_proto.get());
-//   out->initialize();
-//   return out;
-// }
-
-// TODO: Move definitions outside the class to improve code cleaness
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

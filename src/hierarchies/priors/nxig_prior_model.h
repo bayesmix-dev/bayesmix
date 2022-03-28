@@ -1,15 +1,11 @@
 #ifndef BAYESMIX_HIERARCHIES_PRIORS_NXIG_PRIOR_MODEL_H_
 #define BAYESMIX_HIERARCHIES_PRIORS_NXIG_PRIOR_MODEL_H_
 
-// #include <google/protobuf/stubs/casts.h>
-
-// #include <Eigen/Dense>
 #include <memory>
 #include <stan/math/prim.hpp>
 #include <stan/math/rev.hpp>
 #include <vector>
 
-// #include "algorithm_state.pb.h"
 #include "base_prior_model.h"
 #include "hierarchy_prior.pb.h"
 #include "hyperparams.h"
@@ -25,9 +21,6 @@ class NxIGPriorModel : public BasePriorModel<NxIGPriorModel, Hyperparams::NxIG,
   ~NxIGPriorModel() = default;
 
   double lpdf(const google::protobuf::Message &state_) override;
-
-  // std::shared_ptr<google::protobuf::Message> sample(
-  //     bool use_post_hypers) override;
 
   std::shared_ptr<google::protobuf::Message> sample(
       ProtoHypersPtr hier_hypers = nullptr) override;

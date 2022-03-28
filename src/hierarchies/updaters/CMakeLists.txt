@@ -1,6 +1,5 @@
 target_sources(bayesmix PUBLIC
     abstract_updater.h
-    # conjugate_updater.h
     semi_conjugate_updater.h
     nnig_updater.h
     nnig_updater.cc
@@ -16,5 +15,4 @@ target_sources(bayesmix PUBLIC
     mala_updater.h
     random_walk_updater.h
     target_lpdf_unconstrained.h
-    # target_lpdf_unconstrained.cc
 )

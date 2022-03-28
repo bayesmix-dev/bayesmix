@@ -147,32 +147,6 @@ std::shared_ptr<google::protobuf::Message> NWPriorModel::sample(
   return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
 };
 
-// std::shared_ptr<google::protobuf::Message> NWPriorModel::sample(
-//     bool use_post_hypers) {
-//   auto &rng = bayesmix::Rng::Instance().get();
-
-//   Hyperparams::NW params = use_post_hypers ? post_hypers : *hypers;
-
-//   Eigen::MatrixXd tau_new =
-//       stan::math::wishart_rng(params.deg_free, params.scale, rng);
-
-//   // Update state
-//   State::MultiLS out;
-//   out.mean = stan::math::multi_normal_prec_rng(
-//       params.mean, tau_new * params.var_scaling, rng);
-//   write_prec_to_state(tau_new, &out);
-
-//   // Make output state
-//   bayesmix::AlgorithmState::ClusterState state;
-//   bayesmix::to_proto(out.mean,
-//   state.mutable_multi_ls_state()->mutable_mean());
-//   bayesmix::to_proto(out.prec,
-//   state.mutable_multi_ls_state()->mutable_prec());
-//   bayesmix::to_proto(out.prec_chol,
-//                      state.mutable_multi_ls_state()->mutable_prec_chol());
-//   return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
-// };
-
 void NWPriorModel::update_hypers(
     const std::vector<bayesmix::AlgorithmState::ClusterState> &states) {
   auto &rng = bayesmix::Rng::Instance().get();

@@ -84,28 +84,12 @@ double NIGPriorModel::lpdf(const google::protobuf::Message &state_) {
   return target;
 }
 
-// std::shared_ptr<google::protobuf::Message> NIGPriorModel::sample(
-//     bool use_post_hypers) {
-//   auto &rng = bayesmix::Rng::Instance().get();
-//   Hyperparams::NIG params = use_post_hypers ? post_hypers : *hypers;
-//   double var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
-//   double mean =
-//       stan::math::normal_rng(params.mean, sqrt(var / params.var_scaling),
-//       rng);
-
-//   bayesmix::AlgorithmState::ClusterState state;
-//   state.mutable_uni_ls_state()->set_mean(mean);
-//   state.mutable_uni_ls_state()->set_var(var);
-//   return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
-// };
-
 std::shared_ptr<google::protobuf::Message> NIGPriorModel::sample(
     ProtoHypersPtr hier_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
   auto params = (hier_hypers) ? hier_hypers->nnig_state()
                               : get_hypers_proto()->nnig_state();
 
-  // Hyperparams::NIG params = use_post_hypers ? post_hypers : *hypers;
   double var = stan::math::inv_gamma_rng(params.shape(), params.scale(), rng);
   double mean = stan::math::normal_rng(params.mean(),
                                        sqrt(var / params.var_scaling()), rng);

@@ -66,14 +66,6 @@ class BasePriorModel : public AbstractPriorModel {
   //! Returns the struct of the current prior hyperparameters
   HyperParams get_hypers() const { return *hypers; };
 
-  //! Returns the struct of the current posterior hyperparameters
-  // HyperParams get_posterior_hypers() const { return post_hypers; }
-
-  //! Updates the current value of the posterior hyperparameters
-  // void set_posterior_hypers(const HyperParams &_post_hypers) {
-  //   post_hypers = _post_hypers;
-  // };
-
   //! Writes current values of the hyperparameters to a Protobuf message by
   //! pointer
   void write_hypers_to_proto(google::protobuf::Message *out) const override;
@@ -115,9 +107,6 @@ class BasePriorModel : public AbstractPriorModel {
 
   //! Container for prior hyperparameters values
   std::shared_ptr<HyperParams> hypers = std::make_shared<HyperParams>();
-
-  //! Container for posterior hyperparameters values
-  // HyperParams post_hypers;
 
   //! Pointer to a Protobuf prior object for this class
   std::shared_ptr<Prior> prior;
@@ -184,20 +173,5 @@ void BasePriorModel<Derived, HyperParams, Prior>::check_prior_is_set() const {
     throw std::invalid_argument("Hierarchy prior was not provided");
   }
 }
-
-// OLD STUFF
-// double lpdf_from_unconstrained(
-//     Eigen::VectorXd unconstrained_params) const override {
-//   return static_cast<const Derived &>(*this)
-//       .template lpdf_from_unconstrained<double>(unconstrained_params);
-// }
-
-// stan::math::var lpdf_from_unconstrained(
-//     Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>
-//     unconstrained_params) const override {
-//   return static_cast<const Derived &>(*this)
-//       .template lpdf_from_unconstrained<stan::math::var>(
-//           unconstrained_params);
-// }
 
 #endif  // BAYESMIX_HIERARCHIES_PRIORS_BASE_PRIOR_MODEL_H_

@@ -45,20 +45,6 @@ std::shared_ptr<google::protobuf::Message> NxIGPriorModel::sample(
   return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
 };
 
-// std::shared_ptr<google::protobuf::Message> NxIGPriorModel::sample(
-//     bool use_post_hypers) {
-//   auto &rng = bayesmix::Rng::Instance().get();
-//   Hyperparams::NxIG params = use_post_hypers ? post_hypers : *hypers;
-
-//   double var = stan::math::inv_gamma_rng(params.shape, params.scale, rng);
-//   double mean = stan::math::normal_rng(params.mean, sqrt(params.var), rng);
-
-//   bayesmix::AlgorithmState::ClusterState state;
-//   state.mutable_uni_ls_state()->set_mean(mean);
-//   state.mutable_uni_ls_state()->set_var(var);
-//   return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
-// };
-
 void NxIGPriorModel::update_hypers(
     const std::vector<bayesmix::AlgorithmState::ClusterState> &states) {
   if (prior->has_fixed_values()) {

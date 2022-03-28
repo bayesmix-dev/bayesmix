@@ -1,21 +1,11 @@
 #ifndef BAYESMIX_HIERARCHIES_NNW_HIERARCHY_H_
 #define BAYESMIX_HIERARCHIES_NNW_HIERARCHY_H_
 
-// #include <google/protobuf/stubs/casts.h>
-
-// #include <Eigen/Dense>
-// #include <memory>
-// #include <vector>
-
-// #include "algorithm_state.pb.h"
-// #include "conjugate_hierarchy.h"
-#include "hierarchy_id.pb.h"
-#include "src/utils/distributions.h"
-// #include "hierarchy_prior.pb.h"
-
 #include "base_hierarchy.h"
+#include "hierarchy_id.pb.h"
 #include "likelihoods/multi_norm_likelihood.h"
 #include "priors/nw_prior_model.h"
+#include "src/utils/distributions.h"
 #include "updaters/nnw_updater.h"
 
 class NNWHierarchy
@@ -60,7 +50,6 @@ class NNWHierarchy
     unsigned int dim = like->get_dim();
     double nu_n = params.deg_free() - dim + 1;
     double coeff = (params.var_scaling() + 1) / (params.var_scaling() * nu_n);
-    // Eigen::MatrixXd scale = bayesmix::to_eigen(params.scale());
     Eigen::MatrixXd scale_chol =
         Eigen::LLT<Eigen::MatrixXd>(bayesmix::to_eigen(params.scale()))
             .matrixU();

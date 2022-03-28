@@ -86,7 +86,6 @@ class BaseLikelihood : public AbstractLikelihood {
   //! Returns a vector storing the state in its unconstrained form
   Eigen::VectorXd get_unconstrained_state() override {
     return internal::get_unconstrained_state(state, 0);
-    // return state.get_unconstrained();
   }
 
   //! Updates the state of the likelihood with the object given as input
@@ -96,7 +95,6 @@ class BaseLikelihood : public AbstractLikelihood {
   void set_state_from_unconstrained(
       const Eigen::VectorXd &unconstrained_state) override {
     internal::set_state_from_unconstrained(state, unconstrained_state, 0);
-    // state.set_from_unconstrained(unconstrained_state);
   }
 
   //! Sets the (pointer to) the dataset in the cluster
@@ -166,8 +164,6 @@ void BaseLikelihood<Derived, State>::add_datum(
     const Eigen::RowVectorXd &covariate) {
   assert(cluster_data_idx.find(id) == cluster_data_idx.end());
   set_card(++card);
-  // card += 1;
-  // log_card = std::log(card);
   static_cast<Derived *>(this)->update_summary_statistics(datum, covariate,
                                                           true);
   cluster_data_idx.insert(id);
@@ -220,23 +216,5 @@ Eigen::VectorXd BaseLikelihood<Derived, State>::lpdf_grid(
   }
   return lpdf;
 }
-
-// OLD STUFF
-// The unconstrained parameters are mean and log(var)
-
-// double cluster_lpdf_from_unconstrained(
-//     Eigen::VectorXd unconstrained_params) const override {
-//   return static_cast<const Derived &>(*this)
-//       .template cluster_lpdf_from_unconstrained<double>(
-//           unconstrained_params);
-// }
-
-// stan::math::var cluster_lpdf_from_unconstrained(
-//     Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>
-//     unconstrained_params) const override {
-//   return static_cast<const Derived &>(*this)
-//       .template cluster_lpdf_from_unconstrained<stan::math::var>(
-//           unconstrained_params);
-// }
 
 #endif  // BAYESMIX_HIERARCHIES_LIKELIHOODS_BASE_LIKELIHOOD_H_

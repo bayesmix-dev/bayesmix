@@ -1,18 +1,8 @@
 #ifndef BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_H_
 #define BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_H_
 
-// #include <google/protobuf/stubs/casts.h>
-
-// #include <stan/math/rev.hpp>
-// #include <memory>
-// #include <vector>
-
-// #include "algorithm_state.pb.h"
-// #include "conjugate_hierarchy.h"
-#include "hierarchy_id.pb.h"
-// #include "hierarchy_prior.pb.h"
-
 #include "base_hierarchy.h"
+#include "hierarchy_id.pb.h"
 #include "likelihoods/uni_norm_likelihood.h"
 #include "priors/nig_prior_model.h"
 #include "updaters/nnig_updater.h"
