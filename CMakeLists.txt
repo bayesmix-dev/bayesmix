@@ -212,7 +212,7 @@ if (NOT DISABLE_EXAMPLES)
 endif()
 
 # Test MH updater
-add_executable(test_mh $<TARGET_OBJECTS:bayesmix> test_mh_updater.cpp)
-target_include_directories(test_mh PUBLIC ${INCLUDE_PATHS})
-target_link_libraries(test_mh PUBLIC ${LINK_LIBRARIES})
-target_compile_options(test_mh PUBLIC ${COMPILE_OPTIONS})
+# add_executable(test_mh $<TARGET_OBJECTS:bayesmix> test_mh_updater.cpp)
+# target_include_directories(test_mh PUBLIC ${INCLUDE_PATHS})
+# target_link_libraries(test_mh PUBLIC ${LINK_LIBRARIES})
+# target_compile_options(test_mh PUBLIC ${COMPILE_OPTIONS})
