@@ -1,6 +1,7 @@
 #ifndef BAYESMIX_HIERARCHIES_LIKELIHOODS_STATES_UNI_LS_STATE_H_
 #define BAYESMIX_HIERARCHIES_LIKELIHOODS_STATES_UNI_LS_STATE_H_
 
+#include <memory>
 #include <stan/math/rev.hpp>
 
 #include "algorithm_state.pb.h"
@@ -35,6 +36,8 @@ class UniLS {
  public:
   double mean, var;
 
+  using ProtoState = bayesmix::AlgorithmState::ClusterState;
+
   Eigen::VectorXd get_unconstrained() {
     Eigen::VectorXd temp(2);
     temp << mean, var;
@@ -47,16 +50,20 @@ class UniLS {
     var = temp(1);
   }
 
-  void set_from_proto(const bayesmix::AlgorithmState::ClusterState &state_) {
+  void set_from_proto(const ProtoState &state_) {
     mean = state_.uni_ls_state().mean();
     var = state_.uni_ls_state().var();
   }
 
-  bayesmix::AlgorithmState::ClusterState get_as_proto() {
-    bayesmix::AlgorithmState::ClusterState state;
+  ProtoState get_as_proto() {
+    ProtoState state;
     state.mutable_uni_ls_state()->set_mean(mean);
     state.mutable_uni_ls_state()->set_var(var);
     return state;
+  }
+
+  std::shared_ptr<ProtoState> to_proto() {
+    return std::make_shared<ProtoState>(get_as_proto());
   }
 
   double log_det_jac() {

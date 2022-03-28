@@ -41,6 +41,8 @@ class UniLinRegLS {
   Eigen::VectorXd regression_coeffs;
   double var;
 
+  using ProtoState = bayesmix::AlgorithmState::ClusterState;
+
   Eigen::VectorXd get_unconstrained() {
     Eigen::VectorXd temp(regression_coeffs.size() + 1);
     temp << regression_coeffs, var;
@@ -54,19 +56,23 @@ class UniLinRegLS {
     var = temp(dim);
   }
 
-  void set_from_proto(const bayesmix::AlgorithmState::ClusterState &state_) {
+  void set_from_proto(const ProtoState &state_) {
     regression_coeffs =
         bayesmix::to_eigen(state_.lin_reg_uni_ls_state().regression_coeffs());
     var = state_.lin_reg_uni_ls_state().var();
   }
 
-  bayesmix::AlgorithmState::ClusterState get_as_proto() {
-    bayesmix::LinRegUniLSState out;
-    bayesmix::to_proto(regression_coeffs, out.mutable_regression_coeffs());
-    out.set_var(var);
-    bayesmix::AlgorithmState::ClusterState state;
-    state.mutable_lin_reg_uni_ls_state()->CopyFrom(out);
+  ProtoState get_as_proto() {
+    ProtoState state;
+    bayesmix::to_proto(
+        regression_coeffs,
+        state.mutable_lin_reg_uni_ls_state()->mutable_regression_coeffs());
+    state.mutable_lin_reg_uni_ls_state()->set_var(var);
     return state;
+  }
+
+  std::shared_ptr<ProtoState> to_proto() {
+    return std::make_shared<ProtoState>(get_as_proto());
   }
 
   double log_det_jac() {

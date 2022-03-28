@@ -19,17 +19,11 @@ std::shared_ptr<google::protobuf::Message> MNIGPriorModel::sample(
   Eigen::VectorXd mean = bayesmix::to_eigen(params.mean());
   Eigen::MatrixXd var_scaling = bayesmix::to_eigen(params.var_scaling());
 
-  double var = stan::math::inv_gamma_rng(params.shape(), params.scale(), rng);
-  Eigen::VectorXd regression_coeffs =
-      stan::math::multi_normal_prec_rng(mean, var_scaling / var, rng);
-
-  bayesmix::AlgorithmState::ClusterState state;
-  bayesmix::to_proto(
-      regression_coeffs,
-      state.mutable_lin_reg_uni_ls_state()->mutable_regression_coeffs());
-  state.mutable_lin_reg_uni_ls_state()->set_var(var);
-
-  return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
+  State::UniLinRegLS out;
+  out.var = stan::math::inv_gamma_rng(params.shape(), params.scale(), rng);
+  out.regression_coeffs =
+      stan::math::multi_normal_prec_rng(mean, var_scaling / out.var, rng);
+  return out.to_proto();
 }
 
 void MNIGPriorModel::update_hypers(

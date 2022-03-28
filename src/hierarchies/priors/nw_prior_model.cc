@@ -137,14 +137,7 @@ std::shared_ptr<google::protobuf::Message> NWPriorModel::sample(
   out.mean = stan::math::multi_normal_prec_rng(
       mean, tau_new * params.var_scaling(), rng);
   write_prec_to_state(tau_new, &out);
-
-  // Make output state
-  bayesmix::AlgorithmState::ClusterState state;
-  bayesmix::to_proto(out.mean, state.mutable_multi_ls_state()->mutable_mean());
-  bayesmix::to_proto(out.prec, state.mutable_multi_ls_state()->mutable_prec());
-  bayesmix::to_proto(out.prec_chol,
-                     state.mutable_multi_ls_state()->mutable_prec_chol());
-  return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
+  return out.to_proto();
 };
 
 void NWPriorModel::update_hypers(

@@ -36,13 +36,10 @@ std::shared_ptr<google::protobuf::Message> NxIGPriorModel::sample(
   auto params = (hier_hypers) ? hier_hypers->nnxig_state()
                               : get_hypers_proto()->nnxig_state();
 
-  double var = stan::math::inv_gamma_rng(params.shape(), params.scale(), rng);
-  double mean = stan::math::normal_rng(params.mean(), sqrt(params.var()), rng);
-
-  bayesmix::AlgorithmState::ClusterState state;
-  state.mutable_uni_ls_state()->set_mean(mean);
-  state.mutable_uni_ls_state()->set_var(var);
-  return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
+  State::UniLS out;
+  out.mean = stan::math::normal_rng(params.mean(), sqrt(params.var()), rng);
+  out.var = stan::math::inv_gamma_rng(params.shape(), params.scale(), rng);
+  return out.to_proto();
 };
 
 void NxIGPriorModel::update_hypers(
