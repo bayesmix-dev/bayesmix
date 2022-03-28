@@ -1,6 +1,6 @@
 ##### GENERIC SETTINGS FOR ALL ALGORITHMS #####
 # Algorithm ID string, e.g. "Neal2"
-algo_id: "Neal8"
+algo_id: "Neal3"
 
 # RNG initial seed: any nonnegative integer
 rng_seed: 20201124
