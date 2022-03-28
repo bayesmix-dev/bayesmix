@@ -51,25 +51,20 @@
 
 class AbstractHierarchy {
  public:
-  // Set the likelihood for the current hierarchy. Implemented in the
-  // BaseHierarchy class
+  // Set the likelihood for the current hierarchy.
   // virtual void set_likelihood(std::shared_ptr<AbstractLikelihood> like_) =
   // 0;
 
-  // Set the prior model for the current hierarchy. Implemented in the
-  // BaseHierarchy class
+  // Set the prior model for the current hierarchy.
   // virtual void set_prior(std::shared_ptr<AbstractPriorModel> prior_) = 0;
 
-  //! Set the update algorithm for the current hierarchy. Implemented in the
-  //! BaseHierarchy class
+  //! Set the update algorithm for the current hierarchy
   virtual void set_updater(std::shared_ptr<AbstractUpdater> updater_) = 0;
 
-  //! Returns (a pointer to) the likelihood for the current hierarchy.
-  //! Implemented in the BaseHierarchy class
+  //! Returns (a pointer to) the likelihood for the current hierarchy
   virtual std::shared_ptr<AbstractLikelihood> get_likelihood() = 0;
 
-  //! Returns (a pointer to) the prior model for the current hierarchy.
-  //! Implemented in the BaseHierarchy class
+  //! Returns (a pointer to) the prior model for the current hierarchy
   virtual std::shared_ptr<AbstractPriorModel> get_prior() = 0;
 
   //! Default destructor
@@ -260,8 +255,7 @@ class AbstractHierarchy {
   //! Returns whether the hierarchy represents a conjugate model or not
   virtual bool is_conjugate() const = 0;
 
-  //! Sets the (pointer to) the dataset in the cluster. Implemented in
-  //! BaseHierarchy
+  //! Sets the (pointer to) the dataset in the cluster
   virtual void set_dataset(const Eigen::MatrixXd *const dataset) = 0;
 
  protected:
