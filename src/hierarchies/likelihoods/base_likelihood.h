@@ -11,6 +11,7 @@
 #include "abstract_likelihood.h"
 #include "algorithm_state.pb.h"
 #include "likelihood_internal.h"
+#include "src/utils/covariates_getter.h"
 
 template <class Derived, typename State>
 class BaseLikelihood : public AbstractLikelihood {
@@ -195,26 +196,35 @@ template <class Derived, typename State>
 Eigen::VectorXd BaseLikelihood<Derived, State>::lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::MatrixXd &covariates) const {
   Eigen::VectorXd lpdf(data.rows());
-  if (covariates.cols() == 0) {
-    // Pass null value as covariate
-    for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived const *>(this)->lpdf(
-          data.row(i), Eigen::RowVectorXd(0));
-    }
-  } else if (covariates.rows() == 1) {
-    // Use unique covariate
-    for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived const *>(this)->lpdf(data.row(i),
-                                                         covariates.row(0));
-    }
-  } else {
-    // Use different covariates
-    for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived const *>(this)->lpdf(data.row(i),
-                                                         covariates.row(i));
-    }
-  }
+  covariates_getter cov_getter(covariates);
+  for (int i = 0; i < data.rows(); i++)
+    lpdf(i) =
+        static_cast<Derived const *>(this)->lpdf(data.row(i), cov_getter(i));
+
   return lpdf;
 }
+
+/* OLD STUFF THAT WILL BE REMOVED */
+// Eigen::VectorXd lpdf(data.rows());
+
+// if (covariates.cols() == 0) {
+//   // Pass null value as covariate
+//   for (int i = 0; i < data.rows(); i++) {
+//     lpdf(i) = static_cast<Derived const *>(this)->lpdf(
+//         data.row(i), Eigen::RowVectorXd(0));
+//   }
+// } else if (covariates.rows() == 1) {
+//   // Use unique covariate
+//   for (int i = 0; i < data.rows(); i++) {
+//     lpdf(i) = static_cast<Derived const *>(this)->lpdf(data.row(i),
+//                                                        covariates.row(0));
+//   }
+// } else {
+//   // Use different covariates
+//   for (int i = 0; i < data.rows(); i++) {
+//     lpdf(i) = static_cast<Derived const *>(this)->lpdf(data.row(i),
+//                                                        covariates.row(i));
+//   }
+// }
 
 #endif  // BAYESMIX_HIERARCHIES_LIKELIHOODS_BASE_LIKELIHOOD_H_

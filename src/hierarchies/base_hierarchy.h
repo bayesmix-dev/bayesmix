@@ -11,6 +11,7 @@
 #include "abstract_hierarchy.h"
 #include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
+#include "src/utils/covariates_getter.h"
 #include "src/utils/rng.h"
 #include "updaters/target_lpdf_unconstrained.h"
 
@@ -200,25 +201,31 @@ class BaseHierarchy : public AbstractHierarchy {
       const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/)
       const override {
     Eigen::VectorXd lpdf(data.rows());
-    if (covariates.cols() == 0) {
-      // Pass null value as covariate
-      for (int i = 0; i < data.rows(); i++) {
-        lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
-            data.row(i), Eigen::RowVectorXd(0));
-      }
-    } else if (covariates.rows() == 1) {
-      // Use unique covariate
-      for (int i = 0; i < data.rows(); i++) {
-        lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
-            data.row(i), covariates.row(0));
-      }
-    } else {
-      // Use different covariates
-      for (int i = 0; i < data.rows(); i++) {
-        lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
-            data.row(i), covariates.row(i));
-      }
+    covariates_getter cov_getter(covariates);
+    for (int i = 0; i < data.rows(); i++) {
+      lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
+          data.row(i), cov_getter(i));
     }
+
+    // if (covariates.cols() == 0) {
+    //   // Pass null value as covariate
+    //   for (int i = 0; i < data.rows(); i++) {
+    //     lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
+    //         data.row(i), Eigen::RowVectorXd(0));
+    //   }
+    // } else if (covariates.rows() == 1) {
+    //   // Use unique covariate
+    //   for (int i = 0; i < data.rows(); i++) {
+    //     lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
+    //         data.row(i), covariates.row(0));
+    //   }
+    // } else {
+    //   // Use different covariates
+    //   for (int i = 0; i < data.rows(); i++) {
+    //     lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
+    //         data.row(i), covariates.row(i));
+    //   }
+    // }
     return lpdf;
   }
 
@@ -239,25 +246,33 @@ class BaseHierarchy : public AbstractHierarchy {
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override {
     like->clear_data();
     like->clear_summary_statistics();
-    if (covariates.cols() == 0) {
-      // Pass null value as covariate
-      for (int i = 0; i < data.rows(); i++) {
-        static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
-                                                Eigen::RowVectorXd(0));
-      }
-    } else if (covariates.rows() == 1) {
-      // Use unique covariate
-      for (int i = 0; i < data.rows(); i++) {
-        static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
-                                                covariates.row(0));
-      }
-    } else {
-      // Use different covariates
-      for (int i = 0; i < data.rows(); i++) {
-        static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
-                                                covariates.row(i));
-      }
+
+    covariates_getter cov_getter(covariates);
+    for (int i = 0; i < data.rows(); i++) {
+      static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
+                                              cov_getter(i));
     }
+
+    // if (covariates.cols() == 0) {
+    //   // Pass null value as covariate
+    //   for (int i = 0; i < data.rows(); i++) {
+    //     static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
+    //                                             Eigen::RowVectorXd(0));
+    //   }
+    // } else if (covariates.rows() == 1) {
+    //   // Use unique covariate
+    //   for (int i = 0; i < data.rows(); i++) {
+    //     static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
+    //                                             covariates.row(0));
+    //   }
+    // } else {
+    //   // Use different covariates
+    //   for (int i = 0; i < data.rows(); i++) {
+    //     static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
+    //                                             covariates.row(i));
+    //   }
+    // }
+
     static_cast<Derived *>(this)->sample_full_cond(true);
   };
 

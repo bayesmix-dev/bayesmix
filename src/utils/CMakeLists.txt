@@ -15,4 +15,5 @@ target_sources(bayesmix
     rng.h
     testing_utils.h
     testing_utils.cc
+    covariates_getter.h
 )
