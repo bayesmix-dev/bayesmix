@@ -10,55 +10,7 @@
 
 #include "abstract_likelihood.h"
 #include "algorithm_state.pb.h"
-
-namespace internal {
-
-/* SFINAE for cluster_lpdf_from_unconstrained() */
-template <class Like, typename T>
-auto cluster_lpdf_from_unconstrained(
-    const Like &like, Eigen::Matrix<T, Eigen::Dynamic, 1> unconstrained_params,
-    int)
-    -> decltype(like.template cluster_lpdf_from_unconstrained<T>(
-        unconstrained_params)) {
-  return like.template cluster_lpdf_from_unconstrained<T>(
-      unconstrained_params);
-}
-template <class Like, typename T>
-auto cluster_lpdf_from_unconstrained(
-    const Like &like, Eigen::Matrix<T, Eigen::Dynamic, 1> unconstrained_params,
-    double) -> T {
-  throw(std::runtime_error(
-      "cluster_lpdf_from_unconstrained() not yet implemented"));
-}
-
-/* SFINAE for get_unconstrained_state() */
-template <class State>
-auto get_unconstrained_state(const State &state, int)
-    -> decltype(state.get_unconstrained()) {
-  return state.get_unconstrained();
-}
-template <class State>
-auto get_unconstrained_state(const State &state, double) -> Eigen::VectorXd {
-  throw(std::runtime_error("get_unconstrained_state() not yet implemented"));
-}
-
-/* SFINAE for set_state_from_unconstrained() */
-template <class State>
-auto set_state_from_unconstrained(State &state,
-                                  const Eigen::VectorXd &unconstrained_state,
-                                  int)
-    -> decltype(state.set_from_unconstrained(unconstrained_state)) {
-  state.set_from_unconstrained(unconstrained_state);
-}
-template <class State>
-auto set_state_from_unconstrained(State &state,
-                                  const Eigen::VectorXd &unconstrained_state,
-                                  double) -> void {
-  throw(std::runtime_error(
-      "set_state_from_unconstrained() not yet implemented"));
-}
-
-}  // namespace internal
+#include "likelihood_internal.h"
 
 template <class Derived, typename State>
 class BaseLikelihood : public AbstractLikelihood {
@@ -82,7 +34,7 @@ class BaseLikelihood : public AbstractLikelihood {
   //! By unconstrained parameters we mean that each entry of
   //! the parameter vector can range over (-inf, inf).
   //! Usually, some kind of transformation is required from the unconstrained
-  //! parameterization to the actual parameterization.
+  //! parametrization to the actual one.
   //! @param unconstrained_params vector collecting the unconstrained
   //! parameters
   //! @return The evaluation of the log likelihood over all data in the cluster
@@ -97,7 +49,7 @@ class BaseLikelihood : public AbstractLikelihood {
   //! cluster given unconstrained parameter values. By unconstrained parameters
   //! we mean that each entry of the parameter vector can range over (-inf,
   //! inf). Usually, some kind of transformation is required from the
-  //! unconstrained parameterization to the actual parameterization.
+  //! unconstrained parametrization to the actual one.
   //! @param unconstrained_params vector collecting the unconstrained
   //! parameters
   //! @return The evaluation of the log likelihood over all data in the cluster

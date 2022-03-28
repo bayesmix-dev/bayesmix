@@ -13,8 +13,8 @@ class NNWUpdater
 
   bool is_conjugate() const override { return true; };
 
-  ProtoHypers compute_posterior_hypers(AbstractLikelihood &like,
-                                       AbstractPriorModel &prior) override;
+  ProtoHypersPtr compute_posterior_hypers(AbstractLikelihood &like,
+                                          AbstractPriorModel &prior) override;
 
   // void compute_posterior_hypers(AbstractLikelihood& like,
   //                               AbstractPriorModel& prior) override;

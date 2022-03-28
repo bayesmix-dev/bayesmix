@@ -24,7 +24,7 @@ class NWPriorModel : public BasePriorModel<NWPriorModel, Hyperparams::NW,
   double lpdf(const google::protobuf::Message &state_) override;
 
   std::shared_ptr<google::protobuf::Message> sample(
-      bayesmix::AlgorithmState::HierarchyHypers hier_hypers) override;
+      ProtoHypersPtr hier_hypers = nullptr) override;
 
   // std::shared_ptr<google::protobuf::Message> sample(
   //     bool use_post_hypers) override;

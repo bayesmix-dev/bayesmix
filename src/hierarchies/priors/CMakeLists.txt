@@ -1,4 +1,5 @@
 target_sources(bayesmix PUBLIC
+    prior_model_internal.h
     abstract_prior_model.h
     base_prior_model.h
     hyperparams.h

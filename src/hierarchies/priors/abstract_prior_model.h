@@ -13,6 +13,11 @@
 
 class AbstractPriorModel {
  public:
+  // Useful type aliases
+  using ProtoHypersPtr =
+      std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>;
+  using ProtoHypers = ProtoHypersPtr::element_type;
+
   //! Default destructor
   virtual ~AbstractPriorModel() = default;
 
@@ -67,7 +72,7 @@ class AbstractPriorModel {
   //   bool use_post_hypers) = 0;
 
   virtual std::shared_ptr<google::protobuf::Message> sample(
-      bayesmix::AlgorithmState::HierarchyHypers hier_hypers) = 0;
+      ProtoHypersPtr hier_hypers = nullptr) = 0;
 
   //! Updates hyperparameter values given a vector of cluster states
   virtual void update_hypers(

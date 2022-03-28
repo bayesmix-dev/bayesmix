@@ -1,6 +1,6 @@
 #include "mnig_updater.h"
 
-AbstractUpdater::ProtoHypers MNIGUpdater::compute_posterior_hypers(
+AbstractUpdater::ProtoHypersPtr MNIGUpdater::compute_posterior_hypers(
     AbstractLikelihood& like, AbstractPriorModel& prior) {
   // Likelihood and Prior downcast
   auto& likecast = downcast_likelihood(like);
@@ -16,7 +16,7 @@ AbstractUpdater::ProtoHypers MNIGUpdater::compute_posterior_hypers(
 
   // No update possible
   if (card == 0) {
-    return *(priorcast.get_hypers_proto());
+    return priorcast.get_hypers_proto();
   }
 
   // Compute posterior hyperparameters
@@ -41,7 +41,7 @@ AbstractUpdater::ProtoHypers MNIGUpdater::compute_posterior_hypers(
                      out.mutable_lin_reg_uni_state()->mutable_var_scaling());
   out.mutable_lin_reg_uni_state()->set_shape(shape);
   out.mutable_lin_reg_uni_state()->set_scale(scale);
-  return out;
+  return std::make_shared<ProtoHypers>(out);
 }
 
 // void MNIGUpdater::compute_posterior_hypers(AbstractLikelihood& like,

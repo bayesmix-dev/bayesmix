@@ -17,12 +17,12 @@ class SemiConjugateUpdater : public AbstractUpdater {
   void draw(AbstractLikelihood& like, AbstractPriorModel& prior,
             bool update_params) override;
 
-  void save_posterior_hypers(const ProtoHypers& post_hypers_) override;
+  void save_posterior_hypers(ProtoHypersPtr post_hypers_) override;
 
  protected:
   Likelihood& downcast_likelihood(AbstractLikelihood& like_);
   PriorModel& downcast_prior(AbstractPriorModel& prior_);
-  ProtoHypers post_hypers;
+  ProtoHypersPtr post_hypers = std::make_shared<ProtoHypers>();
 };
 
 // Methods' definitions
@@ -47,8 +47,7 @@ void SemiConjugateUpdater<Likelihood, PriorModel>::draw(
   // Sample from the full conditional of a semi-conjugate hierarchy
   bool set_card = true; /*, use_post_hypers=true;*/
   if (likecast.get_card() == 0) {
-    auto prior_params = *priorcast.get_hypers_proto();
-    likecast.set_state_from_proto(*priorcast.sample(prior_params), !set_card);
+    likecast.set_state_from_proto(*priorcast.sample(), !set_card);
   } else {
     auto post_params = compute_posterior_hypers(likecast, priorcast);
     likecast.set_state_from_proto(*priorcast.sample(post_params), !set_card);
@@ -58,7 +57,7 @@ void SemiConjugateUpdater<Likelihood, PriorModel>::draw(
 
 template <class Likelihood, class PriorModel>
 void SemiConjugateUpdater<Likelihood, PriorModel>::save_posterior_hypers(
-    const ProtoHypers& post_hypers_) {
+    ProtoHypersPtr post_hypers_) {
   post_hypers = post_hypers_;
   return;
 }

@@ -44,10 +44,9 @@ class LinRegUniHierarchy
     like->set_state(state);
   };
 
-  double marg_lpdf(const ProtoHypers &hier_params,
-                   const Eigen::RowVectorXd &datum,
+  double marg_lpdf(ProtoHypersPtr hier_params, const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override {
-    auto params = hier_params.lin_reg_uni_state();
+    auto params = hier_params->lin_reg_uni_state();
     Eigen::VectorXd mean = bayesmix::to_eigen(params.mean());
     Eigen::MatrixXd var_scaling = bayesmix::to_eigen(params.var_scaling());
 

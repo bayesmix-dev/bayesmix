@@ -12,10 +12,10 @@ double MNIGPriorModel::lpdf(const google::protobuf::Message &state_) {
 }
 
 std::shared_ptr<google::protobuf::Message> MNIGPriorModel::sample(
-    bayesmix::AlgorithmState::HierarchyHypers hier_hypers) {
+    ProtoHypersPtr hier_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
-
-  auto params = hier_hypers.lin_reg_uni_state();
+  auto params = (hier_hypers) ? hier_hypers->lin_reg_uni_state()
+                              : get_hypers_proto()->lin_reg_uni_state();
   Eigen::VectorXd mean = bayesmix::to_eigen(params.mean());
   Eigen::MatrixXd var_scaling = bayesmix::to_eigen(params.var_scaling());
 

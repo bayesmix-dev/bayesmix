@@ -3,7 +3,7 @@
 #include "src/hierarchies/likelihoods/states/includes.h"
 #include "src/hierarchies/priors/hyperparams.h"
 
-AbstractUpdater::ProtoHypers NNxIGUpdater::compute_posterior_hypers(
+AbstractUpdater::ProtoHypersPtr NNxIGUpdater::compute_posterior_hypers(
     AbstractLikelihood& like, AbstractPriorModel& prior) {
   // Likelihood and Prior downcast
   auto& likecast = downcast_likelihood(like);
@@ -18,7 +18,7 @@ AbstractUpdater::ProtoHypers NNxIGUpdater::compute_posterior_hypers(
 
   // No update possible
   if (card == 0) {
-    return *(priorcast.get_hypers_proto());
+    return priorcast.get_hypers_proto();
   }
 
   // Compute posterior hyperparameters
@@ -37,7 +37,7 @@ AbstractUpdater::ProtoHypers NNxIGUpdater::compute_posterior_hypers(
   out.mutable_nnxig_state()->set_var(var);
   out.mutable_nnxig_state()->set_shape(shape);
   out.mutable_nnxig_state()->set_scale(scale);
-  return out;
+  return std::make_shared<ProtoHypers>(out);
 }
 
 // void NNxIGUpdater::compute_posterior_hypers(AbstractLikelihood& like,

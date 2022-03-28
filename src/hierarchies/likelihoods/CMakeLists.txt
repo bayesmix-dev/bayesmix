@@ -1,4 +1,5 @@
 target_sources(bayesmix PUBLIC
+    likelihood_internal.h
     abstract_likelihood.h
     base_likelihood.h
     uni_norm_likelihood.h

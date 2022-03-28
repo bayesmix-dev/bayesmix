@@ -10,8 +10,7 @@ void FAUpdater::draw(AbstractLikelihood& like, AbstractPriorModel& prior,
   // Sample from the full conditional of the fa hierarchy
   bool set_card = true, use_post_hypers = true;
   if (likecast.get_card() == 0) {
-    auto prior_params = *(priorcast.get_hypers_proto());
-    likecast.set_state_from_proto(*priorcast.sample(prior_params), !set_card);
+    likecast.set_state_from_proto(*priorcast.sample(), !set_card);
   } else {
     // Get state and hypers
     State::FA new_state = likecast.get_state();

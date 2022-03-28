@@ -7,13 +7,15 @@
 
 class AbstractUpdater {
  public:
-  // Type alias
-  using ProtoHypers = bayesmix::AlgorithmState::HierarchyHypers;
+  // Type aliases
+  using ProtoHypersPtr =
+      std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>;
+  using ProtoHypers = ProtoHypersPtr::element_type;
 
   //! Default destructor
   virtual ~AbstractUpdater() = default;
 
-  //! Returns whether the current updater is for conjugate model or not
+  //! Returns whether the current updater is for a (semi)conjugate model or not
   virtual bool is_conjugate() const { return false; };
 
   //! Sampling from the full conditional, given the likelihood and the prior
@@ -26,16 +28,28 @@ class AbstractUpdater {
 
   //! Computes the posterior hyperparameters required for the sampling in case
   //! of conjugate hierarchies
-  virtual ProtoHypers compute_posterior_hypers(AbstractLikelihood &like,
-                                               AbstractPriorModel &prior) {
-    throw(std::runtime_error(
-        "compute_posterior_hypers() not implemented for this updater"));
+  virtual ProtoHypersPtr compute_posterior_hypers(AbstractLikelihood &like,
+                                                  AbstractPriorModel &prior) {
+    if (!is_conjugate()) {
+      throw(
+          std::runtime_error("Cannot call compute_posterior_hypers() from a "
+                             "non-(semi)conjugate updater"));
+    } else {
+      throw(std::runtime_error(
+          "compute_posterior_hypers() not implemented for this updater"));
+    }
   }
 
   //! Stores the posterior hyperparameters in an appropriate container
-  virtual void save_posterior_hypers(const ProtoHypers &post_hypers_) {
-    throw(std::runtime_error(
-        "save_posterior_hypers() not implemented for this updater"));
+  virtual void save_posterior_hypers(ProtoHypersPtr post_hypers_) {
+    if (!is_conjugate()) {
+      throw(
+          std::runtime_error("Cannot call save_posterior_hypers() from a "
+                             "non-(semi)conjugate updater"));
+    } else {
+      throw(std::runtime_error(
+          "save_posterior_hypers() not implemented for this updater"));
+    }
   }
 };
 

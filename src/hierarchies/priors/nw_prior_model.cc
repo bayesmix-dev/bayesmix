@@ -122,9 +122,10 @@ double NWPriorModel::lpdf(const google::protobuf::Message &state_) {
 }
 
 std::shared_ptr<google::protobuf::Message> NWPriorModel::sample(
-    bayesmix::AlgorithmState::HierarchyHypers hier_hypers) {
+    ProtoHypersPtr hier_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
-  auto params = hier_hypers.nnw_state();
+  auto params = (hier_hypers) ? hier_hypers->nnw_state()
+                              : get_hypers_proto()->nnw_state();
   Eigen::MatrixXd scale = bayesmix::to_eigen(params.scale());
   Eigen::VectorXd mean = bayesmix::to_eigen(params.mean());
 

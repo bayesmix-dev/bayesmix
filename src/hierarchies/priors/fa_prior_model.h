@@ -16,13 +16,16 @@
 class FAPriorModel
     : public BasePriorModel<FAPriorModel, Hyperparams::FA, bayesmix::FAPrior> {
  public:
+  using AbstractPriorModel::ProtoHypers;
+  using AbstractPriorModel::ProtoHypersPtr;
+
   FAPriorModel() = default;
   ~FAPriorModel() = default;
 
   double lpdf(const google::protobuf::Message &state_) override;
 
   std::shared_ptr<google::protobuf::Message> sample(
-      bayesmix::AlgorithmState::HierarchyHypers hier_hypers) override;
+      ProtoHypersPtr hier_hypers = nullptr) override;
 
   // std::shared_ptr<google::protobuf::Message> sample(
   //     bool use_post_hypers) override;

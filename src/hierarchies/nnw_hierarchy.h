@@ -44,7 +44,7 @@ class NNWHierarchy
     like->set_state(state);
   };
 
-  double marg_lpdf(const ProtoHypers &hier_params,
+  double marg_lpdf(ProtoHypersPtr hier_params,
                    const Eigen::RowVectorXd &datum) const override {
     HyperParams pred_params = get_predictive_t_parameters(hier_params);
     Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
@@ -54,9 +54,8 @@ class NNWHierarchy
         logdet);
   }
 
-  HyperParams get_predictive_t_parameters(
-      const ProtoHypers &hier_params) const {
-    auto params = hier_params.nnw_state();
+  HyperParams get_predictive_t_parameters(ProtoHypersPtr hier_params) const {
+    auto params = hier_params->nnw_state();
     // Compute dof and scale of marginal distribution
     unsigned int dim = like->get_dim();
     double nu_n = params.deg_free() - dim + 1;

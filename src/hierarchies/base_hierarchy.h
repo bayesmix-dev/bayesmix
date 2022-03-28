@@ -42,7 +42,9 @@ class BaseHierarchy : public AbstractHierarchy {
   std::shared_ptr<AbstractUpdater> updater;
 
  public:
+  // Useful type aliases
   using HyperParams = decltype(prior->get_hypers());
+  using ProtoHypersPtr = AbstractUpdater::ProtoHypersPtr;
   using ProtoHypers = AbstractUpdater::ProtoHypers;
 
   //! Constructor that allows the specification of Likelihood, PriorModel and
@@ -110,26 +112,6 @@ class BaseHierarchy : public AbstractHierarchy {
     return out;
   }
 
-  //! Returns an independent, data-less copy of this object
-  // std::shared_ptr<AbstractHierarchy> deep_clone() const override {
-  //   auto out = std::make_shared<Derived>(static_cast<Derived const
-  //   &>(*this));
-
-  //   out->clear_data();
-  //   out->clear_summary_statistics();
-
-  //   out->create_empty_prior();
-  //   std::shared_ptr<google::protobuf::Message> new_prior(prior->New());
-  //   new_prior->CopyFrom(*prior.get());
-  //   out->get_mutable_prior()->CopyFrom(*new_prior.get());
-
-  //   out->create_empty_hypers();
-  //   auto curr_hypers_proto = get_hypers_proto();
-  //   out->set_hypers_from_proto(*curr_hypers_proto.get());
-  //   out->initialize();
-  //   return out;
-  // }
-
   //! Public wrapper for `like_lpdf()` methods
   double get_like_lpdf(const Eigen::RowVectorXd &datum,
                        const Eigen::RowVectorXd &covariate =
@@ -147,19 +129,17 @@ class BaseHierarchy : public AbstractHierarchy {
     return like->lpdf_grid(data, covariates);
   };
 
-  // ADD EXCEPTION HANDLING
   //! Public wrapper for `marg_lpdf()` methods
   double get_marg_lpdf(
-      const ProtoHypers &hier_params, const Eigen::RowVectorXd &datum,
+      ProtoHypersPtr hier_params, const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
-    if (this->is_dependent()) {
+    if (this->is_dependent() and covariate.size() != 0) {
       return marg_lpdf(hier_params, datum, covariate);
     } else {
       return marg_lpdf(hier_params, datum);
     }
   }
 
-  // ADD EXCEPTION HANDLING
   //! Evaluates the log-prior predictive distribution of data in a single point
   //! @param datum      Point which is to be evaluated
   //! @param covariate  (Optional) covariate vector associated to datum
@@ -167,10 +147,9 @@ class BaseHierarchy : public AbstractHierarchy {
   double prior_pred_lpdf(const Eigen::RowVectorXd &datum,
                          const Eigen::RowVectorXd &covariate =
                              Eigen::RowVectorXd(0)) const override {
-    return get_marg_lpdf(*(prior->get_hypers_proto()), datum, covariate);
+    return get_marg_lpdf(prior->get_hypers_proto(), datum, covariate);
   }
 
-  // ADD EXCEPTION HANDLING
   //! Evaluates the log-prior predictive distr. of data in a grid of points
   //! @param data        Grid of points (by row) which are to be evaluated
   //! @param covariates  (Optional) covariate vectors associated to data
@@ -202,7 +181,6 @@ class BaseHierarchy : public AbstractHierarchy {
     return lpdf;
   }
 
-  // ADD EXCEPTION HANDLING
   //! Evaluates the log-conditional predictive distr. of data in a single point
   //! @param datum      Point which is to be evaluated
   //! @param covariate  (Optional) covariate vector associated to datum
@@ -214,7 +192,6 @@ class BaseHierarchy : public AbstractHierarchy {
                          datum, covariate);
   }
 
-  // ADD EXCEPTION HANDLING
   //! Evaluates the log-prior predictive distr. of data in a grid of points
   //! @param data        Grid of points (by row) which are to be evaluated
   //! @param covariates  (Optional) covariate vectors associated to data
@@ -248,8 +225,8 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Generates new state values from the centering prior distribution
   void sample_prior() override {
-    auto hypers = prior->get_hypers_proto();
-    like->set_state_from_proto(*prior->sample(*hypers), false);
+    // auto hypers = prior->get_hypers_proto();
+    like->set_state_from_proto(*prior->sample(/*hypers*/), false);
   };
 
   //! Generates new state values from the centering posterior distribution
@@ -369,7 +346,7 @@ class BaseHierarchy : public AbstractHierarchy {
   void initialize() override {
     prior->initialize();
     if (is_conjugate()) {
-      updater->save_posterior_hypers(*prior->get_hypers_proto());
+      updater->save_posterior_hypers(prior->get_hypers_proto());
     }
     initialize_state();
     like->clear_data();
@@ -394,12 +371,11 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Initializes state parameters to appropriate values
   virtual void initialize_state() = 0;
 
-  // ADD EXEPTION HANDLING FOR is_dependent()?
   //! Evaluates the log-marginal distribution of data in a single point
   //! @param params     Container of (prior or posterior) hyperparameter values
   //! @param datum      Point which is to be evaluated
   //! @return           The evaluation of the lpdf
-  virtual double marg_lpdf(const ProtoHypers &hier_params,
+  virtual double marg_lpdf(ProtoHypersPtr hier_params,
                            const Eigen::RowVectorXd &datum) const {
     if (!is_conjugate()) {
       throw std::runtime_error(
@@ -410,13 +386,12 @@ class BaseHierarchy : public AbstractHierarchy {
     }
   }
 
-  // ADD EXEPTION HANDLING FOR is_dependent()?
   //! Evaluates the log-marginal distribution of data in a single point
   //! @param params     Container of (prior or posterior) hyperparameter values
   //! @param datum      Point which is to be evaluated
   //! @param covariate  Covariate vector associated to datum
   //! @return           The evaluation of the lpdf
-  virtual double marg_lpdf(const ProtoHypers &hier_params,
+  virtual double marg_lpdf(ProtoHypersPtr hier_params,
                            const Eigen::RowVectorXd &datum,
                            const Eigen::RowVectorXd &covariate) const {
     if (!is_conjugate()) {
@@ -427,10 +402,28 @@ class BaseHierarchy : public AbstractHierarchy {
           "marg_lpdf() not implemented for this hierarchy");
     }
   }
-
-  // TEMPORANEO!
-  // const Eigen::MatrixXd *dataset_ptr;
 };
+
+// OLD STUFF
+//! Returns an independent, data-less copy of this object
+// std::shared_ptr<AbstractHierarchy> deep_clone() const override {
+//   auto out = std::make_shared<Derived>(static_cast<Derived const
+//   &>(*this));
+
+//   out->clear_data();
+//   out->clear_summary_statistics();
+
+//   out->create_empty_prior();
+//   std::shared_ptr<google::protobuf::Message> new_prior(prior->New());
+//   new_prior->CopyFrom(*prior.get());
+//   out->get_mutable_prior()->CopyFrom(*new_prior.get());
+
+//   out->create_empty_hypers();
+//   auto curr_hypers_proto = get_hypers_proto();
+//   out->set_hypers_from_proto(*curr_hypers_proto.get());
+//   out->initialize();
+//   return out;
+// }
 
 // TODO: Move definitions outside the class to improve code cleaness
 

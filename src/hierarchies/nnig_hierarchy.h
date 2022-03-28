@@ -41,9 +41,9 @@ class NNIGHierarchy
     like->set_state(state);
   };
 
-  double marg_lpdf(const ProtoHypers &hier_params,
+  double marg_lpdf(ProtoHypersPtr hier_params,
                    const Eigen::RowVectorXd &datum) const override {
-    auto params = hier_params.nnig_state();
+    auto params = hier_params->nnig_state();
     double sig_n = sqrt(params.scale() * (params.var_scaling() + 1) /
                         (params.shape() * params.var_scaling()));
     return stan::math::student_t_lpdf(datum(0), 2 * params.shape(),

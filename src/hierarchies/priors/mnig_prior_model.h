@@ -16,13 +16,16 @@
 class MNIGPriorModel : public BasePriorModel<MNIGPriorModel, Hyperparams::MNIG,
                                              bayesmix::LinRegUniPrior> {
  public:
+  using AbstractPriorModel::ProtoHypers;
+  using AbstractPriorModel::ProtoHypersPtr;
+
   MNIGPriorModel() = default;
   ~MNIGPriorModel() = default;
 
   double lpdf(const google::protobuf::Message &state_) override;
 
   std::shared_ptr<google::protobuf::Message> sample(
-      bayesmix::AlgorithmState::HierarchyHypers hier_hypers) override;
+      ProtoHypersPtr hier_hypers = nullptr) override;
   // std::shared_ptr<google::protobuf::Message> sample(
   //     bool use_post_hypers) override;
 

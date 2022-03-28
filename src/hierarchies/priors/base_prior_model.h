@@ -12,27 +12,8 @@
 #include "abstract_prior_model.h"
 #include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
+#include "prior_model_internal.h"
 #include "src/utils/rng.h"
-
-namespace internal {
-
-template <class Prior, typename T>
-auto lpdf_from_unconstrained(
-    const Prior &prior,
-    Eigen::Matrix<T, Eigen::Dynamic, 1> unconstrained_params, int)
-    -> decltype(prior.template lpdf_from_unconstrained<T>(
-        unconstrained_params)) {
-  return prior.template lpdf_from_unconstrained<T>(unconstrained_params);
-}
-
-template <class Prior, typename T>
-auto lpdf_from_unconstrained(
-    const Prior &prior,
-    Eigen::Matrix<T, Eigen::Dynamic, 1> unconstrained_params, double) -> T {
-  throw(std::runtime_error("lpdf_from_unconstrained() not yet implemented"));
-}
-
-}  // namespace internal
 
 template <class Derived, typename HyperParams, typename Prior>
 class BasePriorModel : public AbstractPriorModel {
@@ -55,7 +36,7 @@ class BasePriorModel : public AbstractPriorModel {
       Eigen::VectorXd unconstrained_params) const override {
     return internal::lpdf_from_unconstrained(
         static_cast<const Derived &>(*this), unconstrained_params, 0);
-  }
+  };
 
   //! This version using `stan::math::var` type is required for Stan automatic
   //! aifferentiation. Evaluates the log likelihood for unconstrained parameter
@@ -71,7 +52,7 @@ class BasePriorModel : public AbstractPriorModel {
       const override {
     return internal::lpdf_from_unconstrained(
         static_cast<const Derived &>(*this), unconstrained_params, 0);
-  }
+  };
 
   //! Returns an independent, data-less copy of this object
   std::shared_ptr<AbstractPriorModel> clone() const override;
@@ -83,7 +64,7 @@ class BasePriorModel : public AbstractPriorModel {
   google::protobuf::Message *get_mutable_prior() override;
 
   //! Returns the struct of the current prior hyperparameters
-  HyperParams get_hypers() const { return *hypers; }
+  HyperParams get_hypers() const { return *hypers; };
 
   //! Returns the struct of the current posterior hyperparameters
   // HyperParams get_posterior_hypers() const { return post_hypers; }
@@ -105,32 +86,32 @@ class BasePriorModel : public AbstractPriorModel {
   void check_prior_is_set() const;
 
   //! Re-initializes the prior of the hierarchy to a newly created object
-  void create_empty_prior() { prior.reset(new Prior); }
+  void create_empty_prior() { prior.reset(new Prior); };
 
   //! Re-initializes the hyperparameters of the hierarchy to a newly created
   //! object
-  void create_empty_hypers() { hypers.reset(new HyperParams); }
+  void create_empty_hypers() { hypers.reset(new HyperParams); };
 
   //! Down-casts the given generic proto message to a HierarchyHypers proto
   bayesmix::AlgorithmState::HierarchyHypers *downcast_hypers(
       google::protobuf::Message *state_) const {
     return google::protobuf::internal::down_cast<
         bayesmix::AlgorithmState::HierarchyHypers *>(state_);
-  }
+  };
 
   //! Down-casts the given generic proto message to a HierarchyHypers proto
   const bayesmix::AlgorithmState::HierarchyHypers &downcast_hypers(
       const google::protobuf::Message &state_) const {
     return google::protobuf::internal::down_cast<
         const bayesmix::AlgorithmState::HierarchyHypers &>(state_);
-  }
+  };
 
   //! Down-casts the given generic proto message to a ClusterState proto
   const bayesmix::AlgorithmState::ClusterState &downcast_state(
       const google::protobuf::Message &state_) const {
     return google::protobuf::internal::down_cast<
         const bayesmix::AlgorithmState::ClusterState &>(state_);
-  }
+  };
 
   //! Container for prior hyperparameters values
   std::shared_ptr<HyperParams> hypers = std::make_shared<HyperParams>();

@@ -17,6 +17,9 @@
 class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
                                             bayesmix::NNIGPrior> {
  public:
+  using AbstractPriorModel::ProtoHypers;
+  using AbstractPriorModel::ProtoHypersPtr;
+
   NIGPriorModel() = default;
   ~NIGPriorModel() = default;
 
@@ -41,7 +44,7 @@ class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
   //       bool use_post_hypers) override;
 
   std::shared_ptr<google::protobuf::Message> sample(
-      bayesmix::AlgorithmState::HierarchyHypers hier_hypers) override;
+      ProtoHypersPtr hier_hypers = nullptr) override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;

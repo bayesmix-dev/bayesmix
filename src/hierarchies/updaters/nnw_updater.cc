@@ -5,7 +5,7 @@
 #include "src/hierarchies/priors/hyperparams.h"
 #include "src/utils/proto_utils.h"
 
-AbstractUpdater::ProtoHypers NNWUpdater::compute_posterior_hypers(
+AbstractUpdater::ProtoHypersPtr NNWUpdater::compute_posterior_hypers(
     AbstractLikelihood& like, AbstractPriorModel& prior) {
   // Likelihood and Prior downcast
   auto& likecast = downcast_likelihood(like);
@@ -19,7 +19,7 @@ AbstractUpdater::ProtoHypers NNWUpdater::compute_posterior_hypers(
 
   // No update possible
   if (card == 0) {
-    return *(prior.get_hypers_proto());
+    return prior.get_hypers_proto();
   }
 
   // Compute posterior hyperparameters
@@ -41,12 +41,12 @@ AbstractUpdater::ProtoHypers NNWUpdater::compute_posterior_hypers(
   // scale_chol = Eigen::LLT<Eigen::MatrixXd>(scale).matrixU();
 
   // Proto conversion
-  bayesmix::AlgorithmState::HierarchyHypers out;
+  ProtoHypers out;
   bayesmix::to_proto(mean, out.mutable_nnw_state()->mutable_mean());
   out.mutable_nnw_state()->set_var_scaling(var_scaling);
   out.mutable_nnw_state()->set_deg_free(deg_free);
   bayesmix::to_proto(scale, out.mutable_nnw_state()->mutable_scale());
-  return out;
+  return std::make_shared<ProtoHypers>(out);
 }
 
 // void NNWUpdater::compute_posterior_hypers(AbstractLikelihood& like,

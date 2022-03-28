@@ -121,8 +121,8 @@ TEST(nig_prior_model, sample) {
 
   // Set hypers and get sampled state as proto
   prior->set_hypers_from_proto(hypers_proto);
-  auto state1 = prior->sample(*prior->get_hypers_proto());
-  auto state2 = prior->sample(*prior->get_hypers_proto());
+  auto state1 = prior->sample();
+  auto state2 = prior->sample();
 
   // Check if they coincides
   ASSERT_TRUE(state1->DebugString() != state2->DebugString());
@@ -203,8 +203,8 @@ TEST(nxig_prior_model, sample) {
 
   // Set hypers and get sampled state as proto
   prior->set_hypers_from_proto(hypers_proto);
-  auto state1 = prior->sample(*prior->get_hypers_proto());
-  auto state2 = prior->sample(*prior->get_hypers_proto());
+  auto state1 = prior->sample();
+  auto state2 = prior->sample();
 
   // Check if they coincides
   ASSERT_TRUE(state1->DebugString() != state2->DebugString());
@@ -378,8 +378,8 @@ TEST(nw_prior_model, sample) {
 
   // Set hypers and get sampled state as proto
   prior->set_hypers_from_proto(hypers_proto);
-  auto state1 = prior->sample(*prior->get_hypers_proto());
-  auto state2 = prior->sample(*prior->get_hypers_proto());
+  auto state1 = prior->sample();
+  auto state2 = prior->sample();
 
   // Check if they coincides
   ASSERT_TRUE(state1->DebugString() != state2->DebugString());
@@ -470,8 +470,8 @@ TEST(mnig_prior_model, sample) {
 
   // Set hypers and get sampled state as proto
   prior->set_hypers_from_proto(hypers_proto);
-  auto state1 = prior->sample(*prior->get_hypers_proto());
-  auto state2 = prior->sample(*prior->get_hypers_proto());
+  auto state1 = prior->sample();
+  auto state2 = prior->sample();
 
   // Check if they coincides
   ASSERT_TRUE(state1->DebugString() != state2->DebugString());

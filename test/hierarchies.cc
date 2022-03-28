@@ -9,6 +9,7 @@
 #include "src/hierarchies/lin_reg_uni_hierarchy.h"
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/hierarchies/nnw_hierarchy.h"
+#include "src/hierarchies/nnxig_hierarchy.h"
 #include "src/includes.h"
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"

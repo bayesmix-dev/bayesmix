@@ -30,12 +30,12 @@ double FAPriorModel::lpdf(const google::protobuf::Message &state_) {
 }
 
 std::shared_ptr<google::protobuf::Message> FAPriorModel::sample(
-    bayesmix::AlgorithmState::HierarchyHypers hier_hypers) {
+    ProtoHypersPtr hier_hypers) {
   // Random seed
   auto &rng = bayesmix::Rng::Instance().get();
 
   // Get params to use
-  auto params = hier_hypers.fa_state();
+  auto params = get_hypers_proto()->fa_state();
   Eigen::VectorXd mutilde = bayesmix::to_eigen(params.mutilde());
   Eigen::VectorXd beta = bayesmix::to_eigen(params.beta());
 

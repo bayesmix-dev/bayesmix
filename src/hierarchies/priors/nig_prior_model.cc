@@ -100,9 +100,10 @@ double NIGPriorModel::lpdf(const google::protobuf::Message &state_) {
 // };
 
 std::shared_ptr<google::protobuf::Message> NIGPriorModel::sample(
-    bayesmix::AlgorithmState::HierarchyHypers hier_hypers) {
+    ProtoHypersPtr hier_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
-  auto params = hier_hypers.nnig_state();
+  auto params = (hier_hypers) ? hier_hypers->nnig_state()
+                              : get_hypers_proto()->nnig_state();
 
   // Hyperparams::NIG params = use_post_hypers ? post_hypers : *hypers;
   double var = stan::math::inv_gamma_rng(params.shape(), params.scale(), rng);
