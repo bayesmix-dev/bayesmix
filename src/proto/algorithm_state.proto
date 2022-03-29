@@ -38,7 +38,8 @@ message AlgorithmState {
   message HierarchyHypers {
     // Current values of the Hyperparameters of the Hierarchy
     oneof val {
-      EmptyPrior fake_prior = 1;
+      Vector fake_prior = 1;
+      //EmptyPrior fake_prior = 1;
       NIGDistribution nnig_state = 2;
       NWDistribution nnw_state = 3;
       MultiNormalIGDistribution lin_reg_uni_state = 4;
