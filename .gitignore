@@ -20,3 +20,5 @@ sftp-config.json
 .idea/
 # Build debug folder
 cmake-build-debug/
+# mypy cache
+.mypy_cache/
