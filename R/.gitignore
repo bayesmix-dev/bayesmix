@@ -3,7 +3,7 @@
 *.Rproj
 *.Rhistory
 *.Rdata
-*.html
+*.nb.html
 
 # Folders
 build/
