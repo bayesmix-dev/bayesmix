@@ -204,27 +204,4 @@ Eigen::VectorXd BaseLikelihood<Derived, State>::lpdf_grid(
   return lpdf;
 }
 
-/* OLD STUFF THAT WILL BE REMOVED */
-// Eigen::VectorXd lpdf(data.rows());
-
-// if (covariates.cols() == 0) {
-//   // Pass null value as covariate
-//   for (int i = 0; i < data.rows(); i++) {
-//     lpdf(i) = static_cast<Derived const *>(this)->lpdf(
-//         data.row(i), Eigen::RowVectorXd(0));
-//   }
-// } else if (covariates.rows() == 1) {
-//   // Use unique covariate
-//   for (int i = 0; i < data.rows(); i++) {
-//     lpdf(i) = static_cast<Derived const *>(this)->lpdf(data.row(i),
-//                                                        covariates.row(0));
-//   }
-// } else {
-//   // Use different covariates
-//   for (int i = 0; i < data.rows(); i++) {
-//     lpdf(i) = static_cast<Derived const *>(this)->lpdf(data.row(i),
-//                                                        covariates.row(i));
-//   }
-// }
-
 #endif  // BAYESMIX_HIERARCHIES_LIKELIHOODS_BASE_LIKELIHOOD_H_
