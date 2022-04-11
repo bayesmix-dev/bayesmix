@@ -2,15 +2,14 @@ target_sources(bayesmix
   PUBLIC
     abstract_hierarchy.h
     base_hierarchy.h
-    conjugate_hierarchy.h
-    lin_reg_uni_hierarchy.h
-    lin_reg_uni_hierarchy.cc
     nnig_hierarchy.h
-    nnig_hierarchy.cc
+    nnxig_hierarchy.h
     nnw_hierarchy.h
-    nnw_hierarchy.cc
+    lin_reg_uni_hierarchy.h
     fa_hierarchy.h
-    fa_hierarchy.cc
     lapnig_hierarchy.h
-    lapnig_hierarchy.cc
 )
+
+add_subdirectory(likelihoods)
+add_subdirectory(priors)
+add_subdirectory(updaters)

@@ -1,168 +1,66 @@
 #ifndef BAYESMIX_HIERARCHIES_NNW_HIERARCHY_H_
 #define BAYESMIX_HIERARCHIES_NNW_HIERARCHY_H_
 
-#include <google/protobuf/stubs/casts.h>
-
-#include <Eigen/Dense>
-#include <memory>
-#include <vector>
-
-#include "algorithm_state.pb.h"
-#include "conjugate_hierarchy.h"
+#include "base_hierarchy.h"
 #include "hierarchy_id.pb.h"
-#include "hierarchy_prior.pb.h"
-
-//! Normal Normal-Wishart hierarchy for multivariate data.
-
-//! This class represents a hierarchy, i.e. a cluster, whose multivariate data
-//! are distributed according to a multinomial normal likelihood, the
-//! parameters of which have a Normal-Wishart centering distribution. That is:
-//! f(x_i|mu,tau) = N(mu,tau^{-1})
-//!      (mu,tau) ~ NW(mu0, lambda0, tau0, nu0)
-//! The state is composed of mean and precision matrix. The Cholesky factor and
-//! log-determinant of the latter are also included in the container for
-//! efficiency reasons. The state's hyperparameters, contained in the Hypers
-//! object, are (mu0, lambda0, tau0, nu0), which are respectively vector,
-//! scalar, matrix, and scalar. Note that this hierarchy is conjugate, thus the
-//! marginal distribution is available in closed form.  For more information,
-//! please refer to parent classes: `AbstractHierarchy`, `BaseHierarchy`, and
-//! `ConjugateHierarchy`.
-
-namespace NNW {
-//! Custom container for State values
-struct State {
-  Eigen::VectorXd mean;
-  Eigen::MatrixXd prec;
-  Eigen::MatrixXd prec_chol;
-  double prec_logdet;
-};
-
-//! Custom container for Hyperparameters values
-struct Hyperparams {
-  Eigen::VectorXd mean;
-  double var_scaling;
-  double deg_free;
-  Eigen::MatrixXd scale;
-  Eigen::MatrixXd scale_inv;
-  Eigen::MatrixXd scale_chol;
-};
-}  // namespace NNW
+#include "likelihoods/multi_norm_likelihood.h"
+#include "priors/nw_prior_model.h"
+#include "src/utils/distributions.h"
+#include "updaters/nnw_updater.h"
 
 class NNWHierarchy
-    : public ConjugateHierarchy<NNWHierarchy, NNW::State, NNW::Hyperparams,
-                                bayesmix::NNWPrior> {
+    : public BaseHierarchy<NNWHierarchy, MultiNormLikelihood, NWPriorModel> {
  public:
   NNWHierarchy() = default;
   ~NNWHierarchy() = default;
 
-  // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
-  //! Evaluates the log-likelihood of data in a grid of points
-  //! @param data        Grid of points (by row) which are to be evaluated
-  //! @param covariates  (Optional) covariate vectors associated to data
-  //! @return            The evaluation of the lpdf
-  Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data,
-                                 const Eigen::MatrixXd &covariates =
-                                     Eigen::MatrixXd(0, 0)) const override;
-
-  //! Evaluates the log-prior predictive distr. of data in a grid of points
-  //! @param data        Grid of points (by row) which are to be evaluated
-  //! @param covariates  (Optional) covariate vectors associated to data
-  //! @return            The evaluation of the lpdf
-  Eigen::VectorXd prior_pred_lpdf_grid(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
-                                                          0)) const override;
-
-  //! Evaluates the log-prior predictive distr. of data in a grid of points
-  //! @param data        Grid of points (by row) which are to be evaluated
-  //! @param covariates  (Optional) covariate vectors associated to data
-  //! @return            The evaluation of the lpdf
-  Eigen::VectorXd conditional_pred_lpdf_grid(
-      const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
-                                                          0)) const override;
-
-  //! Updates hyperparameter values given a vector of cluster states
-  void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
-                         &states) override;
-
-  //! Updates state values using the given (prior or posterior) hyperparameters
-  NNW::State draw(const NNW::Hyperparams &params);
-
-  //! Resets summary statistics for this cluster
-  void clear_summary_statistics() override;
-
-  //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNW;
   }
 
-  //! Computes and return posterior hypers given data currently in this cluster
-  NNW::Hyperparams compute_posterior_hypers() const;
+  void set_default_updater() { updater = std::make_shared<NNWUpdater>(); }
 
-  //! Read and set state values from a given Protobuf message
-  void set_state_from_proto(const google::protobuf::Message &state_) override;
+  void initialize_state() override {
+    // Initialize likelihood dimension to prior one
+    like->set_dim(prior->get_dim());
+    // Get hypers and data dimension
+    auto hypers = prior->get_hypers();
+    unsigned int dim = like->get_dim();
+    // Initialize likelihood state
+    State::MultiLS state;
+    state.mean = hypers.mean;
+    prior->write_prec_to_state(
+        hypers.var_scaling * Eigen::MatrixXd::Identity(dim, dim), &state);
+    like->set_state(state);
+  };
 
-  //! Read and set hyperparameter values from a given Protobuf message
-  void set_hypers_from_proto(
-      const google::protobuf::Message &hypers_) override;
+  double marg_lpdf(ProtoHypersPtr hier_params,
+                   const Eigen::RowVectorXd &datum) const override {
+    HyperParams pred_params = get_predictive_t_parameters(hier_params);
+    Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
+    double logdet = 2 * log(diag.array()).sum();
+    return bayesmix::multi_student_t_invscale_lpdf(
+        datum, pred_params.deg_free, pred_params.mean, pred_params.scale_chol,
+        logdet);
+  }
 
-  //! Writes current state to a Protobuf message and return a shared_ptr
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! AlgoritmState::ClusterState message by adding the appropriate type
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
-      const override;
-
-  //! Writes current value of hyperparameters to a Protobuf message and
-  //! return a shared_ptr.
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! AlgoritmState::HierarchyHypers message by adding the appropriate type
-  std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> get_hypers_proto()
-      const override;
-
-  //! Returns whether the hierarchy models multivariate data or not
-  bool is_multivariate() const override { return true; }
-
- protected:
-  //! Evaluates the log-likelihood of data in a single point
-  //! @param datum      Point which is to be evaluated
-  //! @return           The evaluation of the lpdf
-  double like_lpdf(const Eigen::RowVectorXd &datum) const override;
-
-  //! Evaluates the log-marginal distribution of data in a single point
-  //! @param params     Container of (prior or posterior) hyperparameter values
-  //! @param datum      Point which is to be evaluated
-  //! @return           The evaluation of the lpdf
-  double marg_lpdf(const NNW::Hyperparams &params,
-                   const Eigen::RowVectorXd &datum) const override;
-
-  //! Updates cluster statistics when a datum is added or removed from it
-  //! @param datum      Data point which is being added or removed
-  //! @param add        Whether the datum is being added or removed
-  void update_summary_statistics(const Eigen::RowVectorXd &datum,
-                                 const bool add) override;
-
-  //! Writes prec and its utilities to the given state object by pointer
-  void write_prec_to_state(const Eigen::MatrixXd &prec_, NNW::State *out);
-
-  //! Returns parameters for the predictive Student's t distribution
-  NNW::Hyperparams get_predictive_t_parameters(
-      const NNW::Hyperparams &params) const;
-
-  //! Initializes state parameters to appropriate values
-  void initialize_state() override;
-
-  //! Initializes hierarchy hyperparameters to appropriate values
-  void initialize_hypers() override;
-
-  //! Dimension of data space
-  unsigned int dim;
-
-  //! Sum of data points currently belonging to the cluster
-  Eigen::VectorXd data_sum;
-
-  //! Sum of squared data points currently belonging to the cluster
-  Eigen::MatrixXd data_sum_squares;
+  HyperParams get_predictive_t_parameters(ProtoHypersPtr hier_params) const {
+    auto params = hier_params->nnw_state();
+    // Compute dof and scale of marginal distribution
+    unsigned int dim = like->get_dim();
+    double nu_n = params.deg_free() - dim + 1;
+    double coeff = (params.var_scaling() + 1) / (params.var_scaling() * nu_n);
+    Eigen::MatrixXd scale_chol =
+        Eigen::LLT<Eigen::MatrixXd>(bayesmix::to_eigen(params.scale()))
+            .matrixU();
+    Eigen::MatrixXd scale_chol_n = scale_chol / std::sqrt(coeff);
+    // Return predictive t parameters
+    HyperParams out;
+    out.mean = bayesmix::to_eigen(params.mean());
+    out.deg_free = nu_n;
+    out.scale_chol = scale_chol_n;
+    return out;
+  }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_NNW_HIERARCHY_H_

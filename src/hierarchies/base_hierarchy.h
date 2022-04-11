@@ -3,16 +3,17 @@
 
 #include <google/protobuf/message.h>
 
-#include <Eigen/Dense>
 #include <memory>
 #include <random>
 #include <set>
-#include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "abstract_hierarchy.h"
 #include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
+#include "src/utils/covariates_getter.h"
 #include "src/utils/rng.h"
+#include "updaters/target_lpdf_unconstrained.h"
 
 //! Base template class for a hierarchy object.
 
@@ -22,326 +23,357 @@
 //! class for further information). It includes class members and some more
 //! functions which could not be implemented in the non-templatized abstract
 //! class.
-//! See, for instance, `ConjugateHierarchy` and `NNIGHierarchy` to better
-//! understand the CRTP patterns.
+//! See, for instance, `NNIGHierarchy` to better understand the CRTP patterns.
 
 //! @tparam Derived      Name of the implemented derived class
-//! @tparam State        Class name of the container for state values
-//! @tparam Hyperparams  Class name of the container for hyperprior parameters
-//! @tparam Prior        Class name of the container for prior parameters
+//! @tparam Likelihood   Class name of the likelihood model for the hierarchy
+//! @tparam PriorModel   Class name of the prior model for the hierarchy
 
-template <class Derived, typename State, typename Hyperparams, typename Prior>
+template <class Derived, class Likelihood, class PriorModel>
 class BaseHierarchy : public AbstractHierarchy {
+ protected:
+  //! Container for the likelihood of the hierarchy
+  std::shared_ptr<Likelihood> like = std::make_shared<Likelihood>();
+
+  //! Container for the prior model of the hierarchy
+  std::shared_ptr<PriorModel> prior = std::make_shared<PriorModel>();
+
+  //! Container for the update algorithm
+  std::shared_ptr<AbstractUpdater> updater;
+
  public:
-  BaseHierarchy() = default;
+  // Useful type aliases
+  using HyperParams = decltype(prior->get_hypers());
+  using ProtoHypersPtr = AbstractUpdater::ProtoHypersPtr;
+  using ProtoHypers = AbstractUpdater::ProtoHypers;
+
+  //! Constructor that allows the specification of Likelihood, PriorModel and
+  //! Updater for a given Hierarchy
+  BaseHierarchy(std::shared_ptr<AbstractLikelihood> like_ = nullptr,
+                std::shared_ptr<AbstractPriorModel> prior_ = nullptr,
+                std::shared_ptr<AbstractUpdater> updater_ = nullptr) {
+    if (like_) {
+      set_likelihood(like_);
+    }
+    if (prior_) {
+      set_prior(prior_);
+    }
+    if (updater_) {
+      set_updater(updater_);
+    } else {
+      static_cast<Derived *>(this)->set_default_updater();
+    }
+  }
+
+  //! Default destructor
   ~BaseHierarchy() = default;
+
+  //! Sets the likelihood for the current hierarchy
+  void set_likelihood(std::shared_ptr<AbstractLikelihood> like_) /*override*/ {
+    like = std::static_pointer_cast<Likelihood>(like_);
+  }
+
+  //! Sets the prior model for the current hierarchy
+  void set_prior(std::shared_ptr<AbstractPriorModel> prior_) /*override*/ {
+    prior = std::static_pointer_cast<PriorModel>(prior_);
+  }
+
+  //! Sets the update algorithm for the current hierarchy
+  void set_updater(std::shared_ptr<AbstractUpdater> updater_) override {
+    updater = updater_;
+  };
+
+  //! Returns (a pointer to) the likelihood for the current hierarchy
+  std::shared_ptr<AbstractLikelihood> get_likelihood() override {
+    return like;
+  }
+
+  //! Returns (a pointer to) the prior model for the current hierarchy.
+  std::shared_ptr<AbstractPriorModel> get_prior() override { return prior; }
 
   //! Returns an independent, data-less copy of this object
   std::shared_ptr<AbstractHierarchy> clone() const override {
+    // Create copy of the hierarchy
     auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
-    out->clear_data();
-    out->clear_summary_statistics();
+    // Cloning each component class
+    out->set_likelihood(std::static_pointer_cast<Likelihood>(like->clone()));
+    out->set_prior(std::static_pointer_cast<PriorModel>(prior->clone()));
+    return out;
+  };
+
+  //! Returns an independent, data-less deep copy of this object
+  std::shared_ptr<AbstractHierarchy> deep_clone() const override {
+    // Create copy of the hierarchy
+    auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
+    // Simple clone for Likelihood is enough
+    out->set_likelihood(std::static_pointer_cast<Likelihood>(like->clone()));
+    // Deep clone required for PriorModel
+    out->set_prior(std::static_pointer_cast<PriorModel>(prior->deep_clone()));
     return out;
   }
 
-  //! Returns an independent, data-less copy of this object
-  std::shared_ptr<AbstractHierarchy> deep_clone() const override {
-    auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
-
-    out->clear_data();
-    out->clear_summary_statistics();
-
-    out->create_empty_prior();
-    std::shared_ptr<google::protobuf::Message> new_prior(prior->New());
-    new_prior->CopyFrom(*prior.get());
-    out->get_mutable_prior()->CopyFrom(*new_prior.get());
-
-    out->create_empty_hypers();
-    auto curr_hypers_proto = get_hypers_proto();
-    out->set_hypers_from_proto(*curr_hypers_proto.get());
-    out->initialize();
-    return out;
+  //! Public wrapper for `like_lpdf()` methods
+  double get_like_lpdf(const Eigen::RowVectorXd &datum,
+                       const Eigen::RowVectorXd &covariate =
+                           Eigen::RowVectorXd(0)) const override {
+    return like->lpdf(datum, covariate);
   }
 
   //! Evaluates the log-likelihood of data in a grid of points
   //! @param data        Grid of points (by row) which are to be evaluated
   //! @param covariates  (Optional) covariate vectors associated to data
   //! @return            The evaluation of the lpdf
-  virtual Eigen::VectorXd like_lpdf_grid(
+  Eigen::VectorXd like_lpdf_grid(const Eigen::MatrixXd &data,
+                                 const Eigen::MatrixXd &covariates =
+                                     Eigen::MatrixXd(0, 0)) const override {
+    return like->lpdf_grid(data, covariates);
+  };
+
+  //! Public wrapper for `marg_lpdf()` methods
+  double get_marg_lpdf(
+      ProtoHypersPtr hier_params, const Eigen::RowVectorXd &datum,
+      const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) const {
+    if (this->is_dependent() and covariate.size() != 0) {
+      return marg_lpdf(hier_params, datum, covariate);
+    } else {
+      return marg_lpdf(hier_params, datum);
+    }
+  }
+
+  //! Evaluates the log-prior predictive distribution of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
+  double prior_pred_lpdf(const Eigen::RowVectorXd &datum,
+                         const Eigen::RowVectorXd &covariate =
+                             Eigen::RowVectorXd(0)) const override {
+    return get_marg_lpdf(prior->get_hypers_proto(), datum, covariate);
+  }
+
+  //! Evaluates the log-prior predictive distr. of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
+  Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0,
-                                                          0)) const override;
+      const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/)
+      const override {
+    Eigen::VectorXd lpdf(data.rows());
+    if (covariates.cols() == 0) {
+      // Pass null value as covariate
+      for (int i = 0; i < data.rows(); i++) {
+        lpdf(i) = static_cast<Derived const *>(this)->prior_pred_lpdf(
+            data.row(i), Eigen::RowVectorXd(0));
+      }
+    } else if (covariates.rows() == 1) {
+      // Use unique covariate
+      for (int i = 0; i < data.rows(); i++) {
+        lpdf(i) = static_cast<Derived const *>(this)->prior_pred_lpdf(
+            data.row(i), covariates.row(0));
+      }
+    } else {
+      // Use different covariates
+      for (int i = 0; i < data.rows(); i++) {
+        lpdf(i) = static_cast<Derived const *>(this)->prior_pred_lpdf(
+            data.row(i), covariates.row(i));
+      }
+    }
+    return lpdf;
+  }
+
+  //! Evaluates the log-conditional predictive distr. of data in a single point
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  (Optional) covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
+  double conditional_pred_lpdf(const Eigen::RowVectorXd &datum,
+                               const Eigen::RowVectorXd &covariate =
+                                   Eigen::RowVectorXd(0)) const override {
+    return get_marg_lpdf(updater->compute_posterior_hypers(*like, *prior),
+                         datum, covariate);
+  }
+
+  //! Evaluates the log-prior predictive distr. of data in a grid of points
+  //! @param data        Grid of points (by row) which are to be evaluated
+  //! @param covariates  (Optional) covariate vectors associated to data
+  //! @return            The evaluation of the lpdf
+  Eigen::VectorXd conditional_pred_lpdf_grid(
+      const Eigen::MatrixXd &data,
+      const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/)
+      const override {
+    Eigen::VectorXd lpdf(data.rows());
+    covariates_getter cov_getter(covariates);
+    for (int i = 0; i < data.rows(); i++) {
+      lpdf(i) = static_cast<Derived const *>(this)->conditional_pred_lpdf(
+          data.row(i), cov_getter(i));
+    }
+    return lpdf;
+  }
 
   //! Generates new state values from the centering prior distribution
   void sample_prior() override {
-    state = static_cast<Derived *>(this)->draw(*hypers);
-  }
+    like->set_state_from_proto(*prior->sample(), false);
+  };
+
+  //! Generates new state values from the centering posterior distribution
+  //! @param update_params  Save posterior hypers after the computation?
+  void sample_full_cond(bool update_params = false) override {
+    updater->draw(*like, *prior, update_params);
+  };
 
   //! Overloaded version of sample_full_cond(bool), mainly used for debugging
-  virtual void sample_full_cond(
+  void sample_full_cond(
       const Eigen::MatrixXd &data,
-      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override;
+      const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) override {
+    like->clear_data();
+    like->clear_summary_statistics();
+
+    covariates_getter cov_getter(covariates);
+    for (int i = 0; i < data.rows(); i++) {
+      static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
+                                              cov_getter(i));
+    }
+    static_cast<Derived *>(this)->sample_full_cond(true);
+  };
+
+  //! Updates hyperparameter values given a vector of cluster states
+  void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
+                         &states) override {
+    prior->update_hypers(states);
+  };
+
+  //! Returns the class of the current state
+  auto get_state() const -> decltype(like->get_state()) {
+    return like->get_state();
+  };
 
   //! Returns the current cardinality of the cluster
-  int get_card() const override { return card; }
+  int get_card() const override { return like->get_card(); };
 
   //! Returns the logarithm of the current cardinality of the cluster
-  double get_log_card() const override { return log_card; }
+  double get_log_card() const override { return like->get_log_card(); };
 
   //! Returns the indexes of data points belonging to this cluster
-  std::set<int> get_data_idx() const override { return cluster_data_idx; }
+  std::set<int> get_data_idx() const override { return like->get_data_idx(); };
+
+  //! Writes current state to a Protobuf message and return a shared_ptr
+  //! New hierarchies have to first modify the field 'oneof val' in the
+  //! AlgoritmState::ClusterState message by adding the appropriate type
+  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
+      const override {
+    return like->get_state_proto();
+  }
 
   //! Returns a pointer to the Protobuf message of the prior of this cluster
   google::protobuf::Message *get_mutable_prior() override {
-    if (prior == nullptr) {
-      create_empty_prior();
-    }
-    return prior.get();
-  }
+    return prior->get_mutable_prior();
+  };
 
   //! Writes current state to a Protobuf message by pointer
-  void write_state_to_proto(
-      google::protobuf::Message *const out) const override;
+  void write_state_to_proto(google::protobuf::Message *out) const override {
+    like->write_state_to_proto(out);
+  };
 
   //! Writes current values of the hyperparameters to a Protobuf message by
   //! pointer
-  void write_hypers_to_proto(
-      google::protobuf::Message *const out) const override;
+  void write_hypers_to_proto(google::protobuf::Message *out) const override {
+    prior->write_hypers_to_proto(out);
+  };
 
-  //! Returns the struct of the current state
-  State get_state() const { return state; }
+  //! Read and set state values from a given Protobuf message
+  void set_state_from_proto(const google::protobuf::Message &state_) override {
+    like->set_state_from_proto(state_);
+  };
 
-  //! Returns the struct of the current prior hyperparameters
-  Hyperparams get_hypers() const { return *hypers; }
-
-  //! Returns the struct of the current posterior hyperparameters
-  Hyperparams get_posterior_hypers() const { return posterior_hypers; }
+  //! Read and set hyperparameter values from a given Protobuf message
+  void set_hypers_from_proto(
+      const google::protobuf::Message &state_) override {
+    prior->set_hypers_from_proto(state_);
+  };
 
   //! Adds a datum and its index to the hierarchy
   void add_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
+    like->add_datum(id, datum, covariate);
+    if (update_params) {
+      updater->save_posterior_hypers(
+          updater->compute_posterior_hypers(*like, *prior));
+    }
+  };
 
   //! Removes a datum and its index from the hierarchy
   void remove_datum(
       const int id, const Eigen::RowVectorXd &datum,
       const bool update_params = false,
-      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
+      const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
+    like->remove_datum(id, datum, covariate);
+    if (update_params) {
+      updater->save_posterior_hypers(
+          updater->compute_posterior_hypers(*like, *prior));
+    }
+  };
 
   //! Main function that initializes members to appropriate values
   void initialize() override {
-    hypers = std::make_shared<Hyperparams>();
-    check_prior_is_set();
-    initialize_hypers();
+    prior->initialize();
+    if (is_conjugate()) {
+      updater->save_posterior_hypers(prior->get_hypers_proto());
+    }
     initialize_state();
-    posterior_hypers = *hypers;
-    clear_data();
-    clear_summary_statistics();
-  }
+    like->clear_data();
+    like->clear_summary_statistics();
+  };
+
+  //! Returns whether the hierarchy models multivariate data or not
+  bool is_multivariate() const override { return like->is_multivariate(); };
+
+  //! Returns whether the hierarchy depends on covariate values or not
+  bool is_dependent() const override { return like->is_dependent(); };
+
+  //! Returns whether the hierarchy represents a conjugate model or not
+  bool is_conjugate() const override { return updater->is_conjugate(); };
 
   //! Sets the (pointer to the) dataset matrix
   void set_dataset(const Eigen::MatrixXd *const dataset) override {
-    dataset_ptr = dataset;
+    like->set_dataset(dataset);
   }
 
  protected:
-  //! Raises an error if the prior pointer is not initialized
-  void check_prior_is_set() const {
-    if (prior == nullptr) {
-      throw std::invalid_argument("Hierarchy prior was not provided");
-    }
-  }
-
-  //! Re-initializes the prior of the hierarchy to a newly created object
-  void create_empty_prior() { prior.reset(new Prior); }
-
-  //! Re-initializes the hypers of the hierarchy to a newly created object
-  void create_empty_hypers() { hypers.reset(new Hyperparams); }
-
-  //! Sets the cardinality of the cluster
-  void set_card(const int card_) {
-    card = card_;
-    log_card = (card_ == 0) ? stan::math::NEGATIVE_INFTY : std::log(card_);
-  }
-
   //! Initializes state parameters to appropriate values
   virtual void initialize_state() = 0;
 
-  //! Writes current value of hyperparameters to a Protobuf message and
-  //! return a shared_ptr.
-  //! New hierarchies have to first modify the field 'oneof val' in the
-  //! AlgoritmState::HierarchyHypers message by adding the appropriate type
-  virtual std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
-  get_hypers_proto() const = 0;
-
-  //! Initializes hierarchy hyperparameters to appropriate values
-  virtual void initialize_hypers() = 0;
-
-  //! Resets cardinality and indexes of data in this cluster
-  void clear_data() {
-    set_card(0);
-    cluster_data_idx = std::set<int>();
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
+  virtual double marg_lpdf(ProtoHypersPtr hier_params,
+                           const Eigen::RowVectorXd &datum) const {
+    if (!is_conjugate()) {
+      throw std::runtime_error(
+          "Call marg_lpdf() for a non-conjugate hierarchy");
+    } else {
+      throw std::runtime_error(
+          "marg_lpdf() not implemented for this hierarchy");
+    }
   }
 
-  virtual void clear_summary_statistics() = 0;
-
-  //! Down-casts the given generic proto message to a ClusterState proto
-  bayesmix::AlgorithmState::ClusterState *downcast_state(
-      google::protobuf::Message *const state_) const {
-    return google::protobuf::internal::down_cast<
-        bayesmix::AlgorithmState::ClusterState *>(state_);
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @param covariate  Covariate vector associated to datum
+  //! @return           The evaluation of the lpdf
+  virtual double marg_lpdf(ProtoHypersPtr hier_params,
+                           const Eigen::RowVectorXd &datum,
+                           const Eigen::RowVectorXd &covariate) const {
+    if (!is_conjugate()) {
+      throw std::runtime_error(
+          "Call marg_lpdf() for a non-conjugate hierarchy");
+    } else {
+      throw std::runtime_error(
+          "marg_lpdf() not implemented for this hierarchy");
+    }
   }
-
-  //! Down-casts the given generic proto message to a ClusterState proto
-  const bayesmix::AlgorithmState::ClusterState &downcast_state(
-      const google::protobuf::Message &state_) const {
-    return google::protobuf::internal::down_cast<
-        const bayesmix::AlgorithmState::ClusterState &>(state_);
-  }
-
-  //! Down-casts the given generic proto message to a HierarchyHypers proto
-  bayesmix::AlgorithmState::HierarchyHypers *downcast_hypers(
-      google::protobuf::Message *const state_) const {
-    return google::protobuf::internal::down_cast<
-        bayesmix::AlgorithmState::HierarchyHypers *>(state_);
-  }
-
-  //! Down-casts the given generic proto message to a HierarchyHypers proto
-  const bayesmix::AlgorithmState::HierarchyHypers &downcast_hypers(
-      const google::protobuf::Message &state_) const {
-    return google::protobuf::internal::down_cast<
-        const bayesmix::AlgorithmState::HierarchyHypers &>(state_);
-  }
-
-  //! Container for state values
-  State state;
-
-  //! Container for prior hyperparameters values
-  std::shared_ptr<Hyperparams> hypers;
-
-  //! Container for posterior hyperparameters values
-  Hyperparams posterior_hypers;
-
-  //! Pointer to a Protobuf prior object for this class
-  std::shared_ptr<Prior> prior;
-
-  //! Set of indexes of data points belonging to this cluster
-  std::set<int> cluster_data_idx;
-
-  //! Current cardinality of this cluster
-  int card = 0;
-
-  //! Logarithm of current cardinality of this cluster
-  double log_card = stan::math::NEGATIVE_INFTY;
-
-  //! Pointer to the dataset matrix for the mixture model
-  const Eigen::MatrixXd *dataset_ptr = nullptr;
 };
-
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-void BaseHierarchy<Derived, State, Hyperparams, Prior>::add_datum(
-    const int id, const Eigen::RowVectorXd &datum,
-    const bool update_params /*= false*/,
-    const Eigen::RowVectorXd &covariate /*= Eigen::RowVectorXd(0)*/) {
-  assert(cluster_data_idx.find(id) == cluster_data_idx.end());
-  card += 1;
-  log_card = std::log(card);
-  static_cast<Derived *>(this)->update_ss(datum, covariate, true);
-  cluster_data_idx.insert(id);
-  if (update_params) {
-    static_cast<Derived *>(this)->save_posterior_hypers();
-  }
-}
-
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-void BaseHierarchy<Derived, State, Hyperparams, Prior>::remove_datum(
-    const int id, const Eigen::RowVectorXd &datum,
-    const bool update_params /*= false*/,
-    const Eigen::RowVectorXd &covariate /* = Eigen::RowVectorXd(0)*/) {
-  static_cast<Derived *>(this)->update_ss(datum, covariate, false);
-  set_card(card - 1);
-  auto it = cluster_data_idx.find(id);
-  assert(it != cluster_data_idx.end());
-  cluster_data_idx.erase(it);
-  if (update_params) {
-    static_cast<Derived *>(this)->save_posterior_hypers();
-  }
-}
-
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_state_to_proto(
-    google::protobuf::Message *const out) const {
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> state_ =
-      get_state_proto();
-  auto *out_cast = downcast_state(out);
-  out_cast->CopyFrom(*state_.get());
-  out_cast->set_cardinality(card);
-}
-
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-void BaseHierarchy<Derived, State, Hyperparams, Prior>::write_hypers_to_proto(
-    google::protobuf::Message *const out) const {
-  std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> hypers_ =
-      get_hypers_proto();
-  auto *out_cast = downcast_hypers(out);
-  out_cast->CopyFrom(*hypers_.get());
-}
-
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-Eigen::VectorXd
-BaseHierarchy<Derived, State, Hyperparams, Prior>::like_lpdf_grid(
-    const Eigen::MatrixXd &data,
-    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) const {
-  Eigen::VectorXd lpdf(data.rows());
-  if (covariates.cols() == 0) {
-    // Pass null value as covariate
-    for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived const *>(this)->get_like_lpdf(
-          data.row(i), Eigen::RowVectorXd(0));
-    }
-  } else if (covariates.rows() == 1) {
-    // Use unique covariate
-    for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived const *>(this)->get_like_lpdf(
-          data.row(i), covariates.row(0));
-    }
-  } else {
-    // Use different covariates
-    for (int i = 0; i < data.rows(); i++) {
-      lpdf(i) = static_cast<Derived const *>(this)->get_like_lpdf(
-          data.row(i), covariates.row(i));
-    }
-  }
-  return lpdf;
-}
-
-template <class Derived, typename State, typename Hyperparams, typename Prior>
-void BaseHierarchy<Derived, State, Hyperparams, Prior>::sample_full_cond(
-    const Eigen::MatrixXd &data,
-    const Eigen::MatrixXd &covariates /*= Eigen::MatrixXd(0, 0)*/) {
-  clear_data();
-  clear_summary_statistics();
-  if (covariates.cols() == 0) {
-    // Pass null value as covariate
-    for (int i = 0; i < data.rows(); i++) {
-      static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
-                                              Eigen::RowVectorXd(0));
-    }
-  } else if (covariates.rows() == 1) {
-    // Use unique covariate
-    for (int i = 0; i < data.rows(); i++) {
-      static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
-                                              covariates.row(0));
-    }
-  } else {
-    // Use different covariates
-    for (int i = 0; i < data.rows(); i++) {
-      static_cast<Derived *>(this)->add_datum(i, data.row(i), false,
-                                              covariates.row(i));
-    }
-  }
-  static_cast<Derived *>(this)->sample_full_cond(true);
-}
 
 #endif  // BAYESMIX_HIERARCHIES_BASE_HIERARCHY_H_

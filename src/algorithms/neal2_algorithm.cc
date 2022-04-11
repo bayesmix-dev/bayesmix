@@ -1,8 +1,8 @@
 #include "neal2_algorithm.h"
 
-#include <Eigen/Dense>
 #include <memory>
 #include <stan/math/prim/fun.hpp>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "algorithm_id.pb.h"

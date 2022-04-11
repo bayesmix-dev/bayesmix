@@ -1,7 +1,7 @@
 #ifndef BAYESMIX_SRC_UTILS_EIGEN_UTILS_H_
 #define BAYESMIX_SRC_UTILS_EIGEN_UTILS_H_
 
-#include <Eigen/Dense>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 //! This file implements a few methods to manipulate groups of matrices, mainly

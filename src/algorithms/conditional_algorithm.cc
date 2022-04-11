@@ -1,7 +1,7 @@
 #include "conditional_algorithm.h"
 
-#include <Eigen/Dense>
 #include <stan/math/prim/fun.hpp>
+#include <stan/math/rev.hpp>
 
 #include "algorithm_state.pb.h"
 #include "base_algorithm.h"

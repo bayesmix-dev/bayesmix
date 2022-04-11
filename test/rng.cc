@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <Eigen/Dense>
+#include <stan/math/rev.hpp>
 
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/utils/distributions.h"

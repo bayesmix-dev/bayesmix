@@ -90,6 +90,7 @@ set(INCLUDE_PATHS
   ${CMAKE_CURRENT_LIST_DIR}/lib/math
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.72.0
   ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/sundials_5.5.0/include
   # TBB already included
   ${CMAKE_CURRENT_BINARY_DIR}
   ${protobuf_SOURCE_DIR}/src
@@ -170,6 +171,7 @@ if (NOT DISABLE_DOCS)
   add_subdirectory(docs)
 endif()
 
+# add_subdirectory(examples)
 if (NOT DISABLE_PLOTS)
   include(FetchContent)
 
@@ -208,3 +210,9 @@ endif()
 if (NOT DISABLE_EXAMPLES)
   add_subdirectory(examples)
 endif()
+
+# Test MH updater
+# add_executable(test_mh $<TARGET_OBJECTS:bayesmix> test_mh_updater.cpp)
+# target_include_directories(test_mh PUBLIC ${INCLUDE_PATHS})
+# target_link_libraries(test_mh PUBLIC ${LINK_LIBRARIES})
+# target_compile_options(test_mh PUBLIC ${COMPILE_OPTIONS})
