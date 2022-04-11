@@ -1,0 +1,13 @@
+Package: bayesmixr
+Title: An R interface to BayesMix
+Version: 0.1.0
+Authors@R:
+    person(given = "Matteo",
+           family = "Gianella",
+           role = c("aut", "cre"),
+           email = "matteo.gianella@polimi.it")
+Description: This package provides a light-weight R interface for BayesMix C++ library
+License: BSD_3_clause + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
