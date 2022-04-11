@@ -37,14 +37,7 @@ text strings. See the documentation for more details.
 For instance, to fit a Dirichlet Process Mixture on univariate data using a Normal-Normal-InverseGamma hierarchy using Neal's Algorithm 3, we use the following
 
 ```R
-eval_dens, n_clus_chain, best_clus = run_mcmc(
-    "NNIG",
-    "DP",
-    data,
-    nnig_params,
-    dp_params,
-    algo_params,
-    dens_grid)
+out = run_mcmc("NNIG", "DP", data, nnig_params, dp_params, algo_params, dens_grid)
 ```
 
 where `data` is a numeric vector of data points, `dens_grid` is a numeric vector of points where to evaluate the density, and `nnig_params`, `dp_params` and `algo_params` are defined as follows.
