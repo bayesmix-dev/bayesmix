@@ -131,28 +131,3 @@ void FAPriorModel::initialize_hypers() {
     throw std::invalid_argument("Unrecognized hierarchy prior");
   }
 }
-
-// TODO
-/*
-// Automatic initialization
-if (dim == 0) {
-  hypers->mutilde = dataset_ptr->colwise().mean();
-  dim = hypers->mutilde.size();
-}
-if (hypers->beta.size() == 0) {
-  Eigen::MatrixXd centered =
-      dataset_ptr->rowwise() - dataset_ptr->colwise().mean();
-  auto cov_llt = ((centered.transpose() * centered) /
-                  double(dataset_ptr->rows() - 1.))
-                      .llt();
-  Eigen::MatrixXd precision_matrix(
-      cov_llt.solve(Eigen::MatrixXd::Identity(dim, dim)));
-  hypers->beta =
-      (hypers->alpha0 - 1) * precision_matrix.diagonal().cwiseInverse();
-  if (hypers->alpha0 == 1) {
-    throw std::invalid_argument(
-        "Scale parameter must be different than 1 when automatic "
-        "initialization is used");
-  }
-}
-*/
