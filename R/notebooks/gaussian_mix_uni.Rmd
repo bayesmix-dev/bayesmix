@@ -26,19 +26,13 @@ P & \sim DP(\alpha G_0)
 \end{align*}
 $$
 
-and
-
-$$
-G_0(d\mu, d\sigma^2) = \mathcal N(d\mu \mid \mu_0,\, \sigma^2/\lambda) \times \mathcal{IG}(\sigma^2 | a, b)
-$$
+and $G_0(d\mu, d\sigma^2) = \mathcal N(d\mu | \mu_0, \sigma^2/\lambda) \times \mathcal{IG}(\sigma^2 | a, b)$
 
 We consider different prior specifications
 
 ### Fixed hyperparameters
 
-$$
-\alpha = 1 \text{ and } \left(\mu_0,~\lambda,~a,~b\right) = \left(0,~0.1,~2,~2)\right)
-$$
+$\alpha = 1$ and $(\mu_0,~\lambda,~a,~b) = (0,~0.1,~2,~2)$
 
 ```{r}
 dp_params_fix =
@@ -59,7 +53,7 @@ fixed_values {
 "
 ```
 
-### Prior on alpha and mu0
+### Prior on $\alpha$ and $\mu_{0}$
 
 $$
 \begin{align*}
@@ -177,7 +171,7 @@ algo_names = c("Neal2", "Neal3", "Neal8")
 Observe that the number of iterations is extremely small! In real problems, you might want to set the burnin at least to 1000 iterations and the total number of iterations to at least 2000.
 
 ```{r}
-par(mfrow=c(2,3),)
+par(mfrow=c(2,3))
 dens_grid = seq(-10, 10, length.out = 1000)
 cols = c("orange", "steelblue", "springgreen")
 
@@ -190,7 +184,8 @@ for (i in 1:length(dp_params)) {
       if (k == 1) {
         plot(dens_grid, exp(colMeans(eval_dens)), type='l', lwd=2, col=cols[k],
              main = sprintf("G0 - %s", g0_names[j]),
-             ylab = sprintf("DP - %s", dp_names[i]))
+             ylab = sprintf("DP - %s", dp_names[i]),
+             xlab = "Grid")
       } else {
         lines(dens_grid, exp(colMeans(eval_dens)), lwd=2, col=cols[k])
       }
