@@ -56,5 +56,5 @@ A list with the following components:
 }
 }
 \description{
-In this light version, this call is made by calling the BayesMix executable from a subprocess via the \link{system} command.
+In this light version, this call is made by calling the BayesMix executable from a subprocess via the \link[base]{system} command.
 }

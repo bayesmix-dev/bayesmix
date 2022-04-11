@@ -28,14 +28,28 @@
 #' }
 #'
 #' @export
-run_mcmc <- function(hierarchy, mixing, data, hier_params, mix_params, algo_params, dens_grid = NULL, out_dir = NULL, return_clusters = TRUE, return_best_clus = TRUE, return_num_clusters = TRUE) {
+run_mcmc <- function(hierarchy, mixing, data,
+                     hier_params, mix_params, algo_params, dens_grid = NULL, out_dir = NULL,
+                     return_clusters = TRUE, return_best_clus = TRUE, return_num_clusters = TRUE) {
+
+  # Get BAYESMIX_EXE and check if set
   BAYESMIX_EXE = Sys.getenv("BAYESMIX_EXE")
   if(BAYESMIX_EXE == ""){
     stop("BAYESMIX_EXE environment variable not set")
   }
-  params = "--algo-params-file '%s' --hier-type '%s' --hier-args '%s' --mix-type '%s' --mix-args '%s' --coll-name '%s' --data-file '%s' --grid-file '%s' --dens-file '%s' --n-cl-file '%s' --clus-file '%s' --best-clus-file '%s'"
+
+  # Set-up template for run_mcmc command
+  params = paste("--algo-params-file '%s' --hier-type '%s'",
+                 "--hier-args '%s' --mix-type '%s'",
+                 "--mix-args '%s' --coll-name '%s'",
+                 "--data-file '%s' --grid-file '%s'",
+                 "--dens-file '%s' --n-cl-file '%s'",
+                 "--clus-file '%s' --best-clus-file '%s'")
+
+  # Set run_mcmc command template
   RUN_CMD = paste(BAYESMIX_EXE, params)
 
+  # Use temporary directory if out_dir is not set
   if(is.null(out_dir)) {
     out_dir = tempdir()
     remove_out_dir = TRUE
@@ -43,6 +57,7 @@ run_mcmc <- function(hierarchy, mixing, data, hier_params, mix_params, algo_para
     remove_out_dir = FALSE
   }
 
+  # Prepare files for data and outcomes
   data_file = paste0(out_dir,"/data.csv"); file.create(data_file)
   dens_grid_file = paste0(out_dir, '/dens_grid.csv'); file.create(dens_grid_file)
   n_clus_file = paste0(out_dir, '/n_clus.csv'); file.create(n_clus_file)
@@ -50,10 +65,12 @@ run_mcmc <- function(hierarchy, mixing, data, hier_params, mix_params, algo_para
   best_clus_file = paste0(out_dir, '/best_clus.csv'); file.create(best_clus_file)
   eval_dens_file = paste0(out_dir, "/eval_dens.csv"); file.create(eval_dens_file)
 
+  # Prepare protobuf configuration files
   hier_params_file = maybe_print_to_file(hier_params, "hier_params", out_dir)
   mix_params_file = maybe_print_to_file(mix_params, "mix_params", out_dir)
   algo_params_file = maybe_print_to_file(algo_params, "algo_params", out_dir)
 
+  # Set-up NULL filenames for arg-parse
   write.table(data, file = data_file, sep = ",", col.names = F, row.names = F)
   if(is.null(dens_grid)) {
     dens_grid_file = "\"\""
@@ -61,7 +78,6 @@ run_mcmc <- function(hierarchy, mixing, data, hier_params, mix_params, algo_para
   } else {
     write.table(dens_grid, file = dens_grid_file, sep = ",", row.names = F, col.names = F)
   }
-
   if(!return_clusters) {
     clus_file = "\"\""
   }
@@ -72,6 +88,7 @@ run_mcmc <- function(hierarchy, mixing, data, hier_params, mix_params, algo_para
     best_clus_file = "\"\""
   }
 
+  # Resolve run_mcmc command
   CMD = sprintf(RUN_CMD, algo_params_file, hierarchy,
                 hier_params_file, mixing,
                 mix_params_file, 'memory',
@@ -79,6 +96,7 @@ run_mcmc <- function(hierarchy, mixing, data, hier_params, mix_params, algo_para
                 eval_dens_file, n_clus_file,
                 clus_file, best_clus_file)
 
+  # Execute run_mcmc
   tryCatch(system(CMD),
            error = function(cond) {
              message(sprintf("Failed with error: %s\n)", as.character(cond)))
@@ -89,39 +107,38 @@ run_mcmc <- function(hierarchy, mixing, data, hier_params, mix_params, algo_para
              return(NULL)
            })
 
+  # Manage return arguments
   eval_dens = NULL
   if(!is.null(dens_grid)) {
       eval_dens = suppressWarnings(as.matrix(read.table(eval_dens_file, sep = ",")))
       attributes(eval_dens)$dimnames <- NULL
   }
-
   nclus = NULL
   if(return_num_clusters){
     nclus = suppressWarnings(as.matrix(read.table(n_clus_file, sep = ",")))
     attributes(nclus)$dimnames <- NULL
   }
-
   clus = NULL
   if(return_clusters){
     clus = suppressWarnings(as.matrix(read.table(clus_file, sep = ",")))
     attributes(clus)$dimnames = NULL
   }
-
   best_clus = NULL
   if(return_best_clus) {
     best_clus = suppressWarnings(as.matrix(read.table(best_clus_file, sep = ",")))
     attributes(best_clus)$dimnames = NULL
   }
 
+  # Define out list
   out = list("eval_dens" = eval_dens,
              "n_clus" = nclus,
              "clus" = clus,
              "best_clus" = best_clus)
 
+  # Clean temporary files and return
   if(remove_out_dir){
     unlink(paste0(out_dir,"/*.csv"))
     unlink(paste0(out_dir,"/*.asciipb"))
   }
-
   return(out)
 }
