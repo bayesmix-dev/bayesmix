@@ -131,9 +131,9 @@ run_mcmc <- function(hierarchy, mixing, data,
 
   # Define out list
   out = list("eval_dens" = eval_dens,
-             "n_clus" = nclus,
+             "n_clus" = as.vector(nclus),
              "clus" = clus,
-             "best_clus" = best_clus)
+             "best_clus" = as.vector(best_clus))
 
   # Clean temporary files and return
   if(remove_out_dir){
