@@ -20,3 +20,11 @@ sftp-config.json
 .idea/
 # Build debug folder
 cmake-build-debug/
+
+# .old folders
+test/.old/
+examples/gamma_hierarchy/.old/
+src/hierarchies/updaters/.old/
+
+# R stuff
+.Rproj.user
