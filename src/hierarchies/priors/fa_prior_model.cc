@@ -125,9 +125,7 @@ void FAPriorModel::initialize_hypers() {
     if (hypers->q <= 0) {
       throw std::invalid_argument("Number of factors must be > 0");
     }
-  }
-  // blabla
-  else {
+  } else {
     throw std::invalid_argument("Unrecognized hierarchy prior");
   }
 }
