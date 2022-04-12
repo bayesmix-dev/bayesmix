@@ -32,6 +32,19 @@ run_mcmc <- function(hierarchy, mixing, data,
                      hier_params, mix_params, algo_params, dens_grid = NULL, out_dir = NULL,
                      return_clusters = TRUE, return_best_clus = TRUE, return_num_clusters = TRUE) {
 
+  # Check input types
+  if (!is.character(hierarchy)) { stop("'hierarchy' parameter must be a string") }
+  if (!is.character(mixing)) { stop("'mixing' parameter must be a string") }
+  if (!is.numeric(data)) { stop("'data' parameter must be a numeric vector or matrix") }
+  if (!is.character(hier_params)) { stop("'hier_params' parameter must be a string") }
+  if (!is.character(mix_params)) { stop("'mix_params' parameter must be a string") }
+  if (!is.character(algo_params)) { stop("'algo_params' parameter must be a string") }
+  if (!is.numeric(dens_grid) & !is.null(dens_grid)) { stop("'dens_grid' parameter can be a numeric vector or matrix, NULL otherwise") }
+  if (!is.character(out_dir) & !is.null(out_dir)) { stop("'out_dir' parameter must be a string, NULL otherwise") }
+  if (!is.logical(return_clusters)) { stop("'return_clusters' parameter must be a bool") }
+  if (!is.logical(return_best_clus)) { stop("'return_best_clus' parameter must be a bool") }
+  if (!is.logical(return_num_clusters)) { stop("'return_num_clusters' parameter must be a bool") }
+
   # Get BAYESMIX_EXE and check if set
   BAYESMIX_EXE = Sys.getenv("BAYESMIX_EXE")
   if(BAYESMIX_EXE == ""){
