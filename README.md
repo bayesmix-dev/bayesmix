@@ -24,6 +24,9 @@ where P is either the Dirichlet process or the Pitman--Yor process
 
 - Serialization of the MCMC chains is possible using Google's [Protocol Buffers](https://developers.google.com/protocol-buffers) aka `protobuf`
 
+- Two lightweight interfaces are available for `Python` ([BayesMixPy](https://github.com/bayesmix-dev/bayesmix/tree/master/python#readme)) and `R` (BayesMixR)
+<!-- Add link after merge !!! -->
+
 # Installation
 
 ## For end users

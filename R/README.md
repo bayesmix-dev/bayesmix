@@ -63,7 +63,7 @@ ngg_prior {
 "
 ```
 
-This specifies that the base (centering) measure is a Normal-InverseGamma with parameters (mu0, lam0, a0, b0). Further, mu0 ~ N(5.5, 2.25) lam0 ~ Gamma(0.2, 0.6) a0 = 1.5, b0 ~ Gamma(4.0, 2.0) [See the messages NNIGPrior and NNIGPrior::NGGPrior in the file hierarchy_prior.proto for further reference].
+This specifies that the base (centering) measure is a Normal-InverseGamma with parameters (mu0, lam0, a0, b0). Further, mu0 ~ N(5.5, 2.25) lam0 ~ Gamma(0.2, 0.6) a0 = 1.5, b0 ~ Gamma(4.0, 2.0) [See the messages NNIGPrior and NNIGPrior::NGGPrior in the file [hierarchy_prior.proto](https://github.com/bayesmix-dev/bayesmix/blob/master/src/proto/hierarchy_prior.proto) for further reference].
 
 ```R
 dp_params =
