@@ -84,7 +84,7 @@ class BaseLikelihood : public AbstractLikelihood {
   //! Returns the class of the current state for the likelihood
   State get_state() const { return state; }
 
-  State* mutable_state() { return &state; }
+  State *mutable_state() { return &state; }
 
   //! Returns a vector storing the state in its unconstrained form
   Eigen::VectorXd get_unconstrained_state() override {
@@ -92,7 +92,19 @@ class BaseLikelihood : public AbstractLikelihood {
   }
 
   //! Updates the state of the likelihood with the object given as input
-  void set_state(const State &_state) { state = _state; };
+  void set_state(const State & state_, bool update_card = true) {
+    state = state_;
+    if (update_card) {
+      set_card(state.card);
+    }
+  };
+
+  void set_state_from_proto(const google::protobuf::Message &state_,
+                                    bool update_card = true) override {
+      State new_state;
+      new_state.set_from_proto(downcast_state(state_), update_card);
+      set_state(new_state, update_card);
+  }
 
   //! Updates the state of the likelihood starting from its unconstrained form
   void set_state_from_unconstrained(
