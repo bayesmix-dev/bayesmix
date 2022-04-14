@@ -1,5 +1,5 @@
 # Test for build_bayesmix function
 test_build <- function() {
-  success = bayesmixr::build_bayesmix()
-  stopifnot(success)
+  readRenviron(system.file(".Renviron", package = "bayesmixr"))
+  stopifnot(bayesmixr::build_bayesmix())
 }
