@@ -23,6 +23,19 @@ void UniNormLikelihood::set_state_from_proto(
   if (update_card) set_card(statecast.cardinality());
 }
 
+void UniNormLikelihood::set_state(
+    const States::UniLS &state_, bool update_card) {
+  
+  int old_card;
+  if (! update_card) {
+    old_card = state.card;
+  }
+  state = state_;
+  if (! update_card) {
+    state.card = old_card;
+  }
+}
+
 std::shared_ptr<bayesmix::AlgorithmState::ClusterState>
 UniNormLikelihood::get_state_proto() const {
   auto out = std::make_shared<bayesmix::AlgorithmState::ClusterState>();
