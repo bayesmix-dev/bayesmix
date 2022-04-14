@@ -1,6 +1,5 @@
-library("bayesmixr")
-
+# Test for build_bayesmix function
 test_build <- function() {
-  success = build_bayesmix()
+  success = bayesmixr::build_bayesmix()
   stopifnot(success)
 }

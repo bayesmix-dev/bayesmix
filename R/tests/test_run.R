@@ -1,4 +1,4 @@
-library("bayesmixr")
+# Tests for run_mcmc function
 
 DP_PARAMS =
 "
@@ -19,11 +19,11 @@ fixed_values {
 
 ALGO_PARAMS =
 "
-    algo_id: 'Neal2'
-    rng_seed: 20201124
-    iterations: 10
-    burnin: 5
-    init_num_clusters: 3
+algo_id: 'Neal2'
+rng_seed: 20201124
+iterations: 10
+burnin: 5
+init_num_clusters: 3
 "
 
 get_data = function() {
@@ -40,8 +40,8 @@ test_run_mcmc = function() {
   data = get_data()
   grid = get_grid()
 
-  out = run_mcmc("NNIG", "DP", data, GO_PARAMS, DP_PARAMS, ALGO_PARAMS, grid,
-                 return_clusters=FALSE, return_num_clusters=FALSE, return_best_clus=FALSE)
+  out = bayesmixr::run_mcmc("NNIG", "DP", data, GO_PARAMS, DP_PARAMS, ALGO_PARAMS, grid,
+                            return_clusters=FALSE, return_num_clusters=FALSE, return_best_clus=FALSE)
 
   stopifnot(dim(out$eval_dens)[1] == 5)
   stopifnot(dim(out$eval_dens)[2] == length(grid))
@@ -49,8 +49,8 @@ test_run_mcmc = function() {
   stopifnot(is.null(out$clus))
   stopifnot(is.null(out$best_clus))
 
-  out = run_mcmc("NNIG", "DP", data, GO_PARAMS, DP_PARAMS, ALGO_PARAMS, NULL,
-                 return_clusters=FALSE, return_num_clusters=TRUE, return_best_clus=FALSE)
+  out = bayesmixr::run_mcmc("NNIG", "DP", data, GO_PARAMS, DP_PARAMS, ALGO_PARAMS, NULL,
+                            return_clusters=FALSE, return_num_clusters=TRUE, return_best_clus=FALSE)
 
   stopifnot(is.null(out$eval_dens))
   stopifnot(!is.null(out$n_clus))
@@ -58,8 +58,8 @@ test_run_mcmc = function() {
   stopifnot(is.null(out$clus))
   stopifnot(is.null(out$best_clus))
 
-  out = run_mcmc("NNIG", "DP", data, GO_PARAMS, DP_PARAMS, ALGO_PARAMS, NULL,
-                 return_clusters=TRUE, return_num_clusters=FALSE, return_best_clus=FALSE)
+  out = bayesmixr::run_mcmc("NNIG", "DP", data, GO_PARAMS, DP_PARAMS, ALGO_PARAMS, NULL,
+                            return_clusters=TRUE, return_num_clusters=FALSE, return_best_clus=FALSE)
 
   stopifnot(is.null(out$eval_dens))
   stopifnot(is.null(out$n_clus))
@@ -69,8 +69,8 @@ test_run_mcmc = function() {
   stopifnot(is.null(out$best_clus))
 
 
-  out = run_mcmc("NNIG", "DP", data, GO_PARAMS, DP_PARAMS, ALGO_PARAMS, NULL,
-                 return_clusters=FALSE, return_num_clusters=FALSE, return_best_clus=TRUE)
+  out = bayesmixr::run_mcmc("NNIG", "DP", data, GO_PARAMS, DP_PARAMS, ALGO_PARAMS, NULL,
+                            return_clusters=FALSE, return_num_clusters=FALSE, return_best_clus=TRUE)
 
   stopifnot(is.null(out$eval_dens))
   stopifnot(is.null(out$n_clus))
