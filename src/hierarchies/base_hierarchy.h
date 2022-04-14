@@ -211,7 +211,7 @@ class BaseHierarchy : public AbstractHierarchy {
 
   //! Generates new state values from the centering prior distribution
   void sample_prior() override {
-    like->set_state_from_proto(*prior->sample(), false);
+    like->set_state(prior->sample(), false);
   };
 
   //! Generates new state values from the centering posterior distribution
