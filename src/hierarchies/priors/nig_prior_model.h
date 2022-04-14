@@ -11,8 +11,9 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
-class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
-                                            bayesmix::NNIGPrior> {
+class NIGPriorModel
+    : public BasePriorModel<NIGPriorModel, States::UniLS, Hyperparams::NIG,
+                            bayesmix::NNIGPrior> {
  public:
   using AbstractPriorModel::ProtoHypers;
   using AbstractPriorModel::ProtoHypersPtr;
@@ -26,8 +27,8 @@ class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
   T lpdf_from_unconstrained(
       const Eigen::Matrix<T, Eigen::Dynamic, 1> &unconstrained_params) const {
     Eigen::Matrix<T, Eigen::Dynamic, 1> constrained_params =
-        State::uni_ls_to_constrained(unconstrained_params);
-    T log_det_jac = State::uni_ls_log_det_jac(constrained_params);
+        States::uni_ls_to_constrained(unconstrained_params);
+    T log_det_jac = States::uni_ls_log_det_jac(constrained_params);
     T mean = constrained_params(0);
     T var = constrained_params(1);
     T lpdf = stan::math::normal_lpdf(mean, hypers->mean,
@@ -37,8 +38,7 @@ class NIGPriorModel : public BasePriorModel<NIGPriorModel, Hyperparams::NIG,
     return lpdf + log_det_jac;
   }
 
-  std::shared_ptr<google::protobuf::Message> sample(
-      ProtoHypersPtr hier_hypers = nullptr) override;
+  States::UniLS sample(ProtoHypersPtr hier_hypers = nullptr) override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;

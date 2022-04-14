@@ -12,7 +12,7 @@
 #include "states/includes.h"
 
 class UniNormLikelihood
-    : public BaseLikelihood<UniNormLikelihood, State::UniLS> {
+    : public BaseLikelihood<UniNormLikelihood, States::UniLS> {
  public:
   UniNormLikelihood() = default;
   ~UniNormLikelihood() = default;
@@ -20,6 +20,7 @@ class UniNormLikelihood
   bool is_dependent() const override { return false; };
   void set_state_from_proto(const google::protobuf::Message &state_,
                             bool update_card = true) override;
+  void set_state(const States::UniLS &state_, bool update_card = true);
   void clear_summary_statistics() override;
   double get_data_sum() const { return data_sum; };
   double get_data_sum_squares() const { return data_sum_squares; };

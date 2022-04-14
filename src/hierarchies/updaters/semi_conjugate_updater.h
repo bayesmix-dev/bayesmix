@@ -47,10 +47,10 @@ void SemiConjugateUpdater<Likelihood, PriorModel>::draw(
   // Sample from the full conditional of a semi-conjugate hierarchy
   bool set_card = true; /*, use_post_hypers=true;*/
   if (likecast.get_card() == 0) {
-    likecast.set_state_from_proto(*priorcast.sample(), !set_card);
+    likecast.set_state(priorcast.sample(), !set_card);
   } else {
     auto post_params = compute_posterior_hypers(likecast, priorcast);
-    likecast.set_state_from_proto(*priorcast.sample(post_params), !set_card);
+    likecast.set_state(priorcast.sample(post_params), !set_card);
     if (update_params) save_posterior_hypers(post_params);
   }
 }

@@ -84,6 +84,8 @@ class BaseLikelihood : public AbstractLikelihood {
   //! Returns the class of the current state for the likelihood
   State get_state() const { return state; }
 
+  State* mutable_state() { return &state; }
+
   //! Returns a vector storing the state in its unconstrained form
   Eigen::VectorXd get_unconstrained_state() override {
     return internal::get_unconstrained_state(state, 0);
