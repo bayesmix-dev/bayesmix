@@ -57,8 +57,8 @@ class BasePriorModel : public AbstractPriorModel {
   virtual State sample(ProtoHypersPtr hier_hypers = nullptr) = 0;
 
   std::shared_ptr<google::protobuf::Message> sample_proto(
-       ProtoHypersPtr hier_hypers = nullptr) override {
-     return sample(hier_hypers).to_proto();
+      ProtoHypersPtr hier_hypers = nullptr) override {
+    return sample(hier_hypers).to_proto();
   }
 
   //! Returns an independent, data-less copy of this object
@@ -120,14 +120,14 @@ class BasePriorModel : public AbstractPriorModel {
 };
 
 /* *** Methods Definitions *** */
-template<class Derived, class State, typename HyperParams, typename Prior>
+template <class Derived, class State, typename HyperParams, typename Prior>
 std::shared_ptr<AbstractPriorModel>
 BasePriorModel<Derived, State, HyperParams, Prior>::clone() const {
   auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
   return out;
 }
 
-template<class Derived, class State, typename HyperParams, typename Prior>
+template <class Derived, class State, typename HyperParams, typename Prior>
 std::shared_ptr<AbstractPriorModel>
 BasePriorModel<Derived, State, HyperParams, Prior>::deep_clone() const {
   auto out = std::make_shared<Derived>(static_cast<Derived const &>(*this));
@@ -149,7 +149,7 @@ BasePriorModel<Derived, State, HyperParams, Prior>::deep_clone() const {
   return out;
 }
 
-template<class Derived, class State, typename HyperParams, typename Prior>
+template <class Derived, class State, typename HyperParams, typename Prior>
 google::protobuf::Message *
 BasePriorModel<Derived, State, HyperParams, Prior>::get_mutable_prior() {
   if (prior == nullptr) {
@@ -158,7 +158,7 @@ BasePriorModel<Derived, State, HyperParams, Prior>::get_mutable_prior() {
   return prior.get();
 }
 
-template<class Derived, class State, typename HyperParams, typename Prior>
+template <class Derived, class State, typename HyperParams, typename Prior>
 void BasePriorModel<Derived, State, HyperParams, Prior>::write_hypers_to_proto(
     google::protobuf::Message *out) const {
   std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers> hypers_ =
@@ -167,15 +167,16 @@ void BasePriorModel<Derived, State, HyperParams, Prior>::write_hypers_to_proto(
   out_cast->CopyFrom(*hypers_.get());
 }
 
-template<class Derived, class State, typename HyperParams, typename Prior>
+template <class Derived, class State, typename HyperParams, typename Prior>
 void BasePriorModel<Derived, State, HyperParams, Prior>::initialize() {
   check_prior_is_set();
   create_empty_hypers();
   initialize_hypers();
 }
 
-template<class Derived, class State, typename HyperParams, typename Prior>
-void BasePriorModel<Derived, State, HyperParams, Prior>::check_prior_is_set() const {
+template <class Derived, class State, typename HyperParams, typename Prior>
+void BasePriorModel<Derived, State, HyperParams, Prior>::check_prior_is_set()
+    const {
   if (prior == nullptr) {
     throw std::invalid_argument("Hierarchy prior was not provided");
   }

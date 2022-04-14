@@ -84,13 +84,12 @@ double NIGPriorModel::lpdf(const google::protobuf::Message &state_) {
   return target;
 }
 
-States::UniLS NIGPriorModel::sample(
-    ProtoHypersPtr hier_hypers) {
+State::UniLS NIGPriorModel::sample(ProtoHypersPtr hier_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
   auto params = (hier_hypers) ? hier_hypers->nnig_state()
                               : get_hypers_proto()->nnig_state();
 
-  States::UniLS out;
+  State::UniLS out;
   out.var = stan::math::inv_gamma_rng(params.shape(), params.scale(), rng);
   out.mean = stan::math::normal_rng(params.mean(),
                                     sqrt(out.var / params.var_scaling()), rng);

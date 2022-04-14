@@ -7,17 +7,17 @@
 #include "algorithm_state.pb.h"
 #include "src/utils/proto_utils.h"
 
-namespace States {
+namespace State {
 
 class BaseState {
  public:
   int card;
-  
+
   using ProtoState = bayesmix::AlgorithmState::ClusterState;
 
   virtual Eigen::VectorXd get_unconstrained() { return Eigen::VectorXd(0); }
 
-  virtual void set_from_unconstrained(Eigen::VectorXd in) { }
+  virtual void set_from_unconstrained(Eigen::VectorXd in) {}
 
   virtual void set_from_proto(const ProtoState &state_, bool update_card) = 0;
 
@@ -30,6 +30,6 @@ class BaseState {
   virtual double log_det_jac() { return -1; }
 };
 
-}  // namespace States
+}  // namespace State
 
 #endif  // BAYESMIX_HIERARCHIES_LIKELIHOODS_STATES_BASE_STATE_H_

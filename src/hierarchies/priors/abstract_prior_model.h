@@ -68,10 +68,7 @@ class AbstractPriorModel {
   //! parameters to use for the sampling. The default behaviour (i.e.
   //! `hier_hypers = nullptr`) uses prior hyperparameters
   //! @return A Protobuf message storing the state sampled from the prior model
-  // virtual std::shared_ptr<google::protobuf::Message> sample(
-  //   bool use_post_hypers) = 0;
-
-  virtual std::shared_ptr<google::protobuf::Message> sample(
+  virtual std::shared_ptr<google::protobuf::Message> sample_proto(
       ProtoHypersPtr hier_hypers = nullptr) = 0;
 
   //! Updates hyperparameter values given a vector of cluster states

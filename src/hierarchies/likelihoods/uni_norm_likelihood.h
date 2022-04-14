@@ -12,7 +12,7 @@
 #include "states/includes.h"
 
 class UniNormLikelihood
-    : public BaseLikelihood<UniNormLikelihood, States::UniLS> {
+    : public BaseLikelihood<UniNormLikelihood, State::UniLS> {
  public:
   UniNormLikelihood() = default;
   ~UniNormLikelihood() = default;
