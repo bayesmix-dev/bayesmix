@@ -6,6 +6,7 @@
 
 #include "algorithm_state.pb.h"
 #include "src/utils/proto_utils.h"
+#include "base_state.h"
 
 namespace State {
 
@@ -32,41 +33,40 @@ T uni_ls_log_det_jac(Eigen::Matrix<T, Eigen::Dynamic, 1> constrained) {
   return out;
 }
 
-class UniLS {
+class UniLS: public BaseState {
  public:
   double mean, var;
 
   using ProtoState = bayesmix::AlgorithmState::ClusterState;
 
-  Eigen::VectorXd get_unconstrained() {
+  Eigen::VectorXd get_unconstrained() override {
     Eigen::VectorXd temp(2);
     temp << mean, var;
     return uni_ls_to_unconstrained(temp);
   }
 
-  void set_from_unconstrained(Eigen::VectorXd in) {
+  void set_from_unconstrained(Eigen::VectorXd in) override {
     Eigen::VectorXd temp = uni_ls_to_constrained(in);
     mean = temp(0);
     var = temp(1);
   }
 
-  void set_from_proto(const ProtoState &state_) {
+  void set_from_proto(const ProtoState &state_, bool update_card) override {
+    if (update_card) {
+      card = state_.cardinality();
+    }
     mean = state_.uni_ls_state().mean();
     var = state_.uni_ls_state().var();
   }
 
-  ProtoState get_as_proto() {
+  ProtoState get_as_proto() override {
     ProtoState state;
     state.mutable_uni_ls_state()->set_mean(mean);
     state.mutable_uni_ls_state()->set_var(var);
     return state;
   }
 
-  std::shared_ptr<ProtoState> to_proto() {
-    return std::make_shared<ProtoState>(get_as_proto());
-  }
-
-  double log_det_jac() {
+  double log_det_jac() override {
     Eigen::VectorXd temp(2);
     temp << mean, var;
     return uni_ls_log_det_jac(temp);
