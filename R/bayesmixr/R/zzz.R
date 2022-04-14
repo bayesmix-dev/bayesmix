@@ -1,6 +1,6 @@
 # Parse internal renviron file to set BAYESMIX_EXE variable
 .onAttach <- function(...) {
-  readRenviron(system.file(".Renviron", package = "bayesmixr"))
+  readRenviron(system.file("bayesmixr.Renviron", package = "bayesmixr"))
 }
 
 # Unset BAYESMIX_EXE variable on detaching
