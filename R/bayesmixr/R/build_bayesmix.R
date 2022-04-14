@@ -35,7 +35,7 @@ build_bayesmix <- function(nproc = ceiling(parallel::detectCores()/2), build_dir
 
   # Set BAYESMIX_EXE environment variable
   cat("*** Setting BAYESMIX_EXE environment variable ***\n")
-  renviron = system.file(".Renviron", package = "bayesmixr")
+  renviron = system.file("bayesmixr.Renviron", package = "bayesmixr")
   write(x = sprintf("BAYESMIX_EXE=%s/run_mcmc", build_dir), file = renviron, append = TRUE)
   readRenviron(renviron)
   cat("Successfully installed BayesMix\n")
