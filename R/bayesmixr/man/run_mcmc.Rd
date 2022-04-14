@@ -46,7 +46,7 @@ after the sampling is finished.}
 
 \item{return_best_clus}{A bool. If \code{TRUE}, returns the best cluster allocation obtained by minimizing the Binder loss function over the visited partitions during the MCMC sampling.}
 
-\item{return_num_clusters:}{A bool. If \code{TRUE}, returns the chain of the number of clusters.}
+\item{return_num_clusters}{A bool. If \code{TRUE}, returns the chain of the number of clusters.}
 }
 \value{
 A list with the following components:

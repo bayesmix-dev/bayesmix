@@ -19,7 +19,7 @@
 #' after the sampling is finished.
 #' @param return_clusters A bool. If \code{TRUE}, returns the chain of the cluster allocations.
 #' @param return_best_clus A bool. If \code{TRUE}, returns the best cluster allocation obtained by minimizing the Binder loss function over the visited partitions during the MCMC sampling.
-#' @param return_num_clusters: A bool. If \code{TRUE}, returns the chain of the number of clusters.
+#' @param return_num_clusters A bool. If \code{TRUE}, returns the chain of the number of clusters.
 #'
 #' @return A list with the following components:
 #' \itemize{
@@ -86,12 +86,12 @@ run_mcmc <- function(hierarchy, mixing, data,
   algo_params_file = maybe_print_to_file(algo_params, "algo_params", out_dir)
 
   # Set-up NULL filenames for arg-parse
-  write.table(data, file = data_file, sep = ",", col.names = F, row.names = F)
+  utils::write.table(data, file = data_file, sep = ",", col.names = F, row.names = F)
   if(is.null(dens_grid)) {
     dens_grid_file = "\"\""
     eval_dens_file = "\"\""
   } else {
-    write.table(dens_grid, file = dens_grid_file, sep = ",", row.names = F, col.names = F)
+    utils::write.table(dens_grid, file = dens_grid_file, sep = ",", row.names = F, col.names = F)
   }
   if(!return_clusters) {
     clus_file = "\"\""
@@ -127,22 +127,22 @@ run_mcmc <- function(hierarchy, mixing, data,
   # Manage return arguments
   eval_dens = NULL
   if(!is.null(dens_grid)) {
-      eval_dens = suppressWarnings(as.matrix(read.table(eval_dens_file, sep = ",")))
+      eval_dens = suppressWarnings(as.matrix(utils::read.table(eval_dens_file, sep = ",")))
       attributes(eval_dens)$dimnames <- NULL
   }
   nclus = NULL
   if(return_num_clusters){
-    nclus = suppressWarnings(as.matrix(read.table(n_clus_file, sep = ",")))
+    nclus = suppressWarnings(as.matrix(utils::read.table(n_clus_file, sep = ",")))
     attributes(nclus)$dimnames <- NULL
   }
   clus = NULL
   if(return_clusters){
-    clus = suppressWarnings(as.matrix(read.table(clus_file, sep = ",")))
+    clus = suppressWarnings(as.matrix(utils::read.table(clus_file, sep = ",")))
     attributes(clus)$dimnames = NULL
   }
   best_clus = NULL
   if(return_best_clus) {
-    best_clus = suppressWarnings(as.matrix(read.table(best_clus_file, sep = ",")))
+    best_clus = suppressWarnings(as.matrix(utils::read.table(best_clus_file, sep = ",")))
     attributes(best_clus)$dimnames = NULL
   }
 
