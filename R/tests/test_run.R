@@ -39,6 +39,7 @@ test_run_mcmc = function() {
 
   data = get_data()
   grid = get_grid()
+  readRenviron(system.file(".Renviron", package = "bayesmixr"))
 
   out = bayesmixr::run_mcmc("NNIG", "DP", data, GO_PARAMS, DP_PARAMS, ALGO_PARAMS, grid,
                             return_clusters=FALSE, return_num_clusters=FALSE, return_best_clus=FALSE)
