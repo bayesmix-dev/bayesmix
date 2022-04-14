@@ -15,6 +15,9 @@ this parameter defaults to half of the available processes (through \code{\link[
 
 \item{build_dirname}{Name for the build directory of BayesMix. Default is "build".}
 }
+\value{
+\code{TRUE} if build is successfull, \code{FALSE} otherwise
+}
 \description{
 After the build, if no error has occurred, it saves the path into the \code{BAYESMIX_EXE} environment variable.
 Such variable is defined only when this package is loaded in the R session.

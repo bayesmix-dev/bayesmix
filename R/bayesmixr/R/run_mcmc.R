@@ -1,16 +1,18 @@
-#' Run BayesMix MCMC sampling
+#' Run BayesMix MCMC samplers
 #'
-#' In this light version, this call is made by calling the BayesMix executable from a subprocess via the \link[base]{system} command.
+#' In this light version, this function calls the BayesMix executable from a subprocess via \code{\link[base]{system}} command.
 #'
-#' @param hierarchy A string, the id of the hyerarchy. Must be one of the 'Name' in \url{http://bayesmix.readthedocs.io/en/latest/protos.html#hierarchy_id.proto}
-#' @param mixing A string, the id of the mixing. Must be one of the 'Name' in \url{http://bayesmix.readthedocs.io/en/latest/protos.html#mixing_id.proto}
+#' @param hierarchy A string, the id of the hierarchy. Must be one of the 'Name' in the [\code{hierarchy_id.proto}](http://bayesmix.readthedocs.io/en/latest/protos.html#hierarchy_id.proto) list.
+#' @param mixing A string, the id of the mixing. Must be one of the 'Name' in the [\code{mixing_id.proto}](http://bayesmix.readthedocs.io/en/latest/protos.html#mixing_id.proto) list.
 #' @param data A numeric vector or matrix of shape (n_samples, n_dim). These are the observations on which to fit the model.
 #' @param hier_params A text string containing the hyperparameters of the hierarchy or a file name where the hyperparameters are stored.
-#' A protobuf message of the corresponding type will be created and populated with the parameters. See the file \code{hierarchy_prior.proto} for the corresponding message.
+#' A protobuf message of the corresponding type will be created and populated with the parameters.
+#' See the file [\code{hierarchy_prior.proto}](https://bayesmix.readthedocs.io/en/latest/protos.html#hierarchy_prior.proto) for the corresponding message.
 #' @param mix_params A text string containing the hyperparameters of the mixing or a file name where the hyperparameters are stored.
-#' A protobuf message of the corresponding type will be created and populated with the parameters. See the file \code{mixing_prior.proto} for the corresponding message.
+#' A protobuf message of the corresponding type will be created and populated with the parameters.
+#' See the file [\code{mixing_prior.proto}](https://bayesmix.readthedocs.io/en/latest/protos.html#mixing_prior.proto) for the corresponding message.
 #' @param algo_params A text string containing the hyperparameters of the algorithm or a file name where the hyperparameters are stored.
-#' See the file \code{algorithm_params.proto} for the corresponding message.
+#' See the file [\code{algorithm_params.proto}](https://bayesmix.readthedocs.io/en/latest/protos.html#algorithm_params.proto) for the corresponding message.
 #' @param dens_grid A numeric vector or matrix of shape (n_dens_grid_points, n_dim). The are the points where to evaluate the density.
 #' If \code{NULL}, the density will not be evaluated.
 #' @param out_dir A string. If not \code{NULL}, is the folder where to store the output. If \code{NULL}, a temporary directory will be created and destroyed
@@ -23,7 +25,7 @@
 #' \itemize{
 #'   \item{\strong{eval_dens} a matrix of shape (n_samples, n_dens_grid_points). It is the mixture density evaluated at the points in dens_grid for each iteration. \code{NULL} if \code{eval_dens} is \code{NULL}.}
 #'   \item{\strong{n_clus} numeric vector of shape (n_samples). The number of clusters for each iteration. \code{NULL} if \code{return_num_clusters} is \code{FALSE}.}
-#'   \item{\strong{clus_chain} numeric matrix of shape (n_samples, n_data). The cluster allocation for each iteration. \code{NULL} if \code{return_clusters} is \code{FALSE}.}
+#'   \item{\strong{clus} numeric matrix of shape (n_samples, n_data). The cluster allocation for each iteration. \code{NULL} if \code{return_clusters} is \code{FALSE}.}
 #'   \item{\strong{best_clus} numeric vector of shape (n_data). The best clustering obtained by minimizing Binder's loss function. \code{NULL} if \code{return_best_clus} is \code{FALSE}.}
 #' }
 #'
@@ -110,15 +112,17 @@ run_mcmc <- function(hierarchy, mixing, data,
                 clus_file, best_clus_file)
 
   # Execute run_mcmc
-  tryCatch(system(CMD),
-           error = function(cond) {
-             message(sprintf("Failed with error: %s\n)", as.character(cond)))
-             if(remove_out_dir){
-               unlink(paste0(out_dir,"/*.csv"))
-               unlink(paste0(out_dir,"/*.asciipb"))
-             }
-             return(NULL)
-           })
+  tryCatch({
+    system(CMD)
+  },
+  error = function(e) {
+    message(sprintf("Failed with error: %s\n)", as.character(e)))
+   if(remove_out_dir) {
+     unlink(paste0(out_dir,"/*.csv"))
+     unlink(paste0(out_dir,"/*.asciipb"))
+   }
+   return(NULL)
+  })
 
   # Manage return arguments
   eval_dens = NULL

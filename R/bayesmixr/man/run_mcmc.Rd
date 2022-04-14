@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_mcmc.R
 \name{run_mcmc}
 \alias{run_mcmc}
-\title{Run BayesMix MCMC sampling}
+\title{Run BayesMix MCMC samplers}
 \usage{
 run_mcmc(
   hierarchy,
@@ -19,20 +19,22 @@ run_mcmc(
 )
 }
 \arguments{
-\item{hierarchy}{A string, the id of the hyerarchy. Must be one of the 'Name' in \url{http://bayesmix.readthedocs.io/en/latest/protos.html#hierarchy_id.proto}}
+\item{hierarchy}{A string, the id of the hierarchy. Must be one of the 'Name' in the \href{http://bayesmix.readthedocs.io/en/latest/protos.html#hierarchy_id.proto}{\code{hierarchy_id.proto}} list.}
 
-\item{mixing}{A string, the id of the mixing. Must be one of the 'Name' in \url{http://bayesmix.readthedocs.io/en/latest/protos.html#mixing_id.proto}}
+\item{mixing}{A string, the id of the mixing. Must be one of the 'Name' in the \href{http://bayesmix.readthedocs.io/en/latest/protos.html#mixing_id.proto}{\code{mixing_id.proto}} list.}
 
 \item{data}{A numeric vector or matrix of shape (n_samples, n_dim). These are the observations on which to fit the model.}
 
 \item{hier_params}{A text string containing the hyperparameters of the hierarchy or a file name where the hyperparameters are stored.
-A protobuf message of the corresponding type will be created and populated with the parameters. See the file \code{hierarchy_prior.proto} for the corresponding message.}
+A protobuf message of the corresponding type will be created and populated with the parameters.
+See the file \href{https://bayesmix.readthedocs.io/en/latest/protos.html#hierarchy_prior.proto}{\code{hierarchy_prior.proto}} for the corresponding message.}
 
 \item{mix_params}{A text string containing the hyperparameters of the mixing or a file name where the hyperparameters are stored.
-A protobuf message of the corresponding type will be created and populated with the parameters. See the file \code{mixing_prior.proto} for the corresponding message.}
+A protobuf message of the corresponding type will be created and populated with the parameters.
+See the file \href{https://bayesmix.readthedocs.io/en/latest/protos.html#mixing_prior.proto}{\code{mixing_prior.proto}} for the corresponding message.}
 
 \item{algo_params}{A text string containing the hyperparameters of the algorithm or a file name where the hyperparameters are stored.
-See the file \code{algorithm_params.proto} for the corresponding message.}
+See the file \href{https://bayesmix.readthedocs.io/en/latest/protos.html#algorithm_params.proto}{\code{algorithm_params.proto}} for the corresponding message.}
 
 \item{dens_grid}{A numeric vector or matrix of shape (n_dens_grid_points, n_dim). The are the points where to evaluate the density.
 If \code{NULL}, the density will not be evaluated.}
@@ -51,10 +53,10 @@ A list with the following components:
 \itemize{
 \item{\strong{eval_dens} a matrix of shape (n_samples, n_dens_grid_points). It is the mixture density evaluated at the points in dens_grid for each iteration. \code{NULL} if \code{eval_dens} is \code{NULL}.}
 \item{\strong{n_clus} numeric vector of shape (n_samples). The number of clusters for each iteration. \code{NULL} if \code{return_num_clusters} is \code{FALSE}.}
-\item{\strong{clus_chain} numeric matrix of shape (n_samples, n_data). The cluster allocation for each iteration. \code{NULL} if \code{return_clusters} is \code{FALSE}.}
+\item{\strong{clus} numeric matrix of shape (n_samples, n_data). The cluster allocation for each iteration. \code{NULL} if \code{return_clusters} is \code{FALSE}.}
 \item{\strong{best_clus} numeric vector of shape (n_data). The best clustering obtained by minimizing Binder's loss function. \code{NULL} if \code{return_best_clus} is \code{FALSE}.}
 }
 }
 \description{
-In this light version, this call is made by calling the BayesMix executable from a subprocess via the \link[base]{system} command.
+In this light version, this function calls the BayesMix executable from a subprocess via \code{\link[base]{system}} command.
 }
