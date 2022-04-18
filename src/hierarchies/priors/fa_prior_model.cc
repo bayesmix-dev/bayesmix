@@ -29,8 +29,7 @@ double FAPriorModel::lpdf(const google::protobuf::Message &state_) {
   return target;
 }
 
-std::shared_ptr<google::protobuf::Message> FAPriorModel::sample(
-    ProtoHypersPtr hier_hypers) {
+State::FA FAPriorModel::sample(ProtoHypersPtr hier_hypers) {
   // Random seed
   auto &rng = bayesmix::Rng::Instance().get();
 
@@ -53,13 +52,7 @@ std::shared_ptr<google::protobuf::Message> FAPriorModel::sample(
       out.lambda(j, i) = stan::math::normal_rng(0, 1, rng);
     }
   }
-
-  // Eigen2Proto conversion
-  bayesmix::AlgorithmState::ClusterState state;
-  bayesmix::to_proto(out.mu, state.mutable_fa_state()->mutable_mu());
-  bayesmix::to_proto(out.psi, state.mutable_fa_state()->mutable_psi());
-  bayesmix::to_proto(out.lambda, state.mutable_fa_state()->mutable_lambda());
-  return std::make_shared<bayesmix::AlgorithmState::ClusterState>(state);
+  return out;
 }
 
 void FAPriorModel::update_hypers(

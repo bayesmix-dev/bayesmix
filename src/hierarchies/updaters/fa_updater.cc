@@ -10,7 +10,7 @@ void FAUpdater::draw(AbstractLikelihood& like, AbstractPriorModel& prior,
   // Sample from the full conditional of the fa hierarchy
   bool set_card = true, use_post_hypers = true;
   if (likecast.get_card() == 0) {
-    likecast.set_state_from_proto(*priorcast.sample(), !set_card);
+    likecast.set_state(priorcast.sample(), !set_card);
   } else {
     // Get state and hypers
     State::FA new_state = likecast.get_state();
@@ -20,17 +20,7 @@ void FAUpdater::draw(AbstractLikelihood& like, AbstractPriorModel& prior,
     sample_mu(new_state, hypers, likecast);
     sample_psi(new_state, hypers, likecast);
     sample_lambda(new_state, hypers, likecast);
-    // Eigen2Proto conversion
-    bayesmix::AlgorithmState::ClusterState new_state_proto;
-    bayesmix::to_proto(new_state.eta,
-                       new_state_proto.mutable_fa_state()->mutable_eta());
-    bayesmix::to_proto(new_state.mu,
-                       new_state_proto.mutable_fa_state()->mutable_mu());
-    bayesmix::to_proto(new_state.psi,
-                       new_state_proto.mutable_fa_state()->mutable_psi());
-    bayesmix::to_proto(new_state.lambda,
-                       new_state_proto.mutable_fa_state()->mutable_lambda());
-    likecast.set_state_from_proto(new_state_proto, !set_card);
+    likecast.set_state(new_state, !set_card);
   }
 }
 
