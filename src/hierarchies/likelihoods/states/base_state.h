@@ -21,7 +21,7 @@ class BaseState {
 
   virtual void set_from_proto(const ProtoState &state_, bool update_card) = 0;
 
-  virtual ProtoState get_as_proto() = 0;
+  virtual ProtoState get_as_proto() const = 0;
 
   std::shared_ptr<ProtoState> to_proto() {
     return std::make_shared<ProtoState>(get_as_proto());

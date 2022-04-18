@@ -92,7 +92,7 @@ class BaseLikelihood : public AbstractLikelihood {
   }
 
   //! Updates the state of the likelihood with the object given as input
-  void set_state(const State & state_, bool update_card = true) {
+  void set_state(const State &state_, bool update_card = true) {
     state = state_;
     if (update_card) {
       set_card(state.card);
@@ -100,10 +100,10 @@ class BaseLikelihood : public AbstractLikelihood {
   };
 
   void set_state_from_proto(const google::protobuf::Message &state_,
-                                    bool update_card = true) override {
-      State new_state;
-      new_state.set_from_proto(downcast_state(state_), update_card);
-      set_state(new_state, update_card);
+                            bool update_card = true) override {
+    State new_state;
+    new_state.set_from_proto(downcast_state(state_), update_card);
+    set_state(new_state, update_card);
   }
 
   //! Updates the state of the likelihood starting from its unconstrained form
@@ -199,10 +199,8 @@ void BaseLikelihood<Derived, State>::remove_datum(
 template <class Derived, typename State>
 void BaseLikelihood<Derived, State>::write_state_to_proto(
     google::protobuf::Message *out) const {
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> state_ =
-      get_state_proto();
   auto *out_cast = downcast_state(out);
-  out_cast->CopyFrom(*state_.get());
+  out_cast->CopyFrom(state.get_as_proto());
   out_cast->set_cardinality(card);
 }
 
