@@ -17,13 +17,13 @@ class BaseState {
 
   virtual Eigen::VectorXd get_unconstrained() { return Eigen::VectorXd(0); }
 
-  virtual void set_from_unconstrained(Eigen::VectorXd in) {}
+  virtual void set_from_unconstrained(const Eigen::VectorXd &in) {}
 
   virtual void set_from_proto(const ProtoState &state_, bool update_card) = 0;
 
   virtual ProtoState get_as_proto() const = 0;
 
-  std::shared_ptr<ProtoState> to_proto() {
+  std::shared_ptr<ProtoState> to_proto() const {
     return std::make_shared<ProtoState>(get_as_proto());
   }
 
