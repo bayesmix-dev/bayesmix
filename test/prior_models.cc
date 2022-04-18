@@ -125,7 +125,8 @@ TEST(nig_prior_model, sample) {
   auto state2 = prior->sample();
 
   // Check if they coincides
-  ASSERT_TRUE(state1->DebugString() != state2->DebugString());
+  ASSERT_TRUE(state1.get_as_proto().DebugString() !=
+              state2.get_as_proto().DebugString());
 }
 
 TEST(nxig_prior_model, set_get_hypers) {
@@ -207,7 +208,8 @@ TEST(nxig_prior_model, sample) {
   auto state2 = prior->sample();
 
   // Check if they coincides
-  ASSERT_TRUE(state1->DebugString() != state2->DebugString());
+  ASSERT_TRUE(state1.get_as_proto().DebugString() !=
+              state2.get_as_proto().DebugString());
 }
 
 TEST(nig_prior_model, unconstrained_lpdf) {
@@ -382,7 +384,8 @@ TEST(nw_prior_model, sample) {
   auto state2 = prior->sample();
 
   // Check if they coincides
-  ASSERT_TRUE(state1->DebugString() != state2->DebugString());
+  ASSERT_TRUE(state1.get_as_proto().DebugString() !=
+              state2.get_as_proto().DebugString());
 }
 
 TEST(mnig_prior_model, set_get_hypers) {
@@ -474,5 +477,6 @@ TEST(mnig_prior_model, sample) {
   auto state2 = prior->sample();
 
   // Check if they coincides
-  ASSERT_TRUE(state1->DebugString() != state2->DebugString());
+  ASSERT_TRUE(state1.get_as_proto().DebugString() !=
+              state2.get_as_proto().DebugString());
 }
