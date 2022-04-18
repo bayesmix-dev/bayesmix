@@ -10,8 +10,9 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
-class MNIGPriorModel : public BasePriorModel<MNIGPriorModel, Hyperparams::MNIG,
-                                             bayesmix::LinRegUniPrior> {
+class MNIGPriorModel
+    : public BasePriorModel<MNIGPriorModel, State::UniLinRegLS,
+                            Hyperparams::MNIG, bayesmix::LinRegUniPrior> {
  public:
   using AbstractPriorModel::ProtoHypers;
   using AbstractPriorModel::ProtoHypersPtr;
@@ -21,8 +22,7 @@ class MNIGPriorModel : public BasePriorModel<MNIGPriorModel, Hyperparams::MNIG,
 
   double lpdf(const google::protobuf::Message &state_) override;
 
-  std::shared_ptr<google::protobuf::Message> sample(
-      ProtoHypersPtr hier_hypers = nullptr) override;
+  State::UniLinRegLS sample(ProtoHypersPtr hier_hypers = nullptr) override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;

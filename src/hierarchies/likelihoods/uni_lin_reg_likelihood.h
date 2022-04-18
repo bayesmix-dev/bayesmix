@@ -18,8 +18,6 @@ class UniLinRegLikelihood
   ~UniLinRegLikelihood() = default;
   bool is_multivariate() const override { return false; };
   bool is_dependent() const override { return true; };
-  void set_state_from_proto(const google::protobuf::Message &state_,
-                            bool update_card = true) override;
   void clear_summary_statistics() override;
 
   // Getters and Setters
@@ -31,9 +29,6 @@ class UniLinRegLikelihood
   double get_data_sum_squares() const { return data_sum_squares; };
   Eigen::MatrixXd get_covar_sum_squares() const { return covar_sum_squares; };
   Eigen::VectorXd get_mixed_prod() const { return mixed_prod; };
-
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
-      const override;
 
  protected:
   double compute_lpdf(const Eigen::RowVectorXd &datum,
