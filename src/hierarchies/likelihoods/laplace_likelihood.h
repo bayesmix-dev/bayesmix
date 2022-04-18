@@ -18,8 +18,6 @@ class LaplaceLikelihood
   ~LaplaceLikelihood() = default;
   bool is_multivariate() const override { return false; };
   bool is_dependent() const override { return false; };
-  void set_state_from_proto(const google::protobuf::Message &state_,
-                            bool update_card = true) override;
   void clear_summary_statistics() override { return; };
 
   template <typename T>
@@ -38,9 +36,6 @@ class LaplaceLikelihood
     }
     return out;
   }
-
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
-      const override;
 
  protected:
   double compute_lpdf(const Eigen::RowVectorXd &datum) const override;

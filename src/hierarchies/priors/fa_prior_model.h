@@ -11,7 +11,8 @@
 #include "src/utils/rng.h"
 
 class FAPriorModel
-    : public BasePriorModel<FAPriorModel, Hyperparams::FA, bayesmix::FAPrior> {
+    : public BasePriorModel<FAPriorModel, State::FA, Hyperparams::FA,
+                            bayesmix::FAPrior> {
  public:
   using AbstractPriorModel::ProtoHypers;
   using AbstractPriorModel::ProtoHypersPtr;
@@ -21,8 +22,7 @@ class FAPriorModel
 
   double lpdf(const google::protobuf::Message &state_) override;
 
-  std::shared_ptr<google::protobuf::Message> sample(
-      ProtoHypersPtr hier_hypers = nullptr) override;
+  State::FA sample(ProtoHypersPtr hier_hypers = nullptr) override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;

@@ -32,9 +32,8 @@ class FAHierarchy
     state.psi = hypers.beta / (hypers.alpha0 + 1.);
     state.lambda = Eigen::MatrixXd::Zero(dim, hypers.q);
     state.psi_inverse = state.psi.cwiseInverse().asDiagonal();
+    state.compute_wood_factors();
     like->set_state(state);
-    like->compute_wood_factors(state.cov_wood, state.cov_logdet, state.lambda,
-                               state.psi_inverse);
   }
 };
 
