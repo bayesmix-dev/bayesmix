@@ -11,16 +11,16 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
-class NWPriorModel : public BasePriorModel<NWPriorModel, Hyperparams::NW,
-                                           bayesmix::NNWPrior> {
+class NWPriorModel
+    : public BasePriorModel<NWPriorModel, State::MultiLS, Hyperparams::NW,
+                            bayesmix::NNWPrior> {
  public:
   NWPriorModel() = default;
   ~NWPriorModel() = default;
 
   double lpdf(const google::protobuf::Message &state_) override;
 
-  std::shared_ptr<google::protobuf::Message> sample(
-      ProtoHypersPtr hier_hypers = nullptr) override;
+  State::MultiLS sample(ProtoHypersPtr hier_hypers = nullptr) override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override;

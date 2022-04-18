@@ -121,8 +121,7 @@ double NWPriorModel::lpdf(const google::protobuf::Message &state_) {
   return target;
 }
 
-std::shared_ptr<google::protobuf::Message> NWPriorModel::sample(
-    ProtoHypersPtr hier_hypers) {
+State::MultiLS NWPriorModel::sample(ProtoHypersPtr hier_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
   auto params = (hier_hypers) ? hier_hypers->nnw_state()
                               : get_hypers_proto()->nnw_state();
@@ -137,7 +136,7 @@ std::shared_ptr<google::protobuf::Message> NWPriorModel::sample(
   out.mean = stan::math::multi_normal_prec_rng(
       mean, tau_new * params.var_scaling(), rng);
   write_prec_to_state(tau_new, &out);
-  return out.to_proto();
+  return out;
 };
 
 void NWPriorModel::update_hypers(
