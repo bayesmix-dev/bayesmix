@@ -5,6 +5,7 @@
 #include <tuple>
 
 #include "algorithm_state.pb.h"
+#include "base_state.h"
 #include "src/utils/proto_utils.h"
 
 namespace State {
@@ -44,7 +45,7 @@ T multi_ls_log_det_jac(
   return out;
 }
 
-class MultiLS {
+class MultiLS : public BaseState {
  public:
   Eigen::VectorXd mean;
   Eigen::MatrixXd prec, prec_chol;
@@ -52,11 +53,11 @@ class MultiLS {
 
   using ProtoState = bayesmix::AlgorithmState::ClusterState;
 
-  Eigen::VectorXd get_unconstrained() {
+  Eigen::VectorXd get_unconstrained() override {
     return multi_ls_to_unconstrained(mean, prec);
   }
 
-  void set_from_unconstrained(Eigen::VectorXd in) {
+  void set_from_unconstrained(Eigen::VectorXd in) override {
     std::tie(mean, prec) = multi_ls_to_constrained(in);
     set_from_constrained(mean, prec);
   }
@@ -69,7 +70,11 @@ class MultiLS {
     prec_logdet = 2 * log(diag.array()).sum();
   }
 
-  void set_from_proto(const ProtoState &state_) {
+  void set_from_proto(const ProtoState &state_, bool update_card) override {
+    if (update_card) {
+      card = state_.cardinality();
+    }
+
     mean = to_eigen(state_.multi_ls_state().mean());
     prec = to_eigen(state_.multi_ls_state().prec());
     prec_chol = to_eigen(state_.multi_ls_state().prec_chol());
@@ -77,7 +82,7 @@ class MultiLS {
     prec_logdet = 2 * log(diag.array()).sum();
   }
 
-  ProtoState get_as_proto() {
+  ProtoState get_as_proto() const override {
     ProtoState state;
     bayesmix::to_proto(mean, state.mutable_multi_ls_state()->mutable_mean());
     bayesmix::to_proto(prec, state.mutable_multi_ls_state()->mutable_prec());
@@ -86,11 +91,7 @@ class MultiLS {
     return state;
   }
 
-  std::shared_ptr<ProtoState> to_proto() {
-    return std::make_shared<ProtoState>(get_as_proto());
-  }
-
-  double log_det_jac() { return multi_ls_log_det_jac(prec); }
+  double log_det_jac() override { return multi_ls_log_det_jac(prec); }
 };
 
 }  // namespace State

@@ -19,8 +19,6 @@ class MultiNormLikelihood
   ~MultiNormLikelihood() = default;
   bool is_multivariate() const override { return true; };
   bool is_dependent() const override { return false; };
-  void set_state_from_proto(const google::protobuf::Message &state_,
-                            bool update_card = true) override;
   void clear_summary_statistics() override;
 
   void set_dim(unsigned int dim_) {
@@ -30,9 +28,6 @@ class MultiNormLikelihood
   unsigned int get_dim() const { return dim; };
   Eigen::VectorXd get_data_sum() const { return data_sum; };
   Eigen::MatrixXd get_data_sum_squares() const { return data_sum_squares; };
-
-  std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
-      const override;
 
  protected:
   double compute_lpdf(const Eigen::RowVectorXd &datum) const override;
