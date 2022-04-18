@@ -5,6 +5,7 @@
 #include <tuple>
 
 #include "algorithm_state.pb.h"
+#include "base_state.h"
 #include "src/utils/eigen_utils.h"
 #include "src/utils/proto_utils.h"
 
@@ -36,33 +37,36 @@ T uni_lin_reg_log_det_jac(Eigen::Matrix<T, Eigen::Dynamic, 1> constrained) {
   return out;
 }
 
-class UniLinRegLS {
+class UniLinRegLS : public BaseState {
  public:
   Eigen::VectorXd regression_coeffs;
   double var;
 
   using ProtoState = bayesmix::AlgorithmState::ClusterState;
 
-  Eigen::VectorXd get_unconstrained() {
+  Eigen::VectorXd get_unconstrained() override {
     Eigen::VectorXd temp(regression_coeffs.size() + 1);
     temp << regression_coeffs, var;
     return uni_lin_reg_to_unconstrained(temp);
   }
 
-  void set_from_unconstrained(Eigen::VectorXd in) {
+  void set_from_unconstrained(Eigen::VectorXd in) override {
     Eigen::VectorXd temp = uni_lin_reg_to_constrained(in);
     int dim = in.size() - 1;
     regression_coeffs = temp.head(dim);
     var = temp(dim);
   }
 
-  void set_from_proto(const ProtoState &state_) {
+  void set_from_proto(const ProtoState &state_, bool update_card) override {
+    if (update_card) {
+      card = state_.cardinality();
+    }
     regression_coeffs =
         bayesmix::to_eigen(state_.lin_reg_uni_ls_state().regression_coeffs());
     var = state_.lin_reg_uni_ls_state().var();
   }
 
-  ProtoState get_as_proto() {
+  ProtoState get_as_proto() const override {
     ProtoState state;
     bayesmix::to_proto(
         regression_coeffs,
@@ -71,11 +75,7 @@ class UniLinRegLS {
     return state;
   }
 
-  std::shared_ptr<ProtoState> to_proto() {
-    return std::make_shared<ProtoState>(get_as_proto());
-  }
-
-  double log_det_jac() {
+  double log_det_jac() override {
     Eigen::VectorXd temp(regression_coeffs.size() + 1);
     temp << regression_coeffs, var;
     return uni_lin_reg_log_det_jac(temp);

@@ -11,8 +11,7 @@ double MNIGPriorModel::lpdf(const google::protobuf::Message &state_) {
   return target;
 }
 
-std::shared_ptr<google::protobuf::Message> MNIGPriorModel::sample(
-    ProtoHypersPtr hier_hypers) {
+State::UniLinRegLS MNIGPriorModel::sample(ProtoHypersPtr hier_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
   auto params = (hier_hypers) ? hier_hypers->lin_reg_uni_state()
                               : get_hypers_proto()->lin_reg_uni_state();
@@ -23,7 +22,7 @@ std::shared_ptr<google::protobuf::Message> MNIGPriorModel::sample(
   out.var = stan::math::inv_gamma_rng(params.shape(), params.scale(), rng);
   out.regression_coeffs =
       stan::math::multi_normal_prec_rng(mean, var_scaling / out.var, rng);
-  return out.to_proto();
+  return out;
 }
 
 void MNIGPriorModel::update_hypers(
