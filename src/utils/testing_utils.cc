@@ -57,7 +57,7 @@ std::shared_ptr<BaseAlgorithm> get_algorithm(const std::string& id, int dim) {
   if (dim == 1) {
     hier = get_univariate_nnig_hierarchy();
   } else {
-    // hier = get_multivariate_nnw_hierarchy(dim);
+    hier = get_multivariate_nnw_hierarchy(dim);
   }
   hier->initialize();
   algo->set_mixing(mixing);
