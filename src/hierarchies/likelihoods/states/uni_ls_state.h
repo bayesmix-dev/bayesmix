@@ -5,8 +5,8 @@
 #include <stan/math/rev.hpp>
 
 #include "algorithm_state.pb.h"
-#include "src/utils/proto_utils.h"
 #include "base_state.h"
+#include "src/utils/proto_utils.h"
 
 namespace State {
 
@@ -33,7 +33,7 @@ T uni_ls_log_det_jac(Eigen::Matrix<T, Eigen::Dynamic, 1> constrained) {
   return out;
 }
 
-class UniLS: public BaseState {
+class UniLS : public BaseState {
  public:
   double mean, var;
 
@@ -59,7 +59,7 @@ class UniLS: public BaseState {
     var = state_.uni_ls_state().var();
   }
 
-  ProtoState get_as_proto() override {
+  ProtoState get_as_proto() const override {
     ProtoState state;
     state.mutable_uni_ls_state()->set_mean(mean);
     state.mutable_uni_ls_state()->set_var(var);

@@ -210,9 +210,7 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   //! Generates new state values from the centering prior distribution
-  void sample_prior() override {
-    like->set_state(prior->sample(), false);
-  };
+  void sample_prior() override { like->set_state(prior->sample(), false); };
 
   //! Generates new state values from the centering posterior distribution
   //! @param update_params  Save posterior hypers after the computation?
@@ -260,7 +258,8 @@ class BaseHierarchy : public AbstractHierarchy {
   //! AlgoritmState::ClusterState message by adding the appropriate type
   std::shared_ptr<bayesmix::AlgorithmState::ClusterState> get_state_proto()
       const override {
-    return like->get_state_proto();
+    return std::make_shared<bayesmix::AlgorithmState::ClusterState>(
+        like->get_state().get_as_proto());
   }
 
   //! Returns a pointer to the Protobuf message of the prior of this cluster

@@ -30,8 +30,7 @@ double NxIGPriorModel::lpdf(const google::protobuf::Message &state_) {
   return target;
 }
 
-std::shared_ptr<google::protobuf::Message> NxIGPriorModel::sample(
-    ProtoHypersPtr hier_hypers) {
+State::UniLS NxIGPriorModel::sample(ProtoHypersPtr hier_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
   auto params = (hier_hypers) ? hier_hypers->nnxig_state()
                               : get_hypers_proto()->nnxig_state();
@@ -39,7 +38,7 @@ std::shared_ptr<google::protobuf::Message> NxIGPriorModel::sample(
   State::UniLS out;
   out.mean = stan::math::normal_rng(params.mean(), sqrt(params.var()), rng);
   out.var = stan::math::inv_gamma_rng(params.shape(), params.scale(), rng);
-  return out.to_proto();
+  return out;
 };
 
 void NxIGPriorModel::update_hypers(
