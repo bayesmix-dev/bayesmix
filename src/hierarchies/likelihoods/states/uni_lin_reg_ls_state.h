@@ -50,7 +50,7 @@ class UniLinRegLS : public BaseState {
     return uni_lin_reg_to_unconstrained(temp);
   }
 
-  void set_from_unconstrained(Eigen::VectorXd in) override {
+  void set_from_unconstrained(const Eigen::VectorXd &in) override {
     Eigen::VectorXd temp = uni_lin_reg_to_constrained(in);
     int dim = in.size() - 1;
     regression_coeffs = temp.head(dim);

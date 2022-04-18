@@ -45,7 +45,7 @@ class UniLS : public BaseState {
     return uni_ls_to_unconstrained(temp);
   }
 
-  void set_from_unconstrained(Eigen::VectorXd in) override {
+  void set_from_unconstrained(const Eigen::VectorXd &in) override {
     Eigen::VectorXd temp = uni_ls_to_constrained(in);
     mean = temp(0);
     var = temp(1);

@@ -57,7 +57,7 @@ class MultiLS : public BaseState {
     return multi_ls_to_unconstrained(mean, prec);
   }
 
-  void set_from_unconstrained(Eigen::VectorXd in) override {
+  void set_from_unconstrained(const Eigen::VectorXd &in) override {
     std::tie(mean, prec) = multi_ls_to_constrained(in);
     set_from_constrained(mean, prec);
   }
