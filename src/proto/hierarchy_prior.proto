@@ -105,3 +105,9 @@ message FAPrior {
 message EmptyPrior {
   double fake_field = 1;
 }
+
+message PythonPrior{
+  oneof prior {
+    Vector values = 1; // values are modified from python
+  }
+}

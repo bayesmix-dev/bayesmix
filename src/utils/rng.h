@@ -25,7 +25,7 @@ class Rng {
   }
 
   //! Returns a reference to the underlying RNG object
-  std::mt19937_64 &get() { return mt; }
+  std::mt19937 &get() { return mt; }
 
   //! Sets the RNG seed
   void seed(const int seed_val) { mt.seed(seed_val); }
@@ -37,7 +37,7 @@ class Rng {
   Rng &operator=(Rng const &) = delete;
 
   //! C++ standard library RNG object
-  std::mt19937_64 mt;
+  std::mt19937 mt;
 };
 }  // namespace bayesmix
 

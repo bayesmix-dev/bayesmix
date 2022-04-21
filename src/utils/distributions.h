@@ -23,7 +23,7 @@ namespace bayesmix {
  * @param start  (default = 0)
  * @return       categorical r.v. with values on {start, ..., start + k}
  */
-int categorical_rng(const Eigen::VectorXd &probas, std::mt19937_64 &rng,
+int categorical_rng(const Eigen::VectorXd &probas, std::mt19937 &rng,
                     const int start = 0);
 
 /*
@@ -68,7 +68,7 @@ Eigen::VectorXd multi_normal_prec_lpdf_grid(const Eigen::MatrixXd &data,
 Eigen::VectorXd multi_normal_diag_rng(
     const Eigen::VectorXd &mean,
     const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &cov_diag,
-    std::mt19937_64 &rng);
+    std::mt19937 &rng);
 
 /*
  * Returns a pseudorandom multivariate normal random variable parametrized
@@ -81,7 +81,7 @@ Eigen::VectorXd multi_normal_diag_rng(
  */
 Eigen::VectorXd multi_normal_prec_chol_rng(
     const Eigen::VectorXd &mean, const Eigen::LLT<Eigen::MatrixXd> &prec_chol,
-    std::mt19937_64 &rng);
+    std::mt19937 &rng);
 
 /*
  * Evaluates the log probability density function of a multivariate Gaussian

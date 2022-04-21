@@ -8,8 +8,8 @@
 
 #include "src/utils/proto_utils.h"
 
-int bayesmix::categorical_rng(const Eigen::VectorXd &probas,
-                              std::mt19937_64 &rng, const int start /*= 0*/) {
+int bayesmix::categorical_rng(const Eigen::VectorXd &probas, std::mt19937 &rng,
+                              const int start /*= 0*/) {
   return stan::math::categorical_rng(probas, rng) + (start - 1);
 }
 
@@ -39,7 +39,7 @@ Eigen::VectorXd bayesmix::multi_normal_prec_lpdf_grid(
 Eigen::VectorXd bayesmix::multi_normal_diag_rng(
     const Eigen::VectorXd &mean,
     const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &cov_diag,
-    std::mt19937_64 &rng) {
+    std::mt19937 &rng) {
   size_t N = mean.size();
   Eigen::VectorXd output(N);
   for (size_t i = 0; i < N; i++) {
@@ -50,10 +50,10 @@ Eigen::VectorXd bayesmix::multi_normal_diag_rng(
 
 Eigen::VectorXd bayesmix::multi_normal_prec_chol_rng(
     const Eigen::VectorXd &mean, const Eigen::LLT<Eigen::MatrixXd> &prec_chol,
-    std::mt19937_64 &rng) {
+    std::mt19937 &rng) {
   size_t N = mean.size();
   Eigen::VectorXd output(N);
-  boost::variate_generator<std::mt19937_64 &, boost::normal_distribution<>>
+  boost::variate_generator<std::mt19937 &, boost::normal_distribution<>>
       std_normal_rng(rng, boost::normal_distribution<>(0, 1));
 
   Eigen::VectorXd z(N);
