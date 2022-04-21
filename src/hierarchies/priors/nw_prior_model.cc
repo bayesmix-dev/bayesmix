@@ -62,7 +62,7 @@ void NWPriorModel::initialize_hypers() {
     // for mu0
     Eigen::VectorXd mu00 =
         bayesmix::to_eigen(prior->ngiw_prior().mean_prior().mean());
-    unsigned int dim = mu00.size();
+    dim = mu00.size();
     Eigen::MatrixXd sigma00 =
         bayesmix::to_eigen(prior->ngiw_prior().mean_prior().var());
     // for lambda0
