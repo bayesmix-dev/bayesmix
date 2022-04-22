@@ -41,8 +41,8 @@ AbstractUpdater::ProtoHypersPtr GammaGammaUpdater::compute_posterior_hypers(
 
   // Proto conversion
   ProtoHypers out;
-  out.mutable_fake_prior()->mutable_data()->Add(rate_alpha_new);
-  out.mutable_fake_prior()->mutable_data()->Add(rate_beta_new);
+  out.mutable_general_state()->mutable_data()->Add(rate_alpha_new);
+  out.mutable_general_state()->mutable_data()->Add(rate_beta_new);
   return std::make_shared<ProtoHypers>(out);
 }
 

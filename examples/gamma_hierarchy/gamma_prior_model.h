@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "algorithm_state.pb.h"
+#include "gamma_likelihood.h"
 #include "hierarchy_prior.pb.h"
 #include "src/hierarchies/priors/base_prior_model.h"
 #include "src/utils/rng.h"
@@ -18,7 +19,7 @@ struct Gamma {
 }  // namespace Hyperparams
 
 class GammaPriorModel
-    : public BasePriorModel<GammaPriorModel, Hyperparams::Gamma,
+    : public BasePriorModel<GammaPriorModel, State::Gamma, Hyperparams::Gamma,
                             bayesmix::EmptyPrior> {
  public:
   using AbstractPriorModel::ProtoHypers;
@@ -30,8 +31,7 @@ class GammaPriorModel
 
   double lpdf(const google::protobuf::Message &state_) override;
 
-  std::shared_ptr<google::protobuf::Message> sample(
-      ProtoHypersPtr hier_hypers = nullptr) override;
+  State::Gamma sample(ProtoHypersPtr hier_hypers = nullptr) override;
 
   void update_hypers(const std::vector<bayesmix::AlgorithmState::ClusterState>
                          &states) override {
@@ -61,36 +61,30 @@ double GammaPriorModel::lpdf(const google::protobuf::Message &state_) {
   return stan::math::gamma_lpdf(rate, hypers->rate_alpha, hypers->rate_beta);
 }
 
-std::shared_ptr<google::protobuf::Message> GammaPriorModel::sample(
-    ProtoHypersPtr hier_hypers) {
+State::Gamma GammaPriorModel::sample(ProtoHypersPtr hier_hypers) {
   auto &rng = bayesmix::Rng::Instance().get();
+  State::Gamma out;
 
-  auto params = (hier_hypers) ? hier_hypers->fake_prior()
-                              : get_hypers_proto()->fake_prior();
+  auto params = (hier_hypers) ? hier_hypers->general_state()
+                              : get_hypers_proto()->general_state();
   double rate_alpha = params.data()[0];
   double rate_beta = params.data()[1];
-  double new_rate = stan::math::gamma_rng(rate_alpha, rate_beta, rng);
-
-  bayesmix::AlgorithmState::ClusterState out;
-  out.mutable_general_state()->mutable_data()->Add(shape);
-  out.mutable_general_state()->mutable_data()->Add(new_rate);
-  return std::make_shared<bayesmix::AlgorithmState::ClusterState>(out);
+  out.shape = shape;
+  out.rate = stan::math::gamma_rng(rate_alpha, rate_beta, rng);
+  return out;
 }
 
 void GammaPriorModel::set_hypers_from_proto(
     const google::protobuf::Message &hypers_) {
-  auto &hyperscast = downcast_hypers(hypers_);
-  hypers->rate_alpha = hyperscast.fake_prior().data()[0];
-  hypers->rate_beta = hyperscast.fake_prior().data()[1];
+  auto &hyperscast = downcast_hypers(hypers_).general_state();
+  hypers->rate_alpha = hyperscast.data()[0];
+  hypers->rate_beta = hyperscast.data()[1];
 };
 
 GammaPriorModel::ProtoHypersPtr GammaPriorModel::get_hypers_proto() const {
-  bayesmix::Vector hypers_;
-  hypers_.mutable_data()->Add(hypers->rate_alpha);
-  hypers_.mutable_data()->Add(hypers->rate_beta);
-
   ProtoHypersPtr out = std::make_shared<ProtoHypers>();
-  out->mutable_fake_prior()->CopyFrom(hypers_);
+  out->mutable_general_state()->mutable_data()->Add(hypers->rate_alpha);
+  out->mutable_general_state()->mutable_data()->Add(hypers->rate_beta);
   return out;
 };
 
