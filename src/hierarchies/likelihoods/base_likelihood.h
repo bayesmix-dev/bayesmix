@@ -13,6 +13,15 @@
 #include "likelihood_internal.h"
 #include "src/utils/covariates_getter.h"
 
+//! Base template class of a likelihood object
+
+//! This class derives from `AbstractLikelihood` and is templated over
+//! `Derived` (needed for the curiously recurring template pattern) and
+//! `State`: an instance of `BaseState`
+
+//! @tparam Derived  Name of the implemented derived class
+//! @tparam State    Class name of the container for state values
+
 template <class Derived, typename State>
 class BaseLikelihood : public AbstractLikelihood {
  public:

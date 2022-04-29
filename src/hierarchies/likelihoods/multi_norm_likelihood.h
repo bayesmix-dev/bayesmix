@@ -12,6 +12,8 @@
 #include "base_likelihood.h"
 #include "states/includes.h"
 
+//! A multivariate normal likelihood
+
 class MultiNormLikelihood
     : public BaseLikelihood<MultiNormLikelihood, State::MultiLS> {
  public:

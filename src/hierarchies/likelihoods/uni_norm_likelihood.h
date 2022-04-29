@@ -11,6 +11,8 @@
 #include "base_likelihood.h"
 #include "states/includes.h"
 
+//! A univariate normal likelihood, using the `State::UniLS` state.
+
 class UniNormLikelihood
     : public BaseLikelihood<UniNormLikelihood, State::UniLS> {
  public:

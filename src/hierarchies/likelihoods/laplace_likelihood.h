@@ -11,6 +11,8 @@
 #include "base_likelihood.h"
 #include "states/includes.h"
 
+//! A univariate laplace likelihood
+
 class LaplaceLikelihood
     : public BaseLikelihood<LaplaceLikelihood, State::UniLS> {
  public:

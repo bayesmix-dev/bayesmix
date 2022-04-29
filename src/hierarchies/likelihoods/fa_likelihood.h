@@ -12,6 +12,11 @@
 #include "base_likelihood.h"
 #include "states/includes.h"
 
+//! A gaussian factor analytic likelihood, that is
+//!     Y ~ N_p(mu, Lambda * Lambda^T + Psi)
+//! Where Lambda is a `p x d` matrix, usually d << p and `Psi` is a diagonal
+//! matrix.
+
 class FALikelihood : public BaseLikelihood<FALikelihood, State::FA> {
  public:
   FALikelihood() = default;
