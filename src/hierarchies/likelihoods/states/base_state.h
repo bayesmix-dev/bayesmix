@@ -17,7 +17,7 @@ namespace State {
 //! observations in the model.
 //!
 //! State classes inheriting from this one should implement the methods
-//! `set_from_proto` and `to_proto`, that are used to deserialzie from
+//! `set_from_proto()` and `to_proto()`, that are used to deserialzie from
 //! (and serialize to) a `bayesmix::AlgorithmState::ClusterState`
 //! protocol buffer message.
 //!
@@ -28,7 +28,7 @@ namespace State {
 //! and `MalaUpdater` to work, but is not necessary for other model-specific
 //! updaters.
 //! If such a representation is needed, child classes should also implement
-//! `get_unconstrained`, `set_from_unconstrained`, and `log_det_jac`.
+//! `get_unconstrained()`, `set_from_unconstrained()`, and `log_det_jac()`.
 
 class BaseState {
  public:

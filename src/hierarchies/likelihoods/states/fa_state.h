@@ -20,7 +20,7 @@ namespace State {
 //!
 //! For faster likelihood evaluation, we store also the `cov_wood` factor and
 //! the log determinant of the matrix `lambda * lambda^T + psi`, see
-//! the `compute_wood_chol_and_logdet` function for more details.
+//! the `compute_wood_chol_and_logdet(...)` function for more details.
 //!
 //! The unconstrained representation for this state is not implemented.
 class FA : public BaseState {
