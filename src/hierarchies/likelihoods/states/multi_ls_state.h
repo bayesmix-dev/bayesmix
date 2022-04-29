@@ -48,7 +48,7 @@ T multi_ls_log_det_jac(
 //! A univariate location-scale state with parametrization (mean, Cov)
 //! where Cov is the covariance matrix.
 //! The unconstrained representation corresponds to (mean, B(cov)), for
-//! B the `stan::math::cov_matrix_free` transformation.
+//! B the `stan::math::cov_matrix_free()` transformation.
 class MultiLS : public BaseState {
  public:
   Eigen::VectorXd mean;
