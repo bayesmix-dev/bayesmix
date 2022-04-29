@@ -37,6 +37,9 @@ T uni_lin_reg_log_det_jac(Eigen::Matrix<T, Eigen::Dynamic, 1> constrained) {
   return out;
 }
 
+//! State of a scalar linear regression model with parameters
+//! (regression_coeffs, var), where var is the variance of the error term.
+//! The unconstrained representation is (regression_coeffs, log(var)).
 class UniLinRegLS : public BaseState {
  public:
   Eigen::VectorXd regression_coeffs;
