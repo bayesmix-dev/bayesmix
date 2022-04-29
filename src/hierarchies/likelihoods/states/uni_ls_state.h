@@ -33,6 +33,8 @@ T uni_ls_log_det_jac(Eigen::Matrix<T, Eigen::Dynamic, 1> constrained) {
   return out;
 }
 
+//! A univariate location-scale state with parametrization (mean, var)
+//! The unconstrained representation corresponds to (mean, log(var))
 class UniLS : public BaseState {
  public:
   double mean, var;

@@ -12,6 +12,17 @@
 
 namespace State {
 
+//! State of a Factor Analytic model
+//!   Y_i = lambda * eta_i + err
+//! where `Y_i` is a `p`-dimensional vetor, `eta_i` is a d-dimensional one,
+//! `lambda` is a `p x d` matrix and `err` is an error term with mean zero and
+//! diagonal covariance matrix `psi`.
+//!
+//! For faster likelihood evaluation, we store also the `cov_wood` factor and
+//! the log determinant of the matrix `lambda * lambda^T + psi`, see
+//! the `compute_wood_chol_and_logdet` function for more details.
+//!
+//! The unconstrained representation for this state is not implemented.
 class FA : public BaseState {
  public:
   Eigen::VectorXd mu, psi;
