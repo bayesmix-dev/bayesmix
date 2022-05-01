@@ -45,6 +45,8 @@ class FA : public BaseState {
     compute_wood_factors();
   }
 
+  //! Sets cov_logdet and cov_wood by calling
+  //! bayesmix::compute_wood_chol_and_logdet()
   void compute_wood_factors() {
     auto [cov_wood_, cov_logdet_] =
         bayesmix::compute_wood_chol_and_logdet(psi_inverse, lambda);
