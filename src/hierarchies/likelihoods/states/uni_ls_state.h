@@ -10,6 +10,8 @@
 
 namespace State {
 
+//! Returns the constrained parametrization from the
+//! unconstrained one, i.e. [in[0], exp(in[1])]
 template <typename T>
 Eigen::Matrix<T, Eigen::Dynamic, 1> uni_ls_to_constrained(
     Eigen::Matrix<T, Eigen::Dynamic, 1> in) {
@@ -18,6 +20,8 @@ Eigen::Matrix<T, Eigen::Dynamic, 1> uni_ls_to_constrained(
   return out;
 }
 
+//! Returns the unconstrained parametrization from the
+//! constrained one, i.e. [in[0], log(in[1])]
 template <typename T>
 Eigen::Matrix<T, Eigen::Dynamic, 1> uni_ls_to_unconstrained(
     Eigen::Matrix<T, Eigen::Dynamic, 1> in) {
@@ -26,6 +30,9 @@ Eigen::Matrix<T, Eigen::Dynamic, 1> uni_ls_to_unconstrained(
   return out;
 }
 
+//! Returns the log determinant of the jacobian of the map
+//! (x, y) -> (x, log(y)), that is the inverse map of the
+//! constrained -> unconstrained representation.
 template <typename T>
 T uni_ls_log_det_jac(Eigen::Matrix<T, Eigen::Dynamic, 1> constrained) {
   T out = 0;

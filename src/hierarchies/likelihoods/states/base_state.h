@@ -17,13 +17,13 @@ namespace State {
 //! observations in the model.
 //!
 //! State classes inheriting from this one should implement the methods
-//! `set_from_proto()` and `to_proto()`, that are used to deserialzie from
+//! `set_from_proto()` and `to_proto()`, that are used to deserialize from
 //! (and serialize to) a `bayesmix::AlgorithmState::ClusterState`
 //! protocol buffer message.
 //!
 //! Optionally, each state can have an "unconstrained" representation,
 //! where a bijective transformation B is applied to `tau`, so that
-//! the image of B(tau) is R^d for some d.
+//! the image of B is R^d for some d.
 //! This is essential for the default updaters such as `RandomWalkUpdater`
 //! and `MalaUpdater` to work, but is not necessary for other model-specific
 //! updaters.
@@ -48,15 +48,15 @@ class BaseState {
 
   //! Sets the current state from a protobuf object
   //! @param state_ a bayesmix::AlgorithmState::ClusterState instance
-  //! @param update_card if true, the current cardinality is udpdate
+  //! @param update_card if true, the current cardinality is updated
   virtual void set_from_proto(const ProtoState &state_, bool update_card) = 0;
 
-  //! Returns a `bayesmix::AlgorithmState::ClusterState` representig the
+  //! Returns a `bayesmix::AlgorithmState::ClusterState` representing the
   //! current value of the state
   virtual ProtoState get_as_proto() const = 0;
 
   //! Returns a shared pointer to `bayesmix::AlgorithmState::ClusterState`
-  //! representig the current value of the state
+  //! representing the current value of the state
   std::shared_ptr<ProtoState> to_proto() const {
     return std::make_shared<ProtoState>(get_as_proto());
   }
