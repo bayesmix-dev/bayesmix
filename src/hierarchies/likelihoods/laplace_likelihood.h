@@ -19,7 +19,7 @@
 //! and var is the variance. The scale is then sqrt(var / 2)
 //! These parameters are stored in a `State::UniLS` state
 //!
-//! Since the Laplce likelihood does not have sufficient statistics
+//! Since the Laplace likelihood does not have sufficient statistics
 //! other than the whole sample, the `update_sum_stats` method
 //! does nothing.
 
