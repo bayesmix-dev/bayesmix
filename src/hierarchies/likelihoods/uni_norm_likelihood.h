@@ -17,7 +17,7 @@
 //!     y_1, ..., y_m ~ N(mu, var)
 //! where (mu, var) are stored in a `State::UniLS` state
 //!
-//! The sufficient statistics store are the sum of the y_i's
+//! The sufficient statistics stored are the sum of the y_i's
 //! and the sum of y_i^2.
 
 class UniNormLikelihood
