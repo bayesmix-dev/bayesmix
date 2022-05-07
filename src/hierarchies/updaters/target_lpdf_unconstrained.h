@@ -4,6 +4,10 @@
 #include "src/hierarchies/likelihoods/abstract_likelihood.h"
 #include "src/hierarchies/priors/abstract_prior_model.h"
 
+//! Functor that computes the log-full conditional distribution
+//! of a specific hierarchy.
+//! Used by metropolis-like updaters especially when the gradient
+//! of the target_lpdf if required
 class target_lpdf_unconstrained {
  protected:
   AbstractLikelihood* like;
@@ -14,6 +18,9 @@ class target_lpdf_unconstrained {
                             AbstractPriorModel* prior)
       : like(like), prior(prior) {}
 
+  //! Computes the log-full conditional that is simply the
+  //! sum of `cluster_lpdf_from_unconstrained` in `AbstractLikelihood`
+  //! and `lpdf_from_unconstrained` in `AbstractPriorModel`
   template <typename T>
   T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
     return like->cluster_lpdf_from_unconstrained(x) +
