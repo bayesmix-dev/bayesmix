@@ -7,6 +7,25 @@
 #include "src/hierarchies/likelihoods/abstract_likelihood.h"
 #include "src/hierarchies/priors/abstract_prior_model.h"
 
+//! Updater for semi-conjugate hierarchies.
+//!
+//! We say that a hierarchy is semi-conjugate if the full conditionals
+//! of each parameter is in the same parametric family of the prior
+//! distribution of that parameter.
+//!
+//! As a consequence, sampling from the full conditional can be done
+//! by calling the `sample` method from the `PriorModel` class, with
+//! updater hyperparameters
+//!
+//! Classes inheriting from this one should only implement the
+//! `compute_posterior_hypers(...)` member function
+//!
+//! This class is templated with respect to
+//! @tparam Likelihood: the likelihood of the hierarchy, instance of
+//! `AbstractLikelihood`
+//! @tparam PriorModel: the prior of the hierarchy, instance of
+//! `AbstractPriorModel`
+
 template <class Likelihood, class PriorModel>
 class SemiConjugateUpdater : public AbstractUpdater {
  public:
@@ -17,6 +36,8 @@ class SemiConjugateUpdater : public AbstractUpdater {
   void draw(AbstractLikelihood& like, AbstractPriorModel& prior,
             bool update_params) override;
 
+  //! Used by algorithms such as Neal3 and SplitMerge
+  //! It stores the hyperparameters computed by `compute_posterior_hypers`
   void save_posterior_hypers(ProtoHypersPtr post_hypers_) override;
 
  protected:
