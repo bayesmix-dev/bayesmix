@@ -1,8 +1,8 @@
 #ifndef BAYESMIX_ALGORITHMS_MARGINAL_ALGORITHM_H_
 #define BAYESMIX_ALGORITHMS_MARGINAL_ALGORITHM_H_
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 
 #include "base_algorithm.h"
 #include "src/collectors/base_collector.h"

@@ -1,7 +1,7 @@
 #include "cluster_utils.h"
 
-#include <Eigen/Dense>
 #include <Eigen/SparseCore>
+#include <stan/math/rev.hpp>
 
 #include "lib/progressbar/progressbar.h"
 #include "proto_utils.h"
@@ -35,6 +35,7 @@ Eigen::VectorXi bayesmix::cluster_estimate(
   std::cout << "Done)" << std::endl;
 
   // Compute Frobenius norm error of all iterations
+  std::cout << "Computing Frobenius norm error... " << std::endl;
   Eigen::VectorXd errors(n_iter);
   for (int k = 0; k < n_iter; k++) {
     for (int i = 0; i < n_data; i++) {
@@ -48,6 +49,7 @@ Eigen::VectorXi bayesmix::cluster_estimate(
     bar.display();
   }
   bar.done();
+  std::cout << "Done" << std::endl;  // Print Ending Message
 
   // Find iteration with the least error
   std::ptrdiff_t ibest;

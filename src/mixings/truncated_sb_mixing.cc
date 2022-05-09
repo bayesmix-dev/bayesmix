@@ -2,11 +2,11 @@
 
 #include <google/protobuf/stubs/casts.h>
 
-#include <Eigen/Dense>
 #include <cassert>
 #include <memory>
 #include <numeric>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "logit_sb_mixing.h"

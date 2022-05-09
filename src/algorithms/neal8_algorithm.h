@@ -1,8 +1,8 @@
 #ifndef BAYESMIX_ALGORITHMS_NEAL8_ALGORITHM_H_
 #define BAYESMIX_ALGORITHMS_NEAL8_ALGORITHM_H_
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "algorithm_id.pb.h"

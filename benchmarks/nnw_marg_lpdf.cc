@@ -1,7 +1,7 @@
 #include <benchmark/benchmark.h>
 
-#include <Eigen/Dense>
 #include <iostream>
+#include <stan/math/rev.hpp>
 
 #include "utils.h"
 
