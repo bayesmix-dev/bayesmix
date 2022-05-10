@@ -12,7 +12,7 @@
 //!             Sigma^{-1} ~ Wishart(nu, Psi)
 //!
 //! It exploits the conjugacy of the model to sample the full conditional of
-//! (mu, sigsq) by calling `NWPriorModel::sample` with updated parameters
+//! (mu, Sigma) by calling `NWPriorModel::sample` with updated parameters
 
 class NNWUpdater
     : public SemiConjugateUpdater<MultiNormLikelihood, NWPriorModel> {

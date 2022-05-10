@@ -15,19 +15,19 @@
 //!                                     &target_lpdf)
 //! and
 //!     template <typename F>
-//!     double proposal_lpdf(Eigen::VectorXd prop_state, Eigen::VectorXd
-//!     curr_state,
-//!                          AbstractLikelihood &like, AbstractPriorModel
-//!                          &prior,
-//!                           F &target_lpdf)
-//! where the template parameter is neeeded to allow the use of stan's
+//!     double proposal_lpdf(Eigen::VectorXd prop_state,
+//!                          Eigen::VectorXd curr_state,
+//!                          AbstractLikelihood &like,
+//!                          AbstractPriorModel &prior,
+//!                          F &target_lpdf)
+//! where the template parameter is needed to allow the use of stan's
 //! automatic differentiation if the gradient of the full conditional is
 //! required.
 template <class DerivedUpdater>
 class MetropolisUpdater : public AbstractUpdater {
  public:
   //! Samples from the full conditional distribution using a
-  //! Metropolis-Hasings step
+  //! Metropolis-Hastings step
   void draw(AbstractLikelihood &like, AbstractPriorModel &prior,
             bool update_params) override {
     if (update_params) {

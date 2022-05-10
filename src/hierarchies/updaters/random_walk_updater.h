@@ -7,7 +7,7 @@
 //! centered in the current value of the parameters (unconstrained).
 //! This class requires that the Hierarchy's state implements
 //! the `get_unconstrained()`, `set_from_unconstrained()` and
-//! `log_det_jac` functions.
+//! `log_det_jac()` functions.
 //!
 //! Given the current value of the unconstrained parameters x, a new
 //! value is proposed from
