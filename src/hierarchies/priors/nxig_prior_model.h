@@ -11,6 +11,10 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
+//! A semi-conjugate prior model for the univariate normal likelihood, that is
+//!     mu ~ N(mu0, var0)
+//!     var ~ IG(a,b)
+
 class NxIGPriorModel
     : public BasePriorModel<NxIGPriorModel, State::UniLS, Hyperparams::NxIG,
                             bayesmix::NNxIGPrior> {

@@ -11,6 +11,19 @@
 #include "src/hierarchies/likelihoods/states/includes.h"
 #include "src/utils/rng.h"
 
+//! Abstract class for a generic prior model
+//!
+//! This class is the basis for a curiously recurring template pattern (CRTP)
+//! for `PriorModel` objects, ad it is solely composed of interface functions
+//! for derived classes to use.
+//!
+//! A prior model represents the prior for the parameters in the likelihood.
+//! Hence, it can evaluate the log probability density function (lpdf) for a
+//! given parameter state.
+//!
+//! We also store a pointer to the protobuf object that represents the type of
+//! prior used fot the parameters in the likelihood.
+
 class AbstractPriorModel {
  public:
   // Useful type aliases

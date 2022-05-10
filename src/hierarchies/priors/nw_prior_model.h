@@ -11,6 +11,12 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
+//! A conjugate prior model for the multivariate normal likelihood, that is
+//!     mu | Sigma ~ N_p(mu0, Sigma / lambda)
+//!     Sigma ~ IW(nu0,Psi0)
+//! With some options for hyper-priors on mu and Sigma. We have considered a
+//! normal prior for mu0 in addition to fixing prior hyperparameters.
+
 class NWPriorModel
     : public BasePriorModel<NWPriorModel, State::MultiLS, Hyperparams::NW,
                             bayesmix::NNWPrior> {
