@@ -10,8 +10,7 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
-//! A conjugate prior model for the scalar linear regression likelihood, that
-//! is
+//! A conjugate prior model for the scalar linear regression likelihood, i.e.
 //!     reg_coeffs | var ~ N_p(mu, sigsq * Lambda^-1)
 //!     sigsq ~ IG(a,b)
 
