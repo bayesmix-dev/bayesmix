@@ -15,8 +15,8 @@
 //!     mu | var ~ N(mu0, var / lambda)
 //!     var ~ IG(a,b)
 //! With several possibilies for hyper-priors on mu and var. We have considered
-//! a normal prior for mu0 and a NGG for (mu0, a, b) in addition to fixing
-//! prior hyperparameters.
+//! a normal prior for mu0 and a Normal-Gamma-Gamma for (mu0, a, b) in addition
+//! to fixing prior hyperparameters.
 
 class NIGPriorModel
     : public BasePriorModel<NIGPriorModel, State::UniLS, Hyperparams::NIG,

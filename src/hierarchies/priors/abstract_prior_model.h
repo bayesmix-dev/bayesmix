@@ -22,7 +22,7 @@
 //! given parameter state.
 //!
 //! We also store a pointer to the protobuf object that represents the type of
-//! prior used fot the parameters in the likelihood.
+//! prior used for the parameters in the likelihood.
 
 class AbstractPriorModel {
  public:

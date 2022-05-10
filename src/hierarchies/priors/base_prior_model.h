@@ -27,7 +27,7 @@
 //! @tparam State       Class name of the container for state values
 //! @tparam HyperParams Class name of the container for hyperparameters
 //! @tparam Prior       Class name of the protobuf message for the prior on the
-//! hyperparameters.
+//!                     hyperparameters.
 
 template <class Derived, class State, typename HyperParams, typename Prior>
 class BasePriorModel : public AbstractPriorModel {
