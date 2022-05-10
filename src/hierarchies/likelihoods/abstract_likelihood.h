@@ -12,7 +12,7 @@
 //! Abstract class for a generic likelihood
 //!
 //! This class is the basis for a curiously recurring template pattern (CRTP)
-//! for `Mixing` objects, and is solely composed of interface functions for
+//! for `Likelihood` objects, and is solely composed of interface functions for
 //! derived classes to use.
 //!
 //! A likelihood can evaluate the log probability density faction (lpdf) at a
