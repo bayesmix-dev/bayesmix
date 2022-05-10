@@ -10,6 +10,11 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
+//! A conjugate prior model for the scalar linear regression likelihood, that
+//! is
+//!     reg_coeffs | var ~ N_p(mu, sigsq * Lambda^-1)
+//!     sigsq ~ IG(a,b)
+
 class MNIGPriorModel
     : public BasePriorModel<MNIGPriorModel, State::UniLinRegLS,
                             Hyperparams::MNIG, bayesmix::LinRegUniPrior> {
