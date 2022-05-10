@@ -11,6 +11,15 @@
 #include "base_likelihood.h"
 #include "states/includes.h"
 
+//! A univariate normal likelihood, using the `State::UniLS` state.
+//!
+//! Represents the model:
+//!     y_1, ..., y_m ~ N(mu, var)
+//! where (mu, var) are stored in a `State::UniLS` state
+//!
+//! The sufficient statistics stored are the sum of the y_i's
+//! and the sum of y_i^2.
+
 class UniNormLikelihood
     : public BaseLikelihood<UniNormLikelihood, State::UniLS> {
  public:

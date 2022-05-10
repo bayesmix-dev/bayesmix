@@ -11,6 +11,10 @@
 
 namespace State {
 
+//! Returns the constrained parametrization from the
+//! unconstrained one, i.e. [a, exp(b)],
+//! where `a` is equal to the vector `in` excluding its last
+//! element, and `b` is the last element in `in`
 template <typename T>
 Eigen::Matrix<T, Eigen::Dynamic, 1> uni_lin_reg_to_constrained(
     Eigen::Matrix<T, Eigen::Dynamic, 1> in) {
@@ -20,6 +24,10 @@ Eigen::Matrix<T, Eigen::Dynamic, 1> uni_lin_reg_to_constrained(
   return out;
 }
 
+//! Returns the unconstrained parametrization from the
+//! constrained one, i.e. [a, log(b)]
+//! where `a` is equal to the vector `in` excluding its last
+//! element, and `b` is the last element in `in`
 template <typename T>
 Eigen::Matrix<T, Eigen::Dynamic, 1> uni_lin_reg_to_unconstrained(
     Eigen::Matrix<T, Eigen::Dynamic, 1> in) {
@@ -29,6 +37,9 @@ Eigen::Matrix<T, Eigen::Dynamic, 1> uni_lin_reg_to_unconstrained(
   return out;
 }
 
+//! Returns the log determinant of the jacobian of the map
+//! (x, y) -> (x, log(y)), that is the inverse map of the
+//! constrained -> unconstrained representation.
 template <typename T>
 T uni_lin_reg_log_det_jac(Eigen::Matrix<T, Eigen::Dynamic, 1> constrained) {
   T out = 0;
@@ -37,6 +48,9 @@ T uni_lin_reg_log_det_jac(Eigen::Matrix<T, Eigen::Dynamic, 1> constrained) {
   return out;
 }
 
+//! State of a scalar linear regression model with parameters
+//! (regression_coeffs, var), where var is the variance of the error term.
+//! The unconstrained representation is (regression_coeffs, log(var)).
 class UniLinRegLS : public BaseState {
  public:
   Eigen::VectorXd regression_coeffs;

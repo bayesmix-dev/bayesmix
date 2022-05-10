@@ -9,6 +9,20 @@
 
 #include "algorithm_state.pb.h"
 
+//! Abstract class for a generic likelihood
+//!
+//! This class is the basis for a curiously recurring template pattern (CRTP)
+//! for `Mixing` objects, and is solely composed of interface functions for
+//! derived classes to use.
+//!
+//! A likelihood can evaluate the log probability density faction (lpdf) at a
+//! certain point given the current value of the parameters, or compute
+//! directly the lpdf for the whole cluster.
+//!
+//! Whenever possible, we store in a `Likelihood` instance also the sufficient
+//! statistics of the data allocated to the cluster, in order to speed-up
+//! computations.
+
 class AbstractLikelihood {
  public:
   //! Default destructor

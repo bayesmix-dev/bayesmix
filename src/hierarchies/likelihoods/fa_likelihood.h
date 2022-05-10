@@ -12,6 +12,17 @@
 #include "base_likelihood.h"
 #include "states/includes.h"
 
+//! A gaussian factor analytic likelihood, that is
+//!     Y ~ N_p(mu, Lambda * Lambda^T + Psi)
+//! Where Lambda is a `p x d` matrix, usually d << p and `Psi` is a diagonal
+//! matrix.
+//!
+//! Parameters are stored in a `State::FA` state.
+//! We store as summary statistics the sum of the y_i's, but it is
+//! not sufficient for all the updates involved. Therefore, all the
+//! observations allocated to a cluster are processed when computing the
+//! cluster lpdf.
+
 class FALikelihood : public BaseLikelihood<FALikelihood, State::FA> {
  public:
   FALikelihood() = default;

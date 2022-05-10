@@ -10,6 +10,10 @@
 
 namespace State {
 
+//! Returns the unonstrained parametrization from the
+//! unconstrained one, i.e. [mean_in[0], B(prec_in[1])]
+//! where B is the `stan::math::cov_matrix_free()`
+//! transformation.
 template <typename T>
 Eigen::Matrix<T, Eigen::Dynamic, 1> multi_ls_to_unconstrained(
     Eigen::Matrix<T, Eigen::Dynamic, 1> mean_in,
@@ -21,6 +25,8 @@ Eigen::Matrix<T, Eigen::Dynamic, 1> multi_ls_to_unconstrained(
   return out;
 }
 
+//! Returns the unonstrained parametrization from the
+//! unconstrained one
 template <typename T>
 std::tuple<Eigen::Matrix<T, Eigen::Dynamic, 1>,
            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>>
@@ -36,6 +42,9 @@ multi_ls_to_constrained(Eigen::Matrix<T, Eigen::Dynamic, 1> in) {
   return std::make_tuple(mean, prec);
 }
 
+//! Returns the log determinant of the jacobian of the map
+//! (x, y) -> (x, B(y)), that is the inverse map of the
+//! constrained -> unconstrained representation.
 template <typename T>
 T multi_ls_log_det_jac(
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> prec_constrained) {
@@ -45,6 +54,10 @@ T multi_ls_log_det_jac(
   return out;
 }
 
+//! A univariate location-scale state with parametrization (mean, Cov)
+//! where Cov is the covariance matrix.
+//! The unconstrained representation corresponds to (mean, B(cov)), where
+//! B is the `stan::math::cov_matrix_free()` transformation.
 class MultiLS : public BaseState {
  public:
   Eigen::VectorXd mean;

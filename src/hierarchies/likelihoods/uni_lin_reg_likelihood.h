@@ -11,6 +11,17 @@
 #include "base_likelihood.h"
 #include "states/includes.h"
 
+//! A scalar linear regression model
+//!
+//! Represents the model:
+//!     y_i ~ N(x_i^T * reg_coeffs, var)
+//! where (reg_coeffs, var) are stored in a `State::UniLinRegLS` state
+//!
+//! The sufficient statistics stored are the
+//! 1) sum of y_i^2
+//! 2) sum of x_i^T x_i
+//! 3) sum of y_i x_i^T
+
 class UniLinRegLikelihood
     : public BaseLikelihood<UniLinRegLikelihood, State::UniLinRegLS> {
  public:
