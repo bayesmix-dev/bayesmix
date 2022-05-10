@@ -9,7 +9,7 @@
 //!
 //! This class requires that the Hierarchy's state implements
 //! the `get_unconstrained()`, `set_from_unconstrained()` and
-//! `log_det_jac` functions.
+//! `log_det_jac()` functions.
 //!
 //! Given the current value of the unconstrained parameters x, a new
 //! value is proposed from
@@ -32,7 +32,7 @@ class MalaUpdater : public MetropolisUpdater<MalaUpdater> {
   //! @param prior instance of prior
   //! @param target_lpdf either double or stan::math::var. Needed for
   //!         stan's automatic differentiation. It will be
-  //!         filled with the lpdf af the 'curr_state'
+  //!         filled with the lpdf at the 'curr_state'
   Eigen::VectorXd sample_proposal(Eigen::VectorXd curr_state,
                                   AbstractLikelihood &like,
                                   AbstractPriorModel &prior,
@@ -56,7 +56,7 @@ class MalaUpdater : public MetropolisUpdater<MalaUpdater> {
   //! @param prior instance of prior
   //! @param target_lpdf either double or stan::math::var. Needed for
   //!         stan's automatic differentiation. It will be
-  //!         filled with the lpdf af 'curr_state'
+  //!         filled with the lpdf at 'curr_state'
   double proposal_lpdf(Eigen::VectorXd prop_state, Eigen::VectorXd curr_state,
                        AbstractLikelihood &like, AbstractPriorModel &prior,
                        target_lpdf_unconstrained &target_lpdf) {
