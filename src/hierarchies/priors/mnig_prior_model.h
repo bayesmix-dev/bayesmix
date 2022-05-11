@@ -11,8 +11,8 @@
 #include "src/utils/rng.h"
 
 //! A conjugate prior model for the scalar linear regression likelihood, i.e.
-//!     reg_coeffs | var ~ N_p(mu, sigsq * Lambda^-1)
-//!     sigsq ~ IG(a,b)
+//!     reg_coeffs | var ~ N_p(mu, var * Lambda^-1)
+//!     var ~ IG(a,b)
 
 class MNIGPriorModel
     : public BasePriorModel<MNIGPriorModel, State::UniLinRegLS,
