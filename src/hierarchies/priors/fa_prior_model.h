@@ -11,7 +11,7 @@
 #include "src/utils/rng.h"
 
 //! A prior model for the factor analyzers likelihood, that is
-//!     mu_j ~ N(mutilde_j, psi)    j=1,...,p
+//!     mu ~ N_p(mutilde, psi*I)
 //!     Lambda ~ DL(alpha)
 //!     Sigma = diag(sigsq_1,...,sigsq_p)
 //!     sigsq_j ~ IG(a,b)    j=1,...,p
