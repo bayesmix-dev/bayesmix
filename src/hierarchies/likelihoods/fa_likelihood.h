@@ -13,8 +13,8 @@
 #include "states/includes.h"
 
 //! A gaussian factor analytic likelihood, that is
-//!     Y ~ N_p(mu, Lambda * Lambda^T + Psi)
-//! Where Lambda is a `p x d` matrix, usually d << p and `Psi` is a diagonal
+//!     Y ~ N_p(mu, Sigma + Lambda * Lambda^T)
+//! Where Lambda is a `p x d` matrix, usually d << p and `Sigma` is a diagonal
 //! matrix.
 //!
 //! Parameters are stored in a `State::FA` state.
