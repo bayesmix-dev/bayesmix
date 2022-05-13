@@ -8,18 +8,37 @@
 #include "src/utils/distributions.h"
 #include "updaters/fa_updater.h"
 
+//! Mixture of Factor Analysers hierarchy for multivariate data.
+//!
+//! This class represents a hierarchical model where data are distributed
+//! according to a multivariate Normal likelihood with a specific factorization
+//! of the covariance function (see the `FAHierarchy` class for details). The
+//! likelihood parameters have a Dirichlet-Laplace distribution x InverseGamma
+//! centering distribution (see the `FAPriorModel` class for details). That is:
+//! f(x_i|mu,Sigma,Lambda) = N(mu,Sigma+Lambda*Lambda^T)
+//!                     mu ~ N(mu0,psi*I)
+//!                 Lambda ~ DL(alpha)
+//!                  Sigma = diag(sig1^2,...,sigp^2)
+//!                 sigj^2 ~ IG(a,b) for j=1,...,p
+//! where Lambda is the latent score matrix (size p x d with d << p) and
+//! DL(alpha) is the Laplace-Dirichlet distribution.
+//! See Bhattacharya et al. (2015) for further details.
+
 class FAHierarchy
     : public BaseHierarchy<FAHierarchy, FALikelihood, FAPriorModel> {
  public:
   FAHierarchy() = default;
   ~FAHierarchy() = default;
 
+  //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::FA;
   }
 
+  //! Sets the default updater algorithm for this hierarchy
   void set_default_updater() { updater = std::make_shared<FAUpdater>(); }
 
+  //! Initializes state parameters to appropriate values
   void initialize_state() override {
     // Initialize likelihood dimension to prior one
     like->set_dim(prior->get_dim());
@@ -37,6 +56,9 @@ class FAHierarchy
   }
 };
 
+//! Empirical-Bayes hyperparameters initialization for the FA HIerarchy.
+//! Sets the hyperparameters in `hier` starting from the data on which the user
+//! wants to fit the model.
 inline void set_fa_hyperparams_from_data(FAHierarchy* hier) {
   auto dataset_ptr =
       std::static_pointer_cast<FALikelihood>(hier->get_likelihood())

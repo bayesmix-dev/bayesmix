@@ -8,18 +8,36 @@
 #include "src/utils/distributions.h"
 #include "updaters/nnw_updater.h"
 
+//! Normal Normal-Wishart hierarchy for multivariate data.
+
+//! This class represents a hierarchy, i.e. a cluster, whose multivariate data
+//! are distributed according to a multivariate normal likelihood (see the
+//! `MultiNormLikelihood` for details). The likelihood parameters have a
+//! Normal-Wishart centering distribution (see the `NWPriorModel` class for
+//! details). That is: f(x_i|mu,tau) = N(mu,tau^{-1})
+//!      (mu,tau) ~ NW(mu0, lambda0, tau0, nu0)
+//! The state is composed of mean and precision matrix. The Cholesky factor and
+//! log-determinant of the latter are also included in the container for
+//! efficiency reasons. The state's hyperparameters are (mu0, lambda0, tau0,
+//! nu0), which are respectively vector, scalar, matrix, and scalar. Note that
+//! this hierarchy is conjugate, thus the marginal distribution is available in
+//! closed form.
+
 class NNWHierarchy
     : public BaseHierarchy<NNWHierarchy, MultiNormLikelihood, NWPriorModel> {
  public:
   NNWHierarchy() = default;
   ~NNWHierarchy() = default;
 
+  //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNW;
   }
 
+  //! Sets the default updater algorithm for this hierarchy
   void set_default_updater() { updater = std::make_shared<NNWUpdater>(); }
 
+  //! Initializes state parameters to appropriate values
   void initialize_state() override {
     // Initialize likelihood dimension to prior one
     like->set_dim(prior->get_dim());
@@ -34,6 +52,10 @@ class NNWHierarchy
     like->set_state(state);
   };
 
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param params     Container of (prior or posterior) hyperparameter values
+  //! @param datum      Point which is to be evaluated
+  //! @return           The evaluation of the lpdf
   double marg_lpdf(ProtoHypersPtr hier_params,
                    const Eigen::RowVectorXd &datum) const override {
     HyperParams pred_params = get_predictive_t_parameters(hier_params);
@@ -44,6 +66,12 @@ class NNWHierarchy
         logdet);
   }
 
+  //! Helper function that computes the predictive parameters for the
+  //! multivariate t distribution from the current hyperparameter values. It is
+  //! used to efficiently compute the log-marginal distribution of data.
+  //! @param hier_params  Container of (prior or posterior) hyperparameter
+  //! values
+  //! @return             A `HyperParam` object with the predictive parameters
   HyperParams get_predictive_t_parameters(ProtoHypersPtr hier_params) const {
     auto params = hier_params->nnw_state();
     // Compute dof and scale of marginal distribution
