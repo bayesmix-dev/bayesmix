@@ -3,6 +3,17 @@
 
 #include "metropolis_updater.h"
 
+//! Metropolis-Hastings updater using an isotropic proposal function
+//! centered in the current value of the parameters (unconstrained).
+//! This class requires that the Hierarchy's state implements
+//! the `get_unconstrained()`, `set_from_unconstrained()` and
+//! `log_det_jac()` functions.
+//!
+//! Given the current value of the unconstrained parameters x, a new
+//! value is proposed from
+//!          x_new ~ N(x_new, step_size * I)
+//! and then either accepted (in which case the hierarchy's state is
+//! set to x_new) or rejected.
 class RandomWalkUpdater : public MetropolisUpdater<RandomWalkUpdater> {
  protected:
   double step_size;
@@ -13,6 +24,12 @@ class RandomWalkUpdater : public MetropolisUpdater<RandomWalkUpdater> {
 
   RandomWalkUpdater(double step_size) : step_size(step_size) {}
 
+  //! Samples from the proposal distribution
+  //! @param curr_state the current state (unconstrained parametrization)
+  //! @param like instance of likelihood
+  //! @param prior instance of prior
+  //! @param target_lpdf either double or stan::math::var. Needed for
+  //!         stan's automatic differentiation. It is not used here.
   template <typename F>
   Eigen::VectorXd sample_proposal(Eigen::VectorXd curr_state,
                                   AbstractLikelihood &like,
@@ -25,6 +42,13 @@ class RandomWalkUpdater : public MetropolisUpdater<RandomWalkUpdater> {
     return curr_state + step;
   }
 
+  //! Evaluates the log probability density function of the proposal
+  //! @param prop_state the proposed state (at which to evaluate the lpdf)
+  //! @param curr_state the current state (unconstrained parametrization)
+  //! @param like instance of likelihood
+  //! @param prior instance of prior
+  //! @param target_lpdf either double or stan::math::var. Needed for
+  //!         stan's automatic differentiation. It is not used here.
   template <typename F>
   double proposal_lpdf(Eigen::VectorXd prop_state, Eigen::VectorXd curr_state,
                        AbstractLikelihood &like, AbstractPriorModel &prior,
@@ -36,6 +60,7 @@ class RandomWalkUpdater : public MetropolisUpdater<RandomWalkUpdater> {
     return out;
   }
 
+  //! Returns a shared_ptr to a new instance of `this`
   std::shared_ptr<RandomWalkUpdater> clone() const {
     auto out = std::make_shared<RandomWalkUpdater>(
         static_cast<RandomWalkUpdater const &>(*this));

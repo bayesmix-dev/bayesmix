@@ -4,6 +4,12 @@
 #include "src/hierarchies/likelihoods/abstract_likelihood.h"
 #include "src/hierarchies/priors/abstract_prior_model.h"
 
+//! Base class for an Updater
+
+//! An updater is a class able to sample from the full conditional
+//! distribution of an `Hierarchy`, coming from the product of a
+//! `Likelihood` and a `Prior`, possibly using a Metropolis-Hastings
+//! algorithm.
 class AbstractUpdater {
  public:
   // Type aliases

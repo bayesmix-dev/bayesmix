@@ -8,6 +8,10 @@
 #include "src/hierarchies/priors/hyperparams.h"
 #include "src/utils/proto_utils.h"
 
+//! Updater specific for the `FAHierachy`.
+//! See  Bhattacharya, Anirban, and David B. Dunson.
+//! "Sparse Bayesian infinite factor models." Biometrika (2011): 291-306.
+//! for further details
 class FAUpdater : public AbstractUpdater {
  public:
   FAUpdater() = default;

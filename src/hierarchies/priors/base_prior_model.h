@@ -15,6 +15,20 @@
 #include "prior_model_internal.h"
 #include "src/utils/rng.h"
 
+//! Base template class of a `PriorModel` object
+//!
+//! This class derives from `AbstractPriorModel` and is templated over
+//! `Derived` (needed for the curiously recurring template pattern), `State`
+//! (an instance of `Basestate`), `HyperParams` (a struct representing the
+//! hyperparameters, see `hyperparams.h`) and `Prior`: a protobuf message
+//! representing the type of prior imposed on the hyperparameters.
+//!
+//! @tparam Derived     Name of the implemented derived class
+//! @tparam State       Class name of the container for state values
+//! @tparam HyperParams Class name of the container for hyperparameters
+//! @tparam Prior       Class name of the protobuf message for the prior on the
+//!                     hyperparameters.
+
 template <class Derived, class State, typename HyperParams, typename Prior>
 class BasePriorModel : public AbstractPriorModel {
  public:
