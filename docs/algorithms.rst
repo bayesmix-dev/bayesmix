@@ -20,7 +20,7 @@ Algorithms
 .. doxygenclass:: Neal8Algorithm
    :project: bayesmix
    :members:
-.. doxygenclass:: SplitMergeAlgorithm
+.. doxygenclass:: SplitAndMergeAlgorithm
    :project: bayesmix
    :members:
 .. doxygenclass:: ConditionalAlgorithm

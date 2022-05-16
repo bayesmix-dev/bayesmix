@@ -13,13 +13,16 @@
 //! according to a laplace likelihood (see the `LaplaceLikelihood` class for
 //! deatils).The likelihood parameters have a Normal x InverseGamma centering
 //! distribution (see the `NxIGPriorModel` class for details). That is:
-//! f(x_i|mu,lambda) = Laplace(mu,sqrt(var/2))
-//!               mu ~ N(mu0,sig0^2)
-//!              var ~ IG(alpha0,beta0)
+//! \f[
+//! f(x_i|\mu,\sigma^2) &= Laplace(\mu,\sqrt(\sigma^2/2))\\
+//!               \mu &\sim N(\mu_0,\eta^2) \\
+//!              \sigma^2 ~ IG(a, b)
+//! \f]
 //! The state is composed of mean and variance (thus the scale for the Laplace
-//! distribution is sqrt(var / 2)). The state hyperparameters are (mu_0,
-//! sig0^2, alpha0, beta0), all scalar values. Note that this hierarchy is NOT
-//! conjugate, thus the marginal distribution is not available in closed form.
+//! distribution is \f$ \sqrt(\sigma^2 / 2)) \f$. The state hyperparameters are
+//! \f$(mu_0, \sigma^2, a, b)\f$, all scalar values. Note that this hierarchy
+//! is NOT conjugate, thus the marginal distribution is not available in closed
+//! form.
 
 class LapNIGHierarchy
     : public BaseHierarchy<LapNIGHierarchy, LaplaceLikelihood,

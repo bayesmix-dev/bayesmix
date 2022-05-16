@@ -13,11 +13,14 @@
 //! according to a Normal likelihood (see the `UniNormLikelihood` class for
 //! details). The likelihood parameters have a Normal-InverseGamma centering
 //! distribution (see the `NIGPriorModel` class for details). That is:
-//! f(x_i|mu,sig^2) = N(mu,sig^2)
-//!    (mu,sig^2) ~ N-IG(mu0, lambda0, alpha0, beta0)
+//! \f[
+//!   f(x_i|\mu, \sigma^2) &= N(\mu,\sigma^2) \\
+//!    (\mu,\sigma^2) & \sim N-IG(\mu_0, \lambda_0, \alpha_0, \beta_0)
+//! \f]
 //! The state is composed of mean and variance. The state hyperparameters are
-//! (mu_0, lambda0, alpha0, beta0), all scalar values. Note that this hierarchy
-//! is conjugate, thus the marginal distribution is available in closed form.
+//! \f$(\mu_0, \lambda_0, \alpha_0, \beta_0)\f$, all scalar values. Note that
+//! this hierarchy is conjugate, thus the marginal distribution is available in
+//! closed form.
 
 class NNIGHierarchy
     : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood, NIGPriorModel> {

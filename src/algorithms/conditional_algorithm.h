@@ -12,15 +12,17 @@
 //! This template class implements a generic Gibbs sampling conditional
 //! algorithm as the child of the `BaseAlgorithm` class.
 //! A mixture model sampled from a conditional algorithm can be expressed as
-//!   x_i | c_i, phi_1, ..., phi_k ~ f(x_i|phi_(c_i))    (data likelihood);
-//!               phi_1, ... phi_k ~ G                   (unique values);
-//!   c_1, ... c_n | w_1, ..., w_k ~ Cat(w_1, ... w_k)   (cluster allocations);
-//!                  w_1, ..., w_k ~ p(w_1, ..., w_k)    (mixture weights)
-//! where f(x | phi_j) is a density for each value of phi_j, the c_i take
-//! values in {1, ..., k} and w_1, ..., w_k are nonnegative weights whose sum
-//! is a.s. 1, i.e. p(w_1, ... w_k) is a probability distribution on the k-1
-//! dimensional unit simplex).
-//! In this library, each phi_j is represented as an `Hierarchy` object (which
+//! \f[
+//!   x_i | c_i, \theta_1, ..., \theta_k & \sim f(x_i|\theta_(c_i)) \\
+//!               \theta_1, ..., \theta_k & \sim G_0 \\
+//!   c_1, ... c_n | w_1, ..., w_k & \sim \text{Cat}(w_1, ... w_k)   \\
+//!                  w_1, ..., w_k & \sim p(w_1, ..., w_k)
+//! \f]
+//! where \f$f(x | \theta_j)\f$ is a density for each value of \f$\theta_j\f$,
+//! \f$c_i\f$ take values in \f${1, ..., k}\f$ and \f$w_1, ..., w_k\f$ are
+//! nonnegative weights whose sum is a.s. 1, i.e. \f$p(w_1, ... w_k)\f$ is a
+//! probability distribution on the k-1 dimensional unit simplex). n this
+//! library, each \f$\theta_j\f$ is represented as an `Hierarchy` object (which
 //! inherits from `AbstractHierarchy`), that also holds the information related
 //! to the base measure `G` is (see `AbstractHierarchy`).
 //! The weights (w_1, ..., w_k) are represented as a `Mixing` object, which

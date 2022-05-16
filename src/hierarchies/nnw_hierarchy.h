@@ -14,14 +14,17 @@
 //! are distributed according to a multivariate normal likelihood (see the
 //! `MultiNormLikelihood` for details). The likelihood parameters have a
 //! Normal-Wishart centering distribution (see the `NWPriorModel` class for
-//! details). That is: f(x_i|mu,tau) = N(mu,tau^{-1})
-//!      (mu,tau) ~ NW(mu0, lambda0, tau0, nu0)
+//! details). That is:
+//! \f[
+//! f(x_i|\mu,\Sigma) &= N(\mu,\Sigma^{-1}) \\
+//!      (\mu,\Sigma) &\sim NW(\mu_0, \lambda, \Psi_0, \nu_0)
+//! \f]
 //! The state is composed of mean and precision matrix. The Cholesky factor and
 //! log-determinant of the latter are also included in the container for
-//! efficiency reasons. The state's hyperparameters are (mu0, lambda0, tau0,
-//! nu0), which are respectively vector, scalar, matrix, and scalar. Note that
-//! this hierarchy is conjugate, thus the marginal distribution is available in
-//! closed form.
+//! efficiency reasons. The state's hyperparameters are \f$(\mu_0, \lambda,
+//! \Psi_0, \nu_0)\f$, which are respectively vector, scalar, matrix, and
+//! scalar. Note that this hierarchy is conjugate, thus the marginal
+//! distribution is available in closed form.
 
 class NNWHierarchy
     : public BaseHierarchy<NNWHierarchy, MultiNormLikelihood, NWPriorModel> {

@@ -38,8 +38,8 @@ Instead, child classes **must** implement:
 
 a. ``lpdf``: evaluates :math:`G_0(\theta_h)`
 b. ``sample``: samples from :math:`G_0` given a hyperparameters (passed as a pointer). If ``hier_hypers`` is ``nullptr``, the prior hyperparameter values are used.
-c. ``set_hypers_from_proto``: sets the hyperparameters from a ``Probuf``message
-d. ``get_hypers_proto``: returns the hyperparameters as a ``Probuf``message
+c. ``set_hypers_from_proto``: sets the hyperparameters from a ``Probuf`` message
+d. ``get_hypers_proto``: returns the hyperparameters as a ``Probuf`` message
 e. ``initialize_hypers``: provides a default initialization of hyperparameters
 
 In case you want to use a Metropolis-like updater, child classes **should** also implement:
@@ -65,18 +65,22 @@ Non-abstract Classes
     :project: bayesmix
     :members:
     :protected-members:
+
 .. doxygenclass:: NxIGPriorModel
     :project: bayesmix
     :members:
     :protected-members:
+
 .. doxygenclass:: NWPriorModel
     :project: bayesmix
     :members:
     :protected-members:
+
 .. doxygenclass:: MNIGPriorModel
     :project: bayesmix
     :members:
     :protected-members:
+
 .. doxygenclass:: FAPriorModel
     :project: bayesmix
     :members:

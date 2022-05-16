@@ -13,17 +13,19 @@
 //! This template class implements a generic Gibbs sampling marginal algorithm
 //! as the child of the `BaseAlgorithm` class.
 //! A mixture model sampled from a Marginal Algorithm can be expressed as
-//!   x_i | c_i, phi_1, ..., phi_k ~ f(x_i|phi_(c_i))    (data likelihood);
-//!               phi_1, ... phi_k ~ G                   (unique values);
-//!                   c_1, ... c_n ~ EPPF(c_1, ... c_n)  (cluster allocations);
-//! where f(x | phi_j) is a density for each value of phi_j and the c_i take
-//! values in {1, ..., k}.
-//! Depending on the actual implementation, the algorithm might require
-//! the kernel/likelihood f(x | phi) and G(phi) to be conjugagte or not.
-//! In the former case, a `ConjugateHierarchy` must be specified.
-//! In this library, each phi_j is represented as an `Hierarchy` object (which
-//! inherits from `AbstractHierarchy`), that also holds the information related
-//! to the base measure `G` is (see `AbstractHierarchy`). The EPPF is instead
+//! \f[
+//!   x_i | c_i, \theta_1, ..., \theta_k & \sim f(x_i|\theta_(c_i)) \\
+//!               \theta_1, ..., \theta_k & \sim G_0  \\
+//!                   c_1, ... c_n & \sim EPPF(c_1, ... c_n)
+//! \f]
+//! where \f$f(x | \theta_j)\f$ is a density for each value of \f$\theta_j\f$
+//! and \f$c_i\f$ take values in \f${1, ..., k}\f$. Depending on the actual
+//! implementation, the algorithm might require the kernel/likelihood \f$f(x |
+//! \theta)\f$ and \f$G_0(phi)\f$ to be conjugagte or not. In the former case,
+//! a conjugate hierarchy must be specified. In this library, each
+//! \f$\theta_j\f$ is represented as an `Hierarchy` object (which inherits from
+//! `AbstractHierarchy`), that also holds the information related to the base
+//! measure \f$G_0\f$ is (see `AbstractHierarchy`). The EPPF is instead
 //! represented as a `Mixing` object, which inherits from `AbstractMixing`.
 //!
 //! The state of a marginal algorithm only consists of allocations and unique
