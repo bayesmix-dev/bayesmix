@@ -4,9 +4,10 @@
 #include <stan/math/rev.hpp>
 #include <vector>
 
-//! This file implements a few methods to manipulate groups of matrices, mainly
-//! by joining different objects, as well as additional utilities for SPD
-//! checking and grid creation.
+//! @file eigen_utils.h
+//! The `eigen_utils.h` file implements a few methods to manipulate groups of
+//! matrices, mainly by joining different objects, as well as additional
+//! utilities for SPD checking and grid creation.
 
 namespace bayesmix {
 //! Concatenates a vector of Eigen matrices along the rows
