@@ -12,16 +12,21 @@
 #include "base_likelihood.h"
 #include "states/includes.h"
 
-//! A gaussian factor analytic likelihood, that is
-//!     Y ~ N_p(mu, Sigma + Lambda * Lambda^T)
-//! Where Lambda is a `p x d` matrix, usually d << p and `Sigma` is a diagonal
-//! matrix.
-//!
-//! Parameters are stored in a `State::FA` state.
-//! We store as summary statistics the sum of the y_i's, but it is
-//! not sufficient for all the updates involved. Therefore, all the
-//! observations allocated to a cluster are processed when computing the
-//! cluster lpdf.
+/**
+ * A gaussian factor analytic likelihood, using the `State::FA` state.
+ * Represents the model:
+ *
+ * \f[
+ *    \bm{y}_1,\dots,\bm{y}_k \stackrel{\small\mathrm{iid}}{\sim} N_p(\bm{\mu},
+ * \Sigma + \Lambda\Lambda^T), \f]
+ *
+ * where Lambda is a \f$ p \times d \f$ matrix, usually \f$ d << p \f$ and \f$
+ * \Sigma \f$ is a diagonal matrix. Parameters are stored in a `State::FA`
+ * state. We store as summary statistics the sum of the \f$ \bm{y}_i \f$'s, but
+ * it is not sufficient for all the updates involved. Therefore, all the
+ * observations allocated to a cluster are processed when computing the
+ * cluster lpdf.
+ */
 
 class FALikelihood : public BaseLikelihood<FALikelihood, State::FA> {
  public:

@@ -12,14 +12,18 @@
 #include "base_likelihood.h"
 #include "states/includes.h"
 
-//! A multivariate normal likelihood
-//!
-//! Represents the model:
-//!     y_1, ..., y_m ~ N(mu, Cov)
-//! where (mu, Cov) are stored in a `State::MultiLS` state
-//!
-//! The sufficient statistics stored are the sum of the y_i's
-//! and the sum of y_i^T  y_i.
+/**
+ * A multivariate normal likelihood, using the `State::MultiLS` state.
+ * Represents the model:
+ *
+ * \f[
+ *    \bm{y}_1,\dots, \bm{y}_k \stackrel{\small\mathrm{iid}}{\sim}
+ * N_p(\bm{\mu}, \Sigma), \f]
+ *
+ * where \f$ (\bm{\mu}, \Sigma) \f$ are stored in a `State::MultiLS` state.
+ * The sufficient statistics stored are the sum of the \f$ \bm{y}_i \f$'s
+ * and the sum of \f$ \bm{y}_i^T \bm{y}_i \f$.
+ */
 
 class MultiNormLikelihood
     : public BaseLikelihood<MultiNormLikelihood, State::MultiLS> {

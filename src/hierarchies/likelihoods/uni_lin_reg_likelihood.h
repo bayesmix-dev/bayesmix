@@ -11,16 +11,18 @@
 #include "base_likelihood.h"
 #include "states/includes.h"
 
-//! A scalar linear regression model
-//!
-//! Represents the model:
-//!     y_i ~ N(x_i^T * reg_coeffs, var)
-//! where (reg_coeffs, var) are stored in a `State::UniLinRegLS` state
-//!
-//! The sufficient statistics stored are the
-//! 1) sum of y_i^2
-//! 2) sum of x_i^T x_i
-//! 3) sum of y_i x_i^T
+/**
+ * A scalar linear regression model, using the `State::UniLinRegLS` state.
+ * Represents the model:
+ *
+ * \f[
+ *    y_i \mid \bm{x}_i, \bm{\beta}, \sigma^2
+ * \stackrel{\small\mathrm{ind}}{\sim} N(\bm{x}_i^T\bm{\beta},\sigma^2), \f]
+ *
+ * where \f$ (\bm{\beta}, \sigma^2) \f$ are stored in a `State::UniLinRegLS`
+ * state. The sufficient statistics stored are the sum of \f$ y_i^2 \f$, the
+ * sum of \f$ \bm{x}_i^T \bm{x}_i \f$ and the sum of \f$ y_i \bm{x}_i^T \f$.
+ */
 
 class UniLinRegLikelihood
     : public BaseLikelihood<UniLinRegLikelihood, State::UniLinRegLS> {
@@ -48,13 +50,13 @@ class UniLinRegLikelihood
                         const Eigen::RowVectorXd &covariate,
                         bool add) override;
 
-  //! Dimension of the coefficients vector
+  // Dimension of the coefficients vector
   unsigned int dim;
-  //! Represents pieces of y^t y
+  // Represents pieces of y^t y
   double data_sum_squares;
-  //! Represents pieces of X^T X
+  // Represents pieces of X^T X
   Eigen::MatrixXd covar_sum_squares;
-  //! Represents pieces of X^t y
+  // Represents pieces of X^t y
   Eigen::VectorXd mixed_prod;
 };
 
