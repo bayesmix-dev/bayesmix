@@ -5,11 +5,12 @@
 
 #include "matrix.pb.h"
 
-//! This file implements a few useful functions to manipulate Protobuf objects.
-//! For instance, this library implements its own version of vectors and
-//! matrices, and the functions implemented here convert from these types to
-//! the Eigen ones and viceversa. One can also read a Protobuf from a text
-//! file. This is mostly useful for algorithm configuration files.
+//! @file proto_utils.h
+//! The `proto_utils.h` file implements a few useful functions to manipulate
+//! Protobuf objects. For instance, this library implements its own version of
+//! vectors and matrices, and the functions implemented here convert from these
+//! types to the Eigen ones and viceversa. One can also read a Protobuf from a
+//! text file. This is mostly useful for algorithm configuration files.
 
 namespace bayesmix {
 
