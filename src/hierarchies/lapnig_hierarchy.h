@@ -10,8 +10,8 @@
 //! Laplace Normal-InverseGamma hierarchy for univariate data.
 
 //! This class represents a hierarchical model where data are distributed
-//! according to a laplace likelihood (see the `LaplaceLikelihood` class for
-//! deatils).The likelihood parameters have a Normal x InverseGamma centering
+//! according to a Laplace likelihood (see the `LaplaceLikelihood` class for
+//! deatils). The likelihood parameters have a Normal x InverseGamma centering
 //! distribution (see the `NxIGPriorModel` class for details). That is:
 //! \f[
 //! f(x_i|\mu,\sigma^2) &= Laplace(\mu,\sqrt(\sigma^2/2))\\
