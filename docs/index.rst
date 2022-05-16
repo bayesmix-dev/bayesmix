@@ -32,7 +32,8 @@ There are currently three submodules to the ``bayesmix`` library, represented by
 Further, we employ Protocol buffers for several purposes, including serialization. The list of all protos with their docs is available in the ``protos`` link below.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
+   :titlesonly:
    :caption: API: library submodules
 
    algorithms
@@ -43,11 +44,15 @@ Further, we employ Protocol buffers for several purposes, including serializatio
    utils
 
 
-
 Tutorials
 =========
 
-:doc:`tutorial`
+.. toctree::
+   :maxdepth: 1
+
+   tutorial
+
+.. :doc:`tutorial`
 
 
 Python interface
