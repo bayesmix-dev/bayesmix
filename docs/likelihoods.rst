@@ -16,7 +16,7 @@ Main operations performed
 
 A likelihood object must be able to perform the following operations:
 
-a. First of all, we require the \code{lpdf()} and \code{lpdf\_grid()} methods, which simply evaluate the loglikelihood in a given point or in a grid of points (also in case of a \emph{dependent} likelihood, i.e., with covariates associated to each observation) [``lpdf()`` and ``lpdf_grid``]
+a. First of all, we require the ``lpdf()`` and ``lpdf\_grid()`` methods, which simply evaluate the loglikelihood in a given point or in a grid of points (also in case of a \emph{dependent} likelihood, i.e., with covariates associated to each observation) [``lpdf()`` and ``lpdf_grid``]
 b. In case you want to rely on a Metropolis-like updater, the likelihood needs to evaluation of the likelihood of the whole cluster starting from the vector of unconstrained parameters [``cluster_lpdf_from_unconstrained()``]. Observe that the ``AbstractLikelihood`` class provides two such methods, one returning a ``double`` and one returning a ``stan::math::var``. The latter is used to automatically compute the gradient of the likelihood via Stan's automatic differentiation, if needed. In practice, users do not need to implement both methods separately and can implement only one templated method
 c. manage the insertion and deletion of a datum in the cluster [``add_datum`` and ``remove_datum``]
 d. update the summary statistics associated to the likelihood [``update_summary_statistics``]. Summary statistics (when available) are used to evaluate the likelihood function on the whole cluster, as well as to perform the posterior updates of :math:`\bm{\tau}`. This usually gives a substantial speedup
