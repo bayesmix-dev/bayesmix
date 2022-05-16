@@ -7,10 +7,11 @@
 
 //! Updater specific for the `UniNormLikelihood` used in combination
 //! with `NxIGPriorModel`, that is the model
-//!        y_i | mu, sigsq ~ N(mu, sigsq)
-//!                     mu ~ N(mu0, s0)
-//!                  sigsq ~ InvGamma(a, b)
-//!
+//! \f[
+//!        y_i | \mu, \sigma^2 &\sim N(\mu, \sigma^2) \\
+//!                     \mu &\sim N(\mu_0, \eta^2) \\
+//!                  \sigma^2 & \sim IG(a,b)
+//! \f]
 //! It exploits the semi-conjugacy of the model to sample the full conditional
 //! of (mu, sigsq) by calling `NxIGPriorModel::sample` with updated parameters
 

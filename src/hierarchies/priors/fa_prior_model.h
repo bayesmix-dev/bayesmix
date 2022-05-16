@@ -10,11 +10,13 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
-//! A prior model for the factor analyzers likelihood, that is
-//!     mu ~ N_p(mutilde, psi*I)
-//!     Lambda ~ DL(alpha)
-//!     Sigma = diag(sigsq_1,...,sigsq_p)
-//!     sigsq_j ~ IG(a,b)    j=1,...,p
+//! A priormodel for the factor analyzers likelihood, that is
+//! \f[
+//!     \mu &\sim N_p(\tilde \mu, \psi I) \\
+//!     \Lambda &\sim DL(\alpha) \\
+//!     \Sigma &= diag(\sigma^2_1, \ldots, \sigma^2_p) \\
+//!     \sigma^2_j &\sim IG(a,b)  \quad  j=1,...,p
+//! \f]
 //! Where DL is the Dirichlet-Laplace distribution. See Bhattacharya A., Pati
 //! D, Pillai N.S., Dunson D.B. (2015). JASA 110(512), 1479–1490 for details.
 

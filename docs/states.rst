@@ -14,7 +14,7 @@ Code Structure
 
 All classes must inherit from the `BaseState` class
 
-.. doxygenclass:: BaseState
+.. doxygenclass:: State::BaseState
     :project: bayesmix
     :members:
 
@@ -26,13 +26,15 @@ Instead, the ``set_from_proto()`` and ``get_as_proto()`` are fundamental as they
 State Classes
 -------------
 
-.. doxygenclass:: UniLSState
+.. doxygenclass:: State::UniLS
     :project: bayesmix
     :members:
-.. doxygenclass:: MultiLSState
+
+.. doxygenclass:: State::MultiLS
     :project: bayesmix
     :members:
-.. doxygenclass:: FAState
+
+.. doxygenclass:: State::FA
     :project: bayesmix
     :members:
     :protected-members:
