@@ -20,10 +20,10 @@
  * \f]
  *
  * The state consists of the `regression_coeffs` \f$ \beta \f$, and the `var`
- * \f$ \sigma^2 \f$. Lambda is called the variance-scaling factor. Note that
- * this hierarchy is conjugate, thus the marginal distribution is available in
- * closed form. For more information, please refer to the parent class
- * `BaseHierarchy`, to the class `UniLinRegLikelihood` for details on the
+ * \f$ \sigma^2 \f$. \f$ \Lambda \f$ is called the variance-scaling factor.
+ * Note that this hierarchy is conjugate, thus the marginal distribution is
+ * available in closed form. For more information, please refer to the parent
+ * class `BaseHierarchy`, to the class `UniLinRegLikelihood` for details on the
  * likelihood model and to `MNIGPriorModel` for details on the prior model.
  */
 
