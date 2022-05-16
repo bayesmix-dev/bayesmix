@@ -11,17 +11,21 @@
 #include "base_likelihood.h"
 #include "states/includes.h"
 
-//! A univariate laplace likelihood
-//!
-//! Represents the model:
-//!     y_i ~ Laplace(mu, var)
-//! where mu is the mean and center of the distribution
-//! and var is the variance. The scale is then sqrt(var / 2)
-//! These parameters are stored in a `State::UniLS` state
-//!
-//! Since the Laplace likelihood does not have sufficient statistics
-//! other than the whole sample, the `update_sum_stats` method
-//! does nothing.
+/**
+ * A univariate Laplace likelihood, using the `State::UniLS` state. Represents
+ * the model:
+ *
+ * \f[
+ *    y_1,\dots,y_k \mid \mu, \sigma^2 \stackrel{\small\mathrm{iid}}{\sim}
+ * Laplace(\mu,\sigma^2), \f]
+ *
+ * where \f$ \mu \f$ is the mean and center of the distribution
+ * and \f$ \sigma^2 \f$ is the variance. The scale parameter \f$ \lambda \f$ is
+ * then \f$ \sqrt{\sigma^2/2} \f$. These parameters are stored in a
+ * `State::UniLS` state. Since the Laplace likelihood does not have sufficient
+ * statistics other than the whole sample, the `update_sum_stats()` method does
+ * nothing.
+ */
 
 class LaplaceLikelihood
     : public BaseLikelihood<LaplaceLikelihood, State::UniLS> {
