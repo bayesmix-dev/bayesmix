@@ -82,6 +82,6 @@ install(DIRECTORY ${SPHINX_BUILD}
   DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
 add_custom_target(document_bayesmix)
-add_dependencies(document_bayesmix document_protos)
+# add_dependencies(document_bayesmix document_protos)
 add_dependencies(document_bayesmix Doxygen)
 add_dependencies(document_bayesmix Sphinx)
