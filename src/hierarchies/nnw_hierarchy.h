@@ -56,8 +56,8 @@ class NNWHierarchy
   };
 
   //! Evaluates the log-marginal distribution of data in a single point
-  //! @param hier_params  Container of (prior or posterior) hyperparameter
-  //! values
+  //! @param hier_params  Pointer to the container of (prior or posterior)
+  //! hyperparameter values
   //! @param datum        Point which is to be evaluated
   //! @return             The evaluation of the lpdf
   double marg_lpdf(ProtoHypersPtr hier_params,
@@ -73,8 +73,8 @@ class NNWHierarchy
   //! Helper function that computes the predictive parameters for the
   //! multivariate t distribution from the current hyperparameter values. It is
   //! used to efficiently compute the log-marginal distribution of data.
-  //! @param hier_params  Container of (prior or posterior) hyperparameter
-  //! values
+  //! @param hier_params  Pointer to the container of (prior or posterior)
+  //! hyperparameter values
   //! @return             A `HyperParam` object with the predictive parameters
   HyperParams get_predictive_t_parameters(ProtoHypersPtr hier_params) const {
     auto params = hier_params->nnw_state();

@@ -56,8 +56,8 @@ class LinRegUniHierarchy
   };
 
   //! Evaluates the log-marginal distribution of data in a single point
-  //! @param hier_params  Container of (prior or posterior) hyperparameter
-  //! values
+  //! @param hier_params  Pointer to the container of (prior or posterior)
+  //! hyperparameter values
   //! @param datum        Point which is to be evaluated
   //! @param covariate    Covariate vectors associated to data
   //! @return             The evaluation of the lpdf

@@ -343,8 +343,8 @@ class BaseHierarchy : public AbstractHierarchy {
   virtual void initialize_state() = 0;
 
   //! Evaluates the log-marginal distribution of data in a single point
-  //! @param hier_params  Container of (prior or posterior) hyperparameter
-  //! values
+  //! @param hier_params  Pointer to the container (prior or posterior)
+  //! hyperparameter values
   //! @param datum        Point which is to be evaluated
   //! @return             The evaluation of the lpdf
   virtual double marg_lpdf(ProtoHypersPtr hier_params,
@@ -359,8 +359,8 @@ class BaseHierarchy : public AbstractHierarchy {
   }
 
   //! Evaluates the log-marginal distribution of data in a single point
-  //! @param hier_params  Container of (prior or posterior) hyperparameter
-  //! values
+  //! @param hier_params  Pointer to the container of (prior or posterior)
+  //! hyperparameter values
   //! @param datum        Point which is to be evaluated
   //! @param covariate    Covariate vector associated to datum
   //! @return             The evaluation of the lpdf
