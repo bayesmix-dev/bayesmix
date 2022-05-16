@@ -45,9 +45,12 @@ class MarginalAlgorithm : public BaseAlgorithm {
 
  protected:
   //! Computes marginal contribution of the given cluster to the lpdf estimate
-  //! @param hier   Pointer to the `Hierarchy` object representing the cluster
-  //! @param grid   Grid of row points on which the density is to be evaluated
-  //! @return       The marginal component of the estimate
+  //! @param hier       Pointer to the `Hierarchy` object representing the
+  //! cluster
+  //! @param grid       Grid of row points on which the density is to be
+  //! evaluated
+  //! @param covariate  (Optional) covariate vectors associated to data
+  //! @return           The marginal component of the estimate
   virtual Eigen::VectorXd lpdf_marginal_component(
       const std::shared_ptr<AbstractHierarchy> hier,
       const Eigen::MatrixXd &grid,

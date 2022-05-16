@@ -60,6 +60,7 @@ class DirichletMixing
  protected:
   //! Returns probability mass for an old cluster (for marginal mixings only)
   //! @param n          Total dataset size
+  //! @param n_clust    Number of clusters
   //! @param log        Whether to return logarithm-scale values or not
   //! @param propto     Whether to include normalizing constants or not
   //! @param hier       `Hierarchy` object representing the cluster

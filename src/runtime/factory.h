@@ -77,7 +77,7 @@ class Factory {
 
   //! Adds a builder function to the storage
   //! @param id      Identifier to associate the builder with
-  //! @param bulider Builder function for a specific object type
+  //! @param builder Builder function for a specific object type
   void add_builder(const Identifier &id, const Builder &builder) {
     storage.insert(std::make_pair(id, builder));
   }
