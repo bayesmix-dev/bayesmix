@@ -45,9 +45,10 @@ class NNIGHierarchy
   };
 
   //! Evaluates the log-marginal distribution of data in a single point
-  //! @param params     Container of (prior or posterior) hyperparameter values
-  //! @param datum      Point which is to be evaluated
-  //! @return           The evaluation of the lpdf
+  //! @param hier_params  Container of (prior or posterior) hyperparameter
+  //! values
+  //! @param datum        Point which is to be evaluated
+  //! @return             The evaluation of the lpdf
   double marg_lpdf(ProtoHypersPtr hier_params,
                    const Eigen::RowVectorXd &datum) const override {
     auto params = hier_params->nnig_state();
