@@ -12,7 +12,7 @@
 //!
 //! This class represents a hierarchical model where data are distributed
 //! according to a multivariate Normal likelihood with a specific factorization
-//! of the covariance function (see the `FAHierarchy` class for details). The
+//! of the covariance matrix (see the `FAHierarchy` class for details). The
 //! likelihood parameters have a Dirichlet-Laplace distribution x InverseGamma
 //! centering distribution (see the `FAPriorModel` class for details). That is:
 //! f(x_i|mu,Sigma,Lambda) = N(mu,Sigma+Lambda*Lambda^T)

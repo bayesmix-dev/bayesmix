@@ -10,7 +10,7 @@
 
 //! Normal Normal-Wishart hierarchy for multivariate data.
 
-//! This class represents a hierarchy, i.e. a cluster, whose multivariate data
+//! This class represents a hierarchy whose multivariate data
 //! are distributed according to a multivariate normal likelihood (see the
 //! `MultiNormLikelihood` for details). The likelihood parameters have a
 //! Normal-Wishart centering distribution (see the `NWPriorModel` class for
@@ -53,9 +53,10 @@ class NNWHierarchy
   };
 
   //! Evaluates the log-marginal distribution of data in a single point
-  //! @param params     Container of (prior or posterior) hyperparameter values
-  //! @param datum      Point which is to be evaluated
-  //! @return           The evaluation of the lpdf
+  //! @param hier_params  Container of (prior or posterior) hyperparameter
+  //! values
+  //! @param datum        Point which is to be evaluated
+  //! @return             The evaluation of the lpdf
   double marg_lpdf(ProtoHypersPtr hier_params,
                    const Eigen::RowVectorXd &datum) const override {
     HyperParams pred_params = get_predictive_t_parameters(hier_params);

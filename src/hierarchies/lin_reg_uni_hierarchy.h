@@ -7,20 +7,25 @@
 #include "priors/mnig_prior_model.h"
 #include "updaters/mnig_updater.h"
 
-//! Linear regression hierarchy for univariate data.
-//!
-//! This class implements a dependent hierarchy which represents the classical
-//! univariate Bayesian linear regression model, i.e.:
-//!    y_i | \beta, x_i, \sigma^2 \sim N(\beta^T x_i, sigma^2)
-//!              \beta | \sigma^2 \sim N(\mu, sigma^2 Lambda^{-1})
-//!                      \sigma^2 \sim InvGamma(a, b)
-//!
-//! The state consists of the `regression_coeffs` \beta, and the `var` sigma^2.
-//! Lambda is called the variance-scaling factor. Note that this hierarchy is
-//! conjugate, thus the marginal distribution is available in closed form. For
-//! more information, please refer to parent classes: `BaseHierarchy`,
-//! `UniLinRegLikelihood` for deatails on the likelihood model, and
-//! `MNIGPriorModel` for details on the prior model.
+/**
+ * Linear regression hierarchy for univariate data.
+ *
+ * This class implements a dependent hierarchy which represents the classical
+ * univariate Bayesian linear regression model, i.e.:
+ *
+ * \f[
+ *    y_i \mid \beta, x_i, \sigma^2 &\sim N(\beta^T x_i, \sigma^2) \\
+ *    \beta \mid \sigma^2 &\sim N(\mu, \sigma^2 \Lambda^{-1}) \\
+ *    \sigma^2 &\sim InvGamma(a, b)
+ * \f]
+ *
+ * The state consists of the `regression_coeffs` \f$ \beta \f$, and the `var`
+ * \f$ \sigma^2 \f$. Lambda is called the variance-scaling factor. Note that
+ * this hierarchy is conjugate, thus the marginal distribution is available in
+ * closed form. For more information, please refer to the parent class
+ * `BaseHierarchy`, to the class `UniLinRegLikelihood` for details on the
+ * likelihood model and to `MNIGPriorModel` for details on the prior model.
+ */
 
 class LinRegUniHierarchy
     : public BaseHierarchy<LinRegUniHierarchy, UniLinRegLikelihood,
@@ -51,9 +56,11 @@ class LinRegUniHierarchy
   };
 
   //! Evaluates the log-marginal distribution of data in a single point
-  //! @param params     Container of (prior or posterior) hyperparameter values
-  //! @param datum      Point which is to be evaluated
-  //! @return           The evaluation of the lpdf
+  //! @param hier_params  Container of (prior or posterior) hyperparameter
+  //! values
+  //! @param datum        Point which is to be evaluated
+  //! @param covariate    Covariate vectors associated to data
+  //! @return             The evaluation of the lpdf
   double marg_lpdf(ProtoHypersPtr hier_params, const Eigen::RowVectorXd &datum,
                    const Eigen::RowVectorXd &covariate) const override {
     auto params = hier_params->lin_reg_uni_state();
