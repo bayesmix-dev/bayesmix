@@ -18,25 +18,30 @@ struct State {
 };
 };  // namespace TruncSB
 
-//! Class that represents a truncated stick-breaking process, as shown in
-//! Ishwaran and James (2001).
-//!
-//! A truncated stick-breaking process is a prior for weights
-//! \f$(w_1,...,w_H)\f$ in the H-1 dimensional unit simplex, and is defined as
-//! follows: \f[
-//!   w_1 &= v_1\\
-//!   w_j &= v_j (1 - v_1) ... (1 - v_{j-1}), \quad \text{for } j=1, ... H-1 \\
-//!   w_H &= 1 - (w_1 + w_2 + ... + w_{H-1})
-//! \f]
-//! The \f$v_j\f$'s are called sticks and we assume them to be independently
-//! distributed as \f$v_j \sim \text{Beta}(a_j, b_j)\f$.
-//!
-//! When \f$a_j = 1\f$ and \f$b_j = M\f$, the stick-breaking process is a
-//! truncation of the stick-breaking representation of the DP. When \f$a_j = 1
-//! - d\f$ and \f$b_j = M + id \f$, it is the trunctation of a PY process. Its
-//! state is composed of the weights \f$w_j\f$ in log-scale and the sticks
-//! \f$v_j\f$. For more information about the class, please refer instead to
-//! base classes, `AbstractMixing` and `BaseMixing`.
+/**
+ * Class that represents a truncated stick-breaking process, as shown in
+ * Ishwaran and James (2001).
+ *
+ * A truncated stick-breaking process is a prior for weights
+ * \f$ (w_1,...,w_H) \f$ in the H-1 dimensional unit simplex, and is defined as
+ * follows:
+ *
+ * \f[
+ *    w_1 &= v_1 \\
+ *    w_j &= v_j (1 - v_1) ... (1 - v_{j-1}), \quad \text{for } j=1, ... H-1 \\
+ *    w_H &= 1 - (w_1 + w_2 + ... + w_{H-1})
+ * \f]
+ *
+ * The \f$ v_j \f$'s are called sticks and we assume them to be independently
+ * distributed as \f$ v_j \sim \text{Beta}(a_j, b_j) \f$.
+ *
+ * When \f$ a_j = 1 \f$ and \f$ b_j = M \f$, the stick-breaking process is a
+ * truncation of the stick-breaking representation of the DP.
+ * When \f$ a_j = 1-d \f$ and \f$ b_j = M+id \f$, it is the trunctation of a PY
+ * process. Its state is composed of the weights \f$ w_j \f$ in log-scale and
+ * the sticks \f$ v_j \f$. For more information about the class, please refer
+ * instead to base classes, `AbstractMixing` and `BaseMixing`.
+ */
 
 class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
                                             bayesmix::TruncSBPrior> {
