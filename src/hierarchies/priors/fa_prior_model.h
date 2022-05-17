@@ -15,7 +15,7 @@
 //!     \mu &\sim N_p(\tilde \mu, \psi I) \\
 //!     \Lambda &\sim DL(\alpha) \\
 //!     \Sigma &= diag(\sigma^2_1, \ldots, \sigma^2_p) \\
-//!     \sigma^2_j &\sim IG(a,b)  \quadq  j=1,...,p
+//!     \sigma^2_j &\sim IG(a,b)  \quad  j=1,...,p
 //! \f]
 //! Where DL is the Dirichlet-Laplace distribution. See Bhattacharya A., Pati
 //! D, Pillai N.S., Dunson D.B. (2015). JASA 110(512), 1479–1490 for details.
