@@ -18,24 +18,28 @@ struct State {
 };
 };  // namespace LogitSB
 
-//! Class that represents the logit stick-breaking process indroduced in Rigon
-//! and Durante (2020).
-//! That is, a prior for weights (w_1,...,w_H), depending on covariates x in
-//! R^p, in the H-1 dimensional unit simplex, defined as follows:
-//! \f[
-//!   w_1 &= v_1\\
-//!   w_j &= v_j (1 - v_1) ... (1 - v_{j-1}), \quad \text{for } j=1, ... H-1 \\
-//!   w_H &= 1 - (w_1 + w_2 + ... + w_{H-1}) \\
-//!   v_j(x) &= 1 / exp(- <\alpha_j, x> ), for j = 1, ..., H-1
-//! \f]
-//!
-//! The main difference with the mentioned paper is that the authors propose a
-//! Gibbs sampler in which the full conditionals are available in close form
-//! thanks to a Polya-Gamma augmentation. Here instead, a Metropolis-adjusted
-//! Langevin algorithm (MALA) step is used. The step-size of the MALA step must
-//! be passed in the LogSBPrior Protobuf message.
-//! For more information about the class, please refer instead to base classes,
-//! `AbstractMixing` and `BaseMixing`.
+/**
+ * Class that represents the logit stick-breaking process indroduced in Rigon
+ * and Durante (2020).
+ * That is, a prior for weights \f$ (w_1,\dots,w_H) \f$, depending on
+ * covariates \f$ x \f$ in \f$ \mathbb{R}^p \f$, in the H-1 dimensional unit
+ * simplex, defined as follows:
+ *
+ * \f[
+ *    w_1 &= v_1 \\
+ *    w_j &= v_j (1 - v_1) ... (1 - v_{j-1}), \quad \text{for } j=1, ... H-1 \\
+ *    w_H &= 1 - (w_1 + w_2 + ... + w_{H-1}) \\
+ *    v_j(x) &= 1 / exp(- <\alpha_j, x> ), for j = 1, ..., H-1
+ * \f]
+ *
+ * The main difference with the mentioned paper is that the authors propose a
+ * Gibbs sampler in which the full conditionals are available in close form
+ * thanks to a Polya-Gamma augmentation. Here instead, a Metropolis-adjusted
+ * Langevin algorithm (MALA) step is used. The step-size of the MALA step must
+ * be passed in the LogSBPrior Protobuf message.
+ * For more information about the class, please refer instead to base classes,
+ * `AbstractMixing` and `BaseMixing`.
+ */
 
 class LogitSBMixing
     : public BaseMixing<LogitSBMixing, LogitSB::State, bayesmix::LogSBPrior> {

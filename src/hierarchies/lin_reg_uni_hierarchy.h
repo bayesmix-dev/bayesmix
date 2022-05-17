@@ -14,17 +14,19 @@
  * univariate Bayesian linear regression model, i.e.:
  *
  * \f[
- *    y_i \mid \beta, x_i, \sigma^2 &\sim N(\beta^T x_i, \sigma^2) \\
- *    \beta \mid \sigma^2 &\sim N(\mu, \sigma^2 \Lambda^{-1}) \\
+ *    f(y_i \mid \bm{x}_i,\mu,\sigma^2) &= N(\bm{\beta}^T \bm{x}_i, \sigma^2)
+ * \\
+ *    \bm{\beta} \mid \sigma^2 &\sim N_p(\bm{\mu}, \sigma^2 \Lambda^{-1}) \\
  *    \sigma^2 &\sim InvGamma(a, b)
  * \f]
  *
- * The state consists of the `regression_coeffs` \f$ \beta \f$, and the `var`
- * \f$ \sigma^2 \f$. \f$ \Lambda \f$ is called the variance-scaling factor.
- * Note that this hierarchy is conjugate, thus the marginal distribution is
- * available in closed form. For more information, please refer to the parent
- * class `BaseHierarchy`, to the class `UniLinRegLikelihood` for details on the
- * likelihood model and to `MNIGPriorModel` for details on the prior model.
+ * The state consists of the `regression_coeffs` \f$ \bm{\beta} \f$, and the
+ * `var` \f$ \sigma^2 \f$. \f$ \Lambda \f$ is called the variance-scaling
+ * factor. Note that this hierarchy is conjugate, thus the marginal
+ * distribution is available in closed form. For more information, please refer
+ * to the parent class `BaseHierarchy`, to the class `UniLinRegLikelihood` for
+ * details on the likelihood model and to `MNIGPriorModel` for details on the
+ * prior model.
  */
 
 class LinRegUniHierarchy

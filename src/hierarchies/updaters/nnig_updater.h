@@ -5,14 +5,21 @@
 #include "src/hierarchies/likelihoods/uni_norm_likelihood.h"
 #include "src/hierarchies/priors/nig_prior_model.h"
 
-//! Updater specific for the `UniNormLikelihood` used in combination
-//! with `NIGPriorModel`, that is the model
-//!        y_i | mu, sigsq ~ N(mu, sigsq)
-//!             mu | sigsq ~ N(mu0, sigsq / lambda)
-//!                  sigsq ~ InvGamma(a, b)
-//!
-//! It exploits the conjugacy of the model to sample the full conditional of
-//! (mu, sigsq) by calling `NIGPriorModel::sample` with updated parameters
+/**
+ * Updater specific for the `UniNormLikelihood` used in combination
+ * with `NIGPriorModel`, that is the model
+ *
+ * \f[
+ *      y_i \mid \mu, \sigma^2 &\stackrel{\small\mathrm{iid}}{\sim} N(\mu,
+ * \sigma^2) \\
+ *      \mu \mid \sigma^2 &\sim N(\mu_0, \sigma^2 / \lambda) \\
+ *      \sigma^2 &\sim InvGamma(a, b)
+ * \f]
+ *
+ * It exploits the conjugacy of the model to sample the full conditional of
+ * \f$ (\mu, \sigma^2) \f$ by calling `NIGPriorModel::sample` with updated
+ * parameters
+ */
 
 class NNIGUpdater
     : public SemiConjugateUpdater<UniNormLikelihood, NIGPriorModel> {

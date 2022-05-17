@@ -12,20 +12,25 @@
 
 namespace State {
 
-//! State of a Factor Analytic model
-//! \f[
-//!   Y_i = \Lambda \eta_i + \varepsilon
-//! \f]
-//! where \f$ Y_i \f$ is a `p`-dimensional vetor, \f$ \eta_i \f$ is a
-//! d-dimensional one, \f$ \Lambda \f$ is a `p x d` matrix and \f$ \varepsilon
-//! \f$ is an error term with mean zero and diagonal covariance matrix \f$ \psi
-//! \f$.
-//!
-//! For faster likelihood evaluation, we store also the `cov_wood` factor and
-//! the log determinant of the matrix \f$ \Lambda \Lambda^T + \psi \f$, see
-//! the `compute_wood_chol_and_logdet(...)` function for more details.
-//!
-//! The unconstrained representation for this state is not implemented.
+/**
+ * State of a Factor Analytic model
+ *
+ * \f[
+ *    Y_i = \Lambda\bm{\eta}_i + \bm{\varepsilon}
+ * \f]
+ *
+ * where \f$ Y_i \f$ is a \f$ p \f$-dimensional vetor, \f$ \bm{\eta}_i \f$ is a
+ * \f$ d \f$-dimensional one, \f$ \Lambda \f$ is a \f$ p \times d \f$ matrix
+ * and \f$ \bm{\varepsilon} \f$ is an error term with mean zero and diagonal
+ * covariance matrix \f$ \psi \f$.
+ *
+ * For faster likelihood evaluation, we store also the `cov_wood` factor and
+ * the log determinant of the matrix \f$ \Lambda \Lambda^T + \psi \f$, see
+ * the `compute_wood_chol_and_logdet(...)` function for more details.
+ *
+ * The unconstrained representation for this state is not implemented.
+ */
+
 class FA : public BaseState {
  public:
   Eigen::VectorXd mu, psi;

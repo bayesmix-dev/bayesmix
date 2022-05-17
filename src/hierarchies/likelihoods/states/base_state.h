@@ -9,26 +9,28 @@
 
 namespace State {
 
-//! Abstract base class for a generic state
-//!
-//! Given a statistical model with likelihood \f$ L(y|tau) \f$ and prior \f$
-//! p(\tau) \f$ a State class represents the value of tau at a certain MCMC
-//! iteration. In addition, each instance stores the cardinality of the number
-//! of observations in the model.
-//!
-//! State classes inheriting from this one should implement the methods
-//! `set_from_proto()` and `to_proto()`, that are used to deserialize from
-//! (and serialize to) a `bayesmix::AlgorithmState::ClusterState`
-//! protocol buffer message.
-//!
-//! Optionally, each state can have an "unconstrained" representation,
-//! where a bijective transformation B is applied to \f$ \tau \f$, so that
-//! the image of B is \f$ R^d \f$ for some d.
-//! This is essential for the default updaters such as `RandomWalkUpdater`
-//! and `MalaUpdater` to work, but is not necessary for other model-specific
-//! updaters.
-//! If such a representation is needed, child classes should also implement
-//! `get_unconstrained()`, `set_from_unconstrained()`, and `log_det_jac()`.
+/**
+ * Abstract base class for a generic state
+ *
+ * Given a statistical model with likelihood \f$ L(y \mid \tau) \f$ and prior
+ * \f$ p(\tau) \f$ a State class represents the value of tau at a certain MCMC
+ * iteration. In addition, each instance stores the cardinality of the number
+ * of observations in the model.
+ *
+ * State classes inheriting from this one should implement the methods
+ * `set_from_proto()` and `to_proto()`, that are used to deserialize from
+ * (and serialize to) a `bayesmix::AlgorithmState::ClusterState`
+ * protocol buffer message.
+ *
+ * Optionally, each state can have an "unconstrained" representation,
+ * where a bijective transformation \f$ B \f$ is applied to \f$ \tau \f$, so
+ * that the image of \f$ B \f$ is in \f$ \mathbb{R}^d \f$ for some \f$ d \f$.
+ * This is essential for the default updaters such as `RandomWalkUpdater`
+ * and `MalaUpdater` to work, but is not necessary for other model-specific
+ * updaters.
+ * If such a representation is needed, child classes should also implement
+ * `get_unconstrained()`, `set_from_unconstrained()`, and `log_det_jac()`.
+ */
 
 class BaseState {
  public:
@@ -36,7 +38,7 @@ class BaseState {
 
   using ProtoState = bayesmix::AlgorithmState::ClusterState;
 
-  //! Returns the unconstrained representation \f$ x = B(tau) \f$
+  //! Returns the unconstrained representation \f$ x = B(\tau) \f$
   virtual Eigen::VectorXd get_unconstrained() { return Eigen::VectorXd(0); }
 
   //! Sets the current state as \f$ \tau = B^{-1}(in) \f$

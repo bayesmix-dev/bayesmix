@@ -8,23 +8,26 @@
 #include "src/utils/distributions.h"
 #include "updaters/nnw_updater.h"
 
-//! Normal Normal-Wishart hierarchy for multivariate data.
-
-//! This class represents a hierarchy whose multivariate data
-//! are distributed according to a multivariate normal likelihood (see the
-//! `MultiNormLikelihood` for details). The likelihood parameters have a
-//! Normal-Wishart centering distribution (see the `NWPriorModel` class for
-//! details). That is:
-//! \f[
-//! f(x_i|\mu,\Sigma) &= N(\mu,\Sigma^{-1}) \\
-//!      (\mu,\Sigma) &\sim NW(\mu_0, \lambda, \Psi_0, \nu_0)
-//! \f]
-//! The state is composed of mean and precision matrix. The Cholesky factor and
-//! log-determinant of the latter are also included in the container for
-//! efficiency reasons. The state's hyperparameters are \f$(\mu_0, \lambda,
-//! \Psi_0, \nu_0)\f$, which are respectively vector, scalar, matrix, and
-//! scalar. Note that this hierarchy is conjugate, thus the marginal
-//! distribution is available in closed form.
+/**
+ * Normal Normal-Wishart hierarchy for multivariate data.
+ *
+ * This class represents a hierarchy whose multivariate data
+ * are distributed according to a multivariate normal likelihood (see the
+ * `MultiNormLikelihood` for details). The likelihood parameters have a
+ * Normal-Wishart centering distribution (see the `NWPriorModel` class for
+ * details). That is:
+ *
+ * \f[
+ *    f(\bm{x}_i \mid \bm{\mu},\Sigma) &= N_d(\bm{\mu},\Sigma^{-1}) \\
+ *    (\bm{\mu},\Sigma) &\sim NW(\mu_0, \lambda, \Psi_0, \nu_0)
+ * \f]
+ * The state is composed of mean and precision matrix. The Cholesky factor and
+ * log-determinant of the latter are also included in the container for
+ * efficiency reasons. The state's hyperparameters are \f$(\mu_0, \lambda,
+ * \Psi_0, \nu_0)\f$, which are respectively vector, scalar, matrix, and
+ * scalar. Note that this hierarchy is conjugate, thus the marginal
+ * distribution is available in closed form
+ */
 
 class NNWHierarchy
     : public BaseHierarchy<NNWHierarchy, MultiNormLikelihood, NWPriorModel> {

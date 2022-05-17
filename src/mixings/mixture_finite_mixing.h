@@ -18,27 +18,35 @@ struct State {
 };
 };  // namespace Mixture_Finite
 
-//! Class that represents the Mixture of Finite Mixtures (MFM) [1]
-//! The basic idea is to take usual finite mixture model with Dirichlet weights
-//! and put a prior (Poisson) on the number of components. The EPPF induced by
-//! MFM depends on a Dirichlet parameter 'gamma' and number \f$V_n(t)\f$, where
-//! \f$V_n(t)\f$ depends on the Poisson rate parameter 'lambda'.
-//! \f[
-//!      V_n(t) = \sum_{k=1}^{\infty} ( k_(t)p_K(k) / (\gamma*k)^(n) )
-//! \f]
-//! Given a clustering of n elements into k clusters, each with cardinality
-//! \f$n_j, j=1, ..., k\f$, the EPPF of the MFM gives the following
-//! probabilities for the cluster membership of the (n+1)-th observation: \f[
-//!      p(\text{j-th cluster} | ...) &= (n_j + \gamma) / D \\
-//!      p(\text{k+1-th cluster} | ...) &= V[k+1]/V[k] \gamma / D \\
-//!      D &= n_j + \gamma / (n + \gamma * (k + V[k+1]/V[k]))
-//! \f]
-//! For numerical reasons each value of V is multiplied with a constant  C
-//! computed as the first term of the series of V_n[0].
-//! For more information about the class, please refer instead to base
-//! classes, `AbstractMixing` and `BaseMixing`.
-//! [1] "Mixture Models with a Prior on the Number of Components", J.W.Miller
-//! and M.T.Harrison, 2015, arXiv:1502.06241v1
+/**
+ * Class that represents the Mixture of Finite Mixtures (MFM) [1]
+ * The basic idea is to take usual finite mixture model with Dirichlet weights
+ * and put a prior (Poisson) on the number of components. The EPPF induced by
+ * MFM depends on a Dirichlet parameter 'gamma' and number \f$V_n(t)\f$, where
+ * \f$ V_n(t) \f$ depends on the Poisson rate parameter 'lambda'.
+ *
+ * \f[
+ *    V_n(t) = \sum_{k=1}^{\infty} ( k_(t)p_K(k) / (\gamma*k)^(n) )
+ * \f]
+ *
+ * Given a clustering of n elements into k clusters, each with cardinality
+ * \f$ n_j, j=1, ..., k \f$, the EPPF of the MFM gives the following
+ * probabilities for the cluster membership of the (n+1)-th observation:
+ *
+ * \f[
+ *    p(\text{j-th cluster} | ...) &= (n_j + \gamma) / D \\
+ *    p(\text{k+1-th cluster} | ...) &= V[k+1]/V[k] \gamma / D \\
+ *    D &= n_j + \gamma / (n + \gamma * (k + V[k+1]/V[k]))
+ * \f]
+ *
+ * For numerical reasons each value of V is multiplied with a constant  C
+ * computed as the first term of the series of V_n[0].
+ * For more information about the class, please refer instead to base
+ * classes, `AbstractMixing` and `BaseMixing`.
+ *
+ * [1] "Mixture Models with a Prior on the Number of Components", J.W.Miller
+ * and M.T.Harrison, 2015, arXiv:1502.06241v1
+ */
 
 class MixtureFiniteMixing
     : public BaseMixing<MixtureFiniteMixing, Mixture_Finite::State,

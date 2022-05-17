@@ -11,14 +11,18 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
-//! A conjugate prior model for the multivariate normal likelihood, that is
-//! \f[
-//!     \mu | \Sigma & \sim N_p(\mu_0, (\Sigma \lambda)^{-1}) \\
-//!     \Sigma & \sim W(\nu_0, \Psi_0)
-//! \f]
-//! With some options for hyper-priors on \f$ \mu \f$ and \f$ \Sigma \f$. We
-//! have considered a normal prior for \f$ \mu_0 \f$ in addition to fixing
-//! prior hyperparameters.
+/**
+ * A conjugate prior model for the multivariate normal likelihood, that is
+ *
+ * \f[
+ *      \bm{\mu} \mid \Sigma &\sim N_p(\bm{\mu}_0, (\Sigma \lambda)^{-1}) \\
+ *      \Sigma & \sim Wishart(\nu_0, \Psi_0)
+ * \f]
+ *
+ * With some options for hyper-priors on \f$ \bm{\mu} \f$ and \f$ \Sigma \f$.
+ * We have considered a normal prior for \f$ \bm{\mu}_0 \f$ in addition to
+ * fixing prior hyperparameters
+ */
 
 class NWPriorModel
     : public BasePriorModel<NWPriorModel, State::MultiLS, Hyperparams::NW,

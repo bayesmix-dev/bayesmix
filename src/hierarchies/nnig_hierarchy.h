@@ -7,20 +7,24 @@
 #include "priors/nig_prior_model.h"
 #include "updaters/nnig_updater.h"
 
-//! Conjugate Normal Normal-InverseGamma hierarchy for univariate data.
-//!
-//! This class represents a hierarchical model where data are distributed
-//! according to a Normal likelihood (see the `UniNormLikelihood` class for
-//! details). The likelihood parameters have a Normal-InverseGamma centering
-//! distribution (see the `NIGPriorModel` class for details). That is:
-//! \f[
-//!   f(x_i|\mu, \sigma^2) &= N(\mu,\sigma^2) \\
-//!    (\mu,\sigma^2) & \sim N-IG(\mu_0, \lambda_0, \alpha_0, \beta_0)
-//! \f]
-//! The state is composed of mean and variance. The state hyperparameters are
-//! \f$(\mu_0, \lambda_0, \alpha_0, \beta_0)\f$, all scalar values. Note that
-//! this hierarchy is conjugate, thus the marginal distribution is available in
-//! closed form.
+/**
+ * Conjugate Normal Normal-InverseGamma hierarchy for univariate data.
+ *
+ * This class represents a hierarchical model where data are distributed
+ * according to a Normal likelihood (see the `UniNormLikelihood` class for
+ * details). The likelihood parameters have a Normal-InverseGamma centering
+ * distribution (see the `NIGPriorModel` class for details). That is:
+ *
+ * \f[
+ *    f(x_i \mid \mu, \sigma^2) &= N(\mu,\sigma^2) \\
+ *    (\mu,\sigma^2) & \sim NIG(\mu_0, \lambda_0, \alpha_0, \beta_0)
+ * \f]
+ *
+ * The state is composed of mean and variance. The state hyperparameters are
+ * \f$(\mu_0, \lambda_0, \alpha_0, \beta_0)\f$, all scalar values. Note that
+ * this hierarchy is conjugate, thus the marginal distribution is available in
+ * closed form
+ */
 
 class NNIGHierarchy
     : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood, NIGPriorModel> {

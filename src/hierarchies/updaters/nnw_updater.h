@@ -5,14 +5,21 @@
 #include "src/hierarchies/likelihoods/multi_norm_likelihood.h"
 #include "src/hierarchies/priors/nw_prior_model.h"
 
-//! Updater specific for the `MultiNormLikelihood` used in combination
-//! with `NWPriorModel`, that is the model
-//!        y_i | mu, Sigma ~ Nd(mu, Sigma)
-//!             mu | Sigma ~ N_d(mu0, sigsq / lambda)
-//!             Sigma^{-1} ~ Wishart(nu, Psi)
-//!
-//! It exploits the conjugacy of the model to sample the full conditional of
-//! (mu, Sigma) by calling `NWPriorModel::sample` with updated parameters
+/**
+ * Updater specific for the `MultiNormLikelihood` used in combination
+ * with `NWPriorModel`, that is the model
+ *
+ * \f[
+ *      y_i \mid \bm{\mu}, \Sigma &\stackrel{\small\mathrm{iid}}{\sim}
+ * N_d(\bm{mu}, \Sigma) \\
+ *      \bm{\mu} \mid \Sigma &\sim N_d(\bm{\mu}_0, \Sigma / \lambda) \\
+ *      \Sigma^{-1} &\sim Wishart(\nu, \Psi)
+ * \f]
+ *
+ * It exploits the conjugacy of the model to sample the full conditional of
+ * \f$ (\bm{\mu}, \Sigma) \f$ by calling `NWPriorModel::sample` with updated
+ * parameters.
+ */
 
 class NNWUpdater
     : public SemiConjugateUpdater<MultiNormLikelihood, NWPriorModel> {

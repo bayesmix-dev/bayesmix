@@ -12,7 +12,7 @@ Moreover, they allow to go from the constrained to the unconstrained representat
 Code Structure
 --------------
 
-All classes must inherit from the `BaseState` class
+All classes must inherit from the ``BaseState`` class
 
 .. doxygenclass:: State::BaseState
     :project: bayesmix

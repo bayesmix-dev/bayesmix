@@ -54,7 +54,6 @@ Updater Classes
 .. doxygenclass:: MalaUpdater
     :project: bayesmix
     :members:
-
 .. doxygenclass:: NNIGUpdater
     :project: bayesmix
     :members:
