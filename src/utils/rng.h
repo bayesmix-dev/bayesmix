@@ -3,7 +3,8 @@
 
 #include <random>
 
-//! Simple Random Number Generation class wrapper.
+//! @file rng.h
+//! The `rng.h` file defines a simple Random Number Generation class wrapper.
 //! This class wraps the C++ standard RNG object and allows the use of any RNG
 //! seed. It is implemented as a singleton, so that every object used in the
 //! library has access to the same exact RNG engine.

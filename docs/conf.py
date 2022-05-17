@@ -57,7 +57,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'haiku'
 
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 highlight_language = 'cpp'
 

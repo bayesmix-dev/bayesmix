@@ -18,17 +18,20 @@ Distribution-related utilities
    :project: bayesmix
 
 ----------------------------------------------
-``Eigen`` input-output and matrix manipulation
+``Eigen`` matrix manipulation utilities
 ----------------------------------------------
 .. doxygenfile:: eigen_utils.h
    :project: bayesmix
-   :members:
+
+--------------------------------
+``Eigen`` input-output utilities
+--------------------------------
 .. doxygenfile:: io_utils.h
    :project: bayesmix
 
--------------------------
-``protobuf`` input-output
--------------------------
+-----------------------------------
+``protobuf`` input-output utilities
+-----------------------------------
 .. doxygenfile:: proto_utils.h
    :project: bayesmix
 

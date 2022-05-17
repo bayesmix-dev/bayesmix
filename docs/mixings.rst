@@ -34,6 +34,9 @@ Classes
 .. doxygenclass:: PitYorMixing
    :project: bayesmix
    :members:
+.. doxygenclass:: MixtureFiniteMixing
+   :project: bayesmix
+   :members:
 .. doxygenclass:: TruncatedSBMixing
    :project: bayesmix
    :members:

@@ -12,8 +12,10 @@
 #include "src/utils/rng.h"
 
 //! A semi-conjugate prior model for the univariate normal likelihood, that is
-//!     mu ~ N(mu0, var0)
-//!     var ~ IG(a,b)
+//! \f[
+//!     \mu & \sim N(\mu_0, \eta^2) \\
+//!     \sigma^2 & \sim IG(a,b)
+//! \f]
 
 class NxIGPriorModel
     : public BasePriorModel<NxIGPriorModel, State::UniLS, Hyperparams::NxIG,

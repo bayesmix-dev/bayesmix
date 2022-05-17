@@ -7,20 +7,36 @@
 #include "priors/nig_prior_model.h"
 #include "updaters/nnig_updater.h"
 
+//! Conjugate Normal Normal-InverseGamma hierarchy for univariate data.
+//!
+//! This class represents a hierarchical model where data are distributed
+//! according to a Normal likelihood (see the `UniNormLikelihood` class for
+//! details). The likelihood parameters have a Normal-InverseGamma centering
+//! distribution (see the `NIGPriorModel` class for details). That is:
+//! \f[
+//!   f(x_i|\mu, \sigma^2) &= N(\mu,\sigma^2) \\
+//!    (\mu,\sigma^2) & \sim N-IG(\mu_0, \lambda_0, \alpha_0, \beta_0)
+//! \f]
+//! The state is composed of mean and variance. The state hyperparameters are
+//! \f$(\mu_0, \lambda_0, \alpha_0, \beta_0)\f$, all scalar values. Note that
+//! this hierarchy is conjugate, thus the marginal distribution is available in
+//! closed form.
+
 class NNIGHierarchy
     : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood, NIGPriorModel> {
  public:
+  NNIGHierarchy() = default;
   ~NNIGHierarchy() = default;
 
-  using BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
-                      NIGPriorModel>::BaseHierarchy;
-
+  //! Returns the Protobuf ID associated to this class
   bayesmix::HierarchyId get_id() const override {
     return bayesmix::HierarchyId::NNIG;
   }
 
+  //! Sets the default updater algorithm for this hierarchy
   void set_default_updater() { updater = std::make_shared<NNIGUpdater>(); }
 
+  //! Initializes state parameters to appropriate values
   void initialize_state() override {
     // Get hypers
     auto hypers = prior->get_hypers();
@@ -31,6 +47,11 @@ class NNIGHierarchy
     like->set_state(state);
   };
 
+  //! Evaluates the log-marginal distribution of data in a single point
+  //! @param hier_params  Pointer to the container of (prior or posterior)
+  //! hyperparameter values
+  //! @param datum        Point which is to be evaluated
+  //! @return             The evaluation of the lpdf
   double marg_lpdf(ProtoHypersPtr hier_params,
                    const Eigen::RowVectorXd &datum) const override {
     auto params = hier_params->nnig_state();
@@ -41,4 +62,4 @@ class NNIGHierarchy
   }
 };
 
-#endif
+#endif  // BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_H_

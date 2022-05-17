@@ -12,25 +12,25 @@
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-//! Class that represents the Pitman-Yor process (PY) in Pitman and Yor (1997).
-//! The EPPF induced by the PY depends on a `strength` parameter M and  a
-//! `discount` paramter d.
-//! Given a clustering of n elements into k clusters, each with cardinality
-//! n_j, j=1, ..., k, the EPPF of the PY gives the following probabilities for
-//! the cluster membership of the (n+1)-th observation:
-//!      p(j-th cluster | ...) \propto (n_j - d)
-//!      p(k+1-th cluster | ...) \propto M + k * d
-//!
-//! When `discount=0`, the EPPF of the PY process coincides with the one of the
-//! DP with totalmass = strength.
-//! For more information about the class, please refer instead to base classes,
-//! `AbstractMixing` and `BaseMixing`.
-
 namespace PitYor {
 struct State {
   double strength, discount;
 };
 };  // namespace PitYor
+
+//! Class that represents the Pitman-Yor process (PY) in Pitman and Yor (1997).
+//! The EPPF induced by the PY depends on a `strength` parameter M and  a
+//! `discount` paramter d.
+//! Given a clustering of n elements into k clusters, each with cardinality
+//! \f$ n_j, j=1, ..., k \f$, the EPPF of the PY gives the following
+//! probabilities for the cluster membership of the (n+1)-th observation: \f[
+//!      p(\text{j-th cluster} | ...) \propto (n_j - d) \\
+//!      p(\text{new cluster} | ...) \propto M + k d
+//! \f]
+//! When `discount=0`, the EPPF of the PY process coincides with the one of the
+//! DP with totalmass = strength.
+//! For more information about the class, please refer instead to base classes,
+//! `AbstractMixing` and `BaseMixing`.
 
 class PitYorMixing
     : public BaseMixing<PitYorMixing, PitYor::State, bayesmix::PYPrior> {
@@ -62,6 +62,7 @@ class PitYorMixing
  protected:
   //! Returns probability mass for an old cluster (for marginal mixings only)
   //! @param n          Total dataset size
+  //! @param n_clust    Number of clusters
   //! @param log        Whether to return logarithm-scale values or not
   //! @param propto     Whether to include normalizing constants or not
   //! @param hier       `Hierarchy` object representing the cluster
