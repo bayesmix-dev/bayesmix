@@ -10,11 +10,14 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
-//! A conjugate prior model for the scalar linear regression likelihood, i.e.
-//! \f[
-//!     \beta | \sigma^2 & \sim N_p(\mu, \sigma^2 \Lambda^-1) \\
-//!     \sigma^2 & \sim IG(a,b)
-//! \f]
+/**
+ * A conjugate prior model for the scalar linear regression likelihood, i.e.
+ *
+ * \f[
+ *      \bm{\beta} \mid \sigma^2 & \sim N_p(\bm{\mu}, \sigma^2 \Lambda^{-1}) \\
+ *      \sigma^2 & \sim InvGamma(a,b)
+ * \f]
+ */
 
 class MNIGPriorModel
     : public BasePriorModel<MNIGPriorModel, State::UniLinRegLS,

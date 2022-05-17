@@ -8,23 +8,27 @@
 #include "src/utils/distributions.h"
 #include "updaters/fa_updater.h"
 
-//! Mixture of Factor Analysers hierarchy for multivariate data.
-//!
-//! This class represents a hierarchical model where data are distributed
-//! according to a multivariate Normal likelihood with a specific factorization
-//! of the covariance matrix (see the `FAHierarchy` class for details). The
-//! likelihood parameters have a Dirichlet-Laplace distribution x InverseGamma
-//! centering distribution (see the `FAPriorModel` class for details). That is:
-//! \f[
-//! f(x_i| \mu, \Sigma, \Lambda) &= N(\mu, \Sigma + \Lambda \Lambda^T) \\
-//!     \mu &\sim N_p(\tilde \mu, \psi I) \\
-//!     \Lambda &\sim DL(\alpha) \\
-//!     \Sigma &= diag(\sigma^2_1, \ldots, \sigma^2_p) \\
-//!     \sigma^2_j &\sim IG(a,b)   \quad j=1,...,p
-//! \f]
-//! where Lambda is the latent score matrix (size p x d with d << p) and
-//! DL(alpha) is the Laplace-Dirichlet distribution.
-//! See Bhattacharya et al. (2015) for further details.
+/**
+ * Mixture of Factor Analysers hierarchy for multivariate data.
+ *
+ * This class represents a hierarchical model where data are distributed
+ * according to a multivariate Normal likelihood with a specific factorization
+ * of the covariance matrix (see the `FAHierarchy` class for details). The
+ * likelihood parameters have a Dirichlet-Laplace distribution x InverseGamma
+ * centering distribution (see the `FAPriorModel` class for details). That is:
+ *
+ * \f[
+ *    f(x_i \mid \mu, \Sigma, \Lambda) &= N(\mu, \Sigma + \Lambda \Lambda^T) \\
+ *    \mu &\sim N_p(\tilde \mu, \psi I) \\
+ *    \Lambda &\sim DL(\alpha) \\
+ *    \Sigma &= diag(\sigma^2_1, \ldots, \sigma^2_p) \\
+ *    \sigma^2_j &\sim IG(a,b)   \quad j=1,...,p
+ * \f]
+ *
+ * where Lambda is the latent score matrix (size \f$ p \times d \f$
+ * with \f$ d << p \f$) and \f$ DL(\alpha) \f$ is the Laplace-Dirichlet
+ * distribution. See Bhattacharya et al. (2015) for further details
+ */
 
 class FAHierarchy
     : public BaseHierarchy<FAHierarchy, FALikelihood, FAPriorModel> {

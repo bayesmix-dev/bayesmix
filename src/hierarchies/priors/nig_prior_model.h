@@ -11,14 +11,19 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
-//! A conjugate prior model for the univariate normal likelihood, that is
-//! \f[
-//!     \mu | \sigma^2 ~ N(\mu_0, \sigma^2 / \lambda)
-//!     \sigma^2 ~ IG(a,b)
-//! \f]
-//! With several possibilies for hyper-priors on \f$ \mu \f$ and \f$ \sigma^2
-//! \f$. We have considered a normal prior for mu0 and a Normal-Gamma-Gamma for
-//! (mu0, a, b) in addition to fixing prior hyperparameters.
+/**
+ * A conjugate prior model for the univariate normal likelihood, that is
+ *
+ * \f[
+ *      \mu \mid \sigma^2 &\sim N(\mu_0, \sigma^2 / \lambda) \\
+ *      \sigma^2 &\sim InvGamma(a,b)
+ * \f]
+ *
+ * With several possibilies for hyper-priors on \f$ \mu \f$ and \f$ \sigma^2
+ * \f$. We have considered a normal prior for \f$ mu0 \f$ and a
+ * Normal-Gamma-Gamma for \f$ (mu0, a, b) \f$ in addition to fixing prior
+ * hyperparameters
+ */
 
 class NIGPriorModel
     : public BasePriorModel<NIGPriorModel, State::UniLS, Hyperparams::NIG,

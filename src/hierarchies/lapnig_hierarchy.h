@@ -7,22 +7,25 @@
 #include "priors/nxig_prior_model.h"
 #include "updaters/mala_updater.h"
 
-//! Laplace Normal-InverseGamma hierarchy for univariate data.
-
-//! This class represents a hierarchical model where data are distributed
-//! according to a Laplace likelihood (see the `LaplaceLikelihood` class for
-//! deatils). The likelihood parameters have a Normal x InverseGamma centering
-//! distribution (see the `NxIGPriorModel` class for details). That is:
-//! \f[
-//! f(x_i|\mu,\sigma^2) &= Laplace(\mu,\sqrt(\sigma^2/2))\\
-//!               \mu &\sim N(\mu_0,\eta^2) \\
-//!              \sigma^2 ~ IG(a, b)
-//! \f]
-//! The state is composed of mean and variance (thus the scale for the Laplace
-//! distribution is \f$ \sqrt(\sigma^2 / 2)) \f$. The state hyperparameters are
-//! \f$(mu_0, \sigma^2, a, b)\f$, all scalar values. Note that this hierarchy
-//! is NOT conjugate, thus the marginal distribution is not available in closed
-//! form.
+/**
+ * Laplace Normal-InverseGamma hierarchy for univariate data.
+ *
+ * This class represents a hierarchical model where data are distributed
+ * according to a Laplace likelihood (see the `LaplaceLikelihood` class for
+ * deatils). The likelihood parameters have a Normal x InverseGamma centering
+ * distribution (see the `NxIGPriorModel` class for details). That is:
+ *
+ * \f[
+ *    f(x_i \mid \mu,\sigma^2) &= Laplace(\mu,\sqrt{\sigma^2/2})\\
+ *    \mu &\sim N(\mu_0,\eta^2) \\
+ *    \sigma^2 &\sim InvGamma(a, b)
+ * \f]
+ * The state is composed of mean and variance (thus the scale for the Laplace
+ * distribution is \f$ \sqrt{\sigma^2/2}) \f$. The state hyperparameters are
+ * \f$(mu_0, \sigma^2, a, b)\f$, all scalar values. Note that this hierarchy
+ * is NOT conjugate, thus the marginal distribution is not available in closed
+ * form.
+ */
 
 class LapNIGHierarchy
     : public BaseHierarchy<LapNIGHierarchy, LaplaceLikelihood,

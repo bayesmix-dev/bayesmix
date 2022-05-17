@@ -3,17 +3,24 @@
 
 #include "metropolis_updater.h"
 
-//! Metropolis-Hastings updater using an isotropic proposal function
-//! centered in the current value of the parameters (unconstrained).
-//! This class requires that the Hierarchy's state implements
-//! the `get_unconstrained()`, `set_from_unconstrained()` and
-//! `log_det_jac()` functions.
-//!
-//! Given the current value of the unconstrained parameters x, a new
-//! value is proposed from
-//!          x_new ~ N(x_new, step_size * I)
-//! and then either accepted (in which case the hierarchy's state is
-//! set to x_new) or rejected.
+/**
+ * Metropolis-Hastings updater using an isotropic proposal function
+ * centered in the current value of the parameters (unconstrained).
+ * This class requires that the Hierarchy's state implements
+ * the `get_unconstrained()`, `set_from_unconstrained()` and
+ * `log_det_jac()` functions.
+ *
+ * Given the current value of the unconstrained parameters \f$ x \f$, a new
+ * value is proposed from
+ *
+ * \f[
+ *    x_{new} \sim N(x, step\_size \cdot I)
+ * \f]
+ *
+ * and then either accepted (in which case the hierarchy's state is
+ * set to \f$ x_{new} \f$) or rejected.
+ */
+
 class RandomWalkUpdater : public MetropolisUpdater<RandomWalkUpdater> {
  protected:
   double step_size;
