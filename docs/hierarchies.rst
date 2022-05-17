@@ -6,9 +6,9 @@ Hierarchies
 In our algorithms, we store a vector of hierarchies, each of which represent a parameter :math:`\theta_h`.
 The hierarchy implements all the methods needed to update :math:`\theta_h`: sampling from the prior distribution :math:`P_0`, the full-conditional distribution (given the data {:math:`y_i` such that :math:`c_i = h`} ) and so on.
 
-In BayesMix, each choice of :math:`G_0` is implemented in a different ``PriorModel`` object and each choice of :math:k(\cdot \mid \cdot)` in a ``Likelihood`` object, so that it is straightforward to create a new ``Hierarchy`` using one of the already implemented priors or likelihoods.
+In BayesMix, each choice of :math:`G_0` is implemented in a different ``PriorModel`` object and each choice of :math:`k(\cdot \mid \cdot)` in a ``Likelihood`` object, so that it is straightforward to create a new ``Hierarchy`` using one of the already implemented priors or likelihoods.
 The sampling from the full conditional of :math:`\theta_h` is performed in an ``Updater`` class.
-`State` classes  are used to store  parameters ``\theta_h`s of every mixture component.
+`State` classes  are used to store  parameters :math:`\theta_h` s of every mixture component.
 Their main purpose is to handle serialization and de-serialization of the state
 
 .. toctree::
