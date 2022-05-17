@@ -23,7 +23,7 @@
  *
  * where \f$ f(x \mid \theta_j) \f$ is a density for each value of \f$ \theta_j
  * \f$, \f$ c_i \f$ take values in \f$ \{1, \dots, k\} \f$ and \f$ w_1, \dots,
- * w_k \f$ are nonnegative weights whose sum is a.s. 1, i.e. \f$ p(w_1, ...
+ * w_k \f$ are nonnegative weights whose sum is a.s. 1, i.e. \f$ p(w_1, \dots,
  * w_k) \f$ is a probability distribution on the k-1 dimensional unit simplex).
  * In this library, each \f$ \theta_j \f$ is represented as an `Hierarchy`
  * object (which inherits from `AbstractHierarchy`), that also holds the
