@@ -167,6 +167,7 @@ int main(int argc, char *argv[]) {
                                  mixing->get_mutable_prior());
   bayesmix::read_proto_from_file(args.get<std::string>("--hier-args"),
                                  hier->get_mutable_prior());
+  hier->initialize();
 
   // Read data matrices
   Eigen::MatrixXd data =

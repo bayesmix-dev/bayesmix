@@ -1,7 +1,7 @@
 #include "neal3_algorithm.h"
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 
 #include "hierarchy_id.pb.h"
 #include "mixing_id.pb.h"
