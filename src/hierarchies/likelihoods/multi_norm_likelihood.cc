@@ -12,8 +12,8 @@ double MultiNormLikelihood::compute_lpdf(
 
 void MultiNormLikelihood::update_sum_stats(const Eigen::RowVectorXd &datum,
                                            bool add) {
-  // Check if dim is not defined yet (usually not happens if hierarchy is
-  // initialized)
+  // Check if dim is not defined yet (this usually doesn't happen if the
+  // hierarchy is initialized)
   if (!dim) set_dim(datum.size());
   // Updates
   if (add) {

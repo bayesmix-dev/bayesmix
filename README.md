@@ -16,13 +16,7 @@ Current state of the software:
 <a href="https://www.codecogs.com/eqnedit.php?latex=P&space;\sim&space;\Pi" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P&space;\sim&space;\Pi" title="\Pi \sim P" /></a>
 -->
 
-where P is either the Dirichlet process or the Pitman--Yor process
-
-- We currently support univariate and multivariate location-scale mixture of Gaussian densities
-
-- Inference is carried out using algorithms such as Algorithm 2 in [Neal (2000)](http://www.stat.columbia.edu/npbayes/papers/neal_sampling.pdf)
-
-- Serialization of the MCMC chains is possible using Google's [Protocol Buffers](https://developers.google.com/protocol-buffers) aka `protobuf`
+For descriptions of the models supported in our library, discussion of software design, and examples, please refer to the following paper: https://arxiv.org/abs/2205.08144
 
 # Installation
 
@@ -101,3 +95,4 @@ Documentation is available at https://bayesmix.readthedocs.io.
 # Contributions are welcome!
 
 Please check out [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to collaborate with us.
+You can also head to our [issues page](https://github.com/bayesmix-dev/bayesmix/issues) to check for useful enhancements needed.

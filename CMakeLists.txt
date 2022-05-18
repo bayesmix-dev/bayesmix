@@ -171,7 +171,6 @@ if (NOT DISABLE_DOCS)
   add_subdirectory(docs)
 endif()
 
-# add_subdirectory(examples)
 if (NOT DISABLE_PLOTS)
   include(FetchContent)
 
@@ -210,9 +209,3 @@ endif()
 if (NOT DISABLE_EXAMPLES)
   add_subdirectory(examples)
 endif()
-
-# Test MH updater
-# add_executable(test_mh $<TARGET_OBJECTS:bayesmix> test_mh_updater.cpp)
-# target_include_directories(test_mh PUBLIC ${INCLUDE_PATHS})
-# target_link_libraries(test_mh PUBLIC ${LINK_LIBRARIES})
-# target_compile_options(test_mh PUBLIC ${COMPILE_OPTIONS})

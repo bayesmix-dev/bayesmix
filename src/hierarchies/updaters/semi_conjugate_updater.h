@@ -66,7 +66,7 @@ void SemiConjugateUpdater<Likelihood, PriorModel>::draw(
   auto& likecast = downcast_likelihood(like);
   auto& priorcast = downcast_prior(prior);
   // Sample from the full conditional of a semi-conjugate hierarchy
-  bool set_card = true; /*, use_post_hypers=true;*/
+  bool set_card = true;
   if (likecast.get_card() == 0) {
     likecast.set_state(priorcast.sample(), !set_card);
   } else {

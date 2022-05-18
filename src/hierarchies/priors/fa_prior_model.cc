@@ -7,8 +7,6 @@ double FAPriorModel::lpdf(const google::protobuf::Message &state_) {
   // Proto2Eigen conversion
   Eigen::VectorXd mu = bayesmix::to_eigen(state.mu());
   Eigen::VectorXd psi = bayesmix::to_eigen(state.psi());
-
-  // Eigen::MatrixXd eta = bayesmix::to_eigen(state.eta());
   Eigen::MatrixXd lambda = bayesmix::to_eigen(state.lambda());
 
   // Initialize lpdf value

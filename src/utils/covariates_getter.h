@@ -2,8 +2,6 @@
 #define BAYESMIX_SRC_UTILS_COVARIATES_GETTER_H
 
 #include <Eigen/Dense>
-// #include "src/hierarchies/likelihoods/abstract_likelihood.h"
-// #include "src/hierarchies/priors/abstract_prior_model.h"
 
 class covariates_getter {
  protected:

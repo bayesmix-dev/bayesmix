@@ -380,7 +380,7 @@ TEST(laplace_likelihood, eval_lpdf_unconstrained) {
     lpdf += like->lpdf(data.row(i));
   }
 
-  like->set_dataset(&data);  // Questa cosa è sempre garantita??
+  like->set_dataset(&data);
   double clus_lpdf =
       like->cluster_lpdf_from_unconstrained(unconstrained_params);
   ASSERT_DOUBLE_EQ(lpdf, clus_lpdf);

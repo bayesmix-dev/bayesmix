@@ -62,10 +62,11 @@ class FAHierarchy
   }
 };
 
-//! Empirical-Bayes hyperparameters initialization for the FA HIerarchy.
+//! Empirical-Bayes hyperparameters initialization for the FAHierarchy.
 //! Sets the hyperparameters in `hier` starting from the data on which the user
 //! wants to fit the model.
 inline void set_fa_hyperparams_from_data(FAHierarchy* hier) {
+  // TODO test this function
   auto dataset_ptr =
       std::static_pointer_cast<FALikelihood>(hier->get_likelihood())
           ->get_dataset();
