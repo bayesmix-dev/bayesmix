@@ -13,4 +13,5 @@ enum HierarchyId {
     LapNIG = 4; // Laplace - Normal Inverse Gamma
     FA = 5; // Factor Analysers
     Python = 6;
+    PythonNonConjugate = 7;
 }
