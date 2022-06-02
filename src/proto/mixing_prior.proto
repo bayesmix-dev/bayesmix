@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "distribution.proto";
 import "mixing_state.proto";
-import "matrix.proto"
+import "matrix.proto";
 
 package bayesmix;
 
