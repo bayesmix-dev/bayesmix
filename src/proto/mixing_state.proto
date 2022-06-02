@@ -42,6 +42,10 @@ message MFMState {
   double gamma = 2; // parameter of the dirichlet distribution for the mixing weights
 }
 
+message PYTHONState {
+  Vector values = 1;
+}
+
 /*
  * Wrapper of all possible mixing states into a single oneof
  */
@@ -52,5 +56,6 @@ message MixingState {
     LogSBState log_sb_state = 3;
     TruncSBState trunc_sb_state = 4;
     MFMState mfm_state = 5;
+    PYTHONState general_state = 6;
   }
 }
