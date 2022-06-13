@@ -115,7 +115,7 @@ message EmptyPrior {
   double fake_field = 1;
 }
 
-message PythonPrior{
+message Python_hPrior{
   oneof prior {
     Vector values = 1; // values are modified from python
   }

@@ -51,7 +51,7 @@ message LogSBPrior {
   uint32 num_components = 3; // Number of components in the process
 }
 
-message PYTHONPrior {
+message Python_mPrior {
   oneof prior {
     Vector values = 1;
   }
@@ -84,7 +84,7 @@ message TruncSBPrior {
     DPPrior dp_prior = 2; // Truncated Dirichlet process
     PYPrior py_prior = 3; // Truncated Pitman-Yor process
     MFMPrior mfm_prior = 5;
-    PYTHONPrior pm_prior = 6;
+    Python_mPrior pm_prior = 6;
   }
   uint32 num_components = 4; // Number of components in the process
 }
