@@ -3,8 +3,8 @@
 
 #include <lib/progressbar/progressbar.h>
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "algorithm_id.pb.h"

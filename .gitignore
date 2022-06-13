@@ -16,10 +16,16 @@ sftp-config.json
 *.local.*
 # MacOS storage files
 .DS_Store
+.dockerignore
+.ipynb_checkpoints/
+docs/_build/
+resources/benchmarks/datasets
+resources/2d
 #CLion cash
 .idea/
 # Build debug folder
 cmake-build-debug/
-# mypy cache
-.mypy_cache/
-#
+# .old folders
+src/hierarchies/updaters/.old/
+test/.old/
+examples/gamma_hierarchy/.old/

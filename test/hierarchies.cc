@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <Eigen/Dense>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "algorithm_state.pb.h"
 #include "ls_state.pb.h"
@@ -9,11 +9,12 @@
 #include "src/hierarchies/lin_reg_uni_hierarchy.h"
 #include "src/hierarchies/nnig_hierarchy.h"
 #include "src/hierarchies/nnw_hierarchy.h"
+#include "src/hierarchies/nnxig_hierarchy.h"
 #include "src/includes.h"
 #include "src/utils/proto_utils.h"
 #include "src/utils/rng.h"
 
-TEST(nnighierarchy, draw) {
+TEST(nnig_hierarchy, draw) {
   auto hier = std::make_shared<NNIGHierarchy>();
   bayesmix::NNIGPrior prior;
   double mu0 = 5.0;
@@ -39,7 +40,7 @@ TEST(nnighierarchy, draw) {
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
 
-TEST(nnighierarchy, sample_given_data) {
+TEST(nnig_hierarchy, sample_given_data) {
   auto hier = std::make_shared<NNIGHierarchy>();
   bayesmix::NNIGPrior prior;
   double mu0 = 5.0;
@@ -70,7 +71,7 @@ TEST(nnighierarchy, sample_given_data) {
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
 
-TEST(nnwhierarchy, draw) {
+TEST(nnw_hierarchy, draw) {
   auto hier = std::make_shared<NNWHierarchy>();
   bayesmix::NNWPrior prior;
   Eigen::Vector2d mu0;
@@ -101,7 +102,7 @@ TEST(nnwhierarchy, draw) {
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
 
-TEST(nnwhierarchy, sample_given_data) {
+TEST(nnw_hierarchy, sample_given_data) {
   auto hier = std::make_shared<NNWHierarchy>();
   bayesmix::NNWPrior prior;
   Eigen::Vector2d mu0;
@@ -136,6 +137,33 @@ TEST(nnwhierarchy, sample_given_data) {
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
 
+TEST(nnw_hierarchy, no_unconstrained_lpdf) {
+  // Initialize hierarchy
+  auto hier = std::make_shared<NNWHierarchy>();
+  bayesmix::NNWPrior prior;
+  Eigen::Vector2d mu0;
+  mu0 << 5.5, 5.5;
+  bayesmix::Vector mu0_proto;
+  bayesmix::to_proto(mu0, &mu0_proto);
+  double lambda0 = 0.2;
+  double nu0 = 5.0;
+  Eigen::Matrix2d tau0 = Eigen::Matrix2d::Identity() / nu0;
+  bayesmix::Matrix tau0_proto;
+  bayesmix::to_proto(tau0, &tau0_proto);
+  *prior.mutable_fixed_values()->mutable_mean() = mu0_proto;
+  prior.mutable_fixed_values()->set_var_scaling(lambda0);
+  prior.mutable_fixed_values()->set_deg_free(nu0);
+  *prior.mutable_fixed_values()->mutable_scale() = tau0_proto;
+  hier->get_mutable_prior()->CopyFrom(prior);
+  hier->initialize();
+
+  // Check exeption handling in case unconstrained lpdfs are not implemented
+  auto state_uc = hier->get_state().get_unconstrained();
+  EXPECT_ANY_THROW(
+      hier->get_likelihood()->cluster_lpdf_from_unconstrained(state_uc));
+  EXPECT_ANY_THROW(hier->get_prior()->lpdf_from_unconstrained(state_uc));
+}
+
 TEST(lin_reg_uni_hierarchy, state_read_write) {
   Eigen::Vector2d beta;
   beta << 2, -1;
@@ -164,10 +192,8 @@ TEST(lin_reg_uni_hierarchy, state_read_write) {
 
 TEST(lin_reg_uni_hierarchy, misc) {
   // Build data
-  int n = 5;
-  int dim = 2;
-  Eigen::Vector2d beta_true;
-  beta_true << 10.0, 10.0;
+  int n = 5, dim = 2;
+  Eigen::Vector2d beta_true({10.0, 10.0});
   Eigen::MatrixXd cov = Eigen::MatrixXd::Random(n, dim);  // each in U[-1,1]
   double sigma2 = 1.0;
   Eigen::VectorXd data(n);
@@ -175,25 +201,26 @@ TEST(lin_reg_uni_hierarchy, misc) {
   for (int i = 0; i < n; i++) {
     data(i) = stan::math::normal_rng(cov.row(i).dot(beta_true), sigma2, rng);
   }
+
   // Initialize objects
   LinRegUniHierarchy hier;
   bayesmix::LinRegUniPrior prior;
+
   // Create prior parameters
   Eigen::Vector2d beta0 = 0 * beta_true;
-  bayesmix::Vector beta0_proto;
-  bayesmix::to_proto(beta0, &beta0_proto);
   auto Lambda0 = Eigen::Matrix2d::Identity();
-  bayesmix::Matrix Lambda0_proto;
-  bayesmix::to_proto(Lambda0, &Lambda0_proto);
   double a0 = 2.0;
   double b0 = 1.0;
+
   // Initialize hierarchy
-  *prior.mutable_fixed_values()->mutable_mean() = beta0_proto;
-  *prior.mutable_fixed_values()->mutable_var_scaling() = Lambda0_proto;
+  bayesmix::to_proto(beta0, prior.mutable_fixed_values()->mutable_mean());
+  bayesmix::to_proto(Lambda0,
+                     prior.mutable_fixed_values()->mutable_var_scaling());
   prior.mutable_fixed_values()->set_shape(a0);
   prior.mutable_fixed_values()->set_scale(b0);
   hier.get_mutable_prior()->CopyFrom(prior);
   hier.initialize();
+
   // Extract hypers for reading test
   bayesmix::AlgorithmState::HierarchyHypers out;
   hier.write_hypers_to_proto(&out);
@@ -202,10 +229,12 @@ TEST(lin_reg_uni_hierarchy, misc) {
             bayesmix::to_eigen(out.lin_reg_uni_state().var_scaling()));
   ASSERT_EQ(a0, out.lin_reg_uni_state().shape());
   ASSERT_EQ(b0, out.lin_reg_uni_state().scale());
+
   // Add data
   for (int i = 0; i < n; i++) {
     hier.add_datum(i, data.row(i), false, cov.row(i));
   }
+
   // Check summary statistics
   // for (int i = 0; i < dim; i++) {
   //   for (int j = 0; j < dim; j++) {
@@ -214,6 +243,7 @@ TEST(lin_reg_uni_hierarchy, misc) {
   //   }
   //   ASSERT_DOUBLE_EQ(hier.get_mixed_prod()(i), (cov.transpose() * data)(i));
   // }
+
   // Compute and check posterior values
   hier.sample_full_cond();
   auto state = hier.get_state();
@@ -222,7 +252,56 @@ TEST(lin_reg_uni_hierarchy, misc) {
   }
 }
 
-TEST(fahierarchy, draw) {
+TEST(nnxig_hierarchy, draw) {
+  auto hier = std::make_shared<NNxIGHierarchy>();
+  bayesmix::NNxIGPrior prior;
+  prior.mutable_fixed_values()->set_mean(5.0);
+  prior.mutable_fixed_values()->set_var(1.2);
+  prior.mutable_fixed_values()->set_shape(2.0);
+  prior.mutable_fixed_values()->set_scale(2.0);
+  hier->get_mutable_prior()->CopyFrom(prior);
+  hier->initialize();
+
+  auto hier2 = hier->clone();
+  hier2->sample_prior();
+
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
+  hier->write_state_to_proto(clusval);
+  hier2->write_state_to_proto(clusval2);
+
+  ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+}
+
+TEST(nnxig_hierarchy, sample_given_data) {
+  auto hier = std::make_shared<NNxIGHierarchy>();
+  bayesmix::NNxIGPrior prior;
+  prior.mutable_fixed_values()->set_mean(5.0);
+  prior.mutable_fixed_values()->set_var(1.2);
+  prior.mutable_fixed_values()->set_shape(2.0);
+  prior.mutable_fixed_values()->set_scale(2.0);
+  hier->get_mutable_prior()->CopyFrom(prior);
+
+  hier->initialize();
+
+  Eigen::VectorXd datum(1);
+  datum << 4.5;
+
+  auto hier2 = hier->clone();
+  hier2->add_datum(0, datum, false);
+  hier2->sample_full_cond();
+
+  bayesmix::AlgorithmState out;
+  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
+  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
+  hier->write_state_to_proto(clusval);
+  hier2->write_state_to_proto(clusval2);
+
+  ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+}
+
+TEST(fa_hierarchy, draw) {
   auto hier = std::make_shared<FAHierarchy>();
   bayesmix::FAPrior prior;
   Eigen::VectorXd mutilde(4);
@@ -256,44 +335,7 @@ TEST(fahierarchy, draw) {
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }
 
-TEST(fahierarchy, draw_auto) {
-  auto hier = std::make_shared<FAHierarchy>();
-  bayesmix::FAPrior prior;
-  Eigen::VectorXd mutilde(0);
-  bayesmix::Vector mutilde_proto;
-  bayesmix::to_proto(mutilde, &mutilde_proto);
-  int q = 2;
-  double phi = 1.0;
-  double alpha0 = 5.0;
-  Eigen::VectorXd beta(0);
-  bayesmix::Vector beta_proto;
-  bayesmix::to_proto(beta, &beta_proto);
-  Eigen::MatrixXd dataset(5, 5);
-  dataset << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-      20, 1, 5, 7, 8, 9;
-  hier->set_dataset(&dataset);
-  *prior.mutable_fixed_values()->mutable_mutilde() = mutilde_proto;
-  prior.mutable_fixed_values()->set_phi(phi);
-  prior.mutable_fixed_values()->set_alpha0(alpha0);
-  prior.mutable_fixed_values()->set_q(q);
-  *prior.mutable_fixed_values()->mutable_beta() = beta_proto;
-  hier->get_mutable_prior()->CopyFrom(prior);
-  hier->initialize();
-
-  auto hier2 = hier->clone();
-  hier2->sample_prior();
-
-  bayesmix::AlgorithmState out;
-  bayesmix::AlgorithmState::ClusterState* clusval = out.add_cluster_states();
-  bayesmix::AlgorithmState::ClusterState* clusval2 = out.add_cluster_states();
-  hier->write_state_to_proto(clusval);
-  hier2->write_state_to_proto(clusval2);
-
-  ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString())
-      << clusval->DebugString() << clusval2->DebugString();
-}
-
-TEST(fahierarchy, sample_given_data) {
+TEST(fa_hierarchy, sample_given_data) {
   auto hier = std::make_shared<FAHierarchy>();
   bayesmix::FAPrior prior;
   Eigen::VectorXd mutilde(4);

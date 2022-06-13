@@ -8,17 +8,15 @@ Current state of the software:
 
 - `bayesmix` performs inference for mixture models of the kind
 
+<img src="https://latex.codecogs.com/svg.image?\begin{align*}y_1,\dots,y_n&space;&\sim&space;\int&space;k(\cdot&space;\mid&space;\theta)P(\mathrm{d}\theta)\\P&space;&\sim&space;\Pi\end{align*}&space;" title="\begin{align*}y_1,\dots,y_n &\sim \int k(\cdot \mid \theta)P(\mathrm{d}\theta)\\P &\sim \Pi\end{align*} " />
+
+<!---
 <a href="https://www.codecogs.com/eqnedit.php?latex=y_1,&space;\ldots,&space;y_n&space;\sim&space;\int&space;k(\cdot&space;\mid&space;\theta)&space;P(d\theta)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?y_1,&space;\ldots,&space;y_n&space;\sim&space;\int&space;k(\cdot&space;\mid&space;\theta)&space;P(d\theta)" title="y_1, \ldots, y_n \sim \int k(\cdot \mid \theta) \Pi(d\theta)" /></a>
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=P&space;\sim&space;\Pi" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P&space;\sim&space;\Pi" title="\Pi \sim P" /></a>
+-->
 
-where P is either the Dirichlet process or the Pitman--Yor process
-
-- We currently support univariate and multivariate location-scale mixture of Gaussian densities
-
-- Inference is carried out using algorithms such as Algorithm 2 in [Neal (2000)](http://www.stat.columbia.edu/npbayes/papers/neal_sampling.pdf)
-
-- Serialization of the MCMC chains is possible using Google's [Protocol Buffers](https://developers.google.com/protocol-buffers) aka `protobuf`
+For descriptions of the models supported in our library, discussion of software design, and examples, please refer to the following paper: https://arxiv.org/abs/2205.08144
 
 # Installation
 
@@ -29,7 +27,7 @@ where P is either the Dirichlet process or the Pitman--Yor process
 To install and use `bayesmix`, please `cd` to the folder to which you wish to install it, and clone this repository with the following command-line instruction:
 
 ```shell
-git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
+git clone --recurse-submodules git@github.com:bayesmix-dev/bayesmix.git
 ```
 
 Then, by using `cd bayesmix`, you will enter the newly downloaded folder.
@@ -39,8 +37,8 @@ To build the executable for the main file `run_mcmc.cc`, please use the followin
 ```shell
 mkdir build
 cd build
-cmake .. -DDISABLE_DOCS=on -DDISABLE_BENCHMARKS=on -DDISABLE_TESTS=on
-make run
+cmake .. -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON -DDISABLE_TESTS=ON
+make run_mcmc
 cd ..
 ```
 
@@ -97,3 +95,4 @@ Documentation is available at https://bayesmix.readthedocs.io.
 # Contributions are welcome!
 
 Please check out [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to collaborate with us.
+You can also head to our [issues page](https://github.com/bayesmix-dev/bayesmix/issues) to check for useful enhancements needed.

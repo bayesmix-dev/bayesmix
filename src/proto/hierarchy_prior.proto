@@ -32,6 +32,16 @@ message NNIGPrior {
 }
 
 /*
+ * Prior for the parameters of the base measure in a Normal-Normal x Inverse Gamma hierarchy
+ */
+message NNxIGPrior {
+
+  oneof prior {
+    NxIGDistribution fixed_values = 1; // no prior, just fixed values
+  }
+}
+
+/*
  * Prior for the parameters of the base measure in a Laplace - Normal Inverse Gamma hierarchy
  */
 message LapNIGState {
@@ -74,7 +84,6 @@ message NNWPrior {
     NGIWPrior ngiw_prior = 3; // prior on the mean, var_scaling, and scale
   }
 }
-
 
 /*
  * Prior for the parameters of the base measure in a Normal mixture model with a covariate-dependent
