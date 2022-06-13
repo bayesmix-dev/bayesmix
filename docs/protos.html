@@ -337,6 +337,10 @@
                   <a href="#bayesmix.NNWPrior.NormalMeanPrior"><span class="badge">M</span>NNWPrior.NormalMeanPrior</a>
                 </li>
               
+                <li>
+                  <a href="#bayesmix.PythonPrior"><span class="badge">M</span>PythonPrior</a>
+                </li>
+              
               
               
               
@@ -427,6 +431,10 @@
               
                 <li>
                   <a href="#bayesmix.PYPrior"><span class="badge">M</span>PYPrior</a>
+                </li>
+              
+                <li>
+                  <a href="#bayesmix.PYTHONPrior"><span class="badge">M</span>PYTHONPrior</a>
                 </li>
               
                 <li>
@@ -865,6 +873,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>python_state</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -1234,6 +1249,18 @@
                 <td>FA</td>
                 <td>5</td>
                 <td><p>Factor Analysers</p></td>
+              </tr>
+            
+              <tr>
+                <td>Python</td>
+                <td>6</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>PythonNonConjugate</td>
+                <td>7</td>
+                <td><p></p></td>
               </tr>
             
           </tbody>
@@ -1714,6 +1741,30 @@
 
         
       
+        <h3 id="bayesmix.PythonPrior">PythonPrior</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>values</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
+                  <td></td>
+                  <td><p>values are modified from python </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
 
       
 
@@ -2023,6 +2074,12 @@
                 <td><p>Mixture of finite mixtures</p></td>
               </tr>
             
+              <tr>
+                <td>PYTHON</td>
+                <td>6</td>
+                <td><p></p></td>
+              </tr>
+            
           </tbody>
         </table>
       
@@ -2179,6 +2236,30 @@
 
         
       
+        <h3 id="bayesmix.PYTHONPrior">PYTHONPrior</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>values</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="bayesmix.TruncSBPrior">TruncSBPrior</h3>
         <p>Definition of the parameters of a truncated Stick-Breaking process</p>
 
@@ -2213,6 +2294,13 @@
                 <tr>
                   <td>mfm_prior</td>
                   <td><a href="#bayesmix.TruncSBPrior.MFMPrior">TruncSBPrior.MFMPrior</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pm_prior</td>
+                  <td><a href="#bayesmix.PYTHONPrior">PYTHONPrior</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2468,6 +2556,13 @@
                 <tr>
                   <td>mfm_state</td>
                   <td><a href="#bayesmix.MFMState">MFMState</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>general_state</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2762,6 +2857,13 @@
                 <tr>
                   <td>lin_reg_uni_ls_state</td>
                   <td><a href="#bayesmix.LinRegUniLSState">LinRegUniLSState</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>general_state</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
