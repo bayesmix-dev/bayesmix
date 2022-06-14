@@ -115,7 +115,10 @@ message EmptyPrior {
   double fake_field = 1;
 }
 
-message Python_hPrior{
+/*
+ * Definition of a generic container for the prior parameters to be used in Python
+ */
+message PythonHierPrior{
   oneof prior {
     Vector values = 1; // values are modified from python
   }

@@ -51,7 +51,10 @@ message LogSBPrior {
   uint32 num_components = 3; // Number of components in the process
 }
 
-message Python_mPrior {
+/*
+ * Definition of a generic container for the prior parameters to be used in Python
+ */
+message PythonMixPrior {
   oneof prior {
     Vector values = 1;
   }
@@ -84,7 +87,7 @@ message TruncSBPrior {
     DPPrior dp_prior = 2; // Truncated Dirichlet process
     PYPrior py_prior = 3; // Truncated Pitman-Yor process
     MFMPrior mfm_prior = 5;
-    Python_mPrior pm_prior = 6;
+    PythonMixPrior pm_prior = 6;
   }
   uint32 num_components = 4; // Number of components in the process
 }
