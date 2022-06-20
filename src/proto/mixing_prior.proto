@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "distribution.proto";
 import "mixing_state.proto";
+import "matrix.proto";
 
 package bayesmix;
 
@@ -50,6 +51,14 @@ message LogSBPrior {
   uint32 num_components = 3; // Number of components in the process
 }
 
+/*
+ * Definition of a generic container for the prior parameters to be used in Python
+ */
+message PythonMixPrior {
+  oneof prior {
+    Vector values = 1;
+  }
+}
 
 /*
  * Definition of the parameters of a truncated Stick-Breaking process
@@ -78,6 +87,7 @@ message TruncSBPrior {
     DPPrior dp_prior = 2; // Truncated Dirichlet process
     PYPrior py_prior = 3; // Truncated Pitman-Yor process
     MFMPrior mfm_prior = 5;
+    PythonMixPrior pm_prior = 6;
   }
   uint32 num_components = 4; // Number of components in the process
 }

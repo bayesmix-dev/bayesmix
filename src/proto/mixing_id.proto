@@ -12,4 +12,5 @@ enum MixingId {
     LogSB = 3; // Logit Stick-Breaking Process
     TruncSB = 4; // Truncated Stick-Breaking Process
     MFM = 5; // Mixture of finite mixtures
+    PythonMix = 6; // Generic python mixing
 }

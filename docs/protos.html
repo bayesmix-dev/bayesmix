@@ -3,8 +3,12 @@
 <html>
   <head>
     <title>Protocol Documentation</title>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic"/>
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic"
+    />
     <style>
       body {
         width: 60em;
@@ -63,57 +67,52 @@
       }
 
       td p:nth-child(1) {
-        text-indent: 0;  
+        text-indent: 0;
       }
 
-       
-      .field-table td:nth-child(1) {  
+      .field-table td:nth-child(1) {
         width: 10em;
       }
-      .field-table td:nth-child(2) {  
+      .field-table td:nth-child(2) {
         width: 10em;
       }
-      .field-table td:nth-child(3) {  
+      .field-table td:nth-child(3) {
         width: 6em;
       }
-      .field-table td:nth-child(4) {  
+      .field-table td:nth-child(4) {
         width: auto;
       }
 
-       
-      .extension-table td:nth-child(1) {  
+      .extension-table td:nth-child(1) {
         width: 10em;
       }
-      .extension-table td:nth-child(2) {  
+      .extension-table td:nth-child(2) {
         width: 10em;
       }
-      .extension-table td:nth-child(3) {  
+      .extension-table td:nth-child(3) {
         width: 10em;
       }
-      .extension-table td:nth-child(4) {  
+      .extension-table td:nth-child(4) {
         width: 5em;
       }
-      .extension-table td:nth-child(5) {  
+      .extension-table td:nth-child(5) {
         width: auto;
       }
 
-       
-      .enum-table td:nth-child(1) {  
+      .enum-table td:nth-child(1) {
         width: 10em;
       }
-      .enum-table td:nth-child(2) {  
+      .enum-table td:nth-child(2) {
         width: 10em;
       }
-      .enum-table td:nth-child(3) {  
+      .enum-table td:nth-child(3) {
         width: auto;
       }
 
-       
       .scalar-value-types-table tr {
         height: 3em;
       }
 
-       
       #toc-container ul {
         list-style-type: none;
         padding-left: 1em;
@@ -124,7 +123,6 @@
         font-weight: bold;
       }
 
-       
       .file-heading {
         width: 100%;
         display: table;
@@ -140,7 +138,6 @@
         display: table-cell;
       }
 
-       
       .badge {
         width: 1.6em;
         height: 1.6em;
@@ -160,2975 +157,3049 @@
       }
     </style>
 
-    
-    <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" />
   </head>
 
   <body>
-
     <h1 id="title">Protocol Documentation</h1>
 
     <h2>Table of Contents</h2>
 
     <div id="toc-container">
       <ul id="toc">
-        
-          
-          <li>
-            <a href="#algorithm_id.proto">algorithm_id.proto</a>
-            <ul>
-              
-              
-                <li>
-                  <a href="#bayesmix.AlgorithmId"><span class="badge">E</span>AlgorithmId</a>
-                </li>
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#algorithm_params.proto">algorithm_params.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#bayesmix.AlgorithmParams"><span class="badge">M</span>AlgorithmParams</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#algorithm_state.proto">algorithm_state.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#bayesmix.AlgorithmState"><span class="badge">M</span>AlgorithmState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.AlgorithmState.ClusterState"><span class="badge">M</span>AlgorithmState.ClusterState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.AlgorithmState.HierarchyHypers"><span class="badge">M</span>AlgorithmState.HierarchyHypers</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#distribution.proto">distribution.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#bayesmix.BetaDistribution"><span class="badge">M</span>BetaDistribution</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.GammaDistribution"><span class="badge">M</span>GammaDistribution</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.InvWishartDistribution"><span class="badge">M</span>InvWishartDistribution</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.MultiNormalDistribution"><span class="badge">M</span>MultiNormalDistribution</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.MultiNormalIGDistribution"><span class="badge">M</span>MultiNormalIGDistribution</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.NIGDistribution"><span class="badge">M</span>NIGDistribution</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.NWDistribution"><span class="badge">M</span>NWDistribution</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.NxIGDistribution"><span class="badge">M</span>NxIGDistribution</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.UniNormalDistribution"><span class="badge">M</span>UniNormalDistribution</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#hierarchy_id.proto">hierarchy_id.proto</a>
-            <ul>
-              
-              
-                <li>
-                  <a href="#bayesmix.HierarchyId"><span class="badge">E</span>HierarchyId</a>
-                </li>
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#hierarchy_prior.proto">hierarchy_prior.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#bayesmix.EmptyPrior"><span class="badge">M</span>EmptyPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.FAPrior"><span class="badge">M</span>FAPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.FAPriorDistribution"><span class="badge">M</span>FAPriorDistribution</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.LapNIGPrior"><span class="badge">M</span>LapNIGPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.LapNIGState"><span class="badge">M</span>LapNIGState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.LinRegUniPrior"><span class="badge">M</span>LinRegUniPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.NNIGPrior"><span class="badge">M</span>NNIGPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.NNIGPrior.NGGPrior"><span class="badge">M</span>NNIGPrior.NGGPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.NNIGPrior.NormalMeanPrior"><span class="badge">M</span>NNIGPrior.NormalMeanPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.NNWPrior"><span class="badge">M</span>NNWPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.NNWPrior.NGIWPrior"><span class="badge">M</span>NNWPrior.NGIWPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.NNWPrior.NormalMeanPrior"><span class="badge">M</span>NNWPrior.NormalMeanPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.NNxIGPrior"><span class="badge">M</span>NNxIGPrior</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#ls_state.proto">ls_state.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#bayesmix.FAState"><span class="badge">M</span>FAState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.LinRegUniLSState"><span class="badge">M</span>LinRegUniLSState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.MultiLSState"><span class="badge">M</span>MultiLSState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.UniLSState"><span class="badge">M</span>UniLSState</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#matrix.proto">matrix.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#bayesmix.Matrix"><span class="badge">M</span>Matrix</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.Vector"><span class="badge">M</span>Vector</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#mixing_id.proto">mixing_id.proto</a>
-            <ul>
-              
-              
-                <li>
-                  <a href="#bayesmix.MixingId"><span class="badge">E</span>MixingId</a>
-                </li>
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#mixing_prior.proto">mixing_prior.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#bayesmix.DPPrior"><span class="badge">M</span>DPPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.DPPrior.GammaPrior"><span class="badge">M</span>DPPrior.GammaPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.LogSBPrior"><span class="badge">M</span>LogSBPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.MFMPrior"><span class="badge">M</span>MFMPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.PYPrior"><span class="badge">M</span>PYPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.TruncSBPrior"><span class="badge">M</span>TruncSBPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.TruncSBPrior.BetaPriors"><span class="badge">M</span>TruncSBPrior.BetaPriors</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.TruncSBPrior.DPPrior"><span class="badge">M</span>TruncSBPrior.DPPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.TruncSBPrior.MFMPrior"><span class="badge">M</span>TruncSBPrior.MFMPrior</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.TruncSBPrior.PYPrior"><span class="badge">M</span>TruncSBPrior.PYPrior</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#mixing_state.proto">mixing_state.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#bayesmix.DPState"><span class="badge">M</span>DPState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.LogSBState"><span class="badge">M</span>LogSBState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.MFMState"><span class="badge">M</span>MFMState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.MixingState"><span class="badge">M</span>MixingState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.PYState"><span class="badge">M</span>PYState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.TruncSBState"><span class="badge">M</span>TruncSBState</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#semihdp.proto">semihdp.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#bayesmix.SemiHdpParams"><span class="badge">M</span>SemiHdpParams</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.SemiHdpParams.PseudoPriorParams"><span class="badge">M</span>SemiHdpParams.PseudoPriorParams</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.SemiHdpParams.WPriorParams"><span class="badge">M</span>SemiHdpParams.WPriorParams</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.SemiHdpState"><span class="badge">M</span>SemiHdpState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.SemiHdpState.ClusterState"><span class="badge">M</span>SemiHdpState.ClusterState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.SemiHdpState.GroupState"><span class="badge">M</span>SemiHdpState.GroupState</a>
-                </li>
-              
-                <li>
-                  <a href="#bayesmix.SemiHdpState.RestaurantState"><span class="badge">M</span>SemiHdpState.RestaurantState</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
+        <li>
+          <a href="#algorithm_id.proto">algorithm_id.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.AlgorithmId"
+                ><span class="badge">E</span>AlgorithmId</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#algorithm_params.proto">algorithm_params.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.AlgorithmParams"
+                ><span class="badge">M</span>AlgorithmParams</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#algorithm_state.proto">algorithm_state.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.AlgorithmState"
+                ><span class="badge">M</span>AlgorithmState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.AlgorithmState.ClusterState"
+                ><span class="badge">M</span>AlgorithmState.ClusterState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.AlgorithmState.HierarchyHypers"
+                ><span class="badge">M</span>AlgorithmState.HierarchyHypers</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#distribution.proto">distribution.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.BetaDistribution"
+                ><span class="badge">M</span>BetaDistribution</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.GammaDistribution"
+                ><span class="badge">M</span>GammaDistribution</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.InvWishartDistribution"
+                ><span class="badge">M</span>InvWishartDistribution</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.MultiNormalDistribution"
+                ><span class="badge">M</span>MultiNormalDistribution</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.MultiNormalIGDistribution"
+                ><span class="badge">M</span>MultiNormalIGDistribution</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.NIGDistribution"
+                ><span class="badge">M</span>NIGDistribution</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.NWDistribution"
+                ><span class="badge">M</span>NWDistribution</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.NxIGDistribution"
+                ><span class="badge">M</span>NxIGDistribution</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.UniNormalDistribution"
+                ><span class="badge">M</span>UniNormalDistribution</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#hierarchy_id.proto">hierarchy_id.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.HierarchyId"
+                ><span class="badge">E</span>HierarchyId</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#hierarchy_prior.proto">hierarchy_prior.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.EmptyPrior"
+                ><span class="badge">M</span>EmptyPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.FAPrior"
+                ><span class="badge">M</span>FAPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.FAPriorDistribution"
+                ><span class="badge">M</span>FAPriorDistribution</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.LapNIGPrior"
+                ><span class="badge">M</span>LapNIGPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.LapNIGState"
+                ><span class="badge">M</span>LapNIGState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.LinRegUniPrior"
+                ><span class="badge">M</span>LinRegUniPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.NNIGPrior"
+                ><span class="badge">M</span>NNIGPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.NNIGPrior.NGGPrior"
+                ><span class="badge">M</span>NNIGPrior.NGGPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.NNIGPrior.NormalMeanPrior"
+                ><span class="badge">M</span>NNIGPrior.NormalMeanPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.NNWPrior"
+                ><span class="badge">M</span>NNWPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.NNWPrior.NGIWPrior"
+                ><span class="badge">M</span>NNWPrior.NGIWPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.NNWPrior.NormalMeanPrior"
+                ><span class="badge">M</span>NNWPrior.NormalMeanPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.NNxIGPrior"
+                ><span class="badge">M</span>NNxIGPrior</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#ls_state.proto">ls_state.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.FAState"
+                ><span class="badge">M</span>FAState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.LinRegUniLSState"
+                ><span class="badge">M</span>LinRegUniLSState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.MultiLSState"
+                ><span class="badge">M</span>MultiLSState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.UniLSState"
+                ><span class="badge">M</span>UniLSState</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#matrix.proto">matrix.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.Matrix"><span class="badge">M</span>Matrix</a>
+            </li>
+
+            <li>
+              <a href="#bayesmix.Vector"><span class="badge">M</span>Vector</a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#mixing_id.proto">mixing_id.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.MixingId"
+                ><span class="badge">E</span>MixingId</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#mixing_prior.proto">mixing_prior.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.DPPrior"
+                ><span class="badge">M</span>DPPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.DPPrior.GammaPrior"
+                ><span class="badge">M</span>DPPrior.GammaPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.LogSBPrior"
+                ><span class="badge">M</span>LogSBPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.MFMPrior"
+                ><span class="badge">M</span>MFMPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.PYPrior"
+                ><span class="badge">M</span>PYPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.TruncSBPrior"
+                ><span class="badge">M</span>TruncSBPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.TruncSBPrior.BetaPriors"
+                ><span class="badge">M</span>TruncSBPrior.BetaPriors</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.TruncSBPrior.DPPrior"
+                ><span class="badge">M</span>TruncSBPrior.DPPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.TruncSBPrior.MFMPrior"
+                ><span class="badge">M</span>TruncSBPrior.MFMPrior</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.TruncSBPrior.PYPrior"
+                ><span class="badge">M</span>TruncSBPrior.PYPrior</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#mixing_state.proto">mixing_state.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.DPState"
+                ><span class="badge">M</span>DPState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.LogSBState"
+                ><span class="badge">M</span>LogSBState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.MFMState"
+                ><span class="badge">M</span>MFMState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.MixingState"
+                ><span class="badge">M</span>MixingState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.PYState"
+                ><span class="badge">M</span>PYState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.TruncSBState"
+                ><span class="badge">M</span>TruncSBState</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#semihdp.proto">semihdp.proto</a>
+          <ul>
+            <li>
+              <a href="#bayesmix.SemiHdpParams"
+                ><span class="badge">M</span>SemiHdpParams</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.SemiHdpParams.PseudoPriorParams"
+                ><span class="badge">M</span>SemiHdpParams.PseudoPriorParams</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.SemiHdpParams.WPriorParams"
+                ><span class="badge">M</span>SemiHdpParams.WPriorParams</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.SemiHdpState"
+                ><span class="badge">M</span>SemiHdpState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.SemiHdpState.ClusterState"
+                ><span class="badge">M</span>SemiHdpState.ClusterState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.SemiHdpState.GroupState"
+                ><span class="badge">M</span>SemiHdpState.GroupState</a
+              >
+            </li>
+
+            <li>
+              <a href="#bayesmix.SemiHdpState.RestaurantState"
+                ><span class="badge">M</span>SemiHdpState.RestaurantState</a
+              >
+            </li>
+          </ul>
+        </li>
+
         <li><a href="#scalar-value-types">Scalar Value Types</a></li>
       </ul>
     </div>
 
-    
-      
-      <div class="file-heading">
-        <h2 id="algorithm_id.proto">algorithm_id.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-
-      
-        <h3 id="bayesmix.AlgorithmId">AlgorithmId</h3>
-        <p>Enum for the different types of algorithms.</p><p>References</p><p>[1] R. M. Neal, Markov Chain Sampling Methods for  Dirichlet Process Mixture Models. JCGS(2000)</p><p>[2] H. Ishwaran and L. F. James, Gibbs Sampling Methods for Stick-Breaking Priors. JASA(2001)</p><p>[3] S. Jain and R. M. Neal,  A Split-Merge Markov Chain Monte Carlo Procedure for the Dirichlet Process Mixture Model. JCGS (2004)</p><p>[4] M. Kalli, J. Griffin and S. G. Walker, Slice sampling mixture models. Stat and Comp. (2011)</p>
-        <table class="enum-table">
-          <thead>
-            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
-          </thead>
-          <tbody>
-            
-              <tr>
-                <td>UNKNOWN_ALGORITHM</td>
-                <td>0</td>
-                <td><p></p></td>
-              </tr>
-            
-              <tr>
-                <td>Neal2</td>
-                <td>1</td>
-                <td><p>Neal&#39;s Algorithm 2, see [1]</p></td>
-              </tr>
-            
-              <tr>
-                <td>Neal3</td>
-                <td>2</td>
-                <td><p>Neal&#39;s Algorithm 3, see [1]</p></td>
-              </tr>
-            
-              <tr>
-                <td>Neal8</td>
-                <td>3</td>
-                <td><p>Neal&#39;s Algorithm 8, see [1]</p></td>
-              </tr>
-            
-              <tr>
-                <td>BlockedGibbs</td>
-                <td>4</td>
-                <td><p>Ishwaran and James Blocked Gibbs, see [2]</p></td>
-              </tr>
-            
-              <tr>
-                <td>SplitMerge</td>
-                <td>5</td>
-                <td><p>Jain and Neal&#39;s Split&amp;Merge, see [3]. NOT IMPLEMENTED YET!</p></td>
-              </tr>
-            
-              <tr>
-                <td>Slice</td>
-                <td>6</td>
-                <td><p>Slice sampling, see [4].  NOT IMPLEMENTED YET!</p></td>
-              </tr>
-            
-          </tbody>
-        </table>
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="algorithm_params.proto">algorithm_params.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="bayesmix.AlgorithmParams">AlgorithmParams</h3>
-        <p>Parameters used in the BaseAlgorithm class and childs.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>algo_id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>Id of the Algorithm. Must match the ones in the AlgorithmId enum </p></td>
-                </tr>
-              
-                <tr>
-                  <td>rng_seed</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p>Seed for the random number generator </p></td>
-                </tr>
-              
-                <tr>
-                  <td>iterations</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p>Total number of iterations of the MCMC chain </p></td>
-                </tr>
-              
-                <tr>
-                  <td>burnin</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p>Number of iterations to discard as burn-in </p></td>
-                </tr>
-              
-                <tr>
-                  <td>init_num_clusters</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p>Number of clusters to initialize the algorithm. It may be overridden by conditional mixings for which the number of components is fixed (e.g. TruncatedSBMixing). In this case, this value is ignored. </p></td>
-                </tr>
-              
-                <tr>
-                  <td>neal8_n_aux</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p>Number of auxiliary unique values for the Neal8 algorithm </p></td>
-                </tr>
-              
-                <tr>
-                  <td>splitmerge_n_restr_gs_updates</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p>Number of restricted GS scans for each MH step. </p></td>
-                </tr>
-              
-                <tr>
-                  <td>splitmerge_n_mh_updates</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p>Number of MH updates for each iteration of Split and Merge algorithm. </p></td>
-                </tr>
-              
-                <tr>
-                  <td>splitmerge_n_full_gs_updates</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p>Number of full GS scans for each iteration of Split and Merge algorithm. </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="algorithm_state.proto">algorithm_state.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="bayesmix.AlgorithmState">AlgorithmState</h3>
-        <p>This message represents the state of a Gibbs sampler for</p><p>a mixture model. All algorithms must be able to handle this</p><p>message, by filling it with the current state of the sampler</p><p>in the `get_state_as_proto` method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>cluster_states</td>
-                  <td><a href="#bayesmix.AlgorithmState.ClusterState">AlgorithmState.ClusterState</a></td>
-                  <td>repeated</td>
-                  <td><p>The state of each cluster </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cluster_allocs</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td>repeated</td>
-                  <td><p>Vector of allocations into clusters, one for each observation </p></td>
-                </tr>
-              
-                <tr>
-                  <td>mixing_state</td>
-                  <td><a href="#bayesmix.MixingState">MixingState</a></td>
-                  <td></td>
-                  <td><p>The state of the `Mixing` </p></td>
-                </tr>
-              
-                <tr>
-                  <td>iteration_num</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td></td>
-                  <td><p>The iteration number </p></td>
-                </tr>
-              
-                <tr>
-                  <td>hierarchy_hypers</td>
-                  <td><a href="#bayesmix.AlgorithmState.HierarchyHypers">AlgorithmState.HierarchyHypers</a></td>
-                  <td></td>
-                  <td><p>The current values of the hyperparameters of the hierarchy </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.AlgorithmState.ClusterState">AlgorithmState.ClusterState</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>uni_ls_state</td>
-                  <td><a href="#bayesmix.UniLSState">UniLSState</a></td>
-                  <td></td>
-                  <td><p>State of a univariate location-scale family </p></td>
-                </tr>
-              
-                <tr>
-                  <td>multi_ls_state</td>
-                  <td><a href="#bayesmix.MultiLSState">MultiLSState</a></td>
-                  <td></td>
-                  <td><p>State of a multivariate location-scale family </p></td>
-                </tr>
-              
-                <tr>
-                  <td>lin_reg_uni_ls_state</td>
-                  <td><a href="#bayesmix.LinRegUniLSState">LinRegUniLSState</a></td>
-                  <td></td>
-                  <td><p>State of a linear regression univariate location-scale family </p></td>
-                </tr>
-              
-                <tr>
-                  <td>general_state</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p>Just a vector of doubles </p></td>
-                </tr>
-              
-                <tr>
-                  <td>fa_state</td>
-                  <td><a href="#bayesmix.FAState">FAState</a></td>
-                  <td></td>
-                  <td><p>State of a Mixture of Factor Analysers </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cardinality</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td></td>
-                  <td><p>How many observations are in this cluster </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.AlgorithmState.HierarchyHypers">AlgorithmState.HierarchyHypers</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>general_state</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>nnig_state</td>
-                  <td><a href="#bayesmix.NIGDistribution">NIGDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>nnw_state</td>
-                  <td><a href="#bayesmix.NWDistribution">NWDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>lin_reg_uni_state</td>
-                  <td><a href="#bayesmix.MultiNormalIGDistribution">MultiNormalIGDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>nnxig_state</td>
-                  <td><a href="#bayesmix.NxIGDistribution">NxIGDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>fa_state</td>
-                  <td><a href="#bayesmix.FAPriorDistribution">FAPriorDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="distribution.proto">distribution.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="bayesmix.BetaDistribution">BetaDistribution</h3>
-        <p>Parameters defining a beta distribution</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>shape_a</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>shape_b</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.GammaDistribution">GammaDistribution</h3>
-        <p>Parameters defining a gamma distribution with density</p><p>f(x) = x^(shape-1) * exp(-rate * x) / Gamma(shape)</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>shape</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>rate</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.InvWishartDistribution">InvWishartDistribution</h3>
-        <p>Parameters defining an Inverse Wishart distribution</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>deg_free</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>scale</td>
-                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.MultiNormalDistribution">MultiNormalDistribution</h3>
-        <p>Parameters defining a multivariate normal distribution</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var</td>
-                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.MultiNormalIGDistribution">MultiNormalIGDistribution</h3>
-        <p>Parameters for the Normal Inverse Gamma distribution commonly employed in</p><p>linear regression models, with density</p><p>f(beta, var) = N(beta | mean, var * var_scaling^{-1}) * IG(var | shape, scale)</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var_scaling</td>
-                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>shape</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>scale</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.NIGDistribution">NIGDistribution</h3>
-        <p>Parameters of a  Normal Inverse-Gamma distribution</p><p>with density</p><p>f(x, y) = N(x | mu, y/var_scaling) * IG(y | shape, scale)</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var_scaling</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>shape</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>scale</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.NWDistribution">NWDistribution</h3>
-        <p>Parameters of a Normal Wishart distribution</p><p>with density</p><p>f(x, y) = N(x | mu, (y * var_scaling)^{-1}) * IW(y | deg_free, scale)</p><p>where x is a vector and y is a matrix (spd)</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var_scaling</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>deg_free</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>scale</td>
-                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.NxIGDistribution">NxIGDistribution</h3>
-        <p>Parameters of a  Normal x Inverse-Gamma distribution</p><p>with density</p><p>f(x, y) = N(x | mu, var) * IG(y | shape, scale)</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>shape</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>scale</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.UniNormalDistribution">UniNormalDistribution</h3>
-        <p>Parameters defining a univariate normal distribution</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="hierarchy_id.proto">hierarchy_id.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-
-      
-        <h3 id="bayesmix.HierarchyId">HierarchyId</h3>
-        <p>Enum for the different types of Hierarchy.</p>
-        <table class="enum-table">
-          <thead>
-            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
-          </thead>
-          <tbody>
-            
-              <tr>
-                <td>UNKNOWN_HIERARCHY</td>
-                <td>0</td>
-                <td><p></p></td>
-              </tr>
-            
-              <tr>
-                <td>NNIG</td>
-                <td>1</td>
-                <td><p>Normal - Normal Inverse Gamma</p></td>
-              </tr>
-            
-              <tr>
-                <td>NNW</td>
-                <td>2</td>
-                <td><p>Normal - Normal Wishart</p></td>
-              </tr>
-            
-              <tr>
-                <td>LinRegUni</td>
-                <td>3</td>
-                <td><p>Linear Regression (univariate response)</p></td>
-              </tr>
-            
-              <tr>
-                <td>LapNIG</td>
-                <td>4</td>
-                <td><p>Laplace - Normal Inverse Gamma</p></td>
-              </tr>
-            
-              <tr>
-                <td>FA</td>
-                <td>5</td>
-                <td><p>Factor Analysers</p></td>
-              </tr>
-            
-              <tr>
-                <td>NNxIG</td>
-                <td>6</td>
-                <td><p>Normal - Normal x Inverse Gamma</p></td>
-              </tr>
-            
-          </tbody>
-        </table>
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="hierarchy_prior.proto">hierarchy_prior.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="bayesmix.EmptyPrior">EmptyPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>fake_field</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.FAPrior">FAPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>fixed_values</td>
-                  <td><a href="#bayesmix.FAPriorDistribution">FAPriorDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.FAPriorDistribution">FAPriorDistribution</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mutilde</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>beta</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>phi</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>alpha0</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>q</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.LapNIGPrior">LapNIGPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>fixed_values</td>
-                  <td><a href="#bayesmix.LapNIGState">LapNIGState</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.LapNIGState">LapNIGState</h3>
-        <p>Prior for the parameters of the base measure in a Laplace - Normal Inverse Gamma hierarchy</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>shape</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>scale</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>mh_mean_var</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>mh_log_scale_var</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.LinRegUniPrior">LinRegUniPrior</h3>
-        <p>Prior for the parameters of the base measure in a Normal mixture model with a covariate-dependent</p><p>location.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>fixed_values</td>
-                  <td><a href="#bayesmix.MultiNormalIGDistribution">MultiNormalIGDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.NNIGPrior">NNIGPrior</h3>
-        <p>Prior for the parameters of the base measure in a Normal-Normal Inverse Gamma hierarchy</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>fixed_values</td>
-                  <td><a href="#bayesmix.NIGDistribution">NIGDistribution</a></td>
-                  <td></td>
-                  <td><p>no prior, just fixed values </p></td>
-                </tr>
-              
-                <tr>
-                  <td>normal_mean_prior</td>
-                  <td><a href="#bayesmix.NNIGPrior.NormalMeanPrior">NNIGPrior.NormalMeanPrior</a></td>
-                  <td></td>
-                  <td><p>prior on the mean </p></td>
-                </tr>
-              
-                <tr>
-                  <td>ngg_prior</td>
-                  <td><a href="#bayesmix.NNIGPrior.NGGPrior">NNIGPrior.NGGPrior</a></td>
-                  <td></td>
-                  <td><p>prior on the mean, var_scaling, and scale </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.NNIGPrior.NGGPrior">NNIGPrior.NGGPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean_prior</td>
-                  <td><a href="#bayesmix.UniNormalDistribution">UniNormalDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var_scaling_prior</td>
-                  <td><a href="#bayesmix.GammaDistribution">GammaDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>shape</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>scale_prior</td>
-                  <td><a href="#bayesmix.GammaDistribution">GammaDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.NNIGPrior.NormalMeanPrior">NNIGPrior.NormalMeanPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean_prior</td>
-                  <td><a href="#bayesmix.UniNormalDistribution">UniNormalDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var_scaling</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>shape</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>scale</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.NNWPrior">NNWPrior</h3>
-        <p>Prior for the parameters of the base measure in a Normal-Normal Wishart hierarchy</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>fixed_values</td>
-                  <td><a href="#bayesmix.NWDistribution">NWDistribution</a></td>
-                  <td></td>
-                  <td><p>no prior, just fixed values </p></td>
-                </tr>
-              
-                <tr>
-                  <td>normal_mean_prior</td>
-                  <td><a href="#bayesmix.NNWPrior.NormalMeanPrior">NNWPrior.NormalMeanPrior</a></td>
-                  <td></td>
-                  <td><p>prior on the mean </p></td>
-                </tr>
-              
-                <tr>
-                  <td>ngiw_prior</td>
-                  <td><a href="#bayesmix.NNWPrior.NGIWPrior">NNWPrior.NGIWPrior</a></td>
-                  <td></td>
-                  <td><p>prior on the mean, var_scaling, and scale </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.NNWPrior.NGIWPrior">NNWPrior.NGIWPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean_prior</td>
-                  <td><a href="#bayesmix.MultiNormalDistribution">MultiNormalDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var_scaling_prior</td>
-                  <td><a href="#bayesmix.GammaDistribution">GammaDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>deg_free</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>scale_prior</td>
-                  <td><a href="#bayesmix.InvWishartDistribution">InvWishartDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.NNWPrior.NormalMeanPrior">NNWPrior.NormalMeanPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean_prior</td>
-                  <td><a href="#bayesmix.MultiNormalDistribution">MultiNormalDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var_scaling</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>deg_free</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>scale</td>
-                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.NNxIGPrior">NNxIGPrior</h3>
-        <p>Prior for the parameters of the base measure in a Normal-Normal x Inverse Gamma hierarchy</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>fixed_values</td>
-                  <td><a href="#bayesmix.NxIGDistribution">NxIGDistribution</a></td>
-                  <td></td>
-                  <td><p>no prior, just fixed values </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="ls_state.proto">ls_state.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="bayesmix.FAState">FAState</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mu</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>psi</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>eta</td>
-                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>lambda</td>
-                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.LinRegUniLSState">LinRegUniLSState</h3>
-        <p>Parameters of a univariate linear regression</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>regression_coeffs</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p>regression coefficients </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p>variance of the noise </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.MultiLSState">MultiLSState</h3>
-        <p>Parameters of a multivariate location-scale family of distributions,</p><p>parameterized by mean and precision (inverse of variance). For</p><p>convenience, we also store the Cholesky factor of the precision matrix.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>prec</td>
-                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>prec_chol</td>
-                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.UniLSState">UniLSState</h3>
-        <p>Parameters of a univariate location-scale family of distributions.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>mean</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="matrix.proto">matrix.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="bayesmix.Matrix">Matrix</h3>
-        <p>Message representing a matrix of doubles.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>rows</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td></td>
-                  <td><p>number of rows </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cols</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td></td>
-                  <td><p>number of columns </p></td>
-                </tr>
-              
-                <tr>
-                  <td>data</td>
-                  <td><a href="#double">double</a></td>
-                  <td>repeated</td>
-                  <td><p>matrix elements </p></td>
-                </tr>
-              
-                <tr>
-                  <td>rowmajor</td>
-                  <td><a href="#bool">bool</a></td>
-                  <td></td>
-                  <td><p>if true, the data is read in row-major order </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.Vector">Vector</h3>
-        <p>Message representing a vector of doubles.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>size</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td></td>
-                  <td><p>number of elements in the vector </p></td>
-                </tr>
-              
-                <tr>
-                  <td>data</td>
-                  <td><a href="#double">double</a></td>
-                  <td>repeated</td>
-                  <td><p>vector elements </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="mixing_id.proto">mixing_id.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-
-      
-        <h3 id="bayesmix.MixingId">MixingId</h3>
-        <p>Enum for the different types of Mixing.</p>
-        <table class="enum-table">
-          <thead>
-            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
-          </thead>
-          <tbody>
-            
-              <tr>
-                <td>UNKNOWN_MIXING</td>
-                <td>0</td>
-                <td><p></p></td>
-              </tr>
-            
-              <tr>
-                <td>DP</td>
-                <td>1</td>
-                <td><p>Dirichlet Process</p></td>
-              </tr>
-            
-              <tr>
-                <td>PY</td>
-                <td>2</td>
-                <td><p>Pitman-Yor Process</p></td>
-              </tr>
-            
-              <tr>
-                <td>LogSB</td>
-                <td>3</td>
-                <td><p>Logit Stick-Breaking Process</p></td>
-              </tr>
-            
-              <tr>
-                <td>TruncSB</td>
-                <td>4</td>
-                <td><p>Truncated Stick-Breaking Process</p></td>
-              </tr>
-            
-              <tr>
-                <td>MFM</td>
-                <td>5</td>
-                <td><p>Mixture of finite mixtures</p></td>
-              </tr>
-            
-          </tbody>
-        </table>
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="mixing_prior.proto">mixing_prior.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="bayesmix.DPPrior">DPPrior</h3>
-        <p>Prior for the concentration parameter of a Dirichlet process</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>fixed_value</td>
-                  <td><a href="#bayesmix.DPState">DPState</a></td>
-                  <td></td>
-                  <td><p>No prior, just a fixed value </p></td>
-                </tr>
-              
-                <tr>
-                  <td>gamma_prior</td>
-                  <td><a href="#bayesmix.DPPrior.GammaPrior">DPPrior.GammaPrior</a></td>
-                  <td></td>
-                  <td><p>Gamma prior on the total mass </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.DPPrior.GammaPrior">DPPrior.GammaPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>totalmass_prior</td>
-                  <td><a href="#bayesmix.GammaDistribution">GammaDistribution</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.LogSBPrior">LogSBPrior</h3>
-        <p>Definition of the parameters of a Logit-Stick Breaking process.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>normal_prior</td>
-                  <td><a href="#bayesmix.MultiNormalDistribution">MultiNormalDistribution</a></td>
-                  <td></td>
-                  <td><p>Normal prior on the regression coefficients </p></td>
-                </tr>
-              
-                <tr>
-                  <td>step_size</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p>Steps size for the MALA algorithm used for posterior inference (TODO: move?) </p></td>
-                </tr>
-              
-                <tr>
-                  <td>num_components</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p>Number of components in the process </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.MFMPrior">MFMPrior</h3>
-        <p>Prior for the Poisson rate and Dirichlet parameters of a MFM (Finite Dirichlet) process.</p><p>For the moment, we only support fixed values</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>fixed_value</td>
-                  <td><a href="#bayesmix.MFMState">MFMState</a></td>
-                  <td></td>
-                  <td><p>No prior, just a fixed value </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.PYPrior">PYPrior</h3>
-        <p>Prior for the strength and discount parameters of a Pitman-Yor process.</p><p>For the moment, we only support fixed values</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>fixed_values</td>
-                  <td><a href="#bayesmix.PYState">PYState</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.TruncSBPrior">TruncSBPrior</h3>
-        <p>Definition of the parameters of a truncated Stick-Breaking process</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>beta_priors</td>
-                  <td><a href="#bayesmix.TruncSBPrior.BetaPriors">TruncSBPrior.BetaPriors</a></td>
-                  <td></td>
-                  <td><p>General stick-breaking distributions </p></td>
-                </tr>
-              
-                <tr>
-                  <td>dp_prior</td>
-                  <td><a href="#bayesmix.TruncSBPrior.DPPrior">TruncSBPrior.DPPrior</a></td>
-                  <td></td>
-                  <td><p>Truncated Dirichlet process </p></td>
-                </tr>
-              
-                <tr>
-                  <td>py_prior</td>
-                  <td><a href="#bayesmix.TruncSBPrior.PYPrior">TruncSBPrior.PYPrior</a></td>
-                  <td></td>
-                  <td><p>Truncated Pitman-Yor process </p></td>
-                </tr>
-              
-                <tr>
-                  <td>mfm_prior</td>
-                  <td><a href="#bayesmix.TruncSBPrior.MFMPrior">TruncSBPrior.MFMPrior</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>num_components</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p>Number of components in the process </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.TruncSBPrior.BetaPriors">TruncSBPrior.BetaPriors</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>beta_distributions</td>
-                  <td><a href="#bayesmix.BetaDistribution">BetaDistribution</a></td>
-                  <td>repeated</td>
-                  <td><p>General stick-breaking distributions </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.TruncSBPrior.DPPrior">TruncSBPrior.DPPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>totalmass</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p>Truncated Dirichlet process </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.TruncSBPrior.MFMPrior">TruncSBPrior.MFMPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>totalmass</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p>Truncated Dirichlet process </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.TruncSBPrior.PYPrior">TruncSBPrior.PYPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>strength</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p>Truncated Pitman-Yor process </p></td>
-                </tr>
-              
-                <tr>
-                  <td>discount</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="mixing_state.proto">mixing_state.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="bayesmix.DPState">DPState</h3>
-        <p>State of a Dirichlet process</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>totalmass</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p>the total mass of the DP </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.LogSBState">LogSBState</h3>
-        <p>State of a Logit-Stick Breaking process</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>regression_coeffs</td>
-                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
-                  <td></td>
-                  <td><p>Num_Components x Num_Features matrix. Each row is the regression coefficients for a component. </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.MFMState">MFMState</h3>
-        <p>State of a MFM (Finite Dirichlet) process</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>lambda</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p>rate parameter of Poisson prior on number of compunents of the MFM </p></td>
-                </tr>
-              
-                <tr>
-                  <td>gamma</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p>parameter of the dirichlet distribution for the mixing weights </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.MixingState">MixingState</h3>
-        <p>Wrapper of all possible mixing states into a single oneof</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>dp_state</td>
-                  <td><a href="#bayesmix.DPState">DPState</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>py_state</td>
-                  <td><a href="#bayesmix.PYState">PYState</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>log_sb_state</td>
-                  <td><a href="#bayesmix.LogSBState">LogSBState</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>trunc_sb_state</td>
-                  <td><a href="#bayesmix.TruncSBState">TruncSBState</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>mfm_state</td>
-                  <td><a href="#bayesmix.MFMState">MFMState</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.PYState">PYState</h3>
-        <p>State of a Pitman-Yor process</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>strength</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>discount</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.TruncSBState">TruncSBState</h3>
-        <p>State of a truncated sitck breaking process. For convenice we store also the logarithm of the weights</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>sticks</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>logweights</td>
-                  <td><a href="#bayesmix.Vector">Vector</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="semihdp.proto">semihdp.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="bayesmix.SemiHdpParams">SemiHdpParams</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>pseudo_prior</td>
-                  <td><a href="#bayesmix.SemiHdpParams.PseudoPriorParams">SemiHdpParams.PseudoPriorParams</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>dirichlet_concentration</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>rest_allocs_update</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>Either &#34;full&#34;, &#34;metro_base&#34;, &#34;metro_dist&#34; </p></td>
-                </tr>
-              
-                <tr>
-                  <td>totalmass_rest</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>totalmass_hdp</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>w_prior</td>
-                  <td><a href="#bayesmix.SemiHdpParams.WPriorParams">SemiHdpParams.WPriorParams</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.SemiHdpParams.PseudoPriorParams">SemiHdpParams.PseudoPriorParams</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>card_weight</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>mean_perturb_sd</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>var_perturb_frac</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.SemiHdpParams.WPriorParams">SemiHdpParams.WPriorParams</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>shape1</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>shape2</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.SemiHdpState">SemiHdpState</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>restaurants</td>
-                  <td><a href="#bayesmix.SemiHdpState.RestaurantState">SemiHdpState.RestaurantState</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>groups</td>
-                  <td><a href="#bayesmix.SemiHdpState.GroupState">SemiHdpState.GroupState</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>taus</td>
-                  <td><a href="#bayesmix.SemiHdpState.ClusterState">SemiHdpState.ClusterState</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>c</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>w</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.SemiHdpState.ClusterState">SemiHdpState.ClusterState</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>uni_ls_state</td>
-                  <td><a href="#bayesmix.UniLSState">UniLSState</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>multi_ls_state</td>
-                  <td><a href="#bayesmix.MultiLSState">MultiLSState</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>lin_reg_uni_ls_state</td>
-                  <td><a href="#bayesmix.LinRegUniLSState">LinRegUniLSState</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cardinality</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.SemiHdpState.GroupState">SemiHdpState.GroupState</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>cluster_allocs</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.SemiHdpState.RestaurantState">SemiHdpState.RestaurantState</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>theta_stars</td>
-                  <td><a href="#bayesmix.SemiHdpState.ClusterState">SemiHdpState.ClusterState</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>n_by_clus</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>table_to_shared</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>table_to_idio</td>
-                  <td><a href="#int32">int32</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
+    <div class="file-heading">
+      <h2 id="algorithm_id.proto">algorithm_id.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.AlgorithmId">AlgorithmId</h3>
+    <p>Enum for the different types of algorithms.</p>
+    <p>References</p>
+    <p>
+      [1] R. M. Neal, Markov Chain Sampling Methods for Dirichlet Process
+      Mixture Models. JCGS(2000)
+    </p>
+    <p>
+      [2] H. Ishwaran and L. F. James, Gibbs Sampling Methods for Stick-Breaking
+      Priors. JASA(2001)
+    </p>
+    <p>
+      [3] S. Jain and R. M. Neal, A Split-Merge Markov Chain Monte Carlo
+      Procedure for the Dirichlet Process Mixture Model. JCGS (2004)
+    </p>
+    <p>
+      [4] M. Kalli, J. Griffin and S. G. Walker, Slice sampling mixture models.
+      Stat and Comp. (2011)
+    </p>
+    <table class="enum-table">
+      <thead>
+        <tr>
+          <td>Name</td>
+          <td>Number</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>UNKNOWN_ALGORITHM</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>Neal2</td>
+          <td>1</td>
+          <td><p>Neal&#39;s Algorithm 2, see [1]</p></td>
+        </tr>
+
+        <tr>
+          <td>Neal3</td>
+          <td>2</td>
+          <td><p>Neal&#39;s Algorithm 3, see [1]</p></td>
+        </tr>
+
+        <tr>
+          <td>Neal8</td>
+          <td>3</td>
+          <td><p>Neal&#39;s Algorithm 8, see [1]</p></td>
+        </tr>
+
+        <tr>
+          <td>BlockedGibbs</td>
+          <td>4</td>
+          <td><p>Ishwaran and James Blocked Gibbs, see [2]</p></td>
+        </tr>
+
+        <tr>
+          <td>SplitMerge</td>
+          <td>5</td>
+          <td>
+            <p>
+              Jain and Neal&#39;s Split&amp;Merge, see [3]. NOT IMPLEMENTED YET!
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Slice</td>
+          <td>6</td>
+          <td><p>Slice sampling, see [4]. NOT IMPLEMENTED YET!</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="file-heading">
+      <h2 id="algorithm_params.proto">algorithm_params.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.AlgorithmParams">AlgorithmParams</h3>
+    <p>Parameters used in the BaseAlgorithm class and childs.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>algo_id</td>
+          <td><a href="#string">string</a></td>
+          <td></td>
+          <td>
+            <p>
+              Id of the Algorithm. Must match the ones in the AlgorithmId enum
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>rng_seed</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td></td>
+          <td><p>Seed for the random number generator</p></td>
+        </tr>
+
+        <tr>
+          <td>iterations</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td></td>
+          <td><p>Total number of iterations of the MCMC chain</p></td>
+        </tr>
+
+        <tr>
+          <td>burnin</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td></td>
+          <td><p>Number of iterations to discard as burn-in</p></td>
+        </tr>
+
+        <tr>
+          <td>init_num_clusters</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td></td>
+          <td>
+            <p>
+              Number of clusters to initialize the algorithm. It may be
+              overridden by conditional mixings for which the number of
+              components is fixed (e.g. TruncatedSBMixing). In this case, this
+              value is ignored.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>neal8_n_aux</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td></td>
+          <td>
+            <p>Number of auxiliary unique values for the Neal8 algorithm</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>splitmerge_n_restr_gs_updates</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td></td>
+          <td><p>Number of restricted GS scans for each MH step.</p></td>
+        </tr>
+
+        <tr>
+          <td>splitmerge_n_mh_updates</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td></td>
+          <td>
+            <p>
+              Number of MH updates for each iteration of Split and Merge
+              algorithm.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>splitmerge_n_full_gs_updates</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td></td>
+          <td>
+            <p>
+              Number of full GS scans for each iteration of Split and Merge
+              algorithm.
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="file-heading">
+      <h2 id="algorithm_state.proto">algorithm_state.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.AlgorithmState">AlgorithmState</h3>
+    <p>This message represents the state of a Gibbs sampler for</p>
+    <p>a mixture model. All algorithms must be able to handle this</p>
+    <p>message, by filling it with the current state of the sampler</p>
+    <p>in the `get_state_as_proto` method.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>cluster_states</td>
+          <td>
+            <a href="#bayesmix.AlgorithmState.ClusterState"
+              >AlgorithmState.ClusterState</a
+            >
+          </td>
+          <td>repeated</td>
+          <td><p>The state of each cluster</p></td>
+        </tr>
+
+        <tr>
+          <td>cluster_allocs</td>
+          <td><a href="#int32">int32</a></td>
+          <td>repeated</td>
+          <td>
+            <p>Vector of allocations into clusters, one for each observation</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>mixing_state</td>
+          <td><a href="#bayesmix.MixingState">MixingState</a></td>
+          <td></td>
+          <td><p>The state of the `Mixing`</p></td>
+        </tr>
+
+        <tr>
+          <td>iteration_num</td>
+          <td><a href="#int32">int32</a></td>
+          <td></td>
+          <td><p>The iteration number</p></td>
+        </tr>
+
+        <tr>
+          <td>hierarchy_hypers</td>
+          <td>
+            <a href="#bayesmix.AlgorithmState.HierarchyHypers"
+              >AlgorithmState.HierarchyHypers</a
+            >
+          </td>
+          <td></td>
+          <td>
+            <p>The current values of the hyperparameters of the hierarchy</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.AlgorithmState.ClusterState">
+      AlgorithmState.ClusterState
+    </h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>uni_ls_state</td>
+          <td><a href="#bayesmix.UniLSState">UniLSState</a></td>
+          <td></td>
+          <td><p>State of a univariate location-scale family</p></td>
+        </tr>
+
+        <tr>
+          <td>multi_ls_state</td>
+          <td><a href="#bayesmix.MultiLSState">MultiLSState</a></td>
+          <td></td>
+          <td><p>State of a multivariate location-scale family</p></td>
+        </tr>
+
+        <tr>
+          <td>lin_reg_uni_ls_state</td>
+          <td><a href="#bayesmix.LinRegUniLSState">LinRegUniLSState</a></td>
+          <td></td>
+          <td>
+            <p>State of a linear regression univariate location-scale family</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>general_state</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p>Just a vector of doubles</p></td>
+        </tr>
+
+        <tr>
+          <td>fa_state</td>
+          <td><a href="#bayesmix.FAState">FAState</a></td>
+          <td></td>
+          <td><p>State of a Mixture of Factor Analysers</p></td>
+        </tr>
+
+        <tr>
+          <td>cardinality</td>
+          <td><a href="#int32">int32</a></td>
+          <td></td>
+          <td><p>How many observations are in this cluster</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.AlgorithmState.HierarchyHypers">
+      AlgorithmState.HierarchyHypers
+    </h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>general_state</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>nnig_state</td>
+          <td><a href="#bayesmix.NIGDistribution">NIGDistribution</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>nnw_state</td>
+          <td><a href="#bayesmix.NWDistribution">NWDistribution</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>lin_reg_uni_state</td>
+          <td>
+            <a href="#bayesmix.MultiNormalIGDistribution"
+              >MultiNormalIGDistribution</a
+            >
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>nnxig_state</td>
+          <td><a href="#bayesmix.NxIGDistribution">NxIGDistribution</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>fa_state</td>
+          <td>
+            <a href="#bayesmix.FAPriorDistribution">FAPriorDistribution</a>
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="file-heading">
+      <h2 id="distribution.proto">distribution.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.BetaDistribution">BetaDistribution</h3>
+    <p>Parameters defining a beta distribution</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>shape_a</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>shape_b</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.GammaDistribution">GammaDistribution</h3>
+    <p>Parameters defining a gamma distribution with density</p>
+    <p>f(x) = x^(shape-1) * exp(-rate * x) / Gamma(shape)</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>shape</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>rate</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.InvWishartDistribution">InvWishartDistribution</h3>
+    <p>Parameters defining an Inverse Wishart distribution</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>deg_free</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>scale</td>
+          <td><a href="#bayesmix.Matrix">Matrix</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.MultiNormalDistribution">MultiNormalDistribution</h3>
+    <p>Parameters defining a multivariate normal distribution</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var</td>
+          <td><a href="#bayesmix.Matrix">Matrix</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.MultiNormalIGDistribution">MultiNormalIGDistribution</h3>
+    <p>
+      Parameters for the Normal Inverse Gamma distribution commonly employed in
+    </p>
+    <p>linear regression models, with density</p>
+    <p>
+      f(beta, var) = N(beta | mean, var * var_scaling^{-1}) * IG(var | shape,
+      scale)
+    </p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var_scaling</td>
+          <td><a href="#bayesmix.Matrix">Matrix</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>shape</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>scale</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.NIGDistribution">NIGDistribution</h3>
+    <p>Parameters of a Normal Inverse-Gamma distribution</p>
+    <p>with density</p>
+    <p>f(x, y) = N(x | mu, y/var_scaling) * IG(y | shape, scale)</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var_scaling</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>shape</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>scale</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.NWDistribution">NWDistribution</h3>
+    <p>Parameters of a Normal Wishart distribution</p>
+    <p>with density</p>
+    <p>f(x, y) = N(x | mu, (y * var_scaling)^{-1}) * IW(y | deg_free, scale)</p>
+    <p>where x is a vector and y is a matrix (spd)</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var_scaling</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>deg_free</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>scale</td>
+          <td><a href="#bayesmix.Matrix">Matrix</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.NxIGDistribution">NxIGDistribution</h3>
+    <p>Parameters of a Normal x Inverse-Gamma distribution</p>
+    <p>with density</p>
+    <p>f(x, y) = N(x | mu, var) * IG(y | shape, scale)</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>shape</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>scale</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.UniNormalDistribution">UniNormalDistribution</h3>
+    <p>Parameters defining a univariate normal distribution</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="file-heading">
+      <h2 id="hierarchy_id.proto">hierarchy_id.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.HierarchyId">HierarchyId</h3>
+    <p>Enum for the different types of Hierarchy.</p>
+    <table class="enum-table">
+      <thead>
+        <tr>
+          <td>Name</td>
+          <td>Number</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>UNKNOWN_HIERARCHY</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>NNIG</td>
+          <td>1</td>
+          <td><p>Normal - Normal Inverse Gamma</p></td>
+        </tr>
+
+        <tr>
+          <td>NNW</td>
+          <td>2</td>
+          <td><p>Normal - Normal Wishart</p></td>
+        </tr>
+
+        <tr>
+          <td>LinRegUni</td>
+          <td>3</td>
+          <td><p>Linear Regression (univariate response)</p></td>
+        </tr>
+
+        <tr>
+          <td>LapNIG</td>
+          <td>4</td>
+          <td><p>Laplace - Normal Inverse Gamma</p></td>
+        </tr>
+
+        <tr>
+          <td>FA</td>
+          <td>5</td>
+          <td><p>Factor Analysers</p></td>
+        </tr>
+
+        <tr>
+          <td>NNxIG</td>
+          <td>6</td>
+          <td><p>Normal - Normal x Inverse Gamma</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="file-heading">
+      <h2 id="hierarchy_prior.proto">hierarchy_prior.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.EmptyPrior">EmptyPrior</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fake_field</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.FAPrior">FAPrior</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fixed_values</td>
+          <td>
+            <a href="#bayesmix.FAPriorDistribution">FAPriorDistribution</a>
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.FAPriorDistribution">FAPriorDistribution</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mutilde</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>beta</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>phi</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>alpha0</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>q</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.LapNIGPrior">LapNIGPrior</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fixed_values</td>
+          <td><a href="#bayesmix.LapNIGState">LapNIGState</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.LapNIGState">LapNIGState</h3>
+    <p>
+      Prior for the parameters of the base measure in a Laplace - Normal Inverse
+      Gamma hierarchy
+    </p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>shape</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>scale</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>mh_mean_var</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>mh_log_scale_var</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.LinRegUniPrior">LinRegUniPrior</h3>
+    <p>
+      Prior for the parameters of the base measure in a Normal mixture model
+      with a covariate-dependent
+    </p>
+    <p>location.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fixed_values</td>
+          <td>
+            <a href="#bayesmix.MultiNormalIGDistribution"
+              >MultiNormalIGDistribution</a
+            >
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.NNIGPrior">NNIGPrior</h3>
+    <p>
+      Prior for the parameters of the base measure in a Normal-Normal Inverse
+      Gamma hierarchy
+    </p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fixed_values</td>
+          <td><a href="#bayesmix.NIGDistribution">NIGDistribution</a></td>
+          <td></td>
+          <td><p>no prior, just fixed values</p></td>
+        </tr>
+
+        <tr>
+          <td>normal_mean_prior</td>
+          <td>
+            <a href="#bayesmix.NNIGPrior.NormalMeanPrior"
+              >NNIGPrior.NormalMeanPrior</a
+            >
+          </td>
+          <td></td>
+          <td><p>prior on the mean</p></td>
+        </tr>
+
+        <tr>
+          <td>ngg_prior</td>
+          <td><a href="#bayesmix.NNIGPrior.NGGPrior">NNIGPrior.NGGPrior</a></td>
+          <td></td>
+          <td><p>prior on the mean, var_scaling, and scale</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.NNIGPrior.NGGPrior">NNIGPrior.NGGPrior</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean_prior</td>
+          <td>
+            <a href="#bayesmix.UniNormalDistribution">UniNormalDistribution</a>
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var_scaling_prior</td>
+          <td><a href="#bayesmix.GammaDistribution">GammaDistribution</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>shape</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>scale_prior</td>
+          <td><a href="#bayesmix.GammaDistribution">GammaDistribution</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.NNIGPrior.NormalMeanPrior">NNIGPrior.NormalMeanPrior</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean_prior</td>
+          <td>
+            <a href="#bayesmix.UniNormalDistribution">UniNormalDistribution</a>
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var_scaling</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>shape</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>scale</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.NNWPrior">NNWPrior</h3>
+    <p>
+      Prior for the parameters of the base measure in a Normal-Normal Wishart
+      hierarchy
+    </p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fixed_values</td>
+          <td><a href="#bayesmix.NWDistribution">NWDistribution</a></td>
+          <td></td>
+          <td><p>no prior, just fixed values</p></td>
+        </tr>
+
+        <tr>
+          <td>normal_mean_prior</td>
+          <td>
+            <a href="#bayesmix.NNWPrior.NormalMeanPrior"
+              >NNWPrior.NormalMeanPrior</a
+            >
+          </td>
+          <td></td>
+          <td><p>prior on the mean</p></td>
+        </tr>
+
+        <tr>
+          <td>ngiw_prior</td>
+          <td><a href="#bayesmix.NNWPrior.NGIWPrior">NNWPrior.NGIWPrior</a></td>
+          <td></td>
+          <td><p>prior on the mean, var_scaling, and scale</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.NNWPrior.NGIWPrior">NNWPrior.NGIWPrior</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean_prior</td>
+          <td>
+            <a href="#bayesmix.MultiNormalDistribution"
+              >MultiNormalDistribution</a
+            >
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var_scaling_prior</td>
+          <td><a href="#bayesmix.GammaDistribution">GammaDistribution</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>deg_free</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>scale_prior</td>
+          <td>
+            <a href="#bayesmix.InvWishartDistribution"
+              >InvWishartDistribution</a
+            >
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.NNWPrior.NormalMeanPrior">NNWPrior.NormalMeanPrior</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean_prior</td>
+          <td>
+            <a href="#bayesmix.MultiNormalDistribution"
+              >MultiNormalDistribution</a
+            >
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var_scaling</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>deg_free</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>scale</td>
+          <td><a href="#bayesmix.Matrix">Matrix</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.NNxIGPrior">NNxIGPrior</h3>
+    <p>
+      Prior for the parameters of the base measure in a Normal-Normal x Inverse
+      Gamma hierarchy
+    </p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fixed_values</td>
+          <td><a href="#bayesmix.NxIGDistribution">NxIGDistribution</a></td>
+          <td></td>
+          <td><p>no prior, just fixed values</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="file-heading">
+      <h2 id="ls_state.proto">ls_state.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.FAState">FAState</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mu</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>psi</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>eta</td>
+          <td><a href="#bayesmix.Matrix">Matrix</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>lambda</td>
+          <td><a href="#bayesmix.Matrix">Matrix</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.LinRegUniLSState">LinRegUniLSState</h3>
+    <p>Parameters of a univariate linear regression</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>regression_coeffs</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p>regression coefficients</p></td>
+        </tr>
+
+        <tr>
+          <td>var</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p>variance of the noise</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.MultiLSState">MultiLSState</h3>
+    <p>Parameters of a multivariate location-scale family of distributions,</p>
+    <p>parameterized by mean and precision (inverse of variance). For</p>
+    <p>
+      convenience, we also store the Cholesky factor of the precision matrix.
+    </p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>prec</td>
+          <td><a href="#bayesmix.Matrix">Matrix</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>prec_chol</td>
+          <td><a href="#bayesmix.Matrix">Matrix</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.UniLSState">UniLSState</h3>
+    <p>Parameters of a univariate location-scale family of distributions.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>mean</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="file-heading">
+      <h2 id="matrix.proto">matrix.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.Matrix">Matrix</h3>
+    <p>Message representing a matrix of doubles.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>rows</td>
+          <td><a href="#int32">int32</a></td>
+          <td></td>
+          <td><p>number of rows</p></td>
+        </tr>
+
+        <tr>
+          <td>cols</td>
+          <td><a href="#int32">int32</a></td>
+          <td></td>
+          <td><p>number of columns</p></td>
+        </tr>
+
+        <tr>
+          <td>data</td>
+          <td><a href="#double">double</a></td>
+          <td>repeated</td>
+          <td><p>matrix elements</p></td>
+        </tr>
+
+        <tr>
+          <td>rowmajor</td>
+          <td><a href="#bool">bool</a></td>
+          <td></td>
+          <td><p>if true, the data is read in row-major order</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.Vector">Vector</h3>
+    <p>Message representing a vector of doubles.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>size</td>
+          <td><a href="#int32">int32</a></td>
+          <td></td>
+          <td><p>number of elements in the vector</p></td>
+        </tr>
+
+        <tr>
+          <td>data</td>
+          <td><a href="#double">double</a></td>
+          <td>repeated</td>
+          <td><p>vector elements</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="file-heading">
+      <h2 id="mixing_id.proto">mixing_id.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.MixingId">MixingId</h3>
+    <p>Enum for the different types of Mixing.</p>
+    <table class="enum-table">
+      <thead>
+        <tr>
+          <td>Name</td>
+          <td>Number</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>UNKNOWN_MIXING</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>DP</td>
+          <td>1</td>
+          <td><p>Dirichlet Process</p></td>
+        </tr>
+
+        <tr>
+          <td>PY</td>
+          <td>2</td>
+          <td><p>Pitman-Yor Process</p></td>
+        </tr>
+
+        <tr>
+          <td>LogSB</td>
+          <td>3</td>
+          <td><p>Logit Stick-Breaking Process</p></td>
+        </tr>
+
+        <tr>
+          <td>TruncSB</td>
+          <td>4</td>
+          <td><p>Truncated Stick-Breaking Process</p></td>
+        </tr>
+
+        <tr>
+          <td>MFM</td>
+          <td>5</td>
+          <td><p>Mixture of finite mixtures</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="file-heading">
+      <h2 id="mixing_prior.proto">mixing_prior.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.DPPrior">DPPrior</h3>
+    <p>Prior for the concentration parameter of a Dirichlet process</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fixed_value</td>
+          <td><a href="#bayesmix.DPState">DPState</a></td>
+          <td></td>
+          <td><p>No prior, just a fixed value</p></td>
+        </tr>
+
+        <tr>
+          <td>gamma_prior</td>
+          <td><a href="#bayesmix.DPPrior.GammaPrior">DPPrior.GammaPrior</a></td>
+          <td></td>
+          <td><p>Gamma prior on the total mass</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.DPPrior.GammaPrior">DPPrior.GammaPrior</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>totalmass_prior</td>
+          <td><a href="#bayesmix.GammaDistribution">GammaDistribution</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.LogSBPrior">LogSBPrior</h3>
+    <p>Definition of the parameters of a Logit-Stick Breaking process.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>normal_prior</td>
+          <td>
+            <a href="#bayesmix.MultiNormalDistribution"
+              >MultiNormalDistribution</a
+            >
+          </td>
+          <td></td>
+          <td><p>Normal prior on the regression coefficients</p></td>
+        </tr>
+
+        <tr>
+          <td>step_size</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td>
+            <p>
+              Steps size for the MALA algorithm used for posterior inference
+              (TODO: move?)
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>num_components</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td></td>
+          <td><p>Number of components in the process</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.MFMPrior">MFMPrior</h3>
+    <p>
+      Prior for the Poisson rate and Dirichlet parameters of a MFM (Finite
+      Dirichlet) process.
+    </p>
+    <p>For the moment, we only support fixed values</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fixed_value</td>
+          <td><a href="#bayesmix.MFMState">MFMState</a></td>
+          <td></td>
+          <td><p>No prior, just a fixed value</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.PYPrior">PYPrior</h3>
+    <p>
+      Prior for the strength and discount parameters of a Pitman-Yor process.
+    </p>
+    <p>For the moment, we only support fixed values</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fixed_values</td>
+          <td><a href="#bayesmix.PYState">PYState</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.TruncSBPrior">TruncSBPrior</h3>
+    <p>Definition of the parameters of a truncated Stick-Breaking process</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>beta_priors</td>
+          <td>
+            <a href="#bayesmix.TruncSBPrior.BetaPriors"
+              >TruncSBPrior.BetaPriors</a
+            >
+          </td>
+          <td></td>
+          <td><p>General stick-breaking distributions</p></td>
+        </tr>
+
+        <tr>
+          <td>dp_prior</td>
+          <td>
+            <a href="#bayesmix.TruncSBPrior.DPPrior">TruncSBPrior.DPPrior</a>
+          </td>
+          <td></td>
+          <td><p>Truncated Dirichlet process</p></td>
+        </tr>
+
+        <tr>
+          <td>py_prior</td>
+          <td>
+            <a href="#bayesmix.TruncSBPrior.PYPrior">TruncSBPrior.PYPrior</a>
+          </td>
+          <td></td>
+          <td><p>Truncated Pitman-Yor process</p></td>
+        </tr>
+
+        <tr>
+          <td>mfm_prior</td>
+          <td>
+            <a href="#bayesmix.TruncSBPrior.MFMPrior">TruncSBPrior.MFMPrior</a>
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>num_components</td>
+          <td><a href="#uint32">uint32</a></td>
+          <td></td>
+          <td><p>Number of components in the process</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.TruncSBPrior.BetaPriors">TruncSBPrior.BetaPriors</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>beta_distributions</td>
+          <td><a href="#bayesmix.BetaDistribution">BetaDistribution</a></td>
+          <td>repeated</td>
+          <td><p>General stick-breaking distributions</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.TruncSBPrior.DPPrior">TruncSBPrior.DPPrior</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>totalmass</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p>Truncated Dirichlet process</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.TruncSBPrior.MFMPrior">TruncSBPrior.MFMPrior</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>totalmass</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p>Truncated Dirichlet process</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.TruncSBPrior.PYPrior">TruncSBPrior.PYPrior</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>strength</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p>Truncated Pitman-Yor process</p></td>
+        </tr>
+
+        <tr>
+          <td>discount</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="file-heading">
+      <h2 id="mixing_state.proto">mixing_state.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.DPState">DPState</h3>
+    <p>State of a Dirichlet process</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>totalmass</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p>the total mass of the DP</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.LogSBState">LogSBState</h3>
+    <p>State of a Logit-Stick Breaking process</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>regression_coeffs</td>
+          <td><a href="#bayesmix.Matrix">Matrix</a></td>
+          <td></td>
+          <td>
+            <p>
+              Num_Components x Num_Features matrix. Each row is the regression
+              coefficients for a component.
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.MFMState">MFMState</h3>
+    <p>State of a MFM (Finite Dirichlet) process</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>lambda</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td>
+            <p>
+              rate parameter of Poisson prior on number of compunents of the MFM
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>gamma</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td>
+            <p>
+              parameter of the dirichlet distribution for the mixing weights
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.MixingState">MixingState</h3>
+    <p>Wrapper of all possible mixing states into a single oneof</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>dp_state</td>
+          <td><a href="#bayesmix.DPState">DPState</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>py_state</td>
+          <td><a href="#bayesmix.PYState">PYState</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>log_sb_state</td>
+          <td><a href="#bayesmix.LogSBState">LogSBState</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>trunc_sb_state</td>
+          <td><a href="#bayesmix.TruncSBState">TruncSBState</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>mfm_state</td>
+          <td><a href="#bayesmix.MFMState">MFMState</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.PYState">PYState</h3>
+    <p>State of a Pitman-Yor process</p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>strength</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>discount</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.TruncSBState">TruncSBState</h3>
+    <p>
+      State of a truncated sitck breaking process. For convenice we store also
+      the logarithm of the weights
+    </p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>sticks</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>logweights</td>
+          <td><a href="#bayesmix.Vector">Vector</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="file-heading">
+      <h2 id="semihdp.proto">semihdp.proto</h2>
+      <a href="#title">Top</a>
+    </div>
+    <p></p>
+
+    <h3 id="bayesmix.SemiHdpParams">SemiHdpParams</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>pseudo_prior</td>
+          <td>
+            <a href="#bayesmix.SemiHdpParams.PseudoPriorParams"
+              >SemiHdpParams.PseudoPriorParams</a
+            >
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>dirichlet_concentration</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>rest_allocs_update</td>
+          <td><a href="#string">string</a></td>
+          <td></td>
+          <td>
+            <p>
+              Either &#34;full&#34;, &#34;metro_base&#34;, &#34;metro_dist&#34;
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>totalmass_rest</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>totalmass_hdp</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>w_prior</td>
+          <td>
+            <a href="#bayesmix.SemiHdpParams.WPriorParams"
+              >SemiHdpParams.WPriorParams</a
+            >
+          </td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.SemiHdpParams.PseudoPriorParams">
+      SemiHdpParams.PseudoPriorParams
+    </h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>card_weight</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>mean_perturb_sd</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>var_perturb_frac</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.SemiHdpParams.WPriorParams">SemiHdpParams.WPriorParams</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>shape1</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>shape2</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.SemiHdpState">SemiHdpState</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>restaurants</td>
+          <td>
+            <a href="#bayesmix.SemiHdpState.RestaurantState"
+              >SemiHdpState.RestaurantState</a
+            >
+          </td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>groups</td>
+          <td>
+            <a href="#bayesmix.SemiHdpState.GroupState"
+              >SemiHdpState.GroupState</a
+            >
+          </td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>taus</td>
+          <td>
+            <a href="#bayesmix.SemiHdpState.ClusterState"
+              >SemiHdpState.ClusterState</a
+            >
+          </td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>c</td>
+          <td><a href="#int32">int32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>w</td>
+          <td><a href="#double">double</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.SemiHdpState.ClusterState">SemiHdpState.ClusterState</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>uni_ls_state</td>
+          <td><a href="#bayesmix.UniLSState">UniLSState</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>multi_ls_state</td>
+          <td><a href="#bayesmix.MultiLSState">MultiLSState</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>lin_reg_uni_ls_state</td>
+          <td><a href="#bayesmix.LinRegUniLSState">LinRegUniLSState</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>cardinality</td>
+          <td><a href="#int32">int32</a></td>
+          <td></td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.SemiHdpState.GroupState">SemiHdpState.GroupState</h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>cluster_allocs</td>
+          <td><a href="#int32">int32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="bayesmix.SemiHdpState.RestaurantState">
+      SemiHdpState.RestaurantState
+    </h3>
+    <p></p>
+
+    <table class="field-table">
+      <thead>
+        <tr>
+          <td>Field</td>
+          <td>Type</td>
+          <td>Label</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>theta_stars</td>
+          <td>
+            <a href="#bayesmix.SemiHdpState.ClusterState"
+              >SemiHdpState.ClusterState</a
+            >
+          </td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>n_by_clus</td>
+          <td><a href="#int32">int32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>table_to_shared</td>
+          <td><a href="#int32">int32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+
+        <tr>
+          <td>table_to_idio</td>
+          <td><a href="#int32">int32</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2 id="scalar-value-types">Scalar Value Types</h2>
     <table class="scalar-value-types-table">
       <thead>
-        <tr><td>.proto Type</td><td>Notes</td><td>C++</td><td>Java</td><td>Python</td><td>Go</td><td>C#</td><td>PHP</td><td>Ruby</td></tr>
+        <tr>
+          <td>.proto Type</td>
+          <td>Notes</td>
+          <td>C++</td>
+          <td>Java</td>
+          <td>Python</td>
+          <td>Go</td>
+          <td>C#</td>
+          <td>PHP</td>
+          <td>Ruby</td>
+        </tr>
       </thead>
       <tbody>
-        
-          <tr id="double">
-            <td>double</td>
-            <td></td>
-            <td>double</td>
-            <td>double</td>
-            <td>float</td>
-            <td>float64</td>
-            <td>double</td>
-            <td>float</td>
-            <td>Float</td>
-          </tr>
-        
-          <tr id="float">
-            <td>float</td>
-            <td></td>
-            <td>float</td>
-            <td>float</td>
-            <td>float</td>
-            <td>float32</td>
-            <td>float</td>
-            <td>float</td>
-            <td>Float</td>
-          </tr>
-        
-          <tr id="int32">
-            <td>int32</td>
-            <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead.</td>
-            <td>int32</td>
-            <td>int</td>
-            <td>int</td>
-            <td>int32</td>
-            <td>int</td>
-            <td>integer</td>
-            <td>Bignum or Fixnum (as required)</td>
-          </tr>
-        
-          <tr id="int64">
-            <td>int64</td>
-            <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead.</td>
-            <td>int64</td>
-            <td>long</td>
-            <td>int/long</td>
-            <td>int64</td>
-            <td>long</td>
-            <td>integer/string</td>
-            <td>Bignum</td>
-          </tr>
-        
-          <tr id="uint32">
-            <td>uint32</td>
-            <td>Uses variable-length encoding.</td>
-            <td>uint32</td>
-            <td>int</td>
-            <td>int/long</td>
-            <td>uint32</td>
-            <td>uint</td>
-            <td>integer</td>
-            <td>Bignum or Fixnum (as required)</td>
-          </tr>
-        
-          <tr id="uint64">
-            <td>uint64</td>
-            <td>Uses variable-length encoding.</td>
-            <td>uint64</td>
-            <td>long</td>
-            <td>int/long</td>
-            <td>uint64</td>
-            <td>ulong</td>
-            <td>integer/string</td>
-            <td>Bignum or Fixnum (as required)</td>
-          </tr>
-        
-          <tr id="sint32">
-            <td>sint32</td>
-            <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s.</td>
-            <td>int32</td>
-            <td>int</td>
-            <td>int</td>
-            <td>int32</td>
-            <td>int</td>
-            <td>integer</td>
-            <td>Bignum or Fixnum (as required)</td>
-          </tr>
-        
-          <tr id="sint64">
-            <td>sint64</td>
-            <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s.</td>
-            <td>int64</td>
-            <td>long</td>
-            <td>int/long</td>
-            <td>int64</td>
-            <td>long</td>
-            <td>integer/string</td>
-            <td>Bignum</td>
-          </tr>
-        
-          <tr id="fixed32">
-            <td>fixed32</td>
-            <td>Always four bytes. More efficient than uint32 if values are often greater than 2^28.</td>
-            <td>uint32</td>
-            <td>int</td>
-            <td>int</td>
-            <td>uint32</td>
-            <td>uint</td>
-            <td>integer</td>
-            <td>Bignum or Fixnum (as required)</td>
-          </tr>
-        
-          <tr id="fixed64">
-            <td>fixed64</td>
-            <td>Always eight bytes. More efficient than uint64 if values are often greater than 2^56.</td>
-            <td>uint64</td>
-            <td>long</td>
-            <td>int/long</td>
-            <td>uint64</td>
-            <td>ulong</td>
-            <td>integer/string</td>
-            <td>Bignum</td>
-          </tr>
-        
-          <tr id="sfixed32">
-            <td>sfixed32</td>
-            <td>Always four bytes.</td>
-            <td>int32</td>
-            <td>int</td>
-            <td>int</td>
-            <td>int32</td>
-            <td>int</td>
-            <td>integer</td>
-            <td>Bignum or Fixnum (as required)</td>
-          </tr>
-        
-          <tr id="sfixed64">
-            <td>sfixed64</td>
-            <td>Always eight bytes.</td>
-            <td>int64</td>
-            <td>long</td>
-            <td>int/long</td>
-            <td>int64</td>
-            <td>long</td>
-            <td>integer/string</td>
-            <td>Bignum</td>
-          </tr>
-        
-          <tr id="bool">
-            <td>bool</td>
-            <td></td>
-            <td>bool</td>
-            <td>boolean</td>
-            <td>boolean</td>
-            <td>bool</td>
-            <td>bool</td>
-            <td>boolean</td>
-            <td>TrueClass/FalseClass</td>
-          </tr>
-        
-          <tr id="string">
-            <td>string</td>
-            <td>A string must always contain UTF-8 encoded or 7-bit ASCII text.</td>
-            <td>string</td>
-            <td>String</td>
-            <td>str/unicode</td>
-            <td>string</td>
-            <td>string</td>
-            <td>string</td>
-            <td>String (UTF-8)</td>
-          </tr>
-        
-          <tr id="bytes">
-            <td>bytes</td>
-            <td>May contain any arbitrary sequence of bytes.</td>
-            <td>string</td>
-            <td>ByteString</td>
-            <td>str</td>
-            <td>[]byte</td>
-            <td>ByteString</td>
-            <td>string</td>
-            <td>String (ASCII-8BIT)</td>
-          </tr>
-        
+        <tr id="double">
+          <td>double</td>
+          <td></td>
+          <td>double</td>
+          <td>double</td>
+          <td>float</td>
+          <td>float64</td>
+          <td>double</td>
+          <td>float</td>
+          <td>Float</td>
+        </tr>
+
+        <tr id="float">
+          <td>float</td>
+          <td></td>
+          <td>float</td>
+          <td>float</td>
+          <td>float</td>
+          <td>float32</td>
+          <td>float</td>
+          <td>float</td>
+          <td>Float</td>
+        </tr>
+
+        <tr id="int32">
+          <td>int32</td>
+          <td>
+            Uses variable-length encoding. Inefficient for encoding negative
+            numbers – if your field is likely to have negative values, use
+            sint32 instead.
+          </td>
+          <td>int32</td>
+          <td>int</td>
+          <td>int</td>
+          <td>int32</td>
+          <td>int</td>
+          <td>integer</td>
+          <td>Bignum or Fixnum (as required)</td>
+        </tr>
+
+        <tr id="int64">
+          <td>int64</td>
+          <td>
+            Uses variable-length encoding. Inefficient for encoding negative
+            numbers – if your field is likely to have negative values, use
+            sint64 instead.
+          </td>
+          <td>int64</td>
+          <td>long</td>
+          <td>int/long</td>
+          <td>int64</td>
+          <td>long</td>
+          <td>integer/string</td>
+          <td>Bignum</td>
+        </tr>
+
+        <tr id="uint32">
+          <td>uint32</td>
+          <td>Uses variable-length encoding.</td>
+          <td>uint32</td>
+          <td>int</td>
+          <td>int/long</td>
+          <td>uint32</td>
+          <td>uint</td>
+          <td>integer</td>
+          <td>Bignum or Fixnum (as required)</td>
+        </tr>
+
+        <tr id="uint64">
+          <td>uint64</td>
+          <td>Uses variable-length encoding.</td>
+          <td>uint64</td>
+          <td>long</td>
+          <td>int/long</td>
+          <td>uint64</td>
+          <td>ulong</td>
+          <td>integer/string</td>
+          <td>Bignum or Fixnum (as required)</td>
+        </tr>
+
+        <tr id="sint32">
+          <td>sint32</td>
+          <td>
+            Uses variable-length encoding. Signed int value. These more
+            efficiently encode negative numbers than regular int32s.
+          </td>
+          <td>int32</td>
+          <td>int</td>
+          <td>int</td>
+          <td>int32</td>
+          <td>int</td>
+          <td>integer</td>
+          <td>Bignum or Fixnum (as required)</td>
+        </tr>
+
+        <tr id="sint64">
+          <td>sint64</td>
+          <td>
+            Uses variable-length encoding. Signed int value. These more
+            efficiently encode negative numbers than regular int64s.
+          </td>
+          <td>int64</td>
+          <td>long</td>
+          <td>int/long</td>
+          <td>int64</td>
+          <td>long</td>
+          <td>integer/string</td>
+          <td>Bignum</td>
+        </tr>
+
+        <tr id="fixed32">
+          <td>fixed32</td>
+          <td>
+            Always four bytes. More efficient than uint32 if values are often
+            greater than 2^28.
+          </td>
+          <td>uint32</td>
+          <td>int</td>
+          <td>int</td>
+          <td>uint32</td>
+          <td>uint</td>
+          <td>integer</td>
+          <td>Bignum or Fixnum (as required)</td>
+        </tr>
+
+        <tr id="fixed64">
+          <td>fixed64</td>
+          <td>
+            Always eight bytes. More efficient than uint64 if values are often
+            greater than 2^56.
+          </td>
+          <td>uint64</td>
+          <td>long</td>
+          <td>int/long</td>
+          <td>uint64</td>
+          <td>ulong</td>
+          <td>integer/string</td>
+          <td>Bignum</td>
+        </tr>
+
+        <tr id="sfixed32">
+          <td>sfixed32</td>
+          <td>Always four bytes.</td>
+          <td>int32</td>
+          <td>int</td>
+          <td>int</td>
+          <td>int32</td>
+          <td>int</td>
+          <td>integer</td>
+          <td>Bignum or Fixnum (as required)</td>
+        </tr>
+
+        <tr id="sfixed64">
+          <td>sfixed64</td>
+          <td>Always eight bytes.</td>
+          <td>int64</td>
+          <td>long</td>
+          <td>int/long</td>
+          <td>int64</td>
+          <td>long</td>
+          <td>integer/string</td>
+          <td>Bignum</td>
+        </tr>
+
+        <tr id="bool">
+          <td>bool</td>
+          <td></td>
+          <td>bool</td>
+          <td>boolean</td>
+          <td>boolean</td>
+          <td>bool</td>
+          <td>bool</td>
+          <td>boolean</td>
+          <td>TrueClass/FalseClass</td>
+        </tr>
+
+        <tr id="string">
+          <td>string</td>
+          <td>
+            A string must always contain UTF-8 encoded or 7-bit ASCII text.
+          </td>
+          <td>string</td>
+          <td>String</td>
+          <td>str/unicode</td>
+          <td>string</td>
+          <td>string</td>
+          <td>string</td>
+          <td>String (UTF-8)</td>
+        </tr>
+
+        <tr id="bytes">
+          <td>bytes</td>
+          <td>May contain any arbitrary sequence of bytes.</td>
+          <td>string</td>
+          <td>ByteString</td>
+          <td>str</td>
+          <td>[]byte</td>
+          <td>ByteString</td>
+          <td>string</td>
+          <td>String (ASCII-8BIT)</td>
+        </tr>
       </tbody>
     </table>
   </body>
 </html>
-

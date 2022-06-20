@@ -25,7 +25,6 @@ resources/2d
 .idea/
 # Build debug folder
 cmake-build-debug/
-
 # .old folders
 src/hierarchies/updaters/.old/
 test/.old/
