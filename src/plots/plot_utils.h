@@ -3,7 +3,6 @@
 
 #include <matplot/matplot.h>
 
-#include <Eigen/Dense>
 #include <numeric>
 #include <stan/math/rev.hpp>
 
