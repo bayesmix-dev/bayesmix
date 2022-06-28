@@ -19,6 +19,6 @@ RUN cd build_ && cmake -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON -DDISABLE_PLOTS
 RUN cd build_ && make run_mcmc
 
 ENV BAYESMIX_EXE=/usr/bayesmix/build_/run_mcmc
-RUN cd python && python3 -m pip install .
+RUN cd python && python3 -m pip install -e .
 
 LABEL Name=test_bayesmix Version=0.0.1
