@@ -3,10 +3,11 @@ import shutil
 import subprocess
 import numpy as np
 
+from dotenv import get_key
 from tempfile import TemporaryDirectory
 from pathlib import Path
 
-from .shell_utils import run_shell
+from .shell_utils import get_env_file, run_shell
 
 
 def _is_file(a: str):
@@ -122,7 +123,7 @@ def run_mcmc(
         if return_best_clus is False.
     """
 
-    BAYESMIX_EXE = os.environ.get("BAYESMIX_EXE", default=None)
+    BAYESMIX_EXE = get_key(get_env_file(), "BAYESMIX_EXE")
     if BAYESMIX_EXE is None:
         raise ValueError("BAYESMIX_EXE environment variable not set")
 
