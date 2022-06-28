@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+HERE = os.path.dirname(os.path.realpath(__file__))
+
 
 def run_shell(cmd, flush_startswith=None, cwd=None):
     proc = subprocess.Popen(
@@ -22,3 +24,7 @@ def run_shell(cmd, flush_startswith=None, cwd=None):
                 print("\r{0}".format(line), end=' ', flush=True)
             else:
                 print("{0}".format(line))
+
+
+def get_env_file():
+    return os.path.join(HERE, ".env")
