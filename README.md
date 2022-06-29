@@ -25,7 +25,7 @@ For descriptions of the models supported in our library, discussion of software 
 **Prerequisites**: to build `bayesmix` you will need `git`, `pkg-config` and a recent version of `cmake`.
 On Linux machines, it is sufficient to run
 
-```
+```shell
  apt-get -y update && apt-get install -y
  apt-get -y install git
  apt-get -y install python3-pip
