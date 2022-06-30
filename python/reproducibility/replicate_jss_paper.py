@@ -15,7 +15,8 @@ os.environ["BAYESMIX_EXE"] = "../build/run_mcmc"
 
 OUTPUT_PATH = "reproducibility"
 
-ALGORITHMS = "Neal2 Neal3 Neal8 SplitMerge".split()
+#ALGORITHMS = "Neal2 Neal3 Neal8 SplitMerge".split()
+ALGORITHMS = ["Neal2"]
 
 ALGO_SETTINGS = """
         algo_id: "{}"
@@ -28,6 +29,12 @@ ALGO_SETTINGS = """
         splitmerge_n_mh_updates: 1
         splitmerge_n_full_gs_updates: 1
         """
+
+DP_PRIOR = """
+    fixed_value {
+        totalmass: 1.0
+}
+"""
 
 PY_PRIOR = """
         fixed_values {
@@ -118,6 +125,15 @@ HIGHDIM_G0 = """
 }
 """
 
+EXAMPLE_G0 = """
+fixed_values {
+    mean: 0.0
+    var_scaling: 0.1
+    shape: 2.0
+    scale: 2.0
+}
+"""
+
 def generate_highdim_data(outfile):
     rng_seed = 20201124
     dim = 4
@@ -137,10 +153,10 @@ def generate_highdim_data(outfile):
     np.savetxt(outfile, samples, delimiter=',', fmt="%.5f")
 
 
-def run_bayesmix(log_fold, dataset, name, g0_params):
+def run_bayesmix(log_fold, dataset, name, g0_params, univariate: bool):
     out_dens = defaultdict(dict)
     out_clus = defaultdict(dict)
-    g0_name = "NNIG" if name == "galaxy" else "NNW"
+    g0_name = "NNIG" if univariate else "NNW"
     for algo in ALGORITHMS:
         log_file = os.path.join(log_fold, 'bayesmix_{0}_{1}.log'.format(name, algo))
         with open(log_file, 'w') as f:
@@ -156,6 +172,7 @@ def run_bayesmix(log_fold, dataset, name, g0_params):
 
 
 if __name__ == "__main__":
+
     log_fold = os.path.join(OUTPUT_PATH, "log")
     csv_fold = os.path.join(OUTPUT_PATH, "csv")
     png_fold = os.path.join(OUTPUT_PATH, "png")
@@ -163,7 +180,148 @@ if __name__ == "__main__":
     for fold in [log_fold, csv_fold, png_fold]:
         os.makedirs(fold, exist_ok=True)
 
+    subprocess.call("cmake .. -DDISABLE_BENCHMARKS=ON".split(), cwd="../build/")
+    subprocess.call("make plot_mcmc -j4".split(), cwd="../build/")
+
     build_bayesmix(4)
+
+    ###########################
+    ## COMMAND LINE EXAMPLES ##
+    ###########################
+
+    run_cmd = """build/run_mcmc
+            --algo-params-file resources/tutorial/algo.asciipb
+            --hier-type NNIG --hier-args resources/tutorial/nnig_ngg.asciipb
+            --mix-type DP --mix-args resources/tutorial/dp_gamma.asciipb
+            --coll-name python/{0}/chains.recordio
+            --data-file resources/tutorial/data.csv
+            --grid-file resources/tutorial/grid.csv
+            --dens-file python/{1}/cmdline_density.csv
+            --n-cl-file python/{1}/cmdline_numclust.csv
+            --clus-file python/{1}/cmdline_clustering.csv
+            --best-clus-file python/{1}/cmdline_best_clustering.csv
+    """.format(log_fold, csv_fold)
+    subprocess.call(run_cmd.split(), cwd="../")
+
+    plt_cmd = """build/plot_mcmc
+        --grid-file resources/tutorial/grid.csv
+        --dens-file python/{0}/cmdline_density.csv
+        --dens-plot python/{1}/cmdline_density.png
+        --n-cl-file python/{0}/cmdline_numclust.csv
+        --n-cl-trace-plot python/{1}/cmdline_traceplot.png
+        --n-cl-bar-plot  python/{1}/cmdline_nclus_barplot.png
+    """.format(csv_fold, png_fold)
+    subprocess.call(plt_cmd.split(), cwd="../")
+
+    ###############################
+    ## PYTHON UNIVARIATE EXAMPLE ##
+    ###############################
+    data = np.concatenate([
+        np.random.normal(loc=3, scale=1, size=100),
+        np.random.normal(loc=-3, scale=1, size=100),
+    ])
+
+    dp_params = """
+    fixed_value {
+        totalmass: 1.0
+    }
+    """
+
+    g0_params = """
+    fixed_values {
+        mean: 0.0
+        var_scaling: 0.1
+        shape: 2.0
+        scale: 2.0
+    }
+    """
+
+    algo_params = """
+        algo_id: "Neal2"
+        rng_seed: 20201124
+        iterations: 2000
+        burnin: 1000
+        init_num_clusters: 3
+    """
+
+    dens_grid = np.linspace(-6, 6, 1000)
+
+    log_dens, numcluschain, cluschain, bestclus = run_mcmc(
+        "NNIG", "DP", data, g0_params, dp_params, algo_params,
+        dens_grid=dens_grid, return_clusters=True, return_num_clusters=True,
+        return_best_clus=True)
+
+    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
+    axes[0].hist(data, alpha=0.2, density=True)
+    for c in np.unique(bestclus):
+        data_in_clus = data[bestclus == c]
+        axes[0].scatter(data_in_clus, np.zeros_like(data_in_clus) + 0.01,
+                        label="Cluster {0}".format(int(c) + 1))
+    axes[0].plot(dens_grid, np.exp(np.mean(log_dens, axis=0)), color="red", lw=3)
+    axes[0].legend(fontsize=12, ncol=2, loc=1)
+    axes[0].set_ylim(0, 0.3)
+
+
+    x, y = np.unique(numcluschain, return_counts=True)
+    axes[1].bar(x, y / y.sum())
+    axes[1].set_xticks(x)
+
+    axes[2].vlines(np.arange(len(numcluschain)), numcluschain-0.3, numcluschain+0.3)
+    plt.savefig(os.path.join(png_fold, 'bayesmix_example_univariate.png'),
+                dpi=300, bbox_inches='tight')
+
+
+    ##############################
+    ## PYTHON BIVARIATE EXAMPLE ##
+    ##############################
+
+    g0_params = """
+    fixed_values {
+        mean {
+            size: 2
+            data: [3.484, 3.487]
+        }
+        var_scaling: 0.01
+        deg_free: 5
+        scale {
+            rows: 2
+            cols: 2
+            data: [1.0, 0.0, 0.0, 1.0]
+            rowmajor: false
+        }
+    }
+    """
+
+    data = np.loadtxt('../resources/datasets/faithful.csv', delimiter=',')
+    xgrid = np.linspace(0, 6, 50)
+    xgrid, ygrid = np.meshgrid(xgrid, xgrid)
+    dens_grid = np.hstack([xgrid.reshape(-1, 1), ygrid.reshape(-1, 1)])
+
+    log_dens, numcluschain, _, best_clus_dp = run_mcmc(
+        "NNW", "DP", data, g0_params, dp_params, algo_params,
+        dens_grid, return_clusters=False, return_num_clusters=True,
+        return_best_clus=True)
+
+    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
+    mean_dens_dp = np.mean(log_dens, axis=0)
+
+    axes[0].contour(xgrid, ygrid, mean_dens_dp.reshape(xgrid.shape))
+    for c in np.unique(best_clus_dp):
+        currdata = data[best_clus_dp == c, :]
+        axes[0].scatter(currdata[:, 0], currdata[:, 1])
+
+    x, y = np.unique(numcluschain, return_counts=True)
+    axes[1].bar(x, y / y.sum())
+    axes[1].set_xticks(x)
+
+    axes[2].vlines(np.arange(len(numcluschain)), numcluschain-0.3, numcluschain+0.3)
+    plt.savefig(os.path.join(png_fold, 'bayesmix_example_bivariate.png'),
+                dpi=300, bbox_inches='tight')
+
+
+    ############################
+    ## COMPARISON WITH BNPMIX ##
+    ############################
 
     highdim_data_file = os.path.join(csv_fold, "highdim_data.csv")
     generate_highdim_data(highdim_data_file)
@@ -183,8 +341,9 @@ if __name__ == "__main__":
 
     for name in datasets.keys():
         print("RUNNING BAYESMIX FOR " + name)
+        univariate = True if name == "galaxy" else False
         curr_dens, curr_clust = run_bayesmix(
-            log_fold, datasets[name], name, g0_params[name])
+            log_fold, datasets[name], name, g0_params[name], univariate)
         bayesmix_densities.update(curr_dens)
         bayesmix_num_clust.update(curr_clust)
 
