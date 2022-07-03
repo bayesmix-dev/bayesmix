@@ -28,4 +28,4 @@ jobs:
         run: docker run -w /usr/bayesmix test ./build_/test/test_bayesmix
 
       - name: run Python tests
-        run: docker run -w /usr/bayesmix/python test /bin/bash -c "python3 -m pip install -e . && cd tests && pytest ."
+        run: docker run -w /usr/bayesmix/python test /bin/bash -c "python3 -m pip install -e . && cd tests && python3 -m pytest ."
