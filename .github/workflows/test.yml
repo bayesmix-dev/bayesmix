@@ -27,5 +27,8 @@ jobs:
       - name: run C++ tests
         run: docker run -w /usr/bayesmix test ./build_/test/test_bayesmix
 
+      - name: install bayesmixpy
+        run: docker run -w /usr/bayesmix/python test python3 -m pip install -e .
+
       - name: run Python tests
         run: docker run -w /usr/bayesmix/python/tests test pytest .
