@@ -8,7 +8,7 @@ from .shell_utils import get_env_file, run_shell
 
 HERE = os.path.dirname(os.path.realpath(__file__))
 path = pathlib.Path(HERE)
-BAYESMIX_HOME = path.resolve().parents[1]
+BAYESMIX_HOME = os.environ.get("BAYESMIX_HOME", path.resolve().parents[1])
 
 
 def set_bayesmix_env(run_path):
