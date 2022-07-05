@@ -78,7 +78,7 @@ option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
 option(DISABLE_BENCHMARKS
       "If benchmarks should be compiled or no" OFF)
-option(DISABLE_DOCS
+option(ENABLE_DOCS
       "If docs should be generated or no" OFF)
 option(BUILD_RUN "" ON)
 
@@ -167,7 +167,7 @@ if (NOT DISABLE_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif()
 
-if (NOT DISABLE_DOCS)
+if (ENABLE_DOCS)
   add_subdirectory(docs)
 endif()
 

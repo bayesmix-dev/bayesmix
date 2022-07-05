@@ -22,7 +22,18 @@ For descriptions of the models supported in our library, discussion of software 
 
 ## For end users
 
-**Warning**: make sure you have a recent version of `cmake` installed (at least 3.20.x) or install `protobuf` beforehand (see the section for developers)!
+**Prerequisites**: to build `bayesmix` you will need `git`, `pkg-config` and a recent version of `cmake`.
+On Linux machines, it is sufficient to run
+
+```shell
+ apt-get -y update && apt-get install -y
+ apt-get -y install git
+ apt-get -y install python3-pip
+ python3 -m pip install cmake
+ apt-get install -yq pkg-config
+```
+
+On macOS, after install HomeBrew, replace `apt-get -y` with `brew`.
 
 To install and use `bayesmix`, please `cd` to the folder to which you wish to install it, and clone this repository with the following command-line instruction:
 
@@ -37,7 +48,7 @@ To build the executable for the main file `run_mcmc.cc`, please use the followin
 ```shell
 mkdir build
 cd build
-cmake .. -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON -DDISABLE_TESTS=ON
+cmake .. -DDISABLE_TESTS=ON -DDISABLE_BENCHMARKS=ON
 make run_mcmc
 cd ..
 ```
@@ -91,6 +102,16 @@ The corresponding executable is located at `build/test/test_bayesmix`.
 # Documentation
 
 Documentation is available at https://bayesmix.readthedocs.io.
+
+To build the documentation locally, make sure to have installed `Doxygen`, `sphinx`, and `docker`. Then
+
+```shell
+cd build
+cmake .. -DENABLE_DOCS=ON
+make document_bayesmix
+```
+
+will generete Sphinx documentation files in `build/docs/sphinx`. You can use a web browser to open the file `index.html`.
 
 # Contributions are welcome!
 
