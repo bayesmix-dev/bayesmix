@@ -15,6 +15,11 @@ methods = c('MAR', 'ICS')
 mcmc = list(niter=5000, nburn=1000, hyper=TRUE)
 rng.seed = 20201124
 
+
+####################
+## GALAXY DATASET ##
+####################
+
 # Read data
 data.folder = '../../resources/datasets/'
 galaxy = as.numeric(readLines(paste(data.folder, 'galaxy.csv', sep='')))
@@ -33,14 +38,22 @@ for(met in methods){
                                   output=output); sink()
   # Save density estimation to file
   csv.file = paste(csv.fold, '/bnpmix_galaxy_dens_', met, '.csv', sep='')
-  write.table(fit['density'], file=file(csv.file, 'wb'), row.names=FALSE,
-              col.names=FALSE, sep=',')
+  conn = file(csv.file, 'wb')
+  write.table(fit['density'], file=conn, row.names=FALSE, col.names=FALSE,
+                              sep=',')
+  close(conn)
   # Save number of clusters to file
   nclust = apply(fit$clust, 1, max)
   csv.file = paste(csv.fold, '/bnpmix_galaxy_nclu_', met, '.csv', sep='')
-  write.table(nclust, file=file(csv.file, 'wb'), row.names=FALSE,
-              col.names=FALSE, sep=',')
+  conn = file(csv.file, 'wb')
+  write.table(nclust, file=conn, row.names=FALSE, col.names=FALSE, sep=',')
+  close(conn)
 }
+
+
+######################
+## FAITHFUL DATASET ##
+######################
 
 # Read data
 data.folder = '../../resources/datasets/'
@@ -62,14 +75,22 @@ for(met in methods){
                                   output=output); sink()
   # Save density estimation to file
   csv.file = paste(csv.fold, '/bnpmix_faithful_dens_', met, '.csv', sep='')
-  write.table(fit['density'], file=file(csv.file, 'wb'), row.names=FALSE,
-              col.names=FALSE, sep=',')
+  conn = file(csv.file, 'wb')
+  write.table(fit['density'], file=conn, row.names=FALSE, col.names=FALSE,
+                              sep=',')
+  close(conn)
   # Save number of clusters to file
   nclust = apply(fit$clust, 1, max)
+  conn = file(csv.file, 'wb')
   csv.file = paste(csv.fold, '/bnpmix_faithful_nclu_', met, '.csv', sep='')
-  write.table(nclust, file=file(csv.file, 'wb'), row.names=FALSE,
-              col.names=FALSE, sep=',')
+  write.table(nclust, file=conn, row.names=FALSE, col.names=FALSE, sep=',')
+  close(conn)
 }
+
+
+#####################
+## HIGHDIM DATASET ##
+#####################
 
 # Read data
 highdim = data.matrix(read.csv('csv/highdim_data.csv', sep=',', header=FALSE))
@@ -89,11 +110,14 @@ for(met in methods){
                                   output=output); sink()
   # Save density estimation to file
   csv.file = paste(csv.fold, '/bnpmix_highdim_dens_', met, '.csv', sep='')
-  write.table(fit['density'], file=file(csv.file, 'wb'), row.names=FALSE,
-              col.names=FALSE, sep=',')
+  conn = file(csv.file, 'wb')
+  write.table(fit['density'], file=conn, row.names=FALSE, col.names=FALSE,
+                              sep=',')
+  close(conn)
   # Save number of clusters to file
   nclust = apply(fit$clust, 1, max)
   csv.file = paste(csv.fold, '/bnpmix_highdim_nclu_', met, '.csv', sep='')
-  write.table(nclust, file=file(csv.file, 'wb'), row.names=FALSE,
-              col.names=FALSE, sep=',')
+  conn = file(csv.file, 'wb')
+  write.table(nclust, file=conn, row.names=FALSE, col.names=FALSE, sep=',')
+  close(conn)
 }
