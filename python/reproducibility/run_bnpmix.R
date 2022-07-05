@@ -81,8 +81,8 @@ for(met in methods){
   close(conn)
   # Save number of clusters to file
   nclust = apply(fit$clust, 1, max)
-  conn = file(csv.file, 'wb')
   csv.file = paste(csv.fold, '/bnpmix_faithful_nclu_', met, '.csv', sep='')
+  conn = file(csv.file, 'wb')
   write.table(nclust, file=conn, row.names=FALSE, col.names=FALSE, sep=',')
   close(conn)
 }
