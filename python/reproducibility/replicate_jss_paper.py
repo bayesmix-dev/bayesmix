@@ -176,8 +176,9 @@ if __name__ == "__main__":
     log_fold = os.path.join(OUTPUT_PATH, "log")
     csv_fold = os.path.join(OUTPUT_PATH, "csv")
     png_fold = os.path.join(OUTPUT_PATH, "png")
+    build_fold = os.path.join(OUTPUT_PATH, os.pardir, os.pardir, "build")
 
-    for fold in [log_fold, csv_fold, png_fold]:
+    for fold in (log_fold, csv_fold, png_fold, build_fold):
         os.makedirs(fold, exist_ok=True)
 
     subprocess.call("cmake .. -DDISABLE_BENCHMARKS=ON".split(), cwd="../build/")

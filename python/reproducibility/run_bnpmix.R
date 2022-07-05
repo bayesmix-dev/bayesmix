@@ -72,7 +72,7 @@ for(met in methods){
 }
 
 # Read data
-highdim = data.matrix(read.csv('csv/highdim.csv', sep=',', header=FALSE))
+highdim = data.matrix(read.csv('csv/highdim_data.csv', sep=',', header=FALSE))
 
 # Set prior
 PYprior = list(strength=1.0, discount=0.1, model='LS', m1=c(0,0,0,0),
