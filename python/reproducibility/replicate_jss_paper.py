@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 
 import arviz as az
@@ -178,11 +179,13 @@ if __name__ == "__main__":
     png_fold = os.path.join(OUTPUT_PATH, "png")
     build_fold = os.path.join(OUTPUT_PATH, os.pardir, os.pardir, "build")
 
+    shutil.rmtree(build_fold, ignore_errors=True)
+
     for fold in (log_fold, csv_fold, png_fold, build_fold):
         os.makedirs(fold, exist_ok=True)
 
-    subprocess.call("cmake .. -DDISABLE_BENCHMARKS=ON".split(), cwd="../build/")
-    subprocess.call("make plot_mcmc -j4".split(), cwd="../build/")
+    subprocess.call("cmake .. -DDISABLE_BENCHMARKS=ON".split(), cwd=build_fold)
+    subprocess.call("make plot_mcmc -j4".split(), cwd=build_fold)
 
     build_bayesmix(4)
 

@@ -172,6 +172,10 @@ if (ENABLE_DOCS)
 endif()
 
 if (NOT DISABLE_PLOTS)
+if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
+  message(FATAL_ERROR
+          "Your cmake version is too old: version >= 3.20.0 is required for plotting.")
+  endif()
   include(FetchContent)
 
   set(FETCHCONTENT_QUIET OFF)
