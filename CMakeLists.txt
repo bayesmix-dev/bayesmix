@@ -9,7 +9,6 @@ endif()
 
 project(bayesmix)
 
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release)
 
@@ -20,6 +19,15 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 # Require PkgConfig
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
+
+# Clone bayesmix-dev/math into lib/math
+include(cmake/GitUtils.cmake)
+git_clone(
+	PROJECT_NAME	math
+	GIT_URL			https://github.com/bayesmix-dev/math.git
+	GIT_BRANCH      develop
+	DIRECTORY		${CMAKE_CURRENT_LIST_DIR}/lib
+)
 
 # TBB CMake integration
 message(STATUS "Using math TBB")

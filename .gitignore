@@ -25,6 +25,8 @@ resources/2d
 .idea/
 # Build debug folder
 cmake-build-debug/
+# lib/math/ folder 
+lib/math/
 # .old folders
 src/hierarchies/updaters/.old/
 test/.old/
