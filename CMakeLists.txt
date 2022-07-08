@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize -Wno-deprecated")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize -fopenmp -Wno-deprecated")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 # Require PkgConfig
