@@ -188,8 +188,8 @@ class BaseHierarchy : public AbstractHierarchy {
   double conditional_pred_lpdf(const Eigen::RowVectorXd &datum,
                                const Eigen::RowVectorXd &covariate =
                                    Eigen::RowVectorXd(0)) const override {
-    return get_marg_lpdf(updater->compute_posterior_hypers(*like, *prior),
-                         datum, covariate);
+    return get_marg_lpdf(updater->get_posterior_hypers(*like, *prior), datum,
+                         covariate);
   }
 
   //! Evaluates the log-prior predictive distr. of data in a grid of points

@@ -38,12 +38,9 @@ class SemiConjugateUpdater : public AbstractUpdater {
 
   //! Used by algorithms such as Neal3 and SplitMerge
   //! It stores the hyperparameters computed by `compute_posterior_hypers`
-  void save_posterior_hypers(ProtoHypersPtr post_hypers_) override;
-
  protected:
   Likelihood& downcast_likelihood(AbstractLikelihood& like_);
   PriorModel& downcast_prior(AbstractPriorModel& prior_);
-  ProtoHypersPtr post_hypers = std::make_shared<ProtoHypers>();
 };
 
 // Methods' definitions
@@ -74,13 +71,6 @@ void SemiConjugateUpdater<Likelihood, PriorModel>::draw(
     likecast.set_state(priorcast.sample(post_params), !set_card);
     if (update_params) save_posterior_hypers(post_params);
   }
-}
-
-template <class Likelihood, class PriorModel>
-void SemiConjugateUpdater<Likelihood, PriorModel>::save_posterior_hypers(
-    ProtoHypersPtr post_hypers_) {
-  post_hypers = post_hypers_;
-  return;
 }
 
 #endif  // BAYESMIX_HIERARCHIES_UPDATERS_SEMI_CONJUGATE_UPDATER_H_
