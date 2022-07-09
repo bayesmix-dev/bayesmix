@@ -65,18 +65,8 @@ class AbstractUpdater {
           "non-(semi)conjugate updater");
     } else {
       if (!saved_posterior_hypers) {
-        std::cout << "computing posterior hypers" << std::endl;
         posterior_hypers = compute_posterior_hypers(like, prior);
       }
-      // std::cout << "saved posterior hypers " << std::endl;
-      // posterior_hypers->PrintDebugString();
-
-      // std::cout << "computed posterior hypers " << std::endl;
-      // posterior_hypers = compute_posterior_hypers(like, prior);
-      // posterior_hypers->PrintDebugString();
-
-      // std::cout << std::endl << std::endl;
-
       return posterior_hypers;
     }
   }
