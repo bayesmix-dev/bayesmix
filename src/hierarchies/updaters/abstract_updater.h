@@ -52,6 +52,7 @@ class AbstractUpdater {
           "Cannot call save_posterior_hypers() from a "
           "non-(semi)conjugate updater");
     } else {
+      saved_posterior_hypers = true;
       posterior_hypers = post_hypers_;
     }
   }
@@ -63,13 +64,29 @@ class AbstractUpdater {
           "Cannot call get_posterior_hypers() from a "
           "non-(semi)conjugate updater");
     } else {
-      if (posterior_hypers == nullptr) {
+      if (!saved_posterior_hypers) {
+        std::cout << "computing posterior hypers" << std::endl;
         posterior_hypers = compute_posterior_hypers(like, prior);
       }
+      // std::cout << "saved posterior hypers " << std::endl;
+      // posterior_hypers->PrintDebugString();
+
+      // std::cout << "computed posterior hypers " << std::endl;
+      // posterior_hypers = compute_posterior_hypers(like, prior);
+      // posterior_hypers->PrintDebugString();
+
+      // std::cout << std::endl << std::endl;
 
       return posterior_hypers;
     }
   }
+
+  void clear_hypers() {
+    saved_posterior_hypers = false;
+    posterior_hypers = nullptr;
+  }
+
+  virtual std::shared_ptr<AbstractUpdater> clone() const = 0;
 
  protected:
   bool saved_posterior_hypers = false;

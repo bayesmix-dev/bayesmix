@@ -81,10 +81,10 @@ class MalaUpdater : public MetropolisUpdater<MalaUpdater> {
     return out;
   }
 
-  //! Returns a shared_ptr to a new instance of `this`
-  std::shared_ptr<MalaUpdater> clone() const {
+  std::shared_ptr<AbstractUpdater> clone() const override {
     auto out =
         std::make_shared<MalaUpdater>(static_cast<MalaUpdater const &>(*this));
+    out->clear_hypers();
     return out;
   }
 };

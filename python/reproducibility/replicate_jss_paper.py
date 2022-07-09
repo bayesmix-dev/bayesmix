@@ -17,7 +17,7 @@ os.environ["BAYESMIX_EXE"] = "../build/run_mcmc"
 OUTPUT_PATH = "reproducibility"
 
 ALGORITHMS = "Neal2 Neal3 Neal8 SplitMerge".split()
-# ALGORITHMS = ["Neal2"]
+ALGORITHMS = ["Neal3"]
 
 ALGO_SETTINGS = """
         algo_id: "{}"
@@ -159,13 +159,13 @@ def run_bayesmix(log_fold, dataset, name, g0_params, univariate: bool):
     out_clus = defaultdict(dict)
     g0_name = "NNIG" if univariate else "NNW"
     for algo in ALGORITHMS:
-        log_file = os.path.join(log_fold, 'bayesmix_{0}_{1}.log'.format(name, algo))
-        with open(log_file, 'w') as f:
-            with redirect_stdout(f):
-                out = run_mcmc(g0_name, "PY", dataset, g0_params, PY_PRIOR,
-                            ALGO_SETTINGS.format(algo), dataset,
-                            return_num_clusters=True,  # out [1]
-                            return_clusters=False, return_best_clus=False)
+        # log_file = os.path.join(log_fold, 'bayesmix_{0}_{1}.log'.format(name, algo))
+        # with open(log_file, 'w') as f:
+        #     with redirect_stdout(f):
+        out = run_mcmc(g0_name, "PY", dataset, g0_params, PY_PRIOR,
+                    ALGO_SETTINGS.format(algo), dataset,
+                    return_num_clusters=True,  # out [1]
+                    return_clusters=False, return_best_clus=False)
         out_dens[name][algo] = out[0]
         out_clus[name][algo] = out[1]
     return out_dens, out_clus
@@ -184,8 +184,8 @@ if __name__ == "__main__":
     for fold in (log_fold, csv_fold, png_fold, build_fold):
         os.makedirs(fold, exist_ok=True)
 
-    subprocess.call("cmake .. -DDISABLE_BENCHMARKS=ON".split(), cwd=build_fold)
-    subprocess.call("make plot_mcmc -j4".split(), cwd=build_fold)
+    # subprocess.call("cmake .. -DDISABLE_BENCHMARKS=ON".split(), cwd=build_fold)
+    # subprocess.call("make plot_mcmc -j4".split(), cwd=build_fold)
 
     build_bayesmix(4)
 
@@ -193,134 +193,134 @@ if __name__ == "__main__":
     ## COMMAND LINE EXAMPLES ##
     ###########################
 
-    run_cmd = """build/run_mcmc
-            --algo-params-file resources/tutorial/algo.asciipb
-            --hier-type NNIG --hier-args resources/tutorial/nnig_ngg.asciipb
-            --mix-type DP --mix-args resources/tutorial/dp_gamma.asciipb
-            --coll-name python/{0}/chains.recordio
-            --data-file resources/tutorial/data.csv
-            --grid-file resources/tutorial/grid.csv
-            --dens-file python/{1}/cmdline_density.csv
-            --n-cl-file python/{1}/cmdline_numclust.csv
-            --clus-file python/{1}/cmdline_clustering.csv
-            --best-clus-file python/{1}/cmdline_best_clustering.csv
-    """.format(log_fold, csv_fold)
-    subprocess.call(run_cmd.split(), cwd="../")
+    # run_cmd = """build/run_mcmc
+    #         --algo-params-file resources/tutorial/algo.asciipb
+    #         --hier-type NNIG --hier-args resources/tutorial/nnig_ngg.asciipb
+    #         --mix-type DP --mix-args resources/tutorial/dp_gamma.asciipb
+    #         --coll-name python/{0}/chains.recordio
+    #         --data-file resources/tutorial/data.csv
+    #         --grid-file resources/tutorial/grid.csv
+    #         --dens-file python/{1}/cmdline_density.csv
+    #         --n-cl-file python/{1}/cmdline_numclust.csv
+    #         --clus-file python/{1}/cmdline_clustering.csv
+    #         --best-clus-file python/{1}/cmdline_best_clustering.csv
+    # """.format(log_fold, csv_fold)
+    # subprocess.call(run_cmd.split(), cwd="../")
 
-    plt_cmd = """build/plot_mcmc
-        --grid-file resources/tutorial/grid.csv
-        --dens-file python/{0}/cmdline_density.csv
-        --dens-plot python/{1}/cmdline_density.png
-        --n-cl-file python/{0}/cmdline_numclust.csv
-        --n-cl-trace-plot python/{1}/cmdline_traceplot.png
-        --n-cl-bar-plot  python/{1}/cmdline_nclus_barplot.png
-    """.format(csv_fold, png_fold)
-    subprocess.call(plt_cmd.split(), cwd="../")
+    # plt_cmd = """build/plot_mcmc
+    #     --grid-file resources/tutorial/grid.csv
+    #     --dens-file python/{0}/cmdline_density.csv
+    #     --dens-plot python/{1}/cmdline_density.png
+    #     --n-cl-file python/{0}/cmdline_numclust.csv
+    #     --n-cl-trace-plot python/{1}/cmdline_traceplot.png
+    #     --n-cl-bar-plot  python/{1}/cmdline_nclus_barplot.png
+    # """.format(csv_fold, png_fold)
+    # subprocess.call(plt_cmd.split(), cwd="../")
 
-    ###############################
-    ## PYTHON UNIVARIATE EXAMPLE ##
-    ###############################
-    data = np.concatenate([
-        np.random.normal(loc=3, scale=1, size=100),
-        np.random.normal(loc=-3, scale=1, size=100),
-    ])
+    # ###############################
+    # ## PYTHON UNIVARIATE EXAMPLE ##
+    # ###############################
+    # data = np.concatenate([
+    #     np.random.normal(loc=3, scale=1, size=100),
+    #     np.random.normal(loc=-3, scale=1, size=100),
+    # ])
 
-    dp_params = """
-    fixed_value {
-        totalmass: 1.0
-    }
-    """
+    # dp_params = """
+    # fixed_value {
+    #     totalmass: 1.0
+    # }
+    # """
 
-    g0_params = """
-    fixed_values {
-        mean: 0.0
-        var_scaling: 0.1
-        shape: 2.0
-        scale: 2.0
-    }
-    """
+    # g0_params = """
+    # fixed_values {
+    #     mean: 0.0
+    #     var_scaling: 0.1
+    #     shape: 2.0
+    #     scale: 2.0
+    # }
+    # """
 
-    algo_params = """
-        algo_id: "Neal2"
-        rng_seed: 20201124
-        iterations: 2000
-        burnin: 1000
-        init_num_clusters: 3
-    """
+    # algo_params = """
+    #     algo_id: "Neal2"
+    #     rng_seed: 20201124
+    #     iterations: 2000
+    #     burnin: 1000
+    #     init_num_clusters: 3
+    # """
 
-    dens_grid = np.linspace(-6, 6, 1000)
+    # dens_grid = np.linspace(-6, 6, 1000)
 
-    log_dens, numcluschain, cluschain, bestclus = run_mcmc(
-        "NNIG", "DP", data, g0_params, dp_params, algo_params,
-        dens_grid=dens_grid, return_clusters=True, return_num_clusters=True,
-        return_best_clus=True)
+    # log_dens, numcluschain, cluschain, bestclus = run_mcmc(
+    #     "NNIG", "DP", data, g0_params, dp_params, algo_params,
+    #     dens_grid=dens_grid, return_clusters=True, return_num_clusters=True,
+    #     return_best_clus=True)
 
-    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
-    axes[0].hist(data, alpha=0.2, density=True)
-    for c in np.unique(bestclus):
-        data_in_clus = data[bestclus == c]
-        axes[0].scatter(data_in_clus, np.zeros_like(data_in_clus) + 0.01,
-                        label="Cluster {0}".format(int(c) + 1))
-    axes[0].plot(dens_grid, np.exp(np.mean(log_dens, axis=0)), color="red", lw=3)
-    axes[0].legend(fontsize=12, ncol=2, loc=1)
-    axes[0].set_ylim(0, 0.3)
-
-
-    x, y = np.unique(numcluschain, return_counts=True)
-    axes[1].bar(x, y / y.sum())
-    axes[1].set_xticks(x)
-
-    axes[2].vlines(np.arange(len(numcluschain)), numcluschain-0.3, numcluschain+0.3)
-    plt.savefig(os.path.join(png_fold, 'bayesmix_example_univariate.png'),
-                dpi=300, bbox_inches='tight')
+    # fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
+    # axes[0].hist(data, alpha=0.2, density=True)
+    # for c in np.unique(bestclus):
+    #     data_in_clus = data[bestclus == c]
+    #     axes[0].scatter(data_in_clus, np.zeros_like(data_in_clus) + 0.01,
+    #                     label="Cluster {0}".format(int(c) + 1))
+    # axes[0].plot(dens_grid, np.exp(np.mean(log_dens, axis=0)), color="red", lw=3)
+    # axes[0].legend(fontsize=12, ncol=2, loc=1)
+    # axes[0].set_ylim(0, 0.3)
 
 
-    ##############################
-    ## PYTHON BIVARIATE EXAMPLE ##
-    ##############################
+    # x, y = np.unique(numcluschain, return_counts=True)
+    # axes[1].bar(x, y / y.sum())
+    # axes[1].set_xticks(x)
 
-    g0_params = """
-    fixed_values {
-        mean {
-            size: 2
-            data: [3.484, 3.487]
-        }
-        var_scaling: 0.01
-        deg_free: 5
-        scale {
-            rows: 2
-            cols: 2
-            data: [1.0, 0.0, 0.0, 1.0]
-            rowmajor: false
-        }
-    }
-    """
+    # axes[2].vlines(np.arange(len(numcluschain)), numcluschain-0.3, numcluschain+0.3)
+    # plt.savefig(os.path.join(png_fold, 'bayesmix_example_univariate.png'),
+    #             dpi=300, bbox_inches='tight')
 
-    data = np.loadtxt('../resources/datasets/faithful.csv', delimiter=',')
-    xgrid = np.linspace(0, 6, 50)
-    xgrid, ygrid = np.meshgrid(xgrid, xgrid)
-    dens_grid = np.hstack([xgrid.reshape(-1, 1), ygrid.reshape(-1, 1)])
 
-    log_dens, numcluschain, _, best_clus_dp = run_mcmc(
-        "NNW", "DP", data, g0_params, dp_params, algo_params,
-        dens_grid, return_clusters=False, return_num_clusters=True,
-        return_best_clus=True)
+    # ##############################
+    # ## PYTHON BIVARIATE EXAMPLE ##
+    # ##############################
 
-    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
-    mean_dens_dp = np.mean(log_dens, axis=0)
+    # g0_params = """
+    # fixed_values {
+    #     mean {
+    #         size: 2
+    #         data: [3.484, 3.487]
+    #     }
+    #     var_scaling: 0.01
+    #     deg_free: 5
+    #     scale {
+    #         rows: 2
+    #         cols: 2
+    #         data: [1.0, 0.0, 0.0, 1.0]
+    #         rowmajor: false
+    #     }
+    # }
+    # """
 
-    axes[0].contour(xgrid, ygrid, mean_dens_dp.reshape(xgrid.shape))
-    for c in np.unique(best_clus_dp):
-        currdata = data[best_clus_dp == c, :]
-        axes[0].scatter(currdata[:, 0], currdata[:, 1])
+    # data = np.loadtxt('../resources/datasets/faithful.csv', delimiter=',')
+    # xgrid = np.linspace(0, 6, 50)
+    # xgrid, ygrid = np.meshgrid(xgrid, xgrid)
+    # dens_grid = np.hstack([xgrid.reshape(-1, 1), ygrid.reshape(-1, 1)])
 
-    x, y = np.unique(numcluschain, return_counts=True)
-    axes[1].bar(x, y / y.sum())
-    axes[1].set_xticks(x)
+    # log_dens, numcluschain, _, best_clus_dp = run_mcmc(
+    #     "NNW", "DP", data, g0_params, dp_params, algo_params,
+    #     dens_grid, return_clusters=False, return_num_clusters=True,
+    #     return_best_clus=True)
 
-    axes[2].vlines(np.arange(len(numcluschain)), numcluschain-0.3, numcluschain+0.3)
-    plt.savefig(os.path.join(png_fold, 'bayesmix_example_bivariate.png'),
-                dpi=300, bbox_inches='tight')
+    # fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
+    # mean_dens_dp = np.mean(log_dens, axis=0)
+
+    # axes[0].contour(xgrid, ygrid, mean_dens_dp.reshape(xgrid.shape))
+    # for c in np.unique(best_clus_dp):
+    #     currdata = data[best_clus_dp == c, :]
+    #     axes[0].scatter(currdata[:, 0], currdata[:, 1])
+
+    # x, y = np.unique(numcluschain, return_counts=True)
+    # axes[1].bar(x, y / y.sum())
+    # axes[1].set_xticks(x)
+
+    # axes[2].vlines(np.arange(len(numcluschain)), numcluschain-0.3, numcluschain+0.3)
+    # plt.savefig(os.path.join(png_fold, 'bayesmix_example_bivariate.png'),
+    #             dpi=300, bbox_inches='tight')
 
 
     ############################
@@ -333,12 +333,12 @@ if __name__ == "__main__":
     datasets = {}
     datasets["galaxy"] = np.loadtxt('../resources/datasets/galaxy.csv', delimiter=',')
     datasets["faithful"] = np.loadtxt('../resources/datasets/faithful.csv', delimiter=',')
-    datasets["highdim"] = np.loadtxt(highdim_data_file, delimiter=",")
+    # datasets["highdim"] = np.loadtxt(highdim_data_file, delimiter=",")
 
     g0_params = {}
     g0_params["galaxy"] = GALAXY_GO
     g0_params["faithful"] = FAITHFUL_G0
-    g0_params["highdim"] = HIGHDIM_G0
+    # g0_params["highdim"] = HIGHDIM_G0
 
     bayesmix_densities = {}
     bayesmix_num_clust = {}
@@ -353,10 +353,12 @@ if __name__ == "__main__":
 
     ## RUN BNPMIX VIA SUBPROCESS
     bnpmix_algos = ('MAR', 'ICS')
-    subprocess.call("Rscript run_bnpmix.R".split(), cwd="reproducibility")
+    # subprocess.call("Rscript run_bnpmix.R".split(), cwd="reproducibility")
 
     # COMPUTE ESS and TIMES
-    datasets = ["galaxy", "faithful", "highdim"]
+    # datasets = ["galaxy", "faithful", "highdim"]
+    datasets = ["galaxy", "faithful"]
+
     ESS = pd.DataFrame(columns=datasets)
     times = pd.DataFrame(columns=datasets)
     for data in datasets:

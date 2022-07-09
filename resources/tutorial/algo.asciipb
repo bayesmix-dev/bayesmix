@@ -1,15 +1,15 @@
 ##### GENERIC SETTINGS FOR ALL ALGORITHMS #####
 # Algorithm ID string, e.g. "Neal2"
-algo_id: "Neal3"
+algo_id: "SplitMerge"
 
 # RNG initial seed: any nonnegative integer
 rng_seed: 20201124
 
 # Number of iterations of the algorithm
-iterations: 1100
+iterations: 6000
 
 # Number of initial iterations discarded by the algorithm
-burnin: 100
+burnin: 1000
 
 # Number of clusters in which data will be first initialized
 # (NOTE: If you wish to initialize one datum per cluster, please write 0.)
@@ -25,3 +25,7 @@ init_num_clusters: 3
 # (NOTE: 3 is the recommended value in most cases, please change it only if you
 #  know what you're doing.)
 neal8_n_aux: 3
+
+splitmerge_n_restr_gs_updates: 5
+splitmerge_n_mh_updates: 1
+splitmerge_n_full_gs_updates: 1

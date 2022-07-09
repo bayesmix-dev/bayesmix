@@ -68,9 +68,10 @@ class RandomWalkUpdater : public MetropolisUpdater<RandomWalkUpdater> {
   }
 
   //! Returns a shared_ptr to a new instance of `this`
-  std::shared_ptr<RandomWalkUpdater> clone() const {
+  std::shared_ptr<AbstractUpdater> clone() const override {
     auto out = std::make_shared<RandomWalkUpdater>(
         static_cast<RandomWalkUpdater const &>(*this));
+    out->clear_hypers();
     return out;
   }
 };

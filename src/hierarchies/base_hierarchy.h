@@ -98,6 +98,7 @@ class BaseHierarchy : public AbstractHierarchy {
     // Cloning each component class
     out->set_likelihood(std::static_pointer_cast<Likelihood>(like->clone()));
     out->set_prior(std::static_pointer_cast<PriorModel>(prior->clone()));
+    out->set_updater(updater->clone());
     return out;
   };
 
@@ -109,6 +110,7 @@ class BaseHierarchy : public AbstractHierarchy {
     out->set_likelihood(std::static_pointer_cast<Likelihood>(like->clone()));
     // Deep clone required for PriorModel
     out->set_prior(std::static_pointer_cast<PriorModel>(prior->deep_clone()));
+    out->set_updater(updater->clone());
     return out;
   }
 
@@ -295,6 +297,9 @@ class BaseHierarchy : public AbstractHierarchy {
       const bool update_params = false,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
     like->add_datum(id, datum, covariate);
+    if (!update_params) {
+      std::cout << "adding datum without updating params" << std::endl;
+    }
     if (update_params) {
       updater->save_posterior_hypers(
           updater->compute_posterior_hypers(*like, *prior));
