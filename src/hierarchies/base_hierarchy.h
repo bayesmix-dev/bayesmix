@@ -297,9 +297,6 @@ class BaseHierarchy : public AbstractHierarchy {
       const bool update_params = false,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
     like->add_datum(id, datum, covariate);
-    if (!update_params) {
-      std::cout << "adding datum without updating params" << std::endl;
-    }
     if (update_params) {
       updater->save_posterior_hypers(
           updater->compute_posterior_hypers(*like, *prior));

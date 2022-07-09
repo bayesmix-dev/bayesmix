@@ -6,10 +6,10 @@ algo_id: "SplitMerge"
 rng_seed: 20201124
 
 # Number of iterations of the algorithm
-iterations: 6000
+iterations: 1000
 
 # Number of initial iterations discarded by the algorithm
-burnin: 1000
+burnin: 100
 
 # Number of clusters in which data will be first initialized
 # (NOTE: If you wish to initialize one datum per cluster, please write 0.)
