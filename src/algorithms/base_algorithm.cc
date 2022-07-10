@@ -143,7 +143,7 @@ void BaseAlgorithm::initialize() {
                                     hier_covariates.row(i));
   }
 
-  if (update_hierarchy_params) {
+  if (update_hierarchy_params()) {
     for (size_t i = 0; i < num_components; i++) {
       unique_values[i]->save_posterior_hypers();
     }

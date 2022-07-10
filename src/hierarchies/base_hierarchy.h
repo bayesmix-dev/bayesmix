@@ -313,7 +313,7 @@ class BaseHierarchy : public AbstractHierarchy {
     }
   };
 
-  void save_posterior_hypers() {
+  void save_posterior_hypers() override {
     updater->save_posterior_hypers(
         updater->compute_posterior_hypers(*like, *prior));
   }

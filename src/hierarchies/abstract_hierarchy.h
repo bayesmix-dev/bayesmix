@@ -183,6 +183,8 @@ class AbstractHierarchy {
   virtual void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;
 
+  virtual void save_posterior_hypers() = 0;
+
   // GETTERS AND SETTERS
   //! Returns the Protobuf ID associated to this class
   virtual bayesmix::HierarchyId get_id() const = 0;

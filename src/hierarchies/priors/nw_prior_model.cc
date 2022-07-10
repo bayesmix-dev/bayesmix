@@ -226,7 +226,7 @@ void NWPriorModel::set_hypers_from_proto(
   hypers->deg_free = hyperscast.deg_free();
   hypers->scale = bayesmix::to_eigen(hyperscast.scale());
   hypers->scale_inv = stan::math::inverse_spd(hypers->scale);
-  hypers->scale_chol = Eigen::LLT<Eigen::MatrixXd>(hypers->scale).matrixU();
+  hypers->scale_chol = hypers->scale_chol;
 }
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
@@ -234,8 +234,11 @@ NWPriorModel::get_hypers_proto() const {
   // Translate to proto
   bayesmix::Vector mean_proto;
   bayesmix::Matrix scale_proto;
+  bayesmix::Matrix scale_proto_chol;
+
   bayesmix::to_proto(hypers->mean, &mean_proto);
   bayesmix::to_proto(hypers->scale, &scale_proto);
+  bayesmix::to_proto(hypers->scale_chol, &scale_proto_chol);
 
   // Make output state and return
   auto out = std::make_shared<bayesmix::AlgorithmState::HierarchyHypers>();
@@ -243,6 +246,8 @@ NWPriorModel::get_hypers_proto() const {
   out->mutable_nnw_state()->set_var_scaling(hypers->var_scaling);
   out->mutable_nnw_state()->set_deg_free(hypers->deg_free);
   out->mutable_nnw_state()->mutable_scale()->CopyFrom(scale_proto);
+  out->mutable_nnw_state()->mutable_scale_chol()->CopyFrom(scale_proto_chol);
+
   return out;
 }
 
