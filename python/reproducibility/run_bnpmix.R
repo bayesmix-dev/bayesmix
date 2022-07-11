@@ -92,32 +92,32 @@ for(met in methods){
 ## HIGHDIM DATASET ##
 #####################
 
-# Read data
-highdim = data.matrix(read.csv('csv/highdim_data.csv', sep=',', header=FALSE))
+# # Read data
+# highdim = data.matrix(read.csv('csv/highdim_data.csv', sep=',', header=FALSE))
 
-# Set prior
-PYprior = list(strength=1.0, discount=0.1, model='LS', m1=c(0,0,0,0),
-               S1=0.1*diag(4), tau1=0.2, zeta1=2.0, n0=10, n1=10,
-               Sigma1=0.1*diag(4))
-output = list(grid=highdim, out_type='FULL')
+# # Set prior
+# PYprior = list(strength=1.0, discount=0.1, model='LS', m1=c(0,0,0,0),
+#                S1=0.1*diag(4), tau1=0.2, zeta1=2.0, n0=10, n1=10,
+#                Sigma1=0.1*diag(4))
+# output = list(grid=highdim, out_type='FULL')
 
-for(met in methods){
-  # Run sampler
-  mcmc$method = met
-  set.seed(rng.seed)
-  log.file = paste(log.fold, '/bnpmix_highdim_', met, '.log', sep='')
-  sink(log.file); fit = PYdensity(y=highdim, mcmc=mcmc, prior=PYprior,
-                                  output=output); sink()
-  # Save density estimation to file
-  csv.file = paste(csv.fold, '/bnpmix_highdim_dens_', met, '.csv', sep='')
-  conn = file(csv.file, 'wb')
-  write.table(fit['density'], file=conn, row.names=FALSE, col.names=FALSE,
-                              sep=',')
-  close(conn)
-  # Save number of clusters to file
-  nclust = apply(fit$clust, 1, max)
-  csv.file = paste(csv.fold, '/bnpmix_highdim_nclu_', met, '.csv', sep='')
-  conn = file(csv.file, 'wb')
-  write.table(nclust, file=conn, row.names=FALSE, col.names=FALSE, sep=',')
-  close(conn)
-}
+# for(met in methods){
+#   # Run sampler
+#   mcmc$method = met
+#   set.seed(rng.seed)
+#   log.file = paste(log.fold, '/bnpmix_highdim_', met, '.log', sep='')
+#   sink(log.file); fit = PYdensity(y=highdim, mcmc=mcmc, prior=PYprior,
+#                                   output=output); sink()
+#   # Save density estimation to file
+#   csv.file = paste(csv.fold, '/bnpmix_highdim_dens_', met, '.csv', sep='')
+#   conn = file(csv.file, 'wb')
+#   write.table(fit['density'], file=conn, row.names=FALSE, col.names=FALSE,
+#                               sep=',')
+#   close(conn)
+#   # Save number of clusters to file
+#   nclust = apply(fit$clust, 1, max)
+#   csv.file = paste(csv.fold, '/bnpmix_highdim_nclu_', met, '.csv', sep='')
+#   conn = file(csv.file, 'wb')
+#   write.table(nclust, file=conn, row.names=FALSE, col.names=FALSE, sep=',')
+#   close(conn)
+# }
