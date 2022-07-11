@@ -31,6 +31,7 @@ AbstractUpdater::ProtoHypersPtr NNWUpdater::compute_posterior_hypers(
   Eigen::VectorXd mubar = data_sum.array() / card;  // sample mean
   mean = (hypers.var_scaling * hypers.mean + card * mubar) /
          (hypers.var_scaling + card);
+
   // Compute tau_n
   Eigen::MatrixXd tau_temp =
       data_sum_squares - card * mubar * mubar.transpose();
