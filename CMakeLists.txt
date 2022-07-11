@@ -85,7 +85,7 @@ endif()
 
 option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
-option(DISABLE_BENCHMARKS
+option(ENABLE_BENCHMARKS
       "If benchmarks should be compiled or no" OFF)
 option(ENABLE_DOCS
       "If docs should be generated or no" OFF)
@@ -172,7 +172,7 @@ if (NOT DISABLE_TESTS)
   add_subdirectory(test)
 endif()
 
-if (NOT DISABLE_BENCHMARKS)
+if (ENABLE_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif()
 
