@@ -47,31 +47,16 @@ class AbstractUpdater {
 
   //! Stores the posterior hyperparameters in an appropriate container
   void save_posterior_hypers(ProtoHypersPtr post_hypers_) {
-    if (!is_conjugate()) {
-      throw std::runtime_error(
-          "Cannot call save_posterior_hypers() from a "
-          "non-(semi)conjugate updater");
-    } else {
-      saved_posterior_hypers = true;
-      posterior_hypers = post_hypers_;
-    }
+    saved_posterior_hypers = true;
+    posterior_hypers = post_hypers_;
   }
 
   virtual ProtoHypersPtr get_posterior_hypers(AbstractLikelihood &like,
                                               AbstractPriorModel &prior,
                                               bool save = false) {
-    if (!is_conjugate()) {
-      throw std::runtime_error(
-          "Cannot call get_posterior_hypers() from a "
-          "non-(semi)conjugate updater");
-    } else {
-      if (!saved_posterior_hypers && save) {
-        posterior_hypers = compute_posterior_hypers(like, prior);
-      } else if (!saved_posterior_hypers && !save) {
-        return compute_posterior_hypers(like, prior);
-      }
-      return posterior_hypers;
-    }
+    throw std::runtime_error(
+        "Cannot call get_posterior_hypers() from a "
+        "non-(semi)conjugate updater");
   }
 
   void clear_hypers() {
