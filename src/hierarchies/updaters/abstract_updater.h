@@ -52,24 +52,34 @@ class AbstractUpdater {
           "Cannot call save_posterior_hypers() from a "
           "non-(semi)conjugate updater");
     } else {
+      saved_posterior_hypers = true;
       posterior_hypers = post_hypers_;
     }
   }
 
   virtual ProtoHypersPtr get_posterior_hypers(AbstractLikelihood &like,
-                                              AbstractPriorModel &prior) {
+                                              AbstractPriorModel &prior,
+                                              bool save = false) {
     if (!is_conjugate()) {
       throw std::runtime_error(
           "Cannot call get_posterior_hypers() from a "
           "non-(semi)conjugate updater");
     } else {
-      if (posterior_hypers == nullptr) {
+      if (!saved_posterior_hypers && save) {
         posterior_hypers = compute_posterior_hypers(like, prior);
+      } else if (!saved_posterior_hypers && !save) {
+        return compute_posterior_hypers(like, prior);
       }
-
       return posterior_hypers;
     }
   }
+
+  void clear_hypers() {
+    saved_posterior_hypers = false;
+    posterior_hypers = nullptr;
+  }
+
+  virtual std::shared_ptr<AbstractUpdater> clone() const = 0;
 
  protected:
   bool saved_posterior_hypers = false;

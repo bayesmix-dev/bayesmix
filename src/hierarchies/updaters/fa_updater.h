@@ -19,6 +19,13 @@ class FAUpdater : public AbstractUpdater {
   void draw(AbstractLikelihood& like, AbstractPriorModel& prior,
             bool update_params) override;
 
+  std::shared_ptr<AbstractUpdater> clone() const override {
+    auto out =
+        std::make_shared<FAUpdater>(static_cast<FAUpdater const&>(*this));
+    out->clear_hypers();
+    return out;
+  }
+
  protected:
   void sample_eta(State::FA& state, const Hyperparams::FA& hypers,
                   const FALikelihood& like);
