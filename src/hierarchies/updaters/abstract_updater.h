@@ -58,14 +58,17 @@ class AbstractUpdater {
   }
 
   virtual ProtoHypersPtr get_posterior_hypers(AbstractLikelihood &like,
-                                              AbstractPriorModel &prior) {
+                                              AbstractPriorModel &prior,
+                                              bool save = false) {
     if (!is_conjugate()) {
       throw std::runtime_error(
           "Cannot call get_posterior_hypers() from a "
           "non-(semi)conjugate updater");
     } else {
-      if (!saved_posterior_hypers) {
+      if (!saved_posterior_hypers && save) {
         posterior_hypers = compute_posterior_hypers(like, prior);
+      } else if (!save) {
+        return compute_posterior_hypers(like, prior);
       }
       return posterior_hypers;
     }

@@ -11,6 +11,7 @@ void NWPriorModel::initialize_hypers() {
     dim = hypers->mean.size();
     hypers->var_scaling = prior->fixed_values().var_scaling();
     hypers->scale = bayesmix::to_eigen(prior->fixed_values().scale());
+
     hypers->deg_free = prior->fixed_values().deg_free();
     // Check validity
     if (hypers->var_scaling <= 0) {

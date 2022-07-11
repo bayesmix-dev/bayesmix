@@ -67,9 +67,9 @@ void SemiConjugateUpdater<Likelihood, PriorModel>::draw(
   if (likecast.get_card() == 0) {
     likecast.set_state(priorcast.sample(), !set_card);
   } else {
-    auto post_params = get_posterior_hypers(likecast, priorcast);
+    auto post_params =
+        get_posterior_hypers(likecast, priorcast, update_params);
     likecast.set_state(priorcast.sample(post_params), !set_card);
-    if (update_params) save_posterior_hypers(post_params);
   }
 }
 
