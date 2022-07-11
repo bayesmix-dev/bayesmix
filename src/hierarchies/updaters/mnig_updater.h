@@ -31,6 +31,13 @@ class MNIGUpdater
 
   ProtoHypersPtr compute_posterior_hypers(AbstractLikelihood &like,
                                           AbstractPriorModel &prior) override;
+
+  std::shared_ptr<AbstractUpdater> clone() const override {
+    auto out =
+        std::make_shared<MNIGUpdater>(static_cast<MNIGUpdater const &>(*this));
+    out->clear_hypers();
+    return out;
+  }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_UPDATERS_MNIG_UPDATER_H_

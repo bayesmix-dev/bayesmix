@@ -29,6 +29,13 @@ class NNxIGUpdater
 
   ProtoHypersPtr compute_posterior_hypers(AbstractLikelihood &like,
                                           AbstractPriorModel &prior) override;
+
+  std::shared_ptr<AbstractUpdater> clone() const override {
+    auto out = std::make_shared<NNxIGUpdater>(
+        static_cast<NNxIGUpdater const &>(*this));
+    out->clear_hypers();
+    return out;
+  }
 };
 
 #endif  // BAYESMIX_HIERARCHIES_UPDATERS_NNXIG_UPDATER_H_

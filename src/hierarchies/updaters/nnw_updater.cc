@@ -39,6 +39,7 @@ AbstractUpdater::ProtoHypersPtr NNWUpdater::compute_posterior_hypers(
               (mubar - hypers.mean) * (mubar - hypers.mean).transpose();
   scale_inv = tau_temp + hypers.scale_inv;
   scale = stan::math::inverse_spd(scale_inv);
+  scale_chol = Eigen::LLT<Eigen::MatrixXd>(scale).matrixU();
 
   // Proto conversion
   ProtoHypers out;
@@ -46,5 +47,7 @@ AbstractUpdater::ProtoHypersPtr NNWUpdater::compute_posterior_hypers(
   out.mutable_nnw_state()->set_var_scaling(var_scaling);
   out.mutable_nnw_state()->set_deg_free(deg_free);
   bayesmix::to_proto(scale, out.mutable_nnw_state()->mutable_scale());
+  bayesmix::to_proto(scale_chol,
+                     out.mutable_nnw_state()->mutable_scale_chol());
   return std::make_shared<ProtoHypers>(out);
 }

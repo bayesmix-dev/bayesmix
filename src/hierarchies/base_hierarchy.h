@@ -98,6 +98,7 @@ class BaseHierarchy : public AbstractHierarchy {
     // Cloning each component class
     out->set_likelihood(std::static_pointer_cast<Likelihood>(like->clone()));
     out->set_prior(std::static_pointer_cast<PriorModel>(prior->clone()));
+    out->set_updater(updater->clone());
     return out;
   };
 
@@ -109,6 +110,7 @@ class BaseHierarchy : public AbstractHierarchy {
     out->set_likelihood(std::static_pointer_cast<Likelihood>(like->clone()));
     // Deep clone required for PriorModel
     out->set_prior(std::static_pointer_cast<PriorModel>(prior->deep_clone()));
+    out->set_updater(updater->clone());
     return out;
   }
 
@@ -188,8 +190,8 @@ class BaseHierarchy : public AbstractHierarchy {
   double conditional_pred_lpdf(const Eigen::RowVectorXd &datum,
                                const Eigen::RowVectorXd &covariate =
                                    Eigen::RowVectorXd(0)) const override {
-    return get_marg_lpdf(updater->compute_posterior_hypers(*like, *prior),
-                         datum, covariate);
+    return get_marg_lpdf(updater->get_posterior_hypers(*like, *prior), datum,
+                         covariate);
   }
 
   //! Evaluates the log-prior predictive distr. of data in a grid of points
@@ -296,8 +298,7 @@ class BaseHierarchy : public AbstractHierarchy {
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
     like->add_datum(id, datum, covariate);
     if (update_params) {
-      updater->save_posterior_hypers(
-          updater->compute_posterior_hypers(*like, *prior));
+      save_posterior_hypers();
     }
   };
 
@@ -308,10 +309,14 @@ class BaseHierarchy : public AbstractHierarchy {
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
     like->remove_datum(id, datum, covariate);
     if (update_params) {
-      updater->save_posterior_hypers(
-          updater->compute_posterior_hypers(*like, *prior));
+      save_posterior_hypers();
     }
   };
+
+  void save_posterior_hypers() override {
+    updater->save_posterior_hypers(
+        updater->compute_posterior_hypers(*like, *prior));
+  }
 
   //! Main function that initializes members to appropriate values
   void initialize() override {

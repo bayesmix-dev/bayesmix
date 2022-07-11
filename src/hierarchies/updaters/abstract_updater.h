@@ -46,16 +46,29 @@ class AbstractUpdater {
   }
 
   //! Stores the posterior hyperparameters in an appropriate container
-  virtual void save_posterior_hypers(ProtoHypersPtr post_hypers_) {
-    if (!is_conjugate()) {
-      throw(
-          std::runtime_error("Cannot call save_posterior_hypers() from a "
-                             "non-(semi)conjugate updater"));
-    } else {
-      throw(std::runtime_error(
-          "save_posterior_hypers() not implemented for this updater"));
-    }
+  void save_posterior_hypers(ProtoHypersPtr post_hypers_) {
+    saved_posterior_hypers = true;
+    posterior_hypers = post_hypers_;
   }
+
+  virtual ProtoHypersPtr get_posterior_hypers(AbstractLikelihood &like,
+                                              AbstractPriorModel &prior,
+                                              bool save = false) {
+    throw std::runtime_error(
+        "Cannot call get_posterior_hypers() from a "
+        "non-(semi)conjugate updater");
+  }
+
+  void clear_hypers() {
+    saved_posterior_hypers = false;
+    posterior_hypers = nullptr;
+  }
+
+  virtual std::shared_ptr<AbstractUpdater> clone() const = 0;
+
+ protected:
+  bool saved_posterior_hypers = false;
+  ProtoHypersPtr posterior_hypers = nullptr;
 };
 
 #endif  // BAYESMIX_HIERARCHIES_UPDATERS_ABSTRACT_UPDATER_H_

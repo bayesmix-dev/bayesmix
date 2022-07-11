@@ -13,7 +13,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -fopenmp -ftree-vectorize -Wno-deprecated")
+set(CMAKE_CXX_FLAGS_DEBUG "-Og")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 # Require PkgConfig
@@ -84,7 +85,7 @@ endif()
 
 option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
-option(DISABLE_BENCHMARKS
+option(ENABLE_BENCHMARKS
       "If benchmarks should be compiled or no" OFF)
 option(ENABLE_DOCS
       "If docs should be generated or no" OFF)
@@ -171,7 +172,7 @@ if (NOT DISABLE_TESTS)
   add_subdirectory(test)
 endif()
 
-if (NOT DISABLE_BENCHMARKS)
+if (ENABLE_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif()
 
@@ -180,6 +181,10 @@ if (ENABLE_DOCS)
 endif()
 
 if (NOT DISABLE_PLOTS)
+if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
+  message(FATAL_ERROR
+          "Your cmake version is too old: version >= 3.20.0 is required for plotting.")
+  endif()
   include(FetchContent)
 
   set(FETCHCONTENT_QUIET OFF)

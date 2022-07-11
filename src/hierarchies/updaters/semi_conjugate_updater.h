@@ -36,14 +36,20 @@ class SemiConjugateUpdater : public AbstractUpdater {
   void draw(AbstractLikelihood& like, AbstractPriorModel& prior,
             bool update_params) override;
 
-  //! Used by algorithms such as Neal3 and SplitMerge
-  //! It stores the hyperparameters computed by `compute_posterior_hypers`
-  void save_posterior_hypers(ProtoHypersPtr post_hypers_) override;
+  virtual ProtoHypersPtr get_posterior_hypers(AbstractLikelihood& like,
+                                              AbstractPriorModel& prior,
+                                              bool save = false) override {
+    if (!saved_posterior_hypers && save) {
+      posterior_hypers = compute_posterior_hypers(like, prior);
+    } else if (!saved_posterior_hypers && !save) {
+      return compute_posterior_hypers(like, prior);
+    }
+    return posterior_hypers;
+  }
 
  protected:
   Likelihood& downcast_likelihood(AbstractLikelihood& like_);
   PriorModel& downcast_prior(AbstractPriorModel& prior_);
-  ProtoHypersPtr post_hypers = std::make_shared<ProtoHypers>();
 };
 
 // Methods' definitions
@@ -70,17 +76,10 @@ void SemiConjugateUpdater<Likelihood, PriorModel>::draw(
   if (likecast.get_card() == 0) {
     likecast.set_state(priorcast.sample(), !set_card);
   } else {
-    auto post_params = compute_posterior_hypers(likecast, priorcast);
+    auto post_params =
+        get_posterior_hypers(likecast, priorcast, update_params);
     likecast.set_state(priorcast.sample(post_params), !set_card);
-    if (update_params) save_posterior_hypers(post_params);
   }
-}
-
-template <class Likelihood, class PriorModel>
-void SemiConjugateUpdater<Likelihood, PriorModel>::save_posterior_hypers(
-    ProtoHypersPtr post_hypers_) {
-  post_hypers = post_hypers_;
-  return;
 }
 
 #endif  // BAYESMIX_HIERARCHIES_UPDATERS_SEMI_CONJUGATE_UPDATER_H_
