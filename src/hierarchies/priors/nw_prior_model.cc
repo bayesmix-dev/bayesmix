@@ -227,7 +227,7 @@ void NWPriorModel::set_hypers_from_proto(
   hypers->deg_free = hyperscast.deg_free();
   hypers->scale = bayesmix::to_eigen(hyperscast.scale());
   hypers->scale_inv = stan::math::inverse_spd(hypers->scale);
-  hypers->scale_chol = hypers->scale_chol;
+  hypers->scale_chol = bayesmix::to_eigen(hyperscast.scale_chol());
 }
 
 std::shared_ptr<bayesmix::AlgorithmState::HierarchyHypers>
