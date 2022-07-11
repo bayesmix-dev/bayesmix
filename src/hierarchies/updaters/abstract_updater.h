@@ -67,7 +67,7 @@ class AbstractUpdater {
     } else {
       if (!saved_posterior_hypers && save) {
         posterior_hypers = compute_posterior_hypers(like, prior);
-      } else if (!save) {
+      } else if (!saved_posterior_hypers && !save) {
         return compute_posterior_hypers(like, prior);
       }
       return posterior_hypers;
