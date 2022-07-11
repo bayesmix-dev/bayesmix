@@ -86,9 +86,7 @@ class NNWHierarchy
     unsigned int dim = like->get_dim();
     double nu_n = params.deg_free() - dim + 1;
     double coeff = (params.var_scaling() + 1) / (params.var_scaling() * nu_n);
-    Eigen::MatrixXd scale_chol =
-        Eigen::LLT<Eigen::MatrixXd>(bayesmix::to_eigen(params.scale()))
-            .matrixU();
+    Eigen::MatrixXd scale_chol = bayesmix::to_eigen(params.scale_chol());
     Eigen::MatrixXd scale_chol_n = scale_chol / std::sqrt(coeff);
     // Return predictive t parameters
     HyperParams out;

@@ -80,6 +80,7 @@ message NWDistribution {
   double var_scaling = 2;
   double deg_free = 3;
   Matrix scale = 4;
+  Matrix scale_chol = 5;
 }
 
 

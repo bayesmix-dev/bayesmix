@@ -298,8 +298,7 @@ class BaseHierarchy : public AbstractHierarchy {
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
     like->add_datum(id, datum, covariate);
     if (update_params) {
-      updater->save_posterior_hypers(
-          updater->compute_posterior_hypers(*like, *prior));
+      save_posterior_hypers();
     }
   };
 
@@ -310,10 +309,14 @@ class BaseHierarchy : public AbstractHierarchy {
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override {
     like->remove_datum(id, datum, covariate);
     if (update_params) {
-      updater->save_posterior_hypers(
-          updater->compute_posterior_hypers(*like, *prior));
+      save_posterior_hypers();
     }
   };
+
+  void save_posterior_hypers() override {
+    updater->save_posterior_hypers(
+        updater->compute_posterior_hypers(*like, *prior));
+  }
 
   //! Main function that initializes members to appropriate values
   void initialize() override {
