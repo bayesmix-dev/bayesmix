@@ -26,14 +26,14 @@ For descriptions of the models supported in our library, discussion of software 
 On Linux machines, it is sufficient to run
 
 ```shell
- apt-get -y update && apt-get install -y
- apt-get -y install git
- apt-get -y install python3-pip
- python3 -m pip install cmake
- apt-get install -yq pkg-config
+ sudo apt-get -y update && apt-get install -y
+ sudo apt-get -y install git
+ sudo apt-get -y install python3-pip
+ sudo python3 -m pip install cmake
+ sudo apt-get install -yq pkg-config
 ```
 
-On macOS, after install HomeBrew, replace `apt-get -y` with `brew`.
+On macOS, after install HomeBrew, replace `sudo apt-get -y` with `brew`.
 
 To install and use `bayesmix`, please `cd` to the folder to which you wish to install it, and clone this repository with the following command-line instruction:
 
