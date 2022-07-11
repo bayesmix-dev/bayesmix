@@ -17,7 +17,6 @@ os.environ["BAYESMIX_EXE"] = "../build/run_mcmc"
 OUTPUT_PATH = "reproducibility"
 
 ALGORITHMS = "Neal2 Neal3 Neal8 SplitMerge".split()
-# ALGORITHMS = ["Neal3"]
 
 ALGO_SETTINGS = """
         algo_id: "{}"
