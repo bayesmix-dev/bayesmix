@@ -14,8 +14,15 @@ set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -fopenmp -ftree-vectorize -Wno-deprecated")
-set(CMAKE_CXX_FLAGS_DEBUG "-Og")
+set(CMAKE_C_FLAGS_DEBUG "-Og -Wno-deprecated -DEIGEN_NO_MALLOC")
+set(CMAKE_CXX_FLAGS_DEBUG "-Og -Wno-deprecated")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
+if(COMPILER_SUPPORTS_MARCH_NATIVE)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+endif()
 
 # Require PkgConfig
 find_package(PkgConfig REQUIRED)
@@ -113,7 +120,7 @@ set(LINK_LIBRARIES
   OpenMP::OpenMP_CXX
 )
 
-set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
+set(COMPILE_OPTIONS -D_REENTRANT -DNDEBUG -fPIC -fno-stack-protector)
 
 file(GLOB ProtoFiles "${BASEPATH}/src/proto/*.proto")
 set(PROTO_DIR proto)
