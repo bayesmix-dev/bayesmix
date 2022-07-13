@@ -217,7 +217,10 @@ class BaseHierarchy : public AbstractHierarchy {
   //! Generates new state values from the centering posterior distribution
   //! @param update_params  Save posterior hypers after the computation?
   void sample_full_cond(bool update_params = false) override {
-    updater->draw(*like, *prior, update_params);
+    if (update_params) {
+      save_posterior_hypers();
+    }
+    updater->draw(*like, *prior, false);
   };
 
   //! Overloaded version of sample_full_cond(bool), mainly used for debugging
