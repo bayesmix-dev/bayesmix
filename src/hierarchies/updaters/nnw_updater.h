@@ -23,6 +23,9 @@
 
 class NNWUpdater
     : public SemiConjugateUpdater<MultiNormLikelihood, NWPriorModel> {
+ protected:
+  ProtoHypers post_hypers;
+
  public:
   NNWUpdater() = default;
   ~NNWUpdater() = default;

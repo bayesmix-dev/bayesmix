@@ -38,16 +38,16 @@ AbstractUpdater::ProtoHypersPtr NNWUpdater::compute_posterior_hypers(
   tau_temp += (card * hypers.var_scaling / (card + hypers.var_scaling)) *
               (mubar - hypers.mean) * (mubar - hypers.mean).transpose();
   scale_inv = tau_temp + hypers.scale_inv;
-  scale = stan::math::inverse_spd(scale_inv);
+  int dim = mean.size();
+  scale = scale_inv.llt().solve(Eigen::MatrixXd::Identity(dim, dim));
   scale_chol = Eigen::LLT<Eigen::MatrixXd>(scale).matrixU();
 
   // Proto conversion
-  ProtoHypers out;
-  bayesmix::to_proto(mean, out.mutable_nnw_state()->mutable_mean());
-  out.mutable_nnw_state()->set_var_scaling(var_scaling);
-  out.mutable_nnw_state()->set_deg_free(deg_free);
-  bayesmix::to_proto(scale, out.mutable_nnw_state()->mutable_scale());
+  bayesmix::to_proto(mean, post_hypers.mutable_nnw_state()->mutable_mean());
+  post_hypers.mutable_nnw_state()->set_var_scaling(var_scaling);
+  post_hypers.mutable_nnw_state()->set_deg_free(deg_free);
+  bayesmix::to_proto(scale, post_hypers.mutable_nnw_state()->mutable_scale());
   bayesmix::to_proto(scale_chol,
-                     out.mutable_nnw_state()->mutable_scale_chol());
-  return std::make_shared<ProtoHypers>(out);
+                     post_hypers.mutable_nnw_state()->mutable_scale_chol());
+  return std::make_shared<ProtoHypers>(post_hypers);
 }
