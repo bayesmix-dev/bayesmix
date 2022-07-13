@@ -31,6 +31,9 @@
 
 class NNWHierarchy
     : public BaseHierarchy<NNWHierarchy, MultiNormLikelihood, NWPriorModel> {
+ protected:
+  HyperParams pred_params;
+
  public:
   NNWHierarchy() = default;
   ~NNWHierarchy() = default;
@@ -66,7 +69,6 @@ class NNWHierarchy
   double marg_lpdf(ProtoHypersPtr hier_params,
                    const Eigen::RowVectorXd &datum) const override {
     // TODO check Bayes rule for this hierarchy
-    HyperParams pred_params = get_predictive_t_parameters(hier_params);
     Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
     double logdet = 2 * log(diag.array()).sum();
     return bayesmix::multi_student_t_invscale_lpdf(
@@ -94,6 +96,14 @@ class NNWHierarchy
     out.deg_free = nu_n;
     out.scale_chol = scale_chol_n;
     return out;
+  }
+
+  void save_posterior_hypers() override {
+    updater->save_posterior_hypers(
+        updater->compute_posterior_hypers(*like, *prior));
+
+    pred_params = get_predictive_t_parameters(
+        updater->get_posterior_hypers(*like, *prior));
   }
 };
 
