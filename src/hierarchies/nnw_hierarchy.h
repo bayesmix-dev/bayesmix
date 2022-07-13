@@ -33,6 +33,8 @@ class NNWHierarchy
     : public BaseHierarchy<NNWHierarchy, MultiNormLikelihood, NWPriorModel> {
  protected:
   HyperParams pred_params;
+  bool saved_prior_pred_params = false;
+  bool saved_cond_pred_params = false;
 
  public:
   NNWHierarchy() = default;
@@ -61,6 +63,22 @@ class NNWHierarchy
     like->set_state(state);
   };
 
+  double conditional_pred_lpdf(const Eigen::RowVectorXd &datum,
+                               const Eigen::RowVectorXd &covariate =
+                                   Eigen::RowVectorXd(0)) const override {
+    HyperParams curr_params;
+    if (!saved_cond_pred_params) {
+      curr_params = get_predictive_t_parameters(
+          updater->get_posterior_hypers(*like, *prior));
+    } else {
+      curr_params = pred_params;
+    }
+    double logdet = 2 * log(curr_params.scale_chol.diagonal().array()).sum();
+    return bayesmix::multi_student_t_invscale_lpdf(
+        datum, curr_params.deg_free, curr_params.mean, curr_params.scale_chol,
+        logdet);
+  }
+
   //! Evaluates the log-marginal distribution of data in a single point
   //! @param hier_params  Pointer to the container of (prior or posterior)
   //! hyperparameter values
@@ -69,10 +87,11 @@ class NNWHierarchy
   double marg_lpdf(ProtoHypersPtr hier_params,
                    const Eigen::RowVectorXd &datum) const override {
     // TODO check Bayes rule for this hierarchy
-    Eigen::VectorXd diag = pred_params.scale_chol.diagonal();
+    HyperParams curr_params = get_predictive_t_parameters(hier_params);
+    Eigen::VectorXd diag = curr_params.scale_chol.diagonal();
     double logdet = 2 * log(diag.array()).sum();
     return bayesmix::multi_student_t_invscale_lpdf(
-        datum, pred_params.deg_free, pred_params.mean, pred_params.scale_chol,
+        datum, curr_params.deg_free, curr_params.mean, curr_params.scale_chol,
         logdet);
   }
 
@@ -88,8 +107,8 @@ class NNWHierarchy
     unsigned int dim = like->get_dim();
     double nu_n = params.deg_free() - dim + 1;
     double coeff = (params.var_scaling() + 1) / (params.var_scaling() * nu_n);
-    Eigen::MatrixXd scale_chol = bayesmix::to_eigen(params.scale_chol());
-    Eigen::MatrixXd scale_chol_n = scale_chol / std::sqrt(coeff);
+    Eigen::MatrixXd scale_chol_n =
+        bayesmix::to_eigen(params.scale_chol()).array() / std::sqrt(coeff);
     // Return predictive t parameters
     HyperParams out;
     out.mean = bayesmix::to_eigen(params.mean());
@@ -101,9 +120,9 @@ class NNWHierarchy
   void save_posterior_hypers() override {
     updater->save_posterior_hypers(
         updater->compute_posterior_hypers(*like, *prior));
-
     pred_params = get_predictive_t_parameters(
         updater->get_posterior_hypers(*like, *prior));
+    saved_cond_pred_params = true;
   }
 };
 
