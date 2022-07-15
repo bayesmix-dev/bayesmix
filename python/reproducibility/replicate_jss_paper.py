@@ -158,6 +158,7 @@ def run_bayesmix(log_fold, dataset, name, g0_params, univariate: bool):
     out_clus = defaultdict(dict)
     g0_name = "NNIG" if univariate else "NNW"
     for algo in ALGORITHMS:
+        print("Algorithm", algo)
         log_file = os.path.join(log_fold, 'bayesmix_{0}_{1}.log'.format(name, algo))
         with open(log_file, 'w') as f:
             with redirect_stdout(f):
