@@ -1,6 +1,6 @@
 # CMake Git Clone (https://github.com/tschuchortdev/cmake_git_clone)
 # CMake module to automatically clone git repositories during configure time.
-# 
+#
 # Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2016 Thilo Schuchort
@@ -48,6 +48,7 @@ endif()
 #           GIT_URL                         <url>
 #           [GIT_TAG|GIT_BRANCH|GIT_COMMIT  <symbol>]
 #           [DIRECTORY                      <dir>]
+#           [DEPTH                          <depth>]
 #           [QUIET]
 #     )
 #
@@ -69,6 +70,9 @@ endif()
 #           optional
 #           the directory the project will be cloned into
 #           default is the build directory, similar to ExternalProject (${CMAKE_BINARY_DIR})
+#       DEPTH
+#           optional
+#           depth of the clone in number of commits
 #
 #       QUIET
 #           optional
@@ -88,11 +92,11 @@ endif()
 #
 # OUTPUT VARIABLES:
 #       <project name>_SOURCE_DIR
-#           optional, exists when SOURCE_DIR_VARIABLE not set      
+#           optional, exists when SOURCE_DIR_VARIABLE not set
 #           top level source directory of the cloned project
 #
 #       <project name>_CLONE_RESULT
-#           optional, exists when CLONE_RESULT_VARIABLE not set      
+#           optional, exists when CLONE_RESULT_VARIABLE not set
 #           Result of git_clone function. TRUE - success, FALSE - error
 #
 #
@@ -110,12 +114,12 @@ endif()
 function(git_clone)
 
     cmake_parse_arguments(
-            PARGS                                                                                                         # prefix of output variables
-            "QUIET"                                                                                                       # list of names of the boolean arguments (only defined ones will be true)
-            "PROJECT_NAME;GIT_URL;GIT_TAG;GIT_BRANCH;GIT_COMMIT;DIRECTORY;SOURCE_DIR_VARIABLE;CLONE_RESULT_VARIABLE"      # list of names of mono-valued arguments
-            ""                                                                                                            # list of names of multi-valued arguments (output variables are lists)
-            ${ARGN}                                                                                                       # arguments of the function to parse, here we take the all original ones
-    )                                                                                                                     # remaining unparsed arguments can be found in PARGS_UNPARSED_ARGUMENTS
+            PARGS                                                                                                           # prefix of output variables
+            "QUIET"                                                                                                         # list of names of the boolean arguments (only defined ones will be true)
+            "PROJECT_NAME;GIT_URL;GIT_TAG;GIT_BRANCH;GIT_COMMIT;DIRECTORY;DEPTH;SOURCE_DIR_VARIABLE;CLONE_RESULT_VARIABLE"  # list of names of mono-valued arguments
+            ""                                                                                                              # list of names of multi-valued arguments (output variables are lists)
+            ${ARGN}                                                                                                         # arguments of the function to parse, here we take the all original ones
+    )                                                                                                                       # remaining unparsed arguments can be found in PARGS_UNPARSED_ARGUMENTS
     if(NOT PARGS_PROJECT_NAME)
         message(FATAL_ERROR "You must provide a project name")
     endif()
@@ -132,21 +136,21 @@ function(git_clone)
         set(${PARGS_PROJECT_NAME}_SOURCE_DIR
                 ${PARGS_DIRECTORY}/${PARGS_PROJECT_NAME}
                 CACHE INTERNAL "" FORCE) # makes var visible everywhere because PARENT_SCOPE wouldn't include this scope
-        
+
         set(SOURCE_DIR ${PARGS_PROJECT_NAME}_SOURCE_DIR)
     else()
         set(${PARGS_SOURCE_DIR_VARIABLE}
                 ${PARGS_DIRECTORY}/${PARGS_PROJECT_NAME}
                 CACHE INTERNAL "" FORCE) # makes var visible everywhere because PARENT_SCOPE wouldn't include this scope
-        
+
         set(SOURCE_DIR ${PARGS_SOURCE_DIR_VARIABLE})
     endif()
 
-    if(NOT PARGS_CLONE_RESULT_VARIABLE)   
+    if(NOT PARGS_CLONE_RESULT_VARIABLE)
         set(CLONE_RESULT ${PARGS_PROJECT_NAME}_CLONE_RESULT)
     else()
         set(CLONE_RESULT ${PARGS_CLONE_RESULT_VARIABLE})
-    endif()    
+    endif()
 
     # check that only one of GIT_TAG xor GIT_BRANCH xor GIT_COMMIT was passed
     at_most_one(at_most_one_tag ${PARGS_GIT_TAG} ${PARGS_GIT_BRANCH} ${PARGS_GIT_COMMIT})
@@ -196,7 +200,7 @@ function(git_clone)
         endif()
 
         execute_process(
-                COMMAND             ${GIT_EXECUTABLE} clone ${PARGS_GIT_URL} --recursive ${${SOURCE_DIR}}
+                COMMAND             ${GIT_EXECUTABLE} clone ${PARGS_GIT_URL} --recursive --depth=${PARGS_DEPTH} ${${SOURCE_DIR}}
                 WORKING_DIRECTORY   ${PARGS_DIRECTORY}
                 RESULT_VARIABLE     git_result
                 OUTPUT_VARIABLE     git_output)
@@ -206,7 +210,7 @@ function(git_clone)
                 message(WARNING "${PARGS_PROJECT_NAME} clone error")  #ToDo: maybe FATAL_ERROR?
             endif()
             return()
-        endif()        
+        endif()
     endif()
 
 

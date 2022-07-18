@@ -14,7 +14,7 @@ set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -fopenmp -ftree-vectorize -Wno-deprecated")
-set(CMAKE_C_FLAGS_DEBUG "-Og -Wno-deprecated -DEIGEN_NO_MALLOC")
+set(CMAKE_C_FLAGS_DEBUG "-Og -Wno-deprecated")
 set(CMAKE_CXX_FLAGS_DEBUG "-Og -Wno-deprecated")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
@@ -34,6 +34,7 @@ git_clone(
 	PROJECT_NAME	math
 	GIT_URL			https://github.com/bayesmix-dev/math.git
 	GIT_BRANCH      develop
+  DEPTH   1
 	DIRECTORY		${CMAKE_CURRENT_LIST_DIR}/lib
 )
 
@@ -49,6 +50,8 @@ list(APPEND MAKE_ARGS "tbb_build_prefix=tbb")
 tbb_build(TBB_ROOT ${TBB_ROOT} CONFIG_DIR TBB_DIR MAKE_ARGS ${MAKE_ARGS})
 # Require TBB library (for compile / link options)
 find_package(TBB)
+
+set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_LIST_DIR}/lib CACHE PATH "Missing description." FORCE)
 
 # Check if Protobuf is present in system
 find_package(Protobuf)
