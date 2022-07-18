@@ -6,4 +6,4 @@ build/plot_mcmc \
   --dens-plot resources/tutorial/out/density.eps \
   --n-cl-file resources/tutorial/out/numclust.csv \
   --n-cl-trace-plot resources/tutorial/out/traceplot.eps \
-  --n-cl-bar-plot  resources/tutorial/out/nclus_barplot.png
+  --n-cl-bar-plot  resources/tutorial/out/nclus_barplot.eps
