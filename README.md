@@ -38,7 +38,7 @@ On macOS, after install HomeBrew, replace `sudo apt-get -y` with `brew`.
 To install and use `bayesmix`, please `cd` to the folder to which you wish to install it, and clone this repository with the following command-line instruction:
 
 ```shell
-git clone --recurse-submodules git@github.com:bayesmix-dev/bayesmix.git
+git clone https://github.com/bayesmix-dev/bayesmix.git
 ```
 
 Then, by using `cd bayesmix`, you will enter the newly downloaded folder.
