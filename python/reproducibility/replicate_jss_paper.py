@@ -158,6 +158,7 @@ def run_bayesmix(log_fold, dataset, name, g0_params, univariate: bool):
     out_clus = defaultdict(dict)
     g0_name = "NNIG" if univariate else "NNW"
     for algo in ALGORITHMS:
+        print("Algorithm", algo)
         log_file = os.path.join(log_fold, 'bayesmix_{0}_{1}.log'.format(name, algo))
         with open(log_file, 'w') as f:
             with redirect_stdout(f):
@@ -209,10 +210,10 @@ if __name__ == "__main__":
     plt_cmd = """build/plot_mcmc
         --grid-file resources/tutorial/grid.csv
         --dens-file python/{0}/cmdline_density.csv
-        --dens-plot python/{1}/cmdline_density.png
+        --dens-plot python/{1}/cmdline_density.eps
         --n-cl-file python/{0}/cmdline_numclust.csv
-        --n-cl-trace-plot python/{1}/cmdline_traceplot.png
-        --n-cl-bar-plot  python/{1}/cmdline_nclus_barplot.png
+        --n-cl-trace-plot python/{1}/cmdline_traceplot.eps
+        --n-cl-bar-plot  python/{1}/cmdline_nclus_barplot.eps
     """.format(csv_fold, png_fold)
     subprocess.call(plt_cmd.split(), cwd="../")
 
