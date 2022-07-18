@@ -210,10 +210,10 @@ if __name__ == "__main__":
     plt_cmd = """build/plot_mcmc
         --grid-file resources/tutorial/grid.csv
         --dens-file python/{0}/cmdline_density.csv
-        --dens-plot python/{1}/cmdline_density.png
+        --dens-plot python/{1}/cmdline_density.eps
         --n-cl-file python/{0}/cmdline_numclust.csv
-        --n-cl-trace-plot python/{1}/cmdline_traceplot.png
-        --n-cl-bar-plot  python/{1}/cmdline_nclus_barplot.png
+        --n-cl-trace-plot python/{1}/cmdline_traceplot.eps
+        --n-cl-bar-plot  python/{1}/cmdline_nclus_barplot.eps
     """.format(csv_fold, png_fold)
     subprocess.call(plt_cmd.split(), cwd="../")
 
