@@ -58,7 +58,7 @@ class UniLinRegLS : public BaseState {
 
   using ProtoState = bayesmix::AlgorithmState::ClusterState;
 
-  Eigen::VectorXd get_unconstrained() override {
+  Eigen::VectorXd get_unconstrained() const override {
     Eigen::VectorXd temp(regression_coeffs.size() + 1);
     temp << regression_coeffs, var;
     return uni_lin_reg_to_unconstrained(temp);
@@ -89,7 +89,7 @@ class UniLinRegLS : public BaseState {
     return state;
   }
 
-  double log_det_jac() override {
+  double log_det_jac() const override {
     Eigen::VectorXd temp(regression_coeffs.size() + 1);
     temp << regression_coeffs, var;
     return uni_lin_reg_log_det_jac(temp);
