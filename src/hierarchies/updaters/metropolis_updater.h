@@ -30,14 +30,6 @@ class MetropolisUpdater : public AbstractUpdater {
   //! Metropolis-Hastings step
   void draw(AbstractLikelihood &like, AbstractPriorModel &prior,
             bool update_params) override {
-    if (update_params) {
-      throw std::runtime_error(
-          "'update_params' can be True only when using instances of"
-          " 'SemiConjugateUpdater'. This is likely caused by"
-          " using a nonconjugate hierarchy (or a nonconjugate updater)"
-          " in a marginal algorithm such as 'Neal3'.");
-    }
-
     target_lpdf_unconstrained target_lpdf(&like, &prior);
     Eigen::VectorXd curr_state = like.get_unconstrained_state();
     Eigen::VectorXd prop_state =
