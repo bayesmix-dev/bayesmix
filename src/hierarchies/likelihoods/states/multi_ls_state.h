@@ -66,7 +66,7 @@ class MultiLS : public BaseState {
 
   using ProtoState = bayesmix::AlgorithmState::ClusterState;
 
-  Eigen::VectorXd get_unconstrained() override {
+  Eigen::VectorXd get_unconstrained() const override {
     return multi_ls_to_unconstrained(mean, prec);
   }
 
@@ -104,7 +104,7 @@ class MultiLS : public BaseState {
     return state;
   }
 
-  double log_det_jac() override { return multi_ls_log_det_jac(prec); }
+  double log_det_jac() const override { return multi_ls_log_det_jac(prec); }
 };
 
 }  // namespace State

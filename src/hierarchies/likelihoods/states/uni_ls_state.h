@@ -48,7 +48,7 @@ class UniLS : public BaseState {
 
   using ProtoState = bayesmix::AlgorithmState::ClusterState;
 
-  Eigen::VectorXd get_unconstrained() override {
+  Eigen::VectorXd get_unconstrained() const override {
     Eigen::VectorXd temp(2);
     temp << mean, var;
     return uni_ls_to_unconstrained(temp);
@@ -75,7 +75,7 @@ class UniLS : public BaseState {
     return state;
   }
 
-  double log_det_jac() override {
+  double log_det_jac() const override {
     Eigen::VectorXd temp(2);
     temp << mean, var;
     return uni_ls_log_det_jac(temp);
