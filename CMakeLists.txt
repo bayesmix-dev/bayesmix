@@ -13,8 +13,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -fopenmp -ftree-vectorize -Wno-deprecated")
-set(CMAKE_CXX_FLAGS_DEBUG "-Og")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -ftree-vectorize -Wno-deprecated")
+set(CMAKE_CXX_FLAGS_DEBUG "-Og -Wno-deprecated")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 set(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL TRUE)
 
@@ -224,3 +224,11 @@ endif()
 if (NOT DISABLE_EXAMPLES)
   add_subdirectory(examples)
 endif()
+
+
+
+# Build run executable
+add_executable(run_private $<TARGET_OBJECTS:bayesmix> executables/run_private_mcmc.cc)
+target_include_directories(run_private PUBLIC ${INCLUDE_PATHS})
+target_link_libraries(run_private PUBLIC ${LINK_LIBRARIES})
+target_compile_options(run_private PUBLIC ${COMPILE_OPTIONS})
