@@ -4,6 +4,13 @@ double UniNormLikelihood::compute_lpdf(const Eigen::RowVectorXd &datum) const {
   return stan::math::normal_lpdf(datum(0), state.mean, sqrt(state.var));
 }
 
+Eigen::VectorXd UniNormLikelihood::sample() const {
+  Eigen::VectorXd out(1);
+  auto &rng = bayesmix::Rng::Instance().get();
+  out(0) = stan::math::normal_rng(state.mean, sqrt(state.var), rng);
+  return out;
+}
+
 void UniNormLikelihood::update_sum_stats(const Eigen::RowVectorXd &datum,
                                          bool add) {
   if (add) {

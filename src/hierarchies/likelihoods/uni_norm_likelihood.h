@@ -35,6 +35,8 @@ class UniNormLikelihood
   double get_data_sum() const { return data_sum; };
   double get_data_sum_squares() const { return data_sum_squares; };
 
+  Eigen::VectorXd sample() const override;
+
   template <typename T>
   T cluster_lpdf_from_unconstrained(
       const Eigen::Matrix<T, Eigen::Dynamic, 1> &unconstrained_params) const {

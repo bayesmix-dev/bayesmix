@@ -75,6 +75,8 @@ class AbstractLikelihood {
         "likelihood");
   }
 
+  virtual Eigen::VectorXd sample() const = 0;
+
   //! Evaluates the log-likelihood of data in a grid of points
   //! @param data        Grid of points (by row) which are to be evaluated
   //! @param covariates  (Optional) covariate vectors associated to data
@@ -126,6 +128,8 @@ class AbstractLikelihood {
 
   //! Resets the values of the summary statistics in the likelihood
   virtual void clear_summary_statistics() = 0;
+
+  virtual void clear_data() = 0;
 
   //! Returns the vector of the unconstrained parameters for this likelihood
   virtual Eigen::VectorXd get_unconstrained_state() = 0;

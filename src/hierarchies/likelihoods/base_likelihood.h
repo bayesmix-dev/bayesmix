@@ -12,6 +12,7 @@
 #include "algorithm_state.pb.h"
 #include "likelihood_internal.h"
 #include "src/utils/covariates_getter.h"
+#include "src/utils/rng.h"
 
 //! Base template class of a `Likelihood` object
 //!
@@ -37,6 +38,10 @@ class BaseLikelihood : public AbstractLikelihood {
     out->clear_data();
     out->clear_summary_statistics();
     return out;
+  }
+
+  virtual Eigen::VectorXd sample() const override {
+    throw std::runtime_error("sample() not yet implemented");
   }
 
   //! Evaluates the log likelihood over all the data in the cluster
@@ -140,7 +145,7 @@ class BaseLikelihood : public AbstractLikelihood {
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) override;
 
   //! Resets cardinality and indexes of data in this cluster
-  void clear_data() {
+  void clear_data() override {
     set_card(0);
     cluster_data_idx = std::set<int>();
   }
@@ -221,7 +226,6 @@ Eigen::VectorXd BaseLikelihood<Derived, State>::lpdf_grid(
   for (int i = 0; i < data.rows(); i++)
     lpdf(i) =
         static_cast<Derived const *>(this)->lpdf(data.row(i), cov_getter(i));
-
   return lpdf;
 }
 
