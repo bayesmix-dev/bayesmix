@@ -18,4 +18,5 @@ enum AlgorithmId {
     BlockedGibbs = 4; // Ishwaran and James Blocked Gibbs, see [2]
     SplitMerge = 5; // Jain and Neal's Split&Merge, see [3]. NOT IMPLEMENTED YET!
     Slice = 6; // Slice sampling, see [4].  NOT IMPLEMENTED YET!
+    PrivateNeal2 = 7;
 }
