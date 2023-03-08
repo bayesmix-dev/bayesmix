@@ -1,0 +1,31 @@
+##### GENERIC SETTINGS FOR ALL ALGORITHMS #####
+# Algorithm ID string, e.g. "Neal2"
+algo_id: "Neal2"
+
+# RNG initial seed: any nonnegative integer
+rng_seed: 20201124
+
+# Number of iterations of the algorithm
+iterations: 10000
+
+# Number of initial iterations discarded by the algorithm
+burnin: 5000
+
+# Number of clusters in which data will be first initialized
+# (NOTE: If you wish to initialize one datum per cluster, please write 0.)
+# (NOTE: This value is ONLY used for initialization, and it may be overwritten
+#  by certain mixing objects, such as LogSBMixing. Please check a mixing's
+#  initialize() function to know for sure whether or not it will override this
+#  value.)
+init_num_clusters: 3
+
+
+##### ALGORITHM-SPECIFIC SETTINGS #####
+# Neal8 number of auxiliary blocks
+# (NOTE: 3 is the recommended value in most cases, please change it only if you
+#  know what you're doing.)
+neal8_n_aux: 3
+
+splitmerge_n_restr_gs_updates: 5
+splitmerge_n_mh_updates: 1
+splitmerge_n_full_gs_updates: 1
