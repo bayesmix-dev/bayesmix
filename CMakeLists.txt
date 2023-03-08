@@ -226,9 +226,4 @@ if (NOT DISABLE_EXAMPLES)
 endif()
 
 
-
-# Build run executable
-add_executable(run_private $<TARGET_OBJECTS:bayesmix> executables/run_private_mcmc.cc)
-target_include_directories(run_private PUBLIC ${INCLUDE_PATHS})
-target_link_libraries(run_private PUBLIC ${LINK_LIBRARIES})
-target_compile_options(run_private PUBLIC ${COMPILE_OPTIONS})
+add_subdirectory(privacy_experiments)

@@ -44,6 +44,8 @@ class PrivateNeal2 : public Neal2Algorithm {
     return out;
   }
 
+  double get_acceptance_rate() { return (1.0 * n_acc) / n_prop; }
+
  protected:
   void print_startup_message() const override;
 
