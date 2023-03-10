@@ -89,8 +89,7 @@ void run_experiment(int ndata, double eps, int repnum) {
   Eigen::MatrixXd arate(1, 1);
   arate(0, 0) = algo->get_acceptance_rate();
 
-  bayesmix::write_matrix_to_file(error_chain,
-                                 base_fname + "acceptance_rate.csv");
+  bayesmix::write_matrix_to_file(arate, base_fname + "acceptance_rate.csv");
 }
 
 int main() {
