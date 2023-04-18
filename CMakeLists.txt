@@ -25,10 +25,10 @@ find_package(OpenMP REQUIRED)
 # Clone bayesmix-dev/math into lib/math
 include(cmake/GitUtils.cmake)
 git_clone(
-	PROJECT_NAME	math
-	GIT_URL			https://github.com/bayesmix-dev/math.git
-	GIT_BRANCH      develop
-	DIRECTORY		${CMAKE_CURRENT_LIST_DIR}/lib
+	PROJECT_NAME math
+	GIT_URL https://github.com/bayesmix-dev/math.git
+	GIT_BRANCH develop
+	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/lib
 )
 
 # TBB CMake integration
