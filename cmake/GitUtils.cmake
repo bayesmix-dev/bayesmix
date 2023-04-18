@@ -166,7 +166,7 @@ function(git_clone)
         endif()
 
         execute_process(
-                COMMAND             ${GIT_EXECUTABLE} pull origin master
+                COMMAND             ${GIT_EXECUTABLE} pull
                 WORKING_DIRECTORY   ${${SOURCE_DIR}}
                 RESULT_VARIABLE     git_result
                 OUTPUT_VARIABLE     git_output)
