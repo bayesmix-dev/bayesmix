@@ -35,7 +35,7 @@ git_clone(
 message(STATUS "Using math TBB")
 # Define TBB_ROOT Folder
 set(TBB_ROOT ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb)
-file(COPY ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2019_U8/ DESTINATION ${TBB_ROOT})
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2020.3/ DESTINATION ${TBB_ROOT})
 # Build TBB Library with CMake Integration
 include(${TBB_ROOT}/cmake/TBBBuild.cmake)
 list(APPEND MAKE_ARGS "tbb_build_dir=${TBB_ROOT}")
@@ -98,10 +98,10 @@ set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
 set(INCLUDE_PATHS
   ${BASEPATH}
   ${CMAKE_CURRENT_LIST_DIR}/lib/math
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.72.0
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.3.9
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.78.0
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.4.0
   ${TBB_ROOT}/include
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/sundials_5.5.0/include
+  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/sundials_6.1.1/include
   ${CMAKE_CURRENT_BINARY_DIR}
   ${protobuf_SOURCE_DIR}/src
 )
