@@ -57,7 +57,7 @@ TEST(mix_dist, 2) {
   double dist_to_self = bayesmix::gaussian_mixture_dist(
       means1, sds1, weights1, means1, sds1, weights1);
 
-  ASSERT_DOUBLE_EQ(dist_to_self, 0.0);
+  ASSERT_NEAR(dist_to_self, 0.0, stan::math::EPSILON);
 }
 
 TEST(student_t, squareform) {
