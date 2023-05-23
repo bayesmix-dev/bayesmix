@@ -3,4 +3,6 @@ target_sources(bayesmix
     base_channel.h
     laplace_channel.h
     laplace_channel.cc
+    wavelet_channel.h
+    wavelet_channel.cc
 )
