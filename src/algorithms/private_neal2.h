@@ -20,7 +20,8 @@
 
 class PrivateNeal2 : public Neal2Algorithm {
  protected:
-  Eigen::MatrixXd private_data;
+  Eigen::MatrixXd public_data;
+  Eigen::MatrixXd& private_data = data;
   int n_acc = 0;
   int n_prop = 0;
   std::shared_ptr<BasePrivacyChannel> privacy_channel;
@@ -45,6 +46,8 @@ class PrivateNeal2 : public Neal2Algorithm {
   }
 
   double get_acceptance_rate() { return (1.0 * n_acc) / n_prop; }
+
+  void set_public_data(const Eigen::MatrixXd& public_data_);
 
  protected:
   void print_startup_message() const override;
