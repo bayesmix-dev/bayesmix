@@ -9,6 +9,16 @@ add_executable(laplace1d $<TARGET_OBJECTS:bayesmix>
     utils.cc
 )
 
+add_executable(wavelet $<TARGET_OBJECTS:bayesmix>
+    wavelets/main.cc
+    utils.h
+    utils.cc
+)
+
 target_include_directories(laplace1d PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(laplace1d PUBLIC ${LINK_LIBRARIES})
 target_compile_options(laplace1d PUBLIC ${COMPILE_OPTIONS})
+
+target_include_directories(wavelet PUBLIC ${INCLUDE_PATHS})
+target_link_libraries(wavelet PUBLIC ${LINK_LIBRARIES})
+target_compile_options(wavelet PUBLIC ${COMPILE_OPTIONS})

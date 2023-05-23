@@ -20,6 +20,9 @@ class LaplaceChannel : public BasePrivacyChannel {
               Eigen::VectorXd private_datum) override;
 
   Eigen::MatrixXd sanitize(Eigen::MatrixXd private_data) override;
+
+  Eigen::MatrixXd get_candidate_private_data(
+      Eigen::MatrixXd sanitized_data) override;
 };
 
 #endif  // BAYESMIX_SRC_PRIVACY_LAPLACE_CHANNEL_

@@ -42,7 +42,7 @@ void run_experiment(int ndata, double eps, int repnum) {
       get_algo1d(PARAM_DIR + "nnig_ngg.asciipb",
                  PARAM_DIR + "dp_gamma.asciipb", PARAM_DIR + "algo.asciipb");
 
-  algo->set_data(sanitized_data);
+  algo->set_public_data(sanitized_data);
   algo->set_channel(channel);
   algo->set_verbose(false);
 
