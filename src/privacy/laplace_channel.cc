@@ -18,6 +18,6 @@ Eigen::MatrixXd LaplaceChannel::sanitize(Eigen::MatrixXd private_data) {
 }
 
 Eigen::MatrixXd LaplaceChannel::get_candidate_private_data(
-      Eigen::MatrixXd sanitized_data) {
+    Eigen::MatrixXd sanitized_data) {
   return sanitized_data;
 }
