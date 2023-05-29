@@ -70,6 +70,5 @@ Eigen::MatrixXd WaveletChannel::get_candidate_private_data(
 
     out(i) = stan::math::uniform_rng(l, u, rng);
   }
-  std::cout << "candidate_private \n" << out.transpose() << std::endl;
   return out;
 }
