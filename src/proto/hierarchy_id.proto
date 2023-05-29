@@ -14,4 +14,5 @@ enum HierarchyId {
     FA = 5; // Factor Analysers
     NNxIG = 6; // Normal - Normal x Inverse Gamma
     PythonHier = 7; // Generic python hierarchy
+    BetaGG = 8; // Beta - Gamma x Gamma hierarchy
 }
