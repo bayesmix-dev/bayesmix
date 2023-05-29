@@ -2,11 +2,12 @@
 
 std::shared_ptr<PrivateNeal2> get_algo1d(std::string hier_params,
                                          std::string mix_params,
-                                         std::string algo_params) {
+                                         std::string algo_params,
+                                         std::string hierarchy) {
   std::shared_ptr<PrivateNeal2> algo(new PrivateNeal2());
   auto& factory_hier = HierarchyFactory::Instance();
   auto& factory_mixing = MixingFactory::Instance();
-  auto hier = factory_hier.create_object("NNIG");
+  auto hier = factory_hier.create_object(hierarchy);
   auto mixing = factory_mixing.create_object("DP");
 
   bayesmix::read_proto_from_file(mix_params, mixing->get_mutable_prior());

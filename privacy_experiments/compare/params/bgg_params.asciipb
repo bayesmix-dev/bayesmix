@@ -1,0 +1,6 @@
+fixed_values {
+  a_rate: 2.0
+  a_shape: 2.0
+  b_rate: 2.0
+  b_shape: 2.0
+}

@@ -6,7 +6,8 @@
 
 std::shared_ptr<PrivateNeal2> get_algo1d(std::string hier_params,
                                          std::string mix_params,
-                                         std::string algo_params);
+                                         std::string algo_params,
+                                         std::string hierarchy = "NNIG");
 
 Eigen::MatrixXd get_cluster_mat(BaseCollector* coll, int ndata);
 
