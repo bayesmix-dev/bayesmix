@@ -13,4 +13,6 @@ target_sources(bayesmix PUBLIC
     mnig_prior_model.cc
     fa_prior_model.h
     fa_prior_model.cc
+    gamma_gamma_prior.h
+    gamma_gamma_prior.cc
 )

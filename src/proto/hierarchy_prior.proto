@@ -111,6 +111,20 @@ message FAPrior {
   }
 }
 
+
+message GamGamDistribution {
+  double a_shape = 1;
+  double a_rate = 2;
+  double b_shape = 3;
+  double b_rate = 4;
+}
+
+message GGPrior {
+  oneof prior {
+    GamGamDistribution fixed_values = 1;
+  }
+}
+
 message EmptyPrior {
   double fake_field = 1;
 }
