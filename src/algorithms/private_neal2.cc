@@ -2,53 +2,7 @@
 
 #include "src/hierarchies/likelihoods/uni_norm_likelihood.h"
 
-void PrivateNeal2::initialize() {
-  Neal2Algorithm::initialize();
-
-  // int private_data_dim = 1;
-  // // private_data = data;
-
-  // int nclus = unique_values.size();
-  // Eigen::VectorXd probs = Eigen::VectorXd::Ones(nclus);
-  // probs /= (1.0 * nclus);
-
-  // for (auto& val : unique_values) {
-  //   val->get_likelihood()->clear_data();
-  //   val->get_likelihood()->clear_summary_statistics();
-  //   std::shared_ptr<UniNormLikelihood> like =
-  //       std::dynamic_pointer_cast<UniNormLikelihood>(val->get_likelihood());
-  // }
-
-  // auto& rng = bayesmix::Rng::Instance().get();
-  // for (int i = 0; i < data.rows(); i++) {
-  //   int c = bayesmix::categorical_rng(probs, rng);
-  //   allocations[i] = c;
-  //   private_data.row(i) =
-  //       unique_values[c]->get_likelihood()->sample().transpose();
-  //   unique_values[c]->add_datum(i, private_data.row(i),
-  //                               update_hierarchy_params(),
-  //                               hier_covariates.row(i));
-  // }
-  // unique_values[0]->set_dataset(&private_data);
-
-  for (int i = 0; i < 100; i++) {
-    Neal2Algorithm::sample_allocations();
-    Neal2Algorithm::sample_unique_values();
-  }
-
-  for (int h = 0; h < unique_values.size(); h++) {
-    std::cout << "Cluster: " << h << std::endl;
-    std::cout << "Params: "
-              << unique_values[h]->get_state_proto()->DebugString();
-    std::cout << "Data: ";
-    for (auto& j : unique_values[h]->get_data_idx()) {
-      std::cout << private_data(j, 0) << ", ";
-    }
-    std::cout << std::endl;
-  }
-}
-
-void PrivateNeal2::set_public_data(const Eigen::MatrixXd& public_data_) {
+void PrivateNeal2::set_public_data(const Eigen::MatrixXd &public_data_) {
   data = privacy_channel->get_candidate_private_data(public_data_);
   private_data = data;
   this->public_data = public_data_;
@@ -65,7 +19,7 @@ void PrivateNeal2::print_startup_message() const {
 void PrivateNeal2::sample_allocations() {
   int ndata = data.rows();
 
-  auto& rng = bayesmix::Rng::Instance().get();
+  auto &rng = bayesmix::Rng::Instance().get();
 
   for (int i = 0; i < ndata; i++) {
     // Sample the private datum from the CRP
@@ -154,4 +108,50 @@ void PrivateNeal2::sample_allocations() {
   //   }
   //   std::cout << std::endl;
   // }
+}
+
+void PrivateNeal2::sample_unique_values() {
+  for (auto &un : unique_values) {
+    un->sample_full_cond(!update_hierarchy_params());
+  }
+}
+
+Eigen::VectorXd PrivateNeal2::lpdf_marginal_component(
+    const std::shared_ptr<AbstractHierarchy> hier, const Eigen::MatrixXd &grid,
+    const Eigen::RowVectorXd &covariate) const {
+  if (hier->is_conjugate()) {
+    return hier->prior_pred_lpdf_grid(grid, covariate);
+  }
+
+  int n_mc = 100;
+  unsigned int n_grid = grid.rows();
+  Eigen::VectorXd lpdf_(n_grid);
+  Eigen::MatrixXd lpdf_temp(n_grid, n_mc);
+
+  for (size_t i = 0; i < n_mc; i++) {
+    hier->sample_prior();
+    lpdf_temp.col(i) = hier->like_lpdf_grid(grid, covariate);
+  }
+  for (size_t i = 0; i < n_grid; i++) {
+    lpdf_(i) = stan::math::log_sum_exp(lpdf_temp.row(i));
+  }
+  return lpdf_.array() - log(1.0 * n_mc);
+}
+
+Eigen::VectorXd PrivateNeal2::get_cluster_prior_mass(
+    const unsigned int data_idx) const {
+  unsigned int n_data = data.rows();
+  unsigned int n_clust = unique_values.size();
+  Eigen::VectorXd logprior(n_clust + 1);
+  for (size_t j = 0; j < n_clust; j++) {
+    // Probability of being assigned to an already existing cluster
+    logprior(j) = mixing->get_mass_existing_cluster(
+        n_data - 1, n_clust, true, true, unique_values[j],
+        mix_covariates.row(data_idx));
+  }
+  // Further update with marginal component
+  logprior(n_clust) = mixing->get_mass_new_cluster(
+      n_data - 1, n_clust, true, true, mix_covariates.row(data_idx));
+
+  return logprior;
 }

@@ -18,7 +18,7 @@
 //!
 //! This algorithm requires the use of a `ConjugateHierarchy` object.
 
-class PrivateNeal2 : public Neal2Algorithm {
+class PrivateNeal2 : public MarginalAlgorithm {
  protected:
   Eigen::MatrixXd public_data;
   Eigen::MatrixXd& private_data = data;
@@ -29,6 +29,8 @@ class PrivateNeal2 : public Neal2Algorithm {
  public:
   PrivateNeal2() = default;
   ~PrivateNeal2() = default;
+
+  bool requires_conjugate_hierarchy() const override { return false; }
 
   void set_channel(const std::shared_ptr<BasePrivacyChannel> channel) {
     privacy_channel = channel;
@@ -54,7 +56,17 @@ class PrivateNeal2 : public Neal2Algorithm {
 
   void sample_allocations() override;
 
-  void initialize() override;
+  void sample_unique_values() override;
+
+  Eigen::VectorXd lpdf_marginal_component(
+      const std::shared_ptr<AbstractHierarchy> hier,
+      const Eigen::MatrixXd& grid,
+      const Eigen::RowVectorXd& covariate) const override;
+
+  //! Computes prior component of allocation sampling masses for given datum
+  //! @param data_idx Index of the considered data point
+  //! @return         Allocation weights for the clusters
+  Eigen::VectorXd get_cluster_prior_mass(const unsigned int data_idx) const;
 };
 
 #endif  // BAYESMIX_ALGORITHMS_PRIVATE_NEAL2_H_
