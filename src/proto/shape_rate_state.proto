@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+
+package bayesmix;
+
+/*
+ * Parameters of a family of distribution indexed by two positive parameters such
+ * as the Beta distribution or the Gamma one.
+ */
+message ShapeRateState {
+  double shape = 1;
+  double rate = 2;
+}

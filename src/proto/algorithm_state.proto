@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "mixing_state.proto";
 import "ls_state.proto";
+import "shape_rate_state.proto";
 import "matrix.proto";
 import "hierarchy_prior.proto";
 import "distribution.proto";
@@ -26,7 +27,7 @@ message AlgorithmState {
       LinRegUniLSState lin_reg_uni_ls_state = 4; // State of a linear regression univariate location-scale family
       Vector general_state = 5; // Just a vector of doubles
       FAState fa_state = 6; // State of a Mixture of Factor Analysers
-
+      ShapeRateState sr_state = 7;
     }
     int32 cardinality = 3; // How many observations are in this cluster
   }
@@ -45,6 +46,7 @@ message AlgorithmState {
       MultiNormalIGDistribution lin_reg_uni_state = 4;
       NxIGDistribution nnxig_state = 5;
       FAPriorDistribution fa_state = 7;
+      GamGamDistribution gg_state = 8;
     }
   }
   HierarchyHypers hierarchy_hypers = 5; // The current values of the hyperparameters of the hierarchy
