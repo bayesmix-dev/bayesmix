@@ -5,7 +5,7 @@
 #include "src/privacy/wavelet_channel.h"
 
 std::string CURR_DIR = "privacy_experiments/wavelets/";
-std::string OUT_DIR = CURR_DIR + "out/";
+std::string OUT_DIR = CURR_DIR + "out_bgg/";
 std::string PARAM_DIR = CURR_DIR + "params/";
 
 Eigen::MatrixXd simulate_private_data(int ndata) {
@@ -44,7 +44,7 @@ Eigen::VectorXd eval_true_dens(Eigen::VectorXd xgrid) {
 void save_stuff_to_file(int ndata, double eps, int repnum, int j,
                         Eigen::MatrixXd private_data, BaseCollector* coll,
                         std::shared_ptr<PrivateNeal2> algo) {
-  bool random_init = true;
+  bool random_init = false;
 
   std::string base_fname;
 
@@ -57,7 +57,7 @@ void save_stuff_to_file(int ndata, double eps, int repnum, int j,
                  std::to_string(eps) + "_j_" + std::to_string(j) + "_rep_" +
                  std::to_string(repnum) + "_";
   }
-  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(1000, -0.5, 1.5);
+  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(1000, 0.0, 1.0);
   Eigen::MatrixXd dens = bayesmix::eval_lpdf_parallel(algo, coll, grid);
   bayesmix::write_matrix_to_file(dens, base_fname + "eval_dens.csv");
 
@@ -84,7 +84,7 @@ void save_stuff_to_file(int ndata, double eps, int repnum, int j,
   Eigen::VectorXd error_chain =
       (dens.array().exp().matrix().rowwise() - true_dens.transpose())
           .rowwise()
-          .squaredNorm() /
+          .squaredNorm() *
       (grid[1] - grid[0]);
 
   bayesmix::write_matrix_to_file(error_chain,
@@ -102,9 +102,9 @@ void run_experiment(int ndata, double eps, int repnum) {
   // std::vector<int> Js = {4};
 
   for (int& j : Js) {
-    std::shared_ptr<PrivateNeal2> algo =
-        get_algo1d(PARAM_DIR + "nnig_ngg.asciipb",
-                   PARAM_DIR + "dp_gamma.asciipb", PARAM_DIR + "algo.asciipb");
+    std::shared_ptr<PrivateNeal2> algo = get_algo1d(
+        PARAM_DIR + "bgg_params.asciipb", PARAM_DIR + "dp_gamma.asciipb",
+        PARAM_DIR + "algo.asciipb", "BetaGG");
 
     algo->set_verbose(false);
     std::shared_ptr<WaveletChannel> channel(new WaveletChannel(j, eps));
