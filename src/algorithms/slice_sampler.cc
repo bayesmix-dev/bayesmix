@@ -1,7 +1,5 @@
 #include "slice_sampler.h"
 
-#include <boost/math/distributions/beta.hpp>
-
 void SliceSampler::print_startup_message() const {
   std::string msg = "Running SliceSampler algorithm with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
@@ -72,18 +70,6 @@ void SliceSampler::sample_weights() {
       unique_values.pop_back();
     }
   }
-}
-
-double SliceSampler::sample_truncated_beta(double a, double b, double l,
-                                           double u) {
-  auto &rng = bayesmix::Rng::Instance().get();
-  double unif = stan::math::uniform_rng(0.0, 1.0, rng);
-
-  boost::math::beta_distribution betadist(a, b);
-  double cdf_l = cdf(betadist, l);
-  double cdf_u = cdf(betadist, u);
-  double orig_quantile = cdf_l + unif * (cdf_u - cdf_l);
-  return quantile(betadist, orig_quantile);
 }
 
 void SliceSampler::sample_allocations() {

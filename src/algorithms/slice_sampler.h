@@ -5,10 +5,10 @@
 #include "conditional_algorithm.h"
 #include "src/mixings/truncated_sb_mixing.h"
 
-//! This class implement the original slice sampler from [1].
+//! This class implement the efficnet slice sampler from [1].
 //!
-//! [1] Walker, S.G.: Sampling the Dirichlet mixture model with slices.
-//!     Commun. Stat., Simul. Comput. 36, 45–54 (2007)
+//! [1] Kalli, M., Griffin, J. E., & Walker, S. G. (2011).
+//!     Slice sampling mixture models. Statistics and Computing.
 
 class SliceSampler : public ConditionalAlgorithm {
  public:
@@ -29,8 +29,6 @@ class SliceSampler : public ConditionalAlgorithm {
     out->set_hierarchy(unique_values[0]->deep_clone());
     return out;
   }
-
-  double sample_truncated_beta(double a, double b, double l, double u);
 
   void sample_slice();
 
