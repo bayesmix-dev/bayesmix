@@ -220,3 +220,10 @@ TEST(lpdf_woodbury, 1) {
 
   ASSERT_LE(std::abs(stan_lpdf - our_lpdf), 1e-10);
 }
+
+TEST(sample_truncated_beta, 1) {
+  auto& rng = bayesmix::Rng::Instance().get();
+  double val = bayesmix::sample_truncated_beta(2.0, 2.0, 0.1, 0.2);
+  ASSERT_GT(val, 0.1);
+  ASSERT_LT(val, 0.2);
+}

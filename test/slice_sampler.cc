@@ -55,13 +55,6 @@ TEST_F(SliceSamplerTest, initialize) {
   ASSERT_TRUE(true);
 }
 
-TEST_F(SliceSamplerTest, sample_truncated_beta) {
-  setup();
-  double val = sample_truncated_beta(2.0, 2.0, 0.1, 0.2);
-  ASSERT_GT(val, 0.1);
-  ASSERT_LT(val, 0.2);
-}
-
 TEST_F(SliceSamplerTest, sample_weights) {
   setup(2);
   initialize();
