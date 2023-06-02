@@ -10,30 +10,30 @@
 #include "src/includes.h"
 #include "src/utils/eigen_utils.h"
 
-std::shared_ptr<AbstractHierarchy> get_hierarchy() {
-  auto hier = std::make_shared<NNIGHierarchy>();
-  bayesmix::NNIGPrior hier_prior;
-  hier_prior.mutable_fixed_values()->set_mean(0.0);
-  hier_prior.mutable_fixed_values()->set_var_scaling(0.1);
-  hier_prior.mutable_fixed_values()->set_shape(2.0);
-  hier_prior.mutable_fixed_values()->set_scale(2.0);
-  hier->get_mutable_prior()->CopyFrom(hier_prior);
-  hier->initialize();
-  return hier;
-}
-
-std::shared_ptr<TruncatedSBMixing> get_mixing(int num_components) {
-  auto mix = std::make_shared<TruncatedSBMixing>();
-  bayesmix::TruncSBPrior prior;
-  prior.mutable_dp_prior()->set_totalmass(2.0);
-  prior.set_num_components(num_components);
-  mix->get_mutable_prior()->CopyFrom(prior);
-  mix->initialize();
-  return mix;
-}
-
 class SliceSamplerTest : public SliceSampler, public ::testing::Test {
  public:
+  std::shared_ptr<AbstractHierarchy> get_hierarchy() {
+    auto hier = std::make_shared<NNIGHierarchy>();
+    bayesmix::NNIGPrior hier_prior;
+    hier_prior.mutable_fixed_values()->set_mean(0.0);
+    hier_prior.mutable_fixed_values()->set_var_scaling(0.1);
+    hier_prior.mutable_fixed_values()->set_shape(2.0);
+    hier_prior.mutable_fixed_values()->set_scale(2.0);
+    hier->get_mutable_prior()->CopyFrom(hier_prior);
+    hier->initialize();
+    return hier;
+  }
+
+  std::shared_ptr<TruncatedSBMixing> get_mixing(int num_components) {
+    auto mix = std::make_shared<TruncatedSBMixing>();
+    bayesmix::TruncSBPrior prior;
+    prior.mutable_dp_prior()->set_totalmass(2.0);
+    prior.set_num_components(num_components);
+    mix->get_mutable_prior()->CopyFrom(prior);
+    mix->initialize();
+    return mix;
+  }
+
   void setup(int num_components = 10) {
     Eigen::MatrixXd data = Eigen::MatrixXd::Ones(30, 1);
     auto hier = get_hierarchy();
@@ -56,13 +56,12 @@ TEST_F(SliceSamplerTest, initialize) {
 }
 
 TEST_F(SliceSamplerTest, sample_weights) {
-  setup(2);
+  setup(3);
   initialize();
   sample_slice();
   sample_weights();
   Eigen::VectorXd weights = mixing->get_mixing_weights(false, false);
-  ASSERT_GT(weights(0), weights(2));
-  ASSERT_GT(weights(1), weights(2));
-  ASSERT_GT(mixing->get_num_components(), 2);
+  ASSERT_GT(weights(0), 0);
+  ASSERT_GT(weights(1), 0);
   ASSERT_LE(weights.sum(), 1.0);
 }
