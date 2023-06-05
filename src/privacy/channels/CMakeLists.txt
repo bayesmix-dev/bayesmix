@@ -1,0 +1,10 @@
+target_sources(bayesmix
+  PUBLIC
+    base_channel.h
+    gaussian_channel.h
+    gaussian_channel.cc
+    laplace_channel.h
+    laplace_channel.cc
+    wavelet_channel.h
+    wavelet_channel.cc
+)
