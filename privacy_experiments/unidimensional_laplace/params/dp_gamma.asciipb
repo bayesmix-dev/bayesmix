@@ -1,6 +1,3 @@
-gamma_prior {
-  totalmass_prior {
-    shape: 4.0
-    rate: 2.0
-  }
+fixed_value {
+  totalmass: 2.0
 }

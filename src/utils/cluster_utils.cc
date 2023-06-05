@@ -29,13 +29,13 @@ Eigen::VectorXi bayesmix::cluster_estimate(
   progresscpp::ProgressBar bar(n_iter, 60);
 
   // Compute mean
-  std::cout << "(Computing mean dissimilarity... " << std::flush;
+  // std::cout << "(Computing mean dissimilarity... " << std::flush;
   Eigen::MatrixXd mean_diss =
       bayesmix::posterior_similarity(alloc_chain.cast<double>());
-  std::cout << "Done)" << std::endl;
+  // std::cout << "Done)" << std::endl;
 
   // Compute Frobenius norm error of all iterations
-  std::cout << "Computing Frobenius norm error... " << std::endl;
+  // std::cout << "Computing Frobenius norm error... " << std::endl;
   Eigen::VectorXd errors(n_iter);
   for (int k = 0; k < n_iter; k++) {
     for (int i = 0; i < n_data; i++) {
@@ -45,11 +45,11 @@ Eigen::VectorXi bayesmix::cluster_estimate(
       }
     }
     // Progress bar
-    ++bar;
-    bar.display();
+    // ++bar;
+    // bar.display();
   }
-  bar.done();
-  std::cout << "Done" << std::endl;  // Print Ending Message
+  // bar.done();
+  // std::cout << "Done" << std::endl;  // Print Ending Message
 
   // Find iteration with the least error
   std::ptrdiff_t ibest;
