@@ -7,6 +7,7 @@
 #include "algorithms/neal2_algorithm.h"
 #include "algorithms/neal3_algorithm.h"
 #include "algorithms/neal8_algorithm.h"
+#include "algorithms/slice_sampler.h"
 #include "collectors/file_collector.h"
 #include "collectors/memory_collector.h"
 #include "hierarchies/fa_hierarchy.h"

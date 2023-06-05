@@ -1,8 +1,3 @@
-target_sources(bayesmix
-  PUBLIC
-    base_channel.h
-    laplace_channel.h
-    laplace_channel.cc
-    wavelet_channel.h
-    wavelet_channel.cc
-)
+add_subdirectory(algorithms)
+add_subdirectory(channels)
+# add_subdirectory(hierarchies)

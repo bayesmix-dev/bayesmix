@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "src/hierarchies/likelihoods/states/includes.h"
+#include "src/includes.h"
 #include "src/utils/rng.h"
 
 TEST(mix_dist, 1) {
@@ -140,6 +141,63 @@ TEST(student_t, marginal) {
       datum, nu_n, mean, scale_chol_n, logdet);
 
   ASSERT_LE(std::abs(old_lpdf - new_lpdf), 0.001);
+}
+
+TEST(nnig_trunc, marginal) {
+  auto& factory_hier = HierarchyFactory::Instance();
+  auto hier = factory_hier.create_object("NNIG");
+
+  bayesmix::NNIGPrior hier_prior;
+  double mu0 = 5.0;
+  double lambda0 = 0.1;
+  double alpha0 = 2.0;
+  double beta0 = 2.0;
+  hier_prior.mutable_fixed_values()->set_mean(mu0);
+  hier_prior.mutable_fixed_values()->set_var_scaling(lambda0);
+  hier_prior.mutable_fixed_values()->set_shape(alpha0);
+  hier_prior.mutable_fixed_values()->set_scale(beta0);
+  hier->get_mutable_prior()->CopyFrom(hier_prior);
+  hier->initialize();
+
+  double var_l = 1.0;
+  double var_u = 10.0;
+
+  double mean = mu0;
+  double var = beta0 / (alpha0 + 1);
+
+  Eigen::VectorXd datum(1);
+  datum << 4.5;
+
+  // Compute posterior parameters
+  double mu_n = (lambda0 * mu0 + datum(0)) / (lambda0 + 1);
+  double alpha_n = alpha0 + 0.5;
+  double lambda_n = lambda0 + 1;
+  double beta_n = beta0 + (0.5 * lambda0 / (lambda0 + 1)) * (datum(0) - mu0) *
+                              (datum(0) - mu0);
+  // equiv.ly: beta0 + 0.5*(mu0^2*lambda0 + datum^2 - mu_n^2*lambda_n);
+
+  // Compute pieces
+  double prior1 = stan::math::inv_gamma_lpdf(var, alpha0, beta0) -
+                  (stan::math::inv_gamma_lcdf(var_u, alpha0, beta0) -
+                   stan::math::inv_gamma_lcdf(var_l, alpha0, beta0));
+  double prior2 = stan::math::normal_lpdf(mean, mu0, sqrt(var / lambda0));
+  double prior = prior1 + prior2;
+
+  double like = hier->get_like_lpdf(datum);
+
+  double post1 = stan::math::inv_gamma_lpdf(var, alpha_n, beta_n) -
+                 (stan::math::inv_gamma_lcdf(var_u, alpha_n, beta_n) -
+                  stan::math::inv_gamma_lcdf(var_l, alpha_n, beta_n));
+  double post2 = stan::math::normal_lpdf(mean, mu_n, sqrt(var / lambda_n));
+  double post = post1 + post2;
+
+  // Bayes: logmarg(x) = logprior(phi) + loglik(x|phi) - logpost(phi|x)
+  double sum = prior + like - post;
+  double marg = hier->prior_pred_lpdf(datum);
+
+  std::cout << "sum: " << sum << ", marg: " << marg << std::endl;
+
+  ASSERT_DOUBLE_EQ(sum, marg);
 }
 
 TEST(mult_normal, lpdf_grid) {

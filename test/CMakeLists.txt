@@ -32,6 +32,7 @@ add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   logit_sb.cc
   gradient.cc
   slice_sampler.cc
+  privacy.cc
 )
 
 target_include_directories(test_bayesmix PUBLIC ${INCLUDE_PATHS})

@@ -20,6 +20,4 @@ target_sources(bayesmix
     split_and_merge_algorithm.h
     slice_sampler.h
     slice_sampler.cc
-    private_neal2.h
-    private_neal2.cc
 )

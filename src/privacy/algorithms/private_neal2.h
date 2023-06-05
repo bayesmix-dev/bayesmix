@@ -5,10 +5,10 @@
 #include <stan/math/rev.hpp>
 
 #include "algorithm_id.pb.h"
-#include "marginal_algorithm.h"
-#include "neal2_algorithm.h"
+#include "src/algorithms/marginal_algorithm.h"
+#include "src/algorithms/neal2_algorithm.h"
 #include "src/hierarchies/base_hierarchy.h"
-#include "src/privacy/base_channel.h"
+#include "src/privacy/channels/base_channel.h"
 #include "src/utils/rng.h"
 
 //! Template class for Neal's algorithm 2 for conjugate hierarchies

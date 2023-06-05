@@ -25,7 +25,7 @@ std::shared_ptr<PrivateNeal2> get_algo1d(std::string hier_params,
   return algo;
 }
 
-Eigen::MatrixXd get_cluster_mat(BaseCollector* coll, int ndata) {
+Eigen::MatrixXi get_cluster_mat(BaseCollector* coll, int ndata) {
   Eigen::MatrixXi clusterings(coll->get_size(), ndata);
   for (int i = 0; i < coll->get_size(); i++) {
     bayesmix::AlgorithmState state;

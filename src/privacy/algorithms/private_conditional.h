@@ -1,8 +1,8 @@
 #ifndef BAYESMIX_ALGORITHMS_PRIVATE_CONDITIONAL_H_
 #define BAYESMIX_ALGORITHMS_PRIVATE_CONDITIONAL_H_
 
-#include "base_algorithm.h"
-#include "src/privacy/base_channel.h"
+#include "src/includes.h"
+#include "src/privacy/channels/base_channel.h"
 
 template <class Algo>
 class PrivateConditionalAlgorithm : public Algo {

@@ -1,6 +1,8 @@
 #ifndef BAYESMIX_SRC_PRIVACY_BASE_CHANNEL_
 #define BAYESMIX_SRC_PRIVACY_BASE_CHANNEL_
 
+#include <stan/math/rev.hpp>
+
 class BasePrivacyChannel {
  public:
   BasePrivacyChannel() = default;

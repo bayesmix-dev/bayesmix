@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "algorithm_state.pb.h"
+#include "boost/math/distributions/inverse_gamma.hpp"
 
 //! @file distributions.h
 //! The `distributions.h` file includes several useful functions related to
@@ -234,9 +235,22 @@ double gaussian_mixture_dist(
  * @param rng the random number generator
  * @return a sample from the truncated distribution
  */
-
 double sample_truncated_beta(double a, double b, double l, double u,
                              std::mt19937 &rng);
+
+/**
+ * Samples from a truncated inverse gamma distribution over the interval (l, u)
+ * with parameters (a, b) using the inverse-cdf method
+ *
+ * @param a the first shape parameter of the beta distribution
+ * @param b the second shape parameter of the beta distribution
+ * @param l lower bound of the truncation interval
+ * @param u upper bound of the truncation interval
+ * @param rng the random number generator
+ * @return a sample from the truncated distribution
+ */
+double sample_truncated_inv_gamma(double a, double b, double l, double u,
+                                  std::mt19937 &rng);
 
 }  // namespace bayesmix
 
