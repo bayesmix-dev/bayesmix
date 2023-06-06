@@ -1,0 +1,6 @@
+dp_prior {
+    totalmass: 1.0
+}
+
+num_components: 20
+infinite_mixture: true
