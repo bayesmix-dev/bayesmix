@@ -44,6 +44,6 @@ jobs:
         with:
           context: .
           push: true
-          file: docker/test/Dockerfile
+          file: resources/docker/test/Dockerfile
           tags: ${{ steps.metadata_test.outputs.tags }}
           labels: mberaha/bayesmix_test:latest   
