@@ -45,7 +45,7 @@ void save_stuff_to_file(int ndata, double eps, int repnum,
                         std::shared_ptr<BaseAlgorithm> algo,
                         std::string algo_name) {
   std::string base_fname =
-      OUT_DIR + "_" + algo_name + "_ndata_" + std::to_string(ndata) + "_eps_" +
+      OUT_DIR + algo_name + "_ndata_" + std::to_string(ndata) + "_eps_" +
       std::to_string(eps) + +"_rep_" + std::to_string(repnum) + "_";
 
   Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(1000, 0.0, 1.0);
