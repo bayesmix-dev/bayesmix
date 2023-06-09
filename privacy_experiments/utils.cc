@@ -13,15 +13,13 @@ std::shared_ptr<PrivateNeal2> get_algo1d(std::string hier_params,
   bayesmix::read_proto_from_file(mix_params, mixing->get_mutable_prior());
   bayesmix::read_proto_from_file(hier_params, hier->get_mutable_prior());
 
-  std::cout << "HIERARCHY PARAMS: "
-            << hier->get_mutable_prior()->DebugString();
-
   bayesmix::AlgorithmParams algo_proto;
   bayesmix::read_proto_from_file(algo_params, &algo_proto);
   algo->read_params_from_proto(algo_proto);
 
   algo->set_mixing(mixing);
   algo->set_hierarchy(hier);
+  algo->set_verbose(false);
   return algo;
 }
 
