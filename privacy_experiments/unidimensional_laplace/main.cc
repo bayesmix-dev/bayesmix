@@ -113,9 +113,9 @@ void save_stuff_to_file(int ndata, double alpha, int repnum,
 
 void run_experiment(int ndata, int repnum) {
   auto [private_data, clus] = simulate_private_data(ndata);
-  bayesmix::write_matrix_to_file(clus, OUT_DIR + "ndata_" +
-                                           std::to_string(ndata) + "_rep_" +
-                                           std::to_string(repnum) + ".csv");
+  bayesmix::write_matrix_to_file(
+      clus, OUT_DIR + "ndata_" + std::to_string(ndata) + "_rep_" +
+                std::to_string(repnum) + "trueclus.csv");
 
   auto& factory_hier = HierarchyFactory::Instance();
   auto& factory_mixing = MixingFactory::Instance();
@@ -134,7 +134,6 @@ void run_experiment(int ndata, int repnum) {
 
     bayesmix::AlgorithmParams algo_proto;
     bayesmix::read_proto_from_file(PARAM_DIR + "algo.asciipb", &algo_proto);
-    std::cout << "algo_proto: " << algo_proto.DebugString() << std::endl;
 
     auto neal2algo = std::make_shared<PrivateNeal2>();
     auto slicealgo =
@@ -144,8 +143,8 @@ void run_experiment(int ndata, int repnum) {
 
     std::map<std::string, std::shared_ptr<BaseAlgorithm>> algos;
     algos.insert(std::make_pair("neal2", neal2algo));
-    // algos.insert(std::make_pair("slice", slicealgo));
-    algos.insert(std::make_pair("blockedgibbs", bgalgo));
+    algos.insert(std::make_pair("slice", slicealgo));
+    // algos.insert(std::make_pair("blockedgibbs", bgalgo));
 
     for (auto& [name, algo] : algos) {
       auto hier = factory_hier.create_object("NNIG");
@@ -206,12 +205,17 @@ void run_experiment(int ndata, int repnum) {
 
 int main() {
   std::vector<int> ndata = {50, 100, 200, 500, 1000};
-  int nrep = 25;
+  // std::vector<int> ndata = {50, 100};
+  int nrep = 50;
 
-#pragma omp parallel for collapse(2)
+#pragma omp parallel for
   for (int i = 0; i < nrep; i++) {
-    for (auto& n : ndata) {
-      run_experiment(n, i);
+    {
+#pragma omp critical
+      std::cout << "repnum: " << i << std::endl;
+    }
+    for (int j = 0; j < ndata.size(); j++) {
+      run_experiment(ndata[j], i);
     }
   }
 }
