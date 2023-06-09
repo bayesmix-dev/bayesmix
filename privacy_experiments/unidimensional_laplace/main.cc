@@ -206,7 +206,7 @@ void run_experiment(int ndata, int repnum) {
 
 int main() {
   std::vector<int> ndata = {50, 100, 200, 500, 1000};
-  int nrep = 10;
+  int nrep = 25;
 
 #pragma omp parallel for collapse(2)
   for (int i = 0; i < nrep; i++) {
