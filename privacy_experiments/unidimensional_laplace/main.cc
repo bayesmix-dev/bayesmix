@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "../utils.h"
 #include "src/includes.h"
 #include "src/privacy/algorithms/private_conditional.h"
@@ -40,15 +42,15 @@ Eigen::VectorXd eval_true_dens(Eigen::VectorXd xgrid) {
   return out;
 }
 
-void save_stuff_to_file(int ndata, double eps, int repnum,
+void save_stuff_to_file(int ndata, double alpha, int repnum,
                         Eigen::MatrixXd private_data, BaseCollector* coll,
                         std::shared_ptr<BaseAlgorithm> algo,
                         std::string algo_name) {
   std::string base_fname =
-      OUT_DIR + algo_name + "_ndata_" + std::to_string(ndata) + "_eps_" +
-      std::to_string(eps) + +"_rep_" + std::to_string(repnum) + "_";
+      OUT_DIR + algo_name + "_ndata_" + std::to_string(ndata) + "_alpha_" +
+      std::to_string(alpha) + +"_rep_" + std::to_string(repnum) + "_";
 
-  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(1000, 0.0, 1.0);
+  Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(1000, -10.0, 10.0);
   Eigen::MatrixXd dens = bayesmix::eval_lpdf_parallel(algo, coll, grid);
   bayesmix::write_matrix_to_file(dens, base_fname + "eval_dens.csv");
 
@@ -118,18 +120,21 @@ void run_experiment(int ndata, int repnum) {
   auto& factory_hier = HierarchyFactory::Instance();
   auto& factory_mixing = MixingFactory::Instance();
 
-  std::vector<double> priv_levels = {0.1, 0.3, 1.0, 3.0, 10.0, 100.0};
+  std::vector<double> priv_levels = {1.0, 2.0, 5.0, 10.0, 50.0};
   std::vector<double> epsilons;
   for (double alpha : priv_levels) {
     epsilons.push_back(20.0 / alpha);
   }
 
-  for (auto& eps : epsilons) {
+  for (int k = 0; k < epsilons.size(); k++) {
+    double eps = epsilons[k];
+    double alpha = priv_levels[k];
     std::shared_ptr<LaplaceChannel> channel(new LaplaceChannel(eps));
     Eigen::MatrixXd sanitized_data = channel->sanitize(private_data);
 
     bayesmix::AlgorithmParams algo_proto;
     bayesmix::read_proto_from_file(PARAM_DIR + "algo.asciipb", &algo_proto);
+    std::cout << "algo_proto: " << algo_proto.DebugString() << std::endl;
 
     auto neal2algo = std::make_shared<PrivateNeal2>();
     auto slicealgo =
@@ -139,7 +144,7 @@ void run_experiment(int ndata, int repnum) {
 
     std::map<std::string, std::shared_ptr<BaseAlgorithm>> algos;
     algos.insert(std::make_pair("neal2", neal2algo));
-    algos.insert(std::make_pair("slice", slicealgo));
+    // algos.insert(std::make_pair("slice", slicealgo));
     algos.insert(std::make_pair("blockedgibbs", bgalgo));
 
     for (auto& [name, algo] : algos) {
@@ -178,16 +183,30 @@ void run_experiment(int ndata, int repnum) {
       algo->set_verbose(false);
 
       BaseCollector* coll = new MemoryCollector();
+
+      algo->read_params_from_proto(algo_proto);
+      auto start = std::chrono::high_resolution_clock::now();
       algo->run(coll);
-      save_stuff_to_file(ndata, eps, repnum, private_data, coll, algo, name);
+      auto end = std::chrono::high_resolution_clock::now();
+      Eigen::MatrixXd time(1, 1);
+      time(0, 0) =
+          std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+              .count();
+
+      std::string fname = OUT_DIR + name + "_ndata_" + std::to_string(ndata) +
+                          "_alpha_" + std::to_string(alpha) + "_rep_" +
+                          std::to_string(repnum) + "_time.csv";
+      bayesmix::write_matrix_to_file(time, fname);
+
+      save_stuff_to_file(ndata, alpha, repnum, private_data, coll, algo, name);
       delete coll;
     }
   }
 }
 
 int main() {
-  std::vector<int> ndata = {50, 250, 500, 1000, 5000, 10000};
-  int nrep = 25;
+  std::vector<int> ndata = {50, 100, 200, 500, 1000};
+  int nrep = 10;
 
 #pragma omp parallel for collapse(2)
   for (int i = 0; i < nrep; i++) {
