@@ -2,8 +2,17 @@
 
 #include "src/hierarchies/likelihoods/uni_norm_likelihood.h"
 
-void PrivateNeal2::set_public_data(const Eigen::MatrixXd &public_data_) {
-  data = privacy_channel->get_candidate_private_data(public_data_);
+void PrivateNeal2::set_public_data(const Eigen::MatrixXd &public_data_,
+                                   bool random_init) {
+  if (!random_init) {
+    data = privacy_channel->get_candidate_private_data(public_data_);
+  } else {
+    auto ex_datum = unique_values[0]->get_likelihood()->sample();
+    data.resize(public_data_.rows(), ex_datum.size());
+    for (int i = 0; i < public_data_.rows(); i++) {
+      data.row(i) = unique_values[0]->get_likelihood()->sample();
+    }
+  }
   private_data = data;
   this->public_data = public_data_;
 }

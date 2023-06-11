@@ -12,6 +12,7 @@ std::shared_ptr<PrivateNeal2> get_algo1d(std::string hier_params,
 
   bayesmix::read_proto_from_file(mix_params, mixing->get_mutable_prior());
   bayesmix::read_proto_from_file(hier_params, hier->get_mutable_prior());
+  hier->initialize();
 
   bayesmix::AlgorithmParams algo_proto;
   bayesmix::read_proto_from_file(algo_params, &algo_proto);

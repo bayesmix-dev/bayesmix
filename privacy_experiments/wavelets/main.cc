@@ -61,10 +61,12 @@ void save_stuff_to_file(int ndata, double alpha, int repnum,
                  std::to_string(ndata) + "_alpha_" + std::to_string(alpha) +
                  +"_rep_" + std::to_string(repnum) + "_";
   }
-
   Eigen::VectorXd grid = Eigen::VectorXd::LinSpaced(1000, 0.0, 1.0);
   Eigen::MatrixXd dens = bayesmix::eval_lpdf_parallel(algo, coll, grid);
-  bayesmix::write_matrix_to_file(dens, base_fname + "eval_dens.csv");
+
+  if (repnum == 0) {
+    bayesmix::write_matrix_to_file(dens, base_fname + "eval_dens.csv");
+  }
 
   Eigen::MatrixXd clus_allocs = get_cluster_mat(coll, ndata);
   // bayesmix::write_matrix_to_file(clus_allocs, base_fname + "clus.csv");
@@ -99,15 +101,11 @@ void save_stuff_to_file(int ndata, double alpha, int repnum,
           .rowwise()
           .squaredNorm() *
       (grid[1] - grid[0]);
-
   bayesmix::write_matrix_to_file(error_chain,
                                  base_fname + "l2error_chain.csv");
-
   Eigen::MatrixXd arate(1, 1);
   arate(0, 0) = algo->get_acceptance_rate();
-
   bayesmix::write_matrix_to_file(arate, base_fname + "acceptance_rate.csv");
-
   bayesmix::write_matrix_to_file(time, base_fname + "time.csv");
 }
 
@@ -117,7 +115,7 @@ void run_experiment(int ndata, int repnum) {
       clus, OUT_DIR + "ndata_" + std::to_string(ndata) + "_rep_" +
                 std::to_string(repnum) + "trueclus.csv");
 
-  std::vector<double> priv_levels = {1.0, 2.0, 5.0, 10.0, 50.0};
+  std::vector<double> priv_levels = {2.0, 10.0, 50.0, 100.0, 250.0};
   std::vector<int> Js = {2, 4, 6};
 
   for (int k = 0; k < priv_levels.size(); k++) {
@@ -131,7 +129,7 @@ void run_experiment(int ndata, int repnum) {
     std::shared_ptr<LaplaceChannel> lap_channel(new LaplaceChannel(lap_sd));
     Eigen::MatrixXd lap_sanitized_data = lap_channel->sanitize(private_data);
     lap_algo->set_channel(lap_channel);
-    lap_algo->set_public_data(lap_sanitized_data);
+    lap_algo->set_public_data(lap_sanitized_data, true);
 
     BaseCollector* lap_coll = new MemoryCollector();
     auto start = std::chrono::high_resolution_clock::now();
@@ -157,7 +155,7 @@ void run_experiment(int ndata, int repnum) {
           new WaveletChannel(j, wave_sd));
       Eigen::MatrixXd wav_sanitized_data = wav_channel->sanitize(private_data);
       wavelet_algo->set_channel(wav_channel);
-      wavelet_algo->set_public_data(wav_sanitized_data);
+      wavelet_algo->set_public_data(wav_sanitized_data, true);
 
       BaseCollector* wav_coll = new MemoryCollector();
       auto start = std::chrono::high_resolution_clock::now();
@@ -175,15 +173,69 @@ void run_experiment(int ndata, int repnum) {
 
 int main() {
   int ndata = 250;
-  int nrep = 48;
+  //   int nrep = 6;
 
-#pragma omp parallel for
-  for (int i = 0; i < nrep; i++) {
-    {
-#pragma omp critical
-      std::cout << "repnum: " << i << std::endl;
-    }
+  // #pragma omp parallel for
+  //   for (int i = 0; i < nrep; i++) {
+  //     {
+  // #pragma omp critical
+  //       std::cout << "repnum: " << i << std::endl;
+  //     }
+  //     run_experiment(ndata, i);
+  //   }
 
-    run_experiment(ndata, i);
+  int repnum = 0;
+  double alpha = 10.0;
+  auto [private_data, clus] = simulate_private_data(ndata);
+  // std::shared_ptr<PrivateNeal2> lap_algo = get_algo1d(
+  //       PARAM_DIR + "bgg_params.asciipb", PARAM_DIR + "dp_gamma.asciipb",
+  //       PARAM_DIR + "algo.asciipb", "BetaGG");
+
+  // // LAPLACE CHANNEL
+  // double lap_sd = 1.0 / alpha;
+  // std::shared_ptr<LaplaceChannel> lap_channel(new LaplaceChannel(lap_sd));
+  // Eigen::MatrixXd lap_sanitized_data = lap_channel->sanitize(private_data);
+  // lap_algo->set_channel(lap_channel);
+  // lap_algo->set_public_data(lap_sanitized_data, true);
+
+  // BaseCollector* lap_coll = new MemoryCollector();
+  // auto start = std::chrono::high_resolution_clock::now();
+  // lap_algo->run(lap_coll);
+  // auto end = std::chrono::high_resolution_clock::now();
+  // Eigen::MatrixXd time(1, 1);
+  // time(0, 0) =
+  //     std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+  //         .count();
+  // save_stuff_to_file(ndata, alpha, repnum, time, private_data, lap_coll,
+  //                    lap_algo, "laplace", -1);
+
+  // delete lap_coll;
+
+  std::vector<int> Js = {2, 4, 6};
+
+  for (int& j : Js) {
+    std::shared_ptr<PrivateNeal2> wavelet_algo = get_algo1d(
+        PARAM_DIR + "bgg_params.asciipb", PARAM_DIR + "dp_gamma.asciipb",
+        PARAM_DIR + "algo.asciipb", "BetaGG");
+
+    // LAPLACE CHANNEL
+    double wave_sd = 12. / alpha * 3.41 * std::pow(2, 0.5 * j);
+    std::shared_ptr<WaveletChannel> wav_channel(
+        new WaveletChannel(j, wave_sd));
+    Eigen::MatrixXd wav_sanitized_data = wav_channel->sanitize(private_data);
+    wavelet_algo->set_channel(wav_channel);
+    wavelet_algo->set_public_data(wav_sanitized_data, true);
+
+    BaseCollector* wav_coll = new MemoryCollector();
+    auto start = std::chrono::high_resolution_clock::now();
+    wavelet_algo->run(wav_coll);
+    auto end = std::chrono::high_resolution_clock::now();
+    Eigen::MatrixXd time(1, 1);
+    time(0, 0) =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+            .count();
+    save_stuff_to_file(ndata, alpha, repnum, time, private_data, wav_coll,
+                       wavelet_algo, "wavelet", j);
+    delete wav_coll;
   }
 }

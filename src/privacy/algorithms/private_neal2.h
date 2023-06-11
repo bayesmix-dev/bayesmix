@@ -49,7 +49,8 @@ class PrivateNeal2 : public MarginalAlgorithm {
 
   double get_acceptance_rate() { return (1.0 * n_acc) / n_prop; }
 
-  void set_public_data(const Eigen::MatrixXd& public_data_);
+  void set_public_data(const Eigen::MatrixXd& public_data_,
+                       bool random_init = false);
 
  protected:
   void print_startup_message() const override;
