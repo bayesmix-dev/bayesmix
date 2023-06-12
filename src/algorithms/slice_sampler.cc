@@ -1,5 +1,7 @@
 #include "slice_sampler.h"
 
+#include "src/hierarchies/nnig_hierarchy.h"
+
 void SliceSampler::print_startup_message() const {
   std::string msg = "Running SliceSampler algorithm with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
@@ -78,16 +80,21 @@ void SliceSampler::sample_allocations() {
   for (int i = 0; i < data.rows(); i++) {
     // Compute weights
     Eigen::VectorXd prior_weights = mixing->get_mixing_weights(false, false);
-    Eigen::VectorXd probas = Eigen::VectorXd::Zero(num_components);
+    std::vector<double> probas_;
+    std::vector<int> inds;
     for (int j = 0; j < num_components; j++) {
       if (slice_u(i) < prior_weights(j)) {
-        probas(j) += std::exp(unique_values[j]->get_like_lpdf(
+        probas_.push_back(unique_values[j]->get_like_lpdf(
             data.row(i), hier_covariates.row(i)));
+        inds.push_back(j);
       }
     }
-    probas = probas / probas.sum();
+    Eigen::VectorXd probas =
+        Eigen::VectorXd::Map(probas_.data(), probas_.size());
+    probas = stan::math::softmax(probas);
     // Draw a NEW value for datum allocation
     unsigned int c_new = bayesmix::categorical_rng(probas, rng, 0);
+    c_new = inds[c_new];
     unsigned int c_old = allocations[i];
     if (c_new != c_old) {
       allocations[i] = c_new;
