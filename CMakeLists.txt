@@ -201,30 +201,36 @@ if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
   message(FATAL_ERROR
           "Your cmake version is too old: version >= 3.20.0 is required for plotting.")
   endif()
-  include(FetchContent)
 
-  set(FETCHCONTENT_QUIET OFF)
-  set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
-  set(BUILD_SHARED_LIBS OFF)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-  set(BUILD_TESTING OFF)
+  # include(FetchContent)
 
+  # set(FETCHCONTENT_QUIET OFF)
+  # set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+  # set(BUILD_SHARED_LIBS OFF)
+  # set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  # set(BUILD_TESTING OFF)
+
+  # Define patch command to inject
+  set(matplotplusplus_patch git apply ${CMAKE_CURRENT_LIST_DIR}/resources/patches/matplotplusplus.patch)
+
+  # Make matplotplusplus available
   message(CHECK_START "Fetching Matplotplusplus")
   list(APPEND CMAKE_MESSAGE_INDENT "  ")
-
   FetchContent_Declare(matplotplusplus
-    GIT_REPOSITORY https://github.com/alandefreitas/matplotplusplus
-    GIT_TAG origin/master # or whatever tag you want
+    GIT_REPOSITORY "https://github.com/alandefreitas/matplotplusplus"
+    GIT_TAG "origin/master" # or whatever tag you want
+    PATCH_COMMAND ${matplotplusplus_patch} 
   )
+  FetchContent_MakeAvailable(matplotplusplus)
 
-  FetchContent_GetProperties(matplotplusplus)
-  if(NOT matplotplusplus_POPULATED)
-    FetchContent_Populate(matplotplusplus)
-    add_subdirectory(${matplotplusplus_SOURCE_DIR} ${matplotplusplus_BINARY_DIR}
-                     EXCLUDE_FROM_ALL)
-  endif()
-  # find_package(Matplot++ REQUIRED)
-  message("matplot " ${matplotplusplus_SOURCE_DIR})
+  # FetchContent_GetProperties(matplotplusplus)
+  # if(NOT matplotplusplus_POPULATED)
+  #   FetchContent_Populate(matplotplusplus)
+  #   add_subdirectory(${matplotplusplus_SOURCE_DIR} ${matplotplusplus_BINARY_DIR}
+  #                    EXCLUDE_FROM_ALL)
+  # endif()
+  # # find_package(Matplot++ REQUIRED)
+  # message("matplot " ${matplotplusplus_SOURCE_DIR})
 
   add_executable(plot_mcmc $<TARGET_OBJECTS:bayesmix> executables/plot_mcmc.cc
     src/plots/plot_utils.h
