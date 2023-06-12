@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14.0)
+cmake_minimum_required(VERSION 3.20.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 message("CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}")
 
@@ -36,26 +36,17 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(BUILD_TESTING OFF)
 
 # Make bayesmix-dev/math available
+message(CHECK_START "Fetching math")
 FetchContent_Declare(math
   GIT_REPOSITORY "https://github.com/bayesmix-dev/math.git"
   GIT_TAG "develop"
 )
 FetchContent_MakeAvailable(math)
-
-# Clone bayesmix-dev/math into lib/math
-# include(cmake/GitUtils.cmake)
-# git_clone(
-# 	PROJECT_NAME math
-# 	GIT_URL https://github.com/bayesmix-dev/math.git
-# 	GIT_BRANCH develop
-# 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/lib
-# )
+message(CHECK_PASS "fetched")
 
 # TBB CMake integration
 message(STATUS "Using math TBB")
 # Define TBB_ROOT Folder
-# set(TBB_ROOT ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb)
-# file(COPY ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2020.3/ DESTINATION ${TBB_ROOT})
 set(TBB_ROOT ${math_SOURCE_DIR}/lib/tbb)
 file(COPY ${math_SOURCE_DIR}/lib/tbb_2020.3/ DESTINATION ${TBB_ROOT})
 # Build TBB Library with CMake Integration
@@ -69,11 +60,12 @@ find_package(TBB)
 # Check if Protobuf is present in system
 find_package(Protobuf)
 if (NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
-  if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
-    message(FATAL_ERROR
-            "Your cmake version is too old: either install a newer version (>=3.20)"
-            " or install google's protocol buffer (protobuf) library by hand.")
-  endif()
+  
+  # if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
+  #   message(FATAL_ERROR
+  #           "Your cmake version is too old: either install a newer version (>=3.20)"
+  #           " or install google's protocol buffer (protobuf) library by hand.")
+  # endif()
 
   message(CHECK_START "Fetching Protobuf")
   list(APPEND CMAKE_MESSAGE_INDENT "  ")
@@ -81,12 +73,11 @@ if (NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotob
   option(protobuf_BUILD_TESTS "" OFF)
   set(protobuf_BUILD_EXPORT OFF)
   set(protobuf_MSVC_STATIC_RUNTIME OFF)
-  FetchContent_Declare(
-      protobuf
-      GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
-      GIT_TAG "v3.14.0"
-      GIT_SUBMODULES ""
-      SOURCE_SUBDIR cmake)
+  FetchContent_Declare(protobuf
+    GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
+    GIT_TAG "v3.14.0"
+    GIT_SUBMODULES ""
+    SOURCE_SUBDIR cmake)
   FetchContent_MakeAvailable(protobuf)
 
   list(POP_BACK CMAKE_MESSAGE_INDENT)
@@ -197,48 +188,37 @@ if (ENABLE_DOCS)
 endif()
 
 if (NOT DISABLE_PLOTS)
-if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
-  message(FATAL_ERROR
-          "Your cmake version is too old: version >= 3.20.0 is required for plotting.")
+  
+  # Check version (not needed)
+  if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
+    message(FATAL_ERROR
+            "Your cmake version is too old: version >= 3.20.0 is required for plotting.")
   endif()
-
-  # include(FetchContent)
-
-  # set(FETCHCONTENT_QUIET OFF)
-  # set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
-  # set(BUILD_SHARED_LIBS OFF)
-  # set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-  # set(BUILD_TESTING OFF)
 
   # Define patch command to inject
   set(matplotplusplus_patch git apply ${CMAKE_CURRENT_LIST_DIR}/resources/patches/matplotplusplus.patch)
 
-  # Make matplotplusplus available
-  message(CHECK_START "Fetching Matplotplusplus")
-  list(APPEND CMAKE_MESSAGE_INDENT "  ")
+  # Make matplotplusplus available (+ patch)
+  message(CHECK_START "Fetching matplotplusplus")
   FetchContent_Declare(matplotplusplus
     GIT_REPOSITORY "https://github.com/alandefreitas/matplotplusplus"
-    GIT_TAG "origin/master" # or whatever tag you want
+    GIT_TAG "origin/master"
     PATCH_COMMAND ${matplotplusplus_patch} 
   )
   FetchContent_MakeAvailable(matplotplusplus)
+  message(CHECK_PASS "fetched")
 
-  # FetchContent_GetProperties(matplotplusplus)
-  # if(NOT matplotplusplus_POPULATED)
-  #   FetchContent_Populate(matplotplusplus)
-  #   add_subdirectory(${matplotplusplus_SOURCE_DIR} ${matplotplusplus_BINARY_DIR}
-  #                    EXCLUDE_FROM_ALL)
-  # endif()
-  # # find_package(Matplot++ REQUIRED)
-  # message("matplot " ${matplotplusplus_SOURCE_DIR})
-
-  add_executable(plot_mcmc $<TARGET_OBJECTS:bayesmix> executables/plot_mcmc.cc
+  add_executable(plot_mcmc
+    $<TARGET_OBJECTS:bayesmix>
+    executables/plot_mcmc.cc
     src/plots/plot_utils.h
-    src/plots/plot_utils.cc)
-    target_include_directories(plot_mcmc PUBLIC
-      ${INCLUDE_PATHS} ${matplotplusplus_SOURCE_DIR}/source)
+    src/plots/plot_utils.cc
+  )
+  
+  target_include_directories(plot_mcmc PUBLIC ${INCLUDE_PATHS} ${matplotplusplus_SOURCE_DIR}/source)
   target_link_libraries(plot_mcmc PUBLIC ${LINK_LIBRARIES} matplot)
   target_compile_options(plot_mcmc PUBLIC ${COMPILE_OPTIONS})
+
 endif()
 
 if (NOT DISABLE_EXAMPLES)
