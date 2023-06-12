@@ -1,13 +1,14 @@
 #include "truncated_nnig_hier.h"
 
-void eval_private_nnig_lpdf(const std::shared_ptr<BaseAlgorithm> algo,
-                            BaseCollector *const collector,
-                            const Eigen::MatrixXd &grid, double var_l) {
+Eigen::MatrixXd eval_private_nnig_lpdf(
+    const std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
+    const Eigen::MatrixXd &grid, double var_l, int njobs) {
   bayesmix::AlgorithmState base_state;
   std::vector<std::shared_ptr<google::protobuf::Message>> chain =
       collector->get_whole_chain(&base_state);
   auto chain_shards = bayesmix::internal::gen_even_slices(chain, njobs);
   std::vector<Eigen::MatrixXd> lpdfs(njobs);
+  Eigen::RowVectorXd fake_cov;
 
 #pragma omp parallel for
   for (int i = 0; i < njobs; i++) {
@@ -18,17 +19,17 @@ void eval_private_nnig_lpdf(const std::shared_ptr<BaseAlgorithm> algo,
       // account the privacy shift
       auto state_cast = std::dynamic_pointer_cast<bayesmix::AlgorithmState>(
           chain_shards[i][j]);
-      for (int h = 0; h < state_clust.cluster_states.size(); h++) {
+      for (int h = 0; h < state_cast->cluster_states_size(); h++) {
         double curr_var =
-            state_cast.mutable_cluster_states()[h]->uni_ls_state().var();
-        state_cast.mutable_cluster_states()[h]
-            ->mutable_uni_ls_state()
-            ->set_var(curr_var - var_l);
+            state_cast->mutable_cluster_states(h)->uni_ls_state().var();
+        state_cast->mutable_cluster_states(h)->mutable_uni_ls_state()->set_var(
+            curr_var - var_l);
       }
 
       curr_algo->set_state_proto(chain_shards[i][j]);
-      curr_lpdfs.row(j) =
-          curr_algo->lpdf_from_state(grid, hier_covariate, mix_covariate);
+      Eigen::VectorXd lpdf_eval =
+          curr_algo->lpdf_from_state(grid, fake_cov, fake_cov);
+      curr_lpdfs.row(j) = lpdf_eval.transpose();
     }
     lpdfs[i] = curr_lpdfs;
   }

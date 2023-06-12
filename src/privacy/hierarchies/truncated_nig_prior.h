@@ -6,9 +6,9 @@
 #include <stan/math/rev.hpp>
 #include <vector>
 
-#include "base_prior_model.h"
 #include "hierarchy_prior.pb.h"
-#include "hyperparams.h"
+#include "src/hierarchies/priors/base_prior_model.h"
+#include "src/hierarchies/priors/hyperparams.h"
 #include "src/utils/rng.h"
 
 /**
@@ -21,8 +21,8 @@
  */
 
 class TruncatedNIGPriorModel
-    : public BasePriorModel<NIGPriorModel, State::UniLS, Hyperparams::NIG,
-                            bayesmix::NNIGPrior> {
+    : public BasePriorModel<TruncatedNIGPriorModel, State::UniLS,
+                            Hyperparams::NIG, bayesmix::NNIGPrior> {
  public:
   using AbstractPriorModel::ProtoHypers;
   using AbstractPriorModel::ProtoHypersPtr;
@@ -30,7 +30,13 @@ class TruncatedNIGPriorModel
   TruncatedNIGPriorModel() = default;
   ~TruncatedNIGPriorModel() = default;
 
-  TruncatedNIGPriorModel(var_l, var_u) : var_l(var_l), var_u(var_u) {}
+  TruncatedNIGPriorModel(double var_l, double var_u)
+      : var_l(var_l), var_u(var_u) {}
+
+  void set_var_bounds(double l, double u) {
+    var_l = l;
+    var_u = u;
+  }
 
   double lpdf(const google::protobuf::Message &state_) override;
 
@@ -50,12 +56,11 @@ class TruncatedNIGPriorModel
     T lpdf = stan::math::normal_lpdf(mean, hypers->mean,
                                      sqrt(var / hypers->var_scaling)) +
              stan::math::inv_gamma_lpdf(var, hypers->shape, hypers->scale);
-    T log_norm_constant =
-        stan::math::inv_gamma_lcdf(var_u) - stan::math::inv_gamma_lcdf(var_l);
-    lpdf -= log_norm_constant
-
-            return lpdf +
-            log_det_jac;
+    T log_norm_constant = std::log(
+        stan::math::inv_gamma_cdf(var_u, hypers->shape, hypers->scale) -
+        stan::math::inv_gamma_cdf(var_l, hypers->shape, hypers->scale));
+    lpdf -= log_norm_constant;
+    return lpdf + log_det_jac;
   }
 
   State::UniLS sample(ProtoHypersPtr hier_hypers = nullptr) override;

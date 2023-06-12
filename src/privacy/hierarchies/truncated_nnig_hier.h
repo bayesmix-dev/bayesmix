@@ -1,11 +1,12 @@
-#ifndef BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_H_
-#define BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_H_
+#ifndef BAYESMIX_HIERARCHIES_PRIVATE_NNIG_HIERARCHY_H_
+#define BAYESMIX_HIERARCHIES_PRIVATE_NNIG_HIERARCHY_H_
 
 #include "hierarchy_id.pb.h"
-#include "src/hiearrchies/likelihoods/uni_norm_likelihood.h"
-#include "src/hiearrchies/updaters/nnig_updater.h"
 #include "src/hierarchies/base_hierarchy.h"
-#include "truncated_nig_hier.h"
+#include "src/hierarchies/likelihoods/uni_norm_likelihood.h"
+#include "src/hierarchies/updaters/nnig_updater.h"
+#include "src/includes.h"
+#include "truncated_nig_prior.h"
 
 /**
  * A Normal- Normal Inverse Gamma hierarchy with inflated variance to
@@ -21,14 +22,22 @@
  * The state is composed of mean and variance.
  */
 
-class PrivateNIGHier : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
+class PrivateNIGHier : public BaseHierarchy<PrivateNIGHier, UniNormLikelihood,
                                             TruncatedNIGPriorModel> {
  public:
   PrivateNIGHier() = default;
   ~PrivateNIGHier() = default;
 
-  PrivateNIGHier(double var_l, double var_u = stan::math::INFTY) {
-    this->prior = std::make_shared<TruncatedNIGPriorModel>(var_l, var_u);
+  // PrivateNIGHier(double var_l, double var_u = stan::math::INFTY) {
+  //   this->prior = std::make_shared<TruncatedNIGPriorModel>(var_l, var_u);
+  // }
+  void set_var_bounds(double var_l, double var_u = stan::math::INFTY) {
+    std::dynamic_pointer_cast<TruncatedNIGPriorModel>(prior)->set_var_bounds(
+        var_l, var_u);
+  }
+
+  bayesmix::HierarchyId get_id() const override {
+    return bayesmix::HierarchyId::UNKNOWN_HIERARCHY;
   }
 
   //! Sets the default updater algorithm for this hierarchy
@@ -59,6 +68,7 @@ class PrivateNIGHier : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
     auto prior_cast = std::dynamic_pointer_cast<TruncatedNIGPriorModel>(prior);
     auto [var_l, var_u] = prior_cast->get_var_bounds();
 
+    auto state = like->get_state();
     double prior_lpdf =
         prior->lpdf(state.mean, state.var, mu0, lambda0, alpha0, beta0);
     double like_lpdf = like->lpdf(datum);
@@ -70,12 +80,13 @@ class PrivateNIGHier : public BaseHierarchy<NNIGHierarchy, UniNormLikelihood,
                                 (datum(0) - mu0) * (datum(0) - mu0);
     double post_lpdf =
         prior->lpdf(state.mean, state.var, mu_n, lambda_n, alpha_n, beta_n);
+
     return prior_lpdf + like_lpdf - post_lpdf;
   }
 };
 
-void eval_private_nnig_lpdf(const std::shared_ptr<BaseAlgorithm> algo,
-                            BaseCollector *const collector,
-                            const Eigen::MatrixXd &grid, double var_l);
+Eigen::MatrixXd eval_private_nnig_lpdf(
+    const std::shared_ptr<BaseAlgorithm> algo, BaseCollector *const collector,
+    const Eigen::MatrixXd &grid, double var_l, int njobs);
 
-#endif  // BAYESMIX_HIERARCHIES_NNIG_HIERARCHY_H_
+#endif  // BAYESMIX_HIERARCHIES_PRIVATE_NNIG_HIERARCHY_H_

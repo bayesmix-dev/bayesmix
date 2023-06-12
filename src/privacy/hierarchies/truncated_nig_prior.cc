@@ -29,8 +29,8 @@ double TruncatedNIGPriorModel::lpdf(const google::protobuf::Message &state_) {
                               sqrt(state.var() / hypers->var_scaling)) +
       stan::math::inv_gamma_lpdf(state.var(), hypers->shape, hypers->scale);
   double log_norm_constant =
-      stan::math::inv_gamma_lcdf(var_u, hypers->shape, hypers->scale) -
-      stan::math::inv_gamma_lcdf(var_l, hypers->shape, hypers->scale);
+      std::log(stan::math::inv_gamma_cdf(var_u, hypers->shape, hypers->scale) -
+               stan::math::inv_gamma_cdf(var_l, hypers->shape, hypers->scale));
   return target - log_norm_constant;
 }
 
@@ -38,8 +38,8 @@ double TruncatedNIGPriorModel::lpdf(double mean, double var, double mu0,
                                     double lam, double a, double b) {
   double target = stan::math::normal_lpdf(mean, mu0, sqrt(var / lam)) +
                   stan::math::inv_gamma_lpdf(var, a, b);
-  double log_norm_constant = stan::math::inv_gamma_lcdf(var_u, a, b) -
-                             stan::math::inv_gamma_lcdf(var_l, a, b);
+  double log_norm_constant = std::log(stan::math::inv_gamma_cdf(var_u, a, b) -
+                                      stan::math::inv_gamma_cdf(var_l, a, b));
   return target - log_norm_constant;
 }
 
@@ -50,7 +50,7 @@ State::UniLS TruncatedNIGPriorModel::sample(ProtoHypersPtr hier_hypers) {
 
   State::UniLS out;
   // sample the variance via the inverse-cdf method
-  out_var = bayesmix::sample_truncated_inv_gamma(
+  out.var = bayesmix::sample_truncated_inv_gamma(
       params.shape(), params.scale(), var_l, var_u, rng);
   out.mean = stan::math::normal_rng(params.mean(),
                                     sqrt(out.var / params.var_scaling()), rng);

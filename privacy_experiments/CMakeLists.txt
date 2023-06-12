@@ -21,6 +21,12 @@ add_executable(compare $<TARGET_OBJECTS:bayesmix>
     utils.cc
 )
 
+add_executable(gaussian $<TARGET_OBJECTS:bayesmix>
+    gaussian/main.cc
+    utils.h
+    utils.cc
+)
+
 target_include_directories(laplace1d PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(laplace1d PUBLIC ${LINK_LIBRARIES})
 target_compile_options(laplace1d PUBLIC ${COMPILE_OPTIONS})
@@ -32,3 +38,8 @@ target_compile_options(wavelet PUBLIC ${COMPILE_OPTIONS})
 target_include_directories(compare PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(compare PUBLIC ${LINK_LIBRARIES})
 target_compile_options(compare PUBLIC ${COMPILE_OPTIONS})
+
+
+target_include_directories(gaussian PUBLIC ${INCLUDE_PATHS})
+target_link_libraries(gaussian PUBLIC ${LINK_LIBRARIES})
+target_compile_options(gaussian PUBLIC ${COMPILE_OPTIONS})

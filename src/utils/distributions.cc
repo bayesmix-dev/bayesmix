@@ -294,10 +294,9 @@ double bayesmix::sample_truncated_beta(double a, double b, double l, double u,
 double bayesmix::sample_truncated_inv_gamma(double a, double b, double l,
                                             double u, std::mt19937 &rng) {
   double unif = stan::math::uniform_rng(0.0, 1.0, rng);
-
+  double cdf_l = stan::math::inv_gamma_cdf(l, a, b);
+  double cdf_u = stan::math::inv_gamma_cdf(u, a, b);
   boost::math::inverse_gamma_distribution igdist(a, b);
-  double cdf_l = cdf(igdist, l);
-  double cdf_u = cdf(igdist, u);
   double orig_quantile = cdf_l + unif * (cdf_u - cdf_l);
   return quantile(igdist, orig_quantile);
 }
