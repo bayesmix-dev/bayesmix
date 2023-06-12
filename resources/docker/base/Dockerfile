@@ -1,6 +1,7 @@
 FROM mberaha/bayesmix-env:latest
 
-COPY . /usr/bayesmix
+# COPY . /usr/bayesmix
+RUN git clone https://github.com/bayesmix-dev/bayesmix.git /usr/bayesmix
 WORKDIR /usr/bayesmix
 
 RUN python3 -m pip install pytest
