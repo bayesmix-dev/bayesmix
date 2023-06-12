@@ -29,7 +29,7 @@ jobs:
         with:
           context: .
           push: true
-          file: docker/base/Dockerfile
+          file: resources/docker/base/Dockerfile
           tags: ${{ steps.metadata_base.outputs.tags }}
           labels: mberaha/bayesmix_base:latest
           
@@ -44,6 +44,6 @@ jobs:
         with:
           context: .
           push: true
-          file: docker/test/Dockerfile
+          file: resources/docker/test/Dockerfile
           tags: ${{ steps.metadata_test.outputs.tags }}
           labels: mberaha/bayesmix_test:latest   

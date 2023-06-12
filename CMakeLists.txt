@@ -20,22 +20,44 @@ set(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL TRUE)
 
 # Require PkgConfig
 find_package(PkgConfig REQUIRED)
+
+# Require OpenMP
 find_package(OpenMP REQUIRED)
 
-# Clone bayesmix-dev/math into lib/math
-include(cmake/GitUtils.cmake)
-git_clone(
-	PROJECT_NAME math
-	GIT_URL https://github.com/bayesmix-dev/math.git
-	GIT_BRANCH develop
-	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/lib
+# Include FetchContent
+include(FetchContent)
+
+# Set up FetchContent options
+set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_LIST_DIR}/lib/_deps)
+set(FETCHCONTENT_QUIET OFF)
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+set(BUILD_SHARED_LIBS OFF)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(BUILD_TESTING OFF)
+
+# Make bayesmix-dev/math available
+FetchContent_Declare(math
+  GIT_REPOSITORY "https://github.com/bayesmix-dev/math.git"
+  GIT_TAG "develop"
 )
+FetchContent_MakeAvailable(math)
+
+# Clone bayesmix-dev/math into lib/math
+# include(cmake/GitUtils.cmake)
+# git_clone(
+# 	PROJECT_NAME math
+# 	GIT_URL https://github.com/bayesmix-dev/math.git
+# 	GIT_BRANCH develop
+# 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/lib
+# )
 
 # TBB CMake integration
 message(STATUS "Using math TBB")
 # Define TBB_ROOT Folder
-set(TBB_ROOT ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb)
-file(COPY ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2020.3/ DESTINATION ${TBB_ROOT})
+# set(TBB_ROOT ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb)
+# file(COPY ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/tbb_2020.3/ DESTINATION ${TBB_ROOT})
+set(TBB_ROOT ${math_SOURCE_DIR}/lib/tbb)
+file(COPY ${math_SOURCE_DIR}/lib/tbb_2020.3/ DESTINATION ${TBB_ROOT})
 # Build TBB Library with CMake Integration
 include(${TBB_ROOT}/cmake/TBBBuild.cmake)
 list(APPEND MAKE_ARGS "tbb_build_dir=${TBB_ROOT}")
@@ -52,13 +74,6 @@ if (NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotob
             "Your cmake version is too old: either install a newer version (>=3.20)"
             " or install google's protocol buffer (protobuf) library by hand.")
   endif()
-
-  include(FetchContent)
-  set(FETCHCONTENT_QUIET OFF)
-  set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
-  set(BUILD_SHARED_LIBS OFF)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-  set(BUILD_TESTING OFF)
 
   message(CHECK_START "Fetching Protobuf")
   list(APPEND CMAKE_MESSAGE_INDENT "  ")
@@ -97,15 +112,14 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
 set(INCLUDE_PATHS
   ${BASEPATH}
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/boost_1.78.0
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/eigen_3.4.0
+  ${math_SOURCE_DIR}
+  ${math_SOURCE_DIR}/lib/boost_1.78.0
+  ${math_SOURCE_DIR}/lib/eigen_3.4.0
+  ${math_SOURCE_DIR}/lib/sundials_6.1.1/include
   ${TBB_ROOT}/include
-  ${CMAKE_CURRENT_LIST_DIR}/lib/math/lib/sundials_6.1.1/include
   ${CMAKE_CURRENT_BINARY_DIR}
   ${protobuf_SOURCE_DIR}/src
 )
-
 
 set(LINK_LIBRARIES
 	pthread
@@ -187,30 +201,36 @@ if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
   message(FATAL_ERROR
           "Your cmake version is too old: version >= 3.20.0 is required for plotting.")
   endif()
-  include(FetchContent)
 
-  set(FETCHCONTENT_QUIET OFF)
-  set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
-  set(BUILD_SHARED_LIBS OFF)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-  set(BUILD_TESTING OFF)
+  # include(FetchContent)
 
+  # set(FETCHCONTENT_QUIET OFF)
+  # set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+  # set(BUILD_SHARED_LIBS OFF)
+  # set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  # set(BUILD_TESTING OFF)
+
+  # Define patch command to inject
+  set(matplotplusplus_patch git apply ${CMAKE_CURRENT_LIST_DIR}/resources/patches/matplotplusplus.patch)
+
+  # Make matplotplusplus available
   message(CHECK_START "Fetching Matplotplusplus")
   list(APPEND CMAKE_MESSAGE_INDENT "  ")
-
   FetchContent_Declare(matplotplusplus
-    GIT_REPOSITORY https://github.com/alandefreitas/matplotplusplus
-    GIT_TAG origin/master # or whatever tag you want
+    GIT_REPOSITORY "https://github.com/alandefreitas/matplotplusplus"
+    GIT_TAG "origin/master" # or whatever tag you want
+    PATCH_COMMAND ${matplotplusplus_patch} 
   )
+  FetchContent_MakeAvailable(matplotplusplus)
 
-  FetchContent_GetProperties(matplotplusplus)
-  if(NOT matplotplusplus_POPULATED)
-    FetchContent_Populate(matplotplusplus)
-    add_subdirectory(${matplotplusplus_SOURCE_DIR} ${matplotplusplus_BINARY_DIR}
-                     EXCLUDE_FROM_ALL)
-  endif()
-  # find_package(Matplot++ REQUIRED)
-  message("matplot " ${matplotplusplus_SOURCE_DIR})
+  # FetchContent_GetProperties(matplotplusplus)
+  # if(NOT matplotplusplus_POPULATED)
+  #   FetchContent_Populate(matplotplusplus)
+  #   add_subdirectory(${matplotplusplus_SOURCE_DIR} ${matplotplusplus_BINARY_DIR}
+  #                    EXCLUDE_FROM_ALL)
+  # endif()
+  # # find_package(Matplot++ REQUIRED)
+  # message("matplot " ${matplotplusplus_SOURCE_DIR})
 
   add_executable(plot_mcmc $<TARGET_OBJECTS:bayesmix> executables/plot_mcmc.cc
     src/plots/plot_utils.h
