@@ -139,33 +139,15 @@ void TruncatedSBMixing::set_sticks(Eigen::VectorXd sticks) {
 
 Eigen::MatrixXd TruncatedSBMixing::get_prior_shape_parameters() const {
   Eigen::MatrixXd shapes(2, num_components);
-  auto priorcast = cast_prior();
-  if (priorcast->has_beta_priors()) {
-    // Individual shape parameters for each component
-    for (int i = 0; i < num_components; i++) {
-      shapes(0, i) = priorcast->beta_priors().beta_distributions(i).shape_a();
-      shapes(1, i) = priorcast->beta_priors().beta_distributions(i).shape_b();
-    }
-  } else if (priorcast->has_dp_prior()) {
-    // Uniform shape parameters for all components, computed from DP parameters
-    double totmass = priorcast->dp_prior().totalmass();
-    shapes.row(0) = Eigen::VectorXd::Ones(num_components);
-    shapes.row(1) = totmass * Eigen::VectorXd::Ones(num_components);
-  } else if (priorcast->has_py_prior()) {
-    // Uniform shape parameters for all components, computed from PY parameters
-    double strength = priorcast->py_prior().strength();
-    double disc = priorcast->py_prior().discount();
-    for (int i = 0; i < num_components; i++) {
-      shapes(0, i) = 1.0 - disc;
-      shapes(1, i) = strength + i * disc;
-    }
-  } else {
-    throw std::invalid_argument("Unrecognized mixing prior");
+  for (int h = 0; h < num_components; h++) {
+    auto [a, b] = get_beta_params(h);
+    shapes(0, h) = a;
+    shapes(1, h) = b;
   }
   return shapes;
 }
 
-std::pair<double, double> TruncatedSBMixing::get_beta_params(int ind) {
+std::pair<double, double> TruncatedSBMixing::get_beta_params(int ind) const {
   auto priorcast = cast_prior();
   std::pair<double, double> out;
   if (priorcast->has_beta_priors()) {

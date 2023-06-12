@@ -99,7 +99,7 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
   //! Returns weights in log-scale computing them from sticks
   Eigen::VectorXd logweights_from_sticks() const;
 
-  std::pair<double, double> get_beta_params(int ind);
+  std::pair<double, double> get_beta_params(int ind) const;
 };
 
 #endif  // BAYESMIX_MIXINGS_TRUNCATED_SB_MIXING_H_
