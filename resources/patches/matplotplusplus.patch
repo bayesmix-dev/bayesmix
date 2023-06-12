@@ -1,0 +1,20 @@
+diff --git a/source/3rd_party/CMakeLists.txt b/source/3rd_party/CMakeLists.txt
+index b5656e1..ad1ccc5 100644
+--- a/source/3rd_party/CMakeLists.txt
++++ b/source/3rd_party/CMakeLists.txt
+@@ -115,7 +115,7 @@ if(FFTW_FOUND)
+ endif()
+ 
+ if (CMAKE_MODULE_PATH)
+-  find_package(OpenCV QUIET)
++  # find_package(OpenCV QUIET)
+   if (OpenCV_FOUND)
+     target_compile_definitions(cimg INTERFACE cimg_use_opencv)
+     target_link_libraries(cimg INTERFACE ${OpenCV_LIBRARIES})
+@@ -153,4 +153,4 @@ endif()
+ if(MASTER_PROJECT AND NOT BUILD_SHARED_LIBS)
+   install(TARGETS cimg
+       EXPORT Matplot++Targets)
+-endif()
+\ No newline at end of file
++endif()
