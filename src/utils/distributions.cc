@@ -1,5 +1,6 @@
 #include "distributions.h"
 
+#include <boost/math/distributions/beta.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <random>
@@ -277,4 +278,15 @@ double bayesmix::gaussian_mixture_dist(
   }
 
   return out;
+}
+
+double bayesmix::sample_truncated_beta(double a, double b, double l, double u,
+                                       std::mt19937 &rng) {
+  double unif = stan::math::uniform_rng(0.0, 1.0, rng);
+
+  boost::math::beta_distribution betadist(a, b);
+  double cdf_l = cdf(betadist, l);
+  double cdf_u = cdf(betadist, u);
+  double orig_quantile = cdf_l + unif * (cdf_u - cdf_l);
+  return quantile(betadist, orig_quantile);
 }

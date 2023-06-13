@@ -72,6 +72,19 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
   //! Returns whether the mixing is conditional or marginal
   bool is_conditional() const override { return true; }
 
+  Eigen::VectorXd get_sticks() const { return state.sticks; }
+
+  //! Returns the prior shape parameters of the Beta-distributed sticks
+  Eigen::MatrixXd get_prior_shape_parameters() const;
+
+  //! Adds `num_sticks` sticks to the state by keep breaking
+  //! returns the sum of the new weights
+  double keep_breaking(int num_sticks);
+
+  void set_sticks(Eigen::VectorXd sticks);
+
+  bool is_infinite_mixture();
+
  protected:
   //! Returns mixing weights (for conditional mixings only)
   //! @param log        Whether to return logarithm-scale values or not
@@ -86,8 +99,7 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
   //! Returns weights in log-scale computing them from sticks
   Eigen::VectorXd logweights_from_sticks() const;
 
-  //! Returns the prior shape parameters of the Beta-distributed sticks
-  Eigen::MatrixXd get_prior_shape_parameters() const;
+  std::pair<double, double> get_beta_params(int ind) const;
 };
 
 #endif  // BAYESMIX_MIXINGS_TRUNCATED_SB_MIXING_H_
