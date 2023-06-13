@@ -1,7 +1,5 @@
 #include "slice_sampler.h"
 
-#include "src/hierarchies/nnig_hierarchy.h"
-
 void SliceSampler::print_startup_message() const {
   std::string msg = "Running SliceSampler algorithm with " +
                     bayesmix::HierarchyId_Name(unique_values[0]->get_id()) +
