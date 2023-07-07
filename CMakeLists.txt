@@ -2,21 +2,24 @@ cmake_minimum_required(VERSION 3.20.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 message("CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}")
 
+# Check if ccache is present to speed up compilation time
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
 	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
+# Project name
 project(bayesmix)
 
+# Set cmake variables
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release)
-
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -fopenmp -ftree-vectorize -Wno-deprecated")
 set(CMAKE_CXX_FLAGS_DEBUG "-Og")
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 set(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL TRUE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Require PkgConfig
 find_package(PkgConfig REQUIRED)
@@ -32,64 +35,44 @@ set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_LIST_DIR}/lib/_deps)
 set(FETCHCONTENT_QUIET OFF)
 set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 set(BUILD_SHARED_LIBS OFF)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(BUILD_TESTING OFF)
 
-# Make bayesmix-dev/math available
-message(CHECK_START "Fetching math")
-FetchContent_Declare(math
-  GIT_REPOSITORY "https://github.com/bayesmix-dev/math.git"
-  GIT_TAG "develop"
-)
-FetchContent_MakeAvailable(math)
-message(CHECK_PASS "fetched")
+# Make available bayesmix-dev/math (and TBB)
+include(cmake/math.cmake)
 
-# TBB CMake integration
-message(STATUS "Using math TBB")
-# Define TBB_ROOT Folder
-set(TBB_ROOT ${math_SOURCE_DIR}/lib/tbb)
-file(COPY ${math_SOURCE_DIR}/lib/tbb_2020.3/ DESTINATION ${TBB_ROOT})
-# Build TBB Library with CMake Integration
-include(${TBB_ROOT}/cmake/TBBBuild.cmake)
-list(APPEND MAKE_ARGS "tbb_build_dir=${TBB_ROOT}")
-list(APPEND MAKE_ARGS "tbb_build_prefix=tbb")
-tbb_build(TBB_ROOT ${TBB_ROOT} CONFIG_DIR TBB_DIR MAKE_ARGS ${MAKE_ARGS})
-# Require TBB library (for compile / link options)
-find_package(TBB)
-
-# Check if Protobuf is present in system
-find_package(Protobuf)
-if (NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
-  
-  # if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
-  #   message(FATAL_ERROR
-  #           "Your cmake version is too old: either install a newer version (>=3.20)"
-  #           " or install google's protocol buffer (protobuf) library by hand.")
-  # endif()
-
-  message(CHECK_START "Fetching Protobuf")
-  list(APPEND CMAKE_MESSAGE_INDENT "  ")
-
-  option(protobuf_BUILD_TESTS "" OFF)
-  set(protobuf_BUILD_EXPORT OFF)
-  set(protobuf_MSVC_STATIC_RUNTIME OFF)
-  FetchContent_Declare(protobuf
-    GIT_REPOSITORY "https://github.com/protocolbuffers/protobuf.git"
-    GIT_TAG "v3.14.0"
-    GIT_SUBMODULES ""
-    SOURCE_SUBDIR cmake)
-  FetchContent_MakeAvailable(protobuf)
-
-  list(POP_BACK CMAKE_MESSAGE_INDENT)
-  message(CHECK_PASS "fetched")
-  message("Protobuf_FOUND ${Protobuf_FOUND}")
-  message("   --> PROTOBUF LIB: ${PROTOBUF_LIBRARIES}")
-  message("   --> PROTOBUF INCLUDE: ${PROTOBUF_INCLUDE_DIRS}")
-  message("   --> PROTOBUF VERSION: ${Protobuf_VERSION}")
-  message("   --> PROTOBUF Found: ${Protobuf_FOUND}")
-
+# Check math is found
+if(math_FOUND)
+  message(STATUS "math source dir: ${math_SOURCE_DIR}")
+  message(STATUS "math binary dir: ${math_BINARY_DIR}")
+else()
+  message(FATAL_ERROR "math library required but not found!")
 endif()
 
+# Check if TBB is found
+if(TBB_FOUND)
+  message(STATUS "TBB version : ${TBB_VERSION}")
+  message(STATUS "TBB include path : ${TBB_ROOT}/include")
+  message(STATUS "TBB imported targets: ${TBB_IMPORTED_TARGETS}")
+else()
+  message(FATAL_ERROR "TBB library required but not found!")
+endif()
+
+# Make available protocolbuffers/protobuf (v3.14.0)
+include(cmake/protobuf.cmake)
+
+# Check if protobuf is found
+if(Protobuf_FOUND)
+  message(STATUS "Protobuf version : ${Protobuf_VERSION}")
+  message(STATUS "Protobuf include path : ${Protobuf_INCLUDE_DIRS}")
+  message(STATUS "Protobuf libraries : ${Protobuf_LIBRARIES}")
+  message(STATUS "Protobuf compiler libraries : ${Protobuf_PROTOC_LIBRARIES}")
+  message(STATUS "Protobuf lite libraries : ${Protobuf_LITE_LIBRARIES}")
+  message(STATUS "Protobuf protoc : ${Protobuf_PROTOC_EXECUTABLE}")
+else()
+  message(FATAL_ERROR "Protobuf library required but not found!")
+endif()
+
+# Define project options
 option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
 option(ENABLE_BENCHMARKS
@@ -98,7 +81,7 @@ option(ENABLE_DOCS
       "If docs should be generated or no" OFF)
 option(BUILD_RUN "" ON)
 
-# set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+# Include pathstests
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
 set(INCLUDE_PATHS
@@ -109,9 +92,10 @@ set(INCLUDE_PATHS
   ${math_SOURCE_DIR}/lib/sundials_6.1.1/include
   ${TBB_ROOT}/include
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${protobuf_SOURCE_DIR}/src
+  ${Protobuf_INCLUDE_DIRS}
 )
 
+# Link paths
 set(LINK_LIBRARIES
 	pthread
 	protobuf::libprotobuf
@@ -119,11 +103,12 @@ set(LINK_LIBRARIES
   OpenMP::OpenMP_CXX
 )
 
+# Compiler options
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
+# Compile proto files
 file(GLOB ProtoFiles "${BASEPATH}/src/proto/*.proto")
 set(PROTO_DIR proto)
-
 foreach(PROTO_FILE IN LISTS ProtoFiles)
   message(STATUS "protoc proto(cc): ${PROTO_FILE}")
   get_filename_component(PROTO_DIR ${PROTO_FILE} DIRECTORY)
@@ -142,9 +127,9 @@ foreach(PROTO_FILE IN LISTS ProtoFiles)
   list(APPEND PROTO_HDRS ${PROTO_HDR})
   list(APPEND PROTO_SRCS ${PROTO_SRC})
 endforeach()
-
 SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 
+# Export variables to parent scope if bayesmix is used as dependency library
 get_directory_property(HAS_PARENT PARENT_DIRECTORY)
 if(HAS_PARENT)
   set(BAYESMIX_INCLUDE_PATHS ${INCLUDE_PATHS} PARENT_SCOPE)
@@ -167,60 +152,50 @@ target_compile_options(bayesmix PUBLIC ${COMPILE_OPTIONS})
 # Build static library
 add_library(bayesmixlib $<TARGET_OBJECTS:bayesmix>)
 
+# Build run executable
 if (BUILD_RUN)
-  # Build run executable
   add_executable(run_mcmc $<TARGET_OBJECTS:bayesmix> executables/run_mcmc.cc)
   target_include_directories(run_mcmc PUBLIC ${INCLUDE_PATHS})
   target_link_libraries(run_mcmc PUBLIC ${LINK_LIBRARIES})
   target_compile_options(run_mcmc PUBLIC ${COMPILE_OPTIONS})
 endif()
 
+# Add tests
 if (NOT DISABLE_TESTS)
   add_subdirectory(test)
 endif()
 
+# Add benchmarks
 if (ENABLE_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif()
 
+# Add docs
 if (ENABLE_DOCS)
   add_subdirectory(docs)
 endif()
 
 if (NOT DISABLE_PLOTS)
-  
-  # Check version (not needed)
-  if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
-    message(FATAL_ERROR
-            "Your cmake version is too old: version >= 3.20.0 is required for plotting.")
+  # Make available matplotplusplus
+  include(cmake/matplotplusplus.cmake)
+  # Check matplotplusplus is found
+  if(matplotplusplus_FOUND)
+    message(STATUS "matplotplusplus source dir: ${matplotplusplus_SOURCE_DIR}")
+    message(STATUS "matplotplusplus binary dir: ${matplotplusplus_BINARY_DIR}")
   endif()
-
-  # Define patch command to inject
-  set(matplotplusplus_patch git apply ${CMAKE_CURRENT_LIST_DIR}/resources/patches/matplotplusplus.patch)
-
-  # Make matplotplusplus available (+ patch)
-  message(CHECK_START "Fetching matplotplusplus")
-  FetchContent_Declare(matplotplusplus
-    GIT_REPOSITORY "https://github.com/alandefreitas/matplotplusplus"
-    GIT_TAG "origin/master"
-    PATCH_COMMAND ${matplotplusplus_patch} 
-  )
-  FetchContent_MakeAvailable(matplotplusplus)
-  message(CHECK_PASS "fetched")
-
+  # Build plot_mcmc executable
   add_executable(plot_mcmc
     $<TARGET_OBJECTS:bayesmix>
     executables/plot_mcmc.cc
     src/plots/plot_utils.h
     src/plots/plot_utils.cc
   )
-  
   target_include_directories(plot_mcmc PUBLIC ${INCLUDE_PATHS} ${matplotplusplus_SOURCE_DIR}/source)
   target_link_libraries(plot_mcmc PUBLIC ${LINK_LIBRARIES} matplot)
   target_compile_options(plot_mcmc PUBLIC ${COMPILE_OPTIONS})
-
 endif()
 
+# Add examples
 if (NOT DISABLE_EXAMPLES)
   add_subdirectory(examples)
 endif()
