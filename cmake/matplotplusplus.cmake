@@ -2,10 +2,11 @@
 set(matplotplusplus_patch git apply ${BASEPATH}/resources/patches/matplotplusplus.patch)
 
 # Make matplotplusplus available (+ patch)
-message(STATUS "Fetching matplotplusplus")
+message(STATUS "")
+message(STATUS "Fetching alandefreitas/matplotplusplus")
 FetchContent_Declare(matplotplusplus
-	GIT_REPOSITORY "https://github.com/alandefreitas/matplotplusplus"
-	GIT_TAG "origin/master"
+	URL https://github.com/alandefreitas/matplotplusplus/archive/refs/tags/v1.2.0.tar.gz
+	DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 	PATCH_COMMAND ${matplotplusplus_patch}
 	OVERRIDE_FIND_PACKAGE
 )
