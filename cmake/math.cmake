@@ -1,4 +1,5 @@
 # Fetching bayesmix-dev/math
+message(STATUS "")
 message(STATUS "Fetching bayesmix-dev/math")
 FetchContent_Declare(math
   GIT_REPOSITORY "https://github.com/bayesmix-dev/math.git"

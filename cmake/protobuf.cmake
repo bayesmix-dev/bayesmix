@@ -7,6 +7,8 @@ set(protobuf_BUILD_TESTS OFF)
 set(protobuf_BUILD_PROTOC_BINARIES ON)
 
 # Fetch protocolbuffers_protobuf
+message(STATUS "")
+message(STATUS "Fetching protocolbuffers/protobuf")
 FetchContent_Declare(protobuf
   URL https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.14.0.tar.gz
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
