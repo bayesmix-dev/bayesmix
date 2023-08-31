@@ -48,14 +48,14 @@ else()
   message(FATAL_ERROR "math library required but not found!")
 endif()
 
-# Check if TBB is found
-if(TBB_FOUND)
-  message(STATUS "TBB version : ${TBB_VERSION}")
-  message(STATUS "TBB include path : ${TBB_ROOT}/include")
-  message(STATUS "TBB imported targets: ${TBB_IMPORTED_TARGETS}")
-else()
-  message(FATAL_ERROR "TBB library required but not found!")
-endif()
+# # Check if TBB is found
+# if(TBB_FOUND)
+#   message(STATUS "TBB version : ${TBB_VERSION}")
+#   message(STATUS "TBB include path : ${TBB_ROOT}/include")
+#   message(STATUS "TBB imported targets: ${TBB_IMPORTED_TARGETS}")
+# else()
+#   message(FATAL_ERROR "TBB library required but not found!")
+# endif()
 
 # Make available protocolbuffers/protobuf (v3.14.0)
 include(cmake/protobuf.cmake)
@@ -90,7 +90,7 @@ set(INCLUDE_PATHS
   ${math_SOURCE_DIR}/lib/boost_1.78.0
   ${math_SOURCE_DIR}/lib/eigen_3.4.0
   ${math_SOURCE_DIR}/lib/sundials_6.1.1/include
-  ${TBB_ROOT}/include
+  ${math_SOURCE_DIR}/lib/tbb_2020.3/include
   ${CMAKE_CURRENT_BINARY_DIR}
   ${Protobuf_INCLUDE_DIRS}
 )
@@ -99,7 +99,7 @@ set(INCLUDE_PATHS
 set(LINK_LIBRARIES
 	pthread
 	protobuf::libprotobuf
-	TBB::tbb
+  tbb
   OpenMP::OpenMP_CXX
 )
 
