@@ -10,7 +10,7 @@ set(protobuf_BUILD_PROTOC_BINARIES ON)
 message(STATUS "")
 message(STATUS "Fetching protocolbuffers/protobuf")
 FetchContent_Declare(protobuf
-  URL https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.14.0.tar.gz
+  URL https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.16.0.tar.gz
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_MakeAvailable(protobuf)
@@ -21,8 +21,9 @@ set(Protobuf_DIR ${Protobuf_ROOT}/${CMAKE_INSTALL_LIBDIR}/cmake/protobuf)
 
 # Configure protobuf
 message(STATUS "Setting up protobuf ...")
+message("CMAKE_COMMAND: ${CMAKE_COMMAND}")
 execute_process(
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -D protobuf_BUILD_TESTS=OFF -D protobuf_BUILD_PROTOC_BINARIES=ON -D CMAKE_POSITION_INDEPENDENT_CODE=ON -G "${CMAKE_GENERATOR}" .
+  COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_BUILD_PROTOC_BINARIES=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -G "${CMAKE_GENERATOR}" .
   RESULT_VARIABLE result
   WORKING_DIRECTORY ${Protobuf_ROOT}
 )
@@ -42,17 +43,17 @@ if(result)
 endif()
 
 # Install protobuf
-message(STATUS "Installing protobuf ...")
-if(WIN32)
-  execute_process(
-		COMMAND ${CMAKE_COMMAND} --build . --target install --config ${CMAKE_BUILD_TYPE}
-  	RESULT_VARIABLE result
-  	WORKING_DIRECTORY ${Protobuf_ROOT}
-	)
-  if(result)
-		message(FATAL_ERROR "Failed to build protobuf (${result})!")
-  endif()
-endif()
+# message(STATUS "Installing protobuf ...")
+# if(WIN32)
+#   execute_process(
+# 		COMMAND ${CMAKE_COMMAND} --build . --target install --config ${CMAKE_BUILD_TYPE}
+#   	RESULT_VARIABLE result
+#   	WORKING_DIRECTORY ${Protobuf_ROOT}
+# 	)
+#   if(result)
+# 		message(FATAL_ERROR "Failed to install protobuf (${result})!")
+#   endif()
+# endif()
 
 # Find package in installed folder
 find_package(Protobuf REQUIRED HINTS ${Protobuf_DIR})
