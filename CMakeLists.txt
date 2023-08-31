@@ -37,6 +37,9 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 set(BUILD_SHARED_LIBS OFF)
 set(BUILD_TESTING OFF)
 
+# Set BASEPATH variable
+set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
+
 # Make available bayesmix-dev/math (and TBB)
 include(cmake/math.cmake)
 
@@ -83,7 +86,6 @@ option(BUILD_RUN "" ON)
 
 # Include pathstests
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
 set(INCLUDE_PATHS
   ${BASEPATH}
   ${math_SOURCE_DIR}
