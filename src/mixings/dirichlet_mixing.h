@@ -3,8 +3,8 @@
 
 #include <google/protobuf/message.h>
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "base_mixing.h"
@@ -12,23 +12,29 @@
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-//! Class that represents the EPPF induced by the Dirithclet process (DP)
-//! introduced in Ferguson (1973), see also Sethuraman (1994).
-//! The EPPF induced by the DP depends on a `totalmass` parameter M.
-//! Given a clustering of n elements into k clusters, each with cardinality
-//! n_j, j=1, ..., k, the EPPF of the DP gives the following probabilities for
-//! the cluster membership of the (n+1)-th observation:
-//!      p(j-th cluster | ...) = n_j / (n + M)
-//!      p(k+1-th cluster | ...) = M / (n + M)
-//! The state is solely composed of M, but we also store log(M) for efficiency
-//! reasons. For more information about the class, please refer instead to base
-//! classes, `AbstractMixing` and `BaseMixing`.
-
 namespace Dirichlet {
 struct State {
   double totalmass, logtotmass;
 };
 };  // namespace Dirichlet
+
+/**
+ * Class that represents the EPPF induced by the Dirithclet process (DP)
+ * introduced in Ferguson (1973), see also Sethuraman (1994).
+ * The EPPF induced by the DP depends on a `totalmass` parameter M.
+ * Given a clustering of n elements into k clusters, each with cardinality
+ * \f$ n_j, j=1, ..., k \f$ the EPPF of the DP gives the following
+ * probabilities for the cluster membership of the (n+1)-th observation:
+ *
+ * \f[
+ *    p(\text{j-th cluster} | ...) &= n_j / (n + M) \\
+ *    p(\text{new cluster} | ...) &= M / (n + M)
+ * \f]
+ *
+ * The state is solely composed of M, but we also store log(M) for efficiency
+ * reasons. For more information about the class, please refer instead to base
+ * classes, `AbstractMixing` and `BaseMixing`.
+ */
 
 class DirichletMixing
     : public BaseMixing<DirichletMixing, Dirichlet::State, bayesmix::DPPrior> {
@@ -60,6 +66,7 @@ class DirichletMixing
  protected:
   //! Returns probability mass for an old cluster (for marginal mixings only)
   //! @param n          Total dataset size
+  //! @param n_clust    Number of clusters
   //! @param log        Whether to return logarithm-scale values or not
   //! @param propto     Whether to include normalizing constants or not
   //! @param hier       `Hierarchy` object representing the cluster

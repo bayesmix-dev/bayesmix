@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "ls_state.proto";
+import "matrix.proto";
 
 package bayesmix;
 
@@ -10,6 +11,7 @@ message SemiHdpState {
       UniLSState uni_ls_state = 1;
       MultiLSState multi_ls_state = 2;
       LinRegUniLSState lin_reg_uni_ls_state = 4;
+      Vector general_state = 5;
     }
     int32 cardinality = 3;
   }

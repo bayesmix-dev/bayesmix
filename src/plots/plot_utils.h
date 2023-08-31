@@ -3,8 +3,8 @@
 
 #include <matplot/matplot.h>
 
-#include <Eigen/Dense>
 #include <numeric>
+#include <stan/math/rev.hpp>
 
 /*
  * Converts the support points of a 2d function and associated values

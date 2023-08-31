@@ -3,10 +3,11 @@ import shutil
 import subprocess
 import numpy as np
 
+from dotenv import load_dotenv
 from tempfile import TemporaryDirectory
 from pathlib import Path
 
-from .shell_utils import run_shell
+from .shell_utils import get_env_file, run_shell
 
 
 def _is_file(a: str):
@@ -121,8 +122,8 @@ def run_mcmc(
         The best clustering obtained by minimizing Binder's loss function. None
         if return_best_clus is False.
     """
-
-    BAYESMIX_EXE = os.environ.get("BAYESMIX_EXE", default=None)
+    load_dotenv(get_env_file())
+    BAYESMIX_EXE = os.getenv("BAYESMIX_EXE")
     if BAYESMIX_EXE is None:
         raise ValueError("BAYESMIX_EXE environment variable not set")
 

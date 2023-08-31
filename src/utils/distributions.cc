@@ -1,15 +1,16 @@
 #include "distributions.h"
 
-#include <Eigen/Dense>
+#include <boost/math/distributions/beta.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <random>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "src/utils/proto_utils.h"
 
-int bayesmix::categorical_rng(const Eigen::VectorXd &probas,
-                              std::mt19937_64 &rng, const int start /*= 0*/) {
+int bayesmix::categorical_rng(const Eigen::VectorXd &probas, std::mt19937 &rng,
+                              const int start /*= 0*/) {
   return stan::math::categorical_rng(probas, rng) + (start - 1);
 }
 
@@ -18,28 +19,30 @@ double bayesmix::multi_normal_prec_lpdf(const Eigen::VectorXd &datum,
                                         const Eigen::MatrixXd &prec_chol,
                                         const double prec_logdet) {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
-  double base = prec_logdet + NEG_LOG_SQRT_TWO_PI * datum.size();
-  double exp = (prec_chol * (datum - mean)).squaredNorm();
-  return 0.5 * (base - exp);
+  double base = 0.5 * prec_logdet + NEG_LOG_SQRT_TWO_PI * datum.size();
+  double exp = 0.5 * (prec_chol.transpose() * (datum - mean)).squaredNorm();
+  return base - exp;
 }
 
 Eigen::VectorXd bayesmix::multi_normal_prec_lpdf_grid(
     const Eigen::MatrixXd &data, const Eigen::VectorXd &mean,
     const Eigen::MatrixXd &prec_chol, const double prec_logdet) {
   using stan::math::NEG_LOG_SQRT_TWO_PI;
-  Eigen::VectorXd exp =
-      ((data.rowwise() - mean.transpose()) * prec_chol.transpose())
-          .rowwise()
-          .squaredNorm();
-  Eigen::VectorXd base = Eigen::ArrayXd::Ones(data.rows()) * prec_logdet +
-                         NEG_LOG_SQRT_TWO_PI * data.cols();
-  return (base - exp) * 0.5;
+
+  Eigen::VectorXd exp = ((data.rowwise() - mean.transpose()) * prec_chol)
+                            .rowwise()
+                            .squaredNorm() *
+                        0.5;
+  Eigen::VectorXd base =
+      Eigen::ArrayXd::Ones(data.rows()) * prec_logdet * 0.5 +
+      NEG_LOG_SQRT_TWO_PI * data.cols();
+  return base - exp;
 }
 
 Eigen::VectorXd bayesmix::multi_normal_diag_rng(
     const Eigen::VectorXd &mean,
     const Eigen::DiagonalMatrix<double, Eigen::Dynamic> &cov_diag,
-    std::mt19937_64 &rng) {
+    std::mt19937 &rng) {
   size_t N = mean.size();
   Eigen::VectorXd output(N);
   for (size_t i = 0; i < N; i++) {
@@ -50,10 +53,10 @@ Eigen::VectorXd bayesmix::multi_normal_diag_rng(
 
 Eigen::VectorXd bayesmix::multi_normal_prec_chol_rng(
     const Eigen::VectorXd &mean, const Eigen::LLT<Eigen::MatrixXd> &prec_chol,
-    std::mt19937_64 &rng) {
+    std::mt19937 &rng) {
   size_t N = mean.size();
   Eigen::VectorXd output(N);
-  boost::variate_generator<std::mt19937_64 &, boost::normal_distribution<>>
+  boost::variate_generator<std::mt19937 &, boost::normal_distribution<>>
       std_normal_rng(rng, boost::normal_distribution<>(0, 1));
 
   Eigen::VectorXd z(N);
@@ -275,4 +278,15 @@ double bayesmix::gaussian_mixture_dist(
   }
 
   return out;
+}
+
+double bayesmix::sample_truncated_beta(double a, double b, double l, double u,
+                                       std::mt19937 &rng) {
+  double unif = stan::math::uniform_rng(0.0, 1.0, rng);
+
+  boost::math::beta_distribution betadist(a, b);
+  double cdf_l = cdf(betadist, l);
+  double cdf_u = cdf(betadist, u);
+  double orig_quantile = cdf_l + unif * (cdf_u - cdf_l);
+  return quantile(betadist, orig_quantile);
 }

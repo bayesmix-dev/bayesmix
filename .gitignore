@@ -16,15 +16,26 @@ sftp-config.json
 *.local.*
 # MacOS storage files
 .DS_Store
+.dockerignore
+.ipynb_checkpoints/
+docs/_build/
+resources/benchmarks/datasets
+resources/2d
 #CLion cash
 .idea/
 # Build debug folder
 cmake-build-debug/
 
+# lib/_deps/ folder
+lib/_deps/
+
 # .old folders
 test/.old/
-examples/gamma_hierarchy/.old/
 src/hierarchies/updaters/.old/
+examples/gamma_hierarchy/.old/
+
+# .env file
+.env
 
 # R stuff
 .Rproj.user

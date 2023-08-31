@@ -1,10 +1,11 @@
 #ifndef BAYESMIX_UTILS_IO_UTILS_H_
 #define BAYESMIX_UTILS_IO_UTILS_H_
 
-#include <Eigen/Dense>
+#include <stan/math/rev.hpp>
 
-//! This file implements basic input-output utilities for Eigen matrices from
-//! and to text files.
+//! @file io_utils.h
+//! The `io_utils.h` file implements basic input-output utilities for Eigen
+//! matrices from and to text files.
 
 namespace bayesmix {
 //! Checks whether the given file is available for writing

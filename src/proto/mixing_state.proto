@@ -52,5 +52,6 @@ message MixingState {
     LogSBState log_sb_state = 3;
     TruncSBState trunc_sb_state = 4;
     MFMState mfm_state = 5;
+    Vector general_state = 6;
   }
 }

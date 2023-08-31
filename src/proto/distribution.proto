@@ -58,6 +58,18 @@ message NIGDistribution {
 }
 
 /*
+ * Parameters of a  Normal x Inverse-Gamma distribution
+ * with density
+ * f(x, y) = N(x | mu, var) * IG(y | shape, scale)
+ */
+message NxIGDistribution {
+  double mean = 1;
+  double var = 2;
+  double shape = 3;
+  double scale = 4;
+}
+
+/*
  * Parameters of a Normal Wishart distribution
  * with density
  * f(x, y) = N(x | mu, (y * var_scaling)^{-1}) * IW(y | deg_free, scale)
@@ -68,6 +80,7 @@ message NWDistribution {
   double var_scaling = 2;
   double deg_free = 3;
   Matrix scale = 4;
+  Matrix scale_chol = 5;
 }
 
 

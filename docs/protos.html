@@ -260,6 +260,10 @@
                 </li>
               
                 <li>
+                  <a href="#bayesmix.NxIGDistribution"><span class="badge">M</span>NxIGDistribution</a>
+                </li>
+              
+                <li>
                   <a href="#bayesmix.UniNormalDistribution"><span class="badge">M</span>UniNormalDistribution</a>
                 </li>
               
@@ -335,6 +339,14 @@
               
                 <li>
                   <a href="#bayesmix.NNWPrior.NormalMeanPrior"><span class="badge">M</span>NNWPrior.NormalMeanPrior</a>
+                </li>
+              
+                <li>
+                  <a href="#bayesmix.NNxIGPrior"><span class="badge">M</span>NNxIGPrior</a>
+                </li>
+              
+                <li>
+                  <a href="#bayesmix.PythonHierPrior"><span class="badge">M</span>PythonHierPrior</a>
                 </li>
               
               
@@ -427,6 +439,10 @@
               
                 <li>
                   <a href="#bayesmix.PYPrior"><span class="badge">M</span>PYPrior</a>
+                </li>
+              
+                <li>
+                  <a href="#bayesmix.PythonMixPrior"><span class="badge">M</span>PythonMixPrior</a>
                 </li>
               
                 <li>
@@ -824,8 +840,8 @@
             <tbody>
               
                 <tr>
-                  <td>fake_prior</td>
-                  <td><a href="#bayesmix.EmptyPrior">EmptyPrior</a></td>
+                  <td>general_state</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -852,8 +868,8 @@
                 </tr>
               
                 <tr>
-                  <td>lapnig_state</td>
-                  <td><a href="#bayesmix.LapNIGState">LapNIGState</a></td>
+                  <td>nnxig_state</td>
+                  <td><a href="#bayesmix.NxIGDistribution">NxIGDistribution</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -1138,6 +1154,58 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>scale_chol</td>
+                  <td><a href="#bayesmix.Matrix">Matrix</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="bayesmix.NxIGDistribution">NxIGDistribution</h3>
+        <p>Parameters of a  Normal x Inverse-Gamma distribution</p><p>with density</p><p>f(x, y) = N(x | mu, var) * IG(y | shape, scale)</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>mean</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>var</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>shape</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>scale</td>
+                  <td><a href="#double">double</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -1234,6 +1302,18 @@
                 <td>FA</td>
                 <td>5</td>
                 <td><p>Factor Analysers</p></td>
+              </tr>
+            
+              <tr>
+                <td>NNxIG</td>
+                <td>6</td>
+                <td><p>Normal - Normal x Inverse Gamma</p></td>
+              </tr>
+            
+              <tr>
+                <td>PythonHier</td>
+                <td>7</td>
+                <td><p>Generic python hierarchy</p></td>
               </tr>
             
           </tbody>
@@ -1714,6 +1794,54 @@
 
         
       
+        <h3 id="bayesmix.NNxIGPrior">NNxIGPrior</h3>
+        <p>Prior for the parameters of the base measure in a Normal-Normal x Inverse Gamma hierarchy</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>fixed_values</td>
+                  <td><a href="#bayesmix.NxIGDistribution">NxIGDistribution</a></td>
+                  <td></td>
+                  <td><p>no prior, just fixed values </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="bayesmix.PythonHierPrior">PythonHierPrior</h3>
+        <p>Definition of a generic container for the prior parameters to be used in Python</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>values</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
+                  <td></td>
+                  <td><p>values are modified from python </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
 
       
 
@@ -2023,6 +2151,12 @@
                 <td><p>Mixture of finite mixtures</p></td>
               </tr>
             
+              <tr>
+                <td>PythonMix</td>
+                <td>6</td>
+                <td><p>Generic python mixing</p></td>
+              </tr>
+            
           </tbody>
         </table>
       
@@ -2179,6 +2313,30 @@
 
         
       
+        <h3 id="bayesmix.PythonMixPrior">PythonMixPrior</h3>
+        <p>Definition of a generic container for the prior parameters to be used in Python</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>values</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="bayesmix.TruncSBPrior">TruncSBPrior</h3>
         <p>Definition of the parameters of a truncated Stick-Breaking process</p>
 
@@ -2213,6 +2371,13 @@
                 <tr>
                   <td>mfm_prior</td>
                   <td><a href="#bayesmix.TruncSBPrior.MFMPrior">TruncSBPrior.MFMPrior</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pm_prior</td>
+                  <td><a href="#bayesmix.PythonMixPrior">PythonMixPrior</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2468,6 +2633,13 @@
                 <tr>
                   <td>mfm_state</td>
                   <td><a href="#bayesmix.MFMState">MFMState</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>general_state</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2762,6 +2934,13 @@
                 <tr>
                   <td>lin_reg_uni_ls_state</td>
                   <td><a href="#bayesmix.LinRegUniLSState">LinRegUniLSState</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>general_state</td>
+                  <td><a href="#bayesmix.Vector">Vector</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>

@@ -269,13 +269,10 @@ void SplitAndMergeAlgorithm::proposal_update_allocations(
     data_to_move_idx = unique_values[label_old_cluster]->get_data_idx();
   }
 
-  auto curr_it = data_to_move_idx.cbegin();
-  auto next_it = curr_it;
-  next_it++;
-  auto end_it = data_to_move_idx.cend();
-  for (; curr_it != end_it; next_it++, curr_it++) {
-    const unsigned int curr_idx = *curr_it;
-    if (next_it == end_it) {
+  for (auto it = data_to_move_idx.cbegin(); it != data_to_move_idx.cend();
+       it++) {
+    const unsigned int curr_idx = *it;
+    if (it == (--data_to_move_idx.cend())) {
       if (split) {
         unique_values[label_old_cluster]->remove_datum(
             curr_idx, data.row(curr_idx), update_hierarchy_params());

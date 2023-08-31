@@ -10,6 +10,13 @@ cd python
 pip3 install -e .
 ```
 
+If the editable (`-e`) installation is not available, export the enviromnental variable `BAYESMIX_HOME=<path_to_bayesmix_root_dir>` and then run
+
+```
+cd python
+pip3 install .
+```
+
 ## Usage
 
 `bayesmixpy` provides two functions: `build_bayesmix` and `run_mcmc`. The first one

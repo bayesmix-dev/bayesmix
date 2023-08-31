@@ -3,64 +3,88 @@
 
 #include <google/protobuf/message.h>
 
-#include <Eigen/Dense>
 #include <memory>
 #include <random>
 #include <set>
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include "algorithm_state.pb.h"
 #include "hierarchy_id.pb.h"
+#include "src/hierarchies/likelihoods/abstract_likelihood.h"
+#include "src/hierarchies/priors/abstract_prior_model.h"
+#include "src/hierarchies/updaters/abstract_updater.h"
 #include "src/utils/rng.h"
 
-//! Abstract base class for a hierarchy object.
-//! This class is the basis for a curiously recurring template pattern (CRTP)
-//! for `Hierarchy` objects, and is solely composed of interface functions for
-//! derived classes to use. For more information about this pattern, as well
-//! the list of methods required for classes in this inheritance tree, please
-//! refer to the README.md file included in this folder.
-
-//! This abstract class represents a Bayesian hierarchical model:
-//! x_1, ..., x_n \sim f(x | \theta)
-//!         theta \sim G
-//! A Hierarchy object can compute the following quantities:
-//! 1- the likelihood log-probability density function
-//! 2- the prior predictive probability: \int_\Theta f(x | theta) G(d\theta)
-//!    (for conjugate models only)
-//! 3- the posterior predictive probability
-//!    \int_\Theta f(x | theta) G(d\theta | x_1, ..., x_n)
-//!    (for conjugate models only)
-//! Moreover, the Hierarchy knows how to sample from the full conditional of
-//! theta, possibly in an approximate way.
-//!
-//! In the context of our Gibbs samplers, an hierarchy represents the parameter
-//! value associated to a certain cluster, and also knows which observations
-//! are allocated to that cluster.
-//! Moreover, hyperparameters and (possibly) hyperpriors associated to them can
-//! be shared across multiple Hierarchies objects via a shared pointer.
-//! In conjunction with a single `Mixing` object, a collection of `Hierarchy`
-//! objects completely defines a mixture model, and these two parts can be
-//! chosen independently of each other.
-//! Communication with other classes, as well as storage of some relevant
-//! values, is performed via appropriately defined Protobuf messages (see for
-//! instance the proto/ls_state.proto and proto/hierarchy_prior.proto files)
-//! and their relative class methods.
+/**
+ * Abstract base class for a hierarchy object.
+ * This class is the basis for a curiously recurring template pattern (CRTP)
+ * for `Hierarchy` objects, and is solely composed of interface functions for
+ * derived classes to use. For more information about this pattern, as well
+ * the list of methods required for classes in this inheritance tree, please
+ * refer to the README.md file included in this folder.
+ *
+ * This abstract class represents a Bayesian hierarchical model:
+ *
+ * \f[
+ *     x_1,\dots,x_n &\sim f(x \mid \theta) \\
+ *     \theta &\sim G
+ * \f]
+ *
+ * A Hierarchy object can compute the following quantities:
+ *
+ * 1. the likelihood log-probability density function
+ * 2. the prior predictive probability: \f$ \int_\Theta f(x \mid \theta)
+ * G(d\theta) \f$ (for conjugate models only)
+ * 3. the posterior predictive probability
+ *    \f$ \int_\Theta f(x \mid \theta) G(d\theta \mid x_1, ..., x_n) \f$
+ *    (for conjugate models only)
+ *
+ * Moreover, the Hierarchy knows how to sample from the full conditional of
+ * \f$ \theta \f$, possibly in an approximate way.
+ *
+ * In the context of our Gibbs samplers, an hierarchy represents the parameter
+ * value associated to a certain cluster, and also knows which observations
+ * are allocated to that cluster.
+ *
+ * Moreover, hyperparameters and (possibly) hyperpriors associated to them can
+ * be shared across multiple Hierarchies objects via a shared pointer.
+ * In conjunction with a single `Mixing` object, a collection of `Hierarchy`
+ * objects completely defines a mixture model, and these two parts can be
+ * chosen independently of each other.
+ *
+ * Communication with other classes, as well as storage of some relevant
+ * values, is performed via appropriately defined Protobuf messages (see for
+ * instance the `proto/ls_state.proto` and `proto/hierarchy_prior.proto` files)
+ * and their relative class methods.
+ */
 
 class AbstractHierarchy {
  public:
+  //! Set the update algorithm for the current hierarchy
+  virtual void set_updater(std::shared_ptr<AbstractUpdater> updater_) = 0;
+
+  //! Returns (a pointer to) the likelihood for the current hierarchy
+  virtual std::shared_ptr<AbstractLikelihood> get_likelihood() = 0;
+
+  //! Returns (a pointer to) the prior model for the current hierarchy
+  virtual std::shared_ptr<AbstractPriorModel> get_prior() = 0;
+
+  //! Default destructor
   virtual ~AbstractHierarchy() = default;
 
   //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractHierarchy> clone() const = 0;
 
+  //! Returns an independent, data-less copy of this object
   virtual std::shared_ptr<AbstractHierarchy> deep_clone() const = 0;
 
   // EVALUATION FUNCTIONS FOR SINGLE POINTS
   //! Public wrapper for `like_lpdf()` methods
-  double get_like_lpdf(
+  virtual double get_like_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    if (is_dependent()) {
+    if (is_dependent() and covariate.size() != 0) {
       return like_lpdf(datum, covariate);
     } else {
       return like_lpdf(datum);
@@ -74,8 +98,13 @@ class AbstractHierarchy {
   virtual double prior_pred_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error(
-        "Cannot call prior_pred_lpdf() from a non-conjugate hierarchy");
+    if (is_conjugate()) {
+      throw std::runtime_error(
+          "prior_pred_lpdf() not implemented for this hierarchy");
+    } else {
+      throw std::runtime_error(
+          "Cannot call prior_pred_lpdf() from a non-conjugate hierarchy");
+    }
   }
 
   //! Evaluates the log-conditional predictive distr. of data in a single point
@@ -85,8 +114,14 @@ class AbstractHierarchy {
   virtual double conditional_pred_lpdf(
       const Eigen::RowVectorXd &datum,
       const Eigen::RowVectorXd &covariate = Eigen::RowVectorXd(0)) const {
-    throw std::runtime_error(
-        "Cannot call conditional_pred_lpdf() from a non-conjugate hierarchy");
+    if (is_conjugate()) {
+      throw std::runtime_error(
+          "conditional_pred_lpdf() not implemented for this hierarchy");
+    } else {
+      throw std::runtime_error(
+          "Cannot call conditional_pred_lpdf() from a non-conjugate "
+          "hierarchy");
+    }
   }
 
   // EVALUATION FUNCTIONS FOR GRIDS OF POINTS
@@ -105,8 +140,13 @@ class AbstractHierarchy {
   virtual Eigen::VectorXd prior_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
-    throw std::runtime_error(
-        "Cannot call prior_pred_lpdf_grid() from a non-conjugate hierarchy");
+    if (is_conjugate()) {
+      throw std::runtime_error(
+          "prior_pred_lpdf_grid() not implemented for this hierarchy");
+    } else {
+      throw std::runtime_error(
+          "Cannot call prior_pred_lpdf_grid() from a non-conjugate hierarchy");
+    }
   }
 
   //! Evaluates the log-prior predictive distr. of data in a grid of points
@@ -116,9 +156,14 @@ class AbstractHierarchy {
   virtual Eigen::VectorXd conditional_pred_lpdf_grid(
       const Eigen::MatrixXd &data,
       const Eigen::MatrixXd &covariates = Eigen::MatrixXd(0, 0)) const {
-    throw std::runtime_error(
-        "Cannot call conditional_pred_lpdf_grid() from a non-conjugate "
-        "hierarchy");
+    if (is_conjugate()) {
+      throw std::runtime_error(
+          "conditional_pred_lpdf_grid() not implemented for this hierarchy");
+    } else {
+      throw std::runtime_error(
+          "Cannot call conditional_pred_lpdf_grid() from a non-conjugate "
+          "hierarchy");
+    }
   }
 
   // SAMPLING FUNCTIONS
@@ -137,6 +182,8 @@ class AbstractHierarchy {
   //! Updates hyperparameter values given a vector of cluster states
   virtual void update_hypers(
       const std::vector<bayesmix::AlgorithmState::ClusterState> &states) = 0;
+
+  virtual void save_posterior_hypers() = 0;
 
   // GETTERS AND SETTERS
   //! Returns the Protobuf ID associated to this class
@@ -208,12 +255,12 @@ class AbstractHierarchy {
   virtual bool is_multivariate() const = 0;
 
   //! Returns whether the hierarchy depends on covariate values or not
-  virtual bool is_dependent() const { return false; }
+  virtual bool is_dependent() const = 0;
 
   //! Returns whether the hierarchy represents a conjugate model or not
-  virtual bool is_conjugate() const { return false; }
+  virtual bool is_conjugate() const = 0;
 
-  //! Main function that initializes members to appropriate values
+  //! Sets the (pointer to) the dataset in the cluster
   virtual void set_dataset(const Eigen::MatrixXd *const dataset) = 0;
 
  protected:
@@ -227,7 +274,8 @@ class AbstractHierarchy {
       throw std::runtime_error(
           "Cannot call like_lpdf() from a non-dependent hierarchy");
     } else {
-      throw std::runtime_error("like_lpdf() not implemented");
+      throw std::runtime_error(
+          "like_lpdf() not implemented for this hierarchy");
     }
   }
 
@@ -239,7 +287,8 @@ class AbstractHierarchy {
       throw std::runtime_error(
           "Cannot call like_lpdf() from a dependent hierarchy");
     } else {
-      throw std::runtime_error("like_lpdf() not implemented");
+      throw std::runtime_error(
+          "like_lpdf() not implemented for this hierarchy");
     }
   }
 
@@ -255,7 +304,8 @@ class AbstractHierarchy {
           "Cannot call update_summary_statistics() from a non-dependent "
           "hierarchy");
     } else {
-      throw std::runtime_error("update_summary_statistics() not implemented");
+      throw std::runtime_error(
+          "update_summary_statistics() not implemented for this hierarchy");
     }
   }
 
@@ -269,7 +319,8 @@ class AbstractHierarchy {
           "Cannot call update_summary_statistics() from a dependent "
           "hierarchy");
     } else {
-      throw std::runtime_error("update_summary_statistics() not implemented");
+      throw std::runtime_error(
+          "update_summary_statistics() not implemented for this hierarchy");
     }
   }
 };

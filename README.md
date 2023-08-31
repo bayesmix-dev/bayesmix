@@ -16,13 +16,7 @@ Current state of the software:
 <a href="https://www.codecogs.com/eqnedit.php?latex=P&space;\sim&space;\Pi" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P&space;\sim&space;\Pi" title="\Pi \sim P" /></a>
 -->
 
-where P is either the Dirichlet process or the Pitman--Yor process
-
-- We currently support univariate and multivariate location-scale mixture of Gaussian densities
-
-- Inference is carried out using algorithms such as Algorithm 2 in [Neal (2000)](http://www.stat.columbia.edu/npbayes/papers/neal_sampling.pdf)
-
-- Serialization of the MCMC chains is possible using Google's [Protocol Buffers](https://developers.google.com/protocol-buffers) aka `protobuf`
+For descriptions of the models supported in our library, discussion of software design, and examples, please refer to the following paper: https://arxiv.org/abs/2205.08144
 
 - Two lightweight interfaces are available for `Python` ([BayesMixPy](https://github.com/bayesmix-dev/bayesmix/tree/master/python#readme)) and `R` (BayesMixR)
 <!-- Add link after merge !!! -->
@@ -31,12 +25,23 @@ where P is either the Dirichlet process or the Pitman--Yor process
 
 ## For end users
 
-**Warning**: make sure you have a recent version of `cmake` installed (at least 3.20.x) or install `protobuf` beforehand (see the section for developers)!
+**Prerequisites**: to build `bayesmix` you will need `git`, `pkg-config` and a recent version of `cmake`.
+On Linux machines, it is sufficient to run
+
+```shell
+ sudo apt-get -y update && apt-get install -y
+ sudo apt-get -y install git
+ sudo apt-get -y install python3-pip
+ sudo python3 -m pip install cmake
+ sudo apt-get install -yq pkg-config
+```
+
+On macOS, after install HomeBrew, replace `sudo apt-get -y` with `brew`.
 
 To install and use `bayesmix`, please `cd` to the folder to which you wish to install it, and clone this repository with the following command-line instruction:
 
 ```shell
-git clone --recurse-submodule git@github.com:bayesmix-dev/bayesmix.git
+git clone https://github.com/bayesmix-dev/bayesmix.git
 ```
 
 Then, by using `cd bayesmix`, you will enter the newly downloaded folder.
@@ -46,8 +51,8 @@ To build the executable for the main file `run_mcmc.cc`, please use the followin
 ```shell
 mkdir build
 cd build
-cmake .. -DDISABLE_DOCS=on -DDISABLE_BENCHMARKS=on -DDISABLE_TESTS=on
-make run
+cmake .. -DDISABLE_TESTS=ON
+make run_mcmc
 cd ..
 ```
 
@@ -101,6 +106,17 @@ The corresponding executable is located at `build/test/test_bayesmix`.
 
 Documentation is available at https://bayesmix.readthedocs.io.
 
+To build the documentation locally, make sure to have installed `Doxygen`, `sphinx`, and `docker`. Then
+
+```shell
+cd build
+cmake .. -DENABLE_DOCS=ON
+make document_bayesmix
+```
+
+will generete Sphinx documentation files in `build/docs/sphinx`. You can use a web browser to open the file `index.html`.
+
 # Contributions are welcome!
 
 Please check out [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to collaborate with us.
+You can also head to our [issues page](https://github.com/bayesmix-dev/bayesmix/issues) to check for useful enhancements needed.

@@ -8,8 +8,8 @@ set(CMAKE_CXX_FLAGS -pthread)
 include(FetchContent)
 FetchContent_Declare(
   googletest
-  # Specify the commit you depend on and update it regularly.
-  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        9c332145b71c36a5bad9688312c79184f98601ff # release-1.13
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -18,9 +18,10 @@ FetchContent_MakeAvailable(googletest)
 add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   write_proto.cc
   proto_utils.cc
+  likelihoods.cc
+  prior_models.cc
   hierarchies.cc
   lpdf.cc
-  priors.cc
   eigen_utils.cc
   distributions.cc
   semi_hdp.cc
@@ -28,6 +29,8 @@ add_executable(test_bayesmix $<TARGET_OBJECTS:bayesmix>
   runtime.cc
   rng.cc
   logit_sb.cc
+  gradient.cc
+  slice_sampler.cc
 )
 
 target_include_directories(test_bayesmix PUBLIC ${INCLUDE_PATHS})

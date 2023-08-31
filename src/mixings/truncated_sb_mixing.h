@@ -3,8 +3,8 @@
 
 #include <google/protobuf/message.h>
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "base_mixing.h"
@@ -12,29 +12,36 @@
 #include "mixing_prior.pb.h"
 #include "src/hierarchies/abstract_hierarchy.h"
 
-//! Class that represents a truncated stick-breaking process, as shown in
-//! Ishwaran and James (2001).
-//!
-//! A truncated stick-breaking process is a prior for weights (w_1,...,w_H) in
-//! the H-1 dimensional unit simplex, and is defined as follows:
-//!   w_1 = v_1
-//!   w_j = v_j (1 - v_1) ... (1 - v_{j-1}), for j=1, ... H-1
-//!   w_H = 1 - (w_1 + w_2 + ... + w_{H-1})
-//! The v_j's are called sticks and we assume them to be independently
-//! distributed as v_j ~ Beta(a_j, b_j).
-//!
-//! When a_j = 1 and b_j = M, the stick-breaking process is a truncation of the
-//! stick-breaking representation of the DP.
-//! When a_j = 1 - d and b_j = M + i*d, it is the trunctation of a PY process.
-//! Its state is composed of the weights w_j in log-scale and the sticks v_j.
-//! For more information about the class, please refer instead to base classes,
-//! `AbstractMixing` and `BaseMixing`.
-
 namespace TruncSB {
 struct State {
   Eigen::VectorXd sticks, logweights;
 };
 };  // namespace TruncSB
+
+/**
+ * Class that represents a truncated stick-breaking process, as shown in
+ * Ishwaran and James (2001).
+ *
+ * A truncated stick-breaking process is a prior for weights
+ * \f$ (w_1,...,w_H) \f$ in the H-1 dimensional unit simplex, and is defined as
+ * follows:
+ *
+ * \f[
+ *    w_1 &= v_1 \\
+ *    w_j &= v_j (1 - v_1) ... (1 - v_{j-1}), \quad \text{for } j=1, ... H-1 \\
+ *    w_H &= 1 - (w_1 + w_2 + ... + w_{H-1})
+ * \f]
+ *
+ * The \f$ v_j \f$'s are called sticks and we assume them to be independently
+ * distributed as \f$ v_j \sim \text{Beta}(a_j, b_j) \f$.
+ *
+ * When \f$ a_j = 1 \f$ and \f$ b_j = M \f$, the stick-breaking process is a
+ * truncation of the stick-breaking representation of the DP.
+ * When \f$ a_j = 1-d \f$ and \f$ b_j = M+id \f$, it is the trunctation of a PY
+ * process. Its state is composed of the weights \f$ w_j \f$ in log-scale and
+ * the sticks \f$ v_j \f$. For more information about the class, please refer
+ * instead to base classes, `AbstractMixing` and `BaseMixing`.
+ */
 
 class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
                                             bayesmix::TruncSBPrior> {
@@ -65,6 +72,19 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
   //! Returns whether the mixing is conditional or marginal
   bool is_conditional() const override { return true; }
 
+  Eigen::VectorXd get_sticks() const { return state.sticks; }
+
+  //! Returns the prior shape parameters of the Beta-distributed sticks
+  Eigen::MatrixXd get_prior_shape_parameters() const;
+
+  //! Adds `num_sticks` sticks to the state by keep breaking
+  //! returns the sum of the new weights
+  double keep_breaking(int num_sticks);
+
+  void set_sticks(Eigen::VectorXd sticks);
+
+  bool is_infinite_mixture();
+
  protected:
   //! Returns mixing weights (for conditional mixings only)
   //! @param log        Whether to return logarithm-scale values or not
@@ -79,8 +99,7 @@ class TruncatedSBMixing : public BaseMixing<TruncatedSBMixing, TruncSB::State,
   //! Returns weights in log-scale computing them from sticks
   Eigen::VectorXd logweights_from_sticks() const;
 
-  //! Returns the prior shape parameters of the Beta-distributed sticks
-  Eigen::MatrixXd get_prior_shape_parameters() const;
+  std::pair<double, double> get_beta_params(int ind) const;
 };
 
 #endif  // BAYESMIX_MIXINGS_TRUNCATED_SB_MIXING_H_

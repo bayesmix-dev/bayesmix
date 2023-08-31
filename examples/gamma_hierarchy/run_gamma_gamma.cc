@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "gamma_gamma_hier.h"
+#include "gammagamma_hierarchy.h"
 #include "src/includes.h"
 
 Eigen::MatrixXd simulate_data(const unsigned int ndata) {

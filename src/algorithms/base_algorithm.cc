@@ -1,7 +1,7 @@
 #include "base_algorithm.h"
 
-#include <Eigen/Dense>
 #include <memory>
+#include <stan/math/rev.hpp>
 #include <vector>
 
 #include "algorithm_params.pb.h"
@@ -133,16 +133,22 @@ void BaseAlgorithm::initialize() {
   allocations.clear();
   for (size_t i = 0; i < num_components; i++) {
     allocations.push_back(i);
-    unique_values[i]->add_datum(i, data.row(i), update_hierarchy_params(),
-                                hier_covariates.row(i));
+    unique_values[i]->add_datum(i, data.row(i), false, hier_covariates.row(i));
   }
   // Randomly allocate all remaining data, and update cardinalities
   for (size_t i = num_components; i < data.rows(); i++) {
     unsigned int clust = distro(generator);
     allocations.push_back(clust);
-    unique_values[clust]->add_datum(i, data.row(i), update_hierarchy_params(),
+    unique_values[clust]->add_datum(i, data.row(i), false,
                                     hier_covariates.row(i));
   }
+
+  if (update_hierarchy_params()) {
+    for (size_t i = 0; i < num_components; i++) {
+      unique_values[i]->save_posterior_hypers();
+    }
+  }
+
   if (verbose) {
     std::cout << "Done" << std::endl;
   }
