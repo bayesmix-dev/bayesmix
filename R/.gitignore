@@ -1,0 +1,10 @@
+# Files
+.Rbuildignore
+*.Rproj
+*.Rhistory
+*.Rdata
+*.nb.html
+
+# Folders
+build/
+.Rproj.user/
