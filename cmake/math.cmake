@@ -43,13 +43,13 @@ if(result)
 endif()
 
 # Generate .lib equivalents if in Windows
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+# if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
   # Generating .def files for each .dll file
-  file(GLOB DllFiles "${TBB_ROOT}/*.dll")
-  foreach(DLL_FILE IN LISTS DllFiles)
+  # file(GLOB DllFiles "${TBB_ROOT}/*.dll")
+  # foreach(DLL_FILE IN LISTS DllFiles)
     # Get def and lib files path
-    get_filename_component(DLL_NAME ${DLL_FILE} NAME_WE)
-    message("DLL_NAME: ${DLL_NAME}")
+    # get_filename_component(DLL_NAME ${DLL_FILE} NAME_WE)
+    # message("DLL_NAME: ${DLL_NAME}")
     # set(DEF_FILE ${TBB_ROOT}/${DLL_NAME}-new.def)
     # message("DEF_FILE: ${DEF_FILE}")
     # set(LIB_FILE ${TBB_ROOT}/${DLL_NAME}.lib)
@@ -80,8 +80,8 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     # find_library(CURR_LIB ${DLL_NAME} HINTS ${TBB_ROOT} REQUIRED)
     # # list(APPEND TBB_LIB_LIST "${CURR_LIB}")
     # unset(CURR_LIB CACHE)
-  endforeach()
-endif()
+  # endforeach()
+# endif()
 
 # Generate TBB_LIBRARIES variable
 # list(JOIN TBB_LIB_LIST " " TBB_LIBRARIES)
