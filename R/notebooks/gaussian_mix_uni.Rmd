@@ -91,7 +91,7 @@ dp_params = c(dp_params_fix, dp_params_prior)
 dp_names = c("fix", "gamma prior")
 ```
 
-### **Prior on all the hyperparameters**
+### Prior on all the hyperparameters
 
 $$
 \begin{align*}
