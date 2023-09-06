@@ -17,27 +17,46 @@ build_bayesmix <- function(nproc = ceiling(parallel::detectCores()/2), build_dir
 
   # Set bayesmix_home folder from BAYESMIXR_HOME
   home_dir = Sys.getenv("BAYESMIXR_HOME")
+  if(home_dir == ""){
+    readRenviron(system.file("inst/bayesmixr.Renviron", package = "bayesmixr"))
+    home_dir = Sys.getenv("BAYESMIXR_HOME")
+  }
+  if(home_dir == ""){
+    stop("Something went wrong while installing bayesmixr R package.")
+  }
   bayesmix_home = dirname(dirname(home_dir))
 
-  # Build bayesmix
+  # Configure bayesmix
   build_dir = sprintf("%s/%s", bayesmix_home, build_dirname)
-  flags = "-DDISABLE_DOCS=TRUE -DDISABLE_BENCHMARKS=TRUE -DDISABLE_TESTS=TRUE -DDISABLE_PLOTS=TRUE -DCMAKE_BUILD_TYPE=Release"
+  flags = "-DDISABLE_TESTS=TRUE -DDISABLE_PLOTS=TRUE -DCMAKE_BUILD_TYPE=Release"
   cat("*** Configuring BayesMix ***\n")
   CONFIGURE = sprintf("mkdir -p %s && cd %s && cmake .. %s", build_dir, build_dir, flags)
-  errlog = system(CONFIGURE, ignore.stdout = TRUE, ignore.stderr = TRUE)
+  errlog = system(CONFIGURE, ignore.stderr = TRUE)
   if(errlog != 0) { stop(sprintf("Something went wrong during configure: exit with status %d", errlog)) }
+  cat("\n")
 
-  # Make run_mcmc executable
+  # Build bayesmix::run_mcmc executable
   cat("*** Building BayesMix executable ***\n")
   BUILD = sprintf("cd %s && make run_mcmc -j%d", build_dir, nproc)
   errlog = system(BUILD)
   if(errlog != 0) { stop(sprintf("Something went wrong during build: exit with status %d", errlog)) }
-
+  cat("\n")
+  
+  # Get .Renviron file from package
+  renviron = system.file("bayesmixr.Renviron", package = "bayesmixr")
+  
   # Set BAYESMIX_EXE environment variable
   cat("*** Setting BAYESMIX_EXE environment variable ***\n")
-  renviron = system.file("bayesmixr.Renviron", package = "bayesmixr")
   write(x = sprintf("BAYESMIX_EXE=%s/run_mcmc", build_dir), file = renviron, append = TRUE)
+  cat("\n")
+  
+  # Set TBB_PATH environment variable
+  cat("*** Setting TBB_PATH environment variable ***\n")
+  tbb_path = sprintf("%s/lib/_deps/math-src/lib/tbb", bayesmix_home)
+  write(x = sprintf("TBB_PATH=%s", tbb_path), file = renviron, append = TRUE)
+  cat("\n")
+  
+  # Parse .Renviron file to get environment vairables
   readRenviron(renviron)
   cat("Successfully installed BayesMix\n")
-  return(TRUE)
 }
