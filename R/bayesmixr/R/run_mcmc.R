@@ -110,10 +110,13 @@ run_mcmc <- function(hierarchy, mixing, data,
                 data_file, dens_grid_file,
                 eval_dens_file, n_clus_file,
                 clus_file, best_clus_file)
+  
+  # Add TBB_PATH to PATH (required in Windows)
+  EXT_PATH = withr::with_path(Sys.getenv("TBB_PATH"), Sys.getenv("PATH"))
 
-  # Execute run_mcmc
+  # Execute run_mcmc in extended environment
   tryCatch({
-    system(CMD)
+    withr::with_path(EXT_PATH, system(CMD))
   },
   error = function(e) {
     message(sprintf("Failed with error: %s\n)", as.character(e)))
