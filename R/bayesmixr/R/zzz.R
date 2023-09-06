@@ -7,4 +7,5 @@
 .onDetach <- function(...) {
   Sys.unsetenv("BAYESMIXR_HOME")
   Sys.unsetenv("BAYESMIX_EXE")
+  Sys.unsetenv("TBB_PATH")
 }
