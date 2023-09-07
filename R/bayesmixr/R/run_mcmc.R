@@ -54,19 +54,19 @@ run_mcmc <- function(hierarchy, mixing, data,
   }
 
   # Set-up template for run_mcmc command
-  params = paste('--algo-params-file "%s" --hier-type "%s"',
-                 '--hier-args "%s" --mix-type "%s"',
-                 '--mix-args "%s" --coll-name "%s"',
-                 '--data-file "%s" --grid-file "%s"',
-                 '--dens-file "%s" --n-cl-file "%s"',
-                 '--clus-file "%s" --best-clus-file "%s"')
+  params = paste('--algo-params-file %s --hier-type %s',
+                 '--hier-args %s --mix-type %s',
+                 '--mix-args %s --coll-name %s',
+                 '--data-file %s --grid-file %s',
+                 '--dens-file %s --n-cl-file %s',
+                 '--clus-file %s --best-clus-file %s')
 
   # Set run_mcmc command template
   RUN_CMD = paste(BAYESMIX_EXE, params)
 
   # Use temporary directory if out_dir is not set
   if(is.null(out_dir)) {
-    out_dir = sprintf("%s/temp", dirname(BAYESMIX_EXE)); dir.create(out_dir)
+    out_dir = sprintf("%s/temp", dirname(BAYESMIX_EXE)); dir.create(out_dir, showWarnings = F)
     remove_out_dir = TRUE
   } else {
     remove_out_dir = FALSE
@@ -84,23 +84,26 @@ run_mcmc <- function(hierarchy, mixing, data,
   hier_params_file = bayesmixr:::maybe_print_to_file(hier_params, "hier_params", out_dir)
   mix_params_file = bayesmixr:::maybe_print_to_file(mix_params, "mix_params", out_dir)
   algo_params_file = bayesmixr:::maybe_print_to_file(algo_params, "algo_params", out_dir)
-
-  # Set-up NULL filenames for arg-parse
+  
+  # Write data to data_file
   utils::write.table(data, file = data_file, sep = ",", col.names = F, row.names = F)
+  
+  # Set-up NULL filenames for arg-parse
+  EMPTYSTR = '\\"\\"'
   if(is.null(dens_grid)) {
-    dens_grid_file = '""""' #"\"\""
-    eval_dens_file = '""""' #"\"\""
+    dens_grid_file = EMPTYSTR #"\"\""
+    eval_dens_file = EMPTYSTR #"\"\""
   } else {
     utils::write.table(dens_grid, file = dens_grid_file, sep = ",", row.names = F, col.names = F)
   }
   if(!return_clusters) {
-    clus_file = '""""' #"\"\""
+    clus_file = EMPTYSTR
   }
   if(!return_num_clusters) {
-    nclus_file = '""""' #"\"\""
+    nclus_file = EMPTYSTR #"\"\""
   }
   if(!return_best_clus) {
-    best_clus_file = '""""' #"\"\""
+    best_clus_file = EMPTYSTR #"\"\""
   }
 
   # Resolve run_mcmc command
