@@ -6,17 +6,18 @@
 \usage{
 build_bayesmix(
   nproc = ceiling(parallel::detectCores()/2),
-  build_dirname = "build"
+  build_subdir = "build"
 )
 }
 \arguments{
 \item{nproc}{Number of processes to use for parallel compilation. Thanks to \code{parallel} package,
 this parameter defaults to half of the available processes (through \code{\link[parallel]{detectCores}} function)}
 
-\item{build_dirname}{Name for the build directory of BayesMix. Default is "build".}
+\item{build_subdir}{Name for the sub-directory of \code{bayesmix/} folder in which configuration and compilation happens.
+Default value is \code{build}.}
 }
 \value{
-\code{TRUE} if build is successful,it raises errors otherwise
+No output if build is successful, it raises errors otherwise
 }
 \description{
 After the build, if no error has occurred, it saves the path into the \code{BAYESMIX_EXE} environment variable.
