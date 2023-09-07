@@ -9,39 +9,27 @@
 #define EMPTYSTR std::string("\"\"")
 
 bool check_args(const argparse::ArgumentParser &args) {
-  std::cout << "check_args()" << std::endl;
-  
-  std::cout << "coll-name: " << args.get<std::string>("--coll-name") << std::endl;
   if (args["--coll-name"] != std::string("memory")) {
     bayesmix::check_file_is_writeable(args.get<std::string>("--coll-name"));
   }
-  
-  std::cout << "dens-file: " << args.get<std::string>("--dens-file") << std::endl;
   if (args["--dens-file"] != EMPTYSTR) {
     bayesmix::check_file_is_writeable(args.get<std::string>("--dens-file"));
   }
-  
-  std::cout << "n-cl-file: " << args.get<std::string>("--n-cl-file") << std::endl;
   if (args["--n-cl-file"] != EMPTYSTR) {
     bayesmix::check_file_is_writeable(args.get<std::string>("--n-cl-file"));
   }
-  
-  std::cout << "clus-file: " << args.get<std::string>("--clus-file") << std::endl;
   if (args["--clus-file"] != EMPTYSTR) {
     bayesmix::check_file_is_writeable(args.get<std::string>("--clus-file"));
   }
-  
-  std::cout << "best-clus-file: " << args.get<std::string>("--best-clus-file") << std::endl;
   if (args["--best-clus-file"] != EMPTYSTR) {
-    bayesmix::check_file_is_writeable(args.get<std::string>("--best-clus-file"));
+    bayesmix::check_file_is_writeable(
+        args.get<std::string>("--best-clus-file"));
   }
-
-  std::cout << "done!" << std::endl;
   return true;
 }
 
 int main(int argc, char *argv[]) {
-  argparse::ArgumentParser args("bayesmix::run");
+  argparse::ArgumentParser args("bayesmix::run_mcmc");
 
   args.add_argument("--algo-params-file")
       .required()
