@@ -47,6 +47,12 @@ run_mcmc <- function(hierarchy, mixing, data,
   if (!is.logical(return_best_clus)) { stop("'return_best_clus' parameter must be a bool") }
   if (!is.logical(return_num_clusters)) { stop("'return_num_clusters' parameter must be a bool") }
 
+  # Get .Renviron file from package
+  renviron = system.file("bayesmixr.Renviron", package = "bayesmixr")
+
+  # Set bayesmix_home folder from BAYESMIXR_HOME
+  readRenviron(renviron)
+
   # Get BAYESMIX_EXE and check if set
   BAYESMIX_EXE = Sys.getenv("BAYESMIX_EXE")
   if(BAYESMIX_EXE == ""){
@@ -84,15 +90,15 @@ run_mcmc <- function(hierarchy, mixing, data,
   hier_params_file = bayesmixr:::maybe_print_to_file(hier_params, "hier_params", out_dir)
   mix_params_file = bayesmixr:::maybe_print_to_file(mix_params, "mix_params", out_dir)
   algo_params_file = bayesmixr:::maybe_print_to_file(algo_params, "algo_params", out_dir)
-  
+
   # Write data to data_file
   utils::write.table(data, file = data_file, sep = ",", col.names = F, row.names = F)
-  
+
   # Set-up NULL filenames for arg-parse
   EMPTYSTR = '\\"\\"'
   if(is.null(dens_grid)) {
-    dens_grid_file = EMPTYSTR #"\"\""
-    eval_dens_file = EMPTYSTR #"\"\""
+    dens_grid_file = EMPTYSTR
+    eval_dens_file = EMPTYSTR
   } else {
     utils::write.table(dens_grid, file = dens_grid_file, sep = ",", row.names = F, col.names = F)
   }
@@ -100,10 +106,10 @@ run_mcmc <- function(hierarchy, mixing, data,
     clus_file = EMPTYSTR
   }
   if(!return_num_clusters) {
-    nclus_file = EMPTYSTR #"\"\""
+    nclus_file = EMPTYSTR
   }
   if(!return_best_clus) {
-    best_clus_file = EMPTYSTR #"\"\""
+    best_clus_file = EMPTYSTR
   }
 
   # Resolve run_mcmc command
@@ -113,7 +119,7 @@ run_mcmc <- function(hierarchy, mixing, data,
                 data_file, dens_grid_file,
                 eval_dens_file, n_clus_file,
                 clus_file, best_clus_file)
-  
+
   # Add TBB_PATH to PATH (required in Windows)
   EXT_PATH = withr::with_path(Sys.getenv("TBB_PATH"), Sys.getenv("PATH"))
 
@@ -125,8 +131,6 @@ run_mcmc <- function(hierarchy, mixing, data,
     message(sprintf("Failed with error: %s\n)", as.character(e)))
    if(remove_out_dir) {
      unlink(out_dir, recursive = TRUE)
-     #unlink(paste0(out_dir,"/*.csv"))
-     #unlink(paste0(out_dir,"/*.asciipb"))
    }
    return(NULL)
   })
@@ -162,8 +166,6 @@ run_mcmc <- function(hierarchy, mixing, data,
   # Clean temporary files and return
   if(remove_out_dir){
     unlink(out_dir, recursive = TRUE)
-    #unlink(paste0(out_dir,"/*.csv"))
-    #unlink(paste0(out_dir,"/*.asciipb"))
   }
   return(out)
 }
