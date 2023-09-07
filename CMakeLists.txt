@@ -51,16 +51,7 @@ else()
   message(FATAL_ERROR "math library required but not found!")
 endif()
 
-# # Check if TBB is found
-# if(TBB_FOUND)
-#   message(STATUS "TBB version : ${TBB_VERSION}")
-#   message(STATUS "TBB include path : ${TBB_ROOT}/include")
-#   message(STATUS "TBB imported targets: ${TBB_IMPORTED_TARGETS}")
-# else()
-#   message(FATAL_ERROR "TBB library required but not found!")
-# endif()
-
-# Make available protocolbuffers/protobuf (v3.14.0)
+# Make available protocolbuffers/protobuf (v3.16.0)
 include(cmake/protobuf.cmake)
 
 # Check if protobuf is found

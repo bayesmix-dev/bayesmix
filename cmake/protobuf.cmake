@@ -42,19 +42,6 @@ if(result)
   message(FATAL_ERROR "Failed to build protobuf (${result})!")
 endif()
 
-# Install protobuf
-# message(STATUS "Installing protobuf ...")
-# if(WIN32)
-#   execute_process(
-# 		COMMAND ${CMAKE_COMMAND} --build . --target install --config ${CMAKE_BUILD_TYPE}
-#   	RESULT_VARIABLE result
-#   	WORKING_DIRECTORY ${Protobuf_ROOT}
-# 	)
-#   if(result)
-# 		message(FATAL_ERROR "Failed to install protobuf (${result})!")
-#   endif()
-# endif()
-
 # Find package in installed folder
 find_package(Protobuf REQUIRED HINTS ${Protobuf_DIR})
 

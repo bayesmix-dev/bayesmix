@@ -42,52 +42,6 @@ if(result)
   message(FATAL_ERROR "Failed to compile math libraries (${result})!")
 endif()
 
-# Generate .lib equivalents if in Windows
-# if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-  # Generating .def files for each .dll file
-  # file(GLOB DllFiles "${TBB_ROOT}/*.dll")
-  # foreach(DLL_FILE IN LISTS DllFiles)
-    # Get def and lib files path
-    # get_filename_component(DLL_NAME ${DLL_FILE} NAME_WE)
-    # message("DLL_NAME: ${DLL_NAME}")
-    # set(DEF_FILE ${TBB_ROOT}/${DLL_NAME}-new.def)
-    # message("DEF_FILE: ${DEF_FILE}")
-    # set(LIB_FILE ${TBB_ROOT}/${DLL_NAME}.lib)
-    # message("LIB_FILE: ${LIB_FILE}")
-    # # Generating .def files
-    # message(STATUS "Generating .def file for ${DLL_FILE}:")
-    # execute_process(
-    #   COMMAND gendef - ${DLL_FILE}
-    #   RESULT_VARIABLE result
-    #   OUTPUT_FILE ${DEF_FILE}
-    #   WORKING_DIRECTORY ${TBB_ROOT}
-    # )
-    # if(result)
-    #   message(FATAL_ERROR "Failed to generate .def file for ${DLL_FILE}: (${result})!")
-    # endif()
-    # # Generating .lib files
-    # message(STATUS "Generating .lib file for ${DEF_FILE}:")
-    # execute_process(
-    #   COMMAND dlltool -d ${DEF_FILE} -l ${LIB_FILE}
-    #   RESULT_VARIABLE result
-    #   WORKING_DIRECTORY ${TBB_ROOT}
-    # )
-    # if(result)
-    #   message(FATAL_ERROR "Failed to generate .lib file for ${DEF_FILE}: (${result})!")
-    # endif()
-    # # Check if current library can be found
-    # message("")
-    # find_library(CURR_LIB ${DLL_NAME} HINTS ${TBB_ROOT} REQUIRED)
-    # # list(APPEND TBB_LIB_LIST "${CURR_LIB}")
-    # unset(CURR_LIB CACHE)
-  # endforeach()
-# endif()
-
-# Generate TBB_LIBRARIES variable
-# list(JOIN TBB_LIB_LIST " " TBB_LIBRARIES)
-# find_library(TBB tbb HINTS ${TBB_ROOT} REQUIRED)
-# message("TBB_LIBRARIES: ${TBB_LIBRARIES}")
-
 # Add TBB link directory
 link_directories(${TBB_ROOT})
 
