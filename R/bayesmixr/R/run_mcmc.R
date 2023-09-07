@@ -54,19 +54,19 @@ run_mcmc <- function(hierarchy, mixing, data,
   }
 
   # Set-up template for run_mcmc command
-  params = paste("--algo-params-file '%s' --hier-type '%s'",
-                 "--hier-args '%s' --mix-type '%s'",
-                 "--mix-args '%s' --coll-name '%s'",
-                 "--data-file '%s' --grid-file '%s'",
-                 "--dens-file '%s' --n-cl-file '%s'",
-                 "--clus-file '%s' --best-clus-file '%s'")
+  params = paste('--algo-params-file "%s" --hier-type "%s"',
+                 '--hier-args "%s" --mix-type "%s"',
+                 '--mix-args "%s" --coll-name "%s"',
+                 '--data-file "%s" --grid-file "%s"',
+                 '--dens-file "%s" --n-cl-file "%s"',
+                 '--clus-file "%s" --best-clus-file "%s"')
 
   # Set run_mcmc command template
   RUN_CMD = paste(BAYESMIX_EXE, params)
 
   # Use temporary directory if out_dir is not set
   if(is.null(out_dir)) {
-    out_dir = tempdir()
+    out_dir = sprintf("%s/temp", dirname(BAYESMIX_EXE)); dir.create(out_dir)
     remove_out_dir = TRUE
   } else {
     remove_out_dir = FALSE
@@ -81,26 +81,26 @@ run_mcmc <- function(hierarchy, mixing, data,
   eval_dens_file = paste0(out_dir, "/eval_dens.csv"); file.create(eval_dens_file)
 
   # Prepare protobuf configuration files
-  hier_params_file = maybe_print_to_file(hier_params, "hier_params", out_dir)
-  mix_params_file = maybe_print_to_file(mix_params, "mix_params", out_dir)
-  algo_params_file = maybe_print_to_file(algo_params, "algo_params", out_dir)
+  hier_params_file = bayesmixr:::maybe_print_to_file(hier_params, "hier_params", out_dir)
+  mix_params_file = bayesmixr:::maybe_print_to_file(mix_params, "mix_params", out_dir)
+  algo_params_file = bayesmixr:::maybe_print_to_file(algo_params, "algo_params", out_dir)
 
   # Set-up NULL filenames for arg-parse
   utils::write.table(data, file = data_file, sep = ",", col.names = F, row.names = F)
   if(is.null(dens_grid)) {
-    dens_grid_file = "\"\""
-    eval_dens_file = "\"\""
+    dens_grid_file = '""""' #"\"\""
+    eval_dens_file = '""""' #"\"\""
   } else {
     utils::write.table(dens_grid, file = dens_grid_file, sep = ",", row.names = F, col.names = F)
   }
   if(!return_clusters) {
-    clus_file = "\"\""
+    clus_file = '""""' #"\"\""
   }
   if(!return_num_clusters) {
-    nclus_file = "\"\""
+    nclus_file = '""""' #"\"\""
   }
   if(!return_best_clus) {
-    best_clus_file = "\"\""
+    best_clus_file = '""""' #"\"\""
   }
 
   # Resolve run_mcmc command
@@ -121,8 +121,9 @@ run_mcmc <- function(hierarchy, mixing, data,
   error = function(e) {
     message(sprintf("Failed with error: %s\n)", as.character(e)))
    if(remove_out_dir) {
-     unlink(paste0(out_dir,"/*.csv"))
-     unlink(paste0(out_dir,"/*.asciipb"))
+     unlink(out_dir, recursive = TRUE)
+     #unlink(paste0(out_dir,"/*.csv"))
+     #unlink(paste0(out_dir,"/*.asciipb"))
    }
    return(NULL)
   })
@@ -157,8 +158,9 @@ run_mcmc <- function(hierarchy, mixing, data,
 
   # Clean temporary files and return
   if(remove_out_dir){
-    unlink(paste0(out_dir,"/*.csv"))
-    unlink(paste0(out_dir,"/*.asciipb"))
+    unlink(out_dir, recursive = TRUE)
+    #unlink(paste0(out_dir,"/*.csv"))
+    #unlink(paste0(out_dir,"/*.asciipb"))
   }
   return(out)
 }
