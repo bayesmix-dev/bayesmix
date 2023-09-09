@@ -216,7 +216,8 @@ init_num_clusters: 3
 
 ```{r}
 out = run_mcmc("NNIG", "DP", data, g0_params_allprior, dp_params_prior, neal2_algo,
-               dens_grid=NULL, return_clusters=TRUE, return_num_clusters=TRUE, return_best_clus=TRUE)
+               dens_grid=NULL, return_clusters=TRUE, return_num_clusters=TRUE,
+               return_best_clus=TRUE, return_whole_chain = TRUE)
 ```
 
 ```{r}
