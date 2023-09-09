@@ -20,6 +20,7 @@
 #' @param return_clusters A bool. If \code{TRUE}, returns the chain of the cluster allocations.
 #' @param return_best_clus A bool. If \code{TRUE}, returns the best cluster allocation obtained by minimizing the Binder loss function over the visited partitions during the MCMC sampling.
 #' @param return_num_clusters A bool. If \code{TRUE}, returns the chain of the number of clusters.
+#' @param return_whole_chain A bool. If \code{TRUE}, returns the whole MCMC chain.
 #'
 #' @return A list with the following components:
 #' \itemize{
@@ -27,12 +28,14 @@
 #'   \item{\strong{n_clus} numeric vector of shape (n_samples). The number of clusters for each iteration. \code{NULL} if \code{return_num_clusters} is \code{FALSE}.}
 #'   \item{\strong{clus} numeric matrix of shape (n_samples, n_data). The cluster allocation for each iteration. \code{NULL} if \code{return_clusters} is \code{FALSE}.}
 #'   \item{\strong{best_clus} numeric vector of shape (n_data). The best clustering obtained by minimizing Binder's loss function. \code{NULL} if \code{return_best_clus} is \code{FALSE}.}
+#'   \item{\strong{mcmc_chain} a list of \code{RProtoBuf::Message} of type \code{bayesmix::AlgorithmState}. See [\code{algorithm_state.proto}](https://bayesmix.readthedocs.io/en/latest/protos.html#bayesmix.AlgorithmState)
+#'   for the corresponding message. \code{NULL} if \code{return_whole_chain} is \code{FALSE}. This chain can be accessed using \code{\link{RProtoBuf}} package.}
 #' }
 #'
 #' @export
 run_mcmc <- function(hierarchy, mixing, data,
                      hier_params, mix_params, algo_params, dens_grid = NULL, out_dir = NULL,
-                     return_clusters = TRUE, return_best_clus = TRUE, return_num_clusters = TRUE) {
+                     return_clusters = TRUE, return_best_clus = TRUE, return_num_clusters = TRUE, return_whole_chain = FALSE) {
 
   # Check input types
   if (!is.character(hierarchy)) { stop("'hierarchy' parameter must be a string") }
@@ -46,6 +49,7 @@ run_mcmc <- function(hierarchy, mixing, data,
   if (!is.logical(return_clusters)) { stop("'return_clusters' parameter must be a bool") }
   if (!is.logical(return_best_clus)) { stop("'return_best_clus' parameter must be a bool") }
   if (!is.logical(return_num_clusters)) { stop("'return_num_clusters' parameter must be a bool") }
+  if (!is.logical(return_whole_chain)) { stop("'return_whole_chain' parameter must be a bool") }
 
   # Get .Renviron file from package
   renviron = system.file("bayesmixr.Renviron", package = "bayesmixr")
@@ -84,7 +88,8 @@ run_mcmc <- function(hierarchy, mixing, data,
   n_clus_file = paste0(out_dir, '/n_clus.csv'); file.create(n_clus_file)
   clus_file = paste0(out_dir, '/clus.csv'); file.create(clus_file)
   best_clus_file = paste0(out_dir, '/best_clus.csv'); file.create(best_clus_file)
-  eval_dens_file = paste0(out_dir, "/eval_dens.csv"); file.create(eval_dens_file)
+  eval_dens_file = paste0(out_dir, '/eval_dens.csv'); file.create(eval_dens_file)
+  chain_file = paste0(out_dir, '/chain.recordio'); file.create(chain_file)
 
   # Prepare protobuf configuration files
   hier_params_file = bayesmixr:::maybe_print_to_file(hier_params, "hier_params", out_dir)
@@ -111,11 +116,14 @@ run_mcmc <- function(hierarchy, mixing, data,
   if(!return_best_clus) {
     best_clus_file = EMPTYSTR
   }
+  if(!return_whole_chain) {
+    chain_file = "memory"
+  }
 
   # Resolve run_mcmc command
   CMD = sprintf(RUN_CMD, algo_params_file, hierarchy,
                 hier_params_file, mixing,
-                mix_params_file, 'memory',
+                mix_params_file, chain_file,
                 data_file, dens_grid_file,
                 eval_dens_file, n_clus_file,
                 clus_file, best_clus_file)
@@ -156,12 +164,18 @@ run_mcmc <- function(hierarchy, mixing, data,
     best_clus = suppressWarnings(as.matrix(utils::read.table(best_clus_file, sep = ",")))
     attributes(best_clus)$dimnames = NULL
   }
+  mcmc_chain = NULL
+  if(return_whole_chain) {
+    bayesmixr:::import_protobuf_messages()
+    mcmc_chain = bayesmixr:::read_many_from_file(chain_file, bayesmix.AlgorithmState)
+  }
 
   # Define out list
   out = list("eval_dens" = eval_dens,
              "n_clus" = as.vector(nclus),
              "clus" = clus,
-             "best_clus" = as.vector(best_clus))
+             "best_clus" = as.vector(best_clus),
+             "mcmc_chain" = mcmc_chain)
 
   # Clean temporary files and return
   if(remove_out_dir){
