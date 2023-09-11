@@ -60,7 +60,7 @@ find_package(TBB)
 # Check if Protobuf is present in system
 find_package(Protobuf)
 if (NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND AND NOT TARGET protobuf::libprotobuf)
-  
+
   # if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
   #   message(FATAL_ERROR
   #           "Your cmake version is too old: either install a newer version (>=3.20)"
@@ -134,8 +134,11 @@ foreach(PROTO_FILE IN LISTS ProtoFiles)
   message(STATUS "protoc src: ${PROTO_SRC}")
   add_custom_command(
     OUTPUT ${PROTO_SRC} ${PROTO_HDR}
-    COMMAND protobuf::protoc "--proto_path=${BASEPATH}/src/proto"
-    ${PROTO_DIRS} "--cpp_out=${PROJECT_BINARY_DIR}" ${PROTO_FILE}
+    COMMAND protobuf::protoc
+    "--proto_path=${BASEPATH}/src/proto" ${PROTO_DIRS}
+    "--cpp_out=${PROJECT_BINARY_DIR}"
+    "--python_out=${BASEPATH}/python/bayesmixpy/proto"
+    ${PROTO_FILE}
     DEPENDS ${PROTO_FILE} protobuf::protoc
     COMMENT "Generate C++ protocol buffer for ${PROTO_FILE}"
     VERBATIM)
@@ -188,7 +191,7 @@ if (ENABLE_DOCS)
 endif()
 
 if (NOT DISABLE_PLOTS)
-  
+
   # Check version (not needed)
   if (${CMAKE_VERSION} VERSION_LESS "3.20.0")
     message(FATAL_ERROR
@@ -203,7 +206,7 @@ if (NOT DISABLE_PLOTS)
   FetchContent_Declare(matplotplusplus
     GIT_REPOSITORY "https://github.com/alandefreitas/matplotplusplus"
     GIT_TAG "origin/master"
-    PATCH_COMMAND ${matplotplusplus_patch} 
+    PATCH_COMMAND ${matplotplusplus_patch}
   )
   FetchContent_MakeAvailable(matplotplusplus)
   message(CHECK_PASS "fetched")
@@ -214,7 +217,7 @@ if (NOT DISABLE_PLOTS)
     src/plots/plot_utils.h
     src/plots/plot_utils.cc
   )
-  
+
   target_include_directories(plot_mcmc PUBLIC ${INCLUDE_PATHS} ${matplotplusplus_SOURCE_DIR}/source)
   target_link_libraries(plot_mcmc PUBLIC ${LINK_LIBRARIES} matplot)
   target_compile_options(plot_mcmc PUBLIC ${COMPILE_OPTIONS})
