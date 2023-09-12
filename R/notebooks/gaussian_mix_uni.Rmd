@@ -202,6 +202,7 @@ We can extract
 1.  The full chain of the cluster allocations
 2.  The chain of the number of clusters
 3.  The "best" cluster according to Binder loss function
+4.  The whole MCMC chain as a list of `RProtoBuf::Message` object of type `bayesmix::AlgorithmState`.
 
 ```{r}
 neal2_algo =
