@@ -5,7 +5,7 @@
 #include <google/protobuf/util/delimited_message_util.h>
 
 void FileCollector::start_collecting() {
-  int outfd = open(filename.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
+  int outfd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0666);
   fout = new google::protobuf::io::FileOutputStream(outfd);
   is_open_write = true;
 }
@@ -34,7 +34,7 @@ void FileCollector::reset() {
 }
 
 void FileCollector::open_for_reading() {
-  infd = open(filename.c_str(), O_RDWR);
+  infd = open(filename.c_str(), O_RDONLY | O_BINARY, 0666);
   if (infd == -1) {
     std::cout << "Errno: " << strerror(errno) << std::endl;
   }

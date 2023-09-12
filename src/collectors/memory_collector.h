@@ -33,7 +33,7 @@ class MemoryCollector : public BaseCollector {
   void write_to_file(const std::string& outfile) {
     // THIS is probabily a HACK: we de-serialize from the chain and
     //! re-serialize to file. Still, it's a reasonable work-around.
-    int outfd = open(outfile.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
+    int outfd = open(outfile.c_str(), O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0666);
     google::protobuf::io::FileOutputStream fout(outfd);
 
     for (std::string& serialized_state : chain) {
@@ -55,7 +55,7 @@ class MemoryCollector : public BaseCollector {
   //! Templatized utility for reading states directly from a file
   template <typename MsgType>
   void read_from_file(const std::string& infile) {
-    int infd = open(infile.c_str(), O_RDONLY);
+    int infd = open(infile.c_str(), O_RDONLY | O_BINARY, 0666);
     if (infd == -1) std::cout << "errno: " << strerror(errno) << std::endl;
 
     google::protobuf::io::FileInputStream fin(infd);
