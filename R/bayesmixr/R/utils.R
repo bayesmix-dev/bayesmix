@@ -14,6 +14,7 @@ maybe_print_to_file <- function(maybe_proto, proto_name = NULL, out_dir = NULL) 
   return(proto_file)
 }
 
+
 #' Import Protocol Buffers Descriptors of bayesmix
 #'
 #' This utility loads in the workspace the protocol buffers descriptors defined
@@ -30,8 +31,8 @@ import_protobuf_messages <- function() {
   renviron <- system.file("bayesmixr.Renviron", package = "bayesmixr")
   readRenviron(renviron)
 
-  # Deduce BUILD_DIR from RSPATIALCMC_EXE variable in RspatialCMC.Renviron
-  BAYESMIX_HOME <- dirname(dirname(Sys.getenv("BAYESMIX_EXE")))
+  # Deduce BUILD_DIR from BAYESMIXR_HOME variable
+  BAYESMIX_HOME <- dirname(dirname(Sys.getenv("BAYESMIXR_HOME")))
 
   # Deduce protocol buffer proto paths
   bayesmix_protoPath <- sprintf("%s/src/proto", BAYESMIX_HOME)
@@ -89,11 +90,3 @@ read_many_from_file <- function(filename, msg_type) {
   # Return chain
   return(out)
 }
-
-# Usage example
-# import_protobuf_messages()
-#
-# file_path <- "resources/tutorial/out/chains.recordio"
-# msg_type <- bayesmix.AlgorithmState
-#
-# chain <- read_many_from_file(file_path, msg_type)

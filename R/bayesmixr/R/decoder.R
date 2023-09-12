@@ -11,17 +11,17 @@ VarintDecoder = function(mask, result_type) {
 
   # Define DecodeVarint function
   DecodeVarint <- function(buffer, pos) {
-    result <- 0L
-    shift <- 0L
-    pos <- as.integer(pos)
+    result = 0
+    shift = 0
     while (TRUE) {
-      b <- as.integer(buffer[pos])
-      result <- bitops::bitOr(result, bitops::bitAnd(b, 0x7f)*(2L^shift))
-      pos <- pos + 1L
+      b = as.numeric(buffer[pos])
+      result = bitops::bitOr(result, bitops::bitShiftL(bitops::bitAnd(b, 0x7f), shift))
+      # result <- bitops::bitOr(result, bitops::bitAnd(b, 0x7f)*(2L^shift))
+      pos = pos + 1
       if (!bitops::bitAnd(b, 0x80)) {
         result <- bitops::bitAnd(result, mask)
         result <- result_type(result)
-        return(list(result = result, pos = pos))
+        return(list(result = result, pos = as.integer(pos)))
       }
       shift <- shift + 7
       if (shift >= 64) {
