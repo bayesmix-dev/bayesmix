@@ -41,7 +41,6 @@ def read_many_protos_from_file(filename, MsgType):
         msg_buf = buf[n:n+msg_len]
         try:
             msg = MsgType()
-            print(msg_buf[:20])
             msg.ParseFromString(msg_buf)
             out.append(msg)
             n += msg_len

@@ -192,9 +192,9 @@ def run_mcmc(
 
     mcmc_chains = None
     if return_chains:
-        chains = read_many_protos_from_file(coll_name, AlgorithmState)
+        mcmc_chains = read_many_protos_from_file(coll_name, AlgorithmState)
 
     if remove_out_dir:
         shutil.rmtree(out_dir, ignore_errors=True)
 
-    return eval_dens, nclus, clus, best_clus
+    return eval_dens, nclus, clus, best_clus, mcmc_chains

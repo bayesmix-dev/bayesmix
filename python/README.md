@@ -48,14 +48,15 @@ For instance, to fit a Dirichlet Process Mixture on univariate data using a Norm
 
 ```
 
-eval_dens, n_clus_chain, best_clus = run_mcmc(
+eval_dens, n_clus_chain, best_clus, chains = run_mcmc(
 "NNIG",
 "DP",
 data,
 nnig_params,
 dp_params,
 algo_params,
-dens_grid)
+dens_grid,
+return_chains=True)
 
 ```
 
