@@ -16,7 +16,6 @@ VarintDecoder = function(mask, result_type) {
     while (TRUE) {
       b = as.numeric(buffer[pos])
       result = bitops::bitOr(result, bitops::bitShiftL(bitops::bitAnd(b, 0x7f), shift))
-      # result <- bitops::bitOr(result, bitops::bitAnd(b, 0x7f)*(2L^shift))
       pos = pos + 1
       if (!bitops::bitAnd(b, 0x80)) {
         result <- bitops::bitAnd(result, mask)
