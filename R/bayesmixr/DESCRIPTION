@@ -1,6 +1,6 @@
 Package: bayesmixr
 Title: An R interface to BayesMix
-Version: 0.1.1
+Version: 0.1.2
 Author: Matteo Gianella
 Maintainer: Matteo Gianella <matteo.gianella@polimi.it>
 Description: This package provides a light-weight R interface for BayesMix C++ library.
