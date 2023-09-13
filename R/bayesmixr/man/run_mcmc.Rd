@@ -16,7 +16,7 @@ run_mcmc(
   return_clusters = TRUE,
   return_best_clus = TRUE,
   return_num_clusters = TRUE,
-  return_whole_chain = FALSE
+  return_chains = FALSE
 )
 }
 \arguments{
@@ -49,7 +49,7 @@ after the sampling is finished.}
 
 \item{return_num_clusters}{A bool. If \code{TRUE}, returns the chain of the number of clusters.}
 
-\item{return_whole_chain}{A bool. If \code{TRUE}, returns the whole MCMC chain.}
+\item{return_chains}{A bool. If \code{TRUE}, returns the whole MCMC chain.}
 }
 \value{
 A list with the following components:
@@ -58,8 +58,8 @@ A list with the following components:
 \item{\strong{n_clus} numeric vector of shape (n_samples). The number of clusters for each iteration. \code{NULL} if \code{return_num_clusters} is \code{FALSE}.}
 \item{\strong{clus} numeric matrix of shape (n_samples, n_data). The cluster allocation for each iteration. \code{NULL} if \code{return_clusters} is \code{FALSE}.}
 \item{\strong{best_clus} numeric vector of shape (n_data). The best clustering obtained by minimizing Binder's loss function. \code{NULL} if \code{return_best_clus} is \code{FALSE}.}
-\item{\strong{mcmc_chain} a list of \code{RProtoBuf::Message} of type \code{bayesmix::AlgorithmState}. See \href{https://bayesmix.readthedocs.io/en/latest/protos.html#bayesmix.AlgorithmState}{\code{algorithm_state.proto}}
-for the corresponding message. \code{NULL} if \code{return_whole_chain} is \code{FALSE}. This chain can be accessed using \code{\link{RProtoBuf}} package.}
+\item{\strong{mcmc_chains} a list of \code{RProtoBuf::Message} of type \code{bayesmix::AlgorithmState}. See \href{https://bayesmix.readthedocs.io/en/latest/protos.html#bayesmix.AlgorithmState}{\code{algorithm_state.proto}}
+for the corresponding message. \code{NULL} if \code{return_chains} is \code{FALSE}. This chain can be accessed using \code{\link{RProtoBuf}} package.}
 }
 }
 \description{
