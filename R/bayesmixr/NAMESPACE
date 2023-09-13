@@ -2,4 +2,5 @@
 
 export(build_bayesmix)
 export(import_protobuf_messages)
+export(read_many_proto_from_file)
 export(run_mcmc)
