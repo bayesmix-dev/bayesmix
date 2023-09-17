@@ -37,8 +37,6 @@ build_bayesmix(n_proc)
 
 this will print out the installation log.
 
-```
-
 ### Running bayesmix
 
 To `run_mcmc` must define the model and the algorithm in some configuration files or
@@ -47,71 +45,62 @@ text strings. See the documentation for more details.
 For instance, to fit a Dirichlet Process Mixture on univariate data using a Normal-Normal-InverseGamma hierarchy using Neal's Algorithm 3, we use the following
 
 ```
-
 eval_dens, n_clus_chain, best_clus, chains = run_mcmc(
-"NNIG",
-"DP",
-data,
-nnig_params,
-dp_params,
-algo_params,
-dens_grid,
-return_chains=True)
-
+    "NNIG",
+    "DP",
+    data,
+    nnig_params,
+    dp_params,
+    algo_params,
+    dens_grid,
+    return_chains=True)
 ```
 
 where `data` is a np.array of data points, `dens_grid` is a np.array of points where to evaluate the density, and `nnig_params`, `dp_params` and `algo_params` are defined as follows.
 
 ```
-
 nnig_params="""
 ngg_prior {
-mean_prior {
-mean: 5.5
-var: 2.25
-}
-var_scaling_prior {
-shape: 0.2
-rate: 0.6
-}
-shape: 1.5
-scale_prior {
-shape: 4.0
-rate: 2.0
-}
+    mean_prior {
+        mean: 5.5
+        var: 2.25
+    }
+    var_scaling_prior {
+        shape: 0.2
+        rate: 0.6
+    }
+    shape: 1.5
+    scale_prior {
+        shape: 4.0
+        rate: 2.0
+        }
 }
 """
-
 ```
 
-This specifies that the base (centering) measure is a Normal-InverseGamma with parameters (mu0, lam0, a0, b0). Further, mu0 ~ N(5.5, 2.25) lam0 ~ Gamma(0.2, 0.6) a0 = 1.5, b0 ~ Gamma(4.0, 2.0) [See the messages NNIGPrior and NNIGPrior::NGGPrior in the file hierarchy_prior.proto for further reference].
+This specifies that the base (centering) measure is a Normal-InverseGamma with parameters $(\mu_0, \lambda_0, a_0, b_0)$. Further, $\mu_0 \sim N(5.5, 2.25)$, $\lambda_0 ~ Gamma(0.2, 0.6)$, $a_0 = 1.5$, $b0 \sim Gamma(4.0, 2.0)$ [See the messages NNIGPrior and NNIGPrior::NGGPrior in the file hierarchy_prior.proto for further reference].
 
 ```
-
 dp_params = """
 gamma_prior {
-totalmass_prior {
-shape: 4.0
-rate: 2.0
-}
+    totalmass_prior {
+        shape: 4.0
+        rate: 2.0
+    }
 }
 """
-
 ```
 
 This specifies that the concentration parameter of the DP has an hyperprior which is a Gamma distribution with parameters (4, 2).
 
 ```
-
 algo_params = """
-algo_id: "Neal3"
-rng_seed: 20201124
-iterations: 2000
-burnin: 1000
-init_num_clusters: 3
+    algo_id: "Neal3"
+    rng_seed: 20201124
+    iterations: 2000
+    burnin: 1000
+    init_num_clusters: 3
 """
-
 ```
 
 See the notebook in `notebooks/gaussian_mix_uni.ipynb` for a concrete usage example
-```
