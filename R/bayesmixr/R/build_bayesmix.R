@@ -38,7 +38,7 @@ build_bayesmix <- function(nproc = ceiling(parallel::detectCores()/2), build_sub
   # Configure bayesmix
   cat("*** Configuring BayesMix ***\n")
   flags = '-DDISABLE_TESTS=TRUE -DDISABLE_PLOTS=TRUE -DCMAKE_BUILD_TYPE=Release'
-  CONFIGURE = sprintf('cmake .. %s', flags)
+  CONFIGURE = sprintf('cmake .. -G "Unix Makefiles" %s', flags)
   errlog = system(CONFIGURE, ignore.stderr = TRUE)
   if(errlog != 0) { stop(sprintf("Something went wrong during configure: exit with status %d", errlog)) }
   cat("\n")
