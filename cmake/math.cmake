@@ -44,9 +44,22 @@ endif()
 # Add TBB link directory
 link_directories(${TBB_ROOT})
 
-# In Windows, write absolute path in ~/.bash_profile
+# In Windows, add TBB_ROOT to PATH variable via batch file if not present
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-  file(APPEND $ENV{HOME}/.bash_profile "PATH=${TBB_ROOT}:$PATH\n")
+  # Check if adding TBB_ROOT is already present in PATH
+  file(TO_CMAKE_PATH "$ENV{PATH}" PATH)
+  string(FIND "${PATH}" "${TBB_ROOT}" tbb_path-LOCATION)
+  # If not present, add to PATH user environment variable
+  if(tbb_path-LOCATION EQUAL -1)
+    execute_process(
+      COMMAND cmd.exe /C install-tbb.bat
+      RESULT_VARIABLE result
+      WORKING_DIRECTORY ${BASEPATH}
+    )
+    if(result)
+      message(FATAL_ERROR "Failed to install TBB (${result})!")
+    endif()
+  endif()
 endif()
 
 # Find math packages
