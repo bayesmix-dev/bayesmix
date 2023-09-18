@@ -61,6 +61,3 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     endif()
   endif()
 endif()
-
-# Find math packages
-# find_package(math REQUIRED)
