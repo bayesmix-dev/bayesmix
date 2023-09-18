@@ -45,5 +45,10 @@ endif()
 # Add TBB link directory
 link_directories(${TBB_ROOT})
 
+# In Windows, write absolute path in ~/.bash_profile
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+  file(APPEND $ENV{HOME}/.bash_profile "PATH=${TBB_ROOT}:$PATH\n")
+endif()
+
 # Find math packages
 find_package(math REQUIRED)
