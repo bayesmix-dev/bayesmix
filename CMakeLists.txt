@@ -43,8 +43,8 @@ set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
 # Make available bayesmix-dev/math (and TBB)
 include(cmake/math.cmake)
 
-# Check math is found
-if(math_FOUND)
+# Check math has been populated
+if(math_POPULATED)
   message(STATUS "math source dir: ${math_SOURCE_DIR}")
   message(STATUS "math binary dir: ${math_BINARY_DIR}")
 else()
@@ -171,10 +171,12 @@ endif()
 if (NOT DISABLE_PLOTS)
   # Make available matplotplusplus
   include(cmake/matplotplusplus.cmake)
-  # Check matplotplusplus is found
-  if(matplotplusplus_FOUND)
+  # Check matplotplusplus has been populated
+  if(matplotplusplus_POPULATED)
     message(STATUS "matplotplusplus source dir: ${matplotplusplus_SOURCE_DIR}")
     message(STATUS "matplotplusplus binary dir: ${matplotplusplus_BINARY_DIR}")
+  else()
+    message(FATAL_ERROR "matplotplusplus library required but not found!")
   endif()
   # Build plot_mcmc executable
   add_executable(plot_mcmc
