@@ -29,10 +29,115 @@ For descriptions of the models supported in our library, discussion of software 
 <!-- Add link after merge !!! -->
 
 # Installation
+Compiling and building `bayesmix` requires a modern C++ compiler, `git`, the GNU `make` utility, `cmake` (version >= 3.20) and `pkg-config`. Make these packages available varies between operating systems.  
 
+**Warning**: Check the version of `cmake` available in your package manager default repository. You may need to install a more recent version in another way. If this is your case, please go to the [official CMake GitHub repository](https://github.com/Kitware/CMake) and follow the installation instructions.
+
+## Requirements - Linux
+On Linux, the required packages can be installed via the default package manager. For instance, in Ubuntu it is sufficient to run
+
+```shell
+sudo apt install git
+sudo apt install g++
+sudo apt install make
+sudo apt install cmake
+sudo apt install pkg-config
+```
+
+## Requirements - MacOS
+On MacOS, the required packages can be installed via [Homebrew](https://brew.sh/). Once installed, it is sufficient to run
+
+```shell
+brew install git
+brew install g++
+brew install make
+brew install cmake
+brew install pkg-config
+```
+
+## Requirements - Windows
+First of all, install `git` via the [Git for Windows](https://gitforwindows.org/) project. Download the [installer](https://github.com/git-for-windows/git/releases/latest) and complete the prompts leaving default choices to install. The Git BASH that comes with this program is the BASH we suggest to compile and run `bayesmix`.  
+
+On Windows, we also need the installation of a proper C++ toolchain to install the other required packages. `bayesmix` is known complatible with RTools40, RTools42 and RTools43 toolchains. These require slightly different steps to configure, so please follow the appropriate steps below. All toolchains will require updating your `PATH` variable, See [these instructions](https://helpdeskgeek.com/windows-10/add-windows-path-environment-variable/) for details on changing the `PATH` if you are unfamiliar. The following instructions will assume that the default installation directory was used, so be sure to update the paths accordingly if you have chosen a different directory.
+
+### Configure RTools40
+Download the [installer](https://github.com/r-windows/rtools-installer/releases/download/2022-02-06/rtools40-x86_64.exe) and complete the prompts to install.
+Next, add the following lines to your `PATH`:
+
+```shell
+C:\rtools40\usr\bin
+C:\rtools40\mingw64\bin
+```
+Then, the other dependencies can be installed by typing the following commands into one of the shells installed with RTools (e.g. lauch the `C:\rtools40\msys.exe` file)
+
+```shell
+pacman -Sy mingw-w64-x86_64-gcc
+pacman -Sy mingw-w64-x86_64-make
+pacman -Sy mingw-w64-x86_64-cmake
+pacman -Sy mingw-w64-x86_64-pkg-config
+```
+### Configure RTools42 / RTools43
+These two versions of RTools toolchain are quite similar. Of course, RTools43 offers newer version of the packages, but in both cases the installation and configuration is identical.
+Download either the [RTools42 installer](https://cran.r-project.org/bin/windows/Rtools/rtools42/files/rtools42-5355-5357.exe) or the [RTools43 installer](https://cran.r-project.org/bin/windows/Rtools/rtools43/files/rtools43-5550-5548.exe) and complete the prompts to install.
+Next, add the following lines to your `PATH`:
+
+```shell
+# RTools42
+C:\rtools42\usr\bin
+C:\rtools42\...\bin
+C:\rtools42\ucrt64\bin
+
+# RTools43
+C:\rtools43\usr\bin
+C:\rtools43\...\bin
+C:\rtools43\ucrt64\bin
+```
+
+Then, the other dependencies can be installed by typing the following commands into one of the shells installed with RTools (e.g. lauch the `C:\rtools42\msys.exe` or `C:\rtools43\msys.exe` file)
+
+```shell
+pacman -Sy mingw-w64-ucrt-x86_64-gcc
+pacman -Sy mingw-w64-ucrt-x86_64-make
+pacman -Sy mingw-w64-ucrt-x86_64-cmake
+pacman -Sy mingw-w64-ucrt-x86_64-pkgconf
+```
+
+## Build `bayesmix`
+**Note for Windows**: Use the Git BASH shell available with Git for Windows to execute these commands. If `PATH` has been configured correctly, all requirements will be satisfied.  
+
+To install and use `bayesmix`, please `cd` to the folder to which you wish to install it, and clone this repository with the following command-line instruction:
+
+```shell
+git clone https://github.com/bayesmix-dev/bayesmix.git
+``` 
+
+Then, by using `cd bayesmix`, you will enter the newly downloaded folder.
+
+To build the executable for the main file `run_mcmc.cc`, please use the following list of commands:
+
+```shell
+mkdir build
+cd build
+cmake .. -DDISABLE_TESTS=ON
+make run_mcmc
+cd ..
+```
+
+Finally, to compile unit tests, please use the following commands:
+
+```shell
+cd build
+cmake ..
+make test_bayesmix
+cd ..
+```
+
+The corresponding executable is located at `build/test/test_bayesmix`.
+
+<!---
 ## For end users
 
-**Prerequisites**: to build `bayesmix` you will need `git`, `pkg-config` and a recent version of `cmake`.
+**Prerequisites**: to build `bayesmix` you will need `gihttps://cran.r-project.org/bin/windows/Rtools/rtools43/files/rtools43-5550-5548.exet`, `pkg-config` and a recent version of `cmake`.
 On Linux machines, it is sufficient to run
 
 ```shell
@@ -63,6 +168,8 @@ make run_mcmc
 cd ..
 ```
 
+--->
+
 ### Tutorial
 
 The `build/run_mcmc` executable can be used to perform all the necessary analysis, but it needs some command-line arguments to be passed.
@@ -76,6 +183,7 @@ This is an example script that runs said executable by passing appropriate argum
 In order to use your custom datasets, algorithm settings, and prior specifications, you can create a copy of the above script and change the arguments as appropriate.
 Please refer to the [documentation](#Documentation) for more information.
 
+<!---
 ## For developers
 
 We heavily depend on the `protobuf` library to move and store structured data.
@@ -97,17 +205,7 @@ sudo ldconfig
 On Mac and Windows machines, please follow the steps from the [official `protobuf` installation guide](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md).
 
 Another very useful tool is [`ccache`](https://ccache.dev) that can significantly speed up the compilation process.
-
-Finally, to compile unit tests, please use the following commands:
-
-```shell
-cd build
-cmake ..
-make test_bayesmix
-cd ..
-```
-
-The corresponding executable is located at `build/test/test_bayesmix`.
+--->
 
 # Documentation
 
