@@ -51,29 +51,22 @@ read_many_proto_from_file <- function(filename, msg_type) {
   # Parse the file and deserialize messages
   n = 1
   while (n < length(buffer)) {
-
     # Decode varint and get message length and new position
     decoder_res = DecodeVarint32(buffer, n)
     msg_len = decoder_res$result
     new_pos = decoder_res$pos
-
     # Prepare single message buffer
     n = new_pos
     msg_buf = buffer[n:(n+msg_len-1)]
-
     # Deserialize message and update counters
-    tryCatch(
-      {
-        out = append(out, RProtoBuf::read(msg_type, msg_buf))
-        n = n + msg_len
-      },
-      error = function(e) {
-        message("Something went wrong while deserialization: ")
-        message(e)
-        out <- NULL
-        break
-      }
-    )
+    tryCatch({
+      out = append(out, RProtoBuf::read(msg_type, msg_buf))
+      n = n + msg_len
+    },
+    error = function(e) {
+      out <- NULL
+      stop(sprintf("Something went wrong while deserialization: %s", as.character(e)))
+    })
   }
   # Return chain
   return(out)
