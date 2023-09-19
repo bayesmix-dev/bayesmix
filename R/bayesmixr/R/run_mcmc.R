@@ -92,9 +92,9 @@ run_mcmc <- function(hierarchy, mixing, data,
   chain_file = paste0(out_dir, '/chains.recordio'); file.create(chain_file)
 
   # Prepare protobuf configuration files
-  hier_params_file = bayesmixr:::maybe_print_proto_to_file(hier_params, "hier_params", out_dir)
-  mix_params_file = bayesmixr:::maybe_print_proto_to_file(mix_params, "mix_params", out_dir)
-  algo_params_file = bayesmixr:::maybe_print_proto_to_file(algo_params, "algo_params", out_dir)
+  hier_params_file = maybe_print_proto_to_file(hier_params, "hier_params", out_dir)
+  mix_params_file = maybe_print_proto_to_file(mix_params, "mix_params", out_dir)
+  algo_params_file = maybe_print_proto_to_file(algo_params, "algo_params", out_dir)
 
   # Write data to data_file
   utils::write.table(data, file = data_file, sep = ",", col.names = F, row.names = F)

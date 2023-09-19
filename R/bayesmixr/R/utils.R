@@ -53,7 +53,7 @@ read_many_proto_from_file <- function(filename, msg_type) {
   while (n < length(buffer)) {
 
     # Decode varint and get message length and new position
-    decoder_res = bayesmixr:::DecodeVarint32(buffer, n)
+    decoder_res = DecodeVarint32(buffer, n)
     msg_len = decoder_res$result
     new_pos = decoder_res$pos
 
