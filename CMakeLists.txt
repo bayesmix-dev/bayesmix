@@ -37,27 +37,21 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 set(BUILD_SHARED_LIBS OFF)
 set(BUILD_TESTING OFF)
 
+# Set BASEPATH variable
+set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
+
 # Make available bayesmix-dev/math (and TBB)
 include(cmake/math.cmake)
 
-# Check math is found
-if(math_FOUND)
+# Check math has been populated
+if(math_POPULATED)
   message(STATUS "math source dir: ${math_SOURCE_DIR}")
   message(STATUS "math binary dir: ${math_BINARY_DIR}")
 else()
   message(FATAL_ERROR "math library required but not found!")
 endif()
 
-# Check if TBB is found
-if(TBB_FOUND)
-  message(STATUS "TBB version : ${TBB_VERSION}")
-  message(STATUS "TBB include path : ${TBB_ROOT}/include")
-  message(STATUS "TBB imported targets: ${TBB_IMPORTED_TARGETS}")
-else()
-  message(FATAL_ERROR "TBB library required but not found!")
-endif()
-
-# Make available protocolbuffers/protobuf (v3.14.0)
+# Make available protocolbuffers/protobuf (v3.16.0)
 include(cmake/protobuf.cmake)
 
 # Check if protobuf is found
@@ -83,14 +77,13 @@ option(BUILD_RUN "" ON)
 
 # Include pathstests
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(BASEPATH "${CMAKE_CURRENT_LIST_DIR}")
 set(INCLUDE_PATHS
   ${BASEPATH}
   ${math_SOURCE_DIR}
   ${math_SOURCE_DIR}/lib/boost_1.78.0
   ${math_SOURCE_DIR}/lib/eigen_3.4.0
   ${math_SOURCE_DIR}/lib/sundials_6.1.1/include
-  ${TBB_ROOT}/include
+  ${math_SOURCE_DIR}/lib/tbb_2020.3/include
   ${CMAKE_CURRENT_BINARY_DIR}
   ${Protobuf_INCLUDE_DIRS}
 )
@@ -99,7 +92,7 @@ set(INCLUDE_PATHS
 set(LINK_LIBRARIES
 	pthread
 	protobuf::libprotobuf
-	TBB::tbb
+  tbb
   OpenMP::OpenMP_CXX
 )
 
@@ -178,10 +171,12 @@ endif()
 if (NOT DISABLE_PLOTS)
   # Make available matplotplusplus
   include(cmake/matplotplusplus.cmake)
-  # Check matplotplusplus is found
-  if(matplotplusplus_FOUND)
+  # Check matplotplusplus has been populated
+  if(matplotplusplus_POPULATED)
     message(STATUS "matplotplusplus source dir: ${matplotplusplus_SOURCE_DIR}")
     message(STATUS "matplotplusplus binary dir: ${matplotplusplus_BINARY_DIR}")
+  else()
+    message(FATAL_ERROR "matplotplusplus library required but not found!")
   endif()
   # Build plot_mcmc executable
   add_executable(plot_mcmc
