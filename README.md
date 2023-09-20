@@ -28,7 +28,7 @@ Compiling and building `bayesmix` requires a modern C++ compiler, `git`, the GNU
 
 ## Requirements - Linux
 
-On Linux syetems, the required packages can be installed via the system's default package manager. For instance, in Ubuntu or other Debian based distros it is sufficient to run
+On Linux systems, the required packages can be installed via the system's default package manager. For instance, in Ubuntu or other Debian based distros it is sufficient to run
 
 ```shell
 sudo apt install git g++ make cmake pkg-config
@@ -48,7 +48,7 @@ First of all, install `git` via the [Git for Windows](https://gitforwindows.org/
 
 On Windows, we also need the installation of a proper C++ toolchain to install the other required packages. `bayesmix` can be successfully compiled and installed with RTools40, RTools42 and RTools43 toolchains. This choice simplified the development on a lightweight `R` interface working on all platforms.
 
-[Rtools](https://cran.r-project.org/bin/windows/Rtools/) is a toolchain bundle used for building `R` packages from source (those that need compilation of C/C++ or Fortran code) and for build `R` itself. Rtools usually consists of Msys2 build tools, GCC/MinGW-w64 compiler toolchain and libraries. These require slightly different steps to configure, so please follow the appropriate steps below.
+[Rtools](https://cran.r-project.org/bin/windows/Rtools/) is a toolchain bundle used for building `R` packages from source (those that need compilation of C/C++ or Fortran code) and for building `R` itself. Rtools usually consists of Msys2 build tools, GCC/MinGW-w64 compiler toolchain and libraries. These require slightly different steps to configure, so please follow the appropriate steps below.
 
 All toolchains will require updating your `PATH` variable, See [these instructions](https://helpdeskgeek.com/windows-10/add-windows-path-environment-variable/) for details on changing the `PATH` if you are unfamiliar. The following instructions will assume that the default installation directory was used, so be sure to update the paths accordingly if you have chosen a different directory.
 
