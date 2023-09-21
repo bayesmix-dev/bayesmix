@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .shell_utils import get_env_file, run_shell
 from .io_utils import maybe_print_proto_to_file, read_many_protos_from_file
-from .proto.algorithm_state_pb2 import AlgorithmState
+
 
 
 
@@ -104,6 +104,9 @@ def run_mcmc(
         See https://bayesmix.readthedocs.io/en/latest/protos.html#algorithm_state.proto
         for furhter details on the AlgorithmState object
     """
+    if return_chains is not None:
+        from .proto.algorithm_state_pb2 import AlgorithmState
+
     load_dotenv(get_env_file())
     BAYESMIX_EXE = os.getenv("BAYESMIX_EXE")
     if BAYESMIX_EXE is None:
