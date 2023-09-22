@@ -30,7 +30,7 @@ bool check_args(const argparse::ArgumentParser &args) {
 }
 
 int main(int argc, char *argv[]) {
-  argparse::ArgumentParser args("bayesmix::run");
+  argparse::ArgumentParser args("bayesmix::run_mcmc");
 
   args.add_argument("--algo-params-file")
       .required()
