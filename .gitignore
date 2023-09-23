@@ -33,9 +33,7 @@ lib/_deps/
 test/.old/
 src/hierarchies/updaters/.old/
 examples/gamma_hierarchy/.old/
-
 # .env file
 .env
-
 # R stuff
 .Rproj.user

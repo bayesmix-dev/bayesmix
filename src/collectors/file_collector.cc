@@ -5,7 +5,8 @@
 #include <google/protobuf/util/delimited_message_util.h>
 
 void FileCollector::start_collecting() {
-  int outfd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0666);
+  int outfd =
+      open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0666);
   fout = new google::protobuf::io::FileOutputStream(outfd);
   is_open_write = true;
 }

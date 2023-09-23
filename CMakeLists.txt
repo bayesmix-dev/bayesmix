@@ -90,8 +90,8 @@ set(INCLUDE_PATHS
 
 # Link paths
 set(LINK_LIBRARIES
-	pthread
-	protobuf::libprotobuf
+  pthread
+  protobuf::libprotobuf
   tbb
   OpenMP::OpenMP_CXX
 )
