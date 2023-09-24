@@ -11,8 +11,6 @@ from .shell_utils import get_env_file, run_shell
 from .io_utils import maybe_print_proto_to_file, read_many_protos_from_file
 
 
-
-
 def _get_filenames(outdir):
     data = os.path.join(outdir, 'data.csv')
     dens_grid = os.path.join(outdir, 'dens_grid.csv')

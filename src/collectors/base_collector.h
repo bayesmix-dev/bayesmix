@@ -2,6 +2,12 @@
 #define BAYESMIX_COLLECTORS_BASE_COLLECTOR_H_
 
 #include <fcntl.h>
+
+#ifndef O_BINARY
+#define O_BINARY 0
+#define O_TEXT 0
+#endif
+
 #include <google/protobuf/message.h>
 #include <stdio.h>
 #include <unistd.h>
