@@ -21,7 +21,6 @@ set(Protobuf_DIR ${Protobuf_ROOT}/${CMAKE_INSTALL_LIBDIR}/cmake/protobuf)
 
 # Configure protobuf
 message(STATUS "Setting up protobuf ...")
-message("CMAKE_COMMAND: ${CMAKE_COMMAND}")
 execute_process(
   COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_BUILD_PROTOC_BINARIES=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -G "${CMAKE_GENERATOR}" .
   RESULT_VARIABLE result
