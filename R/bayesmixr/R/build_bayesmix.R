@@ -35,23 +35,21 @@ build_bayesmix <- function(nproc = ceiling(parallel::detectCores()/2), build_sub
   cat("*** Configuring BayesMix ***\n")
   flags = '-DDISABLE_TESTS=TRUE -DDISABLE_PLOTS=TRUE -DCMAKE_BUILD_TYPE=Release'
   CONFIGURE = sprintf('cmake .. -G "Unix Makefiles" %s', flags)
-  tryCatch({
-    withr::with_dir(build_dir, system(CONFIGURE, ignore.stderr = TRUE))
-  },
-  error = function(e) {
-    stop(sprintf("Something went wrong during configure: %s\n)", as.character(e)))
-  })
+  errlog <- withr::with_dir(build_dir, system(CONFIGURE, ignore.stderr = TRUE))
+  if(errlog != 0L){
+    errmsg <- "Something went wrong during configure: command '%s' exit with status %d"
+    stop(sprintf(errmsg, CONFIGURE, errlog))
+  }
   cat("\n")
 
   # Build bayesmix::run_mcmc executable
   cat("*** Building BayesMix executable ***\n")
   BUILD = sprintf('make run_mcmc -j%d', nproc)
-  tryCatch({
-    withr::with_dir(build_dir, system(BUILD))
-  },
-  error = function(e) {
-    stop(sprintf("Something went wrong during build: %s\n)", as.character(e)))
-  })
+  errlog <- withr::with_dir(build_dir, system(BUILD))
+  if (errlog != 0L) {
+    errmsg <- "Something went wrong during build: command '%s' exit with status %d"
+    stop(sprintf(errmsg, BUILD, errlog))
+  }
   cat("\n")
 
   # Set BAYESMIX_EXE environment variable

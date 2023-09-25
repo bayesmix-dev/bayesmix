@@ -25,8 +25,8 @@
 #' @return A list with the following components:
 #' \itemize{
 #'   \item{\strong{eval_dens} a matrix of shape (n_samples, n_dens_grid_points). It is the mixture density evaluated at the points in dens_grid for each iteration. \code{NULL} if \code{eval_dens} is \code{NULL}.}
-#'   \item{\strong{n_clus} numeric vector of shape (n_samples). The number of clusters for each iteration. \code{NULL} if \code{return_num_clusters} is \code{FALSE}.}
 #'   \item{\strong{clus} numeric matrix of shape (n_samples, n_data). The cluster allocation for each iteration. \code{NULL} if \code{return_clusters} is \code{FALSE}.}
+#'   \item{\strong{n_clus} numeric vector of shape (n_samples). The number of clusters for each iteration. \code{NULL} if \code{return_num_clusters} is \code{FALSE}.}
 #'   \item{\strong{best_clus} numeric vector of shape (n_data). The best clustering obtained by minimizing Binder's loss function. \code{NULL} if \code{return_best_clus} is \code{FALSE}.}
 #'   \item{\strong{mcmc_chains} a list of \code{RProtoBuf::Message} of type \code{bayesmix::AlgorithmState}. See [\code{algorithm_state.proto}](https://bayesmix.readthedocs.io/en/latest/protos.html#bayesmix.AlgorithmState)
 #'   for the corresponding message. \code{NULL} if \code{return_chains} is \code{FALSE}. This chain can be accessed using \code{\link{RProtoBuf}} package.}
@@ -111,7 +111,7 @@ run_mcmc <- function(hierarchy, mixing, data,
     clus_file = EMPTYSTR
   }
   if(!return_num_clusters) {
-    nclus_file = EMPTYSTR
+    n_clus_file = EMPTYSTR
   }
   if(!return_best_clus) {
     best_clus_file = EMPTYSTR
@@ -132,16 +132,12 @@ run_mcmc <- function(hierarchy, mixing, data,
   EXT_PATH = withr::with_path(Sys.getenv("TBB_PATH"), Sys.getenv("PATH"))
 
   # Execute run_mcmc in extended environment
-  tryCatch({
-    withr::with_path(EXT_PATH, system(CMD))
-  },
-  error = function(e) {
-    message(sprintf("Failed with error: %s\n)", as.character(e)))
-   if(remove_out_dir) {
-     unlink(out_dir, recursive = TRUE)
-   }
-   return(NULL)
-  })
+  errlog <- withr::with_path(EXT_PATH, system(CMD))
+  if(errlog != 0L){
+    unlink(out_dir, recursive = TRUE)
+    errmsg <- "Something went wrong: 'run_mcmc()' exit with status %d"
+    stop(sprintf(errmsg, errlog))
+  }
 
   # Manage return arguments
   eval_dens = NULL
@@ -172,8 +168,8 @@ run_mcmc <- function(hierarchy, mixing, data,
 
   # Define out list
   out = list("eval_dens" = eval_dens,
-             "n_clus" = as.vector(nclus),
              "clus" = clus,
+             "n_clus" = as.vector(nclus),
              "best_clus" = as.vector(best_clus),
              "mcmc_chains" = mcmc_chains)
 
