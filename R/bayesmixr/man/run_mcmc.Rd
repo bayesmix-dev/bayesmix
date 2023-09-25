@@ -55,8 +55,8 @@ after the sampling is finished.}
 A list with the following components:
 \itemize{
 \item{\strong{eval_dens} a matrix of shape (n_samples, n_dens_grid_points). It is the mixture density evaluated at the points in dens_grid for each iteration. \code{NULL} if \code{eval_dens} is \code{NULL}.}
-\item{\strong{n_clus} numeric vector of shape (n_samples). The number of clusters for each iteration. \code{NULL} if \code{return_num_clusters} is \code{FALSE}.}
 \item{\strong{clus} numeric matrix of shape (n_samples, n_data). The cluster allocation for each iteration. \code{NULL} if \code{return_clusters} is \code{FALSE}.}
+\item{\strong{n_clus} numeric vector of shape (n_samples). The number of clusters for each iteration. \code{NULL} if \code{return_num_clusters} is \code{FALSE}.}
 \item{\strong{best_clus} numeric vector of shape (n_data). The best clustering obtained by minimizing Binder's loss function. \code{NULL} if \code{return_best_clus} is \code{FALSE}.}
 \item{\strong{mcmc_chains} a list of \code{RProtoBuf::Message} of type \code{bayesmix::AlgorithmState}. See \href{https://bayesmix.readthedocs.io/en/latest/protos.html#bayesmix.AlgorithmState}{\code{algorithm_state.proto}}
 for the corresponding message. \code{NULL} if \code{return_chains} is \code{FALSE}. This chain can be accessed using \code{\link{RProtoBuf}} package.}
