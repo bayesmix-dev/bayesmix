@@ -8,6 +8,21 @@ if (CCACHE_PROGRAM)
 	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
+# On MacOS find clang, otherwise find gcc
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  find_program(CC clang REQUIRED)
+  find_program(CXX clang++ REQUIRED)
+else()
+  find_program(CC gcc REQUIRED)
+  find_program(CXX g++ REQUIRED)
+endif()
+
+# Set C and CXX compilers
+if(CC AND CXX)
+  set(CMAKE_C_COMPILER ${CC})
+  set(CMAKE_CXX_COMPILER ${CXX})
+endif()
+
 # Project name
 project(bayesmix)
 

@@ -15,14 +15,11 @@ FetchContent_MakeAvailable(math)
 set(TBB_ROOT ${math_SOURCE_DIR}/lib/tbb)
 
 # Define make command
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set(MAKE_COMMAND mingw32-make)
 else()
   set(MAKE_COMMAND make)
 endif()
-
-# Set compiler flags
-file(APPEND ${math_SOURCE_DIR}/make/local "TBB_CXX_TYPE=gcc\n")
 
 # Set extra compiler flags for Windows
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
@@ -45,7 +42,7 @@ endif()
 link_directories(${TBB_ROOT})
 
 # In Windows, add TBB_ROOT to PATH variable via batch file if not present
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Check if adding TBB_ROOT is already present in PATH
   file(TO_CMAKE_PATH "$ENV{PATH}" PATH)
   string(FIND "${PATH}" "${TBB_ROOT}" tbb_path-LOCATION)
