@@ -8,24 +8,39 @@ if (CCACHE_PROGRAM)
 	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
+# On MacOS find clang, otherwise find gcc
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  find_program(CC clang REQUIRED)
+  find_program(CXX clang++ REQUIRED)
+else()
+  find_program(CC gcc REQUIRED)
+  find_program(CXX g++ REQUIRED)
+endif()
+
+# Set C and CXX compilers
+if(CC AND CXX)
+  set(CMAKE_C_COMPILER ${CC})
+  set(CMAKE_CXX_COMPILER ${CXX})
+endif()
+
 # Project name
 project(bayesmix)
-
-# Set cmake variables
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops -fopenmp -ftree-vectorize -Wno-deprecated")
-set(CMAKE_CXX_FLAGS_DEBUG "-Og")
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
-set(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL TRUE)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Require PkgConfig
 find_package(PkgConfig REQUIRED)
 
 # Require OpenMP
 find_package(OpenMP REQUIRED)
+
+# Set cmake variables
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -funroll-loops ${OpenMP_CXX_FLAGS} -ftree-vectorize -Wno-deprecated")
+set(CMAKE_CXX_FLAGS_DEBUG "-Og")
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+set(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL TRUE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Include FetchContent
 include(FetchContent)
