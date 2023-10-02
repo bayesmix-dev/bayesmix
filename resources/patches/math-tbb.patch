@@ -9,5 +9,5 @@ index 5e137c6999..b5fb1ac35e 100644
 -        task* next_offloaded;
 +        tbb::task* next_offloaded;
  #endif
-
+ 
  #if __TBB_PREVIEW_RESUMABLE_TASKS
