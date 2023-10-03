@@ -9,7 +9,7 @@ if (CCACHE_PROGRAM)
 endif()
 
 # On MacOS find clang, otherwise find gcc
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
   find_program(CC clang REQUIRED)
   find_program(CXX clang++ REQUIRED)
 else()
