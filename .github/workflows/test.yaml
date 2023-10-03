@@ -16,16 +16,20 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Check out the repo
+        uses: actions/checkout@v3
 
       - name: build
         run: docker
 
-      - name: create build
+      - name: Build test Docker image
         run: docker build -f resources/docker/test/Dockerfile -t test .
 
-      - name: run C++ tests
-        run: docker run -w /usr/bayesmix test ./build_/test/test_bayesmix
+      - name: Run C++ tests
+        run: docker run test ./build/test/test_bayesmix
 
       # - name: run Python tests
       #   run: docker run -w /usr/bayesmix/python test /bin/bash -c "python3 -m pip install -e . && pytest"
+
+      # - name: run R tests
+      #   run: docker run test Rscript --vanilla -e "testthat::test_package('bayesmixr')"

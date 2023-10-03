@@ -1,24 +1,31 @@
-FROM mberaha/bayesmix-base
+FROM mberaha/bayesmix-base:latest
 
-COPY cmake /usr/bayesmix/cmake
-COPY resources /usr/bayesmix/resources
-COPY src /usr/bayesmix/src
-COPY test /usr/bayesmix/test
-COPY python /usr/bayesmix/python
-COPY CMakeLists.txt /usr/bayesmix/CMakeLists.txt
-COPY lib/argparse /usr/bayesmix/lib/argparse
-COPY executables/ /usr/bayesmix/executables
+# Store current version in /usr/bayesmix/update
+COPY . ./update
 
-WORKDIR /usr/bayesmix
+# Generate patch file to update bayesmix
+RUN cd update \
+    && git remote add mainRepo https://github.com/bayesmix-dev/bayesmix.git \
+    && git fetch mainRepo master \
+    && git diff mainRepo/master > ../update.patch \
+    && cd .. && rm -rf update
 
-RUN python3 -m pip install pytest
+# Update only necessary files via patch
+RUN if [ -s update.patch ] ; then git apply update.patch && rm update.patch ; fi
 
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/bayesmix/lib/math/lib/tbb/
+# Make test_bayesmix and run_mcmc after apply changes
+RUN cd build \
+    && cmake -DDISABLE_PLOTS=ON .. \
+    && make test_bayesmix \
+    && make run_mcmc
 
-RUN cd build_ && cmake -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON -DDISABLE_PLOTS=ON .. && make test_bayesmix
-RUN cd build_ && make run_mcmc
+# # Export BAYESMIX_EXE variable
+# ENV BAYESMIX_EXE=/usr/bayesmix/build/run_mcmc
 
-ENV BAYESMIX_EXE=/usr/bayesmix/build_/run_mcmc
+# Install bayesmixpy
 RUN cd python && python3 -m pip install -e .
 
-LABEL Name=test_bayesmix Version=0.0.1
+# Install bayesmixr
+# RUN cd R && Rscript --vanilla -e "devtools::install('bayesmixr/', quick = T, args = '--clean')"
+
+LABEL Name=bayesmix-test Version=0.0.1
