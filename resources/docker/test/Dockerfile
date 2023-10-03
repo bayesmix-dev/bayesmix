@@ -11,19 +11,19 @@ RUN cd update \
     && cd .. && rm -rf update
 
 # Update only necessary files via patch
-RUN git apply update.patch && rm update.patch
+RUN if [ -s update.patch ] ; then git apply update.patch && rm update.patch ; fi
 
-# Make test_bayesmix and run_mcmc after apply changes
-RUN cd build \
-    && cmake -DDISABLE_PLOTS=ON .. \
-    && make test_bayesmix \
-    && make run_mcmc
+# # Make test_bayesmix and run_mcmc after apply changes
+# RUN cd build \
+#     && cmake -DDISABLE_PLOTS=ON .. \
+#     && make test_bayesmix \
+#     && make run_mcmc
 
-# # Export BAYESMIX_EXE variable
-# ENV BAYESMIX_EXE=/usr/bayesmix/build/run_mcmc
+# # # Export BAYESMIX_EXE variable
+# # ENV BAYESMIX_EXE=/usr/bayesmix/build/run_mcmc
 
-# Install bayesmixpy
-RUN cd python && python3 -m pip install -e .
+# # Install bayesmixpy
+# RUN cd python && python3 -m pip install -e .
 
 # Install bayesmixr
 # RUN cd R && Rscript --vanilla -e "devtools::install('bayesmixr/', quick = T, args = '--clean')"
