@@ -16,15 +16,16 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Check out the repo
+        uses: actions/checkout@v3
 
       - name: build
         run: docker
 
-      - name: create build
+      - name: Build test Docker image
         run: docker build -f resources/docker/test/Dockerfile -t test .
 
-      - name: run C++ tests
+      - name: Run C++ tests
         run: docker run test ./build/test/test_bayesmix
 
       # - name: run Python tests

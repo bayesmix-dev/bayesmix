@@ -25,4 +25,4 @@ jobs:
           context: .
           push: true
           file: resources/docker/env/Dockerfile
-          tags: mberaha/bayesmix-env:latest 
+          tags: mberaha/bayesmix-env:latest
