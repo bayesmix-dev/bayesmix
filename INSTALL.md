@@ -22,7 +22,9 @@ brew install git g++ make cmake pkg-config
 
 ## Requirements - Windows
 
-First of all, install `git` via the [Git for Windows](https://gitforwindows.org/) project. Download the [installer](https://github.com/git-for-windows/git/releases/latest) and complete the prompts leaving default choices to install. The Git BASH that comes with this program is the shell we suggest to compile and run `bayesmix`.
+First of all, install `git` via the [Git for Windows](https://gitforwindows.org/) project. Download the [installer](https://github.com/git-for-windows/git/releases/latest) and complete the prompts leaving default choices to install.
+
+<!-- The Git BASH that comes with this program is the shell we suggest to compile and run `bayesmix`. -->
 
 On Windows, we also need the installation of a proper C++ toolchain to install the other required packages. `bayesmix` can be successfully compiled and installed with RTools40, RTools42 and RTools43 toolchains. This choice simplified the development on a lightweight `R` interface working on all platforms.
 
@@ -76,7 +78,7 @@ pacman -Sy mingw-w64-ucrt-x86_64-pkgconf
 
 ### Important remarks :
 
-- Use the Git BASH shell available with Git for Windows to execute these commands. If `PATH` environment variable has been configured correctly, all requirements will be satisfied.
+- Use the native windows Command Prompt (or PowerShell) to execute these commands. If `PATH` environment variable has been configured correctly, all requirements will be satisfied.
 - In order for `bayesmix` to be properly linked to Intel's TBB library, the absolute path to `tbb` must be added to the User `PATH` variable. This is done automatically during build but to make this change effective user need to close and open a new Git BASH shell.
 
 ## Build `bayesmix`
