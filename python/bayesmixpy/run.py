@@ -8,34 +8,7 @@ from tempfile import TemporaryDirectory
 from pathlib import Path
 
 from .shell_utils import get_env_file, run_shell
-
-
-def _is_file(a: str):
-    out = False
-    try:
-        p = Path(a)
-        out = p.exists() and p.is_file()
-    except Exception as e:
-        out = False
-    return out
-
-def _maybe_print_to_file(maybe_proto: str,
-                         proto_name: str = None,
-                         out_dir: str = None):
-    """If maybe_proto is a file, returns the file name.
-    If maybe_proto is a string representing a message, prints the message to
-    a file and returns the file name.
-    """
-    if _is_file(maybe_proto):
-        return maybe_proto
-
-    proto_file = os.path.join(out_dir, proto_name + ".asciipb")
-
-    with open(proto_file, "w") as f:
-        print(maybe_proto, file=f)
-
-    return proto_file
-
+from .io_utils import maybe_print_proto_to_file, read_many_protos_from_file
 
 
 def _get_filenames(outdir):
@@ -58,8 +31,8 @@ def run_mcmc(
         out_dir: str = None,
         return_clusters: bool = True,
         return_best_clus: bool = True,
-        return_num_clusters: bool = True):
-
+        return_num_clusters: bool = True,
+        return_chains: bool = False):
     """
     Run the MCMC sampling by calling the Bayesmix executable from a subprocess.
 
@@ -104,6 +77,8 @@ def run_mcmc(
         during the MCMC sampling.
     return_num_clusters: bool.
         If True, returns the chain of the number of clusters.
+    return_chains: bool.
+        If True, the whole MCMC chain of the parameters is returned.
 
 
     Returns
@@ -121,7 +96,15 @@ def run_mcmc(
     best_clus: np.array of shape (n_data,).
         The best clustering obtained by minimizing Binder's loss function. None
         if return_best_clus is False.
+    mcmc_chain: list of AlgorithmState objects
+        The whole MCMC chain as a list of AlgorithmState protobuf objects. None
+        if return_chains is False
+        See https://bayesmix.readthedocs.io/en/latest/protos.html#algorithm_state.proto
+        for furhter details on the AlgorithmState object
     """
+    if return_chains is not None:
+        from .proto.algorithm_state_pb2 import AlgorithmState
+
     load_dotenv(get_env_file())
     BAYESMIX_EXE = os.getenv("BAYESMIX_EXE")
     if BAYESMIX_EXE is None:
@@ -144,11 +127,11 @@ def run_mcmc(
 
     data_file, dens_grid_file, nclus_file, clus_file, best_clus_file = \
         _get_filenames(out_dir)
-    hier_params_file = _maybe_print_to_file(hier_params, "hier_params",
-                                            out_dir)
-    mix_params_file = _maybe_print_to_file(mix_params, "mix_params", out_dir)
-    algo_params_file = _maybe_print_to_file(algo_params, "algo_params",
-                                            out_dir)
+    hier_params_file = maybe_print_proto_to_file(hier_params, "hier_params",
+                                                 out_dir)
+    mix_params_file = maybe_print_proto_to_file(mix_params, "mix_params", out_dir)
+    algo_params_file = maybe_print_proto_to_file(algo_params, "algo_params",
+                                                 out_dir)
     eval_dens_file = os.path.join(out_dir, "eval_dens.csv")
 
     np.savetxt(data_file, data, fmt='%1.5f', delimiter=',')
@@ -167,11 +150,16 @@ def run_mcmc(
     if not return_best_clus:
         best_clus_file = '\"\"'
 
+    if return_chains:
+        coll_name = os.path.join(out_dir, "chains.recordio")
+    else:
+        coll_name = "memory"
+
     cmd = RUN_CMD.format(
         algo_params_file,
         hierarchy, hier_params_file,
         mixing, mix_params_file,
-        'memory',
+        coll_name,
         data_file,
         dens_grid_file,
         eval_dens_file,
@@ -203,7 +191,11 @@ def run_mcmc(
     if return_best_clus:
         best_clus = np.loadtxt(best_clus_file, delimiter=',')
 
+    mcmc_chains = None
+    if return_chains:
+        mcmc_chains = read_many_protos_from_file(coll_name, AlgorithmState)
+
     if remove_out_dir:
         shutil.rmtree(out_dir, ignore_errors=True)
 
-    return eval_dens, nclus, clus, best_clus
+    return eval_dens, nclus, clus, best_clus, mcmc_chains

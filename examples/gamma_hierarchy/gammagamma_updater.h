@@ -15,6 +15,8 @@ class GammaGammaUpdater
 
   ProtoHypersPtr compute_posterior_hypers(AbstractLikelihood& like,
                                           AbstractPriorModel& prior) override;
+
+  std::shared_ptr<AbstractUpdater> clone() const override;
 };
 
 /* DEFINITIONS */
@@ -45,5 +47,11 @@ AbstractUpdater::ProtoHypersPtr GammaGammaUpdater::compute_posterior_hypers(
   out.mutable_general_state()->mutable_data()->Add(rate_beta_new);
   return std::make_shared<ProtoHypers>(out);
 }
+
+std::shared_ptr<AbstractUpdater> GammaGammaUpdater::clone() const {
+    auto out = std::make_shared<GammaGammaUpdater>(static_cast<GammaGammaUpdater const &>(*this));
+    out->clear_hypers();
+    return out;
+  }
 
 #endif  // BAYESMIX_HIERARCHIES_GAMMA_GAMMA_UPDATER_H_

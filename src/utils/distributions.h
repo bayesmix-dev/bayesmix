@@ -223,6 +223,21 @@ double gaussian_mixture_dist(
     const std::vector<bayesmix::AlgorithmState::ClusterState> &clus2,
     const Eigen::VectorXd &weights2);
 
+/**
+ * Samples from a truncated beta distribution over the interval (l, u)
+ * with parameters (a, b) using the inverse-cdf method
+ *
+ * @param a the first shape parameter of the beta distribution
+ * @param b the second shape parameter of the beta distribution
+ * @param l lower bound of the truncation interval
+ * @param u upper bound of the truncation interval
+ * @param rng the random number generator
+ * @return a sample from the truncated distribution
+ */
+
+double sample_truncated_beta(double a, double b, double l, double u,
+                             std::mt19937 &rng);
+
 }  // namespace bayesmix
 
 #endif  // BAYESMIX_UTILS_DISTRIBUTIONS_H_

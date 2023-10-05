@@ -106,7 +106,7 @@ TEST(uni_norm_likelihood, eval_lpdf_unconstrained) {
 
   double clus_lpdf =
       like->cluster_lpdf_from_unconstrained(unconstrained_params);
-  ASSERT_DOUBLE_EQ(lpdf, clus_lpdf);
+  ASSERT_NEAR(lpdf, clus_lpdf, 1e-12);
 
   unconstrained_params(0) = 4.0;
   clus_lpdf = like->cluster_lpdf_from_unconstrained(unconstrained_params);

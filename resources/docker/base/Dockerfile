@@ -1,13 +1,12 @@
 FROM mberaha/bayesmix-env:latest
 
-COPY . /usr/bayesmix
-WORKDIR /usr/bayesmix
+# Pull master branch to update bayesmix
+RUN git pull
 
-RUN python3 -m pip install pytest
+# Compile test_bayesmix and run_mcmc
+RUN cd build \
+    && cmake -DDISABLE_PLOTS=ON .. \
+    && make test_bayesmix \
+    && make run_mcmc
 
-RUN mkdir build_ && cd build_ && cmake -DDISABLE_DOCS=ON -DDISABLE_BENCHMARKS=ON -DDISABLE_PLOTS=ON .. && make test_bayesmix
-RUN cd build_ && make run_mcmc
-
-CMD ["./build_/test/test_bayesmix"]
-
-LABEL Name=bayesmix_base Version=0.0.1
+LABEL Name=bayesmix-base Version=0.0.1

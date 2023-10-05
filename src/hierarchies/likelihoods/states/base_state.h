@@ -39,14 +39,16 @@ class BaseState {
   using ProtoState = bayesmix::AlgorithmState::ClusterState;
 
   //! Returns the unconstrained representation \f$ x = B(\tau) \f$
-  virtual Eigen::VectorXd get_unconstrained() { return Eigen::VectorXd(0); }
+  virtual Eigen::VectorXd get_unconstrained() const {
+    return Eigen::VectorXd(0);
+  }
 
   //! Sets the current state as \f$ \tau = B^{-1}(in) \f$
   //! @param in  the unconstrained representation of the state
   virtual void set_from_unconstrained(const Eigen::VectorXd &in) {}
 
   //! Returns the log determinant of the jacobian of \f$ B^{-1} \f$
-  virtual double log_det_jac() { return -1; }
+  virtual double log_det_jac() const { return -1; }
 
   //! Sets the current state from a protobuf object
   //! @param state_ a bayesmix::AlgorithmState::ClusterState instance

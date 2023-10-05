@@ -250,14 +250,17 @@ TEST(nw_prior_model, set_get_hypers) {
 
   bayesmix::Vector mean_proto;
   bayesmix::Matrix scale_proto;
+  bayesmix::Matrix scale_chol_proto;
   bayesmix::to_proto(Eigen::Vector2d({5.5, 5.5}), &mean_proto);
   bayesmix::to_proto(Eigen::Matrix2d::Identity(), &scale_proto);
+  bayesmix::to_proto(Eigen::Matrix2d::Identity(), &scale_chol_proto);
 
   // Prepare hypers
   hypers_.mutable_mean()->CopyFrom(mean_proto);
   hypers_.set_deg_free(4);
   hypers_.set_var_scaling(0.1);
   hypers_.mutable_scale()->CopyFrom(scale_proto);
+  hypers_.mutable_scale_chol()->CopyFrom(scale_chol_proto);
   set_state_.mutable_nnw_state()->CopyFrom(hypers_);
 
   // Set and get hypers
@@ -278,12 +281,16 @@ TEST(nw_prior_model, fixed_values_prior) {
   // Set fixed value prior
   bayesmix::Vector mean_proto;
   bayesmix::Matrix scale_proto;
+  bayesmix::Matrix scale_chol_proto;
   bayesmix::to_proto(Eigen::Vector2d({5.5, 5.5}), &mean_proto);
   bayesmix::to_proto(Eigen::Matrix2d::Identity(), &scale_proto);
+  bayesmix::to_proto(Eigen::Matrix2d::Identity(), &scale_chol_proto);
   prior.mutable_fixed_values()->mutable_mean()->CopyFrom(mean_proto);
   prior.mutable_fixed_values()->set_var_scaling(0.1);
   prior.mutable_fixed_values()->set_deg_free(4);
   prior.mutable_fixed_values()->mutable_scale()->CopyFrom(scale_proto);
+  prior.mutable_fixed_values()->mutable_scale_chol()->CopyFrom(
+      scale_chol_proto);
 
   // Initialize prior model
   auto prior_model = std::make_shared<NWPriorModel>();

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-build/plots/plot_mcmc \
+build/plot_mcmc \
   --grid-file resources/datasets/faithful_grid.csv \
   --dens-file resources/2d/density_2d.csv \
   --dens-plot resources/2d/density.png \

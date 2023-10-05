@@ -36,8 +36,17 @@ class SemiConjugateUpdater : public AbstractUpdater {
   void draw(AbstractLikelihood& like, AbstractPriorModel& prior,
             bool update_params) override;
 
-  //! Used by algorithms such as Neal3 and SplitMerge
-  //! It stores the hyperparameters computed by `compute_posterior_hypers`
+  virtual ProtoHypersPtr get_posterior_hypers(AbstractLikelihood& like,
+                                              AbstractPriorModel& prior,
+                                              bool save = false) override {
+    if (!saved_posterior_hypers && save) {
+      posterior_hypers = compute_posterior_hypers(like, prior);
+    } else if (!saved_posterior_hypers && !save) {
+      return compute_posterior_hypers(like, prior);
+    }
+    return posterior_hypers;
+  }
+
  protected:
   Likelihood& downcast_likelihood(AbstractLikelihood& like_);
   PriorModel& downcast_prior(AbstractPriorModel& prior_);

@@ -1,3 +1,4 @@
+*pb2.py
 # Build folder
 build/
 # Visual Studio Code folder
@@ -25,10 +26,11 @@ resources/2d
 .idea/
 # Build debug folder
 cmake-build-debug/
-# lib/math/ folder
-lib/math/
+# lib/_deps/ folder
+lib/_deps/
 # .old folders
-src/hierarchies/updaters/.old/
 test/.old/
+src/hierarchies/updaters/.old/
 examples/gamma_hierarchy/.old/
+# .env file
 .env

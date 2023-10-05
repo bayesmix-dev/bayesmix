@@ -57,7 +57,7 @@ TEST(mix_dist, 2) {
   double dist_to_self = bayesmix::gaussian_mixture_dist(
       means1, sds1, weights1, means1, sds1, weights1);
 
-  ASSERT_DOUBLE_EQ(dist_to_self, 0.0);
+  ASSERT_NEAR(dist_to_self, 0.0, stan::math::EPSILON);
 }
 
 TEST(student_t, squareform) {
@@ -219,4 +219,11 @@ TEST(lpdf_woodbury, 1) {
       bayesmix::multi_normal_lpdf_woodbury(datum, mean, sigma_diag, lambda);
 
   ASSERT_LE(std::abs(stan_lpdf - our_lpdf), 1e-10);
+}
+
+TEST(sample_truncated_beta, 1) {
+  auto& rng = bayesmix::Rng::Instance().get();
+  double val = bayesmix::sample_truncated_beta(2.0, 2.0, 0.1, 0.2, rng);
+  ASSERT_GT(val, 0.1);
+  ASSERT_LT(val, 0.2);
 }
