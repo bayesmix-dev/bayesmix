@@ -84,11 +84,14 @@ endif()
 # Define project options
 option(DISABLE_TESTS
       "If tests should be compiled or no" OFF)
+option(DISABLE_PLOTS
+      "If the plotting script should be compiled or no" OFF)
 option(ENABLE_BENCHMARKS
       "If benchmarks should be compiled or no" OFF)
 option(ENABLE_DOCS
       "If docs should be generated or no" OFF)
 option(BUILD_RUN "" ON)
+
 
 # Include pathstests
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
