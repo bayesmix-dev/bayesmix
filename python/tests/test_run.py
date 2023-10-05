@@ -95,7 +95,8 @@ def test_run_mcmc():
     eval_dens, nclus, clus, best_clus, chains = run_mcmc(
             "NNIG", "DP", data, GO_PARAMS, DP_PARAMS,
             ALGO_PARAMS, None, return_clusters=False,
-            return_num_clusters=False, return_best_clus=False)
+            return_num_clusters=False, return_best_clus=False,
+            return_chains=True)
     assert eval_dens is None
     assert nclus is None
     assert clus is None
