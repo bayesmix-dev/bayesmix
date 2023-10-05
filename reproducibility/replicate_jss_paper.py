@@ -207,7 +207,7 @@ if __name__ == "__main__":
             --best-clus-file {1}/cmdline_best_clustering.csv
     """.format(log_fold, csv_fold)
     print(run_cmd)
-    # subprocess.call(run_cmd.split(), cwd="./")
+    subprocess.call(run_cmd.split(), cwd="./")
 
     plt_cmd = """build/plot_mcmc
         --grid-file resources/tutorial/grid.csv
@@ -218,8 +218,7 @@ if __name__ == "__main__":
         --n-cl-bar-plot  {1}/cmdline_nclus_barplot.eps
     """.format(csv_fold, png_fold)
     print(plt_cmd)
-    # subprocess.call(plt_cmd.split(), cwd="./")
-    mariooooo
+    subprocess.call(plt_cmd.split(), cwd="./")
 
     ###############################
     ## PYTHON UNIVARIATE EXAMPLE ##
