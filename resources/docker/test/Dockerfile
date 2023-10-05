@@ -1,26 +1,26 @@
 FROM mberaha/bayesmix-base:latest
 
-# Store current version in /usr/bayesmix/update
-COPY . ./update
+# Pull master branch to update bayesmix
+RUN git pull
 
-# Generate patch file to update bayesmix
-RUN cd update \
-    && git remote add mainRepo https://github.com/bayesmix-dev/bayesmix.git \
-    && git fetch mainRepo master \
-    && git diff mainRepo/master > ../update.patch \
-    && cd .. && rm -rf update
+# Set working directory to /usr
+WORKDIR /usr
 
-# Update only necessary files via patch
-RUN if [ -s update.patch ] ; then git apply update.patch && rm update.patch ; fi
+# Store current version in /usr/bayesmix-update
+COPY . bayesmix-update
 
-# Make test_bayesmix and run_mcmc after apply changes
+# Generate and apply patch to updtae bayesmix
+RUN diff -ruN --exclude=build --exclude=_deps --exclude=.git bayesmix/ bayesmix-update/ | patch -p0 \
+    && rm -rf bayesmix-update
+
+# Set working directory to /usr
+WORKDIR /usr/bayesmix
+
+# Compile test_bayesmix and run_mcmc after apply changes
 RUN cd build \
     && cmake -DDISABLE_PLOTS=ON .. \
     && make test_bayesmix \
     && make run_mcmc
-
-# # Export BAYESMIX_EXE variable
-# ENV BAYESMIX_EXE=/usr/bayesmix/build/run_mcmc
 
 # Install bayesmixpy
 RUN cd python && python3 -m pip install -e .
