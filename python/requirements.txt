@@ -1,5 +1,5 @@
 2to3
 matplotlib>=2.0.1
 numpy>=1.18.4
-protobuf==3.18.3
+protobuf==3.19.0
 python-dotenv>=0.20.0
