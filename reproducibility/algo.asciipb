@@ -1,0 +1,5 @@
+algo_id: "Neal2"
+rng_seed: 20201124
+iterations: 2000
+burnin: 1000
+init_num_clusters: 3
