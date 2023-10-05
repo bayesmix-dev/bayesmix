@@ -11,7 +11,7 @@ message(STATUS "")
 message(STATUS "Fetching protocolbuffers/protobuf")
 FetchContent_Declare(protobuf
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  URL "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.16.0.tar.gz"
+  URL "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.19.0.tar.gz"
 )
 FetchContent_MakeAvailable(protobuf)
 
