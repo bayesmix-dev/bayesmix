@@ -28,7 +28,7 @@ jobs:
         run: docker run test ./build/test/test_bayesmix
 
       - name: Run Python tests
-        run: docker run test /bin/bash -c "cd python && python3 -m pip install -e . && pytest"
+        run: docker run test /bin/bash -c "cd python && pytest"
 
       # - name: run R tests
       #   run: docker run test Rscript --vanilla -e "testthat::test_package('bayesmixr')"
