@@ -16,14 +16,14 @@ RUN diff -ruN -x 'build' -x '_deps' -x '.git' -x '*_pb2.py' bayesmix/ bayesmix-u
 # Set working directory to /usr
 WORKDIR /usr/bayesmix
 
-# # Compile test_bayesmix and run_mcmc after apply changes
-# RUN cd build \
-#     && cmake -DDISABLE_PLOTS=ON .. \
-#     && make test_bayesmix \
-#     && make run_mcmc
+# Compile test_bayesmix and run_mcmc after apply changes
+RUN cd build \
+    && cmake -DDISABLE_PLOTS=ON .. \
+    && make test_bayesmix \
+    && make run_mcmc
 
-# # Install bayesmixpy
-# RUN cd python && python3 -m pip install -e .
+# Install bayesmixpy
+RUN cd python && python3 -m pip install -e .
 
 # Install bayesmixr
 # RUN cd R && Rscript --vanilla -e "devtools::install('bayesmixr/', quick = T, args = '--clean')"
