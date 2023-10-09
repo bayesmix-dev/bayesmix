@@ -10,7 +10,7 @@ WORKDIR /usr
 COPY . bayesmix-update
 
 # Generate and apply patch to updtae bayesmix
-RUN diff -ruN --exclude=build --exclude=_deps --exclude=.git --exclude='*.pb2.py' bayesmix/ bayesmix-update/ | patch -d bayesmix -p1 \
+RUN diff -ruN -x 'build' -x '_deps' -x '.git' -x '*_pb2.py' bayesmix/ bayesmix-update/ | patch -d bayesmix -p1 \
     && rm -rf bayesmix-update
 
 # Set working directory to /usr
