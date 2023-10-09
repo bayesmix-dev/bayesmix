@@ -127,8 +127,11 @@ foreach(PROTO_FILE IN LISTS ProtoFiles)
   message(STATUS "protoc src: ${PROTO_SRC}")
   add_custom_command(
     OUTPUT ${PROTO_SRC} ${PROTO_HDR}
-    COMMAND protobuf::protoc "--proto_path=${BASEPATH}/src/proto"
-    ${PROTO_DIRS} "--cpp_out=${PROJECT_BINARY_DIR}" ${PROTO_FILE}
+    COMMAND protobuf::protoc
+    "--proto_path=${BASEPATH}/src/proto" ${PROTO_DIRS}
+    "--cpp_out=${PROJECT_BINARY_DIR}"
+    "--python_out=${BASEPATH}/python/bayesmixpy/proto"
+    ${PROTO_FILE}
     DEPENDS ${PROTO_FILE} protobuf::protoc
     COMMENT "Generate C++ protocol buffer for ${PROTO_FILE}"
     VERBATIM)

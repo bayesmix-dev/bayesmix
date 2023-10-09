@@ -1,6 +1,9 @@
 import os
 import pathlib
 import subprocess
+import sys
+
+from distutils.spawn import find_executable
 
 from dotenv import set_key
 
@@ -9,6 +12,9 @@ from .shell_utils import get_env_file, run_shell
 HERE = os.path.dirname(os.path.realpath(__file__))
 path = pathlib.Path(HERE)
 BAYESMIX_HOME = os.environ.get("BAYESMIX_HOME", path.resolve().parents[1])
+
+py2to3 = find_executable("2to3")
+PROTO_DIR = os.path.join(path, "proto/")
 
 
 def set_bayesmix_env(run_path):
@@ -54,6 +60,14 @@ def build_bayesmix(nproc=1, build_dirname="build"):
         return
 
     set_bayesmix_env("{0}/{1}".format(build_dir, "run_mcmc"))
+
+    two_to_three_command = [
+            py2to3, "--output-dir={0}".format(PROTO_DIR), "-W", "-n", PROTO_DIR]
+    print("********* CALLING 2to3 ***********")
+    print(" ".join(two_to_three_command))
+    if subprocess.call(two_to_three_command) != 0:
+        sys.exit(-1)
+
     return True
 
 if __name__ == '__main__':
