@@ -25,7 +25,6 @@ bool check_args(const argparse::ArgumentParser &args) {
     bayesmix::check_file_is_writeable(
         args.get<std::string>("--best-clus-file"));
   }
-
   return true;
 }
 

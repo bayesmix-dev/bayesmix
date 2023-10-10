@@ -1,0 +1,240 @@
+---
+title: "BayesMixR - Univariate Gaussian Mixture"
+output: html_notebook
+---
+
+```{r}
+library("bayesmixr")
+build_bayesmix()
+```
+
+## Generate Data
+
+```{r}
+data <- c(rnorm(100, -3, 1),
+          rnorm(100, 3, 1))
+hist(data, probability = TRUE, main = "", xlab = "")
+```
+
+## The Bayesian Model
+
+$$
+\begin{align*}
+y_i \mid \theta_i=(\mu_i, \sigma^2_i) & \sim \mathcal{N}(\mu_i, \sigma^2_i) \\[3pt]
+\theta_i \mid P & \sim P \\[3pt]
+P & \sim DP(\alpha G_0)
+\end{align*}
+$$
+
+and $G_0(\text{d}\mu, \text{d}\sigma^2) = \mathcal{N}\left(\text{d}\mu \mid \mu_0,\, \sigma^2/\lambda\right) \times \mathcal{IG}\left(\text{d}\sigma^2 \mid a,\, b\right)$
+
+We consider different prior specifications
+
+### Fixed hyperparameters
+
+$\alpha = 1$ and $(\mu_0,~\lambda,~a,~b) = (0,~0.1,~2,~2)$
+
+```{r}
+dp_params_fix =
+  "
+  fixed_value {
+      totalmass: 1.0
+  }
+  "
+
+g0_params_fix =
+  "
+  fixed_values {
+      mean: 0.0
+      var_scaling: 0.1
+      shape: 2.0
+      scale: 2.0
+  }
+  "
+```
+
+### Prior on $\alpha$ and $\mu_{0}$
+
+$$
+\begin{align*}
+\alpha &\sim \text{Gamma}(2, 2) \\[3pt]
+\mu_0 &\sim \mathcal{N}(0, 10) \\[3pt]
+(\lambda,~a,~b) &= (0.1,~2,~2)
+\end{align*}
+$$
+
+```{r}
+dp_params_prior =
+  "
+  gamma_prior {
+    totalmass_prior {
+      shape: 4.0
+      rate: 2.0
+    }
+  }
+  "
+
+g0_params_meanprior =
+  "
+  normal_mean_prior {
+      mean_prior {
+          mean: 0.0
+          var: 10.0
+      }
+      var_scaling: 0.1
+      shape: 2.0
+      scale: 2.0
+  }
+  "
+
+dp_params = c(dp_params_fix, dp_params_prior)
+dp_names = c("fix", "gamma prior")
+```
+
+### Prior on all the hyperparameters
+
+$$
+\begin{align*}
+\alpha &\sim \text{Gamma}(2,~2) \\[3pt]
+\mu_0 &\sim \mathcal{N}(0,~10) \\[3pt]
+\lambda &\sim \text{Gamma}(0.2,~0.6) \\[3pt]
+a &= 1.5 \\[3pt]
+b &\sim \text{Gamma}(4,~2)
+\end{align*}
+$$
+
+```{r}
+g0_params_allprior =
+  "
+  ngg_prior {
+      mean_prior {
+          mean: 5.5
+          var: 2.25
+      }
+      var_scaling_prior {
+          shape: 0.2
+          rate: 0.6
+      }
+      shape: 1.5
+      scale_prior {
+          shape: 4.0
+          rate: 2.0
+      }
+  }
+  "
+
+g0_params = c(g0_params_fix, g0_params_meanprior, g0_params_allprior)
+g0_names = c("Fix", "Mean prior", "NGG prior")
+```
+
+## The algorithm
+
+We consider some available algorithms in bayesmix: Neal's Algorithms 2, 3 and 8 (see the documentation for the complete list)
+
+```{r}
+neal2_algo =
+  "
+  algo_id: 'Neal2'
+  rng_seed: 20201124
+  iterations: 100
+  burnin: 50
+  init_num_clusters: 3
+  "
+
+neal3_algo =
+  "
+  algo_id: 'Neal3'
+  rng_seed: 20201124
+  iterations: 100
+  burnin: 50
+  init_num_clusters: 3
+  "
+
+neal8_algo =
+  "
+  algo_id: 'Neal8'
+  rng_seed: 20201124
+  iterations: 100
+  burnin: 50
+  init_num_clusters: 3
+  neal8_n_aux: 3
+  "
+
+algorithms = c(neal2_algo, neal3_algo, neal8_algo)
+algo_names = c("Neal2", "Neal3", "Neal8")
+```
+
+### We are interested in the predictive density
+
+`return_clusters = FALSE, return_num_clusters = FALSE, return_best_clus = FALSE`
+
+Observe that the number of iterations is extremely small! In real problems, you might want to set the burnin at least to 1000 iterations and the total number of iterations to at least 2000.
+
+```{r}
+par(mfrow=c(2,3))
+dens_grid = seq(-10, 10, length.out = 1000)
+cols = c("orange", "steelblue", "springgreen")
+
+for (i in 1:length(dp_params)) {
+  for (j in 1:length(g0_params)) {
+    for (k in 1:length(algorithms)) {
+      eval_dens = run_mcmc("NNIG", "DP", data, g0_params[j], dp_params[i], algorithms[k],
+                           dens_grid, return_clusters=FALSE, return_num_clusters=FALSE,
+                           return_best_clus=FALSE)$eval_dens
+      if (k == 1) {
+        plot(dens_grid, exp(colMeans(eval_dens)), type='l', lwd=2, col=cols[k],
+             main = sprintf("G0 - %s", g0_names[j]),
+             ylab = sprintf("DP - %s", dp_names[i]),
+             xlab = "Grid")
+      } else {
+        lines(dens_grid, exp(colMeans(eval_dens)), lwd=2, col=cols[k])
+      }
+      legend("topright", legend=algo_names, col=cols, lwd=2)
+    }
+  }
+}
+```
+
+## What about the clustering?
+
+We can extract
+
+1.  The full chain of the cluster allocations
+2.  The chain of the number of clusters
+3.  The "best" cluster according to Binder loss function
+4.  The whole MCMC chain as a list of `RProtoBuf::Message` object of type `bayesmix::AlgorithmState`.
+
+```{r}
+neal2_algo =
+  "
+  algo_id: 'Neal2'
+  rng_seed: 20201124
+  iterations: 2000
+  burnin: 1000
+  init_num_clusters: 3
+  "
+```
+
+```{r}
+out = run_mcmc("NNIG", "DP", data, g0_params_allprior, dp_params_prior, neal2_algo,
+               dens_grid=NULL, return_clusters=TRUE, return_num_clusters=TRUE,
+               return_best_clus=TRUE, return_chains=TRUE)
+```
+
+```{r}
+p_nclus = table(as.factor(out$n_clus)) / length(out$n_clus)
+barplot(p_nclus, main = "Posterior distribution of the number of clusters")
+```
+
+```{r}
+best_clus = out$best_clus
+Nopt = length(unique(out$best_clus))
+cols = rainbow(Nopt)
+
+hist(data, probability = TRUE, main = "", xlab = "Data")
+for (c in unique(best_clus)) {
+  data_in_clus = data[best_clus == c]
+  points(x = data_in_clus, y = rep(0.01, length(data_in_clus)),
+         col = cols[c+1], pch=19)
+}
+```

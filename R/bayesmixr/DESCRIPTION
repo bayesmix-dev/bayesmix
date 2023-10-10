@@ -1,0 +1,19 @@
+Package: bayesmixr
+Title: An R interface to BayesMix
+Version: 0.1.3
+Author: Matteo Gianella
+Maintainer: Matteo Gianella <matteo.gianella@polimi.it>
+Description: This package provides a light-weight R interface for BayesMix C++ library.
+License: BSD_3_clause + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Suggests:
+    devtools (>= 2.4.5),
+    testthat (>= 3.1.5)
+Config/testthat/edition: 3
+Imports:
+    bitops (>= 1.0.7),
+    RProtoBuf (>= 0.4.20),
+    utils (>= 4.3.1),
+    withr (>= 2.5.0)

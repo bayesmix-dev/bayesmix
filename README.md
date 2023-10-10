@@ -17,8 +17,7 @@ Current state of the software:
 
 For descriptions of the models supported in our library, discussion of software design, and examples, please refer to the following paper: https://arxiv.org/abs/2205.08144
 
-- Two lightweight interfaces are available for `Python` ([BayesMixPy](python/README.md)) and `R` (BayesMixR)
-<!-- Add link after merge !!! -->
+- Two lightweight interfaces are available for `Python` ([BayesMixPy](python/README.md)) and `R` ([BayesMixR](R/README.md))
 
 # Installation
 

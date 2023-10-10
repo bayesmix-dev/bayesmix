@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Clean inst/ directory after install
+rm -rf ./inst
