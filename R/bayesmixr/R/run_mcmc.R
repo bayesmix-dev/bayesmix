@@ -60,7 +60,7 @@ run_mcmc <- function(hierarchy, mixing, data,
   # Get BAYESMIX_EXE and check if set
   BAYESMIX_EXE = Sys.getenv("BAYESMIX_EXE")
   if(BAYESMIX_EXE == ""){
-    stop("BAYESMIX_EXE environment variable not set")
+    stop("BAYESMIX_EXE environment variable is not set")
   }
 
   # Set-up template for run_mcmc command

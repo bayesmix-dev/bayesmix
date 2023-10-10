@@ -23,7 +23,7 @@ build_bayesmix <- function(nproc = ceiling(parallel::detectCores()/2), build_sub
   readRenviron(renviron)
   home_dir = Sys.getenv("BAYESMIXR_HOME")
   if(home_dir == ""){
-    stop("Something went wrong while installing bayesmixr R package.")
+    stop("BAYESMIXR_HOME environment variable is not set")
   }
   bayesmix_home = dirname(dirname(home_dir))
 
