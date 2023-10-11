@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20.0)
+cmake_minimum_required(VERSION 3.16.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 message("CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}")
 
@@ -10,17 +10,17 @@ endif()
 
 # On MacOS find clang, otherwise find gcc
 if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
-  find_program(CC clang REQUIRED)
-  find_program(CXX clang++ REQUIRED)
+  find_program(CC_PROGRAM clang REQUIRED)
+  find_program(CXX_PROGRAM clang++ REQUIRED)
 else()
-  find_program(CC gcc REQUIRED)
-  find_program(CXX g++ REQUIRED)
+  find_program(CC_PROGRAM gcc REQUIRED)
+  find_program(CXX_PROGRAM g++ REQUIRED)
 endif()
 
 # Set C and CXX compilers
-if(CC AND CXX)
-  set(CMAKE_C_COMPILER ${CC})
-  set(CMAKE_CXX_COMPILER ${CXX})
+if(CC_PROGRAM AND CXX_PROGRAM)
+  set(CMAKE_C_COMPILER ${CC_PROGRAM})
+  set(CMAKE_CXX_COMPILER ${CXX_PROGRAM})
 endif()
 
 # Project name

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Set BAYESMIXR_HOME environment variable
+mkdir -p ./inst && echo BAYESMIXR_HOME=$PWD > ./inst/bayesmixr.Renviron

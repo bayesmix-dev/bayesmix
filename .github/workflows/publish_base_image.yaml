@@ -9,6 +9,7 @@ on:
 jobs:
   push_to_registry:
     name: Push bayesmix-base Docker image to Docker Hub
+    if: github.repository == 'bayesmix-dev/bayesmix'
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
