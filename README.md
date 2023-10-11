@@ -41,6 +41,8 @@ make run_mcmc
 cd ..
 ```
 
+**Remark**: Configuring and compiling `bayesmix` for the first time will require several minutes, since `cmake` needs to provide and compile all the libraries on which `bayesmix` depends.
+
 # Tutorial
 
 The `build/run_mcmc` executable can be used to perform all the necessary analysis, but it needs some command-line arguments to be passed.
