@@ -26,6 +26,6 @@ RUN cd build \
 RUN cd python && python3 -m pip install -e .
 
 # Install bayesmixr
-# RUN cd R && Rscript --vanilla -e "devtools::install('bayesmixr/', quick = T, args = '--clean')"
+RUN cd R && Rscript --vanilla -e "devtools::install('bayesmixr/', quick = T, args = '--clean')"
 
 LABEL Name=bayesmix-test Version=0.0.1
