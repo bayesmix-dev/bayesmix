@@ -279,8 +279,6 @@ if __name__ == "__main__":
     plt.savefig(os.path.join(png_fold, 'bayesmix_example_univariate.png'),
                 dpi=300, bbox_inches='tight')
 
-    mariooo
-
     ##############################
     ## PYTHON BIVARIATE EXAMPLE ##
     ##############################
