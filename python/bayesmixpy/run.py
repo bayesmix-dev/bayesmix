@@ -102,7 +102,7 @@ def run_mcmc(
         See https://bayesmix.readthedocs.io/en/latest/protos.html#algorithm_state.proto
         for furhter details on the AlgorithmState object
     """
-    if return_chains is not None:
+    if return_chains:
         from .proto.algorithm_state_pb2 import AlgorithmState
 
     load_dotenv(get_env_file())
