@@ -4,7 +4,7 @@
 
 We suggest working in a virtual environment using, e.g., [conda](https://docs.conda.io/projects/miniconda/en/latest/):
 ```
-conda create --name bayexmix
+conda create --name bayesmix
 conda activate bayesmix
 conda install pip
 ```
