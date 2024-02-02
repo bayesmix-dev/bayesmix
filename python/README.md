@@ -2,6 +2,13 @@
 
 ## Installation
 
+We suggest working in a virtual environment using, e.g., [conda](https://docs.conda.io/projects/miniconda/en/latest/):
+```
+conda create --name bayexmix
+conda activate bayesmix
+conda install pip
+```
+
 After you have cloned the bayesmix github directory, navigate to the Python subfolder and install bayesmixpy using pip
 
 ```
