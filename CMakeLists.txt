@@ -106,7 +106,7 @@ set(INCLUDE_PATHS
 # Link paths
 set(LINK_LIBRARIES
   pthread
-  protobuf::libprotobuf
+  ${Protobuf_LIBRARIES}
   tbb
   OpenMP::OpenMP_CXX
 )
@@ -114,31 +114,15 @@ set(LINK_LIBRARIES
 # Compiler options
 set(COMPILE_OPTIONS -D_REENTRANT -fPIC)
 
-# Compile proto files
-file(GLOB ProtoFiles "${BASEPATH}/src/proto/*.proto")
-set(PROTO_DIR proto)
-foreach(PROTO_FILE IN LISTS ProtoFiles)
-  message(STATUS "protoc proto(cc): ${PROTO_FILE}")
-  get_filename_component(PROTO_DIR ${PROTO_FILE} DIRECTORY)
-  get_filename_component(PROTO_NAME ${PROTO_FILE} NAME_WE)
-  set(PROTO_HDR ${CMAKE_CURRENT_BINARY_DIR}/${PROTO_NAME}.pb.h)
-  set(PROTO_SRC ${CMAKE_CURRENT_BINARY_DIR}/${PROTO_NAME}.pb.cc)
-  message(STATUS "protoc hdr: ${PROTO_HDR}")
-  message(STATUS "protoc src: ${PROTO_SRC}")
-  add_custom_command(
-    OUTPUT ${PROTO_SRC} ${PROTO_HDR}
-    COMMAND protobuf::protoc
-    "--proto_path=${BASEPATH}/src/proto" ${PROTO_DIRS}
-    "--cpp_out=${PROJECT_BINARY_DIR}"
-    "--python_out=${BASEPATH}/python/bayesmixpy/proto"
-    ${PROTO_FILE}
-    DEPENDS ${PROTO_FILE} protobuf::protoc
-    COMMENT "Generate C++ protocol buffer for ${PROTO_FILE}"
-    VERBATIM)
-  list(APPEND PROTO_HDRS ${PROTO_HDR})
-  list(APPEND PROTO_SRCS ${PROTO_SRC})
-endforeach()
-SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
+# Compile proto files in ${BASEPATH}/src/proto
+include(cmake/ProtobufUtils.cmake)
+compile_protobuf_files(
+  FOLDER "${BASEPATH}/src/proto"
+  INCLUDE_PROTO_PATHS "${Protobuf_INCLUDE_DIRS}"
+  PYTHON_OUT_PATH "${BASEPATH}/python/bayesmixpy/proto"
+  HEADERS PROTO_HDRS
+  SOURCES PROTO_SRCS
+)
 
 # Export variables to parent scope if bayesmix is used as dependency library
 get_directory_property(HAS_PARENT PARENT_DIRECTORY)
@@ -147,15 +131,16 @@ if(HAS_PARENT)
   set(BAYESMIX_INCLUDE_PATHS ${INCLUDE_PATHS} PARENT_SCOPE)
   set(BAYESMIX_LINK_LIBRARIES ${LINK_LIBRARIES} PARENT_SCOPE)
   set(BAYESMIX_COMPILE_OPTIONS ${COMPILE_OPTIONS} PARENT_SCOPE)
-  set(BAYESMIX_PROTO_PATH "${BASEPATH}/src/proto" PARENT_SCOPE)
-  set(PROTO_HEADERS ${PROTO_HDRS} PARENT_SCOPE)
-  set(PROTO_SOURCES ${PROTO_SRCS} PARENT_SCOPE)
+  set(BAYESMIX_PROTO_PATHS "${BASEPATH}/src/proto" "${Protobuf_INCLUDE_DIRS}" PARENT_SCOPE)
+  set(BAYESMIX_PROTO_HDRS ${PROTO_HDRS} PARENT_SCOPE)
+  set(BAYESMIX_PROTO_SRCS ${PROTO_SRCS} PARENT_SCOPE)
   set(ProtoFiles ${ProtoFiles} PARENT_SCOPE)
+  set(Protobuf_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE} PARENT_SCOPE)
 endif()
 
 # Build library object
 add_library(bayesmix OBJECT)
-target_sources(bayesmix PUBLIC ${PROTO_SRCS} ${PROTO_HDRS})
+target_sources(bayesmix PUBLIC ${PROTO_HDRS} ${PROTO_SRCS})
 add_subdirectory(src)
 target_include_directories(bayesmix PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(bayesmix PUBLIC ${LINK_LIBRARIES})
