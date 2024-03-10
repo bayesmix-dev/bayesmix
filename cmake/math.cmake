@@ -1,13 +1,9 @@
-# Define patch command to inject
-set(math-tbb_patch git apply ${BASEPATH}/resources/patches/math-tbb.patch)
-
 # Fetching bayesmix-dev/math
 message(STATUS "")
 message(STATUS "Fetching bayesmix-dev/math")
 FetchContent_Declare(math
   GIT_REPOSITORY "https://github.com/bayesmix-dev/math.git"
   GIT_TAG "develop"
-  PATCH_COMMAND ${math-tbb_patch}
 )
 FetchContent_MakeAvailable(math)
 

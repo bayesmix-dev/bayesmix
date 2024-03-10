@@ -95,7 +95,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(INCLUDE_PATHS
   ${BASEPATH}
   ${math_SOURCE_DIR}
-  ${math_SOURCE_DIR}/lib/boost_1.78.0
+  ${math_SOURCE_DIR}/lib/boost_1.84.0
   ${math_SOURCE_DIR}/lib/eigen_3.4.0
   ${math_SOURCE_DIR}/lib/sundials_6.1.1/include
   ${math_SOURCE_DIR}/lib/tbb_2020.3/include
