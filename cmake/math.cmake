@@ -2,7 +2,7 @@
 message(STATUS "")
 message(STATUS "Fetching bayesmix-dev/math")
 FetchContent_Declare(math
-  GIT_REPOSITORY "https://github.com/stan-dev/math.git"
+  GIT_REPOSITORY "https://github.com/bayesmix-dev/math.git"
   GIT_TAG "develop"
 )
 FetchContent_MakeAvailable(math)
