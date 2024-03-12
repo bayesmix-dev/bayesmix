@@ -6,6 +6,7 @@
 
 #include "algorithm_state.pb.h"
 #include "hierarchy_prior.pb.h"
+#include "src/hierarchies/priors/gamma_gamma_prior.h"
 #include "src/hierarchies/priors/mnig_prior_model.h"
 #include "src/hierarchies/priors/nig_prior_model.h"
 #include "src/hierarchies/priors/nw_prior_model.h"
@@ -477,6 +478,88 @@ TEST(mnig_prior_model, sample) {
       hypers_proto.mutable_lin_reg_uni_state()->mutable_var_scaling());
   hypers_proto.mutable_lin_reg_uni_state()->set_shape(4.0);
   hypers_proto.mutable_lin_reg_uni_state()->set_scale(3.0);
+
+  // Set hypers and get sampled state as proto
+  prior->set_hypers_from_proto(hypers_proto);
+  auto state1 = prior->sample();
+  auto state2 = prior->sample();
+
+  // Check if they coincides
+  ASSERT_TRUE(state1.get_as_proto().DebugString() !=
+              state2.get_as_proto().DebugString());
+}
+
+TEST(gg_prior_model, set_get_hypers) {
+  // Instance
+  auto prior = std::make_shared<GGPriorModel>();
+
+  // Prepare buffers
+  bayesmix::GamGamDistribution hypers_;
+  bayesmix::AlgorithmState::HierarchyHypers set_state_;
+  bayesmix::AlgorithmState::HierarchyHypers got_state_;
+
+  // Prepare hypers
+  hypers_.set_a_shape(5.0);
+  hypers_.set_a_rate(1.0);
+  hypers_.set_b_shape(4.0);
+  hypers_.set_b_rate(3.0);
+  set_state_.mutable_gg_state()->CopyFrom(hypers_);
+
+  // Set and get hypers
+  prior->set_hypers_from_proto(set_state_);
+  prior->write_hypers_to_proto(&got_state_);
+
+  // Check if they coincides
+  ASSERT_EQ(got_state_.DebugString(), set_state_.DebugString());
+}
+
+TEST(gg_prior_model, fixed_values_prior) {
+  // Prepare buffers
+  bayesmix::GGPrior prior;
+  bayesmix::AlgorithmState::HierarchyHypers prior_out;
+  std::vector<std::shared_ptr<AbstractPriorModel>> prior_models;
+  std::vector<bayesmix::AlgorithmState::ClusterState> states;
+
+  // Set fixed value prior
+  prior.mutable_fixed_values()->set_a_shape(5.0);
+  prior.mutable_fixed_values()->set_a_rate(1.0);
+  prior.mutable_fixed_values()->set_b_shape(4.0);
+  prior.mutable_fixed_values()->set_b_rate(3.0);
+
+  // Initialize prior model
+  auto prior_model = std::make_shared<GGPriorModel>();
+  prior_model->get_mutable_prior()->CopyFrom(prior);
+  prior_model->initialize();
+
+  // Check equality before update
+  prior_models.push_back(prior_model);
+  for (size_t i = 1; i < 4; i++) {
+    prior_models.push_back(prior_model->clone());
+    prior_models[i]->write_hypers_to_proto(&prior_out);
+    ASSERT_EQ(prior.fixed_values().DebugString(),
+              prior_out.gg_state().DebugString());
+  }
+
+  // Check equality after update
+  prior_models[0]->update_hypers(states);
+  prior_models[0]->write_hypers_to_proto(&prior_out);
+  for (size_t i = 1; i < 4; i++) {
+    prior_models[i]->write_hypers_to_proto(&prior_out);
+    ASSERT_EQ(prior.fixed_values().DebugString(),
+              prior_out.gg_state().DebugString());
+  }
+}
+
+TEST(gg_prior_model, sample) {
+  // Instance
+  auto prior = std::make_shared<GGPriorModel>();
+
+  // Define prior hypers
+  bayesmix::AlgorithmState::HierarchyHypers hypers_proto;
+  hypers_proto.mutable_gg_state()->set_a_shape(5.0);
+  hypers_proto.mutable_gg_state()->set_a_rate(1.0);
+  hypers_proto.mutable_gg_state()->set_b_shape(4.0);
+  hypers_proto.mutable_gg_state()->set_b_rate(3.0);
 
   // Set hypers and get sampled state as proto
   prior->set_hypers_from_proto(hypers_proto);

@@ -31,6 +31,11 @@ struct FA {
   unsigned int q;
 };
 
+struct GG {
+  double a_shape, a_rate;
+  double b_shape, b_rate;
+};
+
 }  // namespace Hyperparams
 
 #endif  // BAYESMIX_HIERARCHIES_PRIORS_HYPERPARAMS_H_
