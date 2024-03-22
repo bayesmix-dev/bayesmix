@@ -95,3 +95,10 @@ message MultiNormalIGDistribution {
   double shape = 3;
   double scale = 4;
 }
+
+message GamGamDistribution {
+  double a_shape = 1;
+  double a_rate = 2;
+  double b_shape = 3;
+  double b_rate = 4;
+}

@@ -123,3 +123,12 @@ message PythonHierPrior{
     Vector values = 1; // values are modified from python
   }
 }
+
+/*
+ * Prior for the parameters of the base measure in a Beta - GammaGamma hierarchy
+ */
+message GGPrior {
+  oneof prior {
+    GamGamDistribution fixed_values = 1;
+  }
+}
