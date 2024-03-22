@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "abstract_hierarchy.h"
+#include "betagg_hierarchy.h"
 #include "fa_hierarchy.h"
 #include "hierarchy_id.pb.h"
 #include "lapnig_hierarchy.h"
@@ -43,6 +44,9 @@ __attribute__((constructor)) static void load_hierarchies() {
   Builder<AbstractHierarchy> LapNIGbuilder = []() {
     return std::make_shared<LapNIGHierarchy>();
   };
+  Builder<AbstractHierarchy> BetaGGbuilder = []() {
+    return std::make_shared<BetaGGHierarchy>();
+  };
 
   factory.add_builder(NNIGHierarchy().get_id(), NNIGbuilder);
   factory.add_builder(NNxIGHierarchy().get_id(), NNxIGbuilder);
@@ -50,6 +54,7 @@ __attribute__((constructor)) static void load_hierarchies() {
   factory.add_builder(LinRegUniHierarchy().get_id(), LinRegUnibuilder);
   factory.add_builder(FAHierarchy().get_id(), FAbuilder);
   factory.add_builder(LapNIGHierarchy().get_id(), LapNIGbuilder);
+  factory.add_builder(BetaGGHierarchy().get_id(), BetaGGbuilder);
 }
 
 #endif  // BAYESMIX_HIERARCHIES_LOAD_HIERARCHIES_H_

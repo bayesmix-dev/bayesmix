@@ -37,3 +37,8 @@ message FAState {
   Matrix eta = 3;
   Matrix lambda = 4;
 }
+
+message SRState {
+  double shape = 1;
+  double rate = 2;
+}

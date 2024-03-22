@@ -3,6 +3,7 @@
 
 #include "fa_state.h"
 #include "multi_ls_state.h"
+#include "shape_rate_state.h"
 #include "uni_lin_reg_ls_state.h"
 #include "uni_ls_state.h"
 

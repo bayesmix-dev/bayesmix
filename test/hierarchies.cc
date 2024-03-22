@@ -5,6 +5,7 @@
 
 #include "algorithm_state.pb.h"
 #include "ls_state.pb.h"
+#include "src/hierarchies/betagg_hierarchy.h"
 #include "src/hierarchies/fa_hierarchy.h"
 #include "src/hierarchies/lin_reg_uni_hierarchy.h"
 #include "src/hierarchies/nnig_hierarchy.h"
@@ -372,4 +373,45 @@ TEST(fa_hierarchy, sample_given_data) {
   hier2->write_state_to_proto(clusval2);
 
   ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
+}
+
+TEST(betagg_hierarchy, sample_given_data) {
+  auto hier = std::make_shared<BetaGGHierarchy>();
+  bayesmix::GGPrior prior;
+
+  prior.mutable_fixed_values()->set_a_rate(2.0);
+  prior.mutable_fixed_values()->set_a_shape(2.0);
+  prior.mutable_fixed_values()->set_b_rate(2.0);
+  prior.mutable_fixed_values()->set_b_shape(2.0);
+  hier->get_mutable_prior()->CopyFrom(prior);
+
+  auto mala_updater = std::make_shared<MalaUpdater>(0.0005);
+  hier->set_updater(mala_updater);
+
+  Eigen::MatrixXd dataset = Eigen::MatrixXd::Ones(100, 1) * 0.1;
+  hier->set_dataset(&dataset);
+  hier->initialize();
+
+  for (int i = 0; i < dataset.rows(); i++) {
+    hier->add_datum(i, dataset.row(i));
+  }
+
+  for (int i = 0; i < 1000; i++) {
+    hier->sample_full_cond();
+  }
+
+  bayesmix::AlgorithmState::ClusterState out;
+  hier->write_state_to_proto(&out);
+
+  double a = out.sr_state().shape();
+  double b = out.sr_state().rate();
+
+  double mean = a / (a + b);
+  double var = a * b / ((a + b) * (a + b) * (a + b + 1));
+
+  ASSERT_LT(mean, 0.2);
+  ASSERT_GT(mean, 0.05);
+  ASSERT_LT(var, 0.1);
+
+  // ASSERT_TRUE(clusval->DebugString() != clusval2->DebugString());
 }

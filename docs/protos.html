@@ -458,10 +458,6 @@
                 </li>
               
                 <li>
-                  <a href="#bayesmix.TruncSBPrior.MFMPrior"><span class="badge">M</span>TruncSBPrior.MFMPrior</a>
-                </li>
-              
-                <li>
                   <a href="#bayesmix.TruncSBPrior.PYPrior"><span class="badge">M</span>TruncSBPrior.PYPrior</a>
                 </li>
               
@@ -2369,24 +2365,18 @@
                 </tr>
               
                 <tr>
-                  <td>mfm_prior</td>
-                  <td><a href="#bayesmix.TruncSBPrior.MFMPrior">TruncSBPrior.MFMPrior</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>pm_prior</td>
-                  <td><a href="#bayesmix.PythonMixPrior">PythonMixPrior</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
                   <td>num_components</td>
                   <td><a href="#uint32">uint32</a></td>
                   <td></td>
                   <td><p>Number of components in the process </p></td>
+                </tr>
+              
+                <tr>
+                  <td>infinite_mixture</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>If true we must use the Slice Sampler, and num_components is used only for
+the initialization </p></td>
                 </tr>
               
             </tbody>
@@ -2421,30 +2411,6 @@
         
       
         <h3 id="bayesmix.TruncSBPrior.DPPrior">TruncSBPrior.DPPrior</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>totalmass</td>
-                  <td><a href="#double">double</a></td>
-                  <td></td>
-                  <td><p>Truncated Dirichlet process </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="bayesmix.TruncSBPrior.MFMPrior">TruncSBPrior.MFMPrior</h3>
         <p></p>
 
         
