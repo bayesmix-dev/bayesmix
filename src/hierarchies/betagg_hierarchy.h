@@ -8,7 +8,22 @@
 #include "updaters/random_walk_updater.h"
 
 /**
+ * Beta Gamma-Gamma hierarchy for univaraite data in [0, 1]
  *
+ * This class represents a hierarchical model where data are distributed
+ * according to a Beta likelihood (see the `BetaLikelihood` class for
+ * details). The shape and rate parameters of the likelihood have
+ * independent gamma priors. That is
+ *
+ * \f[
+ *    f(x_i \mid \alpha, \beta) &= Beta(\alpha, \beta) \\
+ *    \alpha &\sim Gamma(\alpha_a, \alpha_b) \\
+ *    \beta &\sim Gamma(\beta_a, \beta_b)
+ * \f]
+ *
+ * The state is composed of shape and rate. Note that this hierarchy
+ * is NOT conjugate, meaning that the marginal distribution is not available
+ * in closed form.
  */
 
 class BetaGGHierarchy

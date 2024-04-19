@@ -10,6 +10,11 @@
 #include "hyperparams.h"
 #include "src/utils/rng.h"
 
+/*
+ * Prior model for `ShapeRate` states.
+ * This class assumes that the shape and rate are independent and given
+ * Gamma-distributed priors
+ */
 class GGPriorModel
     : public BasePriorModel<GGPriorModel, State::ShapeRate, Hyperparams::GG,
                             bayesmix::GGPrior> {

@@ -30,8 +30,6 @@ class BetaLikelihood
   bool is_dependent() const override { return false; };
   void clear_summary_statistics() override;
 
-  // Eigen::VectorXd sample() const override;
-
   template <typename T>
   T cluster_lpdf_from_unconstrained(
       const Eigen::Matrix<T, Eigen::Dynamic, 1> &unconstrained_params) const {

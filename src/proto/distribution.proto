@@ -96,6 +96,10 @@ message MultiNormalIGDistribution {
   double scale = 4;
 }
 
+/*
+ * Parameters for the product of two independent Gamma distributions with different
+ * rates and shapes
+ */
 message GamGamDistribution {
   double a_shape = 1;
   double a_rate = 2;
