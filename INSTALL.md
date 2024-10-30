@@ -113,7 +113,7 @@ Finally, to compile unit tests, please use the following commands:
 
 ```shell
 cd build
-cmake ..-DDISABLE_TESTS=OFF
+cmake .. -DDISABLE_TESTS=OFF
 make test_bayesmix
 cd ..
 ```
