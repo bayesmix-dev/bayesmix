@@ -37,3 +37,11 @@ message FAState {
   Matrix eta = 3;
   Matrix lambda = 4;
 }
+
+/*
+ * Parameters of a shape-rate state, used, e.g., by the BetaLikelihood
+ */
+message SRState {
+  double shape = 1;
+  double rate = 2;
+}
